@@ -1,0 +1,214 @@
+/**
+ * Beauty Salon Dashboard - Premium Glass Design System
+ * Elegant rose accents with glassmorphism effects
+ */
+
+/* ============================================================================
+   Color Palette - Elegant Rose (Default Theme)
+   ============================================================================ */
+
+:root {
+  /* Background Colors */
+  --beauty-bg-primary: #1A0F1A;      /* Deep plum-black */
+  --beauty-bg-secondary: #2A1A2A;     /* Elevated surfaces */
+  --beauty-bg-tertiary: rgba(255, 255, 255, 0.03); /* Glass panels */
+  
+  /* Accent Colors */
+  --beauty-accent-primary: #E879A8;   /* Elegant rose pink */
+  --beauty-accent-secondary: #F09BC0; /* Soft rose */
+  --beauty-accent-tertiary: #F8D5E8;  /* Blush highlight */
+  
+  /* Text Colors */
+  --beauty-text-primary: #FFFFFF;
+  --beauty-text-secondary: rgba(255, 255, 255, 0.75);
+  --beauty-text-tertiary: rgba(255, 255, 255, 0.5);
+  
+  /* Status Colors */
+  --beauty-status-available: #10B981;
+  --beauty-status-busy: #F59E0B;
+  --beauty-status-off-duty: #6B7280;
+  --beauty-status-vip: #E879A8;
+}
+
+/* ============================================================================
+   Glassmorphism Effects
+   ============================================================================ */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(232, 121, 168, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(232, 121, 168, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(232, 121, 168, 0.4);
+  box-shadow: 0 8px 32px rgba(232, 121, 168, 0.15);
+  transform: translateY(-2px);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(232, 121, 168, 0.3);
+  color: var(--beauty-text-primary);
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: rgba(232, 121, 168, 0.15);
+  border-color: rgba(232, 121, 168, 0.5);
+  box-shadow: 0 4px 16px rgba(232, 121, 168, 0.2);
+}
+
+/* ============================================================================
+   Gradient Accents
+   ============================================================================ */
+
+.accent-gradient {
+  background: linear-gradient(135deg, #E879A8 0%, #F09BC0 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #E879A8 0%, #F09BC0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.metric-glow {
+  box-shadow: 0 0 40px rgba(232, 121, 168, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.metric-glow:hover {
+  box-shadow: 0 0 60px rgba(232, 121, 168, 0.25);
+}
+
+/* ============================================================================
+   Before/After Slider
+   ============================================================================ */
+
+.ba-slider {
+  position: relative;
+  border: 2px solid rgba(232, 121, 168, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ba-slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 100%;
+  background: rgba(232, 121, 168, 0.5);
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    rgba(232, 121, 168, 0.1) 0%,
+    rgba(232, 121, 168, 0.2) 50%,
+    rgba(232, 121, 168, 0.1) 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* ============================================================================
+   Theme Presets
+   ============================================================================ */
+
+/* Theme 1: Elegant Rose (Default) */
+.theme-elegant-rose {
+  --beauty-accent-primary: #E879A8;
+  --beauty-accent-secondary: #F09BC0;
+  --beauty-bg-primary: #1A0F1A;
+}
+
+/* Theme 2: Lavender Luxe */
+.theme-lavender-luxe {
+  --beauty-accent-primary: #A78BFA;
+  --beauty-accent-secondary: #C4B5FD;
+  --beauty-bg-primary: #1A142A;
+}
+
+/* Theme 3: Gold Glamour */
+.theme-gold-glamour {
+  --beauty-accent-primary: #D4AF37;
+  --beauty-accent-secondary: #E5C158;
+  --beauty-bg-primary: #1A1408;
+}
+
+/* Theme 4: Sapphire Spa */
+.theme-sapphire-spa {
+  --beauty-accent-primary: #4A90E2;
+  --beauty-accent-secondary: #5BA0F2;
+  --beauty-bg-primary: #0A0F1A;
+}
+
+/* Theme 5: Emerald Elegance */
+.theme-emerald-elegance {
+  --beauty-accent-primary: #10B981;
+  --beauty-accent-secondary: #34D399;
+  --beauty-bg-primary: #0A1F15;
+}
+
+/* ============================================================================
+   Responsive Design
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .glass-panel {
+    border-radius: 12px;
+    padding: 12px;
+  }
+  
+  .metric-glow {
+    box-shadow: 0 0 20px rgba(232, 121, 168, 0.1);
+  }
+}
+
+/* ============================================================================
+   Accessibility
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card,
+  .glass-button,
+  .metric-glow,
+  .shimmer {
+    transition: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export const FoodHero = () => {
+    return (_jsxs("section", { className: "relative h-64 bg-yellow-500 overflow-hidden", children: [_jsx("img", { src: "https://placehold.co/800x400/F59E0B/fff?text=Hot+Meals", alt: "Food Hero", className: "w-full h-full object-cover opacity-90" }), _jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6", children: _jsxs("div", { children: [_jsx("span", { className: "bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide", children: "30-45 Mins" }), _jsx("h1", { className: "text-white text-3xl font-extrabold mt-2 leading-none drop-shadow-md", children: "Crave it? Get it." }), _jsx("p", { className: "text-gray-200 text-sm mt-1 font-medium", children: "Free delivery on orders over \u20A610,000" })] }) })] }));
+};

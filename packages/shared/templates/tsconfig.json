@@ -1,0 +1,47 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "module": "esnext",
+    "target": "es2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "downlevelIteration": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@vayva/templates/*": [
+        "./src/*"
+      ],
+      "@vayva/templates": [
+        "./src/index.ts"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "@vayva/shared": [
+        "../shared/src/index.ts"
+      ],
+      "@vayva/shared/*": [
+        "../shared/src/*"
+      ],
+      "@vayva/ui": [
+        "../../ui/src/index.ts"
+      ],
+      "@vayva/ui/*": [
+        "../../ui/src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

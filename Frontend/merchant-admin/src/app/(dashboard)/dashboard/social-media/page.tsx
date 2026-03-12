@@ -1,0 +1,383 @@
+'use client';
+
+/**
+ * Social Media Management Dashboard
+ * Central hub for managing all social platform integrations
+ */
+
+import { useState, useEffect } from "react";
+import { 
+  TelegramLogo, 
+  DiscordLogo,
+  CheckCircle,
+  Warning,
+  Plug,
+  Gear,
+  ChartLine,
+  Users,
+  MessageCircle,
+  TrendUp,
+  Bell,
+  Eye
+} from "@phosphor-icons/react/ssr";
+import { Button } from "@vayva/ui";
+import { toast } from "sonner";
+import { apiJson } from "@/lib/api-client-shared";
+import { CompleteSocialIntegrationManager } from "@/components/onboarding/CompleteSocialIntegrationManager";
+
+interface SocialConnection {
+  id: string;
+  platform: string;
+  accountName: string;
+  status: 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
+  createdAt: string;
+  lastActive: string;
+}
+
+interface SocialStats {
+  platform: string;
+  messages: number;
+  conversions: number;
+  engagement: number;
+  growth: number;
+}
+
+interface SocialDashboardData {
+  connections: SocialConnection[];
+  stats: SocialStats[];
+  summary: {
+    totalConnected: number;
+    totalPlatforms: number;
+    totalMessages: number;
+    totalConversions: number;
+  };
+}
+
+export default function SocialMediaDashboard() {
+  const [dashboardData, setDashboardData] = useState<SocialDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'integrations' | 'analytics'>('overview');
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // In real implementation:
+      // const response = await apiJson<SocialDashboardData>('/api/social-connections');
+      // setDashboardData(response.data);
+      
+      // Simulate API response
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setDashboardData({
+        connections: [
+          {
+            id: '1',
+            platform: 'telegram',
+            accountName: 'MyStoreBot',
+            status: 'CONNECTED',
+            createdAt: new Date().toISOString(),
+            lastActive: new Date().toISOString()
+          },
+          {
+            id: '2',
+            platform: 'discord',
+            accountName: 'StoreCommunity',
+            status: 'DISCONNECTED',
+            createdAt: new Date().toISOString(),
+            lastActive: new Date(Date.now() - 86400000).toISOString()
+          }
+        ],
+        stats: [
+          {
+            platform: 'telegram',
+            messages: 1247,
+            conversions: 89,
+            engagement: 76,
+            growth: 12
+          },
+          {
+            platform: 'discord',
+            messages: 0,
+            conversions: 0,
+            engagement: 0,
+            growth: 0
+          }
+        ],
+        summary: {
+          totalConnected: 1,
+          totalPlatforms: 2,
+          totalMessages: 1247,
+          totalConversions: 89
+        }
+      });
+      
+    } catch (error) {
+      toast.error('Failed to load dashboard data');
+      console.error('Dashboard load error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getConnectionIcon = (platform: string) => {
+    switch (platform) {
+      case 'telegram': return <TelegramLogo className="w-6 h-6" />;
+      case 'discord': return <DiscordLogo className="w-6 h-6" />;
+      default: return <Plug className="w-6 h-6" />;
+    }
+  };
+
+  const getConnectionColor = (platform: string) => {
+    switch (platform) {
+      case 'telegram': return 'bg-blue-500';
+      case 'discord': return 'bg-indigo-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'CONNECTED': return 'text-green-600 bg-green-50';
+      case 'ERROR': return 'text-red-600 bg-red-50';
+      default: return 'text-amber-600 bg-amber-50';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'CONNECTED': return <CheckCircle className="w-5 h-5" />;
+      case 'ERROR': return <Warning className="w-5 h-5" />;
+      default: return <Warning className="w-5 h-5" />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-vayva-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading social dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Warning className="w-8 h-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-text-primary mb-2">Unable to load dashboard</h3>
+        <p className="text-text-secondary mb-4">There was an error loading your social media data</p>
+        <Button onClick={loadDashboardData}>Try Again</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-text-primary">Social Media Hub</h1>
+          <p className="text-text-secondary mt-1">
+            Manage all your social platform integrations and monitor performance
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-200">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-bold text-blue-700">
+              {dashboardData.summary.totalConnected}/{dashboardData.summary.totalPlatforms} Active
+            </span>
+          </div>
+          <Button variant="outline" size="sm">
+            <Gear className="w-4 h-4 mr-2" />
+            Settings
+          </Button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-border">
+        <nav className="flex space-x-8">
+          {(['overview', 'integrations', 'analytics'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
+                activeTab === tab
+                  ? 'border-vayva-green text-vayva-green'
+                  : 'border-transparent text-text-secondary hover:text-text-primary hover:border-gray-300'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white border border-border rounded-2xl p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-text-primary">
+                    {dashboardData.summary.totalMessages.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-text-secondary">Total Messages</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white border border-border rounded-2xl p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendUp className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-text-primary">
+                    {dashboardData.summary.totalConversions.toLocaleString()}
+                  </p>
+                  <p className="text-sm text-text-secondary">Sales Generated</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white border border-border rounded-2xl p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-text-primary">
+                    {Math.round(dashboardData.summary.totalMessages / 30)}
+                  </p>
+                  <p className="text-sm text-text-secondary">Daily Avg</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white border border-border rounded-2xl p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <Bell className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-text-primary">
+                    {Math.round((dashboardData.summary.totalConversions / dashboardData.summary.totalMessages) * 100) || 0}%
+                  </p>
+                  <p className="text-sm text-text-secondary">Conversion Rate</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Platform Performance */}
+          <div className="bg-white border border-border rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-text-primary mb-6">Platform Performance</h2>
+            <div className="space-y-4">
+              {dashboardData.connections.map((connection) => {
+                const stats = dashboardData.stats.find(s => s.platform === connection.platform);
+                return (
+                  <div key={connection.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div className="flex items-center gap-4">
+                      <div className={`${getConnectionColor(connection.platform)} p-3 rounded-xl text-white`}>
+                        {getConnectionIcon(connection.platform)}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-text-primary">{connection.accountName}</h3>
+                        <p className="text-sm text-text-secondary capitalize">{connection.platform}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-6">
+                      {stats && (
+                        <>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-text-primary">{stats.messages}</p>
+                            <p className="text-xs text-text-secondary">Messages</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-green-600">{stats.conversions}</p>
+                            <p className="text-xs text-text-secondary">Sales</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-blue-600">{stats.engagement}%</p>
+                            <p className="text-xs text-text-secondary">Engagement</p>
+                          </div>
+                        </>
+                      )}
+                      
+                      <div className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(connection.status)}`}>
+                        {getStatusIcon(connection.status)}
+                        <span className="ml-1">{connection.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'integrations' && (
+        <CompleteSocialIntegrationManager />
+      )}
+
+      {activeTab === 'analytics' && (
+        <div className="bg-white border border-border rounded-2xl p-6">
+          <h2 className="text-xl font-bold text-text-primary mb-6">Analytics Dashboard</h2>
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ChartLine className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-text-primary mb-2">Advanced Analytics Coming Soon</h3>
+            <p className="text-text-secondary max-w-md mx-auto">
+              Detailed performance metrics, conversion tracking, and engagement analytics will be available here.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="bg-gradient-to-r from-vayva-green/10 to-emerald-500/10 border border-vayva-green/20 rounded-2xl p-6">
+        <h3 className="font-bold text-lg text-text-primary mb-4 flex items-center gap-2">
+          <Eye className="w-5 h-5 text-vayva-green" />
+          Quick Actions
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <Button variant="outline" className="justify-start">
+            <ChartLine className="w-5 h-5 mr-2 text-vayva-green" />
+            View Detailed Analytics
+          </Button>
+          <Button variant="outline" className="justify-start">
+            <Gear className="w-5 h-5 mr-2 text-vayva-green" />
+            Automation Settings
+          </Button>
+          <Button variant="outline" className="justify-start">
+            <Users className="w-5 h-5 mr-2 text-vayva-green" />
+            Team Access
+          </Button>
+          <Button variant="outline" className="justify-start">
+            <Bell className="w-5 h-5 mr-2 text-vayva-green" />
+            Notification Settings
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

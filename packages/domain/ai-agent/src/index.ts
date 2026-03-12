@@ -1,0 +1,9 @@
+export { SalesAgent } from "./lib/ai/sales-agent";
+export { VoiceProcessor } from "./lib/ai/voice-processor";
+export { VisualSearchService } from "./lib/ai/visual-search.service";
+export { MerchantBrainService } from "./lib/ai/merchant-brain.service";
+export { AiUsageService } from "./lib/ai/ai-usage.service";
+export { ConversionService } from "./lib/ai/conversion.service";
+export { ProductImageIndexer } from "./lib/ai/product-image-indexer";
+export { GroqClient } from "./lib/ai/groq-client";
+export { DataGovernanceService } from "./lib/governance/data-governance.service";

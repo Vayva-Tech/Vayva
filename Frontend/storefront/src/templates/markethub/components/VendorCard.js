@@ -1,0 +1,6 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Button } from "@vayva/ui";
+import { BadgeCheck, Star } from "lucide-react";
+export const VendorCard = ({ vendor }) => {
+    return (_jsxs("div", { className: "bg-background/70 backdrop-blur-xl border border-gray-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer group", children: [_jsx("img", { src: vendor.logo, alt: vendor.name, className: "w-12 h-12 rounded-full bg-background/50 backdrop-blur-sm object-cover" }), _jsxs("div", { className: "flex-1 min-w-0", children: [_jsxs("div", { className: "flex items-center gap-1", children: [_jsx("h3", { className: "font-bold text-gray-900 truncate group-hover:text-[#10B981] transition-colors", children: vendor.name }), vendor.isVerified && (_jsx(BadgeCheck, { size: 14, className: "text-blue-500" }))] }), _jsxs("div", { className: "flex items-center gap-1 text-xs font-medium text-gray-500", children: [_jsx(Star, { size: 12, className: "text-yellow-400 fill-current" }), _jsx("span", { children: vendor.rating }), _jsx("span", { className: "text-gray-300", children: "\u2022" }), _jsx("span", { children: "Following" })] })] }), _jsx(Button, { className: "text-xs font-bold text-[#10B981] bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors", children: "Visit" })] }));
+};

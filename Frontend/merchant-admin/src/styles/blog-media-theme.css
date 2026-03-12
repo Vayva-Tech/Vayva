@@ -1,0 +1,391 @@
+/* 
+ * Blog/Media Industry - Premium Glass Design System
+ * Based on BATCH_4_DESIGN_BLOG.md specification
+ */
+
+/* ============================================================================
+   COLOR PALETTE - PROFESSIONAL BLUE (DEFAULT)
+   ============================================================================ */
+
+:root {
+  /* Background Colors */
+  --blog-bg-primary: #0F0F1A;      /* Deep blue-black */
+  --blog-bg-secondary: #1A1A2E;    /* Elevated surfaces */
+  --blog-bg-tertiary: rgba(255, 255, 255, 0.03); /* Glass panels */
+  
+  /* Accent Colors */
+  --blog-accent-primary: #4A90E2;   /* Professional blue */
+  --blog-accent-secondary: #5BA0F2; /* Soft blue */
+  --blog-accent-tertiary: #7BB3F0;  /* Light blue highlight */
+  
+  /* Text Colors */
+  --blog-text-primary: #FFFFFF;
+  --blog-text-secondary: rgba(255, 255, 255, 0.75);
+  --blog-text-tertiary: rgba(255, 255, 255, 0.5);
+  
+  /* Status Colors */
+  --blog-status-published: #10B981;  /* Green */
+  --blog-status-draft: #F59E0B;      /* Amber */
+  --blog-status-scheduled: #3B82F6;  /* Blue */
+  --blog-status-idea: #6B7280;       /* Gray */
+}
+
+/* ============================================================================
+   THEME VARIANTS
+   ============================================================================ */
+
+/* Content Creator Purple Theme */
+[data-blog-theme="purple"] {
+  --blog-bg-primary: #1A142A;
+  --blog-bg-secondary: #2D2440;
+  --blog-bg-tertiary: rgba(167, 139, 250, 0.05);
+  --blog-accent-primary: #A78BFA;
+  --blog-accent-secondary: #C4B5FD;
+  --blog-accent-tertiary: #DDD6FE;
+}
+
+/* Writer's Green Theme */
+[data-blog-theme="green"] {
+  --blog-bg-primary: #0A1F0F;
+  --blog-bg-secondary: #14331F;
+  --blog-bg-tertiary: rgba(16, 185, 129, 0.05);
+  --blog-accent-primary: #10B981;
+  --blog-accent-secondary: #34D399;
+  --blog-accent-tertiary: #6EE7B7;
+}
+
+/* Media Orange Theme */
+[data-blog-theme="orange"] {
+  --blog-bg-primary: #1A0F0A;
+  --blog-bg-secondary: #331A14;
+  --blog-bg-tertiary: rgba(249, 115, 22, 0.05);
+  --blog-accent-primary: #F97316;
+  --blog-accent-secondary: #FB923C;
+  --blog-accent-tertiary: #FDBA74;
+}
+
+/* Publisher's Teal Theme */
+[data-blog-theme="teal"] {
+  --blog-bg-primary: #0A1F1A;
+  --blog-bg-secondary: #14332E;
+  --blog-bg-tertiary: rgba(20, 184, 166, 0.05);
+  --blog-accent-primary: #14B8A6;
+  --blog-accent-secondary: #2DD4BF;
+  --blog-accent-tertiary: #5EEAD4;
+}
+
+/* ============================================================================
+   GLASSMORPHISM EFFECTS
+   ============================================================================ */
+
+.blog-glass-panel {
+  background: linear-gradient(
+    135deg,
+    var(--blog-bg-tertiary) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.blog-glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.blog-glass-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ============================================================================
+   GRADIENT ACCENTS
+   ============================================================================ */
+
+.blog-gradient-primary {
+  background: linear-gradient(135deg, var(--blog-accent-primary), var(--blog-accent-secondary));
+}
+
+.blog-gradient-subtle {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 226, 0.1) 0%,
+    rgba(91, 160, 242, 0.05) 100%
+  );
+}
+
+.blog-gradient-text {
+  background: linear-gradient(135deg, var(--blog-accent-primary), var(--blog-accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================================
+   STATUS INDICATORS
+   ============================================================================ */
+
+.blog-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.blog-status-published {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--blog-status-published);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.blog-status-draft {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--blog-status-draft);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.blog-status-scheduled {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--blog-status-scheduled);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.blog-status-idea {
+  background: rgba(107, 114, 128, 0.15);
+  color: var(--blog-status-idea);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+/* ============================================================================
+   DASHBOARD SPECIFIC STYLES
+   ============================================================================ */
+
+.blog-dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--blog-bg-primary) 0%, var(--blog-bg-secondary) 100%);
+}
+
+.blog-kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent,
+    var(--blog-accent-primary),
+    var(--blog-accent-secondary),
+    transparent
+  );
+  opacity: 0.6;
+}
+
+.blog-sparkline-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  opacity: 0.3;
+}
+
+/* ============================================================================
+   CONTENT CALENDAR STYLES
+   ============================================================================ */
+
+.blog-calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.blog-calendar-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--blog-bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.blog-calendar-day:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--blog-accent-primary);
+  transform: scale(1.05);
+}
+
+.blog-calendar-day.has-content {
+  border-color: var(--blog-accent-primary);
+  box-shadow: 0 0 12px rgba(74, 144, 226, 0.3);
+}
+
+/* ============================================================================
+   PROGRESS BARS & METERS
+   ============================================================================ */
+
+.blog-progress-bar {
+  position: relative;
+  height: 8px;
+  background: var(--blog-bg-tertiary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.blog-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    var(--blog-accent-primary),
+    var(--blog-accent-secondary)
+  );
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 12px rgba(74, 144, 226, 0.4);
+}
+
+/* ============================================================================
+   ENGAGEMENT METER
+   ============================================================================ */
+
+.blog-engagement-meter {
+  position: relative;
+  height: 6px;
+  background: var(--blog-bg-tertiary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.blog-engagement-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.blog-engagement-low {
+  background: linear-gradient(90deg, #EF4444, #F59E0B);
+}
+
+.blog-engagement-medium {
+  background: linear-gradient(90deg, #F59E0B, #10B981);
+}
+
+.blog-engagement-high {
+  background: linear-gradient(90deg, #10B981, #34D399);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes blog-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.blog-live-indicator {
+  animation: blog-pulse 2s ease-in-out infinite;
+}
+
+@keyframes blog-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.blog-shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+  animation: blog-shimmer 3s infinite;
+}
+
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================================ */
+
+@media (max-width: 1400px) {
+  .blog-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .blog-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .blog-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .blog-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .blog-header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.blog-text-gradient {
+  background: linear-gradient(135deg, var(--blog-accent-primary), var(--blog-accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.blog-border-glow {
+  border-color: var(--blog-accent-primary);
+  box-shadow: 0 0 24px rgba(74, 144, 226, 0.2);
+}
+
+.blog-shadow-colored {
+  box-shadow: 0 8px 32px rgba(74, 144, 226, 0.15);
+}
+
+.blog-backdrop-blur {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}

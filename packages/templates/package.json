@@ -1,0 +1,42 @@
+{
+  "name": "@vayva/templates",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./templates/*": "./src/templates/*",
+    "./types/*": "./src/types/*",
+    "./context/*": "./src/context/*",
+    "./components/*": "./src/components/*",
+    "./lib/*": "./src/lib/*",
+    "./services/*": "./src/services/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.4.0",
+    "framer-motion": "^12.26.2",
+    "lucide-react": "^0.562.0",
+    "next": "16.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.0.2",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

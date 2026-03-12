@@ -1,0 +1,1873 @@
+## Page/Layout Routes
+- **Route**: /
+  **File**: app/layout.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /
+  **File**: app/error.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /
+  **File**: app/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /
+  **File**: app/not-found.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /privacy
+  **File**: app/privacy/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /app
+  **File**: app/app/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /auth/forgot-password
+  **File**: app/auth/forgot-password/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /terms
+  **File**: app/terms/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /status
+  **File**: app/status/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /invite/[token]
+  **File**: app/invite/[token]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /control-center/policies
+  **File**: app/control-center/policies/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /designer
+  **File**: app/designer/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /designer/submit
+  **File**: app/designer/submit/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /preview
+  **File**: app/preview/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Server Session Check
+- **Route**: /preview/[slug]
+  **File**: app/preview/[slug]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market
+  **File**: app/market/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/products/[id]
+  **File**: app/market/products/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/checkout
+  **File**: app/market/checkout/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/search
+  **File**: app/market/search/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/order-confirmation
+  **File**: app/market/order-confirmation/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/cart
+  **File**: app/market/cart/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/orders
+  **File**: app/market/orders/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/account/profile
+  **File**: app/market/account/profile/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/account/orders
+  **File**: app/market/account/orders/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/categories/[category]
+  **File**: app/market/categories/[category]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /market/sellers/[id]
+  **File**: app/market/sellers/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /(auth)
+  **File**: app/(auth)/layout.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /(auth)
+  **File**: app/(auth)/error.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /verify
+  **File**: app/(auth)/verify/page.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /signup
+  **File**: app/(auth)/signup/page.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /signin
+  **File**: app/(auth)/signin/page.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /forgot-password
+  **File**: app/(auth)/forgot-password/page.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /reset-password
+  **File**: app/(auth)/reset-password/page.tsx
+  **Parents**: app/(auth)/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /(dashboard)
+  **File**: app/(dashboard)/error.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/payments
+  **File**: app/(dashboard)/settings/payments/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/branding
+  **File**: app/(dashboard)/settings/branding/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/domains
+  **File**: app/(dashboard)/settings/domains/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/api-keys
+  **File**: app/(dashboard)/settings/api-keys/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/profile
+  **File**: app/(dashboard)/settings/profile/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/team
+  **File**: app/(dashboard)/settings/team/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/theme/builder
+  **File**: app/(dashboard)/settings/theme/builder/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/notifications
+  **File**: app/(dashboard)/settings/notifications/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/whatsapp
+  **File**: app/(dashboard)/settings/whatsapp/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/store
+  **File**: app/(dashboard)/settings/store/layout.tsx
+  **Parents**: app/(dashboard)/settings/store/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/store/pickup
+  **File**: app/(dashboard)/settings/store/pickup/page.tsx
+  **Parents**: app/(dashboard)/settings/store/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /settings/store/delivery
+  **File**: app/(dashboard)/settings/store/delivery/page.tsx
+  **Parents**: app/(dashboard)/settings/store/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard
+  **File**: app/(dashboard)/dashboard/loading.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard
+  **File**: app/(dashboard)/dashboard/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /dashboard/wa-agent
+  **File**: app/(dashboard)/dashboard/wa-agent/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/customers
+  **File**: app/(dashboard)/dashboard/customers/loading.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/customers
+  **File**: app/(dashboard)/dashboard/customers/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/customers/insights
+  **File**: app/(dashboard)/dashboard/customers/insights/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings
+  **File**: app/(dashboard)/dashboard/settings/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Auth Redirect
+- **Route**: /dashboard/settings/payments
+  **File**: app/(dashboard)/dashboard/settings/payments/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/store-policies
+  **File**: app/(dashboard)/dashboard/settings/store-policies/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/security
+  **File**: app/(dashboard)/dashboard/settings/security/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/activity
+  **File**: app/(dashboard)/dashboard/settings/activity/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/roles
+  **File**: app/(dashboard)/dashboard/settings/roles/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/audit-log
+  **File**: app/(dashboard)/dashboard/settings/audit-log/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/shipping
+  **File**: app/(dashboard)/dashboard/settings/shipping/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/integrations
+  **File**: app/(dashboard)/dashboard/settings/integrations/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/team
+  **File**: app/(dashboard)/dashboard/settings/team/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /dashboard/settings/industry
+  **File**: app/(dashboard)/dashboard/settings/industry/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /dashboard/settings/overview
+  **File**: app/(dashboard)/dashboard/settings/overview/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/seo
+  **File**: app/(dashboard)/dashboard/settings/seo/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Auth Redirect, Server Session Check
+- **Route**: /dashboard/settings/notifications
+  **File**: app/(dashboard)/dashboard/settings/notifications/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/billing
+  **File**: app/(dashboard)/dashboard/settings/billing/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/store
+  **File**: app/(dashboard)/dashboard/settings/store/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/settings/ai-agent
+  **File**: app/(dashboard)/dashboard/settings/ai-agent/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/developer/apps
+  **File**: app/(dashboard)/dashboard/developer/apps/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/posts
+  **File**: app/(dashboard)/dashboard/posts/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/posts/new
+  **File**: app/(dashboard)/dashboard/posts/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/posts/[id]
+  **File**: app/(dashboard)/dashboard/posts/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/products
+  **File**: app/(dashboard)/dashboard/products/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/products/new
+  **File**: app/(dashboard)/dashboard/products/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/products/[id]
+  **File**: app/(dashboard)/dashboard/products/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/inbox
+  **File**: app/(dashboard)/dashboard/inbox/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/setup-checklist
+  **File**: app/(dashboard)/dashboard/setup-checklist/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/check-in
+  **File**: app/(dashboard)/dashboard/check-in/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/bookings
+  **File**: app/(dashboard)/dashboard/bookings/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/quotes
+  **File**: app/(dashboard)/dashboard/quotes/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/referrals
+  **File**: app/(dashboard)/dashboard/referrals/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/leads
+  **File**: app/(dashboard)/dashboard/leads/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/leads/[id]
+  **File**: app/(dashboard)/dashboard/leads/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/projects
+  **File**: app/(dashboard)/dashboard/projects/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/projects/[id]
+  **File**: app/(dashboard)/dashboard/projects/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/listings
+  **File**: app/(dashboard)/dashboard/listings/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/listings/new
+  **File**: app/(dashboard)/dashboard/listings/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/listings/[id]
+  **File**: app/(dashboard)/dashboard/listings/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/catalog/collections
+  **File**: app/(dashboard)/dashboard/catalog/collections/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/menu-items
+  **File**: app/(dashboard)/dashboard/menu-items/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/menu-items/new
+  **File**: app/(dashboard)/dashboard/menu-items/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/menu-items/[id]
+  **File**: app/(dashboard)/dashboard/menu-items/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/fulfillment/shipments
+  **File**: app/(dashboard)/dashboard/fulfillment/shipments/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/fulfillment/issues
+  **File**: app/(dashboard)/dashboard/fulfillment/issues/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/fulfillment/pickups
+  **File**: app/(dashboard)/dashboard/fulfillment/pickups/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/wholesale-catalog
+  **File**: app/(dashboard)/dashboard/wholesale-catalog/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/viewings
+  **File**: app/(dashboard)/dashboard/viewings/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/courses
+  **File**: app/(dashboard)/dashboard/courses/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/courses/new
+  **File**: app/(dashboard)/dashboard/courses/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/courses/[id]
+  **File**: app/(dashboard)/dashboard/courses/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/stays
+  **File**: app/(dashboard)/dashboard/stays/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/stays/new
+  **File**: app/(dashboard)/dashboard/stays/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/stays/[id]
+  **File**: app/(dashboard)/dashboard/stays/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/properties
+  **File**: app/(dashboard)/dashboard/properties/loading.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/properties
+  **File**: app/(dashboard)/dashboard/properties/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/support
+  **File**: app/(dashboard)/dashboard/support/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/support/messages
+  **File**: app/(dashboard)/dashboard/support/messages/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/support/messages/[id]
+  **File**: app/(dashboard)/dashboard/support/messages/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/support/disputes
+  **File**: app/(dashboard)/dashboard/support/disputes/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/support/new
+  **File**: app/(dashboard)/dashboard/support/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/inventory
+  **File**: app/(dashboard)/dashboard/inventory/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: PermissionGate Component
+- **Route**: /dashboard/control-center
+  **File**: app/(dashboard)/dashboard/control-center/layout.tsx
+  **Parents**: app/(dashboard)/dashboard/control-center/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/control-center
+  **File**: app/(dashboard)/dashboard/control-center/page.tsx
+  **Parents**: app/(dashboard)/dashboard/control-center/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/control-center/customize
+  **File**: app/(dashboard)/dashboard/control-center/customize/page.tsx
+  **Parents**: app/(dashboard)/dashboard/control-center/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /dashboard/marketing/flash-sales
+  **File**: app/(dashboard)/dashboard/marketing/flash-sales/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/marketing/discounts
+  **File**: app/(dashboard)/dashboard/marketing/discounts/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/marketing/discounts/new
+  **File**: app/(dashboard)/dashboard/marketing/discounts/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/marketing/discounts/[id]
+  **File**: app/(dashboard)/dashboard/marketing/discounts/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/marketing/affiliates
+  **File**: app/(dashboard)/dashboard/marketing/affiliates/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/marketing/bundles
+  **File**: app/(dashboard)/dashboard/marketing/bundles/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/vehicles
+  **File**: app/(dashboard)/dashboard/vehicles/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/vehicles/new
+  **File**: app/(dashboard)/dashboard/vehicles/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/vehicles/[id]
+  **File**: app/(dashboard)/dashboard/vehicles/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/finance
+  **File**: app/(dashboard)/dashboard/finance/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: PermissionGate Component
+- **Route**: /dashboard/finance/transactions
+  **File**: app/(dashboard)/dashboard/finance/transactions/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/finance/statements
+  **File**: app/(dashboard)/dashboard/finance/statements/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/finance/wallet
+  **File**: app/(dashboard)/dashboard/finance/wallet/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Server Session Check
+- **Route**: /dashboard/finance/payouts
+  **File**: app/(dashboard)/dashboard/finance/payouts/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/automations
+  **File**: app/(dashboard)/dashboard/automations/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/digital-assets
+  **File**: app/(dashboard)/dashboard/digital-assets/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/digital-assets/new
+  **File**: app/(dashboard)/dashboard/digital-assets/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/digital-assets/[id]
+  **File**: app/(dashboard)/dashboard/digital-assets/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/campaigns
+  **File**: app/(dashboard)/dashboard/campaigns/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/campaigns/new
+  **File**: app/(dashboard)/dashboard/campaigns/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/campaigns/[id]
+  **File**: app/(dashboard)/dashboard/campaigns/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/orders
+  **File**: app/(dashboard)/dashboard/orders/loading.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/orders
+  **File**: app/(dashboard)/dashboard/orders/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /dashboard/orders/[id]
+  **File**: app/(dashboard)/dashboard/orders/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/account
+  **File**: app/(dashboard)/dashboard/account/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/creative-editor
+  **File**: app/(dashboard)/dashboard/creative-editor/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/events
+  **File**: app/(dashboard)/dashboard/events/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/events/new
+  **File**: app/(dashboard)/dashboard/events/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/events/[id]
+  **File**: app/(dashboard)/dashboard/events/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/approvals
+  **File**: app/(dashboard)/dashboard/approvals/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/kitchen
+  **File**: app/(dashboard)/dashboard/kitchen/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/logistics
+  **File**: app/(dashboard)/dashboard/logistics/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/notifications
+  **File**: app/(dashboard)/dashboard/notifications/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/services
+  **File**: app/(dashboard)/dashboard/services/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/services/new
+  **File**: app/(dashboard)/dashboard/services/new/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/services/[id]
+  **File**: app/(dashboard)/dashboard/services/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/billing
+  **File**: app/(dashboard)/dashboard/billing/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/analytics
+  **File**: app/(dashboard)/dashboard/analytics/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: PermissionGate Component
+- **Route**: /dashboard/reports
+  **File**: app/(dashboard)/dashboard/reports/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/reviews
+  **File**: app/(dashboard)/dashboard/reviews/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/ai-agent/profile
+  **File**: app/(dashboard)/dashboard/ai-agent/profile/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /dashboard/ai-agent/channels
+  **File**: app/(dashboard)/dashboard/ai-agent/channels/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /portfolio/[id]
+  **File**: app/(dashboard)/portfolio/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /analytics
+  **File**: app/(dashboard)/analytics/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /legal
+  **File**: app/legal/layout.tsx
+  **Parents**: app/legal/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /legal/privacy
+  **File**: app/legal/privacy/page.tsx
+  **Parents**: app/legal/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /legal/terms
+  **File**: app/legal/terms/page.tsx
+  **Parents**: app/legal/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /legal/cookies
+  **File**: app/legal/cookies/page.tsx
+  **Parents**: app/legal/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /billing/trial-expired
+  **File**: app/billing/trial-expired/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: Client Auth Hook
+- **Route**: /onboarding
+  **File**: app/onboarding/layout.tsx
+  **Parents**: app/onboarding/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /onboarding
+  **File**: app/onboarding/page.tsx
+  **Parents**: app/onboarding/layout.tsx, app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]
+  **File**: app/store/[slug]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]/track
+  **File**: app/store/[slug]/track/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]/products/[id]
+  **File**: app/store/[slug]/products/[id]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]/checkout
+  **File**: app/store/[slug]/checkout/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]/order-confirmation
+  **File**: app/store/[slug]/order-confirmation/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]/cart
+  **File**: app/store/[slug]/cart/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+- **Route**: /store/[slug]/collections/[collection]
+  **File**: app/store/[slug]/collections/[collection]/page.tsx
+  **Parents**: app/layout.tsx
+  **Shell**: No
+  **Gating**: None identified
+
+## API Routes
+- **Route**: /api/seller/ai/whatsapp-settings
+  **Methods**: GET, PUT
+  **File**: app/api/seller/ai/whatsapp-settings/route.ts
+- **Route**: /api/seller/ai/profile
+  **Methods**: GET, PUT
+  **File**: app/api/seller/ai/profile/route.ts
+- **Route**: /api/seller/ai/knowledge-base
+  **Methods**: GET
+  **File**: app/api/seller/ai/knowledge-base/route.ts
+- **Route**: /api/wa-agent/compliance-settings
+  **Methods**: GET, PATCH
+  **File**: app/api/wa-agent/compliance-settings/route.ts
+- **Route**: /api/customers
+  **Methods**: GET, POST
+  **File**: app/api/customers/route.ts
+- **Route**: /api/customers/insights
+  **Methods**: GET
+  **File**: app/api/customers/insights/route.ts
+- **Route**: /api/customers/details
+  **Methods**: GET
+  **File**: app/api/customers/details/route.ts
+- **Route**: /api/customers/list
+  **Methods**: GET
+  **File**: app/api/customers/list/route.ts
+- **Route**: /api/customers/[id]
+  **Methods**: GET, PUT, DELETE
+  **File**: app/api/customers/[id]/route.ts
+- **Route**: /api/customers/[id]/notes
+  **Methods**: POST
+  **File**: app/api/customers/[id]/notes/route.ts
+- **Route**: /api/customers/[id]/history
+  **Methods**: GET
+  **File**: app/api/customers/[id]/history/route.ts
+- **Route**: /api/settings
+  **Methods**: PATCH
+  **File**: app/api/settings/route.ts
+- **Route**: /api/settings/audit-logs
+  **Methods**: GET
+  **File**: app/api/settings/audit-logs/route.ts
+- **Route**: /api/settings/payments/beneficiaries
+  **Methods**: GET
+  **File**: app/api/settings/payments/beneficiaries/route.ts
+- **Route**: /api/settings/payments/gateway
+  **Methods**: GET
+  **File**: app/api/settings/payments/gateway/route.ts
+- **Route**: /api/settings/branding
+  **Methods**: GET
+  **File**: app/api/settings/branding/route.ts
+- **Route**: /api/settings/domains
+  **Methods**: GET
+  **File**: app/api/settings/domains/route.ts
+- **Route**: /api/settings/domains/verify
+  **Methods**: GET
+  **File**: app/api/settings/domains/verify/route.ts
+- **Route**: /api/settings/security
+  **Methods**: GET, PATCH
+  **File**: app/api/settings/security/route.ts
+- **Route**: /api/settings/roles
+  **Methods**: GET, POST
+  **File**: app/api/settings/roles/route.ts
+- **Route**: /api/settings/api-keys/[id]
+  **Methods**: POST, DELETE
+  **File**: app/api/settings/api-keys/[id]/route.ts
+- **Route**: /api/settings/shipping
+  **Methods**: GET, POST
+  **File**: app/api/settings/shipping/route.ts
+- **Route**: /api/settings/policies
+  **Methods**: GET
+  **File**: app/api/settings/policies/route.ts
+- **Route**: /api/settings/integrations
+  **Methods**: GET
+  **File**: app/api/settings/integrations/route.ts
+- **Route**: /api/settings/profile
+  **Methods**: GET, POST
+  **File**: app/api/settings/profile/route.ts
+- **Route**: /api/settings/team
+  **Methods**: GET, DELETE
+  **File**: app/api/settings/team/route.ts
+- **Route**: /api/settings/team/invite
+  **Methods**: POST, DELETE
+  **File**: app/api/settings/team/invite/route.ts
+- **Route**: /api/settings/notifications
+  **Methods**: GET
+  **File**: app/api/settings/notifications/route.ts
+- **Route**: /api/settings/payouts
+  **Methods**: GET, POST
+  **File**: app/api/settings/payouts/route.ts
+- **Route**: /api/settings/billing
+  **Methods**: GET
+  **File**: app/api/settings/billing/route.ts
+- **Route**: /api/settings/whatsapp
+  **Methods**: GET
+  **File**: app/api/settings/whatsapp/route.ts
+- **Route**: /api/settings/whatsapp/templates
+  **Methods**: POST, DELETE
+  **File**: app/api/settings/whatsapp/templates/route.ts
+- **Route**: /api/settings/whatsapp/stats
+  **Methods**: GET
+  **File**: app/api/settings/whatsapp/stats/route.ts
+- **Route**: /api/payments/resolve
+  **Methods**: GET
+  **File**: app/api/payments/resolve/route.ts
+- **Route**: /api/payments/verify
+  **Methods**: GET, POST
+  **File**: app/api/payments/verify/route.ts
+- **Route**: /api/payments/initialize
+  **Methods**: POST
+  **File**: app/api/payments/initialize/route.ts
+- **Route**: /api/payments/resolve-account
+  **Methods**: POST
+  **File**: app/api/payments/resolve-account/route.ts
+- **Route**: /api/payments/wallet/pin/verify
+  **Methods**: POST
+  **File**: app/api/payments/wallet/pin/verify/route.ts
+- **Route**: /api/payments/wallet/pin/set
+  **Methods**: POST
+  **File**: app/api/payments/wallet/pin/set/route.ts
+- **Route**: /api/payments/wallet/withdraw/confirm
+  **Methods**: POST
+  **File**: app/api/payments/wallet/withdraw/confirm/route.ts
+- **Route**: /api/payments/wallet/withdraw/initiate
+  **Methods**: POST
+  **File**: app/api/payments/wallet/withdraw/initiate/route.ts
+- **Route**: /api/payments/wallet/summary
+  **Methods**: GET
+  **File**: app/api/payments/wallet/summary/route.ts
+- **Route**: /api/payments/banks
+  **Methods**: GET
+  **File**: app/api/payments/banks/route.ts
+- **Route**: /api/payments/funnel
+  **Methods**: GET
+  **File**: app/api/payments/funnel/route.ts
+- **Route**: /api/storefront/draft
+  **Methods**: GET, POST
+  **File**: app/api/storefront/draft/route.ts
+- **Route**: /api/storefront/reset
+  **Methods**: POST
+  **File**: app/api/storefront/reset/route.ts
+- **Route**: /api/storefront/status
+  **Methods**: GET
+  **File**: app/api/storefront/status/route.ts
+- **Route**: /api/storefront/url
+  **Methods**: GET
+  **File**: app/api/storefront/url/route.ts
+- **Route**: /api/storefront/publish
+  **Methods**: POST
+  **File**: app/api/storefront/publish/route.ts
+- **Route**: /api/storefront/[slug]/products
+  **Methods**: GET
+  **File**: app/api/storefront/[slug]/products/route.ts
+- **Route**: /api/storefront/[slug]/bookings
+  **Methods**: POST
+  **File**: app/api/storefront/[slug]/bookings/route.ts
+- **Route**: /api/storefront/[slug]/raffles/enter
+  **Methods**: POST
+  **File**: app/api/storefront/[slug]/raffles/enter/route.ts
+- **Route**: /api/storefront/[slug]/availability
+  **Methods**: GET
+  **File**: app/api/storefront/[slug]/availability/route.ts
+- **Route**: /api/storefront/[slug]/store
+  **Methods**: GET
+  **File**: app/api/storefront/[slug]/store/route.ts
+- **Route**: /api/posts/create
+  **Methods**: POST
+  **File**: app/api/posts/create/route.ts
+- **Route**: /api/products/bulk
+  **Methods**: PATCH
+  **File**: app/api/products/bulk/route.ts
+- **Route**: /api/products/limits
+  **Methods**: GET
+  **File**: app/api/products/limits/route.ts
+- **Route**: /api/products/items
+  **Methods**: GET, POST
+  **File**: app/api/products/items/route.ts
+- **Route**: /api/products/items/[id]
+  **Methods**: GET, PUT, DELETE
+  **File**: app/api/products/items/[id]/route.ts
+- **Route**: /api/products/[id]
+  **Methods**: GET, PATCH
+  **File**: app/api/products/[id]/route.ts
+- **Route**: /api/products/[id]/variants
+  **Methods**: GET, POST
+  **File**: app/api/products/[id]/variants/route.ts
+- **Route**: /api/products/[id]/variants/[variantId]
+  **Methods**: DELETE, PATCH
+  **File**: app/api/products/[id]/variants/[variantId]/route.ts
+- **Route**: /api/products/[id]/inventory
+  **Methods**: GET
+  **File**: app/api/products/[id]/inventory/route.ts
+- **Route**: /api/products/[id]/inventory/history
+  **Methods**: GET
+  **File**: app/api/products/[id]/inventory/history/route.ts
+- **Route**: /api/products/create
+  **Methods**: POST
+  **File**: app/api/products/create/route.ts
+- **Route**: /api/kyc/verify
+  **Methods**: POST
+  **File**: app/api/kyc/verify/route.ts
+- **Route**: /api/kyc/status
+  **Methods**: GET
+  **File**: app/api/kyc/status/route.ts
+- **Route**: /api/kyc/upload
+  **Methods**: POST
+  **File**: app/api/kyc/upload/route.ts
+- **Route**: /api/test/seed
+  **Methods**: POST
+  **File**: app/api/test/seed/route.ts
+- **Route**: /api/bookings
+  **Methods**: GET, POST
+  **File**: app/api/bookings/route.ts
+- **Route**: /api/bookings/[id]
+  **Methods**: GET, PUT, DELETE
+  **File**: app/api/bookings/[id]/route.ts
+- **Route**: /api/invoices
+  **Methods**: GET, POST
+  **File**: app/api/invoices/route.ts
+- **Route**: /api/invoices/[id]/[action]
+  **Methods**: POST
+  **File**: app/api/invoices/[id]/[action]/route.ts
+- **Route**: /api/security/password
+  **Methods**: POST
+  **File**: app/api/security/password/route.ts
+- **Route**: /api/security/sessions
+  **Methods**: GET
+  **File**: app/api/security/sessions/route.ts
+- **Route**: /api/security/2fa/enable
+  **Methods**: POST
+  **File**: app/api/security/2fa/enable/route.ts
+- **Route**: /api/security/2fa/disable
+  **Methods**: POST
+  **File**: app/api/security/2fa/disable/route.ts
+- **Route**: /api/security/2fa/verify
+  **Methods**: POST
+  **File**: app/api/security/2fa/verify/route.ts
+- **Route**: /api/auth/pin/verify
+  **Methods**: POST
+  **File**: app/api/auth/pin/verify/route.ts
+- **Route**: /api/auth/pin/setup
+  **Methods**: POST
+  **File**: app/api/auth/pin/setup/route.ts
+- **Route**: /api/auth/security/signout-all
+  **Methods**: POST
+  **File**: app/api/auth/security/signout-all/route.ts
+- **Route**: /api/auth/logout
+  **Methods**: POST
+  **File**: app/api/auth/logout/route.ts
+- **Route**: /api/auth/[...nextauth]
+  **Methods**: 
+  **File**: app/api/auth/[...nextauth]/route.ts
+- **Route**: /api/auth/forgot-password
+  **Methods**: POST
+  **File**: app/api/auth/forgot-password/route.ts
+- **Route**: /api/auth/reset-password
+  **Methods**: POST
+  **File**: app/api/auth/reset-password/route.ts
+- **Route**: /api/auth/sudo
+  **Methods**: POST
+  **File**: app/api/auth/sudo/route.ts
+- **Route**: /api/auth/merchant/verify-otp
+  **Methods**: POST
+  **File**: app/api/auth/merchant/verify-otp/route.ts
+- **Route**: /api/auth/merchant/logout
+  **Methods**: POST
+  **File**: app/api/auth/merchant/logout/route.ts
+- **Route**: /api/auth/merchant/register
+  **Methods**: POST
+  **File**: app/api/auth/merchant/register/route.ts
+- **Route**: /api/auth/merchant/resend-otp
+  **Methods**: POST
+  **File**: app/api/auth/merchant/resend-otp/route.ts
+- **Route**: /api/auth/merchant/login
+  **Methods**: POST
+  **File**: app/api/auth/merchant/login/route.ts
+- **Route**: /api/auth/session
+  **Methods**: GET
+  **File**: app/api/auth/session/route.ts
+- **Route**: /api/referrals
+  **Methods**: GET
+  **File**: app/api/referrals/route.ts
+- **Route**: /api/recovery/fix-perms
+  **Methods**: POST
+  **File**: app/api/recovery/fix-perms/route.ts
+- **Route**: /api/recovery/webhook-sync
+  **Methods**: POST
+  **File**: app/api/recovery/webhook-sync/route.ts
+- **Route**: /api/health
+  **Methods**: GET
+  **File**: app/api/health/route.ts
+- **Route**: /api/health/integrations
+  **Methods**: GET
+  **File**: app/api/health/integrations/route.ts
+- **Route**: /api/resources/[primaryObject]/[id]
+  **Methods**: GET, PATCH
+  **File**: app/api/resources/[primaryObject]/[id]/route.ts
+- **Route**: /api/resources/list
+  **Methods**: GET
+  **File**: app/api/resources/list/route.ts
+- **Route**: /api/resources/create
+  **Methods**: POST
+  **File**: app/api/resources/create/route.ts
+- **Route**: /api/menu-items
+  **Methods**: POST
+  **File**: app/api/menu-items/route.ts
+- **Route**: /api/rescue/report
+  **Methods**: POST
+  **File**: app/api/rescue/report/route.ts
+- **Route**: /api/rescue/incidents/[id]
+  **Methods**: GET
+  **File**: app/api/rescue/incidents/[id]/route.ts
+- **Route**: /api/marketplace/templates
+  **Methods**: GET
+  **File**: app/api/marketplace/templates/route.ts
+- **Route**: /api/fulfillment/shipments
+  **Methods**: GET
+  **File**: app/api/fulfillment/shipments/route.ts
+- **Route**: /api/stores/public/policies
+  **Methods**: GET
+  **File**: app/api/stores/public/policies/route.ts
+- **Route**: /api/status
+  **Methods**: GET
+  **File**: app/api/status/route.ts
+- **Route**: /api/compliance/reports/create
+  **Methods**: POST
+  **File**: app/api/compliance/reports/create/route.ts
+- **Route**: /api/checkout/initialize
+  **Methods**: POST
+  **File**: app/api/checkout/initialize/route.ts
+- **Route**: /api/checkout/optimization/status
+  **Methods**: GET
+  **File**: app/api/checkout/optimization/status/route.ts
+- **Route**: /api/checkout/optimization/toggle
+  **Methods**: POST
+  **File**: app/api/checkout/optimization/toggle/route.ts
+- **Route**: /api/storage/upload
+  **Methods**: GET, POST
+  **File**: app/api/storage/upload/route.ts
+- **Route**: /api/exports
+  **Methods**: GET, POST
+  **File**: app/api/exports/route.ts
+- **Route**: /api/exports/[id]/download
+  **Methods**: GET
+  **File**: app/api/exports/[id]/download/route.ts
+- **Route**: /api/exports/create
+  **Methods**: POST
+  **File**: app/api/exports/create/route.ts
+- **Route**: /api/dashboard/metrics
+  **Methods**: GET
+  **File**: app/api/dashboard/metrics/route.ts
+- **Route**: /api/dashboard/context
+  **Methods**: GET
+  **File**: app/api/dashboard/context/route.ts
+- **Route**: /api/dashboard/activity
+  **Methods**: GET
+  **File**: app/api/dashboard/activity/route.ts
+- **Route**: /api/dashboard/health
+  **Methods**: GET
+  **File**: app/api/dashboard/health/route.ts
+- **Route**: /api/dashboard/earnings
+  **Methods**: GET
+  **File**: app/api/dashboard/earnings/route.ts
+- **Route**: /api/integrations
+  **Methods**: GET
+  **File**: app/api/integrations/route.ts
+- **Route**: /api/integrations/kyc/verify
+  **Methods**: POST
+  **File**: app/api/integrations/kyc/verify/route.ts
+- **Route**: /api/integrations/whatsapp/verify
+  **Methods**: POST
+  **File**: app/api/integrations/whatsapp/verify/route.ts
+- **Route**: /api/integrations/whatsapp/send-receipt
+  **Methods**: POST
+  **File**: app/api/integrations/whatsapp/send-receipt/route.ts
+- **Route**: /api/integrations/whatsapp/connect
+  **Methods**: POST
+  **File**: app/api/integrations/whatsapp/connect/route.ts
+- **Route**: /api/public/status
+  **Methods**: GET
+  **File**: app/api/public/status/route.ts
+- **Route**: /api/public/ai/chat
+  **Methods**: POST
+  **File**: app/api/public/ai/chat/route.ts
+- **Route**: /api/public/returns/request
+  **Methods**: POST
+  **File**: app/api/public/returns/request/route.ts
+- **Route**: /api/consent/merchant-whatsapp
+  **Methods**: GET, POST
+  **File**: app/api/consent/merchant-whatsapp/route.ts
+- **Route**: /api/consent/cookies
+  **Methods**: GET, POST
+  **File**: app/api/consent/cookies/route.ts
+- **Route**: /api/audit
+  **Methods**: GET
+  **File**: app/api/audit/route.ts
+- **Route**: /api/audit/ledger
+  **Methods**: GET
+  **File**: app/api/audit/ledger/route.ts
+- **Route**: /api/audit/kyc
+  **Methods**: GET
+  **File**: app/api/audit/kyc/route.ts
+- **Route**: /api/audit/disputes
+  **Methods**: GET
+  **File**: app/api/audit/disputes/route.ts
+- **Route**: /api/audit/aml
+  **Methods**: GET
+  **File**: app/api/audit/aml/route.ts
+- **Route**: /api/audit/logs
+  **Methods**: GET
+  **File**: app/api/audit/logs/route.ts
+- **Route**: /api/audit/export
+  **Methods**: POST
+  **File**: app/api/audit/export/route.ts
+- **Route**: /api/audit/overview
+  **Methods**: GET
+  **File**: app/api/audit/overview/route.ts
+- **Route**: /api/properties
+  **Methods**: POST
+  **File**: app/api/properties/route.ts
+- **Route**: /api/properties/viewings
+  **Methods**: GET, POST
+  **File**: app/api/properties/viewings/route.ts
+- **Route**: /api/properties/viewings/[id]/status
+  **Methods**: PATCH
+  **File**: app/api/properties/viewings/[id]/status/route.ts
+- **Route**: /api/properties/[id]
+  **Methods**: GET, PUT, DELETE
+  **File**: app/api/properties/[id]/route.ts
+- **Route**: /api/support/tickets
+  **Methods**: GET, POST
+  **File**: app/api/support/tickets/route.ts
+- **Route**: /api/support/tickets/[id]
+  **Methods**: GET
+  **File**: app/api/support/tickets/[id]/route.ts
+- **Route**: /api/support/tickets/[id]/messages
+  **Methods**: POST
+  **File**: app/api/support/tickets/[id]/messages/route.ts
+- **Route**: /api/support/context
+  **Methods**: GET
+  **File**: app/api/support/context/route.ts
+- **Route**: /api/support/chat
+  **Methods**: POST
+  **File**: app/api/support/chat/route.ts
+- **Route**: /api/support/resolve-check
+  **Methods**: POST
+  **File**: app/api/support/resolve-check/route.ts
+- **Route**: /api/support/disputes
+  **Methods**: GET
+  **File**: app/api/support/disputes/route.ts
+- **Route**: /api/support/disputes/[id]/evidence
+  **Methods**: POST
+  **File**: app/api/support/disputes/[id]/evidence/route.ts
+- **Route**: /api/support/feedback
+  **Methods**: GET
+  **File**: app/api/support/feedback/route.ts
+- **Route**: /api/support/conversations
+  **Methods**: GET
+  **File**: app/api/support/conversations/route.ts
+- **Route**: /api/support/conversations/[id]/messages
+  **Methods**: GET, POST
+  **File**: app/api/support/conversations/[id]/messages/route.ts
+- **Route**: /api/support/create
+  **Methods**: POST
+  **File**: app/api/support/create/route.ts
+- **Route**: /api/support/incidents
+  **Methods**: GET
+  **File**: app/api/support/incidents/route.ts
+- **Route**: /api/support/escalate
+  **Methods**: POST
+  **File**: app/api/support/escalate/route.ts
+- **Route**: /api/paystack/resolve-account
+  **Methods**: POST
+  **File**: app/api/paystack/resolve-account/route.ts
+- **Route**: /api/paystack/banks
+  **Methods**: GET
+  **File**: app/api/paystack/banks/route.ts
+- **Route**: /api/ai/forecast/cashflow
+  **Methods**: GET
+  **File**: app/api/ai/forecast/cashflow/route.ts
+- **Route**: /api/ai/forecast/revenue
+  **Methods**: GET
+  **File**: app/api/ai/forecast/revenue/route.ts
+- **Route**: /api/ai/forecast/risk
+  **Methods**: GET
+  **File**: app/api/ai/forecast/risk/route.ts
+- **Route**: /api/ai/insights
+  **Methods**: GET
+  **File**: app/api/ai/insights/route.ts
+- **Route**: /api/ai/chat
+  **Methods**: GET, POST
+  **File**: app/api/ai/chat/route.ts
+- **Route**: /api/ai/usage
+  **Methods**: GET
+  **File**: app/api/ai/usage/route.ts
+- **Route**: /api/ai/business-health
+  **Methods**: GET
+  **File**: app/api/ai/business-health/route.ts
+- **Route**: /api/ai/coach/messages
+  **Methods**: GET
+  **File**: app/api/ai/coach/messages/route.ts
+- **Route**: /api/ai/index
+  **Methods**: POST
+  **File**: app/api/ai/index/route.ts
+- **Route**: /api/ai/brain
+  **Methods**: GET, POST
+  **File**: app/api/ai/brain/route.ts
+- **Route**: /api/ai/templates/recommendations
+  **Methods**: GET
+  **File**: app/api/ai/templates/recommendations/route.ts
+- **Route**: /api/me/plan
+  **Methods**: GET
+  **File**: app/api/me/plan/route.ts
+- **Route**: /api/me/onboarding-summary
+  **Methods**: GET
+  **File**: app/api/me/onboarding-summary/route.ts
+- **Route**: /api/wallet/pin/verify
+  **Methods**: POST
+  **File**: app/api/wallet/pin/verify/route.ts
+- **Route**: /api/wallet/pin/setup
+  **Methods**: POST
+  **File**: app/api/wallet/pin/setup/route.ts
+- **Route**: /api/wallet/pin/reset-request
+  **Methods**: POST
+  **File**: app/api/wallet/pin/reset-request/route.ts
+- **Route**: /api/wallet/settlements
+  **Methods**: GET
+  **File**: app/api/wallet/settlements/route.ts
+- **Route**: /api/wallet/disputes
+  **Methods**: GET
+  **File**: app/api/wallet/disputes/route.ts
+- **Route**: /api/wallet/balance
+  **Methods**: GET
+  **File**: app/api/wallet/balance/route.ts
+- **Route**: /api/wallet/transactions
+  **Methods**: GET
+  **File**: app/api/wallet/transactions/route.ts
+- **Route**: /api/wallet/withdrawals
+  **Methods**: GET
+  **File**: app/api/wallet/withdrawals/route.ts
+- **Route**: /api/wallet/withdrawals/export
+  **Methods**: GET
+  **File**: app/api/wallet/withdrawals/export/route.ts
+- **Route**: /api/wallet/payout-accounts
+  **Methods**: GET, POST
+  **File**: app/api/wallet/payout-accounts/route.ts
+- **Route**: /api/wallet/payout-accounts/resolve
+  **Methods**: POST
+  **File**: app/api/wallet/payout-accounts/resolve/route.ts
+- **Route**: /api/wallet/withdraw/quote
+  **Methods**: POST
+  **File**: app/api/wallet/withdraw/quote/route.ts
+- **Route**: /api/wallet/withdraw/eligibility
+  **Methods**: GET
+  **File**: app/api/wallet/withdraw/eligibility/route.ts
+- **Route**: /api/designer/templates
+  **Methods**: GET
+  **File**: app/api/designer/templates/route.ts
+- **Route**: /api/designer/templates/submit
+  **Methods**: POST
+  **File**: app/api/designer/templates/submit/route.ts
+- **Route**: /api/portfolio
+  **Methods**: GET, POST
+  **File**: app/api/portfolio/route.ts
+- **Route**: /api/portfolio/[id]
+  **Methods**: GET, PATCH
+  **File**: app/api/portfolio/[id]/route.ts
+- **Route**: /api/marketing/flash-sales
+  **Methods**: GET, POST
+  **File**: app/api/marketing/flash-sales/route.ts
+- **Route**: /api/marketing/flash-sales/[id]
+  **Methods**: DELETE, PATCH
+  **File**: app/api/marketing/flash-sales/[id]/route.ts
+- **Route**: /api/marketing/discounts
+  **Methods**: GET, POST
+  **File**: app/api/marketing/discounts/route.ts
+- **Route**: /api/marketing/discounts/[id]
+  **Methods**: GET, DELETE, PATCH
+  **File**: app/api/marketing/discounts/[id]/route.ts
+- **Route**: /api/marketing/affiliates
+  **Methods**: GET
+  **File**: app/api/marketing/affiliates/route.ts
+- **Route**: /api/templates
+  **Methods**: GET
+  **File**: app/api/templates/route.ts
+- **Route**: /api/templates/apply
+  **Methods**: POST
+  **File**: app/api/templates/apply/route.ts
+- **Route**: /api/templates/install
+  **Methods**: POST
+  **File**: app/api/templates/install/route.ts
+- **Route**: /api/templates/optimization/enable
+  **Methods**: POST
+  **File**: app/api/templates/optimization/enable/route.ts
+- **Route**: /api/templates/optimization/revert
+  **Methods**: POST
+  **File**: app/api/templates/optimization/revert/route.ts
+- **Route**: /api/templates/optimization/status
+  **Methods**: GET
+  **File**: app/api/templates/optimization/status/route.ts
+- **Route**: /api/templates/recommendations
+  **Methods**: GET
+  **File**: app/api/templates/recommendations/route.ts
+- **Route**: /api/templates/purchase
+  **Methods**: POST
+  **File**: app/api/templates/purchase/route.ts
+- **Route**: /api/templates/performance/insights
+  **Methods**: GET
+  **File**: app/api/templates/performance/insights/route.ts
+- **Route**: /api/templates/performance/compare
+  **Methods**: GET
+  **File**: app/api/templates/performance/compare/route.ts
+- **Route**: /api/templates/performance/active
+  **Methods**: GET
+  **File**: app/api/templates/performance/active/route.ts
+- **Route**: /api/templates/seasonal/apply
+  **Methods**: POST
+  **File**: app/api/templates/seasonal/apply/route.ts
+- **Route**: /api/templates/seasonal/suggestions
+  **Methods**: GET
+  **File**: app/api/templates/seasonal/suggestions/route.ts
+- **Route**: /api/dev/verification-codes
+  **Methods**: GET
+  **File**: app/api/dev/verification-codes/route.ts
+- **Route**: /api/dev/reset-password
+  **Methods**: POST
+  **File**: app/api/dev/reset-password/route.ts
+- **Route**: /api/dev/clear-db
+  **Methods**: POST
+  **File**: app/api/dev/clear-db/route.ts
+- **Route**: /api/ops/metrics
+  **Methods**: GET
+  **File**: app/api/ops/metrics/route.ts
+- **Route**: /api/ops/kyc
+  **Methods**: GET
+  **File**: app/api/ops/kyc/route.ts
+- **Route**: /api/ops/kyc/[id]/retry
+  **Methods**: POST
+  **File**: app/api/ops/kyc/[id]/retry/route.ts
+- **Route**: /api/ops/kyc/[id]/override
+  **Methods**: POST
+  **File**: app/api/ops/kyc/[id]/override/route.ts
+- **Route**: /api/ops/auth/logout
+  **Methods**: POST
+  **File**: app/api/ops/auth/logout/route.ts
+- **Route**: /api/ops/auth/login
+  **Methods**: POST
+  **File**: app/api/ops/auth/login/route.ts
+- **Route**: /api/ops/merchants
+  **Methods**: GET
+  **File**: app/api/ops/merchants/route.ts
+- **Route**: /api/ops/merchants/[id]/notifications
+  **Methods**: GET
+  **File**: app/api/ops/merchants/[id]/notifications/route.ts
+- **Route**: /api/ops/merchants/[id]/notifications/preferences
+  **Methods**: GET, POST
+  **File**: app/api/ops/merchants/[id]/notifications/preferences/route.ts
+- **Route**: /api/ops/merchants/[id]/summary
+  **Methods**: GET
+  **File**: app/api/ops/merchants/[id]/summary/route.ts
+- **Route**: /api/ops/audit
+  **Methods**: GET
+  **File**: app/api/ops/audit/route.ts
+- **Route**: /api/ops/support/metrics
+  **Methods**: GET
+  **File**: app/api/ops/support/metrics/route.ts
+- **Route**: /api/ops/support/tickets
+  **Methods**: GET
+  **File**: app/api/ops/support/tickets/route.ts
+- **Route**: /api/ops/support/tickets/[id]
+  **Methods**: GET
+  **File**: app/api/ops/support/tickets/[id]/route.ts
+- **Route**: /api/ops/support/tickets/[id]/reply
+  **Methods**: POST
+  **File**: app/api/ops/support/tickets/[id]/reply/route.ts
+- **Route**: /api/ops/users
+  **Methods**: GET, POST
+  **File**: app/api/ops/users/route.ts
+- **Route**: /api/ops/users/[id]
+  **Methods**: PATCH
+  **File**: app/api/ops/users/[id]/route.ts
+- **Route**: /api/ops/webhooks
+  **Methods**: GET
+  **File**: app/api/ops/webhooks/route.ts
+- **Route**: /api/ops/notifications/[id]/resend
+  **Methods**: POST
+  **File**: app/api/ops/notifications/[id]/resend/route.ts
+- **Route**: /api/ops/payouts
+  **Methods**: GET
+  **File**: app/api/ops/payouts/route.ts
+- **Route**: /api/telemetry/event
+  **Methods**: POST
+  **File**: app/api/telemetry/event/route.ts
+- **Route**: /api/orders
+  **Methods**: GET, POST
+  **File**: app/api/orders/route.ts
+- **Route**: /api/orders/bulk-status
+  **Methods**: POST
+  **File**: app/api/orders/bulk-status/route.ts
+- **Route**: /api/orders/export
+  **Methods**: GET
+  **File**: app/api/orders/export/route.ts
+- **Route**: /api/orders/[id]
+  **Methods**: GET, PATCH
+  **File**: app/api/orders/[id]/route.ts
+- **Route**: /api/orders/[id]/notes
+  **Methods**: POST
+  **File**: app/api/orders/[id]/notes/route.ts
+- **Route**: /api/orders/[id]/delivery/dispatch
+  **Methods**: POST
+  **File**: app/api/orders/[id]/delivery/dispatch/route.ts
+- **Route**: /api/orders/[id]/delivery/manual-status
+  **Methods**: POST
+  **File**: app/api/orders/[id]/delivery/manual-status/route.ts
+- **Route**: /api/orders/stats
+  **Methods**: GET
+  **File**: app/api/orders/stats/route.ts
+- **Route**: /api/jobs
+  **Methods**: GET
+  **File**: app/api/jobs/route.ts
+- **Route**: /api/jobs/cron/trial-reminders
+  **Methods**: GET
+  **File**: app/api/jobs/cron/trial-reminders/route.ts
+- **Route**: /api/account/branding
+  **Methods**: GET, PUT
+  **File**: app/api/account/branding/route.ts
+- **Route**: /api/account/branding/upload
+  **Methods**: POST
+  **File**: app/api/account/branding/upload/route.ts
+- **Route**: /api/account/deletion
+  **Methods**: GET, POST, DELETE
+  **File**: app/api/account/deletion/route.ts
+- **Route**: /api/account/domains
+  **Methods**: GET, POST
+  **File**: app/api/account/domains/route.ts
+- **Route**: /api/account/domains/verify
+  **Methods**: POST
+  **File**: app/api/account/domains/verify/route.ts
+- **Route**: /api/account/kyc/status
+  **Methods**: GET, POST
+  **File**: app/api/account/kyc/status/route.ts
+- **Route**: /api/account/security
+  **Methods**: GET
+  **File**: app/api/account/security/route.ts
+- **Route**: /api/account/security/status
+  **Methods**: GET
+  **File**: app/api/account/security/status/route.ts
+- **Route**: /api/account/security/logout-all
+  **Methods**: POST
+  **File**: app/api/account/security/logout-all/route.ts
+- **Route**: /api/account/security/change-password
+  **Methods**: POST
+  **File**: app/api/account/security/change-password/route.ts
+- **Route**: /api/account/bank
+  **Methods**: GET, POST
+  **File**: app/api/account/bank/route.ts
+- **Route**: /api/account/usage
+  **Methods**: GET
+  **File**: app/api/account/usage/route.ts
+- **Route**: /api/account/export
+  **Methods**: GET
+  **File**: app/api/account/export/route.ts
+- **Route**: /api/account/overview
+  **Methods**: GET
+  **File**: app/api/account/overview/route.ts
+- **Route**: /api/account/payouts
+  **Methods**: POST
+  **File**: app/api/account/payouts/route.ts
+- **Route**: /api/account/billing
+  **Methods**: GET, PUT
+  **File**: app/api/account/billing/route.ts
+- **Route**: /api/kitchen/orders
+  **Methods**: GET
+  **File**: app/api/kitchen/orders/route.ts
+- **Route**: /api/kitchen/orders/[id]
+  **Methods**: PUT
+  **File**: app/api/kitchen/orders/[id]/route.ts
+- **Route**: /api/kitchen/orders/[id]/status
+  **Methods**: PATCH
+  **File**: app/api/kitchen/orders/[id]/status/route.ts
+- **Route**: /api/webhooks/paystack
+  **Methods**: POST
+  **File**: app/api/webhooks/paystack/route.ts
+- **Route**: /api/webhooks/delivery/kwik
+  **Methods**: POST
+  **File**: app/api/webhooks/delivery/kwik/route.ts
+- **Route**: /api/collections
+  **Methods**: GET, POST
+  **File**: app/api/collections/route.ts
+- **Route**: /api/collections/[id]
+  **Methods**: GET, PUT, DELETE
+  **File**: app/api/collections/[id]/route.ts
+- **Route**: /api/notifications
+  **Methods**: GET
+  **File**: app/api/notifications/route.ts
+- **Route**: /api/notifications/settings
+  **Methods**: GET, PUT
+  **File**: app/api/notifications/settings/route.ts
+- **Route**: /api/notifications/preferences
+  **Methods**: GET, POST
+  **File**: app/api/notifications/preferences/route.ts
+- **Route**: /api/notifications/trigger
+  **Methods**: POST
+  **File**: app/api/notifications/trigger/route.ts
+- **Route**: /api/notifications/mark-read
+  **Methods**: POST
+  **File**: app/api/notifications/mark-read/route.ts
+- **Route**: /api/notifications/unread-count
+  **Methods**: GET
+  **File**: app/api/notifications/unread-count/route.ts
+- **Route**: /api/services
+  **Methods**: POST
+  **File**: app/api/services/route.ts
+- **Route**: /api/services/list
+  **Methods**: GET
+  **File**: app/api/services/list/route.ts
+- **Route**: /api/billing/invoices
+  **Methods**: GET
+  **File**: app/api/billing/invoices/route.ts
+- **Route**: /api/billing/subscription
+  **Methods**: GET, POST
+  **File**: app/api/billing/subscription/route.ts
+- **Route**: /api/billing/paystack/initiate
+  **Methods**: POST
+  **File**: app/api/billing/paystack/initiate/route.ts
+- **Route**: /api/billing/verify-payment
+  **Methods**: POST
+  **File**: app/api/billing/verify-payment/route.ts
+- **Route**: /api/onboarding/check-slug
+  **Methods**: GET
+  **File**: app/api/onboarding/check-slug/route.ts
+- **Route**: /api/onboarding/save-progress
+  **Methods**: POST
+  **File**: app/api/onboarding/save-progress/route.ts
+- **Route**: /api/onboarding/state
+  **Methods**: GET, PUT
+  **File**: app/api/onboarding/state/route.ts
+- **Route**: /api/whatsapp/webhook
+  **Methods**: POST
+  **File**: app/api/whatsapp/webhook/route.ts
+- **Route**: /api/whatsapp/webhook/status
+  **Methods**: POST
+  **File**: app/api/whatsapp/webhook/status/route.ts
+- **Route**: /api/whatsapp/messages
+  **Methods**: GET, POST
+  **File**: app/api/whatsapp/messages/route.ts
+- **Route**: /api/whatsapp/messages/send
+  **Methods**: POST
+  **File**: app/api/whatsapp/messages/send/route.ts
+- **Route**: /api/whatsapp/conversations
+  **Methods**: GET
+  **File**: app/api/whatsapp/conversations/route.ts
+- **Route**: /api/whatsapp/conversations/[id]/link
+  **Methods**: POST
+  **File**: app/api/whatsapp/conversations/[id]/link/route.ts
+- **Route**: /api/whatsapp/instance
+  **Methods**: GET, POST
+  **File**: app/api/whatsapp/instance/route.ts
+- **Route**: /api/whatsapp/notifications
+  **Methods**: GET
+  **File**: app/api/whatsapp/notifications/route.ts
+- **Route**: /api/whatsapp/notifications/read
+  **Methods**: POST
+  **File**: app/api/whatsapp/notifications/read/route.ts
+- **Route**: /api/analytics/insights
+  **Methods**: GET
+  **File**: app/api/analytics/insights/route.ts
+- **Route**: /api/analytics/activation
+  **Methods**: GET
+  **File**: app/api/analytics/activation/route.ts
+- **Route**: /api/analytics/business-intelligence
+  **Methods**: GET
+  **File**: app/api/analytics/business-intelligence/route.ts
+- **Route**: /api/analytics/dashboard
+  **Methods**: GET
+  **File**: app/api/analytics/dashboard/route.ts
+- **Route**: /api/analytics/events
+  **Methods**: POST
+  **File**: app/api/analytics/events/route.ts
+- **Route**: /api/analytics/overview
+  **Methods**: GET
+  **File**: app/api/analytics/overview/route.ts
+- **Route**: /api/analytics/onboarding/summary
+  **Methods**: GET
+  **File**: app/api/analytics/onboarding/summary/route.ts
+- **Route**: /api/merchant/settings/ai-agent
+  **Methods**: GET, PATCH
+  **File**: app/api/merchant/settings/ai-agent/route.ts
+- **Route**: /api/merchant/inbox/conversations
+  **Methods**: GET
+  **File**: app/api/merchant/inbox/conversations/route.ts
+- **Route**: /api/merchant/inbox/conversations/[id]
+  **Methods**: GET
+  **File**: app/api/merchant/inbox/conversations/[id]/route.ts
+- **Route**: /api/merchant/inbox/conversations/[id]/notes
+  **Methods**: POST
+  **File**: app/api/merchant/inbox/conversations/[id]/notes/route.ts
+- **Route**: /api/merchant/stores
+  **Methods**: GET, POST
+  **File**: app/api/merchant/stores/route.ts
+- **Route**: /api/merchant/imports/init
+  **Methods**: POST
+  **File**: app/api/merchant/imports/init/route.ts
+- **Route**: /api/merchant/imports/validate
+  **Methods**: POST
+  **File**: app/api/merchant/imports/validate/route.ts
+- **Route**: /api/merchant/imports/run
+  **Methods**: POST
+  **File**: app/api/merchant/imports/run/route.ts
+- **Route**: /api/merchant/imports/[id]
+  **Methods**: GET
+  **File**: app/api/merchant/imports/[id]/route.ts
+- **Route**: /api/merchant/policies
+  **Methods**: GET
+  **File**: app/api/merchant/policies/route.ts
+- **Route**: /api/merchant/policies/publish-all
+  **Methods**: POST
+  **File**: app/api/merchant/policies/publish-all/route.ts
+- **Route**: /api/merchant/policies/[type]
+  **Methods**: GET, POST
+  **File**: app/api/merchant/policies/[type]/route.ts
+- **Route**: /api/merchant/policies/[type]/publish
+  **Methods**: POST
+  **File**: app/api/merchant/policies/[type]/publish/route.ts
+- **Route**: /api/merchant/policies/generate
+  **Methods**: POST
+  **File**: app/api/merchant/policies/generate/route.ts
+- **Route**: /api/merchant/audit
+  **Methods**: GET
+  **File**: app/api/merchant/audit/route.ts
+- **Route**: /api/merchant/team
+  **Methods**: GET
+  **File**: app/api/merchant/team/route.ts
+- **Route**: /api/merchant/team/member/remove
+  **Methods**: POST
+  **File**: app/api/merchant/team/member/remove/route.ts
+- **Route**: /api/merchant/team/member/update-role
+  **Methods**: POST
+  **File**: app/api/merchant/team/member/update-role/route.ts
+- **Route**: /api/merchant/templates
+  **Methods**: GET
+  **File**: app/api/merchant/templates/route.ts
+- **Route**: /api/merchant/templates/apply
+  **Methods**: POST
+  **File**: app/api/merchant/templates/apply/route.ts
+- **Route**: /api/merchant/templates/current
+  **Methods**: GET
+  **File**: app/api/merchant/templates/current/route.ts
+- **Route**: /api/merchant/approvals
+  **Methods**: GET, POST
+  **File**: app/api/merchant/approvals/route.ts
+- **Route**: /api/merchant/approvals/[id]/reject
+  **Methods**: POST
+  **File**: app/api/merchant/approvals/[id]/reject/route.ts
+- **Route**: /api/merchant/approvals/[id]/approve
+  **Methods**: POST
+  **File**: app/api/merchant/approvals/[id]/approve/route.ts
+- **Route**: /api/merchant/notifications
+  **Methods**: GET
+  **File**: app/api/merchant/notifications/route.ts
+- **Route**: /api/merchant/notifications/preferences
+  **Methods**: GET, POST
+  **File**: app/api/merchant/notifications/preferences/route.ts
+- **Route**: /api/merchant/notifications/mark-read
+  **Methods**: POST
+  **File**: app/api/merchant/notifications/mark-read/route.ts
+- **Route**: /api/merchant/notifications/send
+  **Methods**: POST
+  **File**: app/api/merchant/notifications/send/route.ts
+- **Route**: /api/merchant/billing/cancel
+  **Methods**: POST
+  **File**: app/api/merchant/billing/cancel/route.ts
+- **Route**: /api/merchant/billing/status
+  **Methods**: GET
+  **File**: app/api/merchant/billing/status/route.ts
+- **Route**: /api/merchant/billing/subscribe
+  **Methods**: POST
+  **File**: app/api/merchant/billing/subscribe/route.ts
+- **Route**: /api/merchant/onboarding/products
+  **Methods**: GET
+  **File**: app/api/merchant/onboarding/products/route.ts
+- **Route**: /api/merchant/onboarding/complete
+  **Methods**: POST
+  **File**: app/api/merchant/onboarding/complete/route.ts
+- **Route**: /api/merchant/onboarding/state
+  **Methods**: GET, POST
+  **File**: app/api/merchant/onboarding/state/route.ts
+- **Route**: /api/merchant/reports/reconciliation
+  **Methods**: GET
+  **File**: app/api/merchant/reports/reconciliation/route.ts
+- **Route**: /api/merchant/reports/export/[type]
+  **Methods**: GET
+  **File**: app/api/merchant/reports/export/[type]/route.ts
+- **Route**: /api/merchant/reports/summary
+  **Methods**: GET
+  **File**: app/api/merchant/reports/summary/route.ts
+- **Route**: /api/merchant/session/switch
+  **Methods**: POST
+  **File**: app/api/merchant/session/switch/route.ts
+- **Route**: /api/store/policies
+  **Methods**: GET, PATCH
+  **File**: app/api/store/policies/route.ts
+- **Route**: /api/reviews
+  **Methods**: GET
+  **File**: app/api/reviews/route.ts
+- **Route**: /api/healthz
+  **Methods**: GET
+  **File**: app/healthz/route.ts

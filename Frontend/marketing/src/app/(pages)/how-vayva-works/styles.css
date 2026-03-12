@@ -1,0 +1,28 @@
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.float-animation {
+    animation: float 6s ease-in-out infinite;
+}
+
+.float-animation-delay-1 {
+    animation: float 6s ease-in-out infinite 1s;
+}
+
+.float-animation-delay-2 {
+    animation: float 6s ease-in-out infinite 2s;
+}
+
+.float-animation-delay-3 {
+    animation: float 6s ease-in-out infinite 3s;
+}
+
+.float-animation-delay-4 {
+    animation: float 6s ease-in-out infinite 4s;
+}

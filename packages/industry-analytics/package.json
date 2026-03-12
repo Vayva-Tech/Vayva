@@ -1,0 +1,28 @@
+{
+  "name": "@vayva/industry-analytics",
+  "version": "0.1.0",
+  "description": "Analytics & Insights industry module for Vayva platform",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/analytics.engine.ts",
+    "./components": "./src/components/index.ts",
+    "./services": "./src/services/index.ts",
+    "./dashboard": "./src/dashboard/index.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vayva/industry-core": "workspace:*",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,71 @@
+export enum Role {
+  OWNER = "OWNER",
+  ADMIN = "ADMIN",
+  STAFF = "STAFF",
+  OPS_ADMIN = "OPS_ADMIN",
+  OPS_AGENT = "OPS_AGENT",
+}
+
+export enum OrderPaymentStatus {
+  PENDING = "PENDING",
+  VERIFIED = "VERIFIED",
+  FAILED = "FAILED",
+  REFUNDED = "REFUNDED",
+  DISPUTED = "DISPUTED",
+}
+
+export enum OrderFulfillmentStatus {
+  PROCESSING = "PROCESSING",
+  OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
+  DELIVERED = "DELIVERED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum ApprovalType {
+  DELIVERY_SCHEDULE = "DELIVERY_SCHEDULE",
+  DISCOUNT = "DISCOUNT",
+  REFUND = "REFUND",
+  STATUS_CHANGE = "STATUS_CHANGE",
+}
+
+export enum ApprovalStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  EXPIRED = "EXPIRED",
+}
+
+export enum DeliveryTaskStatus {
+  SCHEDULED = "SCHEDULED",
+  IN_PROGRESS = "IN_PROGRESS",
+  DELIVERED = "DELIVERED",
+  FAILED = "FAILED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum ListingStatus {
+  UNLISTED = "UNLISTED",
+  LISTED = "LISTED",
+  PENDING_REVIEW = "PENDING_REVIEW",
+  REJECTED = "REJECTED",
+}
+
+export enum ConversationStatus {
+  OPEN = "OPEN",
+  ESCALATED = "ESCALATED",
+  RESOLVED = "RESOLVED",
+}
+
+export enum Channel {
+  STOREFRONT = "STOREFRONT",
+  MARKETPLACE = "MARKETPLACE",
+  WHATSAPP_AI = "WHATSAPP_AI",
+}
+
+export enum NotificationType {
+  ORDER = "ORDER",
+  APPROVAL = "APPROVAL",
+  PAYMENT = "PAYMENT",
+  PAYOUT = "PAYOUT",
+  SYSTEM = "SYSTEM",
+}

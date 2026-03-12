@@ -1,0 +1,439 @@
+/**
+ * Kitchen/KDS Dashboard Themes
+ * 
+ * Design categories for restaurant kitchen environments:
+ * - Optimized for readability in various lighting conditions
+ * - Touch-friendly interfaces
+ * - High contrast for quick information scanning
+ */
+
+/* ============================================================================
+   Theme 1: Kitchen Fire (Default) - Bold Energy Design Category
+   ============================================================================ */
+.kitchen-theme-fire {
+  --kds-primary: #FF6B35;        /* Fire Orange */
+  --kds-secondary: #4A90E2;      /* Steel Blue */
+  --kds-accent: #10B981;         /* Fresh Green */
+  --kds-background: #1E293B;     /* Dark Slate */
+  --kds-card-bg: rgba(30, 41, 59, 0.95);
+  --kds-card-border: rgba(255, 107, 53, 0.2);
+  --kds-text-primary: #F1F5F9;
+  --kds-text-secondary: #94A3B8;
+  --kds-text-muted: #64748B;
+  
+  /* Timer Colors */
+  --kds-timer-green: #10B981;
+  --kds-timer-yellow: #F59E0B;
+  --kds-timer-red: #EF4444;
+  --kds-timer-critical: #DC2626;
+  
+  /* Status Colors */
+  --kds-status-fresh: #10B981;
+  --kds-status-cooking: #3B82F6;
+  --kds-status-ready: #10B981;
+  --kds-status-urgent: #F59E0B;
+  --kds-status-overdue: #EF4444;
+  
+  /* Shadows */
+  --kds-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --kds-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --kds-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --kds-shadow-glow: 0 0 20px rgba(255, 107, 53, 0.3);
+}
+
+/* ============================================================================
+   Theme 2: Stainless Steel - Professional Kitchen
+   ============================================================================ */
+.kitchen-theme-steel {
+  --kds-primary: #94A3B8;        /* Steel Gray */
+  --kds-secondary: #475569;      /* Darker Steel */
+  --kds-accent: #10B981;         /* Green */
+  --kds-background: #0F172A;     /* Very Dark */
+  --kds-card-bg: rgba(15, 23, 42, 0.95);
+  --kds-card-border: rgba(148, 163, 184, 0.2);
+  --kds-text-primary: #F1F5F9;
+  --kds-text-secondary: #94A3B8;
+  --kds-text-muted: #64748B;
+  
+  /* Timer Colors */
+  --kds-timer-green: #10B981;
+  --kds-timer-yellow: #F59E0B;
+  --kds-timer-red: #EF4444;
+  --kds-timer-critical: #DC2626;
+  
+  /* Shadows */
+  --kds-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --kds-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --kds-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --kds-shadow-glow: 0 0 20px rgba(148, 163, 184, 0.2);
+}
+
+/* ============================================================================
+   Theme 3: Chef's Green - Fresh & Clean
+   ============================================================================ */
+.kitchen-theme-chef-green {
+  --kds-primary: #10B981;        /* Emerald */
+  --kds-secondary: #059669;      /* Darker Green */
+  --kds-accent: #F59E0B;         /* Amber */
+  --kds-background: #1E293B;     /* Dark Slate */
+  --kds-card-bg: rgba(30, 41, 59, 0.95);
+  --kds-card-border: rgba(16, 185, 129, 0.2);
+  --kds-text-primary: #F1F5F9;
+  --kds-text-secondary: #94A3B8;
+  --kds-text-muted: #64748B;
+  
+  /* Timer Colors */
+  --kds-timer-green: #10B981;
+  --kds-timer-yellow: #F59E0B;
+  --kds-timer-red: #EF4444;
+  --kds-timer-critical: #DC2626;
+  
+  /* Shadows */
+  --kds-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --kds-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --kds-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --kds-shadow-glow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================================================
+   Theme 4: Midnight Kitchen - Modern Dark
+   ============================================================================ */
+.kitchen-theme-midnight {
+  --kds-primary: #6366F1;        /* Indigo */
+  --kds-secondary: #8B5CF6;      /* Violet */
+  --kds-accent: #10B981;         /* Green */
+  --kds-background: #0F172A;     /* Very Dark */
+  --kds-card-bg: rgba(15, 23, 42, 0.95);
+  --kds-card-border: rgba(99, 102, 241, 0.2);
+  --kds-text-primary: #F1F5F9;
+  --kds-text-secondary: #94A3B8;
+  --kds-text-muted: #64748B;
+  
+  /* Timer Colors */
+  --kds-timer-green: #10B981;
+  --kds-timer-yellow: #F59E0B;
+  --kds-timer-red: #EF4444;
+  --kds-timer-critical: #DC2626;
+  
+  /* Shadows */
+  --kds-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --kds-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --kds-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --kds-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* ============================================================================
+   Theme 5: Classic Brigade - Traditional Kitchen Red
+   ============================================================================ */
+.kitchen-theme-brigade {
+  --kds-primary: #EF4444;        /* Red */
+  --kds-secondary: #1E293B;      /* Dark Blue-Gray */
+  --kds-accent: #F59E0B;         /* Gold */
+  --kds-background: #1E293B;     /* Dark Slate */
+  --kds-card-bg: rgba(30, 41, 59, 0.95);
+  --kds-card-border: rgba(239, 68, 68, 0.2);
+  --kds-text-primary: #F1F5F9;
+  --kds-text-secondary: #94A3B8;
+  --kds-text-muted: #64748B;
+  
+  /* Timer Colors */
+  --kds-timer-green: #10B981;
+  --kds-timer-yellow: #F59E0B;
+  --kds-timer-red: #EF4444;
+  --kds-timer-critical: #DC2626;
+  
+  /* Shadows */
+  --kds-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --kds-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --kds-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --kds-shadow-glow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+/* ============================================================================
+   Timer Animations & Urgency Classes
+   ============================================================================ */
+
+/* Normal timer (green) */
+.timer-normal {
+  color: var(--kds-timer-green);
+  transition: color 0.3s ease;
+}
+
+/* Warning timer (yellow) - pulses slowly */
+.timer-warning {
+  color: var(--kds-timer-yellow);
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Critical timer (red) - flashes quickly */
+.timer-critical {
+  color: var(--kds-timer-red);
+  animation: flash-critical 1s steps(2, start) infinite;
+}
+
+@keyframes flash-critical {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Overdue timer (dark red) - rapid flash */
+.timer-overdue {
+  color: var(--kds-timer-critical);
+  animation: flash-overdue 0.5s steps(2, start) infinite;
+}
+
+@keyframes flash-overdue {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* ============================================================================
+   Station Workload Visualization
+   ============================================================================ */
+
+.workload-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--kds-timer-green) 0%,
+    var(--kds-timer-yellow) 70%,
+    var(--kds-timer-red) 100%
+  );
+  transition: width 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.workload-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================================================
+   Card Styles
+   ============================================================================ */
+
+.kds-card {
+  background: var(--kds-card-bg);
+  border: 1px solid var(--kds-card-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--kds-shadow);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.kds-card:hover {
+  box-shadow: var(--kds-shadow-lg);
+  border-color: var(--kds-primary);
+}
+
+.kds-card.priority-high {
+  border-left: 4px solid var(--kds-status-urgent);
+}
+
+.kds-card.priority-urgent {
+  border-left: 4px solid var(--kds-status-overdue);
+  animation: priority-pulse 2s infinite;
+}
+
+@keyframes priority-pulse {
+  0%, 100% {
+    box-shadow: var(--kds-shadow);
+  }
+  50% {
+    box-shadow: var(--kds-shadow-glow);
+  }
+}
+
+/* ============================================================================
+   Status Badges
+   ============================================================================ */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.fresh {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--kds-status-fresh);
+  border: 1px solid var(--kds-status-fresh);
+}
+
+.status-badge.cooking {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--kds-status-cooking);
+  border: 1px solid var(--kds-status-cooking);
+}
+
+.status-badge.ready {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--kds-status-ready);
+  border: 1px solid var(--kds-status-ready);
+}
+
+.status-badge.urgent {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--kds-status-urgent);
+  border: 1px solid var(--kds-status-urgent);
+}
+
+.status-badge.overdue {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--kds-status-overdue);
+  border: 1px solid var(--kds-status-overdue);
+  animation: badge-flash 2s infinite;
+}
+
+@keyframes badge-flash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ============================================================================
+   Touch-Optimized Buttons
+   ============================================================================ */
+
+.kds-touch-button {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.kds-touch-button:active {
+  transform: scale(0.95);
+}
+
+.kds-touch-button.primary {
+  background: var(--kds-primary);
+  color: white;
+  border: none;
+}
+
+.kds-touch-button.primary:hover {
+  background: color-mix(in srgb, var(--kds-primary) 85%, black);
+  box-shadow: var(--kds-shadow-glow);
+}
+
+.kds-touch-button.secondary {
+  background: transparent;
+  color: var(--kds-text-primary);
+  border: 2px solid var(--kds-text-secondary);
+}
+
+.kds-touch-button.danger {
+  background: var(--kds-timer-red);
+  color: white;
+  border: none;
+}
+
+/* ============================================================================
+   Responsive Grid Layouts
+   ============================================================================ */
+
+.kds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .kds-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+@media (min-width: 1440px) {
+  .kds-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================================================
+   Accessibility & Reduced Motion
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .kds-card {
+    border-width: 2px;
+  }
+  
+  .timer-normal,
+  .timer-warning,
+  .timer-critical,
+  .timer-overdue {
+    font-weight: 700;
+  }
+}

@@ -1,0 +1,99 @@
+/**
+ * Touch-Friendly UI Utilities
+ * Ensures all interactive elements meet accessibility standards
+ * Minimum touch target: 44x44px (WCAG 2.1 Level AAA)
+ */
+
+/* Touch Target Utilities */
+.touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.touch-target-sm {
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.touch-target-lg {
+    min-width: 48px;
+    min-height: 48px;
+}
+
+/* Button Enhancements for Mobile */
+@media (max-width: 768px) {
+
+    button,
+    a[role="button"],
+    [role="button"] {
+        min-height: 44px;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    /* Form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="search"],
+    select,
+    textarea {
+        min-height: 44px;
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+    }
+
+    /* Checkbox and Radio */
+    input[type="checkbox"],
+    input[type="radio"] {
+        min-width: 24px;
+        min-height: 24px;
+    }
+}
+
+/* Active State Feedback for Touch */
+.touch-feedback {
+    transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+.touch-feedback:active {
+    transform: scale(0.97);
+    opacity: 0.8;
+}
+
+/* Prevent Double-Tap Zoom on Buttons */
+button,
+a[role="button"],
+[role="button"] {
+    touch-action: manipulation;
+}
+
+/* Improve Tap Highlight */
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Safe Area Insets for Notched Devices */
+@supports (padding: max(0px)) {
+    .safe-area-inset-top {
+        padding-top: max(env(safe-area-inset-top), 1rem);
+    }
+
+    .safe-area-inset-bottom {
+        padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+    }
+
+    .safe-area-inset-left {
+        padding-left: max(env(safe-area-inset-left), 1rem);
+    }
+
+    .safe-area-inset-right {
+        padding-right: max(env(safe-area-inset-right), 1rem);
+    }
+}

@@ -1,0 +1,112 @@
+"use client";
+
+import { Button } from "@vayva/ui";
+import {
+  Plug,
+  ArrowSquareOut as ExternalLink,
+} from "@phosphor-icons/react/ssr";
+import Link from "next/link";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+
+export default function IntegrationsPage() {
+  return (
+    <div className="p-8">
+      <Breadcrumbs />
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-text-primary mb-2">
+          Integrations
+        </h1>
+        <p className="text-text-secondary mb-8">
+          Connect your store with third-party services and tools.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Payment Gateways */}
+          <div className="bg-background/70 backdrop-blur-xl p-6 rounded-lg border border-border">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-green-100 p-2 rounded">
+                <Plug className="h-5 w-5 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-text-primary">
+                Payment Gateways
+              </h3>
+            </div>
+            <p className="text-sm text-text-secondary mb-4">
+              Paystack integration is pre-configured for your store. Manage your
+              payment settings in Finance.
+            </p>
+            <Link href="/dashboard/settings/payments">
+              <Button variant="outline" size="sm" className="w-full">
+                View Payment Settings
+                <ExternalLink className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* Logistics */}
+          <div className="bg-background/70 backdrop-blur-xl p-6 rounded-lg border border-border">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-blue-100 p-2 rounded">
+                <Plug className="h-5 w-5 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-text-primary">
+                Logistics & Delivery
+              </h3>
+            </div>
+            <p className="text-sm text-text-secondary mb-4">
+              Kwik delivery integration available. Configure your logistics
+              preferences.
+            </p>
+            <Link href="/dashboard/settings/shipping">
+              <Button variant="outline" size="sm" className="w-full">
+                View Logistics Settings
+                <ExternalLink className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* WhatsApp */}
+          <div className="bg-background/70 backdrop-blur-xl p-6 rounded-lg border border-border">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-purple-100 p-2 rounded">
+                <Plug className="h-5 w-5 text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-text-primary">
+                WhatsApp Business
+              </h3>
+            </div>
+            <p className="text-sm text-text-secondary mb-4">
+              Connect your WhatsApp Business account to enable AI-powered
+              customer support.
+            </p>
+            <Link href="/dashboard/settings/whatsapp">
+              <Button variant="outline" size="sm" className="w-full">
+                Configure WhatsApp
+                <ExternalLink className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* More integrations placeholder */}
+          <div className="bg-background/30 p-6 rounded-lg border border-dashed border-border">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-border p-2 rounded">
+                <Plug className="h-5 w-5 text-text-tertiary" />
+              </div>
+              <h3 className="font-semibold text-text-secondary">
+                More Integrations
+              </h3>
+            </div>
+            <p className="text-sm text-text-tertiary mb-4">
+              Additional integrations are being added regularly. Contact support
+              if you need a specific integration.
+            </p>
+            <Button variant="ghost" size="sm" className="w-full" disabled>
+              Request Integration
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

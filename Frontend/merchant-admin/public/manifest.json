@@ -1,0 +1,49 @@
+{
+    "name": "Vayva Merchant",
+    "short_name": "Vayva",
+    "description": "Manage your store on the go",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#F7FAF7",
+    "theme_color": "#22C55E",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/vayva-logo-official.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "categories": [
+        "business",
+        "shopping"
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Inbox",
+            "short_name": "Inbox",
+            "url": "/dashboard/support",
+            "icons": [
+                {
+                    "src": "/vayva-logo-official.svg",
+                    "sizes": "any",
+                    "type": "image/svg+xml"
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "short_name": "Orders",
+            "url": "/dashboard/orders",
+            "icons": [
+                {
+                    "src": "/vayva-logo-official.svg",
+                    "sizes": "any",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    ]
+}

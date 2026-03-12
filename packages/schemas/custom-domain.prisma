@@ -1,0 +1,118 @@
+// Custom Domain & SSL Configuration for Multi-Tenant Storefront
+// Add these models to your main schema.prisma
+
+model StoreDomain {
+  id              String    @id @default(cuid())
+  storeId         String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  // Domain configuration
+  domain          String    @unique // e.g., "www.merchant.com"
+  subdomain       String    @unique // e.g., "merchant" (for merchant.vayva.ng)
+  fullSubdomain   String    @unique // e.g., "merchant.vayva.ng"
+  
+  // Domain status
+  status          DomainStatus @default(PENDING)
+  isPrimary       Boolean   @default(false) // Primary domain for redirects
+  isCustomDomain  Boolean   @default(false) // true if not *.vayva.ng
+  
+  // DNS verification
+  dnsVerified     Boolean   @default(false)
+  dnsVerifiedAt   DateTime?
+  dnsRecords      Json?     // Required DNS records for verification
+  
+  // SSL/TLS Configuration
+  ssl             StoreSSL? @relation(fields: [sslId], references: [id])
+  sslId           String?
+  
+  // Domain masking/aliasing
+  isMasked        Boolean   @default(false) // If true, shows custom domain in browser
+  maskConfig      Json?     // Masking configuration
+  
+  // Redirect settings
+  redirectWww     Boolean   @default(true)  // Redirect www to non-www or vice versa
+  forceHttps      Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([storeId])
+  @@index([status])
+  @@index([subdomain])
+  @@map("store_domains")
+}
+
+model StoreSSL {
+  id              String    @id @default(cuid())
+  storeId         String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  // Certificate type
+  type            SSLType   @default(AUTOMATIC)
+  
+  // For custom certificates
+  certificate     String?   @db.Text // PEM format
+  privateKey      String?   @db.Text // Encrypted PEM format
+  chain           String?   @db.Text // Certificate chain
+  
+  // Certificate metadata
+  issuer          String?
+  subject         String?
+  validFrom       DateTime?
+  validUntil      DateTime?
+  fingerprint     String?
+  
+  // Auto-renewal
+  autoRenew       Boolean   @default(true)
+  lastRenewedAt   DateTime?
+  expiresAt       DateTime?
+  
+  // Status
+  status          SSLStatus @default(PENDING)
+  lastError       String?
+  
+  // Relations
+  domains         StoreDomain[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([storeId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("store_ssl")
+}
+
+// Add to existing Store model:
+// model Store {
+//   ... existing fields ...
+//   domains         StoreDomain[]
+//   sslCerts        StoreSSL[]
+//   defaultDomain   String?   // Default subdomain (e.g., "merchant.vayva.ng")
+//   customDomain    String?   // Primary custom domain if set
+// }
+
+enum DomainStatus {
+  PENDING      // Awaiting DNS verification
+  VERIFYING    // DNS verification in progress
+  ACTIVE       // Domain is active and serving
+  FAILED       // Verification failed
+  SUSPENDED    // Domain suspended
+  EXPIRED      // Domain/SSL expired
+}
+
+enum SSLType {
+  AUTOMATIC    // Vercel/Vayva managed (Let's Encrypt)
+  CUSTOM       // Merchant-provided certificate
+  ADVANCED     // Advanced SSL with custom config
+}
+
+enum SSLStatus {
+  PENDING      // Certificate pending
+  ISSUING      // Certificate being issued
+  ACTIVE       // Certificate active
+  EXPIRING     // Certificate expiring soon
+  EXPIRED      // Certificate expired
+  FAILED       // Certificate issuance failed
+  REVOKED      // Certificate revoked
+}

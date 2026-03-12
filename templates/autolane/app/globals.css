@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 220 20% 98%;
+  --foreground: 220 20% 15%;
+  --card: 220 15% 97%;
+  --card-foreground: 220 20% 15%;
+  --popover: 220 20% 98%;
+  --popover-foreground: 220 20% 15%;
+  --primary: 220 80% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 15% 50%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 10% 40%;
+  --accent: 45 90% 50%;
+  --accent-foreground: 0 0% 10%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 15% 90%;
+  --input: 220 15% 90%;
+  --ring: 220 80% 50%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.section-padding {
+  @apply py-16 md:py-24;
+}

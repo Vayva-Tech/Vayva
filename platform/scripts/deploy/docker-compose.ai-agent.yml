@@ -1,0 +1,83 @@
+# ============================================
+# VAYVA AI AGENT - Docker Compose Overlay
+# Run alongside docker-compose.app.yml for Evolution API
+# ============================================
+
+services:
+  # ---------- AI Agent Service ----------
+  ai-agent:
+    build:
+      context: ../../../..
+      dockerfile: packages/ai-agent/Dockerfile
+    container_name: vayva-ai-agent
+    depends_on:
+      redis:
+        condition: service_healthy
+      evolution-api:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - EVOLUTION_API_URL=http://evolution-api:8080
+      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY}
+      - EVOLUTION_INSTANCE_NAME=${EVOLUTION_INSTANCE_NAME:-vayva-main}
+      # AI Provider Keys (optional - ML works without these)
+      - GROQ_API_KEY_MERCHANT=${GROQ_API_KEY_MERCHANT:-}
+      - GROQ_API_KEY_SUPPORT=${GROQ_API_KEY_SUPPORT:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # ML Configuration
+      - ML_ENABLED=${ML_ENABLED:-true}
+      - ML_SENTIMENT_ENABLED=${ML_SENTIMENT_ENABLED:-true}
+      - ML_FORECAST_ENABLED=${ML_FORECAST_ENABLED:-true}
+      - ML_RECOMMENDATIONS_ENABLED=${ML_RECOMMENDATIONS_ENABLED:-true}
+      - ML_ANOMALY_DETECTION_ENABLED=${ML_ANOMALY_DETECTION_ENABLED:-true}
+      - ML_WORKER_THREADS=${ML_WORKER_THREADS:-2}
+    networks:
+      - vayva
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ---------- AI Agent Health Check Endpoint ----------
+  # Simple nginx proxy for health checks and load balancing
+  ai-agent-proxy:
+    image: nginx:alpine
+    container_name: vayva-ai-agent-proxy
+    depends_on:
+      - ai-agent
+    ports:
+      - "127.0.0.1:3001:80"
+    volumes:
+      - ./nginx-ai-agent.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - vayva
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Use the same network as the main compose file
+networks:
+  vayva:
+    external: true

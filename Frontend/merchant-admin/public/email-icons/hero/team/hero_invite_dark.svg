@@ -1,0 +1,6 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="120" height="120" rx="24" fill="#18181B"/>
+<rect x="30" y="30" width="60" height="60" rx="12" fill="#34D399" fill-opacity="0.2"/>
+<path d="M60 40C48.9543 40 40 48.9543 40 60C40 71.0457 48.9543 80 60 80C71.0457 80 80 71.0457 80 60C80 48.9543 71.0457 40 60 40Z" fill="#34D399"/>
+<text x="60" y="110" font-family="sans-serif" font-size="10" text-anchor="middle" fill="#34D399">hero_invite</text>
+</svg>

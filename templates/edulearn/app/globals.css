@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light Theme Colors - Exact from Dribbble Design */
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  
+  /* Accent Colors */
+  --accent-red: #ef4444;
+  --accent-orange: #f97316;
+  --accent-purple: #8b5cf6;
+  
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --text-white: #ffffff;
+  
+  /* Border Colors */
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  
+  /* Sidebar Width */
+  --sidebar-width: 240px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg 
+           hover:bg-gray-800 transition-all duration-200;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg 
+           border border-gray-200 hover:bg-gray-50 transition-all duration-200;
+  }
+  
+  .btn-accent {
+    @apply px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white 
+           text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200;
+  }
+  
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 
+           hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all duration-200;
+  }
+  
+  .sidebar-link-active {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 
+           bg-red-50 rounded-lg font-medium;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+  }
+  
+  .tab-active {
+    @apply px-4 py-2 text-sm font-medium text-gray-900 border-b-2 border-gray-900;
+  }
+  
+  .tab-inactive {
+    @apply px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

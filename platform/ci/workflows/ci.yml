@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "fix/*"]
+  pull_request:
+    types: [opened, synchronize]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and Test
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test?schema=public
+      NEXTAUTH_SECRET: ci-build-secret-key
+      NEXTAUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ci-build-secret-key
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: 1
+      TURBO_DAEMON: false
+      NODE_OPTIONS: --max-old-space-size=4096
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vayva_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 10.2.0
+          run_install: false
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - uses: actions/cache@v3
+        name: Setup turbo cache
+        with:
+          path: |
+            .turbo
+            apps/**/.next/cache
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (fail fast)
+        run: pnpm lint
+
+      - name: Auth Cookie Domain Guard
+        run: |
+          set -euo pipefail
+          FILES=$(git ls-files \
+            ':!**/.next/**' \
+            ':!**/dist/**' \
+            ':!**/build/**' \
+            ':!**/node_modules/**')
+          # Guard against explicitly setting cookie domain (which would enable cross-subdomain cookie bleeding)
+          DOT_DOMAIN_HITS=$(echo "$FILES" | xargs -r grep -nE "\bdomain\s*:\s*['\"]\.[A-Za-z0-9.-]+['\"]" || true)
+          if [ -n "$DOT_DOMAIN_HITS" ]; then
+            echo "$DOT_DOMAIN_HITS"
+            echo "FAIL: Found explicit cookie domain configuration. Cookies must be host-only (no domain:)."
+            exit 1
+          fi
+          # Extra strict: never allow parent-domain cookie scope for Vayva
+          VAYVA_DOMAIN_HITS=$(echo "$FILES" | xargs -r grep -nE "\bdomain\s*:\s*['\"]\\.vayva\\.ng['\"]" || true)
+          if [ -n "$VAYVA_DOMAIN_HITS" ]; then
+            echo "$VAYVA_DOMAIN_HITS"
+            echo "FAIL: Cookie domain must not be set to .vayva.ng"
+            exit 1
+          fi
+
+      - name: IDOR and Boundary Guard
+        run: node scripts/check-idors.js
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @vayva/db db:generate
+
+      - name: Build all packages
+        run: pnpm turbo run build --summarize --continue --output-logs=full --log-order=stream --concurrency=1
+        continue-on-error: false
+
+      - name: Type check
+        run: pnpm typecheck
+        continue-on-error: false
+
+      - name: Check bundle size
+        run: pnpm check:bundle
+        continue-on-error: false
+
+      - name: Setup test database
+        run: |
+          pnpm --filter @vayva/db db:generate
+          pnpm --filter @vayva/db db:push
+
+      # - name: Install Playwright browsers
+      #   run: pnpm exec playwright install --with-deps
+
+      # - name: E2E tests
+      #   env:
+      #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test?schema=public
+      #     NEXTAUTH_SECRET: "mock_secret_for_ci_tests_only_12345"
+      #     NEXTAUTH_URL: "http://localhost:3000"
+      #     PAYSTACK_SECRET_KEY: "sk_test_mock"
+      #     PAYSTACK_PUBLIC_KEY: "pk_test_mock"
+      #     RESEND_API_KEY: "re_mock_key"
+      #     GROQ_API_KEY: "gsk_mock_key"
+      #     APP_URL: "http://localhost:3000"
+      #   run: pnpm test:e2e
+      #   timeout-minutes: 30
+      #   continue-on-error: true

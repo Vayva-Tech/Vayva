@@ -1,0 +1,25 @@
+{
+  "name": "@vayva/affiliate",
+  "version": "1.0.0",
+  "description": "Affiliate management service for Vayva",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vayva/db": "workspace:*",
+    "@vayva/payments": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

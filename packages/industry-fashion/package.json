@@ -1,0 +1,39 @@
+{
+  "name": "@vayva/industry-fashion",
+  "version": "0.0.1",
+  "description": "Vayva Fashion Industry Engine - Wholesale, B2B, trend analytics, inventory optimization",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/db": "workspace:*",
+    "@vayva/prisma": "workspace:*",
+    "@vayva/realtime": "workspace:*",
+    "@vayva/ai-agent": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/schemas": "workspace:*",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/fashion.engine.ts",
+    "./components": "./src/components/index.ts",
+    "./features": "./src/features/index.ts",
+    "./services": "./src/services/index.ts",
+    "./dashboard": "./src/dashboard-config.ts",
+    "./types": "./src/types.ts"
+  }
+}

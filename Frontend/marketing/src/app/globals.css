@@ -1,0 +1,401 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 142 76% 96%;
+    --accent-foreground: 142 76% 36%;
+    --muted: 142 30% 96%;
+    --muted-foreground: 142 10% 40%;
+    --border: 142 30% 88%;
+    --input: 142 30% 88%;
+    --ring: 142 76% 36%;
+    --radius: 1rem;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --secondary: 142 30% 96%;
+    --secondary-foreground: 142 76% 36%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --chart-1: 142 76% 45%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 142 50% 55%;
+    --chart-4: 130 65% 50%;
+    --chart-5: 150 70% 50%;
+
+    /* Semantic Colors */
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 98%;
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 98%;
+  }
+
+  /* FLUID TYPOGRAPHY: Scale down UI on mobile */
+  html {
+    font-size: 14px;
+    scroll-behavior: smooth;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      font-size: 15px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    /* Semantic Colors - Dark Mode */
+    --success: 142 70% 50%;
+    --success-foreground: 0 0% 9%;
+    --warning: 45 90% 50%;
+    --warning-foreground: 0 0% 9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground;
+    font-family: var(--font-inter), Inter, system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease;
+    background: 
+      /* Primary emerald glow - subtle top gradient */
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(34, 197, 94, 0.15), transparent 50%),
+      /* Secondary emerald glow - bottom right corner */
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(34, 197, 94, 0.10), transparent 40%),
+      /* Tertiary emerald glow - bottom left corner */
+      radial-gradient(ellipse 60% 40% at 10% 100%, rgba(34, 197, 94, 0.08), transparent 30%),
+      /* Soft center glow for depth */
+      radial-gradient(ellipse 50% 30% at 50% 50%, rgba(34, 197, 94, 0.05), transparent 60%),
+      /* Clean white base */
+      #ffffff;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif;
+  }
+}
+
+/* Glass Utilities & Surfaces */
+@layer utilities {
+  /* Clean Design System - Minimal, Human-Centered */
+  
+  /* Surface utilities - Flat, no glass effects */
+  .surface-clean {
+    @apply bg-white;
+  }
+  
+  .surface-gradient {
+    background: linear-gradient(135deg, 
+      rgba(34, 197, 94, 0.03) 0%, 
+      rgba(255, 255, 255, 1) 50%, 
+      rgba(59, 130, 246, 0.03) 100%);
+  }
+  
+  .surface-gradient-green {
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 197, 94, 0.15), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59, 130, 246, 0.08), transparent);
+  }
+
+  /* Emerald blur gradient background for sections - subtle clean look */
+  .bg-emerald-blur {
+    background: 
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(34, 197, 94, 0.15), transparent 50%),
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(34, 197, 94, 0.10), transparent 40%),
+      radial-gradient(ellipse 60% 40% at 10% 100%, rgba(34, 197, 94, 0.08), transparent 30%),
+      radial-gradient(ellipse 50% 30% at 50% 50%, rgba(34, 197, 94, 0.05), transparent 60%),
+      #ffffff;
+    background-attachment: fixed;
+  }
+
+  .crm-canvas {
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(34, 197, 94, 0.15), transparent 50%),
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(34, 197, 94, 0.10), transparent 40%),
+      radial-gradient(ellipse 60% 40% at 10% 100%, rgba(34, 197, 94, 0.08), transparent 30%),
+      radial-gradient(ellipse 50% 30% at 50% 50%, rgba(34, 197, 94, 0.05), transparent 60%),
+      #ffffff;
+    background-attachment: fixed;
+  }
+
+  /* Illustrative stroke decorations */
+  .stroke-decoration {
+    position: relative;
+  }
+  
+  .stroke-decoration::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .stroke-glow {
+    box-shadow: 
+      0 0 0 1px rgba(34, 197, 94, 0.2),
+      0 0 20px rgba(34, 197, 94, 0.1),
+      0 0 40px rgba(34, 197, 94, 0.05);
+  }
+
+  /* Decorative corner accents */
+  .corner-accent {
+    position: relative;
+  }
+  
+  .corner-accent::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(34, 197, 94, 0.4);
+    border-radius: 8px;
+  }
+
+  .corner-accent-top-left::after {
+    top: -8px;
+    left: -8px;
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 12px;
+  }
+
+  .corner-accent-bottom-right::after {
+    bottom: -8px;
+    right: -8px;
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 12px;
+  }
+  
+  /* DEPRECATED: Glass effects - being phased out for cleaner design */
+  .surface-glass {
+    @apply bg-white/[0.22] backdrop-blur-2xl shadow-[0_2px_20px_-4px_rgba(0,0,0,0.06)];
+  }
+
+  .surface-glass-card {
+    @apply bg-white/[0.24] backdrop-blur-2xl shadow-[0_4px_24px_-6px_rgba(0,0,0,0.08)] rounded-3xl;
+  }
+
+  .surface-elevated {
+    @apply bg-white/[0.28] backdrop-blur-xl shadow-[0_4px_24px_-6px_rgba(0,0,0,0.08)];
+  }
+
+  .glass-panel {
+    @apply surface-glass;
+  }
+
+  .glass-card {
+    @apply surface-elevated rounded-2xl;
+  }
+
+  /* Section spacing - generous whitespace */
+  .section-lg {
+    @apply py-24 md:py-32;
+  }
+  
+  .section-md {
+    @apply py-16 md:py-24;
+  }
+  
+  .section-sm {
+    @apply py-12 md:py-16;
+  }
+  
+  /* Container - tighter for readability */
+  .container-readable {
+    @apply max-w-3xl mx-auto px-6;
+  }
+  
+  .container-wide {
+    @apply max-w-6xl mx-auto px-6;
+  }
+  
+  /* Typography scale - clean hierarchy */
+  .text-hero {
+    @apply text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1];
+  }
+  
+  .text-headline {
+    @apply text-3xl md:text-4xl font-semibold tracking-tight leading-tight;
+  }
+  
+  .text-subhead {
+    @apply text-xl md:text-2xl font-medium leading-relaxed;
+  }
+  
+  .text-body-lg {
+    @apply text-lg leading-relaxed;
+  }
+  
+  .text-body {
+    @apply text-base leading-relaxed;
+  }
+
+  /* DEPRECATED - Old typography classes */
+  .text-display {
+    @apply font-heading text-4xl font-bold tracking-tight;
+  }
+
+  .text-title {
+    @apply font-heading text-2xl font-semibold tracking-tight;
+  }
+
+  .text-section {
+    @apply font-sans text-lg font-medium text-foreground;
+  }
+
+  .text-body-old {
+    @apply font-sans text-base text-foreground leading-relaxed;
+  }
+
+  .text-meta {
+    @apply font-sans text-sm text-muted-foreground;
+  }
+
+  .text-link {
+    @apply font-sans text-sm font-medium text-primary hover:underline underline-offset-4 cursor-pointer;
+  }
+
+  /* Micro-interactions */
+  .hover-lift {
+    @apply transition-transform duration-200 ease-out hover:scale-[1.02];
+  }
+  
+  .hover-fade {
+    @apply transition-opacity duration-200 hover:opacity-80;
+  }
+  
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+  
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+  
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Stagger children animations */
+  .stagger-children > * {
+    opacity: 0;
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+  
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  .divider-h {
+    @apply h-px w-full bg-border/40 my-4;
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-fade-in-up,
+    .stagger-children > * {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    
+    .hover-lift:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Density Systems - Global overrides for standard components */
+@layer components {
+  .density-compact table tr td,
+  .density-compact table tr th {
+    @apply py-2 px-3 text-xs;
+  }
+
+  .density-compact .btn-std {
+    @apply h-8 px-3 text-xs;
+  }
+
+  .density-comfortable table tr td,
+  .density-comfortable table tr th {
+    @apply py-4 px-6 text-sm;
+  }
+
+
+  .density-comfortable .btn-std {
+    @apply h-10 px-4 text-sm;
+  }
+}
+
+/* Canvas Design System - Iconography */
+.lucide {
+  stroke-width: 1.5px;
+}

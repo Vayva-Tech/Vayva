@@ -1,0 +1,24 @@
+{
+  "name": "@vayva/customer-success",
+  "version": "1.0.0",
+  "description": "Customer success platform for Vayva - Health scores, playbooks, and NPS",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@vayva/db": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/redis": "workspace:*",
+    "bullmq": "^5.0.0",
+    "date-fns": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}

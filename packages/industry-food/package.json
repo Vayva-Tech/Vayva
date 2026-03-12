@@ -1,0 +1,32 @@
+{
+  "name": "@vayva/industry-food",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/food.engine.ts",
+    "./dashboard": "./src/dashboard/config.ts",
+    "./components": "./src/components/index.ts",
+    "./features": "./src/features/index.ts",
+    "./services": "./src/services/index.ts",
+    "./widgets": "./src/widgets/registry.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/ui": "workspace:*",
+    "react": "^18.x",
+    "react-dom": "^18.x"
+  },
+  "devDependencies": {
+    "@types/react": "^18.x",
+    "typescript": "^5.x"
+  }
+}

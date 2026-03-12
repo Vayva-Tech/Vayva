@@ -1,0 +1,33 @@
+{
+  "name": "@vayva/industry-blog-media",
+  "version": "1.0.0",
+  "description": "Blog & Media industry module for Vayva platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.0",
+    "@vayva/industry-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@vayva/tsconfig": "workspace:*",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "zod": "^3.22.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/blog-media.engine.ts",
+    "./components": "./src/components/index.ts",
+    "./features": "./src/features/index.ts",
+    "./services": "./src/services/index.ts",
+    "./dashboard": "./src/dashboard-config.ts",
+    "./types": "./src/types.ts"
+  }
+}

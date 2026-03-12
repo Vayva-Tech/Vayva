@@ -1,0 +1,37 @@
+{
+  "name": "@vayva/industry-healthcare",
+  "version": "0.0.1",
+  "description": "Vayva Healthcare Industry Engine - Patient management, appointments, telemedicine, HIPAA compliance",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vayva/schemas": "workspace:*",
+    "@vayva/db": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ai-agent": "workspace:*",
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/realtime": "workspace:*",
+    "@hookform/resolvers": "^3.3.4",
+    "react-hook-form": "^7.50.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "@types/react": "^18.x",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/healthcare.engine.ts",
+    "./components": "./src/components/index.ts",
+    "./features": "./src/features/index.ts",
+    "./services": "./src/services/index.ts",
+    "./dashboard": "./src/dashboard/index.ts",
+    "./types": "./src/types/index.ts"
+  }
+}

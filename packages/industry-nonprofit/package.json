@@ -1,0 +1,36 @@
+{
+  "name": "@vayva/industry-nonprofit",
+  "version": "0.1.0",
+  "description": "Vayva Nonprofit Industry Engine - Donor Management, Campaign Tracking, Fundraising",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/schemas": "workspace:*",
+    "@vayva/db": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ai-agent": "workspace:*",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "@types/react": "^18.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/nonprofit.engine.ts",
+    "./components": "./src/components/index.ts",
+    "./features": "./src/features/index.ts",
+    "./services": "./src/services/index.ts",
+    "./dashboard": "./src/dashboard/index.ts",
+    "./types": "./src/types/index.ts"
+  }
+}

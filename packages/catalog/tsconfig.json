@@ -1,0 +1,10 @@
+{
+  "extends": "../../packages/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@vayva/*": ["../../packages/*/src"]
+    }
+  },
+  "include": ["src/**/*"]
+}

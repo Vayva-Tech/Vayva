@@ -1,0 +1,7 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { User, Ticket } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@vayva/ui";
+export const EventHeader = ({ storeName }) => {
+    return (_jsx("header", { className: "sticky top-0 z-50 bg-background/70 backdrop-blur-xl border-b border-gray-100", children: _jsxs("div", { className: "max-w-6xl mx-auto px-6 h-16 flex items-center justify-between", children: [_jsxs(Link, { href: "/", className: "flex items-center gap-2 font-black text-xl tracking-tighter text-gray-900", children: [_jsx("div", { className: "bg-purple-600 text-white p-1 rounded-lg", children: _jsx(Ticket, { size: 18, strokeWidth: 2.5 }) }), storeName?.toUpperCase() || "TICKETLY"] }), _jsxs("nav", { className: "hidden md:flex items-center gap-6 text-sm font-bold text-gray-500", children: [_jsx(Link, { href: "#", className: "hover:text-purple-600 transition-colors", children: "Upcoming Events" }), _jsx(Link, { href: "#", className: "hover:text-purple-600 transition-colors", children: "Past Events" }), _jsx(Link, { href: "#", className: "hover:text-purple-600 transition-colors", children: "Venues" })] }), _jsx("div", { className: "flex items-center gap-3", children: _jsxs(Button, { variant: "outline", className: "hidden sm:flex items-center gap-2 text-sm font-bold text-gray-900 bg-background/50 backdrop-blur-sm hover:bg-gray-200 px-4 py-2 rounded-full transition-colors h-auto", "aria-label": "View my tickets", children: [_jsx(User, { size: 16 }), " My Tickets"] }) })] }) }));
+};

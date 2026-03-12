@@ -1,0 +1,6 @@
+DO $$
+BEGIN
+  ALTER TYPE "Channel" ADD VALUE 'INSTAGRAM';
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;

@@ -1,0 +1,928 @@
+/**
+ * Minimal @vayva/settings package for Phase 3 AI Integration
+ * Contains only the essential types and functions needed for AI settings
+ */
+
+// ===========================================================================
+// CORE TYPES - Only what's needed for AI integration
+// ===========================================================================
+
+export interface AIPersonality {
+  tone: 'professional' | 'friendly' | 'casual' | 'formal' | 'enthusiastic';
+  responseLength: 'concise' | 'moderate' | 'detailed';
+  technicalLevel: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  proactivity: 'reactive' | 'balanced' | 'proactive';
+  emojiUsage: boolean;
+  useIndustryJargon: boolean;
+  explainTechnicalTerms: boolean;
+}
+
+export interface AutomationLevel {
+  mode: 'manual' | 'semi-automated' | 'fully-automated';
+  tasks: {
+    respondToInquiries: boolean;
+    sendFollowUps: boolean;
+    scheduleAppointments: boolean;
+    createSocialMediaPosts: boolean;
+    adjustPrices: boolean;
+    updateInventory: boolean;
+    sendReports: boolean;
+    processRefunds: boolean;
+    approveTransactions: boolean;
+    detectAnomalies: boolean;
+  };
+  approvalRequired: {
+    financialTransactions: boolean;
+    permanentChanges: boolean;
+    externalCommunications: boolean;
+  };
+}
+
+export interface AlertSensitivity {
+  level: 'critical-only' | 'important' | 'all-insights';
+  categories: {
+    salesMilestones: boolean;
+    revenueDrops: boolean;
+    largeOrders: boolean;
+    lowStock: boolean;
+    outOfStock: boolean;
+    overstock: boolean;
+    customerComplaints: boolean;
+    negativeReviews: boolean;
+    employeePerformance: boolean;
+    systemIssues: boolean;
+    securityAlerts: boolean;
+    integrationFailures: boolean;
+    budgetOverruns: boolean;
+  };
+  thresholds: {
+    revenueDropPercent: number;
+    stockLowThreshold: number;
+    customerComplaintVolume: number;
+  };
+  quietHours: {
+    enabled: boolean;
+    startTime: string;
+    endTime: string;
+  };
+}
+
+export interface DataSharingLevel {
+  enableBenchmarking: boolean;
+  shareDataForBenchmarks: boolean;
+  benchmarkComparisonGroup: 'local' | 'national' | 'global' | 'industry-specific';
+  allowDataForModelImprovement: boolean;
+  allowFeatureUsageAnalytics: boolean;
+  dataAccess: {
+    internalTeams: boolean;
+    thirdPartyVendors: boolean;
+    researchPartners: boolean;
+  };
+  thirdPartyIntegrations?: {
+    provider: string;
+    purpose: string;
+    dataShared: string[];
+  }[];
+}
+
+export interface ForecastingSettings {
+  aggressiveness: 'moderate' | 'conservative' | 'aggressive';
+  shortTermDays: number;
+  mediumTermDays: number;
+  longTermDays: number;
+  minimumConfidence: number;
+  predictions: {
+    inventory: boolean;
+    sales: boolean;
+    staffing: boolean;
+    customerDemand: boolean;
+    marketTrends: boolean;
+    seasonalPatterns: boolean;
+    lifetimeValue: boolean;
+  };
+  modelPreference: 'custom' | 'industry-default' | 'simple';
+  includeSeasonality: boolean;
+}
+
+export interface AISettings {
+  industry: {
+    healthcare?: {
+      clinicalDecisionSupport: boolean;
+      drugInteractionChecking: boolean;
+      diagnosisCoding: boolean;
+      patientRiskStratification: boolean;
+      appointmentNoShowPrediction: boolean;
+    };
+    restaurant?: {
+      demandForecasting: boolean;
+      menuEngineering: boolean;
+      staffingOptimization: boolean;
+      inventoryManagement: boolean;
+      customerPreferenceAnalysis: boolean;
+    };
+    retail?: {
+      demandForecasting: boolean;
+      pricingOptimization: boolean;
+      inventoryReplenishment: boolean;
+      customerSegmentation: boolean;
+      crossSellingSuggestions: boolean;
+    };
+    professional?: {
+      projectTimelineForecasting: boolean;
+      resourceAllocation: boolean;
+      clientRetentionPrediction: boolean;
+      billingOptimization: boolean;
+      skillGapAnalysis: boolean;
+    };
+    events?: {
+      attendancePrediction: boolean;
+      pricingOptimization: boolean;
+      vendorSelection: boolean;
+      riskAssessment: boolean;
+      crowdManagement: boolean;
+    };
+  };
+  personality: AIPersonality;
+  automation: AutomationLevel;
+  alerts: AlertSensitivity;
+  dataSharing: DataSharingLevel;
+  forecasting: ForecastingSettings;
+  advanced: {
+    // Model Configuration
+    modelVersion: 'v1' | 'v2' | 'beta';
+    temperature: number;
+    maxTokens: number;
+    contextWindowMessages: number;
+    
+    // Performance Settings
+    enableCaching: boolean;
+    cacheExpirationHours: number;
+    enableDebugLogging: boolean;
+    logApiCalls: boolean;
+  };
+}
+
+export interface BusinessSettings {
+  profile: {
+    businessName: string;
+    email: string;
+    legalBusinessName?: string;
+    tagline?: string;
+    description?: string;
+    phone?: string;
+    website?: string;
+    address?: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+      country: string;
+    };
+    logoUrl?: string;
+    faviconUrl?: string;
+    socialMedia?: {
+      facebook?: string;
+      twitter?: string;
+      instagram?: string;
+      linkedin?: string;
+      youtube?: string;
+    };
+  };
+  branding: {
+    theme: {
+      mode: 'light' | 'dark' | 'system';
+      sidebarColor: 'primary' | 'secondary' | 'accent';
+      headerColor: 'primary' | 'secondary' | 'accent';
+    };
+    colors: {
+      primary: string;
+      secondary: string;
+      accent: string;
+      success: string;
+      warning: string;
+      error: string;
+    };
+    logo: {
+      lightModeUrl?: string;
+      darkModeUrl?: string;
+      faviconUrl?: string;
+      mobileLogoUrl?: string;
+    };
+    typography: {
+      fontFamily: string;
+      baseFontSize: string;
+      headingFontFamily?: string;
+    };
+  };
+  localization: {
+    defaultLanguage: string;
+    currency: string;
+    timezone: string;
+    dateFormat: string;
+    timeFormat: string;
+    numberFormat: 'comma' | 'dot' | 'space';
+  };
+}
+
+export interface DashboardSettings {
+  widgets: Array<{
+    id: string;
+    type: string;
+    position: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    };
+    config: Record<string, unknown>;
+    visible: boolean;
+  }>;
+  layout: {
+    columns: number;
+    rowHeight: number;
+    gutter: number;
+  };
+  refreshInterval: number;
+  autoRefresh: boolean;
+  theme: 'light' | 'dark' | 'system';
+  compactMode: boolean;
+}
+
+export interface NotificationSettings {
+  customRules?: any[];
+  quietHours?: {
+    enabled: boolean;
+    startTime: string;
+    endTime: string;
+    emergencyContactKeywords?: string[];
+    allowEmergencyContacts?: boolean;
+    vipContacts?: string[];
+    timezone?: string;
+    allowVipOverrides?: boolean;
+    allowEmergency?: boolean;
+  };
+  trackEngagement?: boolean;
+  priority?: {
+    highPriorityKeywords?: string[];
+    autoEscalateAfterMinutes?: number;
+  };
+  doNotDisturb?: {
+    enabled: boolean;
+    startDate: string;
+    endDate: string;
+    allowEmergency?: boolean;
+  };
+  channels: {
+    email: {
+      enabled: boolean;
+      address: string;
+      digestEnabled: boolean;
+      digestFrequency: 'hourly' | 'daily' | 'weekly';
+    };
+    push: {
+      enabled: boolean;
+      browserPermission: 'granted' | 'denied' | 'default';
+      deviceTokens?: string[];
+    };
+    sms: {
+      enabled: boolean;
+      provider: 'twilio' | 'nexmo' | 'plivo';
+      senderId?: string;
+      countryCode: string;
+    };
+    inApp: {
+      enabled: boolean;
+      showBadge: boolean;
+      soundEnabled: boolean;
+      desktopNotifications: boolean;
+    };
+    slack: {
+      enabled: boolean;
+      webhookUrl: string;
+      channel: string;
+    };
+    whatsapp: {
+      enabled: boolean;
+      phoneNumber: string;
+      templateNamespace: string;
+    };
+  };
+  categories: {
+    sales: {
+      newOrder: boolean;
+      largeOrder: boolean;
+      largeOrderThreshold: number;
+      orderStatusChange: boolean;
+      paymentReceived: boolean;
+      refundProcessed: boolean;
+      subscriptionRenewal: boolean;
+    };
+    customer: {
+      newReview: boolean;
+      supportTicket: boolean;
+      loyaltyMilestone: boolean;
+      birthday: boolean;
+    };
+    inventory: {
+      lowStock: boolean;
+      outOfStock: boolean;
+      supplierUpdate: boolean;
+      reorderNeeded: boolean;
+    };
+    finance: {
+      paymentReceived: boolean;
+      invoiceDue: boolean;
+      refundProcessed: boolean;
+      subscriptionRenewal: boolean;
+    };
+    system: {
+      loginAlert: boolean;
+      securityWarning: boolean;
+      systemMaintenance: boolean;
+      backupCompleted: boolean;
+      apiRateLimitWarning: boolean;
+      integrationError: boolean;
+    };
+    appointments: {
+      bookingConfirmation: boolean;
+      reminder: boolean;
+      cancellation: boolean;
+      reschedule: boolean;
+    };
+    marketing: {
+      campaignPerformance: boolean;
+      audienceInsight: boolean;
+      contentSuggestion: boolean;
+      competitorUpdate: boolean;
+    };
+    compliance: {
+      licenseExpiry: boolean;
+      auditRequired: boolean;
+      policyUpdate: boolean;
+      trainingDue: boolean;
+    };
+  };
+  digest: {
+    enabled: boolean;
+    frequency: 'daily' | 'weekly' | 'monthly';
+    deliveryTime: string;
+    includeCharts: boolean;
+    maxItems: number;
+  };
+  preferences: {
+    dailyDigestTime: string;
+    weeklyDigestDay: string;
+    monthlyDigestDate: number;
+    priorityThreshold: 'low' | 'medium' | 'high';
+    groupSimilar: boolean;
+    maxNotificationsPerHour: number;
+  };
+}
+
+export interface UserPreferences {
+  theme: {
+    mode: 'light' | 'dark' | 'system';
+    accentColor: string;
+    density: 'compact' | 'comfortable' | 'spacious';
+    fontSize: 'small' | 'medium' | 'large';
+    highContrast: boolean;
+    reduceMotion: boolean;
+  };
+  accessibility: {
+    screenReaderOptimized: boolean;
+    dyslexiaFriendlyFont: boolean;
+    colorBlindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia';
+    keyboardNavigationOnly: boolean;
+    voiceControlEnabled: boolean;
+    simplifiedLayout: boolean;
+    focusMode: boolean;
+    readingAssist: boolean;
+    captionsAlwaysOn: boolean;
+    visualAlerts: boolean;
+  };
+  workspace: {
+    defaultLandingPage: string;
+    itemsPerPage: number;
+    defaultSortOrder: 'asc' | 'desc';
+    viewMode: 'list' | 'grid' | 'kanban';
+    richTextEditor: boolean;
+    showTooltips: boolean;
+    enableKeyboardShortcuts: boolean;
+    autoSaveDrafts: boolean;
+    confirmBeforeDelete: boolean;
+  };
+  privacy: {
+    profileVisibility: 'public' | 'team-only' | 'private';
+    showOnlineStatus: boolean;
+    showContactInfo: boolean;
+  };
+  shortcuts: {
+    enableKeyboardShortcuts: boolean;
+    customShortcuts: Array<{
+      key: string;
+      action: string;
+      description: string;
+    }>;
+    quickActionsShortcut: boolean;
+    quickActionsKey: string;
+  };
+  sessionTimeout: number;
+  rememberMe: boolean;
+  multiSessionAllowed: boolean;
+  onboardingCompleted: boolean;
+  featureTourDismissed: string[];
+  optInBetaFeatures: boolean;
+  betaFeatureFlags: Record<string, boolean>;
+}
+
+export interface SettingsStore {
+  business: BusinessSettings;
+  dashboard: DashboardSettings;
+  notifications: NotificationSettings;
+  user: UserPreferences;
+}
+
+// ===========================================================================
+// SETTINGS MANAGER - Minimal implementation
+// ===========================================================================
+
+export class SettingsManager {
+  private aiSettings: AISettings;
+  private settingsStore: SettingsStore;
+
+  constructor() {
+    this.aiSettings = this.getDefaultAISettings();
+    this.settingsStore = this.getDefaultSettingsStore();
+  }
+
+  private getDefaultAISettings(): AISettings {
+    return {
+      industry: {},
+      personality: {
+        tone: 'professional',
+        responseLength: 'moderate',
+        technicalLevel: 'intermediate',
+        proactivity: 'balanced',
+        emojiUsage: false,
+        useIndustryJargon: true,
+        explainTechnicalTerms: true
+      },
+      automation: {
+        mode: 'semi-automated',
+        tasks: {
+          respondToInquiries: true,
+          sendFollowUps: true,
+          scheduleAppointments: false,
+          createSocialMediaPosts: false,
+          adjustPrices: false,
+          updateInventory: true,
+          sendReports: true,
+          processRefunds: false,
+          approveTransactions: false,
+          detectAnomalies: true
+        },
+        approvalRequired: {
+          financialTransactions: true,
+          permanentChanges: true,
+          externalCommunications: true
+        }
+      },
+      alerts: {
+        level: 'important',
+        categories: {
+          salesMilestones: true,
+          revenueDrops: true,
+          largeOrders: true,
+          lowStock: true,
+          outOfStock: true,
+          overstock: false,
+          customerComplaints: true,
+          negativeReviews: true,
+          employeePerformance: false,
+          systemIssues: true,
+          securityAlerts: true,
+          integrationFailures: true,
+          budgetOverruns: true
+        },
+        thresholds: {
+          revenueDropPercent: 10,
+          stockLowThreshold: 5,
+          customerComplaintVolume: 3
+        },
+        quietHours: {
+          enabled: true,
+          startTime: '22:00',
+          endTime: '08:00'
+        }
+      },
+      dataSharing: {
+        enableBenchmarking: true,
+        shareDataForBenchmarks: true,
+        benchmarkComparisonGroup: 'industry-specific',
+        allowDataForModelImprovement: true,
+        allowFeatureUsageAnalytics: true,
+        dataAccess: {
+          internalTeams: true,
+          thirdPartyVendors: false,
+          researchPartners: false
+        }
+      },
+      forecasting: {
+        aggressiveness: 'moderate',
+        shortTermDays: 7,
+        mediumTermDays: 30,
+        longTermDays: 90,
+        minimumConfidence: 0.7,
+        predictions: {
+          inventory: true,
+          sales: true,
+          staffing: true,
+          customerDemand: true,
+          marketTrends: true,
+          seasonalPatterns: true,
+          lifetimeValue: true
+        },
+        modelPreference: 'industry-default',
+        includeSeasonality: true
+      },
+      advanced: {
+        // Model Configuration
+        modelVersion: 'v2',
+        temperature: 0.7,
+        maxTokens: 1000,
+        contextWindowMessages: 10,
+        
+        // Performance Settings
+        enableCaching: true,
+        cacheExpirationHours: 24,
+        enableDebugLogging: false,
+        logApiCalls: true
+      }
+    };
+  }
+
+  private getDefaultSettingsStore(): SettingsStore {
+    return {
+      business: {
+        profile: {
+          businessName: 'My Business',
+          email: 'contact@mybusiness.com',
+          legalBusinessName: 'My Business LLC',
+          tagline: 'Your business tagline',
+          description: 'Your business description',
+          phone: '+1 (555) 123-4567',
+          website: 'https://mybusiness.com',
+          address: {
+            street: '123 Business St',
+            city: 'Business City',
+            state: 'BC',
+            zipCode: '12345',
+            country: 'US'
+          },
+          logoUrl: '',
+          faviconUrl: '',
+          socialMedia: {
+            facebook: '',
+            twitter: '',
+            instagram: '',
+            linkedin: '',
+            youtube: ''
+          }
+        },
+        branding: {
+          theme: {
+            mode: 'light',
+            sidebarColor: 'primary',
+            headerColor: 'primary'
+          },
+          colors: { 
+            primary: '#3B82F6',
+            secondary: '#64748B',
+            accent: '#8B5CF6',
+            success: '#10B981',
+            warning: '#F59E0B',
+            error: '#EF4444'
+          },
+          logo: {
+            lightModeUrl: '',
+            darkModeUrl: '',
+            faviconUrl: '',
+            mobileLogoUrl: ''
+          },
+          typography: {
+            fontFamily: 'Inter, sans-serif',
+            baseFontSize: '16px',
+          }
+        },
+        localization: {
+          defaultLanguage: 'en',
+          currency: 'USD',
+          timezone: 'America/New_York',
+          dateFormat: 'MM/DD/YYYY',
+          timeFormat: '12h',
+          numberFormat: 'comma'
+        }
+      },
+      dashboard: {
+        widgets: [],
+        layout: {
+          columns: 12,
+          rowHeight: 100,
+          gutter: 16
+        },
+        refreshInterval: 300,
+        autoRefresh: true,
+        theme: 'light',
+        compactMode: false
+      },
+      notifications: {
+        customRules: [],
+        quietHours: {
+          enabled: true,
+          startTime: '22:00',
+          endTime: '08:00',
+          emergencyContactKeywords: ['emergency', 'urgent', 'critical'],
+          allowEmergencyContacts: true,
+          vipContacts: [],
+          timezone: 'America/New_York',
+          allowVipOverrides: true
+        },
+        trackEngagement: true,
+        priority: {
+          highPriorityKeywords: ['urgent', 'emergency', 'critical', 'immediate'],
+          autoEscalateAfterMinutes: 30
+        },
+        doNotDisturb: {
+          enabled: false,
+          startDate: '',
+          endDate: ''
+        },
+        channels: {
+          email: { 
+            enabled: true, 
+            address: '',
+            digestEnabled: false,
+            digestFrequency: 'daily'
+          },
+          push: { 
+            enabled: true,
+            browserPermission: 'default',
+            deviceTokens: []
+          },
+          sms: {
+            enabled: false,
+            provider: 'twilio',
+            senderId: '',
+            countryCode: '+1'
+          },
+          inApp: { 
+            enabled: true,
+            showBadge: true,
+            soundEnabled: true,
+            desktopNotifications: false
+          },
+          slack: {
+            enabled: false,
+            webhookUrl: '',
+            channel: '#notifications'
+          },
+          whatsapp: {
+            enabled: false,
+            phoneNumber: '',
+            templateNamespace: ''
+          }
+        },
+        categories: {
+          sales: { 
+            newOrder: true,
+            largeOrder: true,
+            largeOrderThreshold: 500,
+            orderStatusChange: false,
+            paymentReceived: true,
+            refundProcessed: true,
+            subscriptionRenewal: true
+          },
+          customer: {
+            newReview: true,
+            supportTicket: true,
+            loyaltyMilestone: true,
+            birthday: true
+          },
+          inventory: {
+            lowStock: true,
+            outOfStock: true,
+            supplierUpdate: true,
+            reorderNeeded: true
+          },
+          finance: {
+            paymentReceived: true,
+            invoiceDue: true,
+            refundProcessed: true,
+            subscriptionRenewal: true
+          },
+          system: {
+            loginAlert: true,
+            securityWarning: true,
+            systemMaintenance: true,
+            backupCompleted: true,
+            apiRateLimitWarning: true,
+            integrationError: true
+          },
+          appointments: {
+            bookingConfirmation: true,
+            reminder: true,
+            cancellation: true,
+            reschedule: true
+          },
+          marketing: {
+            campaignPerformance: true,
+            audienceInsight: true,
+            contentSuggestion: true,
+            competitorUpdate: true
+          },
+          compliance: {
+            licenseExpiry: true,
+            auditRequired: true,
+            policyUpdate: true,
+            trainingDue: true
+          }
+        },
+        digest: { 
+          enabled: false,
+          frequency: 'daily',
+          deliveryTime: '09:00',
+          includeCharts: true,
+          maxItems: 20
+        },
+        preferences: {
+          dailyDigestTime: '09:00',
+          weeklyDigestDay: 'monday',
+          monthlyDigestDate: 1,
+          priorityThreshold: 'medium',
+          groupSimilar: true,
+          maxNotificationsPerHour: 10
+        }
+      },
+      user: {
+        theme: { 
+          mode: 'system',
+          accentColor: '#3B82F6',
+          density: 'comfortable',
+          fontSize: 'medium',
+          highContrast: false,
+          reduceMotion: false
+        },
+        accessibility: {
+          screenReaderOptimized: false,
+          dyslexiaFriendlyFont: false,
+          colorBlindMode: 'none',
+          keyboardNavigationOnly: false,
+          voiceControlEnabled: false,
+          simplifiedLayout: false,
+          focusMode: false,
+          readingAssist: false,
+          captionsAlwaysOn: false,
+          visualAlerts: false
+        },
+        workspace: {
+          defaultLandingPage: '/dashboard',
+          itemsPerPage: 20,
+          defaultSortOrder: 'desc',
+          viewMode: 'list',
+          richTextEditor: true,
+          showTooltips: true,
+          enableKeyboardShortcuts: true,
+          autoSaveDrafts: true,
+          confirmBeforeDelete: true
+        },
+        privacy: {
+          profileVisibility: 'team-only',
+          showOnlineStatus: true,
+          showContactInfo: false
+        },
+        shortcuts: {
+          enableKeyboardShortcuts: true,
+          customShortcuts: [],
+          quickActionsShortcut: true,
+          quickActionsKey: 'k'
+        },
+        sessionTimeout: 60,
+        rememberMe: true,
+        multiSessionAllowed: true,
+        onboardingCompleted: false,
+        featureTourDismissed: [],
+        optInBetaFeatures: false,
+        betaFeatureFlags: {}
+      }
+    };
+  }
+
+  public getAISettings(): AISettings {
+    return this.aiSettings;
+  }
+
+  public getSettings(): SettingsStore {
+    return this.settingsStore;
+  }
+
+  public updateAISettings(newSettings: Partial<AISettings>): void {
+    this.aiSettings = { ...this.aiSettings, ...newSettings };
+  }
+
+  public updateBusinessSettings(updates: Partial<BusinessSettings>): void {
+    this.settingsStore.business = { ...this.settingsStore.business, ...updates };
+  }
+
+  public updateDashboardSettings(updates: Partial<DashboardSettings>): void {
+    this.settingsStore.dashboard = { ...this.settingsStore.dashboard, ...updates };
+  }
+
+  public updateNotificationSettings(updates: Partial<NotificationSettings>): void {
+    this.settingsStore.notifications = { ...this.settingsStore.notifications, ...updates };
+  }
+
+  public updateUserPreferences(updates: Partial<UserPreferences>): void {
+    this.settingsStore.user = { ...this.settingsStore.user, ...updates };
+  }
+}
+
+// Global instance
+let manager: SettingsManager | null = null;
+
+export function getSettingsManager(): SettingsManager {
+  if (!manager) {
+    manager = new SettingsManager();
+  }
+  return manager;
+}
+
+export function initializeSettingsManager(instance: SettingsManager): void {
+  manager = instance;
+}
+
+  public async saveAllSettings(): Promise<void> {
+    // Mock implementation - in real app this would persist to database
+    return Promise.resolve();
+  }
+
+  public reset(): void {
+    this.aiSettings = this.getDefaultAISettings();
+    this.settingsStore = this.getDefaultSettingsStore();
+  }
+
+  public exportSettings(): string {
+    return JSON.stringify({
+      ai: this.aiSettings,
+      settings: this.settingsStore
+    }, null, 2);
+  }
+
+  public async importSettings(settingsJson: string): Promise<void> {
+    // Mock implementation
+    const parsed = JSON.parse(settingsJson);
+    if (parsed.ai) this.aiSettings = parsed.ai;
+    if (parsed.settings) this.settingsStore = parsed.settings;
+  }
+
+// Convenience hooks for React components
+export function useAISettings() {
+  const manager = getSettingsManager();
+  return {
+    ai: manager.getAISettings(),
+    updateAISettings: (updates: Partial<AISettings>) => manager.updateAISettings(updates)
+  };
+}
+
+export function useBusinessSettings() {
+  const manager = getSettingsManager();
+  return {
+    business: manager.getSettings().business,
+    updateBusinessSettings: (updates: Partial<BusinessSettings>) => manager.updateBusinessSettings(updates)
+  };
+}
+
+export function useDashboardSettings() {
+  const manager = getSettingsManager();
+  return {
+    dashboard: manager.getSettings().dashboard,
+    widgets: manager.getSettings().dashboard.widgets,
+    refreshInterval: manager.getSettings().dashboard.refreshInterval,
+    updateDashboardSettings: (updates: Partial<DashboardSettings>) => manager.updateDashboardSettings(updates)
+  };
+}
+
+export function useNotificationSettings() {
+  const manager = getSettingsManager();
+  return {
+    notifications: manager.getSettings().notifications,
+    updateNotificationSettings: (updates: Partial<NotificationSettings>) => manager.updateNotificationSettings(updates)
+  };
+}
+
+export function useUserPreferences() {
+  const manager = getSettingsManager();
+  return {
+    user: manager.getSettings().user,
+    updateUserPreferences: (updates: Partial<UserPreferences>) => manager.updateUserPreferences(updates)
+  };
+}

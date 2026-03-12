@@ -1,0 +1,319 @@
+/* Professional Services Theme - Signature Clean Design */
+
+/* Primary Professional Palette */
+:root[data-theme="professional"] {
+  /* Core Colors */
+  --primary: #3B82F6; /* Trust Blue */
+  --primary-foreground: #FFFFFF;
+  --secondary: #10B981; /* Success Green */
+  --secondary-foreground: #FFFFFF;
+  --accent: #F59E0B; /* Amber */
+  --accent-foreground: #FFFFFF;
+  
+  /* Backgrounds */
+  --background: #F8FAFC; /* Light gray-blue */
+  --foreground: #1E293B; /* Dark slate */
+  --card: #FFFFFF;
+  --card-foreground: #1E293B;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E293B;
+  
+  /* Borders */
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  
+  /* Status Colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --destructive: #EF4444;
+  --info: #3B82F6;
+  
+  /* Text Colors */
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  
+  /* Professional Gradients */
+  --gradient-primary: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  --gradient-secondary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --gradient-accent: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(59 130 246 / 0.05);
+  --shadow: 0 4px 24px 0 rgb(59 130 246 / 0.15);
+  --shadow-md: 0 6px 30px 0 rgb(59 130 246 / 0.20);
+  --shadow-lg: 0 10px 40px 0 rgb(59 130 246 / 0.25);
+  --shadow-xl: 0 20px 60px 0 rgb(59 130 246 / 0.30);
+  
+  /* Spacing & Radius */
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Professional Widget Styles */
+  --widget-bg: #FFFFFF;
+  --widget-border: #E2E8F0;
+  --widget-hover-bg: #F1F5F9;
+  --widget-shadow: 0 4px 24px rgba(59, 130, 246, 0.15);
+  
+  /* Chart Colors */
+  --chart-1: #3B82F6;
+  --chart-2: #10B981;
+  --chart-3: #F59E0B;
+  --chart-4: #8B5CF6;
+  --chart-5: #EF4444;
+  
+  /* Practice Area Colors */
+  --corporate-law: #3B82F6;
+  --litigation: #EF4444;
+  --real-estate: #10B981;
+  --family-law: #F59E0B;
+  --ip-law: #8B5CF6;
+  --employment: #06B6D4;
+  --tax-law: #8B5CF6;
+  --estate-planning: #059669;
+}
+
+/* Professional Services Component Styles */
+.theme-professional {
+  /* Card Styles */
+  .professional-card {
+    background: var(--widget-bg);
+    border: 1px solid var(--widget-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+  }
+  
+  .professional-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  
+  /* Metric Card Styles */
+  .metric-card {
+    background: linear-gradient(135deg, var(--widget-bg) 0%, #F8FAFC 100%);
+    border-left: 4px solid var(--primary);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .metric-card.blue {
+    border-left-color: var(--primary);
+  }
+  
+  .metric-card.green {
+    border-left-color: var(--success);
+  }
+  
+  .metric-card.purple {
+    border-left-color: var(--chart-4);
+  }
+  
+  .metric-card.amber {
+    border-left-color: var(--accent);
+  }
+  
+  /* Status Badge Styles */
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+  
+  .status-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  
+  .status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #D97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  
+  .status-overdue {
+    background: rgba(239, 68, 68, 0.1);
+    color: #DC2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+  
+  /* Progress Bar Styles */
+  .progress-bar-container {
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+  
+  /* Practice Area Tags */
+  .practice-area-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .tag-corporate {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1D4ED8;
+  }
+  
+  .tag-litigation {
+    background: rgba(239, 68, 68, 0.1);
+    color: #DC2626;
+  }
+  
+  .tag-real-estate {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+  }
+  
+  .tag-family {
+    background: rgba(245, 158, 11, 0.1);
+    color: #D97706;
+  }
+  
+  /* Timeline Styles */
+  .professional-timeline {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  
+  .professional-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary) 0%, var(--accent) 100%);
+  }
+  
+  .timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 0.5rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px var(--primary);
+  }
+  
+  /* Alert Styles */
+  .professional-alert {
+    padding: 1rem;
+    border-radius: var(--radius);
+    border-left: 4px solid;
+    margin-bottom: 1rem;
+  }
+  
+  .alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-left-color: var(--accent);
+    color: #92400E;
+  }
+  
+  .alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border-left-color: var(--primary);
+    color: #1E3A8A;
+  }
+  
+  .alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border-left-color: var(--success);
+    color: #065F46;
+  }
+  
+  /* Button Variants */
+  .btn-professional {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-professional:hover {
+    background: #2563EB;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn-professional-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-professional-outline:hover {
+    background: var(--primary);
+    color: white;
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .theme-professional {
+    .metric-card {
+      padding: 1rem;
+    }
+    
+    .professional-card {
+      border-radius: var(--radius);
+    }
+  }
+}
+
+/* Print Styles */
+@media print {
+  .theme-professional {
+    .professional-card {
+      box-shadow: none;
+      border: 1px solid #E2E8F0;
+    }
+    
+    .btn-professional,
+    .btn-professional-outline {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,546 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  avatar        String?
+  role          UserRole  @default(STUDENT)
+  bio           String?
+  company       String?
+  title         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Auth
+  password      String?
+  emailVerified DateTime?
+  
+  // Relations
+  enrollments   Enrollment[]
+  favorites     Favorite[]
+  comments      Comment[]
+  submissions   Submission[]
+  forumPosts    ForumPost[]
+  forumReplies  ForumReply[]
+  progress      LessonProgress[]
+  certificates  Certificate[]
+  purchases     Purchase[]
+  notifications Notification[]
+  
+  // Mentor specific
+  taughtCourses Course[]   @relation("CourseInstructor")
+  
+  @@map("users")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  shortDesc   String?
+  thumbnail   String?
+  trailerUrl  String?
+  
+  // Pricing
+  price       Float    @default(0)
+  isFree      Boolean  @default(true)
+  
+  // Metadata
+  level       CourseLevel @default(BEGINNER)
+  category    String
+  tags        String[]
+  duration    Int      // in minutes
+  language    String   @default("en")
+  
+  // Stats
+  studentCount Int     @default(0)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  
+  // Status
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  instructorId String
+  instructor   User     @relation("CourseInstructor", fields: [instructorId], references: [id])
+  
+  sections     Section[]
+  enrollments  Enrollment[]
+  favorites    Favorite[]
+  reviews      Review[]
+  resources    Resource[]
+  certificates Certificate[]
+  
+  @@map("courses")
+}
+
+model Section {
+  id       String @id @default(cuid())
+  title    String
+  order    Int
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  lessons  Lesson[]
+  
+  @@map("sections")
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int
+  duration    Int      // in minutes
+  
+  // Content
+  videoUrl    String?
+  content     String?  @db.Text // Markdown content
+  
+  // Type
+  type        LessonType @default(VIDEO)
+  isPreview   Boolean  @default(false)
+  
+  sectionId   String
+  section     Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  progress    LessonProgress[]
+  resources   Resource[]
+  
+  @@map("lessons")
+}
+
+model LessonProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  isCompleted Boolean @default(false)
+  progressPercent Int @default(0)
+  lastWatchedAt DateTime?
+  completedAt DateTime?
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, lessonId])
+  @@map("lesson_progress")
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  status    EnrollmentStatus @default(ACTIVE)
+  enrolledAt DateTime @default(now())
+  completedAt DateTime?
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@map("favorites")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@map("reviews")
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  type        ResourceType
+  size        String?
+  
+  courseId    String?
+  course      Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  lessonId    String?
+  lesson      Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  
+  @@map("resources")
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  issuedAt    DateTime @default(now())
+  downloadUrl String?
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@map("certificates")
+}
+
+// Programs (Learning Paths)
+model Program {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  thumbnail   String?
+  
+  level       CourseLevel @default(BEGINNER)
+  duration    Int      // in minutes
+  price       Float    @default(0)
+  
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  courses     ProgramCourse[]
+  enrollments ProgramEnrollment[]
+  
+  @@map("programs")
+}
+
+model ProgramCourse {
+  id        String @id @default(cuid())
+  programId String
+  courseId  String
+  order     Int
+  
+  @@map("program_courses")
+}
+
+model ProgramEnrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  programId String
+  enrolledAt DateTime @default(now())
+  
+  @@map("program_enrollments")
+}
+
+// Challenges
+model Challenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  category    String
+  difficulty  Difficulty @default(MEDIUM)
+  
+  startDate   DateTime
+  endDate     DateTime?
+  
+  prize       String?
+  isActive    Boolean  @default(true)
+  
+  submissions Submission[]
+  
+  @@map("challenges")
+}
+
+model Submission {
+  id          String   @id @default(cuid())
+  challengeId String
+  userId      String
+  
+  title       String
+  description String?
+  projectUrl  String?
+  
+  status      SubmissionStatus @default(PENDING)
+  score       Int?
+  submittedAt DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("submissions")
+}
+
+// Workshops / Live Events
+model Workshop {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  
+  instructorId String
+  thumbnail   String?
+  
+  startTime   DateTime
+  duration    Int      // in minutes
+  timezone    String   @default("UTC")
+  
+  maxAttendees Int?
+  price       Float    @default(0)
+  
+  meetingUrl  String?
+  recordingUrl String?
+  
+  isPublished Boolean @default(false)
+  createdAt   DateTime @default(now())
+  
+  registrations WorkshopRegistration[]
+  
+  @@map("workshops")
+}
+
+model WorkshopRegistration {
+  id          String   @id @default(cuid())
+  workshopId  String
+  userId      String
+  registeredAt DateTime @default(now())
+  attended    Boolean  @default(false)
+  
+  @@map("workshop_registrations")
+}
+
+// Forum / Community
+model ForumCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  order       Int      @default(0)
+  
+  topics      ForumTopic[]
+  
+  @@map("forum_categories")
+}
+
+model ForumTopic {
+  id          String   @id @default(cuid())
+  categoryId  String
+  title       String
+  slug        String   @unique
+  description String?
+  
+  category    ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  posts       ForumPost[]
+  
+  @@map("forum_topics")
+}
+
+model ForumPost {
+  id          String   @id @default(cuid())
+  topicId     String
+  userId      String
+  
+  title       String
+  content     String   @db.Text
+  isPinned    Boolean  @default(false)
+  
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  replies     ForumReply[]
+  
+  @@map("forum_posts")
+}
+
+model ForumReply {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@map("forum_replies")
+}
+
+// Comments (on lessons/videos)
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String?
+  courseId  String?
+  
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("comments")
+}
+
+// Calendar Events
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  
+  type        EventType @default(LESSON)
+  
+  startTime   DateTime
+  endTime     DateTime?
+  
+  courseId    String?
+  lessonId    String?
+  workshopId  String?
+  
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  @@map("calendar_events")
+}
+
+// Store / Products
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  
+  type        ProductType @default(TEMPLATE)
+  fileUrl     String
+  previewUrl  String?
+  
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  purchases   Purchase[]
+  
+  @@map("products")
+}
+
+model Purchase {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String
+  amount      Float
+  purchasedAt DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@map("purchases")
+}
+
+// Notifications
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String?
+  data      Json?
+  
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+  QUIZ
+  ASSIGNMENT
+  PROJECT
+}
+
+enum ResourceType {
+  VIDEO
+  PDF
+  ZIP
+  BLEND
+  PSD
+  AI
+  CODE
+  OTHER
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  SUSPENDED
+  CANCELLED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+enum SubmissionStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  WINNER
+}
+
+enum EventType {
+  LESSON
+  DEADLINE
+  WORKSHOP
+  CHALLENGE
+  LIVE_SESSION
+}
+
+enum ProductType {
+  TEMPLATE
+  ASSET_PACK
+  PLUGIN
+  PRESET
+  EBOOK
+}
+
+enum NotificationType {
+  COURSE_UPDATE
+  NEW_ENROLLMENT
+  COURSE_COMPLETED
+  NEW_REVIEW
+  REPLY_RECEIVED
+  DEADLINE_REMINDER
+  SYSTEM
+}

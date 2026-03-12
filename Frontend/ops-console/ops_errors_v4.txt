@@ -1,0 +1,7 @@
+
+> ops-console@0.0.0 typecheck /Users/fredrick/Documents/GitHub/vayva/apps/ops-console
+> tsc --noEmit
+
+src/lib/ops-metrics.ts(126,6): error TS1005: ',' expected.
+src/lib/ops-metrics.ts(136,1): error TS1005: '}' expected.
+ ELIFECYCLE  Command failed with exit code 2.

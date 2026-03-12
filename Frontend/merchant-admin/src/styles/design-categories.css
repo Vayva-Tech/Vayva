@@ -1,0 +1,209 @@
+/* ============================================================================
+   DESIGN CATEGORY STYLES
+   ============================================================================
+   Dynamic CSS variables for each design category
+   Applied via data-design-category attribute
+   ============================================================================ */
+
+/* Glassmorphism Design (Fashion, Beauty, Real Estate) */
+[data-design-category="glass"] {
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(255, 255, 255, 0.4);
+  --backdrop-blur: 20px;
+  --shadow-card: 0 8px 32px rgba(236, 72, 153, 0.1);
+  --gradient-primary: linear-gradient(135deg, #F472B6 0%, #FDB4A4 50%, #FCD34D 100%);
+  --gradient-secondary: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+  --background-base: #FFF5F7;
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --accent-glow: rgba(236, 72, 153, 0.3);
+}
+
+[data-design-category="glass"] .dashboard-card,
+[data-design-category="glass"] .card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.1);
+}
+
+[data-design-category="glass"] .btn-primary {
+  background: linear-gradient(135deg, #F472B6 0%, #FDB4A4 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.3);
+}
+
+/* Dark Mode Design (Tech, SaaS, Digital) */
+[data-design-category="dark"] {
+  --bg-primary: #0D0D0D;
+  --bg-secondary: #1A1A1A;
+  --bg-card: rgba(30, 30, 30, 0.95);
+  --border-color: #2D2D2D;
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+  --text-tertiary: #6B7280;
+  --accent-primary: #6366F1;
+  --accent-secondary: #8B5CF6;
+  --gradient-primary: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-design-category="dark"] {
+  background-color: #0D0D0D;
+  color: #E5E7EB;
+}
+
+[data-design-category="dark"] .dashboard-card,
+[data-design-category="dark"] .card {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid #2D2D2D;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-design-category="dark"] .btn-primary {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: white;
+}
+
+/* Bold Design (Food, Events, Nightlife) */
+[data-design-category="bold"] {
+  --border-width: 2px;
+  --border-color: #000000;
+  --shadow-solid: 4px 4px 0px #000000;
+  --gradient-primary: linear-gradient(135deg, #FF2E63 0%, #F73D93 100%);
+  --accent-primary: #FF2E63;
+  --accent-secondary: #F73D93;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --live-color: #00F5FF;
+  --sold-color: #FF2E63;
+  --available-color: #00E676;
+  --low-stock-color: #F59E0B;
+}
+
+[data-design-category="bold"] .dashboard-card,
+[data-design-category="bold"] .card {
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
+  background: white;
+}
+
+[data-design-category="bold"] .btn-primary {
+  background: linear-gradient(135deg, #FF2E63 0%, #F73D93 100%);
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0px #000000;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Live indicator pulse animation for Bold category */
+[data-design-category="bold"] .live-indicator {
+  animation: pulse-live 2s infinite;
+}
+
+@keyframes pulse-live {
+  0% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 245, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0); }
+}
+
+/* Natural Design (Grocery, Fitness, Travel, Nonprofit) */
+[data-design-category="natural"] {
+  --bg-gradient: linear-gradient(180deg, #FEFCE8 0%, #FEF3C7 100%);
+  --accent-color: #D97706;
+  --border-radius: 16px;
+  --text-primary: #7C2D12;
+  --text-secondary: #92400E;
+  --card-bg: #FFFBEB;
+  --card-border: #FED7AA;
+  --shadow-soft: 0 4px 16px rgba(217, 119, 6, 0.1);
+}
+
+[data-design-category="natural"] {
+  background: linear-gradient(180deg, #FEFCE8 0%, #FEF3C7 100%);
+}
+
+[data-design-category="natural"] .dashboard-card,
+[data-design-category="natural"] .card {
+  background: #FFFBEB;
+  border: 1px solid #FED7AA;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(217, 119, 6, 0.1);
+}
+
+[data-design-category="natural"] .btn-primary {
+  background: #D97706;
+  color: white;
+  border-radius: 12px;
+}
+
+/* Signature Design (Default - Professional) */
+[data-design-category="signature"] {
+  --bg-primary: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --border-color: #E5E7EB;
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --accent-primary: #6366F1;
+  --gradient-primary: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+[data-design-category="signature"] .dashboard-card,
+[data-design-category="signature"] .card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+}
+
+[data-design-category="signature"] .btn-primary {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: white;
+  border-radius: 8px;
+}
+
+/* ============================================================================
+   COMPONENT-SPECIFIC OVERRIDES
+   ============================================================================ */
+
+/* KPI Blocks */
+[data-design-category="glass"] .kpi-block {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+[data-design-category="bold"] .kpi-block {
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px #000000;
+}
+
+[data-design-category="dark"] .kpi-block {
+  background: rgba(40, 40, 40, 0.8);
+  border: 1px solid #374151;
+}
+
+/* Navigation */
+[data-design-category="glass"] .sidebar {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-design-category="dark"] .sidebar {
+  background: #111827;
+  border-right: 1px solid #374151;
+}
+
+/* Headers */
+[data-design-category="bold"] .page-header {
+  border-bottom: 3px solid #000000;
+}
+
+[data-design-category="natural"] .page-header {
+  background: linear-gradient(to right, #FEFCE8, #FEF3C7);
+  border-bottom: 1px solid #FED7AA;
+}

@@ -1,0 +1,17 @@
+{
+    "name": "@vayva/compliance",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "scripts": {
+        "test": "vitest run --passWithNoTests",
+        "typecheck": "tsc --noEmit -p tsconfig.json"
+    },
+    "dependencies": {
+        "@vayva/db": "workspace:*"
+    },
+    "devDependencies": {
+        "typescript": "^5.9.3",
+        "vitest": "^1.6.1"
+    }
+}

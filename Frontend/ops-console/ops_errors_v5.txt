@@ -1,0 +1,7 @@
+
+> ops-console@0.0.0 typecheck /Users/fredrick/Documents/GitHub/vayva/apps/ops-console
+> tsc --noEmit
+
+src/app/ops/(app)/tools/page.tsx(120,81): error TS2339: Property 'message' does not exist on type '{}'.
+src/app/ops/(auth)/login/page.tsx(53,16): error TS18046: 'err' is of type 'unknown'.
+ ELIFECYCLE  Command failed with exit code 2.

@@ -1,0 +1,361 @@
+// Restaurant Industry Schema Extensions
+// These models support the @vayva/industry-restaurant package features
+
+// ============================================
+// Kitchen Display System (KDS)
+// ============================================
+
+model KitchenOrder {
+  id                String   @id @default(cuid())
+  merchantId        String
+  orderNumber       String
+  course            String   // appetizer, entree, dessert, drink
+  priority          String   @default("normal") // rush, normal, future
+  station           String
+  status            String   @default("pending") // pending, preparing, ready, served, bumped
+  modifiers         String[] @default([])
+  allergies         String[] @default([])
+  specialInstructions String?
+  serverName        String?
+  tableNumber       String?
+  guestCount        Int?
+  
+  // Timing
+  receivedAt        DateTime @default(now())
+  promisedTime      DateTime?
+  startedAt         DateTime?
+  readyAt           DateTime?
+  servedAt          DateTime?
+  bumpedAt          DateTime?
+  prepTimeMinutes   Int?
+  
+  // Relations
+  items             KitchenOrderItem[]
+  
+  @@index([merchantId, status])
+  @@index([merchantId, station])
+  @@index([receivedAt])
+}
+
+model KitchenOrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  menuItemId  String
+  name        String
+  quantity    Int
+  status      String  @default("pending")
+  station     String
+  course      String
+  notes       String?
+  
+  // Relations
+  order       KitchenOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  modifiers   KitchenOrderItemModifier[]
+  
+  @@index([orderId])
+}
+
+model KitchenOrderItemModifier {
+  id                String  @id @default(cuid())
+  orderItemId       String
+  name              String
+  priceAdjustment   Float   @default(0)
+  type              String  // add, remove, substitute
+  
+  // Relations
+  orderItem         KitchenOrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  
+  @@index([orderItemId])
+}
+
+model KDSStation {
+  id            String   @id @default(cuid())
+  merchantId    String
+  name          String
+  categories    String[] // Menu categories this station handles
+  printers      String[]
+  displayOrder  Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([merchantId])
+  @@unique([merchantId, name])
+}
+
+// ============================================
+// Recipe Costing
+// ============================================
+
+model Recipe {
+  id              String   @id @default(cuid())
+  merchantId      String
+  menuItemId      String   @unique
+  name            String
+  description     String?
+  yield           Float    @default(1)
+  yieldUnit       String   @default("serving")
+  prepTimeMinutes Int      @default(0)
+  cookTimeMinutes Int      @default(0)
+  notes           String?
+  version         Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  ingredients     RecipeIngredient[]
+  instructions    RecipeInstruction[]
+  
+  @@index([merchantId])
+  @@index([menuItemId])
+}
+
+model RecipeIngredient {
+  id            String  @id @default(cuid())
+  recipeId      String
+  ingredientId  String
+  name          String
+  quantity      Float
+  unit          String
+  prepNotes     String?
+  optional      Boolean @default(false)
+  
+  // Relations
+  recipe        Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  
+  @@index([recipeId])
+  @@index([ingredientId])
+}
+
+model RecipeInstruction {
+  id          String  @id @default(cuid())
+  recipeId    String
+  stepNumber  Int
+  instruction String
+  
+  // Relations
+  recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  
+  @@index([recipeId])
+}
+
+model Ingredient {
+  id              String   @id @default(cuid())
+  merchantId      String
+  name            String
+  category        String
+  unit            String
+  currentCost     Float    @default(0)
+  averageCost     Float    @default(0)
+  vendorId        String?
+  vendorName      String?
+  parLevel        Float    @default(0)
+  onHand          Float    @default(0)
+  lastOrdered     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  priceHistory    IngredientPriceHistory[]
+  
+  @@index([merchantId])
+  @@index([merchantId, category])
+}
+
+model IngredientPriceHistory {
+  id            String   @id @default(cuid())
+  ingredientId  String
+  price         Float
+  vendorId      String?
+  date          DateTime @default(now())
+  
+  // Relations
+  ingredient    Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  
+  @@index([ingredientId])
+  @@index([date])
+}
+
+// ============================================
+// 86 Manager (Sold Out Items)
+// ============================================
+
+model EightySixItem {
+  id                String   @id @default(cuid())
+  merchantId        String
+  menuItemId        String
+  name              String
+  reason            String   // sold_out, ingredient_unavailable, kitchen_issue, equipment_down, staff_shortage
+  reasonDetails     String?
+  eightySixedAt     DateTime @default(now())
+  eightySixedBy     String
+  estimatedRestock  DateTime?
+  restockedAt       DateTime?
+  restockedBy       String?
+  affectedItems     String[] @default([])
+  channelsDisabled  String[] @default([])
+  isActive          Boolean  @default(true)
+  
+  // Relations
+  events            EightySixEvent[]
+  
+  @@index([merchantId, isActive])
+  @@index([merchantId, menuItemId])
+  @@index([eightySixedAt])
+}
+
+model EightySixEvent {
+  id          String   @id @default(cuid())
+  itemId      String
+  type        String   // eighty_sixed, restocked, extended
+  timestamp   DateTime @default(now())
+  userId      String
+  userName    String
+  details     String?
+  
+  // Relations
+  item        EightySixItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@index([itemId])
+  @@index([timestamp])
+}
+
+model Auto86Rule {
+  id                  String   @id @default(cuid())
+  merchantId          String
+  ingredientId        String
+  ingredientName      String
+  thresholdQuantity   Float
+  affectedMenuItems   String[]
+  enabled             Boolean  @default(true)
+  channelsToDisable   String[] @default([])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([merchantId])
+  @@index([merchantId, ingredientId])
+}
+
+// ============================================
+// Table Management
+// ============================================
+
+model RestaurantTable {
+  id                  String   @id @default(cuid())
+  merchantId          String
+  number              String
+  name                String?
+  shape               String   // round, square, rectangle, booth, bar, outdoor
+  capacity            Int
+  minCapacity         Int      @default(1)
+  maxCapacity         Int
+  section             String   @default("main")
+  positionX           Float    @default(0)
+  positionY           Float    @default(0)
+  status              String   @default("available")
+  avgTurnTimeMinutes  Int      @default(60)
+  isActive            Boolean  @default(true)
+  features            String[] @default([])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relations
+  reservations        TableReservation[]
+  
+  @@index([merchantId])
+  @@index([merchantId, section])
+  @@index([merchantId, status])
+  @@unique([merchantId, number])
+}
+
+model TableReservation {
+  id                String    @id @default(cuid())
+  tableId           String
+  partyName         String
+  partySize         Int
+  phone             String?
+  email             String?
+  status            String    @default("seated")
+  seatedAt          DateTime?
+  orderStartedAt    DateTime?
+  foodServedAt      DateTime?
+  checkDroppedAt    DateTime?
+  paidAt            DateTime?
+  clearedAt         DateTime?
+  predictedReadyAt  DateTime?
+  specialRequests   String?
+  serverId          String?
+  serverName        String?
+  
+  // Course progress
+  currentCourse     String    @default("appetizer")
+  appetizerStarted  DateTime?
+  appetizerCompleted DateTime?
+  entreeStarted     DateTime?
+  entreeCompleted   DateTime?
+  dessertStarted    DateTime?
+  dessertCompleted  DateTime?
+  percentComplete   Int       @default(0)
+  
+  // Relations
+  table             RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  
+  @@index([tableId])
+  @@index([status])
+  @@index([seatedAt])
+}
+
+model WaitlistEntry {
+  id                String   @id @default(cuid())
+  merchantId        String
+  partyName         String
+  partySize         Int
+  phone             String
+  quotedWaitMinutes Int
+  actualWaitMinutes Int?
+  status            String   @default("waiting") // waiting, notified, seated, no_show, cancelled
+  joinedAt          DateTime @default(now())
+  notifiedAt        DateTime?
+  seatedAt          DateTime?
+  quotedTime        DateTime
+  
+  // Relations
+  preferences       WaitlistPreference[]
+  
+  @@index([merchantId, status])
+  @@index([joinedAt])
+}
+
+model WaitlistPreference {
+  id          String  @id @default(cuid())
+  entryId     String
+  type        String  // section, feature, size
+  value       String
+  priority    Int     @default(5)
+  
+  // Relations
+  entry       WaitlistEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  
+  @@index([entryId])
+}
+
+// ============================================
+// Historical Data for Predictions
+// ============================================
+
+model TableTurnHistory {
+  id              String   @id @default(cuid())
+  merchantId      String
+  tableId         String
+  reservationId   String
+  partySize       Int
+  seatedAt        DateTime
+  clearedAt       DateTime
+  turnTimeMinutes Int
+  courseCount     Int      @default(3)
+  hasDessert      Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  
+  @@index([merchantId, tableId])
+  @@index([seatedAt])
+}

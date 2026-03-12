@@ -1,0 +1,95 @@
+/* Mobile Touch Enhancements */
+
+/* Ensure proper touch scrolling */
+.touch-pan-y {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Larger touch targets for accessibility */
+.mobile-touch-target-large {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Improved tap highlights */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+input, textarea, select, button {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+/* Prevent zoom on form focus for iOS */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+}
+
+/* Safe area utilities */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-pl {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-pr {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Mobile-specific focus states */
+@media (hover: none) and (pointer: coarse) {
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid #22C55E;
+    outline-offset: 2px;
+  }
+  
+  button:focus:not(:focus-visible),
+  a:focus:not(:focus-visible),
+  input:focus:not(:focus-visible),
+  select:focus:not(:focus-visible),
+  textarea:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* Prevent pull-to-refresh on mobile */
+body.mobile-prevent-refresh {
+  overscroll-behavior-y: contain;
+}
+
+/* Smooth scrolling for mobile */
+.smooth-scroll-mobile {
+  scroll-behavior: smooth;
+}

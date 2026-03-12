@@ -1,0 +1,47 @@
+{
+  "name": "@vayva/marketing",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p ${PORT:-3001}",
+    "build": "next build --webpack",
+    "start": "next start -p ${PORT:-3001}",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit"
+  },
+  "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
+    "@gsap/react": "^2.1.2",
+    "@phosphor-icons/react": "^2.1.10",
+    "@tabler/icons-react": "^3.24.0",
+    "@tanstack/react-query": "^5.28.0",
+    "@vayva/content": "workspace:*",
+    "@vayva/db": "workspace:*",
+    "@vayva/redis": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.26.2",
+    "groq-sdk": "^0.37.0",
+    "gsap": "^3.14.2",
+    "lucide-react": "^0.460.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "resend": "^6.7.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.7",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.0.2",
+    "autoprefixer": "^10.4.23",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "paths": {
+            "@vayva/redis": ["packages/infra/redis-adapter/src/index.ts"],
+            "bullmq": ["node_modules/.pnpm/bullmq@5.69.3/node_modules/bullmq"],
+            "bullmq/*": ["node_modules/.pnpm/bullmq@5.69.3/node_modules/bullmq/*"]
+        }
+    },
+    "include": [
+        "src"
+    ]
+}

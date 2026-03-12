@@ -1,0 +1,311 @@
+/* Real Estate Premium Glass Design System */
+
+:root {
+  /* Professional Blue Theme (Default) */
+  --re-bg-primary: #0A0F1A;
+  --re-bg-secondary: #151F2E;
+  --re-bg-tertiary: rgba(255, 255, 255, 0.03);
+  --re-accent-primary: #4A90E2;
+  --re-accent-secondary: #5BA0F2;
+  --re-accent-tertiary: #7BB3F0;
+  --re-text-primary: #FFFFFF;
+  --re-text-secondary: rgba(255, 255, 255, 0.75);
+  --re-text-tertiary: rgba(255, 255, 255, 0.5);
+  --re-status-active: #10B981;
+  --re-status-pending: #F59E0B;
+  --re-status-sold: #EF4444;
+  --re-status-new: #60A5FA;
+}
+
+/* Luxury Gold Theme */
+.theme-luxury-gold {
+  --re-accent-primary: #D4AF37;
+  --re-accent-secondary: #E5C158;
+  --re-accent-tertiary: #F0D578;
+  --re-bg-primary: #1A1408;
+  --re-bg-secondary: #2A2418;
+}
+
+/* Emerald Elite Theme */
+.theme-emerald-elite {
+  --re-accent-primary: #10B981;
+  --re-accent-secondary: #34D399;
+  --re-accent-tertiary: #6EE7B7;
+  --re-bg-primary: #0A1F15;
+  --re-bg-secondary: #1A2F25;
+}
+
+/* Slate Professional Theme */
+.theme-slate-professional {
+  --re-accent-primary: #64748B;
+  --re-accent-secondary: #94A3B8;
+  --re-accent-tertiary: #CBD5E1;
+  --re-bg-primary: #0F172A;
+  --re-bg-secondary: #1E293B;
+}
+
+/* Burgundy Prestige Theme */
+.theme-burgundy-prestige {
+  --re-accent-primary: #991B1B;
+  --re-accent-secondary: #DC2626;
+  --re-accent-tertiary: #EF4444;
+  --re-bg-primary: #1A0F0F;
+  --re-bg-secondary: #2A1F1F;
+}
+
+/* Glass Panel Base */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(74, 144, 226, 0.3);
+  box-shadow: 0 8px 32px rgba(74, 144, 226, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Metric Card with Glow */
+.metric-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  box-shadow: 0 0 40px rgba(74, 144, 226, 0.15);
+  border-color: rgba(74, 144, 226, 0.4);
+}
+
+/* Gradient Accent Button */
+.btn-gradient {
+  background: linear-gradient(135deg, #4A90E2 0%, #5BA0F2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.3);
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(74, 144, 226, 0.4);
+}
+
+.btn-gradient:active {
+  transform: translateY(0);
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--re-status-active);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--re-status-pending);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-badge.sold {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--re-status-sold);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.new {
+  background: rgba(96, 165, 255, 0.15);
+  color: var(--re-status-new);
+  border: 1px solid rgba(96, 165, 255, 0.3);
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4A90E2 0%, #5BA0F2 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Trend Indicator */
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.trend-indicator.up {
+  color: var(--re-status-active);
+}
+
+.trend-indicator.down {
+  color: var(--re-status-sold);
+}
+
+/* Sparkline Container */
+.sparkline-container {
+  height: 40px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* Map Container */
+.map-container {
+  height: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* AI Insight Card */
+.ai-insight-card {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 226, 0.1) 0%,
+    rgba(91, 160, 242, 0.05) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-left: 4px solid var(--re-accent-primary);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 24px rgba(74, 144, 226, 0.1);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Scrollbar Styling */
+.re-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.re-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
+.re-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(74, 144, 226, 0.3);
+  border-radius: 4px;
+}
+
+.re-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 144, 226, 0.5);
+}
+
+/* Responsive Grid */
+.re-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.re-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .re-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .re-grid {
+    grid-template-columns: 1fr;
+  }
+}

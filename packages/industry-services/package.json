@@ -1,0 +1,29 @@
+{
+  "name": "@vayva/industry-services",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./dashboard": "./src/dashboard/config.ts",
+    "./components": "./src/components/index.ts",
+    "./widgets": "./src/widgets/registry.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/ui": "workspace:*",
+    "react": "^18.x || ^19.x",
+    "react-dom": "^18.x || ^19.x"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.x",
+    "typescript": "^5.x"
+  }
+}

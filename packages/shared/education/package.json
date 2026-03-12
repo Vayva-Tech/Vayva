@@ -1,0 +1,15 @@
+{
+    "name": "@vayva/education",
+    "version": "0.0.0",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@vayva/analytics": "workspace:*"
+    },
+    "devDependencies": {
+        "typescript": "^5.9.3"
+    }
+}

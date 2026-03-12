@@ -1,0 +1,144 @@
+{
+  "templates": [
+    {
+      "key": "auth_otp_verification",
+      "category": "auth",
+      "subject": "Your Vayva verification code: {{otp}}",
+      "required_fields": ["otp"],
+      "optional_fields": ["first_name", "expires_minutes"]
+    },
+    {
+      "key": "auth_welcome",
+      "category": "onboarding",
+      "subject": "Welcome to Vayva! 🎉",
+      "required_fields": ["first_name", "store_name", "dashboard_url"],
+      "optional_fields": []
+    },
+    {
+      "key": "auth_password_reset",
+      "category": "auth",
+      "subject": "Reset your Vayva password",
+      "required_fields": ["reset_link"],
+      "optional_fields": ["user_email", "expires_minutes"]
+    },
+    {
+      "key": "team_invite",
+      "category": "team",
+      "subject": "You've been invited to join {{store_name}} on Vayva",
+      "required_fields": ["inviter_name", "store_name", "role", "invite_url"],
+      "optional_fields": ["role_description"]
+    },
+    {
+      "key": "billing_receipt",
+      "category": "billing",
+      "subject": "Receipt for {{store_name}} - {{invoice_number}}",
+      "required_fields": ["store_name", "amount", "currency", "invoice_number", "date"],
+      "optional_fields": ["billing_url"]
+    },
+    {
+      "key": "auth_password_changed",
+      "category": "auth",
+      "subject": "Security Alert: Password Changed",
+      "required_fields": ["date"],
+      "optional_fields": ["user_email", "support_url"]
+    },
+    {
+      "key": "auth_new_login",
+      "category": "auth",
+      "subject": "New login to your Vayva account",
+      "required_fields": ["date", "device", "location", "ip"],
+      "optional_fields": ["lock_account_url"]
+    },
+    {
+      "key": "auth_verify_email_link",
+      "category": "auth",
+      "subject": "Verify your email address",
+      "required_fields": ["verify_link"],
+      "optional_fields": ["first_name"]
+    },
+    {
+      "key": "auth_account_locked",
+      "category": "auth",
+      "subject": "Your account has been locked",
+      "required_fields": ["unlock_link"],
+      "optional_fields": ["reason"]
+    },
+    {
+      "key": "onboarding_incomplete",
+      "category": "onboarding",
+      "subject": "Don't forget to complete your setup",
+      "required_fields": ["first_name", "next_step"],
+      "optional_fields": ["dashboard_url"]
+    },
+    {
+      "key": "billing_invoice_available",
+      "category": "billing",
+      "subject": "New Invoice Available: {{invoice_number}}",
+      "required_fields": ["invoice_number", "amount", "due_date"],
+      "optional_fields": ["download_url"]
+    },
+    {
+      "key": "billing_payment_failed",
+      "category": "billing",
+      "subject": "Action Required: Payment for {{invoice_number}} failed",
+      "required_fields": ["invoice_number", "amount", "retry_link"],
+      "optional_fields": ["reason"]
+    },
+    {
+      "key": "billing_subscription_started",
+      "category": "billing",
+      "subject": "Your {{plan_name}} subscription is active",
+      "required_fields": ["plan_name", "amount", "renewal_date"],
+      "optional_fields": []
+    },
+    {
+      "key": "billing_subscription_cancelled",
+      "category": "billing",
+      "subject": "Subscription Cancellation Confirmed",
+      "required_fields": ["plan_name", "end_date"],
+      "optional_fields": ["reactivate_link"]
+    },
+    {
+      "key": "order_confirmation_customer",
+      "category": "orders",
+      "subject": "Order Confirmation #{{order_id}}",
+      "required_fields": ["order_id", "items", "total", "customer_name"],
+      "optional_fields": ["shipping_address", "tracking_link"]
+    },
+    {
+      "key": "order_shipped_customer",
+      "category": "orders",
+      "subject": "Your order #{{order_id}} has shipped!",
+      "required_fields": ["order_id", "tracking_number", "carrier"],
+      "optional_fields": ["tracking_link", "delivery_estimate"]
+    },
+    {
+      "key": "order_delivered_customer",
+      "category": "orders",
+      "subject": "Delivered: Order #{{order_id}}",
+      "required_fields": ["order_id"],
+      "optional_fields": ["support_link"]
+    },
+    {
+      "key": "merchant_new_order",
+      "category": "orders",
+      "subject": "New Order #{{order_id}} from {{customer_name}}",
+      "required_fields": ["order_id", "total", "items"],
+      "optional_fields": ["dashboard_link"]
+    },
+    {
+      "key": "merchant_payout_processed",
+      "category": "billing",
+      "subject": "Payout of {{amount}} is on its way",
+      "required_fields": ["amount", "currency", "bank_name", "account_last4"],
+      "optional_fields": ["arrival_date"]
+    },
+    {
+      "key": "system_maintenance",
+      "category": "system",
+      "subject": "Scheduled Maintenance: {{date}}",
+      "required_fields": ["date", "duration_estimate"],
+      "optional_fields": ["impact_description"]
+    }
+  ]
+}

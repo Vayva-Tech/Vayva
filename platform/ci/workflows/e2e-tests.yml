@@ -1,0 +1,456 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  e2e-merchant-admin:
+    name: Merchant Admin E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vayva_test
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 10.2.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: Frontend/merchant-admin
+
+      - name: Generate Prisma Client
+        run: pnpm --dir infra/db db:generate
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+        run: |
+          pnpm --dir infra/db db:push
+          pnpm --dir infra/db exec tsx prisma/seed-e2e.ts
+
+      - name: Build merchant-admin
+        run: pnpm --filter merchant-admin build
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "merchant-admin"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3000
+          MERCHANT_ORIGIN: http://localhost:3000
+          MARKETING_ORIGIN: http://localhost:3000
+          OPS_ORIGIN: http://localhost:3000
+          PAYSTACK_SECRET_KEY: sk_test_ci_placeholder
+          NEXT_PUBLIC_PAYSTACK_KEY: pk_test_ci_placeholder
+          RESEND_API_KEY: re_ci_placeholder
+          RESEND_FROM_EMAIL: ci@vayva.test
+
+      - name: Run Smoke E2E (merchant)
+        run: pnpm test:e2e -- --grep "@smoke.*@merchant|@merchant.*@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "merchant-admin"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3000
+          MERCHANT_ORIGIN: http://localhost:3000
+          MARKETING_ORIGIN: http://localhost:3000
+          OPS_ORIGIN: http://localhost:3000
+          PAYSTACK_SECRET_KEY: sk_test_ci_placeholder
+          NEXT_PUBLIC_PAYSTACK_KEY: pk_test_ci_placeholder
+          RESEND_API_KEY: re_ci_placeholder
+          RESEND_FROM_EMAIL: ci@vayva.test
+
+      - name: Run Full E2E (merchant)
+        run: pnpm test:e2e -- --grep "@merchant" --grep-invert "@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "merchant-admin"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3000
+          MERCHANT_ORIGIN: http://localhost:3000
+          MARKETING_ORIGIN: http://localhost:3000
+          OPS_ORIGIN: http://localhost:3000
+          PAYSTACK_SECRET_KEY: sk_test_ci_placeholder
+          NEXT_PUBLIC_PAYSTACK_KEY: pk_test_ci_placeholder
+          RESEND_API_KEY: re_ci_placeholder
+          RESEND_FROM_EMAIL: ci@vayva.test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-merchant
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos-merchant
+          path: test-results/
+          retention-days: 7
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'Frontend/merchant-admin/playwright-report/index.html';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ E2E tests failed. Check the [test report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            });
+
+  e2e-storefront:
+    name: Storefront E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vayva_test
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 10.2.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: Frontend/storefront
+
+      - name: Generate Prisma Client
+        run: pnpm --dir infra/db db:generate
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+        run: |
+          pnpm --dir infra/db db:push
+          pnpm --dir infra/db exec tsx prisma/seed-e2e.ts
+
+      - name: Build storefront
+        run: pnpm --filter storefront build
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "storefront"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Run Smoke E2E (storefront)
+        run: pnpm test:e2e -- --grep "@smoke.*@storefront|@storefront.*@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "storefront"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Run Full E2E (storefront)
+        run: pnpm test:e2e -- --grep "@storefront" --grep-invert "@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "storefront"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-storefront
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos-storefront
+          path: test-results/
+          retention-days: 7
+
+  e2e-ops-console:
+    name: Ops Console E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vayva_test
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 10.2.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: Frontend/ops-console
+
+      - name: Generate Prisma Client
+        run: pnpm --dir infra/db db:generate
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+        run: |
+          pnpm --dir infra/db db:push
+          pnpm --dir infra/db exec tsx prisma/seed-e2e.ts
+
+      - name: Build ops-console
+        run: pnpm --filter ops-console build
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "ops-console"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3002
+          OPS_OWNER_EMAIL: e2e-ops@vayva.test
+          OPS_OWNER_PASSWORD: TestPass123!
+          OPS_BOOTSTRAP_ENABLE: "true"
+
+      - name: Run Smoke E2E (ops)
+        run: pnpm test:e2e -- --grep "@smoke.*@ops|@ops.*@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "ops-console"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3002
+          OPS_OWNER_EMAIL: e2e-ops@vayva.test
+          OPS_OWNER_PASSWORD: TestPass123!
+          OPS_BOOTSTRAP_ENABLE: "true"
+
+      - name: Run Full E2E (ops)
+        run: pnpm test:e2e -- --grep "@ops" --grep-invert "@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "ops-console"
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3002
+          OPS_OWNER_EMAIL: e2e-ops@vayva.test
+          OPS_OWNER_PASSWORD: TestPass123!
+          OPS_BOOTSTRAP_ENABLE: "true"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-ops
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos-ops
+          path: test-results/
+          retention-days: 7
+
+  e2e-storefront-staging-destructive:
+    name: Storefront E2E (Staging Test DB - Destructive)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 10.2.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: Frontend/storefront
+
+      - name: Generate Prisma Client
+        run: pnpm --dir infra/db db:generate
+
+      - name: Setup staging test database
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_TEST_DATABASE_URL }}
+        run: |
+          pnpm --dir infra/db db:push
+          pnpm --dir infra/db exec tsx prisma/seed-e2e.ts
+
+      - name: Build storefront
+        run: pnpm --filter storefront build
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "storefront"
+          DATABASE_URL: ${{ secrets.STAGING_TEST_DATABASE_URL }}
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Run Full E2E (storefront, destructive)
+        run: pnpm test:e2e -- --grep "@storefront" --grep-invert "@smoke"
+        env:
+          NODE_ENV: test
+          CI: "true"
+          VAYVA_E2E_MODE: "true"
+          VAYVA_E2E_TARGET: "storefront"
+          DATABASE_URL: ${{ secrets.STAGING_TEST_DATABASE_URL }}
+          REDIS_URL: redis://localhost:6379
+          NEXTAUTH_SECRET: test-secret-key-for-ci
+          NEXTAUTH_URL: http://localhost:3001
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-storefront-staging-destructive
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos-storefront-staging-destructive
+          path: test-results/
+          retention-days: 7

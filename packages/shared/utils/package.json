@@ -1,0 +1,34 @@
+{
+    "name": "@vayva/shared",
+    "version": "0.0.0",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "lint": "eslint .",
+        "check-types": "tsc --noEmit",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@vayva/db": "workspace:*",
+        "@vayva/redis": "workspace:*",
+        "bullmq": "^5.66.5",
+        "file-type": "^21.3.0",
+        "ioredis": "^5.9.2",
+        "zod": "^3.25.76"
+    },
+    "exports": {
+        ".": "./src/index.ts",
+        "./*": "./src/*.ts"
+    },
+    "typesVersions": {
+        "*": {
+            "*": [
+                "src/*"
+            ]
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^20.19.30",
+        "typescript": "^5.9.3"
+    }
+}

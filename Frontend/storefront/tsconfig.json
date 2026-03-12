@@ -1,0 +1,57 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@vayva/shared": [
+        "../../packages/shared/src/index.ts"
+      ],
+      "@vayva/shared/*": [
+        "../../packages/shared/src/*"
+      ],
+      "@vayva/payments": [
+        "../../packages/domain/payments/src/index.ts"
+      ],
+      "@vayva/payments/*": [
+        "../../packages/domain/payments/src/*"
+      ],
+      "@vayva/templates": [
+        "../../packages/shared/templates/src/index.ts"
+      ],
+      "@vayva/templates/*": [
+        "../../packages/shared/templates/src/*"
+      ],
+      "@vayva/db": [
+        "../../infra/db/src/client.ts"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

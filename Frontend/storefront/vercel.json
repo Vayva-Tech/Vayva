@@ -1,0 +1,6 @@
+{
+    "version": 2,
+    "installCommand": "pnpm install",
+    "buildCommand": "pnpm install && pnpm turbo run build --filter=storefront",
+    "outputDirectory": ".next"
+}

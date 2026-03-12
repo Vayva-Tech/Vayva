@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "paths": {
+      "@vayva/templates/*": ["./src/*"],
+      "@vayva/templates": ["./src/index.ts"],
+      "@/*": ["./src/*"],
+      "@vayva/shared": ["../shared/src/index.ts"],
+      "@vayva/shared/*": ["../shared/src/*"],
+      "@vayva/ui": ["../ui/src/index.ts"],
+      "@vayva/ui/*": ["../ui/src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

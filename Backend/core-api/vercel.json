@@ -1,0 +1,13 @@
+{
+  "crons": [
+    {
+      "path": "/api/reports/schedule/run",
+      "schedule": "0 9 * * 1"
+    }
+  ],
+  "functions": {
+    "src/app/api/reports/schedule/run/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

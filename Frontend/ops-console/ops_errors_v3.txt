@@ -1,0 +1,71 @@
+
+> ops-console@0.0.0 typecheck /Users/fredrick/Documents/GitHub/vayva/apps/ops-console
+> tsc --noEmit
+
+src/app/ops/(app)/communications/page.tsx(76,78): error TS2339: Property 'to' does not exist on type '{}'.
+src/app/ops/(app)/communications/page.tsx(76,120): error TS2339: Property 'email' does not exist on type '{}'.
+src/app/ops/(app)/kyc/page.tsx(53,19): error TS2339: Property 'message' does not exist on type '{}'.
+src/app/ops/(app)/page.tsx(61,5): error TS2339: Property 'title' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(62,5): error TS2339: Property 'value' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(63,5): error TS2339: Property 'icon' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(64,5): error TS2339: Property 'trend' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(65,5): error TS2339: Property 'trendUp' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(66,5): error TS2339: Property 'color' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(122,21): error TS2322: Type '{ title: string; value: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; trend: string; trendUp: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'title' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/page.tsx(130,21): error TS2322: Type '{ title: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; trend: any; trendUp: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'title' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/page.tsx(137,21): error TS2322: Type '{ title: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'title' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/payouts/page.tsx(103,42): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(105,92): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(106,92): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(107,111): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(108,54): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(117,43): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(63,33): error TS2339: Property 'diagnostics' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(82,86): error TS2339: Property 'severity' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(88,47): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(90,94): error TS2339: Property 'id' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(94,101): error TS2339: Property 'createdAt' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(98,89): error TS2339: Property 'errorType' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(99,77): error TS2339: Property 'errorMessage' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(104,93): error TS2339: Property 'surface' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(106,39): error TS2339: Property 'route' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(109,99): error TS2339: Property 'route' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(112,39): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(113,72): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(115,106): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(171,39): error TS2339: Property 'FixActions' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(172,43): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(173,158): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(179,96): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(180,95): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(182,79): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(183,129): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(194,100): error TS2339: Property 'createdAt' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(196,120): error TS2339: Property 'surface' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(208,58): error TS2339: Property 'diagnostics' does not exist on type '{}'.
+src/app/ops/(app)/tools/page.tsx(120,81): error TS2339: Property 'message' does not exist on type '{}'.
+src/app/ops/(auth)/login/page.tsx(53,16): error TS18046: 'err' is of type 'unknown'.
+src/lib/audit.ts(50,9): error TS2322: Type 'unknown' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+src/lib/ops-auth.ts(111,67): error TS2339: Property 'ip' does not exist on type '{}'.
+src/lib/ops-auth.ts(164,37): error TS18046: 'user' is of type 'unknown'.
+src/lib/ops-auth.ts(169,74): error TS18046: 'user' is of type 'unknown'.
+src/lib/ops-auth.ts(193,9): error TS2322: Type 'unknown' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+src/lib/ops-metrics.ts(59,19): error TS2322: Type 'unknown' is not assignable to type 'OrderStatus[] | FieldRef<"Order", "OrderStatus[]"> | undefined'.
+src/lib/ops-metrics.ts(62,27): error TS18048: 'res._sum' is possibly 'undefined'.
+src/lib/ops-metrics.ts(102,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(103,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(104,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(105,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(106,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(110,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(111,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(112,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(115,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(116,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(117,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/withOpsAuth.ts(59,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'OpsAuthContext'.
+src/lib/withOpsAuth.ts(94,27): error TS18046: 'handler' is of type 'unknown'.
+ ELIFECYCLE  Command failed with exit code 2.

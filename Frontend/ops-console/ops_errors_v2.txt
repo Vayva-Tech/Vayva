@@ -1,0 +1,197 @@
+
+> ops-console@0.0.0 typecheck /Users/fredrick/Documents/GitHub/vayva/apps/ops-console
+> tsc --noEmit
+
+src/app/ops/(app)/ai/page.tsx(58,21): error TS2322: Type '{ label: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'label' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/ai/page.tsx(64,21): error TS2322: Type '{ label: string; value: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'label' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/ai/page.tsx(70,21): error TS2322: Type '{ label: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'label' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/ai/page.tsx(76,21): error TS2322: Type '{ label: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'label' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/ai/page.tsx(114,46): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(118,54): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(119,67): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(121,57): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(125,97): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(126,93): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(130,82): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(132,46): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(135,61): error TS18046: 'merchant' is of type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(175,21): error TS2339: Property 'label' does not exist on type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(175,28): error TS2339: Property 'value' does not exist on type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(175,35): error TS2339: Property 'icon' does not exist on type 'unknown'.
+src/app/ops/(app)/ai/page.tsx(175,47): error TS2339: Property 'color' does not exist on type 'unknown'.
+src/app/ops/(app)/audit/page.tsx(115,22): error TS2339: Property 'targetType' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(115,45): error TS2339: Property 'storeName' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(116,32): error TS2339: Property 'targetType' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(116,56): error TS2339: Property 'storeName' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(118,22): error TS2339: Property 'targetType' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(118,45): error TS2339: Property 'targetId' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(119,32): error TS2339: Property 'targetType' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(119,56): error TS2339: Property 'targetId' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(121,22): error TS2339: Property 'fileName' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(121,57): error TS2339: Property 'fileName' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(122,22): error TS2339: Property 'reportType' does not exist on type '{}'.
+src/app/ops/(app)/audit/page.tsx(122,61): error TS2339: Property 'reportType' does not exist on type '{}'.
+src/app/ops/(app)/communications/page.tsx(76,78): error TS2339: Property 'to' does not exist on type '{}'.
+src/app/ops/(app)/communications/page.tsx(76,120): error TS2339: Property 'email' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(40,22): error TS18046: 'err' is of type 'unknown'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(82,44): error TS2339: Property 'trackingCode' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(85,71): error TS2339: Property 'orderId' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(85,137): error TS2339: Property 'Order' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(89,100): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(90,34): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(93,35): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(106,80): error TS2339: Property 'recipientName' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(107,68): error TS2339: Property 'addressLine1' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(108,68): error TS2339: Property 'addressCity' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(109,81): error TS2339: Property 'recipientPhone' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(121,73): error TS2339: Property 'DispatchJob' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(121,111): error TS2339: Property 'provider' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(126,47): error TS2339: Property 'DispatchJob' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(126,91): error TS2339: Property 'externalId' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(129,39): error TS2339: Property 'trackingUrl' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(131,52): error TS2339: Property 'trackingUrl' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(149,35): error TS2339: Property 'DispatchJob' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(161,37): error TS2339: Property 'DispatchJob' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(161,61): error TS2339: Property 'DispatchJob' does not exist on type '{}'.
+src/app/ops/(app)/deliveries/[id]/page.tsx(171,54): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/inbox/[id]/page.tsx(85,70): error TS1064: The return type of an async function or method must be the global Promise<T> type. Did you mean to write 'Promise<void>'?
+src/app/ops/(app)/inbox/[id]/page.tsx(97,50): error TS2698: Spread types may only be created from object types.
+src/app/ops/(app)/kyc/page.tsx(53,19): error TS2339: Property 'message' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(39,22): error TS18046: 'err' is of type 'unknown'.
+src/app/ops/(app)/orders/[id]/page.tsx(81,43): error TS2339: Property 'orderNumber' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(83,105): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(84,35): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(87,36): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(91,51): error TS2339: Property 'createdAt' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(91,91): error TS2339: Property 'store' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(96,55): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(96,91): error TS2339: Property 'id' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(115,76): error TS2339: Property 'items' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(118,36): error TS2339: Property 'items' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(138,95): error TS2339: Property 'total' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(153,40): error TS2339: Property 'OrderEvent' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(167,57): error TS2339: Property 'createdAt' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(184,32): error TS2339: Property 'Customer' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(186,67): error TS2339: Property 'Customer' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(186,94): error TS2339: Property 'Customer' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(187,77): error TS2339: Property 'Customer' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(188,77): error TS2339: Property 'Customer' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(195,64): error TS2339: Property 'customerEmail' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(196,59): error TS2339: Property 'customerPhone' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(208,71): error TS2339: Property 'paymentStatus' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(209,44): error TS2339: Property 'paymentStatus' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(214,95): error TS2339: Property 'paymentMethod' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(216,36): error TS2339: Property 'PaymentTransaction' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(220,48): error TS2339: Property 'PaymentTransaction' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(235,84): error TS2339: Property 'fulfillmentStatus' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(237,36): error TS2339: Property 'Shipment' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(237,54): error TS2339: Property 'Shipment' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(244,59): error TS2339: Property 'Shipment' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(245,59): error TS2339: Property 'Shipment' does not exist on type '{}'.
+src/app/ops/(app)/orders/[id]/page.tsx(251,76): error TS2339: Property 'Shipment' does not exist on type '{}'.
+src/app/ops/(app)/page.tsx(61,5): error TS2339: Property 'title' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(62,5): error TS2339: Property 'value' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(63,5): error TS2339: Property 'icon' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(64,5): error TS2339: Property 'trend' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(65,5): error TS2339: Property 'trendUp' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(66,5): error TS2339: Property 'color' does not exist on type 'unknown'.
+src/app/ops/(app)/page.tsx(122,21): error TS2322: Type '{ title: string; value: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; trend: string; trendUp: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'title' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/page.tsx(130,21): error TS2322: Type '{ title: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; trend: any; trendUp: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'title' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/page.tsx(137,21): error TS2322: Type '{ title: string; value: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'title' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/payouts/page.tsx(103,42): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(105,92): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(106,92): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(107,111): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(108,54): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/payouts/page.tsx(117,43): error TS2571: Object is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(63,33): error TS2339: Property 'diagnostics' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(82,86): error TS2339: Property 'severity' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(88,47): error TS2339: Property 'status' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(90,94): error TS2339: Property 'id' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(94,101): error TS2339: Property 'createdAt' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(98,89): error TS2339: Property 'errorType' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(99,77): error TS2339: Property 'errorMessage' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(104,93): error TS2339: Property 'surface' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(106,39): error TS2339: Property 'route' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(109,99): error TS2339: Property 'route' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(112,39): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(113,72): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(115,106): error TS2339: Property 'storeId' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(171,39): error TS2339: Property 'FixActions' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(172,43): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(173,158): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(179,96): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(180,95): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(182,79): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(183,129): error TS18046: 'fix' is of type 'unknown'.
+src/app/ops/(app)/rescue/[id]/page.tsx(194,100): error TS2339: Property 'createdAt' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(196,120): error TS2339: Property 'surface' does not exist on type '{}'.
+src/app/ops/(app)/rescue/[id]/page.tsx(208,58): error TS2339: Property 'diagnostics' does not exist on type '{}'.
+src/app/ops/(app)/tools/page.tsx(120,81): error TS2339: Property 'message' does not exist on type '{}'.
+src/app/ops/(app)/users/page.tsx(125,17): error TS2322: Type '{ isOpen: boolean; onClose: () => void; onSuccess: (creds: { email: string; tempPass: string; }) => void; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'isOpen' does not exist on type 'IntrinsicAttributes'.
+src/app/ops/(app)/users/page.tsx(275,28): error TS2339: Property 'isOpen' does not exist on type 'unknown'.
+src/app/ops/(app)/users/page.tsx(275,36): error TS2339: Property 'onClose' does not exist on type 'unknown'.
+src/app/ops/(app)/users/page.tsx(275,45): error TS2339: Property 'onSuccess' does not exist on type 'unknown'.
+src/app/ops/(auth)/login/page.tsx(53,16): error TS18046: 'err' is of type 'unknown'.
+src/components/analytics/csat-widget.tsx(36,39): error TS2339: Property 'csatScore' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(36,57): error TS2339: Property 'target' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(47,83): error TS2339: Property 'csatScore' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(66,45): error TS2339: Property 'csatScore' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(74,76): error TS2339: Property 'great' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(79,76): error TS2339: Property 'okay' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(84,76): error TS2339: Property 'bad' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(90,43): error TS2339: Property 'total' does not exist on type '{}'.
+src/components/analytics/csat-widget.tsx(91,54): error TS2339: Property 'target' does not exist on type '{}'.
+src/components/ops/ReasonModal.tsx(66,25): error TS2322: Type '{ value: string; onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void; placeholder: string; className: string; autoFocus: true; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'value' does not exist on type 'IntrinsicAttributes'.
+src/components/ui/AddressInputNG.tsx(19,16): error TS2698: Spread types may only be created from object types.
+src/components/ui/AddressInputNG.tsx(29,25): error TS2339: Property 'addressLine1' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(34,18): error TS2339: Property 'addressLine1' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(35,60): error TS2339: Property 'addressLine1' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(45,27): error TS2339: Property 'state' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(56,20): error TS2339: Property 'state' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(57,62): error TS2339: Property 'state' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(65,27): error TS2339: Property 'city' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(70,20): error TS2339: Property 'city' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(71,62): error TS2339: Property 'city' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(81,25): error TS2339: Property 'landmark' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(86,18): error TS2339: Property 'landmark' does not exist on type '{}'.
+src/components/ui/AddressInputNG.tsx(87,60): error TS2339: Property 'landmark' does not exist on type '{}'.
+src/components/ui/textarea.tsx(4,3): error TS2339: Property 'value' does not exist on type 'unknown'.
+src/components/ui/textarea.tsx(5,3): error TS2339: Property 'onChange' does not exist on type 'unknown'.
+src/components/ui/textarea.tsx(6,3): error TS2339: Property 'placeholder' does not exist on type 'unknown'.
+src/components/ui/textarea.tsx(7,3): error TS2339: Property 'rows' does not exist on type 'unknown'.
+src/components/ui/textarea.tsx(8,3): error TS2339: Property 'className' does not exist on type 'unknown'.
+src/lib/audit.ts(50,9): error TS2322: Type 'unknown' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+src/lib/logger.ts(53,53): error TS2698: Spread types may only be created from object types.
+src/lib/ops-auth.ts(111,67): error TS2339: Property 'ip' does not exist on type '{}'.
+src/lib/ops-auth.ts(164,37): error TS18046: 'user' is of type 'unknown'.
+src/lib/ops-auth.ts(169,74): error TS18046: 'user' is of type 'unknown'.
+src/lib/ops-auth.ts(193,9): error TS2322: Type 'unknown' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+src/lib/ops-metrics.ts(59,19): error TS2322: Type 'unknown' is not assignable to type 'OrderStatus[] | FieldRef<"Order", "OrderStatus[]"> | undefined'.
+src/lib/ops-metrics.ts(62,27): error TS18048: 'res._sum' is possibly 'undefined'.
+src/lib/ops-metrics.ts(102,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(103,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(104,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(105,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(106,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(110,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(111,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(112,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(115,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(116,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/ops-metrics.ts(117,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/lib/rescue/rescue-service.ts(99,25): error TS2698: Spread types may only be created from object types.
+src/lib/rescue/rescue-service.ts(174,40): error TS2552: Cannot find name 'error'. Did you mean 'Error'?
+src/lib/rescue/rescue-service.ts(177,19): error TS2552: Cannot find name 'error'. Did you mean 'Error'?
+src/lib/withOpsAuth.ts(59,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'OpsAuthContext'.
+src/lib/withOpsAuth.ts(94,27): error TS18046: 'handler' is of type 'unknown'.
+ ELIFECYCLE  Command failed with exit code 2.

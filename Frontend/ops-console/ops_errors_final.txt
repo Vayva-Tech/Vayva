@@ -1,0 +1,4 @@
+
+> ops-console@0.0.0 typecheck /Users/fredrick/Documents/GitHub/vayva/apps/ops-console
+> tsc --noEmit
+

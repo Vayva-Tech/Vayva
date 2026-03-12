@@ -1,0 +1,7 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { ShoppingBag, Search, Menu } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@vayva/ui";
+export const EditorialHeader = ({ storeName = "BLOOME & HOME", cartItemCount = 0, }) => {
+    return (_jsxs("header", { className: "sticky top-0 z-50 bg-[#FAFAF9]/90 backdrop-blur-sm border-b border-stone-200 h-[70px] flex items-center justify-between px-6 transition-all duration-300", children: [_jsx(Button, { variant: "ghost", size: "icon", className: "p-2 -ml-2 hover:bg-stone-100 rounded-full text-stone-600 transition-colors h-auto", "aria-label": "Open menu", children: _jsx(Menu, { size: 22, strokeWidth: 1.5 }) }), _jsx(Link, { href: "/", className: "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-2xl tracking-widest text-[#2E2E2E]", children: storeName }), _jsxs("div", { className: "flex items-center gap-4 text-stone-600", children: [_jsx(Button, { variant: "ghost", size: "icon", className: "p-2 hover:text-[#C9B7A2] transition-colors h-auto", "aria-label": "Search", children: _jsx(Search, { size: 22, strokeWidth: 1.5 }) }), _jsxs(Link, { href: "/cart", className: "relative p-2 hover:text-[#C9B7A2] transition-colors", children: [_jsx(ShoppingBag, { size: 22, strokeWidth: 1.5 }), cartItemCount > 0 && (_jsx("span", { className: "absolute top-1 right-0 bg-[#C9B7A2] text-white text-[10px] font-medium h-4 w-4 rounded-full flex items-center justify-center", children: cartItemCount }))] })] })] }));
+};

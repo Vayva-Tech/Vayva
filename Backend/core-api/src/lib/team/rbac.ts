@@ -1,0 +1,35 @@
+import { getSessionUser } from "@/lib/session.server";
+import { can } from "./permissions";
+import { NextResponse } from "next/server";
+export async function checkPermission(action: string) {
+  const user = await getSessionUser();
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+  const userRole = user.role;
+  if (!can(userRole, action)) {
+    throw new Error("Forbidden: Insufficient permissions");
+  }
+  // Test session object structure for compatibility with existing handlers
+  return { user };
+}
+export function withRBAC(
+  action: string,
+  handler: (...args: unknown[]) => Promise<Response>,
+) {
+  return async (...args: unknown[]) => {
+    try {
+      const session = await checkPermission(action);
+      return await handler(session, ...args);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.includes("Unauthorized")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      if (message.includes("Forbidden")) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      throw error;
+    }
+  };
+}

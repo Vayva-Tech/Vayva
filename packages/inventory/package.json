@@ -1,0 +1,32 @@
+{
+  "name": "@vayva/inventory",
+  "version": "0.0.1",
+  "description": "Inventory management with smart restock and reservation for Vayva",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "lint": "eslint src/ --config ../../.eslintrc.json",
+    "lint:fix": "eslint src/ --config ../../.eslintrc.json --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@vayva/db": "workspace:*",
+    "@vayva/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "eslintConfig": {
+    "rules": {
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^TODO"
+      }],
+      "@typescript-eslint/no-explicit-any": "warn"
+    }
+  }
+}

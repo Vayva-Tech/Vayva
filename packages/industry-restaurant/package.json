@@ -1,0 +1,52 @@
+{
+  "name": "@vayva/industry-restaurant",
+  "version": "0.1.0",
+  "description": "Unified restaurant industry package for VAYVA platform - FOH, KDS, and backend services",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./components": {
+      "import": "./src/components/index.ts",
+      "types": "./src/components/index.ts"
+    },
+    "./services": {
+      "import": "./src/services/index.ts",
+      "types": "./src/services/index.ts"
+    },
+    "./dashboard": {
+      "import": "./src/dashboard/index.ts",
+      "types": "./src/dashboard/index.ts"
+    },
+    "./types": {
+      "import": "./src/types/index.ts",
+      "types": "./src/types/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/realtime": "workspace:*",
+    "@vayva/db": "workspace:*",
+    "@vayva/schemas": "workspace:*",
+    "@vayva/prisma": "workspace:*",
+    "@vayva/ai-agent": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.0"
+  }
+}

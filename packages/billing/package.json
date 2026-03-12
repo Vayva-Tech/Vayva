@@ -1,0 +1,21 @@
+{
+  "name": "@vayva/billing",
+  "version": "1.0.0",
+  "description": "Vayva billing services - usage-based billing and dunning management",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vayva/db": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/payments": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

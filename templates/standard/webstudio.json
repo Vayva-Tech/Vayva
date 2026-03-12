@@ -1,0 +1,108 @@
+{
+  "$schema": "https://schema.webstudio.is/1.0.0/template.json",
+  "name": "standard",
+  "displayName": "Standard Store",
+  "description": "Versatile e-commerce template for general retail",
+  "version": "1.0.0",
+  "author": "Vayva",
+  "category": "ecommerce",
+  "tags": ["retail", "store", "shop", "products"],
+  "preview": {
+    "thumbnail": "/preview/thumbnail.png",
+    "screenshots": [
+      "/preview/home.png",
+      "/preview/product.png",
+      "/preview/cart.png"
+    ],
+    "demoUrl": "https://standard-demo.vayva.ng"
+  },
+  "exports": {
+    "pages": {
+      "home": {
+        "file": "app/page.tsx",
+        "editable": true,
+        "sections": ["header", "hero", "features", "products", "footer"]
+      },
+      "cart": {
+        "file": "app/cart/page.tsx",
+        "editable": true,
+        "sections": ["header", "cart-items", "summary", "footer"]
+      },
+      "checkout": {
+        "file": "app/checkout/page.tsx",
+        "editable": true,
+        "sections": ["header", "form", "summary", "footer"]
+      }
+    },
+    "components": {
+      "ProductCard": {
+        "file": "components/product-card.tsx",
+        "props": ["id", "name", "price", "image", "badge"]
+      },
+      "Header": {
+        "file": "components/header.tsx",
+        "props": ["logo", "nav", "cart"]
+      }
+    },
+    "styles": {
+      "globals": "app/globals.css",
+      "tailwind": "tailwind.config.ts"
+    }
+  },
+  "customization": {
+    "colors": {
+      "primary": {
+        "type": "color",
+        "default": "#0f172a",
+        "label": "Primary Color"
+      },
+      "accent": {
+        "type": "color",
+        "default": "#3b82f6",
+        "label": "Accent Color"
+      }
+    },
+    "content": {
+      "storeName": {
+        "type": "text",
+        "default": "Standard Store",
+        "label": "Store Name"
+      },
+      "heroTitle": {
+        "type": "text",
+        "default": "Premium Products for Modern Living",
+        "label": "Hero Title"
+      },
+      "heroDescription": {
+        "type": "text",
+        "default": "Discover our curated collection of high-quality products",
+        "label": "Hero Description"
+      }
+    },
+    "images": {
+      "heroBackground": {
+        "type": "image",
+        "label": "Hero Background"
+      },
+      "logo": {
+        "type": "image",
+        "label": "Store Logo"
+      }
+    }
+  },
+  "deployment": {
+    "buildCommand": "npm run build",
+    "outputDir": ".next",
+    "environment": {
+      "required": [
+        "DATABASE_URL",
+        "PAYSTACK_SECRET_KEY",
+        "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY"
+      ],
+      "optional": [
+        "WEBSTUDIO_PROJECT_ID",
+        "ANALYTICS_ID"
+      ]
+    }
+  }
+}

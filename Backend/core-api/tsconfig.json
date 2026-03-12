@@ -1,0 +1,95 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "target": "es2017",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "preserve",
+        "incremental": true,
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ],
+            "@vayva/db": [
+                "../../infra/db/src/client.ts"
+            ],
+            "@vayva/payments": [
+                "../../packages/domain/payments/src/index.ts"
+            ],
+            "@vayva/payments/*": [
+                "../../packages/domain/payments/src/*"
+            ],
+            "@vayva/affiliate": [
+                "../../packages/affiliate/src/index.ts"
+            ],
+            "@vayva/affiliate/*": [
+                "../../packages/affiliate/src/*"
+            ],
+            "@vayva/compliance": [
+                "../../packages/compliance/src/index.ts"
+            ],
+            "@vayva/templates": [
+                "../../packages/shared/templates/src/index.ts"
+            ],
+            "@vayva/templates/*": [
+                "../../packages/shared/templates/src/*"
+            ],
+            "@vayva/shared": [
+                "../../packages/shared/src/index.ts"
+            ],
+            "@vayva/shared/*": [
+                "../../packages/shared/src/*"
+            ],
+            "@vayva/ui": [
+                "../../packages/ui/src/index.ts"
+            ],
+            "@vayva/ui/*": [
+                "../../packages/ui/src/*"
+            ],
+            "@vayva/ai-agent": [
+                "../../packages/ai-agent/src/index.ts"
+            ],
+            "@vayva/redis": [
+                "../../packages/infra/redis-adapter/src/index.ts"
+            ]
+        }
+    },
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        ".next/types/**/*.ts",
+        "src/types/**/*.ts",
+        "src/types/**/*.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "src/services/paystack-webhook.ts",
+        "src/services/wallet.ts",
+        "src/context/WalletContext.tsx",
+        "vitest.config.ts",
+        "scripts"
+    ]
+}

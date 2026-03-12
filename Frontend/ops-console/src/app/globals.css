@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Vayva Light Glass Theme */
+        --background: 180 3% 98.6%;
+        /* #FBFCFC - Strict Requirement */
+        --foreground: 222 47% 11%;
+        /* #0F172A */
+
+        --primary: 186 42% 8%;
+        /* #0D1D1E - Dark Accent */
+        --primary-foreground: 210 40% 98%;
+
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222 47% 11.2%;
+
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215 16% 47%;
+
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222 47% 11.2%;
+
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+
+        --border: 214 32% 91%;
+        --input: 214 32% 91%;
+        --ring: 222 84% 4.9%;
+
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-[hsl(var(--background))] text-foreground font-sans selection:bg-primary/20;
+    }
+}
+
+/* Glass Utilities & Surfaces */
+@layer utilities {
+
+    /* Surface Primitives */
+    .surface-base {
+        @apply bg-background text-foreground;
+    }
+
+    .surface-muted {
+        @apply bg-muted text-muted-foreground;
+    }
+
+    .surface-glass {
+        @apply bg-white/60 backdrop-blur-md border border-white/20 shadow-glass;
+    }
+
+    .surface-elevated {
+        @apply bg-white shadow-elevated border border-gray-100;
+    }
+
+    /* Typography Roles */
+    .text-display {
+        @apply font-heading text-4xl font-bold tracking-tight;
+    }
+
+    .text-title {
+        @apply font-heading text-2xl font-semibold tracking-tight;
+    }
+
+    .text-section {
+        @apply font-sans text-lg font-medium text-foreground;
+    }
+
+    .text-body {
+        @apply font-sans text-base text-foreground leading-relaxed;
+    }
+
+    .text-meta {
+        @apply font-sans text-sm text-muted-foreground;
+    }
+
+    .text-link {
+        @apply font-sans text-sm font-medium text-primary hover:underline underline-offset-4 cursor-pointer;
+    }
+
+    .crm-canvas {
+        background-color: #f0fdf4;
+        background-image:
+            radial-gradient(ellipse 120% 80% at 0% 0%, rgba(34, 197, 94, 0.15) 0%, transparent 60%),
+            radial-gradient(ellipse 100% 70% at 100% 100%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse 80% 60% at 50% 20%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse 90% 50% at 30% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 253, 244, 0.6) 40%, rgba(255, 255, 255, 0.85) 100%);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+
+    /* Layout Primitives */
+    .divider-h {
+        @apply h-px w-full bg-border/40 my-4;
+    }
+}
+
+/* Density Systems - Global overrides for standard components */
+@layer components {
+
+    /* Compact Mode (Ops Console Default) */
+    .density-compact table tr td,
+    .density-compact table tr th {
+        @apply py-2 px-3 text-xs;
+    }
+
+    .density-compact .btn-std {
+        @apply h-8 px-3 text-xs;
+    }
+
+    /* Comfortable Mode */
+    .density-comfortable table tr td,
+    .density-comfortable table tr th {
+        @apply py-4 px-6 text-sm;
+    }
+
+    .density-comfortable .btn-std {
+        @apply h-10 px-4 text-sm;
+    }
+}
+
+/* Canvas Design System - Iconography */
+.lucide {
+    stroke-width: 1.5px;
+}
+
+/* Canvas Design System - Iconography */
+.lucide {
+    stroke-width: 1.5px;
+}

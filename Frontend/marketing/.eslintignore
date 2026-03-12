@@ -1,0 +1,11 @@
+# Build outputs
+.next/
+out/
+dist/
+
+# Service worker files (minified/bundled)
+public/sw.js
+public/workbox-*.js
+
+# Node modules
+node_modules/

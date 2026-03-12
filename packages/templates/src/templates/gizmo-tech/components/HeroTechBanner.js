@@ -1,0 +1,6 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Button } from "@vayva/ui";
+import Image from "next/image";
+export const HeroTechBanner = ({ imageUrl = "https://placehold.co/800x600/111/fff?text=Headphones", headline = "Experience Sound Like Never Before", subheadline = "New Noise Cancelling Series", ctaText = "Shop Now", }) => {
+    return (_jsxs("div", { className: "relative w-full aspect-[4/3] md:aspect-[21/9] bg-[#F2F4F7] overflow-hidden flex flex-col justify-end p-6", children: [_jsx(Image, { src: imageUrl, alt: "Hero", fill: true, className: "object-cover opacity-90 mix-blend-multiply", priority: true }), _jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent" }), _jsxs("div", { className: "relative z-10 text-white max-w-lg mb-2", children: [_jsx("span", { className: "inline-block px-2 py-1 bg-blue-600 text-[10px] font-bold uppercase tracking-wider mb-3 rounded-sm", children: subheadline }), _jsx("h2", { className: "text-3xl md:text-5xl font-bold tracking-tight mb-4 leading-tight", children: headline }), _jsx(Button, { className: "bg-background/70 backdrop-blur-xl text-black px-6 py-3 rounded-lg font-bold text-sm hover:bg-white/60 transition-colors shadow-lg active:scale-95 transform transition-transform", children: ctaText })] })] }));
+};

@@ -1,0 +1,195 @@
+/**
+ * APPLE DESIGN SYSTEM
+ * Consistent rounded corners, shadows, and spacing across the entire app
+ */
+
+/* Apple-style rounded corners */
+.apple-card {
+  border-radius: 16px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.apple-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Apple-style buttons */
+.apple-button {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 10px 20px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.apple-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.apple-button:active {
+  transform: scale(0.98);
+}
+
+/* Apple-style primary button */
+.apple-button-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.apple-button-primary:hover {
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.apple-button-primary:active {
+  transform: scale(0.98);
+}
+
+/* Apple-style secondary button */
+.apple-button-secondary {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1f2937;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.apple-button-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Apple-style input fields */
+.apple-input {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 12px 16px;
+  font-size: 15px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+}
+
+.apple-input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Apple-style modals/dialogs */
+.apple-modal {
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Apple-style dropdown menus */
+.apple-dropdown {
+  border-radius: 14px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+/* Apple-style badges */
+.apple-badge {
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Apple-style tabs */
+.apple-tabs {
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 4px;
+  display: inline-flex;
+  gap: 4px;
+}
+
+.apple-tab {
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.apple-tab-active {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Apple-style sections */
+.apple-section {
+  border-radius: 16px;
+  background: white;
+  padding: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Apple-style list items */
+.apple-list-item {
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.apple-list-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Apple-style dividers */
+.apple-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin: 16px 0;
+}
+
+/* Apple-style glass effect */
+.apple-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Apply to all buttons globally */
+button {
+  border-radius: 12px !important;
+}
+
+/* Apply to all cards globally */
+[class*="card"], [class*="Card"] {
+  border-radius: 16px !important;
+}
+
+/* Apply to all inputs globally */
+input, textarea, select {
+  border-radius: 12px !important;
+}
+
+/* Apply to all modals/dialogs globally */
+[role="dialog"], [class*="dialog"], [class*="Dialog"], [class*="modal"], [class*="Modal"] {
+  border-radius: 20px !important;
+}

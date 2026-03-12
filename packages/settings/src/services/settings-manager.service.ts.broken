@@ -1,0 +1,1014 @@
+import { z } from 'zod';
+import { businessSettingsSchema, type BusinessSettings } from '../schemas/business-settings.schema.js';
+import { industrySettingsSchema, type IndustrySettings } from '../schemas/industry-settings.schema.js';
+import { dashboardSettingsSchema, type DashboardSettings } from '../schemas/dashboard-settings.schema.js';
+import { aiSettingsSchema, type AISettings } from '../schemas/ai-settings.schema.js';
+import { notificationSettingsSchema, type NotificationSettings } from '../schemas/notification-settings.schema.js';
+import { userPreferencesSchema, type UserPreferences } from '../schemas/user-preferences.schema.js';
+
+/**
+ * Settings Manager Service
+ * 
+ * Centralized service for managing all application settings.
+ * Handles storage, retrieval, validation, and synchronization.
+ */
+
+// ============================================================================
+// TYPES & INTERFACES
+// ============================================================================
+
+export interface SettingsStore {
+  business: BusinessSettings;
+  industry: IndustrySettings;
+  dashboard: DashboardSettings;
+  ai: AISettings;
+  notifications: NotificationSettings;
+  user: UserPreferences;
+}
+
+export interface SettingsChangeHandler {
+  (section: keyof SettingsStore, path: string, value: any): void;
+}
+
+export interface ValidationErrors {
+  section: string;
+  field: string;
+  error: string;
+}
+
+export class SettingsManager {
+  private store: SettingsStore;
+  private listeners: Map<string, Set<SettingsChangeHandler>>;
+  private dbConnection?: any; // Prisma client or other DB connection
+  private cache: Map<string, { data: any; timestamp: number }>;
+  private cacheExpirationMs: number = 60000; // 1 minute
+
+  constructor() {
+    this.store = this.getDefaultSettings();
+    this.listeners = new Map();
+    this.cache = new Map();
+  }
+
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+
+  /**
+   * Initialize settings manager with database connection
+   */
+  async initialize(dbConnection?: any): Promise<void> {
+    this.dbConnection = dbConnection;
+    
+    if (dbConnection) {
+      await this.loadFromDatabase();
+    }
+  }
+
+  /**
+   * Get default settings for all sections
+   */
+  private getDefaultSettings(): SettingsStore {
+    return {
+      business: {
+        profile: {
+          businessName: 'My Business',
+          email: 'contact@mybusiness.com',
+          legalBusinessName: 'My Business LLC',
+          tagline: 'Your business tagline',
+          description: 'Your business description',
+          phone: '+1 (555) 123-4567',
+          website: 'https://mybusiness.com',
+          address: {
+            street: '123 Business St',
+            city: 'Business City',
+            state: 'BC',
+            zipCode: '12345',
+            country: 'US'
+          },
+          logoUrl: '',
+          faviconUrl: '',
+          socialMedia: {
+            facebook: '',
+            twitter: '',
+            instagram: '',
+            linkedin: '',
+            youtube: ''
+          }
+        },
+        branding: {
+          theme: {
+            mode: 'light',
+            sidebarColor: 'primary',
+            headerColor: 'primary'
+          },
+          colors: { 
+            primary: '#3B82F6',
+            secondary: '#64748B',
+            accent: '#8B5CF6',
+            success: '#10B981',
+            warning: '#F59E0B',
+            error: '#EF4444'
+          },
+          logo: {
+            lightModeUrl: '',
+            darkModeUrl: '',
+            faviconUrl: '',
+            mobileLogoUrl: ''
+          },
+          typography: {
+            fontFamily: 'Inter, sans-serif',
+            baseFontSize: '16px',
+            headingFontFamily: 'Inter, sans-serif'
+          },
+          layout: {
+            maxWidth: '1200px',
+            sidebarWidth: '280px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }
+        },
+        localization: {
+          locale: 'en-US',
+          timezone: 'America/New_York',
+          currency: 'USD',
+          language: 'en',
+          dateFormat: 'MM/DD/YYYY',
+          timeFormat: '12h',
+          firstDayOfWeek: 'sunday'
+        },
+      },
+      industry: {},
+      dashboard: {
+        layout: { 
+          activePreset: 'default',
+          locked: false
+        },
+        widgets: { registry: [] },
+        refresh: { 
+          autoRefreshEnabled: true, 
+          globalRefreshInterval: 300,
+          realTimeUpdates: false,
+          websocketEnabled: false,
+          performanceMode: false,
+          performanceModeInterval: 60,
+          backgroundRefresh: true,
+          maxConcurrentRequests: 3,
+          requestThrottling: true,
+          throttleDelayMs: 100,
+          cacheEnabled: true,
+          cacheTTLSeconds: 300,
+          networkRetryAttempts: 3,
+          networkRetryDelayMs: 1000,
+          slowNetworkThresholdMbps: 1
+        },
+        behavior: {
+          sidebar: { 
+            width: 280,
+            collapsedByDefault: false,
+            pinned: true,
+            iconsOnly: false
+          },
+          header: { 
+            showBreadcrumbs: true,
+            showSearch: true,
+            showNotifications: true,
+            showUserMenu: true,
+            sticky: true
+          },
+          grid: { 
+            columns: 12, 
+            rowHeight: 100,
+            margin: 16,
+            useCssGrid: false,
+            resizableWidgets: true,
+            draggableWidgets: true,
+            preventCollision: true
+          },
+          animations: {
+            enabled: true,
+            duration: 300,
+            easing: 'easeInOut'
+          }
+        },
+        dateRanges: { 
+          defaultRange: 'last-7-days',
+          compareWithPreviousPeriod: true,
+          compareWithSamePeriodLastYear: false,
+          fiscalYearStartMonth: 1,
+          useFiscalYear: false,
+          useBusinessTimezone: true
+        },
+        user: { 
+          allowCustomization: true,
+          saveLayoutPerUser: false,
+          resetLayoutOnLogout: false
+        },
+        mobile: { 
+          separateMobileLayout: true,
+          collapsibleSections: true
+        },
+      },
+      ai: {
+        personality: { 
+          tone: 'professional',
+          responseLength: 'moderate',
+          technicalLevel: 'intermediate',
+          proactivity: 'balanced',
+          emojiUsage: false,
+          useIndustryJargon: true,
+          explainTechnicalTerms: false
+        },
+        automation: { 
+          mode: 'semi-automated',
+          tasks: {
+            respondToInquiries: false,
+            sendFollowUps: true,
+            scheduleAppointments: false,
+            createSocialMediaPosts: false,
+            sendEmailCampaigns: false,
+            optimizeAdSpend: false,
+            adjustInventory: false,
+            updatePricing: false,
+            reorderStock: false,
+            sendInvoiceReminders: true,
+            processRefunds: false,
+            applyDiscounts: false,
+            generateReports: true,
+            identifyTrends: true,
+            detectAnomalies: true,
+          },
+          approvalRequired: {
+            spendingOver: 100,
+            discountOver: 20,
+            refundOver: 50,
+            priceChangeOver: 15,
+          }
+        },
+        alerts: { 
+          level: 'important',
+          categories: {
+            salesMilestones: true,
+            revenueDrops: true,
+            largeOrders: true,
+            lowStock: true,
+            outOfStock: true,
+            overstock: false,
+            newCustomers: true,
+            vipCustomerActivity: true,
+            negativeReviews: true,
+            churnRisk: true,
+            systemIssues: true,
+            complianceAlerts: true,
+            staffIssues: false,
+            trendAlerts: true,
+            anomalyDetection: true,
+            optimizationSuggestions: true,
+            benchmarkingInsights: true,
+            cashflowWarnings: true,
+            unpaidInvoices: true,
+            budgetOverruns: true,
+          },
+          thresholds: {
+            revenueDropPercentage: 20,
+            inventoryDaysRemaining: 7,
+            customerResponseTimeHours: 24,
+            websiteConversionRate: 2,
+          },
+          quietHours: {
+            enabled: true,
+            startTime: "22:00",
+            endTime: "08:00",
+            allowCriticalAlerts: true,
+          }
+        },
+        dataSharing: { 
+          enableBenchmarking: true,
+          shareDataForBenchmarks: true,
+          benchmarkComparisonGroup: 'industry-specific',
+          allowDataForModelImprovement: true,
+          allowFeatureUsageAnalytics: true,
+          dataAccess: {
+            allowFullHistoryAccess: true,
+            maxDataRangeMonths: 24,
+            excludeSensitiveData: true,
+            piiRedaction: true,
+          }
+        },
+        actionPermissions: {
+          autoExecute: ['send-email', 'create-report'],
+          requiresApproval: ['spend-money', 'issue-refund'],
+          prohibited: ['access-bank-accounts', 'transfer-money'],
+        },
+        forecasting: { 
+          aggressiveness: 'moderate',
+          shortTermDays: 7,
+          mediumTermDays: 30,
+          longTermDays: 90,
+          minimumConfidence: 70,
+          predictions: {
+            revenue: true,
+            orders: true,
+            traffic: true,
+            conversion: true,
+            inventory: true,
+            churn: true,
+            lifetimeValue: false,
+          },
+          modelPreference: 'advanced',
+          includeSeasonality: true,
+          includeExternalFactors: true,
+        },
+        industry: {},
+        advanced: {
+          modelVersion: 'v2',
+          temperature: 0.7,
+          maxTokens: 1024,
+          contextWindowMessages: 10,
+          enableCaching: true,
+          cacheExpirationHours: 24,
+          enableDebugLogging: false,
+          logApiCalls: true,
+        },
+      },
+      notifications: {
+        categories: {
+          sales: { 
+            newOrder: true,
+            orderUpdate: true,
+            abandonedCart: true,
+            upsellOpportunity: true
+          },
+          inventory: {
+            lowStock: true,
+            outOfStock: true,
+            supplierUpdate: true,
+            reorderNeeded: true
+          },
+          finance: {
+            paymentReceived: true,
+            invoiceDue: true,
+            refundProcessed: true,
+            subscriptionRenewal: true
+          },
+          customer: {
+            newReview: true,
+            supportTicket: true,
+            loyaltyMilestone: true,
+            birthday: true
+          },
+          system: {
+            loginAlert: true,
+            securityWarning: true,
+            systemMaintenance: true,
+            backupCompleted: true,
+            apiRateLimitWarning: true,
+            integrationError: true
+          },
+          appointments: {
+            bookingConfirmation: true,
+            reminder: true,
+            cancellation: true,
+            reschedule: true
+          },
+          marketing: {
+            campaignPerformance: true,
+            audienceInsight: true,
+            contentSuggestion: true,
+            competitorUpdate: true
+          },
+          compliance: {
+            licenseExpiry: true,
+            auditRequired: true,
+            policyUpdate: true,
+            trainingDue: true
+          }
+        },
+        channels: {
+          email: { 
+            enabled: true, 
+            address: '',
+            digestEnabled: false,
+            digestFrequency: 'daily'
+          },
+          push: { 
+            enabled: true,
+            browserPermission: 'default',
+            deviceTokens: []
+          },
+          sms: {
+            enabled: false,
+            provider: 'twilio',
+            senderId: '',
+            countryCode: '+1'
+          },
+          inApp: { 
+            enabled: true,
+            showBadge: true,
+            soundEnabled: true,
+            desktopNotifications: false
+          },
+          slack: {
+            enabled: false,
+            webhookUrl: '',
+            channel: '#notifications'
+          },
+          whatsapp: {
+            enabled: false,
+            phoneNumber: '',
+            templateNamespace: ''
+          }
+        },
+        quietHours: { 
+          enabled: true, 
+          startTime: '22:00', 
+          endTime: '08:00',
+          allowEmergencyContacts: false,
+          emergencyContactKeywords: [],
+          allowVipOverrides: false,
+          timezone: 'America/New_York',
+          vipContacts: []
+        },
+        doNotDisturb: {
+          enabled: false,
+          startTime: '22:00',
+          endTime: '08:00',
+          days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+        },
+        preferences: {
+          dailyDigestTime: '09:00',
+          weeklyDigestDay: 'monday',
+          monthlyDigestDate: 1,
+          priorityThreshold: 'medium',
+          groupSimilar: true,
+          maxNotificationsPerHour: 10
+        }
+      },
+        categories: {
+          sales: { 
+            newOrder: true,
+            largeOrder: true,
+            largeOrderThreshold: 500,
+            orderStatusChange: false,
+            paymentReceived: true,
+            refundProcessed: true
+          },
+          customers: { 
+            newCustomer: true,
+            vipCustomerActivity: true,
+            customerComplaint: true,
+            negativeReview: true,
+            positiveReview: false,
+            customerChurnRisk: true
+          },
+          inventory: { 
+            lowStock: true,
+            outOfStock: true,
+            restockAlert: false,
+            expirationAlert: true,
+            shrinkageDetected: false
+          },
+          appointments: { 
+            newBooking: true,
+            bookingCancelled: true,
+            bookingReminder: true,
+            noShow: true,
+            waitlistAvailable: false
+          },
+          finance: { 
+            invoiceSent: false,
+            invoiceOverdue: true,
+            paymentFailed: true,
+            budgetExceeded: true,
+            cashflowWarning: true,
+            taxDeadline: true
+          },
+          staff: {
+            shiftReminder: false,
+            timeOffRequest: true,
+            newHire: false,
+            workAnniversary: false,
+            performanceReview: false
+          },
+          aiInsights: { 
+            trendAlert: true,
+            anomalyDetected: true,
+            optimizationOpportunity: true,
+            benchmarkingInsight: true,
+            forecastUpdate: false,
+            recommendationReady: true
+          },
+          system: { 
+            loginAlert: false,
+            securityWarning: true,
+            systemMaintenance: true,
+            backupCompleted: false,
+            apiRateLimitWarning: false,
+            integrationError: true
+          },
+          marketing: {
+            campaignCompleted: true,
+            campaignPerformance: false,
+            leadMilestone: true,
+            socialMediaMention: false,
+            emailBounce: true
+          }
+        },
+        digest: { 
+          enabled: false,
+          frequency: 'daily',
+          deliveryTime: '09:00',
+          includeCharts: true,
+          maxItems: 20
+        },
+      }},
+      user: {
+        theme: { 
+          mode: 'system',
+          accentColor: '#3B82F6',
+          density: 'comfortable',
+          fontSize: 'medium',
+          highContrast: false,
+          reduceMotion: false
+        },
+        accessibility: {
+          screenReaderOptimized: false,
+          dyslexiaFriendlyFont: false,
+          colorBlindMode: 'none',
+          keyboardNavigationOnly: false,
+          voiceControlEnabled: false,
+          simplifiedLayout: false,
+          focusMode: false,
+          readingAssist: false,
+          captionsAlwaysOn: false,
+          visualAlerts: false
+        },
+        workspace: {
+          defaultLandingPage: '/dashboard',
+          itemsPerPage: 20,
+          defaultSortOrder: 'desc',
+          viewMode: 'list',
+          richTextEditor: true,
+          markdownSupport: false,
+          autoSave: true,
+          autoSaveIntervalSeconds: 30,
+          saveSearchFilters: true,
+          recentSearchesCount: 5,
+          enableClipboardHistory: false,
+          clipboardHistorySize: 10
+        },
+        languageRegion: {
+          language: 'en',
+          region: 'US',
+          dateFormat: 'MM/DD/YYYY',
+          timeFormat: '12h',
+          firstDayOfWeek: 'sunday',
+          numberFormat: {
+            decimalSeparator: '.',
+            thousandsSeparator: ','
+          },
+          showCurrencySymbol: true,
+          currencyCodePosition: 'before'
+        },
+        privacy: {
+          trackActivity: true,
+          trackProductivity: false,
+          shareUsageAnalytics: true,
+          retainSearchHistory: true,
+          searchHistoryDays: 90,
+          retainViewedItems: true,
+          viewedItemsDays: 30,
+          profileVisibility: 'team-only',
+          showOnlineStatus: true,
+          showContactInfo: false
+        },
+        shortcuts: {
+          enableKeyboardShortcuts: true,
+          customShortcuts: [],
+          quickActionsShortcut: true,
+          quickActionsKey: 'k'
+        },
+        sessionTimeout: 60,
+        rememberMe: true,
+        multiSessionAllowed: true,
+        onboardingCompleted: false,
+        featureTourDismissed: [],
+        optInBetaFeatures: false,
+        betaFeatureFlags: {}
+      },
+    };
+  }
+
+  // ============================================================================
+  // DATABASE OPERATIONS
+  // ============================================================================
+
+  /**
+   * Load settings from database
+   */
+  private async loadFromDatabase(): Promise<void> {
+    try {
+      if (!this.dbConnection) return;
+
+      const settings = await this.dbConnection.settings.findFirst({
+        where: { active: true },
+      });
+
+      if (settings) {
+        this.store = {
+          ...this.store,
+          ...settings.data,
+        };
+      }
+    } catch (error) {
+      console.error('[SETTINGS] Failed to load from database:', error);
+    }
+  }
+
+  /**
+   * Save settings to database
+   */
+  async saveToDatabase(): Promise<void> {
+    try {
+      if (!this.dbConnection) return;
+
+      await this.dbConnection.settings.upsert({
+        where: { id: 'default' },
+        update: {
+          data: this.store,
+          updatedAt: new Date(),
+        },
+        create: {
+          id: 'default',
+          data: this.store,
+          active: true,
+        },
+      });
+    } catch (error) {
+      console.error('[SETTINGS] Failed to save to database:', error);
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // GETTER METHODS
+  // ============================================================================
+
+  /**
+   * Get entire settings store
+   */
+  getAllSettings(): SettingsStore {
+    return { ...this.store };
+  }
+
+  /**
+   * Get specific section of settings
+   */
+  getSection<K extends keyof SettingsStore>(section: K): SettingsStore[K] {
+    return this.store[section];
+  }
+
+  /**
+   * Get nested value using dot notation path
+   */
+  getValue<T = any>(path: string): T | undefined {
+    const keys = path.split('.');
+    let value: any = this.store;
+
+    for (const key of keys) {
+      if (value === undefined || value === null) return undefined;
+      value = value[key];
+    }
+
+    return value as T;
+  }
+
+  /**
+   * Get business settings
+   */
+  getBusinessSettings(): BusinessSettings {
+    return this.store.business;
+  }
+
+  /**
+   * Get AI settings
+   */
+  getAISettings(): AISettings {
+    return this.store.ai;
+  }
+
+  /**
+   * Get dashboard settings
+   */
+  getDashboardSettings(): DashboardSettings {
+    return this.store.dashboard;
+  }
+
+  /**
+   * Get notification settings
+   */
+  getNotificationSettings(): NotificationSettings {
+    return this.store.notifications;
+  }
+
+  /**
+   * Get user preferences
+   */
+  getUserPreferences(): UserPreferences {
+    return this.store.user;
+  }
+
+  /**
+   * Get industry-specific settings
+   */
+  getIndustrySettings(industry: string): any {
+    return this.store.industry[industry as keyof IndustrySettings];
+  }
+
+  // ============================================================================
+  // SETTER METHODS
+  // ============================================================================
+
+  /**
+   * Update entire section
+   */
+  async setSection<K extends keyof SettingsStore>(
+    section: K,
+    value: SettingsStore[K],
+    options: { validate?: boolean; persist?: boolean; notify?: boolean } = {}
+  ): Promise<void> {
+    const { validate = true, persist = false, notify = true } = options;
+
+    if (validate) {
+      this.validateSection(section, value);
+    }
+
+    this.store[section] = value;
+
+    if (notify) {
+      this.notifyListeners(section, '', value);
+    }
+
+    if (persist) {
+      await this.saveToDatabase();
+    }
+  }
+
+  /**
+   * Update nested value using dot notation path
+   */
+  async setValue<T = any>(
+    path: string,
+    value: T,
+    options: { validate?: boolean; persist?: boolean; notify?: boolean } = {}
+  ): Promise<void> {
+    const { validate = true, persist = false, notify = true } = options;
+
+    const keys = path.split('.');
+    const lastKey = keys.pop()!;
+    
+    let current: any = this.store;
+    for (const key of keys) {
+      if (current[key] === undefined) {
+        current[key] = {};
+      }
+      current = current[key];
+    }
+
+    current[lastKey] = value;
+
+    if (notify) {
+      const section = keys[0] as keyof SettingsStore;
+      const relativePath = keys.slice(1).join('.') + '.' + lastKey;
+      this.notifyListeners(section, relativePath, value);
+    }
+
+    if (persist) {
+      await this.saveToDatabase();
+    }
+  }
+
+  /**
+   * Update business settings
+   */
+  async setBusinessSettings(settings: Partial<BusinessSettings>, persist = false): Promise<void> {
+    this.store.business = {
+      ...this.store.business,
+      ...settings,
+    };
+
+    if (persist) {
+      await this.saveToDatabase();
+    }
+
+    this.notifyListeners('business', '', this.store.business);
+  }
+
+  /**
+   * Update AI settings
+   */
+  async setAISettings(settings: Partial<AISettings>, persist = false): Promise<void> {
+    this.store.ai = {
+      ...this.store.ai,
+      ...settings,
+    };
+
+    if (persist) {
+      await this.saveToDatabase();
+    }
+
+    this.notifyListeners('ai', '', this.store.ai);
+  }
+
+  /**
+   * Update dashboard settings
+   */
+  async setDashboardSettings(settings: Partial<DashboardSettings>, persist = false): Promise<void> {
+    this.store.dashboard = {
+      ...this.store.dashboard,
+      ...settings,
+    };
+
+    if (persist) {
+      await this.saveToDatabase();
+    }
+
+    this.notifyListeners('dashboard', '', this.store.dashboard);
+  }
+
+  /**
+   * Update industry settings
+   */
+  async setIndustrySettings(industry: string, settings: any, persist = false): Promise<void> {
+    this.store.industry = {
+      ...this.store.industry,
+      [industry]: settings,
+    };
+
+    if (persist) {
+      await this.saveToDatabase();
+    }
+
+    this.notifyListeners('industry', industry, settings);
+  }
+
+  // ============================================================================
+  // VALIDATION
+  // ============================================================================
+
+  /**
+   * Validate a settings section against its schema
+   */
+  validateSection(section: keyof SettingsStore, value: any): ValidationErrors[] {
+    const errors: ValidationErrors[] = [];
+
+    try {
+      switch (section) {
+        case 'business':
+          businessSettingsSchema.parse(value);
+          break;
+        case 'industry':
+          industrySettingsSchema.parse(value);
+          break;
+        case 'dashboard':
+          dashboardSettingsSchema.parse(value);
+          break;
+        case 'ai':
+          aiSettingsSchema.parse(value);
+          break;
+        case 'notifications':
+          notificationSettingsSchema.parse(value);
+          break;
+        case 'user':
+          userPreferencesSchema.parse(value);
+          break;
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          errors.push({
+            section: section as string,
+            field: err.path.join('.'),
+            error: err.message,
+          });
+        });
+      }
+      throw new Error(`Settings validation failed: ${errors.map(e => `${e.field}: ${e.error}`).join(', ')}`);
+    }
+
+    return errors;
+  }
+
+  /**
+   * Validate entire settings store
+   */
+  validateAll(): ValidationErrors[] {
+    const errors: ValidationErrors[] = [];
+
+    Object.keys(this.store).forEach((key) => {
+      const sectionErrors = this.validateSection(key as keyof SettingsStore, this.store[key as keyof SettingsStore]);
+      errors.push(...sectionErrors);
+    });
+
+    return errors;
+  }
+
+  // ============================================================================
+  // EVENT LISTENERS
+  // ============================================================================
+
+  /**
+   * Subscribe to settings changes
+   */
+  subscribe(section: keyof SettingsStore, handler: SettingsChangeHandler): () => void {
+    if (!this.listeners.has(section)) {
+      this.listeners.set(section, new Set());
+    }
+
+    const sectionListeners = this.listeners.get(section)!;
+    sectionListeners.add(handler);
+
+    // Return unsubscribe function
+    return () => {
+      sectionListeners.delete(handler);
+    };
+  }
+
+  /**
+   * Notify all listeners of a change
+   */
+  private notifyListeners(section: keyof SettingsStore, path: string, value: any): void {
+    const sectionListeners = this.listeners.get(section);
+    if (sectionListeners) {
+      sectionListeners.forEach((handler) => {
+        try {
+          handler(section, path, value);
+        } catch (error) {
+          console.error('[SETTINGS] Error in settings listener:', error);
+        }
+      });
+    }
+  }
+
+  // ============================================================================
+  // UTILITY METHODS
+  // ============================================================================
+
+  /**
+   * Reset settings to defaults
+   */
+  reset(section?: keyof SettingsStore): void {
+    if (section) {
+      this.store[section] = this.getDefaultSettings()[section];
+      this.notifyListeners(section, '', this.store[section]);
+    } else {
+      this.store = this.getDefaultSettings();
+      Object.keys(this.listeners).forEach((section) => {
+        this.notifyListeners(section as keyof SettingsStore, '', this.store[section as keyof SettingsStore]);
+      });
+    }
+  }
+
+  /**
+   * Export settings as JSON
+   */
+  exportSettings(): string {
+    return JSON.stringify(this.store, null, 2);
+  }
+
+  /**
+   * Import settings from JSON
+   */
+  async importSettings(json: string, persist = false): Promise<void> {
+    try {
+      const imported = JSON.parse(json);
+      
+      // Validate each section
+      Object.keys(imported).forEach((key) => {
+        this.validateSection(key as keyof SettingsStore, imported[key]);
+      });
+
+      this.store = {
+        ...this.store,
+        ...imported,
+      };
+
+      if (persist) {
+        await this.saveToDatabase();
+      }
+
+      // Notify all sections
+      Object.keys(imported).forEach((section) => {
+        this.notifyListeners(section as keyof SettingsStore, '', imported[section]);
+      });
+    } catch (error) {
+      throw new Error(`Failed to import settings: ${error}`);
+    }
+  }
+
+  /**
+   * Clear cache
+   */
+  clearCache(): void {
+    this.cache.clear();
+  }
+}
