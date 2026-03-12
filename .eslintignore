@@ -1,0 +1,80 @@
+# ESLint ignore patterns
+
+# Build & Dependency Artifacts
+**/node_modules/**
+**/.next/**
+**/.turbo/**
+**/dist/**
+**/build/**
+**/out/**
+**/public/**
+**/coverage/**
+**/.vercel/**
+
+# Generated Code & Clients
+**/generated/**
+**/generated/client/**
+infra/db/src/generated/**
+packages/api-client/src/generated/**
+
+# Playwright & Automation Artifacts
+**/playwright-report/**
+**/trace/**
+**/test-results/**
+**/test-output/**
+
+# Static Bundles & Maps
+**/*.bundle.js
+**/*.bundle.min.js
+**/*.map
+
+# Build Artifacts (Environment specific)
+.next/
+dist/
+build/
+out/
+.turbo/
+.vercel/
+
+# Logs and system files
+*.log
+.DS_Store
+lint_report.txt
+lint_results.json
+typecheck_results.txt
+
+# Tooling specific (sometimes generates JS in src)
+**/src/**/*.js
+**/src/**/*.jsx
+!**/src/**/*.ts
+!**/src/**/*.tsx
+
+# Legacy & One-off Fixes
+singularity_fix*.js
+SINGULARITY_RECOVERY*.js
+migrate-*.js
+cleanup-*.js
+test-*.js
+*.test.js
+*.spec.js
+analyze_lint.js
+lint_report.json
+mass_fix*.js
+mass-fix*.js
+health-*.js
+health_*.js
+**/prisma/seed*.ts
+**/prisma/seed*.js
+
+# One-off scripts / reports
+*.txt
+*.log
+final-*.js
+fix-*.js
+mass_*.js
+nuclear_*.js
+refine-services.js
+regression_cleanup.js
+scripts/
+.agent/scripts/
+

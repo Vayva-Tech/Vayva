@@ -1,0 +1,24 @@
+name: Prevent Nav/Footer Drift
+
+on:
+  pull_request:
+    paths:
+      - 'apps/merchant-admin/src/components/layout/GlobalHeader.tsx'
+      - 'apps/merchant-admin/src/components/layout/GlobalFooter.tsx'
+
+jobs:
+  nav-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for approval label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+            if (!labels.includes('nav-approved')) {
+              core.setFailed('⛔ Navigation and footer components are locked.\n\nThese files require explicit approval from Product & Design leads.\n\nTo proceed:\n1. Get approval from Product Lead\n2. Get approval from Design Lead\n3. Add "nav-approved" label to this PR');
+            } else {
+              core.info('✅ nav-approved label found - allowing nav/footer changes');
+            }

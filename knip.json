@@ -1,0 +1,49 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "Frontend/merchant-admin": {
+      "entry": ["src/**/*.tsx", "src/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["**/*.d.ts", "**/*.test.ts", "**/*.test.tsx"]
+    },
+    "Frontend/storefront": {
+      "entry": ["src/**/*.tsx", "src/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["**/*.d.ts", "**/*.test.ts", "**/*.test.tsx"]
+    },
+    "Frontend/ops-console": {
+      "entry": ["src/**/*.tsx", "src/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["**/*.d.ts", "**/*.test.ts", "**/*.test.tsx"]
+    },
+    "Frontend/marketing": {
+      "entry": ["src/**/*.tsx", "src/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["**/*.d.ts", "**/*.test.ts", "**/*.test.tsx"]
+    },
+    "Backend/core-api": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"],
+      "ignore": ["**/*.d.ts", "**/*.test.ts"]
+    },
+    "Backend/worker": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"],
+      "ignore": ["**/*.d.ts", "**/*.test.ts"]
+    }
+  },
+  "ignore": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/generated/**",
+    "platform/**",
+    "tests/**"
+  ],
+  "ignoreDependencies": [
+    "@types/node",
+    "typescript",
+    "eslint",
+    "prettier"
+  ]
+}

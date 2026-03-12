@@ -1,0 +1,43 @@
+name: Ops Security Guard
+
+on: [push, pull_request]
+
+jobs:
+  tripwires:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Tripwire - Merchant Admin Platform Leakage
+        run: |
+          if grep -r "src/app/admin" apps/merchant-admin/src/app --include="*.ts" --include="*.tsx" 2>/dev/null; then
+            echo "FAIL: Found legacy admin routes in merchant-admin"
+            exit 1
+          fi
+          if grep -r "/api/admin/ops" apps/merchant-admin/src --include="*.ts" --include="*.tsx" 2>/dev/null; then
+             echo "FAIL: Found legacy ops api calls in merchant-admin"
+             exit 1
+          fi
+
+      - name: Tripwire - Ops Auth Enforcement
+        run: |
+          # Ensure every Ops API route uses OpsAuthService (except auth routes)
+          # We look for route.ts files in api/ops and check if they contain the guard
+          for file in $(find apps/ops-console/src/app/api/ops -name "route.ts"); do
+            # Skip auth routes (login, logout, etc.) as they can't require auth
+            if echo "$file" | grep -q "/api/ops/auth/"; then
+              continue
+            fi
+            if ! grep -qE "(OpsAuthService\.requireSession|withOpsAPI|withOpsAuth)" "$file"; then
+              echo "FAIL: $file is missing OpsAuthService.requireSession() or withOpsAPI/withOpsAuth wrapper"
+              exit 1
+            fi
+          done
+
+      - name: Tripwire - Domain Safety
+        run: |
+          # Fail if new .com references are introduced in code (exclude docs if needed)
+          if grep -r "vayva.com" apps/merchant-admin/src --include=*.ts --include=*.tsx; then
+            echo "FAIL: Found vayva.com references in merchant-admin source"
+            exit 1
+          fi

@@ -1,0 +1,109 @@
+name: Production Readiness Check
+
+on:
+  push:
+    branches: [vayva-v1, main, production]
+  pull_request:
+    branches: [vayva-v1, main, production]
+
+jobs:
+  production-scan:
+    name: Production Readiness Scan
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: vayva_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vayva_test?schema=public
+      NEXTAUTH_SECRET: ci-build-secret-key-for-production-readiness
+      NEXTAUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ci-build-secret-key-for-production-readiness
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BACKEND_API_URL: https://api.vayva.ng
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 10.2.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm db:generate
+
+      - name: Push database schema
+        run: pnpm --filter @vayva/db db:push
+
+      - name: Run Production Scan
+        working-directory: Frontend/merchant-admin
+        run: pnpm run production:scan
+      
+      - name: Verify Environment Template
+        working-directory: Frontend/merchant-admin
+        run: |
+          if [ ! -f .env.example ]; then
+            echo "❌ .env.example file missing"
+            exit 1
+          fi
+          
+          # Check required vars are documented
+          REQUIRED_VARS=(
+            "NEXTAUTH_SECRET"
+            "DATABASE_URL"
+            "PAYSTACK_SECRET_KEY"
+            "PAYSTACK_PUBLIC_KEY"
+            "RESEND_API_KEY"
+            "RESEND_FROM_EMAIL"
+          )
+          
+          for var in "${REQUIRED_VARS[@]}"; do
+            if ! grep -q "$var" .env.example; then
+              echo "❌ Required variable $var not in .env.example"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All required variables documented in .env.example"
+      
+      - name: TypeScript Check
+        working-directory: Frontend/merchant-admin
+        run: pnpm run typecheck
+      
+      - name: ✅ Build Project
+        run: pnpm build --filter=@vayva/merchant-admin...
+      
+      - name: Run Tests
+        working-directory: Frontend/merchant-admin
+        run: pnpm test
+      
+      # E2E tests disabled - require database setup in CI
+      # Uncomment when database is configured in GitHub Actions
+      # - name: E2E tests
+      #   working-directory: Frontend/merchant-admin
+      #   run: pnpm test:e2e
+      

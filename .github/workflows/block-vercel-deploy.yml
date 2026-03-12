@@ -1,0 +1,32 @@
+name: Block Vercel Deployment
+
+on:
+  push:
+    branches: [main, develop, production]
+  pull_request:
+    branches: [main, develop, production]
+
+jobs:
+  block-deployment:
+    name: Deployment Blocked - GitHub Actions Fixing in Progress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block Deployment
+        run: |
+          echo "❌ DEPLOYMENT BLOCKED"
+          echo ""
+          echo "Vercel deployments are temporarily disabled."
+          echo "Reason: GitHub Actions workflows are being fixed."
+          echo ""
+          echo "Current Status:"
+          echo "  - CI Tests & Coverage: Under repair"
+          echo "  - Typecheck: Under repair"
+          echo "  - E2E Tests: Under repair"
+          echo "  - Production Readiness: Under repair"
+          echo ""
+          echo "To unblock:"
+          echo "  1. Fix all GitHub Actions failures"
+          echo "  2. Update this workflow to remove the block"
+          echo "  3. Re-run all checks"
+          echo ""
+          exit 1

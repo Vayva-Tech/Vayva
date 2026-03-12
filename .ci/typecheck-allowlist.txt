@@ -1,0 +1,5 @@
+# Workspaces allowed to fail typecheck (temporary).
+# One workspace name per line.
+# Keep this list short and shrink it over time.
+
+

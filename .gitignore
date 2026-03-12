@@ -1,0 +1,150 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+test-results/
+playwright-report/
+
+apps/merchant-admin/cookies.txt
+.windsurf/
+.claude/
+
+# Production
+build/
+dist/
+.next/
+out/
+
+# Generated PWA artifacts (marketing)
+apps/marketing/public/sw.js
+apps/marketing/public/workbox-*.js
+
+# Generated PWA artifacts (Frontend apps)
+Frontend/**/public/sw.js
+Frontend/**/public/workbox-*.js
+Frontend/**/public/workbox-*.js.map
+
+# Misc
+.DS_Store
+*.pem
+.turbo
+.vercel
+
+# One-off artifacts (local-only)
+*.bak
+*.patch
+dump.rdb
+lint_output*.txt
+Backend/**/full_lint_report*.json
+.!*.DS_Store
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment Variables
+.env
+.env.local
+.env.*
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+!.env.example
+!.env.production.example
+
+# Deploy secrets (never commit)
+platform/scripts/deploy/.env.app
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+*.backup
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Build artifacts
+*.tsbuildinfo
+.eslintcache
+
+# CI/log artifacts (development-only, never commit)
+all_errors.txt
+build_log*.txt
+ci_output*.txt
+ci_current_status.txt
+ci_results.txt
+error_codes_count.txt
+error_distribution.txt
+error_files_count.txt
+error_patterns.txt
+files_list.txt
+files_with_implicit_any.txt
+filtered_lint.txt
+final-lint-verification*.txt
+final_health_report*.txt
+final_lint*.txt
+fresh_auth_failures.txt
+full-lint-report.txt
+global_lint_report.txt
+global_typecheck*.txt
+grep_adminshell.txt
+latest_idor_hits.txt
+marketplace_typecheck.txt
+merchant_admin_typecheck*.txt
+merchant_pages.txt
+remaining_idor_hits.txt
+sample_residues.txt
+storefront_typecheck.txt
+typecheck_results.txt
+
+# Duplicate root docs (canonical versions live in docs/)
+DEPLOY.md
+DEPLOYMENT_CHECKLIST.md
+QUICK_START.md
+SETUP_GUIDE.md
+VERCEL_DEPLOYMENT.md
+
+# One-off fix/migration scripts (development-only)
+analyze_lint.js
+final-service-fix.js
+fix-error-handling.js
+fix_buttons.sh
+mass_fix_v*.js
+nuclear_fix_v*.js
+refine-services.js
+regression_cleanup.js
+seed-order.js
+seed-store.js
+singularity_fix_v*.js
+migrate_prisma_names.sh
+test-ai.sh
+.gitignore.backup
+.env*.local
+
+# Environment files with secrets
+worker.env
+worker.env.*
+.env.production
+.env.local
+logs_59765035677/
