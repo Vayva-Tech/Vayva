@@ -1,0 +1,182 @@
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/analytics/timeseries/route.ts
+  147:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/approval/request/route.ts
+  141:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/audit-logs/route.ts
+  126:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  211:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/dashboard/stats/route.ts
+  168:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/impersonate/route.ts
+  171:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  179:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  187:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/kyc/assign/route.ts
+  136:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  199:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/merchants/bulk/route.ts
+  235:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  243:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/payments/paystack-webhooks/route.ts
+  8:60  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/api/ops/support/route.ts
+  77:30  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/invite/accept/page.tsx
+  34:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/invite/accept/page.tsx:34:7
+  32 |   useEffect(() => {
+  33 |     if (!token) {
+> 34 |       setValidating(false);
+     |       ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  35 |       setError("Invalid invitation link. Please request a new invitation.");
+  36 |       return;
+  37 |     }  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/ops/(app)/analytics/comprehensive/page.tsx
+  278:13  error  Error: Cannot reassign variable after render completes
+
+Reassigning `cumulativePercent` after render has completed can cause inconsistent behavior on subsequent renders. Consider using state instead.
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/ops/(app)/analytics/comprehensive/page.tsx:278:13
+  276 |             const dashArray = `${percent} ${100 - percent}`;
+  277 |             const offset = 100 - cumulativePercent;
+> 278 |             cumulativePercent += percent;
+      |             ^^^^^^^^^^^^^^^^^ Cannot reassign `cumulativePercent` after render completes
+  279 |             
+  280 |             return (
+  281 |               <circle  react-hooks/immutability
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/ops/(app)/growth/campaigns/page.tsx
+  73:54  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/app/ops/(app)/growth/campaigns/page.tsx:73:54
+  71 |               campaigns.map((c: any) => {
+  72 |                 const diff = Math.ceil(
+> 73 |                   (new Date(c.expiresAt).getTime() - Date.now()) /
+     |                                                      ^^^^^^^^^^ Cannot call impure function
+  74 |                     (1000 * 60 * 60),
+  75 |                 );
+  76 |  react-hooks/purity
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/components/OpsShell.tsx
+  36:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/components/OpsShell.tsx:36:7
+  34 |     const savedDensity = localStorage.getItem("ops-table-density") as "relaxed" | "compact";
+  35 |     if (savedDensity) {
+> 36 |       setDensity(savedDensity);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  37 |     }
+  38 |     const savedCollapsed = localStorage.getItem("ops-sidebar-collapsed") === "true";
+  39 |     setIsCollapsed(savedCollapsed);  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/components/ops/AdvancedSearchInput.tsx
+  49:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/components/ops/AdvancedSearchInput.tsx:49:5
+  47 |   useEffect(() => {
+  48 |     const query = parseSearchQuery(value);
+> 49 |     setParsedQuery(query);
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  50 |   }, [value]);
+  51 |
+  52 |   // Update suggestions based on cursor position  react-hooks/set-state-in-effect
+  71:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/components/ops/AdvancedSearchInput.tsx:71:5
+  69 |
+  70 |   useEffect(() => {
+> 71 |     updateSuggestions();
+     |     ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  72 |   }, [updateSuggestions]);
+  73 |
+  74 |   // Handle keyboard navigation                                                 react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/lib/ops-auth.ts
+  149:31  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/ops-console/src/lib/search/queryParser.ts
+  270:9  error  Unexpected lexical declaration in case block  no-case-declarations
+  307:7  error  Unexpected lexical declaration in case block  no-case-declarations
+
+✖ 23 problems (23 errors, 0 warnings)
+

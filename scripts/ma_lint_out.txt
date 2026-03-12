@@ -1,0 +1,528 @@
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/analytics/page.tsx
+  16:24  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/analytics/page.tsx:16:24
+  14 |   const storeId = user.storeId;
+  15 |   const range = {
+> 16 |         from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+     |                        ^^^^^^^^^^ Cannot call impure function
+  17 |     to: new Date(),
+  18 |   };
+  19 |  react-hooks/purity
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/addons/components/add-on-detail-modal.tsx
+   19:1   error  '@vayva/addons/types' import is duplicated                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-duplicate-imports
+  380:81  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/addons/components/add-on-detail-modal.tsx:380:81
+  378 |                   <div className="flex items-center justify-between pt-4 border-t">
+  379 |                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
+> 380 |                       <span>Last updated: {new Date(addon.stats?.lastUpdated ?? Date.now()).toLocaleDateString()}</span>
+      |                                                                                 ^^^^^^^^^^ Cannot call impure function
+  381 |                       {addon.docs?.setup && (
+  382 |                         <a href={addon.docs.setup} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+  383 |                           Documentation  react-hooks/purity
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/addons/page.tsx
+  22:1  error  '@vayva/addons/types' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/ai/page.tsx
+  119:15  error  Missing "key" prop for element in iterator  react/jsx-key
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/discounts/page.tsx
+  373:16  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  444:14  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/finance/wallet/page.tsx
+  6:1  error  'next-auth' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/page.tsx
+  233:26  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?         react-hooks/rules-of-hooks
+  243:23  error  React Hook "useTrialPrompt" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/settings/ai-agent/page.tsx
+  465:17  error  Missing "key" prop for element in iterator  react/jsx-key
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/settings/tools/page.tsx
+  20:1  error  'react' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/(dashboard)/dashboard/socials/page.tsx
+  171:23  error  Empty block statement  no-empty
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/account/overview/route.ts
+  8:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/checkout/initialize/route.ts
+  7:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/domains/[id]/verify/route.ts
+  26:11  error  Empty block statement  no-empty
+  35:11  error  Empty block statement  no-empty
+  78:13  error  Empty block statement  no-empty
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/domains/route.ts
+  5:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/education/enrollments/route.ts
+  6:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/forecasting/route.ts
+  96:9  error  Unexpected lexical declaration in case block  no-case-declarations
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/fulfillment/shipments/[id]/retry/route.ts
+  76:27  error  Empty block statement  no-empty
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/merchant/policies/generate/route.ts
+  2:1  error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/nightlife/events/[id]/route.ts
+  5:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/nightlife/events/route.ts
+  6:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/reviews/[id]/status/route.ts
+  6:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/segments/route.ts
+   89:9  error  Unexpected lexical declaration in case block  no-case-declarations
+  109:9  error  Unexpected lexical declaration in case block  no-case-declarations
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/stays/route.ts
+  6:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/api/vehicles/route.ts
+  6:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/checkout/success/page.tsx
+  37:5  error  Error: Cannot access variable before it is declared
+
+`verifyPayment` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/checkout/success/page.tsx:37:5
+  35 |     }
+  36 |
+> 37 |     verifyPayment(reference);
+     |     ^^^^^^^^^^^^^ `verifyPayment` accessed before it is declared
+  38 |   }, [reference]);
+  39 |
+  40 |   const verifyPayment = async (ref: string) => {
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/checkout/success/page.tsx:40:3
+  38 |   }, [reference]);
+  39 |
+> 40 |   const verifyPayment = async (ref: string) => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |     try {
+     | ^^^^^^^^^
+> 42 |       const response = await apiJson<PaymentVerification>("/api/payments/verify", {
+     …
+     | ^^^^^^^^^
+> 56 |     }
+     | ^^^^^^^^^
+> 57 |   };
+     | ^^^^^ `verifyPayment` is declared here
+  58 |
+  59 |   const getSuccessMessage = () => {
+  60 |     switch (verification?.type) {  react-hooks/immutability
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/app/preview/page.tsx
+  6:1  error  'next-auth' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/admin-shell.tsx
+  34:1  error  '@/lib/extensions/registry' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard-v2/AIUsageChart.tsx
+  40:35  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard-v2/AIUsageChart.tsx:40:35
+  38 |               key={i}
+  39 |               className="flex-1 bg-surface-2 rounded-t animate-pulse"
+> 40 |               style={{ height: `${Math.random() * 40 + 20}%` }}
+     |                                   ^^^^^^^^^^^^^ Cannot call impure function
+  41 |             />
+  42 |           ))}
+  43 |         </div>  react-hooks/purity
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard-v2/DashboardLegacyContent.tsx
+  9:1  error  '@/lib/extensions/registry' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard-v2/QuickActions.tsx
+  329:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard-v2/QuickActions.tsx:329:7
+  327 |     // Simulate loading state until industry data is available
+  328 |     if (industrySlug !== undefined) {
+> 329 |       setIsLoading(false);
+      |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  330 |     }
+  331 |   }, [industrySlug]);
+  332 |     react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard/UpgradePrompt.tsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/dashboard/UpgradePrompt.tsx:28:5
+  26 |
+  27 |   useEffect(() => {
+> 28 |     setIsVisible(true);
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |   }, [promptType]);
+  30 |
+  31 |   const handleDismiss = () => {  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/events/CreateEventDialog.tsx
+  5:1  error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/kyc/KYCFileUpload.tsx
+  72:28  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/kyc/KYCFileUpload.tsx:72:28
+  70 |
+  71 |   const uploadFile = async (file: File) => {
+> 72 |     const fileId = `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+     |                            ^^^^^^^^^^ Cannot call impure function
+  73 |     
+  74 |     // Add file to state
+  75 |     setFiles((prev) => [                      react-hooks/purity
+  72:42  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/kyc/KYCFileUpload.tsx:72:42
+  70 |
+  71 |   const uploadFile = async (file: File) => {
+> 72 |     const fileId = `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+     |                                          ^^^^^^^^^^^^^ Cannot call impure function
+  73 |     
+  74 |     // Add file to state
+  75 |     setFiles((prev) => [  react-hooks/purity
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/legal/ConsentBanner.tsx
+  23:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/legal/ConsentBanner.tsx:23:9
+  21 |       try {
+  22 |         const parsed = JSON.parse(storedPrefs);
+> 23 |         setPreferences((prev) => ({ ...prev, ...parsed }));
+     |         ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |       } catch {
+  25 |         // ignore malformed data
+  26 |       }  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/network/NetworkStatus.tsx
+  31:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/network/NetworkStatus.tsx:31:7
+  29 |   useEffect(() => {
+  30 |     if (isOnline && queueCount === 0) {
+> 31 |       setShowSynced(true);
+     |       ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  32 |       const timer = setTimeout(() => setShowSynced(false), 3000);
+  33 |       return () => clearTimeout(timer);
+  34 |     }  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/nonprofit/CampaignsList.tsx
+  5:1  error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/nonprofit/CreateCampaignDialog.tsx
+  5:1  error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/onboarding/steps/NonprofitSetupStep.tsx
+  6:1  error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/products/CSVImportModal.tsx
+  36:7  error  Error: Cannot access variable before it is declared
+
+`parseFile` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/products/CSVImportModal.tsx:36:7
+  34 |     if (file) {
+  35 |       setFile(file);
+> 36 |       parseFile(file);
+     |       ^^^^^^^^^ `parseFile` accessed before it is declared
+  37 |     }
+  38 |   }, []);
+  39 |
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/products/CSVImportModal.tsx:49:3
+  47 |   });
+  48 |
+> 49 |   const parseFile = (file: File) => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |     setIsParsing(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |     setErrors([]);
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 78 |     });
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 79 |   };
+     | ^^^^^ `parseFile` is declared here
+  80 |
+  81 |   const handleImport = () => {
+  82 |     if (!file) return;  react-hooks/immutability
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/ui/OptimizedImage.tsx
+  75:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/components/ui/OptimizedImage.tsx:75:7
+  73 |   useEffect(() => {
+  74 |     if (priority || loading === "eager") {
+> 75 |       setImageSrc(optimizedSrc());
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  76 |       return;
+  77 |     }
+  78 |  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/context/AuthContext.tsx
+  81:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/context/AuthContext.tsx:81:5
+  79 |       return;
+  80 |     }
+> 81 |     fetchProfile().finally(() => queueMicrotask(() => setIsLoading(false)));
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  82 |   }, [pathname]);
+  83 |
+  84 |   const login = (  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/hooks/use-sse.ts
+  46:38  error  'NodeJS' is not defined  no-undef
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/accessibility.tsx
+   60:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/accessibility.tsx:60:5
+  58 |   useEffect(() => {
+  59 |     const mediaQuery = window.matchMedia("(prefers-contrast: more)");
+> 60 |     setIsHighContrast(mediaQuery.matches);
+     |     ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  61 |
+  62 |     const handler = (e: MediaQueryListEvent) => {
+  63 |       setIsHighContrast(e.matches);  react-hooks/set-state-in-effect
+  163:9  error  Unexpected lexical declaration in case block                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-case-declarations
+  170:9  error  Unexpected lexical declaration in case block                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-case-declarations
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/api.ts
+  14:13  error  'RequestInit' is not defined  no-undef
+  37:13  error  'RequestInit' is not defined  no-undef
+  49:13  error  'RequestInit' is not defined  no-undef
+  60:13  error  'RequestInit' is not defined  no-undef
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/auth.ts
+    1:48  error  '/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/node_modules/next-auth/index.js' imported multiple times  import/no-duplicates
+  211:1   error  'next-auth' import is duplicated                                                                                              no-duplicate-imports
+  211:62  error  '/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/node_modules/next-auth/index.js' imported multiple times  import/no-duplicates
+  215:35  error  The `Function` type accepts any function-like value.
+Prefer explicitly defining any function parameters and return type       @typescript-eslint/no-unsafe-function-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/auth/session.ts
+  6:1  error  'next-auth' import is duplicated    no-duplicate-imports
+  7:1  error  'next/server' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/delivery/DeliveryProvider.ts
+   4:18  error  Unsafe declaration merging between classes and interfaces  @typescript-eslint/no-unsafe-declaration-merging
+  11:14  error  Unsafe declaration merging between classes and interfaces  @typescript-eslint/no-unsafe-declaration-merging
+  32:18  error  Unsafe declaration merging between classes and interfaces  @typescript-eslint/no-unsafe-declaration-merging
+  41:14  error  Unsafe declaration merging between classes and interfaces  @typescript-eslint/no-unsafe-declaration-merging
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/delivery/DeliveryService.ts
+  3:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/events/eventBus.ts
+  4:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/governance/data-governance.service.ts
+  3:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/onboarding-sync.ts
+  70:21  error  Empty block statement  no-empty
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/ops-auth.ts
+  22:21  error  Empty block statement  no-empty
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/payment/mock-payments.ts
+  83:12  error  'RequestInit' is not defined  no-undef
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/rescue/merchant-rescue-service.ts
+  4:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/lib/support/support-context.service.ts
+  2:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/middleware.ts
+  2:1  error  'next/server' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/providers/ThemeProvider.tsx
+  64:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/providers/ThemeProvider.tsx:64:5
+  62 |   // Initialize theme from localStorage after mount
+  63 |   useEffect(() => {
+> 64 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  65 |     const initial = getInitialTheme();
+  66 |     setThemeState(initial);
+  67 |     const resolved =  react-hooks/set-state-in-effect
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/BookingService.ts
+  5:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/DeletionService.ts
+  4:24  error  '/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/node_modules/@vayva/shared/src/index.ts' imported multiple times                           import/no-duplicates
+  5:1   error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  6:1   error  '@vayva/shared' import is duplicated                                                                                                                           no-duplicate-imports
+  6:26  error  '/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/node_modules/@vayva/shared/src/index.ts' imported multiple times                           import/no-duplicates
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/MenuService.ts
+  3:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/autopilot-engine.ts
+  5:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/creative-portfolio.service.ts
+  21:61  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  22:51  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  23:65  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  24:61  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/discount.service.ts
+  20:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/fashion.service.ts
+  2:29   error  '/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/node_modules/@vayva/db/src/client.ts' imported multiple times  import/no-duplicates
+  3:1    error  '@vayva/db' import is duplicated                                                                                                   no-duplicate-imports
+  3:103  error  '/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/node_modules/@vayva/db/src/client.ts' imported multiple times  import/no-duplicates
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/kyc.ts
+  3:1  error  '@vayva/db' import is duplicated  no-duplicate-imports
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/loyalty.service.ts
+  483:57  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  501:59  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  517:65  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  531:55  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/onboarding.ts
+  24:20  error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/pricing.service.ts
+  193:40  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  231:80  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  488:51  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  510:53  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  525:69  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/services/return.service.ts
+  395:53  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  444:49  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/fredrick/Documents/Vayva-Tech/vayva/Frontend/merchant-admin/src/types/whatsapp-broadcast.ts
+  91:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+✖ 105 problems (105 errors, 0 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

@@ -1,0 +1,153 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Notification Engine Metrics",
+    "tags": ["notifications", "backend", "vayva"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "panels": [
+      {
+        "id": 1,
+        "type": "graph",
+        "title": "Notification Delivery Rate",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(notification_deliveries_total[5m])",
+            "legendFormat": "{{channel}}"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Messages/sec"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "type": "stat",
+        "title": "Total Notifications Sent (24h)",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(increase(notification_deliveries_total[24h]))"
+          }
+        ],
+        "options": {
+          "reduceOptions": {
+            "calcs": ["lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": "graph",
+        "title": "Delivery Success Rate by Channel",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(notification_deliveries_success_total[5m]) / rate(notification_deliveries_total[5m]) * 100",
+            "legendFormat": "{{channel}}"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "percent",
+            "label": "Success Rate %"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "type": "piechart",
+        "title": "Notification Distribution by Category",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum by (category) (increase(notification_deliveries_total[24h]))"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "type": "graph",
+        "title": "Average Delivery Latency",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(notification_delivery_duration_seconds_sum[5m]) / rate(notification_delivery_duration_seconds_count[5m])",
+            "legendFormat": "{{channel}}"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Latency (seconds)"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "type": "stat",
+        "title": "Active Rules",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "notification_active_rules"
+          }
+        ],
+        "options": {
+          "reduceOptions": {
+            "calcs": ["lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 7,
+        "type": "graph",
+        "title": "Rule Evaluations",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(notification_rule_evaluations_total[5m])",
+            "legendFormat": "Evaluations/sec"
+          },
+          {
+            "expr": "rate(notification_rule_triggers_total[5m])",
+            "legendFormat": "Triggers/sec"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "type": "table",
+        "title": "Top Failed Deliveries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "topk(10, sum by (channel, error) (increase(notification_deliveries_failed_total[1h])))",
+            "format": "table"
+          }
+        ],
+        "columns": [
+          { "text": "Channel", "value": "channel" },
+          { "text": "Error", "value": "error" },
+          { "text": "Count", "value": "Value" }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "channel",
+          "type": "query",
+          "datasource": "Prometheus",
+          "query": "label_values(notification_deliveries_total, channel)",
+          "multi": true
+        }
+      ]
+    }
+  }
+}
