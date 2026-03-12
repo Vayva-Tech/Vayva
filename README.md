@@ -1,118 +1,164 @@
-# Vayva 🚀
+# Vayva Platform 🚀
 
-[![CI](https://github.com/itsfredrick/vayva-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/itsfredrick/vayva-platform/actions/workflows/ci.yml)
+[![CI](https://github.com/Vayva-Tech/Vayva/actions/workflows/ci.yml/badge.svg)](https://github.com/Vayva-Tech/Vayva/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Vayva is a **multi-tenant e-commerce and commerce-operations platform** purpose-built for the Nigerian market. It enables merchants to launch, operate, and scale online businesses across web, mobile, and conversational channels, with native payments, logistics, and AI-powered customer engagement.
-
-The platform is designed as **infrastructure**, not just a storefront—combining payments, fulfillment, marketing, and automated customer interaction into a single, extensible system.
+**Multi-tenant e-commerce and commerce-operations platform** built for emerging markets, enabling merchants to launch, operate, and scale online businesses across web, mobile, and conversational channels with native payments, logistics, and AI-powered customer engagement.
 
 ---
 
-🎯 Core Capabilities
+## 🎯 Core Capabilities
 
-- **Multi-Tenant Commerce Engine**
-  Secure, isolated merchant environments with shared infrastructure and centralized governance.
+### Multi-Tenant Commerce Engine
+Secure, isolated merchant environments with shared infrastructure and centralized governance.
 
-- **Merchant Dashboard**
-  Unified interface for product management, orders, customers, analytics, marketing campaigns, and payouts.
+### Merchant Dashboard
+Unified interface for product management, orders, customers, analytics, marketing campaigns, and payouts.
 
-- **AI-Powered WhatsApp Commerce**
-  Conversational storefronts that handle customer inquiries, product discovery, and order placement directly on WhatsApp.
+### AI-Powered WhatsApp Commerce
+Conversational storefronts that handle customer inquiries, product discovery, and order placement directly on WhatsApp.
 
-- **Native Paystack Payments**
-  First-class integration with Paystack for cards, bank transfers, and local payment flows.
+### Native Payments Integration
+First-class integration with Paystack for cards, bank transfers, and local payment flows.
 
-- **Logistics & Fulfillment Automation**
-  Order routing, delivery coordination, and fulfillment status tracking.
+### Logistics & Fulfillment Automation
+Order routing, delivery coordination, and fulfillment status tracking.
 
-### 💡 Why WhatsApp Commerce?
+### Operations Console (Internal)
+Administrative tools for onboarding merchants, auditing transactions, resolving disputes, and platform oversight.
 
-**The Problem**:
-In emerging markets like Nigeria, **trust and data** are the biggest barriers to e-commerce adoption.
-
-1. Customers don't trust websites they've never heard of.
-2. Data is expensive; users live in WhatsApp where data is bundled/cheap.
-3. Downloading an app for a single store is high friction.
-
-**Our Approach**:
-Vayva brings the _entire store_ into WhatsApp.
-
-- **Catalog & Search**: Browse products without leaving the chat.
-- **Checkout**: Add to cart and pay via secure links generated in-chat.
-- **AI Agent**: Automatically answers "How much is delivery?" and "Is this available?".
-
-**Constraints**:
-
-- Must work on low-end Android devices (latency sensitive).
-- Must handle intermittent connectivity (optimistic UI).
-
-- **Marketing & Growth Tools**
-  Discount campaigns, SEO-friendly storefronts, and customer engagement workflows.
-
-- **Operations Console (Internal)**
-  Administrative tools for onboarding merchants, auditing transactions, resolving disputes, and platform oversight.
-
-- **Append-Only Financial Ledger**
-  Immutable transaction records designed for audits, reconciliation, and regulatory clarity.
+### Append-Only Financial Ledger
+Immutable transaction records designed for audits, reconciliation, and regulatory clarity.
 
 ---
 
 ## 🏗 System Architecture
 
-> **See full documentation in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
-
 Vayva is implemented as a **high-performance monorepo** using **TurboRepo**, optimized for independent scaling of applications and services while maintaining strong type safety and shared standards.
+
+### Infrastructure Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        CLIENT LAYER                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────┐ │
+│  │   Mobile    │  │ Merchant    │  │    Ops      │  │Marketing│ │
+│  │ Application │  │   Admin     │  │  Console    │  │  Site   │ │
+│  │   (React    │  │  Dashboard  │  │ (Internal)  │  │(Public) │ │
+│  │  Native)    │  │             │  │             │  │         │ │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    HTTPS/WSS │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    API GATEWAY & SERVICES                        │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                    Vercel Edge                              │ │
+│  │               (Frontend Applications)                       │ │
+│  │               - Auto-scaling                                │ │
+│  │               - Global CDN                                  │ │
+│  │               - Edge functions                              │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                              │                                   │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                      VPS Infrastructure                     │ │
+│  │  ┌──────────┐ ┌──────────┐ ┌────────────┐ ┌──────────────┐ │ │
+│  │  │ Core API │ │  Worker  │ │ Evolution  │ │   Nginx      │ │ │
+│  │  │ (Port    │ │ (BullMQ) │ │  WhatsApp  │ │ Proxy Manager│ │ │
+│  │  │  3001)   │ │          │ │   (8080)   │ │   (80/443)   │ │ │
+│  │  │ - Docker │ │ - Docker │ │ - Docker   │ │              │ │ │
+│  │  │ - PM2    │ │ - Systemd│ │            │ │              │ │ │
+│  │  └──────────┘ └──────────┘ └────────────┘ └──────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                              │                                   │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                    Data Layer                               │ │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │ │
+│  │  │   VPS 2      │  │    Redis     │  │     MinIO        │  │ │
+│  │  │  PostgreSQL  │  │   (Cache)    │  │  (Object Store)  │  │ │
+│  │  │   (5432)     │  │   (6379)     │  │   (9000/9001)    │  │ │
+│  │  └──────────────┘  └──────────────┘  └──────────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ### Repository Layout
 
 #### `apps/`
-
 End-user and internal applications:
-
-- **`web`** — Next.js application containing:
-  - Public marketing site
-  - Merchant dashboard
-  - Customer-facing storefronts
-
+- **`merchant-admin`** — Next.js merchant dashboard application
 - **`ops-console`** — Internal admin and support tooling
-- **`mobile`** — Merchant mobile application
-- **`worker`** — Background job processor (emails, webhooks, sync tasks)
+- **`marketing`** — Public marketing website
+- **`www`** — Main landing page
+- **`worker`** — Background job processor
 
-#### `services/`
+#### `Backend/`
+Server-side applications and services:
+- **`core-api`** — Central API layer (Next.js API routes)
+- **`worker`** — Background job processing
+- **`workflow`** — Business workflow engine
 
-Domain-focused backend services, including:
-
-- Authentication & identity
-- Payments & ledgering
-- Orders & fulfillment
-- WhatsApp messaging
-- AI orchestration and automation
-
-Each service is independently deployable and communicates via standardized APIs.
+#### `Frontend/`
+Client-side applications:
+- **`merchant-admin`** — Merchant dashboard frontend
+- **`ops-console`** — Operations console frontend
+- **`marketing`** — Marketing site frontend
+- **`storefront`** — Customer-facing storefront
+- **`mobile`** — React Native mobile application
 
 #### `packages/`
+Shared foundations across the platform (72 industry packages):
+- **`ui`** — Premium design system and components
+- **`schemas`** — Shared Zod schemas for validation
+- **`shared`** — Common utilities and types
+- **`api-client`** — Typed API clients
+- **`templates`** — Industry-specific template implementations
+- **Industry packages** — 72 specialized industry implementations
 
-Shared foundations across the platform:
+#### `platform/`
+Platform infrastructure and core services:
+- **`infra/db`** — Database schema and Prisma configuration
+- **`scripts`** — Deployment and operational scripts
+- **`testing`** — End-to-end and integration tests
 
-- **`ui`** — Premium “Light Glass” design system and components
-- **`schemas`** — Shared Zod schemas for runtime and compile-time validation
-- **`shared`** — Common utilities, types, and constants
-- **`api-client`** — Typed service-to-service and frontend API clients
+#### `templates/`
+Industry-specific template implementations (72 templates):
+- Fashion, Retail, Restaurant, Healthcare, Legal, Real Estate, Travel, Education, and more
 
 ---
 
 ## 🛠 Technology Stack
 
-- **Frontend**: Next.js 15 (App Router), React 19
-- **Styling**: Tailwind CSS
-- **State & Data Fetching**: React Context API, SWR
-- **Database**: PostgreSQL with Prisma ORM
-- **Background Jobs / Caching**: Redis
-- **Email**: Resend
-- **Monorepo Tooling**: TurboRepo, pnpm
-- **Animation & Motion**: Framer Motion
-- **Testing**: Playwright, unit and integration test suites
+### Frontend
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript 5.9+
+- **Styling**: Tailwind CSS 4.2+
+- **Components**: React 19 + Lucide Icons
+- **State Management**: React Context API + SWR
+- **Animations**: Framer Motion
+
+### Backend
+- **Runtime**: Node.js 20+
+- **Framework**: Next.js 15 API Routes
+- **Database**: PostgreSQL 16 with Prisma ORM
+- **Caching**: Redis 7
+- **Queue Processing**: BullMQ
+- **Object Storage**: MinIO
+
+### Infrastructure
+- **Hosting**: Vercel (Frontend) + Hetzner VPS (Backend)
+- **Containerization**: Docker Compose
+- **Process Management**: PM2/Systemd
+- **Proxy**: Nginx Proxy Manager
+- **Monitoring**: Sentry + Custom health checks
+
+### Development Tools
+- **Monorepo**: TurboRepo 2.8+
+- **Package Manager**: pnpm 10.3+
+- **Testing**: Playwright + Vitest
+- **Linting**: ESLint + Prettier
+- **Type Checking**: TypeScript
 
 ---
 
@@ -121,152 +167,222 @@ Shared foundations across the platform:
 ### Prerequisites
 
 - Node.js ≥ 20
-- pnpm ≥ 9
+- pnpm ≥ 10
 - Docker (for PostgreSQL and Redis)
+- Git
 
-### Setup
+### Initial Setup
 
 ```bash
-git clone https://github.com/itsfredrick/vayva-platform.git
-cd vayva-platform
+# Clone the repository
+git clone https://github.com/Vayva-Tech/Vayva.git
+cd Vayva
+
+# Install dependencies
 pnpm install
-```
 
-Create your environment file:
-
-```bash
-cp .env.staging.example .env
-```
-
-Initialize the database:
-
-```bash
-pnpm db:generate
-pnpm db:push
+# Set up environment variables
+cp .env.example .env
 ```
 
 ### Local Development
 
-Start the core applications:
-
 ```bash
+# Start all services in development mode
 pnpm dev
+
+# Individual service commands:
+pnpm --filter merchant-admin dev    # Merchant dashboard
+pnpm --filter core-api dev          # Backend API
+pnpm --filter worker dev            # Background worker
 ```
 
-Accessible endpoints:
+### Database Setup
 
-- Merchant Dashboard: [http://localhost:3000](http://localhost:3000)
-- Ops Console: [http://localhost:3002](http://localhost:3002)
+```bash
+# Generate Prisma client
+pnpm db:generate
+
+# Push schema to database
+pnpm db:push
+
+# Seed initial data (optional)
+pnpm db:seed
+```
+
+### Running Tests
+
+```bash
+# Type checking
+pnpm typecheck
+
+# Linting
+pnpm lint
+
+# Unit tests
+pnpm test
+
+# End-to-end tests
+pnpm test:e2e
+
+# All validation checks
+pnpm validate:ship
+```
 
 ---
 
-## 🧪 Quality & Validation
+## ☁️ Production Deployment
 
-- Type safety: `pnpm typecheck`
-- Linting: `pnpm lint`
-- Unit & integration tests: `pnpm test`
-- End-to-end tests: `pnpm test:e2e`
-- Smoke tests: `pnpm test:smoke`
+### VPS Infrastructure
+
+Vayva uses a two-server VPS architecture for optimal performance and security:
+
+#### VPS 1 (App Server): 163.245.209.202
+- Docker containers: Evolution API, Redis, MinIO, Nginx Proxy Manager
+- System services: Worker process (BullMQ)
+- Reverse proxy for all backend services
+
+#### VPS 2 (Database Server): 163.245.209.203
+- PostgreSQL 16 database
+- Shared Redis instance
+- Secured with firewall rules
+
+### Deployment Process
+
+```bash
+# 1. Deploy database server
+ssh root@163.245.209.203
+./scripts/deploy/setup-db-server.sh 163.245.209.202
+
+# 2. Deploy app server
+ssh root@163.245.209.202
+./scripts/deploy/setup-core-api.sh
+./scripts/deploy/setup-worker.sh
+
+# 3. Deploy frontend to Vercel
+pnpm build
+# Then deploy via Vercel dashboard or CLI
+```
+
+### Environment Configuration
+
+Production environment variables are managed through:
+- Vercel dashboard for frontend applications
+- `/opt/vayva/` directory on VPS for backend services
+- Docker secrets for containerized services
 
 ---
 
-## 📜 Development Standards
+## 🧪 Quality Assurance
 
-- Feature-based branching (`feat/*`, `fix/*`)
-- Conventional commits
-- Mandatory type checks before merge
-- CI-enforced test and build validation
+### Automated Testing
+
+- **Unit Tests**: Component and service unit tests with Vitest
+- **Integration Tests**: API and database integration tests
+- **End-to-End Tests**: Full user journey testing with Playwright
+- **Type Safety**: Strict TypeScript checking across all packages
+
+### Code Quality
+
+- **Linting**: ESLint with custom rules
+- **Formatting**: Prettier for consistent code style
+- **Dead Code Detection**: Knip for unused code identification
+- **Security Scanning**: Automated dependency vulnerability checks
+
+### CI/CD Pipeline
+
+GitHub Actions workflows handle:
+- Code quality checks on every PR
+- Automated testing and type checking
+- Security scanning and dependency updates
+- Performance monitoring and bundle analysis
+
+---
+
+## 📚 Documentation
+
+### Development Guides
+- [Getting Started Guide](docs/00_start-here/README.md)
+- [Development Workflows](docs/03_development/workflows/README.md)
+- [Testing Guidelines](docs/03_development/testing/README.md)
+
+### Architecture
+- [System Architecture](docs/02_engineering/architecture-overview.md)
+- [API Design Principles](docs/02_engineering/api-design/README.md)
+- [Data Model Documentation](docs/02_engineering/data-model/README.md)
+
+### Deployment
+- [VPS Deployment Guide](docs/04_deployment/README.md)
+- [Infrastructure Setup](docs/infrastructure-setup-guide.md)
+- [Production Runbooks](docs/04_deployment/procedures/README.md)
+
+### Industry Templates
+- [Template Gallery](template-gallery/)
+- [Industry Package Documentation](docs/01_product/features/template-gallery.md)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Please see our [Contributing Guidelines](docs/CONTRIBUTING.md) for details on:
+
+- Code style and conventions
+- Pull request process
+- Issue reporting
+- Development workflow
+
+### Branch Strategy
+- `main` - Production-ready code
+- `develop` - Development branch
+- `feature/*` - New features
+- `fix/*` - Bug fixes
+- `hotfix/*` - Critical production fixes
+
+---
+
+## 🔐 Security
+
+Vayva takes security seriously. Please review our [Security Policy](SECURITY.md) for:
+
+- Reporting security vulnerabilities
+- Security practices and guidelines
+- Dependency security management
+- Data protection measures
+
+---
+
+## 📞 Support
+
+For questions, issues, or support:
+
+- **Documentation**: Check our comprehensive docs in `/docs/`
+- **Issues**: [GitHub Issues](https://github.com/Vayva-Tech/Vayva/issues)
+- **Community**: Join our developer community
+- **Contact**: security@vayva.ng for security concerns
+
+---
+
+## 📈 Roadmap
+
+### Current Focus (Phase 6)
+- **Architecture Cleanup**: Component consolidation and code hygiene
+- **Performance Optimization**: Bundle size reduction and loading improvements
+- **Security Compliance**: Enhanced security measures and audit preparation
+
+### Upcoming Features
+- **Enhanced AI Capabilities**: Advanced conversational commerce features
+- **Marketplace Expansion**: Centralized merchant discovery
+- **Mobile App**: Native iOS/Android applications
+- **Advanced Analytics**: Cross-channel attribution and insights
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 **Vayva is designed as long-term commerce infrastructure for emerging markets—modular, auditable, and automation-first.**
 
----
-
-## Explanation of the README (what each part communicates)
-
-**What this README does better**
-
-- Positions Vayva as **commerce infrastructure**, not just an e-commerce site.
-- Makes the Nigerian-market focus explicit without sounding narrow.
-- Signals production readiness, auditability, and scale.
-- Helps investors, contributors, and reviewers quickly understand _why this exists_ and _how it works_.
-
-### 1. Introduction
-
-Explains _what Vayva is_ and _why it exists_.
-Key idea: Vayva is not a Shopify clone—it is an integrated commerce + operations + AI platform.
-
-### 2. Core Capabilities
-
-This replaces a generic “features list” with **business-level capabilities**:
-
-- Multi-tenancy → scale and isolation
-- WhatsApp AI → local behavior fit
-- Ledger → financial correctness and trust
-  This helps technical and non-technical readers.
-
-### 3. Architecture
-
-Clarifies that:
-
-- This is a **monorepo by design**, not accident.
-- Apps, services, and packages are separated for scale.
-- Services are domain-driven and deployable independently.
-
-### 4. Technology Stack
-
-Signals modern, forward-compatible choices:
-
-- Next.js 15
-- Prisma + PostgreSQL
-- Redis + background workers
-  This reassures contributors that the project is not experimental chaos.
-
-### 5. Getting Started
-
-Optimized for:
-
-- New contributors
-- Reviewers cloning the repo
-- CI environments
-  Minimal but complete.
-
-### 6. Quality & Validation
-
-Communicates engineering discipline:
-
-- Type safety
-- E2E testing
-- Smoke tests
-  This matters for trust.
-
-### 7. Development Standards
-
-Shows maturity:
-
-- Branching strategy
-- Commit discipline
-- CI enforcement
-
----
-
-## 🗺 Roadmap
-
-### 🔴 Now (Current Focus)
-
-- **Core Stability**: Fixing CI/CD pipelines and type safety.
-- **Documentation**: Establishing architectural baselines (`docs/ARCHITECTURE.md`).
-- **Email System**: Productionizing transactional emails with Resend.
-
-### 🟡 Next (Upcoming)
-
-- **Merchant Onboarding**: Smooth KYC and Business Profile setup.
-- **AI Agent Hardening**: Improving WhatsApp sales bot intent recognition.
-- **Payments**: End-to-end Paystack integration for split payments.
-
-### 🟢 Later (Future)
-
-- **Marketplace**: Centralized discovery for all Vayva merchants.
-- **Mobile App**: Dedicated Android/iOS app for store management.
-- **Advanced Analytics**: Cross-channel attribution modeling.
+Built with ❤️ for African entrepreneurs and businesses.
