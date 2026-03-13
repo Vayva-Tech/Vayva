@@ -278,7 +278,7 @@ const getContrastColor = (hexColor: string): string => {
 
 export const applyTheme = (themeId: string): void => {
   // Check wellness themes first
-  let theme = wellnessThemes[themeId] || industryThemes[themeId];
+  const theme = wellnessThemes[themeId] || industryThemes[themeId];
   if (!theme) return;
   
   const variables = getThemeCSSVariables(theme);

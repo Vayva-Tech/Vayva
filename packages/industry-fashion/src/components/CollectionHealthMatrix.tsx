@@ -1,6 +1,5 @@
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
-import { ProgressBar } from '@vayva/ui/components/fashion';
+import { GlassPanel , ProgressBar } from '@vayva/ui/components/fashion';
 import type { CollectionHealth } from '../types';
 
 export interface CollectionHealthMatrixProps {

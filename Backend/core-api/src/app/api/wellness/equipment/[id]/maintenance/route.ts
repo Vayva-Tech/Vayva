@@ -165,7 +165,7 @@ export const POST = withVayvaAPI(
       });
 
       // Update equipment status if needed
-      let updateData: any = {};
+      const updateData: any = {};
       if (body.type === "repair" && equipment.condition !== "poor") {
         updateData.condition = "fair"; // Downgrade condition after repair
       }

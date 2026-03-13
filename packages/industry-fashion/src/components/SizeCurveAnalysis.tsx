@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
-import { DonutChart } from '@vayva/ui/components/fashion';
-import { ProgressBar } from '@vayva/ui/components/fashion';
+import { GlassPanel , DonutChart , ProgressBar } from '@vayva/ui/components/fashion';
 import type { SizeCurveData, SizeDistribution } from '../types';
 
 export interface SizeCurveAnalysisProps {

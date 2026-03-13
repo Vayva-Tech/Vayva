@@ -28,7 +28,7 @@ export const GET = withVayvaAPI(
 
       // Calculate date range
       const now = new Date();
-      let startDate = new Date();
+      const startDate = new Date();
       
       if (timeframe === "30d") startDate.setDate(now.getDate() - 30);
       else if (timeframe === "90d") startDate.setDate(now.getDate() - 90);

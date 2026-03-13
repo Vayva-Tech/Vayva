@@ -1,10 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { cn } from '@vayva/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@vayva/ui';
-import { Badge } from '@vayva/ui';
-import { Button } from '@vayva/ui';
+import { cn , Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
 import { useTravelDashboardData } from '../../hooks/useTravelDashboardData';
 import { 
   MapPin, 

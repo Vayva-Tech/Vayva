@@ -96,6 +96,9 @@ export const PERMISSIONS = {
   APPROVALS_DECIDE: "approvals:decide",
   APPROVALS_REQUEST: "approvals:request",
   APPROVALS_VIEW: "approvals:view",
+  // Wholesale
+  WHOLESALE_VIEW: "wholesale:view",
+  WHOLESALE_MANAGE: "wholesale:manage",
 };
 
 export const PERMISSION_GROUPS = [

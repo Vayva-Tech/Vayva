@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent } from '@vayva/ui';
+import { Card, CardContent , cn } from '@vayva/ui';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@vayva/ui';
 
 interface CalendarViewProps {
   currentDate?: Date;

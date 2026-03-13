@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ReservationService, type Reservation } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle } from '@vayva/ui';
-import { Badge } from '@vayva/ui';
-import { Button } from '@vayva/ui';
+import { Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
 import { 
   Calendar,
   Clock,

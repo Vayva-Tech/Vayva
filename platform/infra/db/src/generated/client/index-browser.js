@@ -3746,6 +3746,43 @@ exports.Prisma.DigitalReceiptScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.WholesaleOrderScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  customerId: 'customerId',
+  orderNumber: 'orderNumber',
+  status: 'status',
+  totalAmount: 'totalAmount',
+  currency: 'currency',
+  items: 'items',
+  shippingAddress: 'shippingAddress',
+  billingAddress: 'billingAddress',
+  paymentStatus: 'paymentStatus',
+  paymentMethod: 'paymentMethod',
+  notes: 'notes',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deliveredAt: 'deliveredAt',
+  cancelledAt: 'cancelledAt'
+};
+
+exports.Prisma.WholesaleCustomerScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  email: 'email',
+  phone: 'phone',
+  companyName: 'companyName',
+  contactPerson: 'contactPerson',
+  taxId: 'taxId',
+  creditLimit: 'creditLimit',
+  outstandingBalance: 'outstandingBalance',
+  status: 'status',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -5148,7 +5185,9 @@ exports.Prisma.ModelName = {
   RoutePlan: 'RoutePlan',
   RouteStop: 'RouteStop',
   Vehicle: 'Vehicle',
-  DigitalReceipt: 'DigitalReceipt'
+  DigitalReceipt: 'DigitalReceipt',
+  WholesaleOrder: 'WholesaleOrder',
+  WholesaleCustomer: 'WholesaleCustomer'
 };
 
 /**

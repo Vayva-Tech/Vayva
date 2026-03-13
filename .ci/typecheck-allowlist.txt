@@ -2,4 +2,15 @@
 # One workspace name per line.
 # Keep this list short and shrink it over time.
 
+@vayva/merchant-admin-api
+@vayva/backend-workflow
+@vayva/compliance
+@vayva/worker
+@vayva/mobile
+@vayva/ops-console
+@vayva/shared
+@vayva/ui
+@vayva/marketing
+@vayva/merchant-admin
+
 

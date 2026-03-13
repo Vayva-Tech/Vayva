@@ -1,5 +1,4 @@
-import type { ChannelProvider } from '../services/notification-dispatcher.service';
-import type { NotificationMessage } from '../services/notification-dispatcher.service';
+import type { ChannelProvider , NotificationMessage } from '../services/notification-dispatcher.service';
 
 export class EmailChannel implements ChannelProvider {
   private config: any;

@@ -75,7 +75,7 @@ export class AppointmentService {
     const workingEnd = new Date(date);
     workingEnd.setHours(18, 0, 0, 0);
 
-    let slotStart = new Date(workingStart);
+    const slotStart = new Date(workingStart);
 
     while (slotStart < workingEnd) {
       const slotEndTime = new Date(slotStart.getTime() + duration * 60000);

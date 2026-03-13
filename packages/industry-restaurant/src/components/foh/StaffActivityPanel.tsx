@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { RestaurantDashboardService } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle } from '@vayva/ui';
-import { Badge } from '@vayva/ui';
+import { Card, CardContent, CardHeader, CardTitle , Badge } from '@vayva/ui';
 import { 
   Users,
   Clock,

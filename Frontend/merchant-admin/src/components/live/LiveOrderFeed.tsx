@@ -8,8 +8,7 @@
 import React, { useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ShoppingBag, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { useLiveOrders } from '@vayva/realtime';
-import { OrderEventData } from '@vayva/realtime';
+import { useLiveOrders , OrderEventData } from '@vayva/realtime';
 import { cn } from '@/lib/utils';
 
 interface LiveOrderFeedProps {

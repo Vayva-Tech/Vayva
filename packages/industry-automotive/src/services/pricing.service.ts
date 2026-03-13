@@ -26,7 +26,7 @@ export class VehiclePricingService {
     if (!vehicle) throw new Error('Vehicle not found');
 
     // Base pricing factors
-    let basePrice = vehicle.price;
+    const basePrice = vehicle.price;
     let multiplier = 1.0;
 
     // Inventory aging adjustment

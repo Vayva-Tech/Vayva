@@ -147,7 +147,7 @@ export class ReservationService {
     const endHour = 22; // 10 PM
 
     for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute of ['00', '30']) {
+      for (const minute of ['00', '30']) {
         const time = `${hour.toString().padStart(2, '0')}:${minute}`;
         const availableTables = this.getAvailableTablesForParty(partySize, date, time);
         

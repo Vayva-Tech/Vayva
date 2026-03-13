@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs , router } from "expo-router";
 import { View, Text, useColorScheme, TouchableOpacity } from "react-native";
 import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,7 +15,6 @@ import {
   LucideIcon,
 } from "lucide-react-native";
 
-import { router } from "expo-router";
 import { fetchMobileNav, type MobileNavTab } from "../lib/api";
 import VayvaBackground from "../components/VayvaBackground";
 

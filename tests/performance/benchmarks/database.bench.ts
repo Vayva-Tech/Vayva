@@ -3,7 +3,7 @@
  * Tests database query performance against targets
  */
 
-import { describe, bench, beforeAll, afterAll } from 'vitest';
+import { describe, bench, beforeAll, afterAll , test, expect } from 'vitest';
 import { prisma } from '@vayva/db';
 import { BENCHMARK_TARGETS, BENCHMARK_CATEGORIES } from '../config';
 
@@ -309,4 +309,3 @@ describe('Database Performance Targets', () => {
   });
 });
 
-import { test, expect } from 'vitest';

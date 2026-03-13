@@ -3,7 +3,7 @@
  * Tests Redis/cache operations performance
  */
 
-import { describe, bench, beforeAll, afterAll } from 'vitest';
+import { describe, bench, beforeAll, afterAll , test, expect } from 'vitest';
 import { BENCHMARK_TARGETS } from '../config';
 
 // Mock cache client for benchmarks
@@ -278,4 +278,3 @@ describe('Cache Performance Targets', () => {
   });
 });
 
-import { test, expect } from 'vitest';

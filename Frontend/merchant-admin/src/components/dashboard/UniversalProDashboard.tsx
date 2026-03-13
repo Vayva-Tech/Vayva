@@ -27,9 +27,8 @@ import {
   StationWorkload,
   EightySixBoard
 } from '@/components/dashboard/kitchen';
-import { useRealTimeDashboard } from '@/hooks/useRealTimeDashboard';
+import { useRealTimeDashboard , useDashboardMetrics, useDashboardAlerts, useDashboardActions } from '@/hooks/useRealTimeDashboard';
 import { SettingsButton } from './SettingsButton';
-import { useDashboardMetrics, useDashboardAlerts, useDashboardActions } from '@/hooks/useRealTimeDashboard';
 import type { UniversalDashboardProps } from '@/config/dashboard-universal-types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { AlertCircle, RefreshCw, TrendingUp, BarChart3, ChefHat } from 'lucide-react';

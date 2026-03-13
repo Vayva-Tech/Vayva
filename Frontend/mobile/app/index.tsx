@@ -1,10 +1,9 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text , useColorScheme } from "react-native";
 import { router } from "expo-router";
 import { getAuthToken } from "./lib/auth";
 import VayvaBackground from "./components/VayvaBackground";
 import VayvaLogo from "./components/VayvaLogo";
-import { useColorScheme } from "react-native";
 
 export default function Home(): React.JSX.Element {
   const scheme = useColorScheme();

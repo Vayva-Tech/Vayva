@@ -155,7 +155,7 @@ export class RuleEngine {
 
     for (const action of rule.actions) {
       // Determine recipient
-      let recipient = {
+      const recipient = {
         userId: context.userId,
         storeId: context.storeId
       };

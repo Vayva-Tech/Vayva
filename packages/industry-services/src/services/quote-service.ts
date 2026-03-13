@@ -125,7 +125,7 @@ export class QuoteService {
 
   async updateQuote(quoteId: string, data: Partial<Omit<Quote, 'id' | 'createdAt' | 'updatedAt'>>) {
     // Recalculate totals if items changed
-    let updateData: any = { ...data };
+    const updateData: any = { ...data };
 
     if (data.items) {
       const subtotal = data.items.reduce((sum, item) => sum + item.totalPrice, 0);

@@ -87,6 +87,7 @@
         "tailwind-merge": "^3.4.0",
         "tailwindcss-animate": "^1.0.7",
         "uuid": "^13.0.0",
+        "ws": "^8.18.0",
         "zod": "^3.25.76"
     },
     "devDependencies": {
@@ -100,6 +101,7 @@
         "@types/react": "19.2.7",
         "@types/react-dom": "19.0.2",
         "@types/speakeasy": "^2.0.10",
+        "@types/ws": "^8.5.13",
         "@vitejs/plugin-react": "^5.1.2",
         "autoprefixer": "^10.4.23",
         "babel-plugin-react-compiler": "^1.0.0",

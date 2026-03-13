@@ -289,7 +289,7 @@ export class NotificationDispatcher {
     const matchingRules = rules.filter((rule: any) => this.matchesRule(message, rule));
     
     // Apply rule transformations
-    let processedMessage = { ...message };
+    const processedMessage = { ...message };
     
     for (const rule of matchingRules) {
       // Apply rule actions

@@ -1,7 +1,5 @@
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
-import { SparklineChart } from '@vayva/ui/components/fashion';
-import { TrendIndicator } from '@vayva/ui/components/fashion';
+import { GlassPanel , SparklineChart , TrendIndicator } from '@vayva/ui/components/fashion';
 
 export interface KPICardProps {
   id: string;

@@ -87,7 +87,7 @@ export async function GET(request: Request) {
 
     // Apply filters
     let filteredIncidents = incidents;
-    let filteredProtocols = protocols;
+    const filteredProtocols = protocols;
     
     if (tourId) {
       filteredIncidents = filteredIncidents.filter(i => i.tourId === tourId);

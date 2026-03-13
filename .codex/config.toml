@@ -1,0 +1,10 @@
+[permissions]
+read = true
+write = false      # start read-only
+exec = false       # disable command execution initially
+model = "gpt-4o"
+
+[project]
+name = "vayva-platform"
+language = "typescript"
+frameworks = ["next.js", "turbo", "prisma"]

@@ -459,7 +459,7 @@ function calculateDeadline(
   // Simplified deadline calculation
   // In reality, this would account for weekends, holidays, and court-specific rules
   
-  let deadline = new Date(triggerDate);
+  const deadline = new Date(triggerDate);
   
   if (isBusinessDays) {
     // Count backwards business days

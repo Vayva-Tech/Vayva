@@ -173,7 +173,7 @@ export class TableTurnPredictionEngine {
 
     // Calculate based on completed courses
     let completedTime = 0;
-    let totalTime =
+    const totalTime =
       this.config.avgAppetizerTime +
       this.config.avgEntreeTime +
       this.config.avgDessertTime;

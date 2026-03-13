@@ -66,7 +66,7 @@ class BrowserMatrixTester {
     
     let browser;
     let page;
-    let testResult = {
+    const testResult = {
       browser: browserConfig.name,
       device: device.name,
       timestamp: new Date().toISOString(),

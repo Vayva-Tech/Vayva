@@ -77,7 +77,7 @@ export const POST = withVayvaAPI(
       });
 
       // If propertyId provided, create a transaction/opportunity record
-      let opportunity = null;
+      const opportunity = null;
       if (propertyId) {
         // This would typically create a Deal or Transaction record
         // For now, we'll just log it

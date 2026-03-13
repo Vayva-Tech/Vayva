@@ -153,7 +153,7 @@ export const POST = withVayvaAPI(
       });
 
       // Update session totals
-      let updateData: any = {};
+      const updateData: any = {};
       
       switch (type) {
         case "sale":

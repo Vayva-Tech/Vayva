@@ -23,7 +23,7 @@ export const GET = withVayvaAPI(
       
       // Calculate date range
       const now = new Date();
-      let startDate = new Date(now);
+      const startDate = new Date(now);
       
       switch (timeHorizon) {
         case "today":

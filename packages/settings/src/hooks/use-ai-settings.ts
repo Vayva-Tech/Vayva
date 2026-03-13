@@ -97,8 +97,8 @@ export function useAISettings() {
     const currentAction = action as any;
     const autoExecute = ai.actionPermissions.autoExecute.filter((a: any) => a !== currentAction);
     
-    let requiresApproval = [...ai.actionPermissions.requiresApproval];
-    let prohibited = [...ai.actionPermissions.prohibited];
+    const requiresApproval = [...ai.actionPermissions.requiresApproval];
+    const prohibited = [...ai.actionPermissions.prohibited];
 
     if (moveTo === 'requires_approval') {
       requiresApproval.push(currentAction);

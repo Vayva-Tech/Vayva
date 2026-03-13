@@ -404,7 +404,7 @@ class MobileTester {
     console.log(`  ▶️  ${testName}`);
     
     let browser, page;
-    let testResult = {
+    const testResult = {
       name: testName,
       status: 'pending',
       startTime: new Date().toISOString(),

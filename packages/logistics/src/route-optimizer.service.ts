@@ -446,7 +446,7 @@ export class RouteOptimizerService {
     const route: DeliveryStop[] = [];
 
     // Start from depot
-    let currentIdx = 0; // Depot is at index 0
+    const currentIdx = 0; // Depot is at index 0
     let currentPoint = depot;
 
     while (unvisited.length > 0) {
