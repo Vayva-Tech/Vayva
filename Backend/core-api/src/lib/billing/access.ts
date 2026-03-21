@@ -1,4 +1,13 @@
+/**
+ * Feature Access Checker - Re-gating Plan V2
+ * 
+ * Single source of truth for feature gating based on subscription plan.
+ * Uses credit system for metering usage.
+ */
+
 import { prisma } from "@vayva/db";
+import { CreditManager } from "@/lib/credits/credit-manager";
+
 export async function checkFeatureAccess(
   storeId: string,
   feature: string,
@@ -7,157 +16,228 @@ export async function checkFeatureAccess(
     where: { id: storeId },
     include: {
       aiSubscription: true,
+      creditAllocation: true,
     },
   });
+  
   if (!store) {
     throw new Error("Store not found");
   }
-  const subscription = store.aiSubscription;
-  const plan = (store.plan as string) || "STARTER";
+  
+  const plan = (store.plan as string) || "FREE";
+  const creditManager = new CreditManager();
 
-  // 0. Compliance & KYC Gating
+  // ============================================================================
+  // 1. COMPLIANCE & KYC GATING (All Plans)
+  // ============================================================================
   if (feature === "payouts" || feature === "withdrawals") {
     if (store.kycStatus !== "VERIFIED") {
       return {
         allowed: false,
         reason: "kyc_required",
-        message:
-          "Identity verification (BVN/NIN) is required to withdraw funds.",
+        message: "Identity verification (BVN/NIN) is required to withdraw funds.",
       };
     }
   }
 
-  // 1. Check Trial Expiry
-  if (plan === "STARTER" && subscription?.trialExpiresAt) {
-    if (new Date() > subscription.trialExpiresAt) {
+  // ============================================================================
+  // 2. TRIAL EXPIRATION CHECK (FREE Plan Only)
+  // ============================================================================
+  if (plan === "FREE" && store.trialEndDate) {
+    if (new Date() > store.trialEndDate && !store.trialExpired) {
+      // Mark as expired
+      await prisma.store.update({
+        where: { id: storeId },
+        data: { trialExpired: true },
+      });
+      
       return {
         allowed: false,
         reason: "trial_expired",
-        message:
-          "Your 7-day free trial has expired. Please upgrade to continue.",
+        message: "Your free trial has expired. Please upgrade to continue.",
+      };
+    }
+    
+    // If already expired
+    if (store.trialExpired) {
+      return {
+        allowed: false,
+        reason: "trial_expired",
+        message: "Your free trial has ended. Upgrade to restore access.",
       };
     }
   }
-  // 2. Usage Limits
-  if (plan === "STARTER") {
-    if (feature === "whatsapp_ai") {
+
+  // ============================================================================
+  // 3. FEATURE-SPECIFIC GATING
+  // ============================================================================
+
+  // AUTOPILOT - PRO ONLY
+  if (feature === "autopilot" || feature === "autopilot_run") {
+    if (plan !== "PRO") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "AI Autopilot is available on Pro plan only.",
+      };
+    }
+  }
+
+  // INDUSTRY DASHBOARDS - STARTER+
+  if (feature === "industry_dashboards" || feature === "industry_specific_dashboard") {
+    if (plan === "FREE") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Industry-specific dashboards are available on Starter plan and above.",
+      };
+    }
+  }
+
+  // CUSTOM DOMAIN - STARTER+
+  if (feature === "custom_domain") {
+    if (plan === "FREE") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Custom domain support is available on Starter plan and above.",
+      };
+    }
+  }
+
+  // ADVANCED ANALYTICS - STARTER+
+  if (feature === "advanced_analytics") {
+    if (plan === "FREE") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Advanced analytics are available on Starter plan and above.",
+      };
+    }
+  }
+
+  // PREDICTIVE INSIGHTS - PRO ONLY
+  if (feature === "predictive_insights") {
+    if (plan !== "PRO") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Predictive insights are available on Pro plan only.",
+      };
+    }
+  }
+
+  // CUSTOM LAYOUTS - PRO ONLY
+  if (feature === "custom_layouts") {
+    if (plan !== "PRO") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Custom dashboard layouts are available on Pro plan only.",
+      };
+    }
+  }
+
+  // TEMPLATE CHANGING - FREE users cannot change after initial selection
+  if (feature === "template_change") {
+    if (plan === "FREE") {
+      if (store.currentTemplateId) {
+        return {
+          allowed: false,
+          reason: "plan_restriction",
+          message: "Template changes require Starter plan or higher.",
+        };
+      }
+      // First template selection is OK for FREE
+      return { allowed: true };
+    }
+    
+    if (plan === "STARTER") {
+      // Can own max 2 templates (1 included + 1 paid)
+      const ownedCount = store.ownedTemplates?.length || 0;
+      if (ownedCount >= 2) {
+        return {
+          allowed: false,
+          reason: "template_limit",
+          message: "Maximum 2 templates on Starter plan. Upgrade to Pro for more.",
+        };
+      }
+      // Second template costs credits
+      return { allowed: true, reason: "requires_payment" };
+    }
+    
+    if (plan === "PRO") {
+      // Can own 2 templates free, pay for 3rd+
+      const ownedCount = store.ownedTemplates?.length || 0;
+      if (ownedCount >= 2) {
+        return { allowed: true, reason: "requires_payment" };
+      }
+      return { allowed: true };
+    }
+  }
+
+  // AI MESSAGING - Check credits for all plans except FREE trial
+  if (feature === "ai_message" || feature === "whatsapp_ai") {
+    if (plan === "FREE") {
+      // FREE users get 100 messages during trial via Evolution API only
       const messagesSent = await getWhatsAppMessageCount(storeId);
       if (messagesSent >= 100) {
         return {
           allowed: false,
           reason: "limit_reached",
-          message:
-            "You've reached your free limit of 100 AI messages. Upgrade to Growth for 500.",
+          message: "Free plan includes 100 AI messages. Upgrade to Starter for 5,000/month.",
         };
       }
+      return { allowed: true };
     }
-    if (feature === "template_usage") {
-      const storeWithCount = await prisma.store.findUnique({
-        where: { id: storeId },
-        include: { _count: { select: { notificationTemplates: true } } },
-      });
-      if ((storeWithCount?._count?.notificationTemplates || 0) >= 2) {
-        return {
-          allowed: false,
-          reason: "limit_reached",
-          message:
-            "Free plan is limited to 2 templates. Upgrade to Growth for more.",
-        };
-      }
+    
+    // STARTER and PRO: Check credit balance
+    const creditCheck = await creditManager.checkCredits(storeId, 1); // 1 credit per message
+    if (!creditCheck.allowed) {
+      return {
+        allowed: false,
+        reason: "insufficient_credits",
+        message: `Insufficient credits. You have ${creditCheck.remaining} credits remaining.`,
+      };
     }
-  }
-  if (plan === "GROWTH") {
-    if (feature === "order_creation") {
-      const ordersThisMonth = await prisma.order.count({
-        where: {
-          storeId,
-          createdAt: {
-            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-          },
-        },
-      });
-      if (ordersThisMonth >= 100) {
-        return {
-          allowed: false,
-          reason: "limit_reached",
-          message:
-            "You've reached your limit of 100 orders this month. Upgrade to Pro for unlimited.",
-        };
-      }
-    }
-    if (feature === "whatsapp_ai") {
-      const messagesSent = await getWhatsAppMessageCount(storeId);
-      if (messagesSent >= 500) {
-        return {
-          allowed: false,
-          reason: "limit_reached",
-          message:
-            "You've reached your limit of 500 AI messages this month. Upgrade to Pro for unlimited.",
-        };
-      }
-    }
-    if (feature === "template_usage") {
-      const storeWithCount = await prisma.store.findUnique({
-        where: { id: storeId },
-        include: { _count: { select: { notificationTemplates: true } } },
-      });
-      if ((storeWithCount?._count?.notificationTemplates || 0) >= 5) {
-        return {
-          allowed: false,
-          reason: "limit_reached",
-          message:
-            "Growth plan is limited to 5 templates. Upgrade to Pro for unlimited.",
-        };
-      }
-    }
-  }
-  // 3. Feature Gating
-  if (feature === "ai_profile_edit" && plan === "STARTER") {
-    return {
-      allowed: false,
-      reason: "trial_restricted",
-      message:
-        "During your free trial, your AI assistant uses a default persona. Upgrade to Growth to fully customize it.",
-    };
-  }
-  if (feature === "vavya_cut_pro" && plan !== "PRO") {
-    return {
-      allowed: false,
-      reason: "feature_locked",
-      message: "Vayva Cut Pro is only available on the Pro plan.",
-    };
+    return { allowed: true };
   }
 
-  // Marketplace publishing requires paid subscription
-  if (feature === "marketplace_publish" && plan === "STARTER") {
-    return {
-      allowed: false,
-      reason: "feature_locked",
-      message:
-        "Publishing to the Vayva Marketplace requires a Growth or Pro subscription.",
-    };
+  // AUTOPILOT RUN - Costs 100 credits (PRO only feature, but double-check)
+  if (feature === "autopilot_run") {
+    const creditCheck = await creditManager.checkCredits(storeId, 100);
+    if (!creditCheck.allowed) {
+      return {
+        allowed: false,
+        reason: "insufficient_credits",
+        message: `Autopilot analysis requires 100 credits. You have ${creditCheck.remaining} credits.`,
+      };
+    }
+    return { allowed: true };
   }
 
-  if (plan === "STARTER" || plan === "GROWTH") {
-    if (feature === "custom_domain" || feature === "advanced_analytics") {
-      if (plan === "STARTER") {
-        return {
-          allowed: false,
-          reason: "feature_locked",
-          message: "This feature is only available on paid plans.",
-        };
-      }
-      if (feature === "custom_domain" && plan === "GROWTH") {
-        return {
-          allowed: false,
-          reason: "feature_locked",
-          message: "Custom domains are only available on the Pro plan.",
-        };
-      }
+  // TEMPLATE PURCHASE - Costs 5,000 credits for extra templates
+  if (feature === "template_purchase") {
+    const creditCheck = await creditManager.checkCredits(storeId, 5000);
+    if (!creditCheck.allowed) {
+      return {
+        allowed: false,
+        reason: "insufficient_credits",
+        message: `Template change requires 5,000 credits. You have ${creditCheck.remaining} credits.`,
+      };
     }
+    return { allowed: true };
   }
+
+  // ============================================================================
+  // 4. DEFAULT ALLOW
+  // ============================================================================
   return { allowed: true };
 }
+
+/**
+ * Count WhatsApp AI messages sent this month
+ */
 async function getWhatsAppMessageCount(storeId: string) {
   return prisma.notification.count({
     where: {

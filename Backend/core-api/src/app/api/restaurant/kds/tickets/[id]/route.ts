@@ -154,9 +154,25 @@ class TicketDetailController extends BaseIndustryController {
   }
 
   private async notifyKDSUpdate(storeId: string, stationId?: string) {
-    // TODO: Implement WebSocket notification for real-time updates
-    // This will be integrated with @vayva/realtime package
-    console.log(`[KDS_UPDATE] Store: ${storeId}, Station: ${stationId || "all"}`);
+    // Emit WebSocket event for real-time KDS updates
+    try {
+      const { getLiveDashboard } = await import('@vayva/realtime');
+      const liveDashboard = getLiveDashboard();
+      
+      await liveDashboard.emitEvent(storeId, {
+        type: 'kds:update',
+        data: {
+          eventType: 'ticket_updated',
+          storeId,
+          stationId: stationId || 'all',
+          timestamp: Date.now(),
+        },
+      });
+      
+      console.log(`[KDS_WS] Notified subscribers - Store: ${storeId}, Station: ${stationId || 'all'}`);
+    } catch (error) {
+      console.error('[KDS_WS] Failed to emit WebSocket event:', error);
+    }
   }
 }
 

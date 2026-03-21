@@ -450,15 +450,99 @@ export class RevenueRecognitionEngine {
       byObligationType[type] = (byObligationType[type] || 0) + recognition.amount;
     }
 
+    // Calculate revenue breakdown by product
+    const byProduct = await this.getRevenueByProduct(periodStart, periodEnd, recognizedRevenue);
+    
+    // Calculate revenue breakdown by region
+    const byRegion = await this.getRevenueByRegion(periodStart, periodEnd, recognizedRevenue);
+
     return {
       period: { start: periodStart, end: periodEnd },
       recognizedRevenue,
       deferredRevenue,
       unbilledRevenue,
-      byProduct: {}, // TODO: Implement product breakdown
-      byRegion: {}, // TODO: Implement region breakdown
+      byProduct,
+      byRegion,
       byObligationType,
     };
+  }
+
+  private async getRevenueByProduct(periodStart: Date, periodEnd: Date, totalRevenue: number): Promise<Record<string, number>> {
+    // Query subscription revenue grouped by product/plan
+    const subscriptions = await prisma.subscription.groupBy({
+      by: ['planId'],
+      where: {
+        createdAt: {
+          gte: periodStart,
+          lte: periodEnd,
+        },
+        status: 'active',
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    const byProduct: Record<string, number> = {};
+    let total = 0;
+    
+    for (const sub of subscriptions) {
+      const plan = sub.planId || 'default';
+      const amount = (sub._sum.amount as number) || 0;
+      byProduct[plan] = amount;
+      total += amount;
+    }
+
+    // Normalize to percentages if needed
+    if (total > 0 && totalRevenue > 0) {
+      const ratio = totalRevenue / total;
+      Object.keys(byProduct).forEach(key => {
+        byProduct[key] *= ratio;
+      });
+    }
+
+    return byProduct;
+  }
+
+  private async getRevenueByRegion(periodStart: Date, periodEnd: Date, totalRevenue: number): Promise<Record<string, number>> {
+    // Query revenue by customer region (based on store location)
+    const stores = await prisma.store.groupBy({
+      by: ['region'],
+      include: {
+        subscriptions: {
+          where: {
+            createdAt: {
+              gte: periodStart,
+              lte: periodEnd,
+            },
+            status: 'active',
+          },
+          select: {
+            amount: true,
+          },
+        },
+      },
+    });
+
+    const byRegion: Record<string, number> = {};
+    let total = 0;
+    
+    for (const store of stores) {
+      const region = store.region || 'unspecified';
+      const amount = store.subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
+      byRegion[region] = amount;
+      total += amount;
+    }
+
+    // Normalize to percentages if needed
+    if (total > 0 && totalRevenue > 0) {
+      const ratio = totalRevenue / total;
+      Object.keys(byRegion).forEach(key => {
+        byRegion[key] *= ratio;
+      });
+    }
+
+    return byRegion;
   }
 
   private async calculateUnbilledRevenue(asOfDate: Date): Promise<number> {

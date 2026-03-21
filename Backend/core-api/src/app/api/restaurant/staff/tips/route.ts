@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }> = [];
 
     switch (distributionMethod) {
-      case 'equal':
+      case 'equal': {
         const equalShare = totalTips / staff.length;
         distribution = staff.map(s => ({
           staffId: s.staffId,
@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
           percentage: (equalShare / totalTips) * 100,
         }));
         break;
+      }
 
       case 'hoursWorked': {
         const totalHours = staff.reduce((sum, s) => sum + (s.hoursWorked || 0), 0);

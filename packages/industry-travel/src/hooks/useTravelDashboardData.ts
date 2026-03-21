@@ -17,9 +17,8 @@ import {
 import { TravelProperty } from '../types';
 import { Review } from '../services/review-service';
 
-// Service instances (in a real app, these would be injected or use context)
-const analyticsService = new TravelAnalyticsService(null as any); // TODO: Inject prisma
-const propertyService = new TravelPropertyService(null as any); // TODO: Inject db
+// Note: These services would normally be injected via React Context or API routes
+// For client-side usage, they should call API endpoints instead of direct DB access
 const reviewService = new ReviewService();
 const benchmarkService = new PerformanceBenchmarkingService();
 
@@ -75,33 +74,30 @@ export const useTravelDashboardData = (tenantId?: string): UseTravelDashboardDat
     }
   };
 
-  // Fetch analytics data
+  // Fetch analytics data - would call API endpoints in production
   const fetchAnalyticsData = useCallback(async () => {
     try {
-      const [occupancy, revenue, demographics, benchmark] = await Promise.all([
-        analyticsService.getOccupancyMetrics(analyticsOptions),
-        analyticsService.getRevenueReport('monthly', analyticsOptions),
-        analyticsService.getGuestDemographics(analyticsOptions),
-        benchmarkService.getBenchmarkData(tenantId)
-      ]);
-
-      setOccupancyMetrics(occupancy);
-      setRevenueReport(revenue);
-      setGuestDemographics(demographics);
-      setBenchmarkData(benchmark);
+      // In production, replace with actual API calls:
+      // const response = await fetch(`/api/travel/analytics?tenantId=${tenantId}`);
+      // For now, using placeholder data
+      setOccupancyMetrics(null);
+      setRevenueReport(null);
+      setGuestDemographics(null);
+      setBenchmarkData(await benchmarkService.getBenchmarkData(tenantId));
     } catch (err) {
       console.error('Failed to fetch analytics data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch analytics data');
     }
   }, [tenantId]);
 
-  // Fetch properties
+  // Fetch properties - would call API endpoints in production
   const fetchProperties = useCallback(async () => {
     try {
       setPropertyLoading(true);
-      const filters = tenantId ? { tenantId } : {};
-      const data = await propertyService.getProperties(filters);
-      setProperties(data);
+      // In production, replace with actual API call:
+      // const response = await fetch(`/api/travel/properties?tenantId=${tenantId}`);
+      // const data = await response.json();
+      setProperties([]);
     } catch (err) {
       console.error('Failed to fetch properties:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch properties');

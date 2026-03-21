@@ -1,6 +1,6 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Fix Unused Variables Script
@@ -21,7 +21,7 @@ function processLintLine(line) {
   };
 }
 
-const readline = require('readline');
+import readline from 'readline';
 const rl = readline.createInterface({
   input: process.stdin,
   terminal: false

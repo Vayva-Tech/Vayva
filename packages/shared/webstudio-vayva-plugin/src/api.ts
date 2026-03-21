@@ -1,7 +1,7 @@
 /**
  * API Client for the Vayva Webstudio Plugin
  *
- * This client calls the `editor-data` endpoints in merchant-admin.
+ * This client calls the `editor-data` endpoints in merchant.
  * Since the plugin runs in the context of the merchant admin (iframe or same-origin),
  * it relies on the merchant's session cookie.
  */

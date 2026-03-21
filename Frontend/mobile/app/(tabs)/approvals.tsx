@@ -101,7 +101,7 @@ export default function ApprovalsScreen(): React.JSX.Element {
     if (!listUrl) {
       setIsLoading(false);
       setError(
-        "Missing EXPO_PUBLIC_API_URL. Set it to your merchant-admin origin (e.g. https://merchant-admin.yourdomain.com).",
+        "Missing EXPO_PUBLIC_API_URL. Set it to your merchant origin (e.g. https://merchant.yourdomain.com).",
       );
       return;
     }

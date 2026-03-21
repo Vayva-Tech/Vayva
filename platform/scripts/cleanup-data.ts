@@ -1,4 +1,4 @@
-import { prisma } from "../apps/merchant-admin/src/lib/prisma";
+import { prisma } from "../apps/merchant/src/lib/prisma";
 
 async function cleanup() {
   const isDryRun = !process.argv.includes("--exec");

@@ -393,9 +393,10 @@ export class SmartRestockService {
       case "percentage":
         // Would need max stock for this calculation
         return currentStock <= thresholdValue;
-      case "velocity_based":
+      case "velocity_based": {
         const daysOfStock = velocity.avgDailySales > 0 ? currentStock / velocity.avgDailySales : 0;
         return daysOfStock <= thresholdValue;
+      }
       default:
         return false;
     }

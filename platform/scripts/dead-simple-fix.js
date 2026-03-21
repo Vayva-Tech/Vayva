@@ -1,10 +1,10 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const dirs = [
-    'apps/merchant-admin/src',
-    'apps/merchant-admin/tests'
+    'apps/merchant/src',
+    'apps/merchant/tests'
 ];
 
 function walk(dir) {

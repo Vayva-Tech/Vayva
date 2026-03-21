@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 // Configuration
-const API_ROOT = path.join(process.cwd(), "apps/merchant-admin/src/app/api");
+const API_ROOT = path.join(process.cwd(), "apps/merchant/src/app/api");
 const EXEMPT_ROUTES = [
   "auth/", // NextAuth handles its own security
   "webhooks/", // Handled by signature verification, not session

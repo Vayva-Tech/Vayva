@@ -8,7 +8,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 const DEFAULT_PREFS = {
-  channels: { in_app: true, banner: true, whatsapp: false, email: true },
+  channels: { in_app: true, banner: true, email: true },
   categories: { orders: true, payments: true, account: true, system: true },
   quietHours: { enabled: false, start: "22:00", end: "08:00" },
 };

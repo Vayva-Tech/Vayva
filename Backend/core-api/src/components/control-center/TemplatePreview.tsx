@@ -21,7 +21,7 @@ export const TemplatePreview = ({
   const [loading, setLoading] = useState(true);
 
   // Determine lock state
-  const planLevels = ["starter", "growth", "pro"];
+  const planLevels = ["starter", "pro"];
   const userLevelIndex = planLevels.indexOf(userPlan);
   const requiredLevelIndex = planLevels.indexOf(template.tier);
   const isLocked = requiredLevelIndex > userLevelIndex;

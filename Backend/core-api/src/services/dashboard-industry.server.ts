@@ -345,7 +345,8 @@ export class DashboardIndustryService {
       }));
     }
 
-    const isFood = industrySlug === "food";
+    const isFood = industrySlug === "food" || industrySlug === "meal-kit";
+    const isMealKit = industrySlug === "meal-kit";
     const isBlogMedia =
       industrySlug === "blog_media" || industrySlug === "creative_portfolio";
     const isNonprofit = industrySlug === "nonprofit";
@@ -860,6 +861,9 @@ export class DashboardIndustryService {
       hasDisputes: disputesOpenCount > 0,
       hasPendingInquiries: pendingInquiriesCount > 0,
       hasCompletedProjects: isPortfolio && salesTodayCount > 0,
+      hasUnselectedMeals: isMealKit && true, // TODO: implement actual meal selection tracking
+      hasIngredientSurplus: isMealKit && false, // TODO: implement inventory surplus detection
+      hasLowIngredients: isMealKit && lowStockProducts.length > 0, // Uses same logic as retail for now
     };
 
     const alerts = computeDashboardAlerts(definition, metricValues);

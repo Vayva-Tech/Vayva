@@ -134,7 +134,7 @@ export class AiUsageService {
             (sub.planKey === "STARTER" && sub.trialExpiresAt < now)) {
             return {
                 allowed: false,
-                reason: "Trial period has ended. Please upgrade to a Growth plan.",
+                reason: "Trial period has ended. Please upgrade to a Starter plan.",
                 usage: {
                     messagesUsed: sub.monthMessagesUsed,
                     messageLimit: 0,

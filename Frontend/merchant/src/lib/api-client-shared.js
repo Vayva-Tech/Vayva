@@ -1,0 +1,32 @@
+/**
+ * Centralized client-side API fetch helper with strict typing and error handling.
+ * Prevents runtime crashes from empty/unknown JSON responses.
+ */
+export async function apiJson(input, init) {
+    const res = await fetch(input, {
+        ...init,
+        headers: {
+            "Content-Type": "application/json",
+            ...(init?.headers || {}),
+        },
+    });
+    // Handle network/parsing errors safely
+    const json = await res.json().catch(() => null);
+    if (!res.ok) {
+        // Standard error extraction from Vayva API contract
+        const jsonRecord = isRecord(json) ? json : {};
+        const msg = typeof jsonRecord.error === "string"
+            ? jsonRecord.error
+            : `Request failed (${res.status})`;
+        const error = new Error(msg);
+        error.status = res.status;
+        error.correlationId = res.headers.get("x-correlation-id");
+        throw error;
+    }
+    // Ensure we don't return null if the caller expects a partial object
+    // but let the caller handle the specific T structure.
+    return json;
+}
+function isRecord(value) {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}

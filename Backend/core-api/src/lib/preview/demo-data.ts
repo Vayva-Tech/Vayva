@@ -29,7 +29,7 @@ export function getDemoStore(templateSlug: string) {
     "Port Harcourt Picks",
     "Kaduna Co.",
   ];
-  const plans = ["STARTER", "GROWTH", "PRO"];
+  const plans = ["STARTER", "PRO"];
   const categories = [
     "New In",
     "Best Sellers",

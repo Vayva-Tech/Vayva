@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 // @ts-expect-error - Module resolution pending
-import { ReturnTokenService } from "../../apps/merchant-admin/src/lib/returns/returnToken";
+import { ReturnTokenService } from "../../apps/merchant/src/lib/returns/returnToken";
 
 test.describe("Returns Management", () => {
   test.beforeEach(async ({ page }) => {

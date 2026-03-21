@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
         "target": "ES2020",
         "lib": [
@@ -70,11 +71,11 @@
                 "packages/infra/redis-adapter/src/index.ts"
             ],
             "@/components/marketing/*": [
-                "Frontend/merchant-admin/src/components/marketing/*",
+                "Frontend/merchant/src/components/marketing/*",
                 "Frontend/marketing/src/components/marketing/*"
             ],
             "@/lib/*": [
-                "Frontend/merchant-admin/src/lib/*",
+                "Frontend/merchant/src/lib/*",
                 "Frontend/marketing/src/lib/*"
             ],
             "@/components/seo/*": [
@@ -82,20 +83,20 @@
             ],
             "@/components/layout/*": [
                 "Frontend/marketing/src/components/layout/*",
-                "Frontend/merchant-admin/src/components/layout/*"
+                "Frontend/merchant/src/components/layout/*"
             ],
             "@/components/*": [
-                "Frontend/merchant-admin/src/components/*",
+                "Frontend/merchant/src/components/*",
                 "Frontend/ops-console/src/components/*"
             ],
             "@/components/ui/*": [
-                "Frontend/merchant-admin/src/components/ui/*"
+                "Frontend/merchant/src/components/ui/*"
             ],
             "@/app/*": [
-                "Frontend/merchant-admin/src/app/*"
+                "Frontend/merchant/src/app/*"
             ],
             "@/hooks/*": [
-                "Frontend/merchant-admin/src/hooks/*",
+                "Frontend/merchant/src/hooks/*",
                 "Frontend/ops-console/src/hooks/*"
             ],
             "@/components/ops/*": [
@@ -108,17 +109,17 @@
                 "Frontend/ops-console/src/lib/roles.ts"
             ],
             "@/types/*": [
-                "Frontend/merchant-admin/src/types/*"
+                "Frontend/merchant/src/types/*"
             ],
             "@/services/*": [
-                "Frontend/merchant-admin/src/services/*",
+                "Frontend/merchant/src/services/*",
                 "Frontend/storefront/src/services/*"
             ],
             "@/components/blog/*": [
                 "Frontend/marketing/src/components/blog/*"
             ],
             "@/context/*": [
-                "Frontend/merchant-admin/src/context/*",
+                "Frontend/merchant/src/context/*",
                 "Frontend/marketing/src/context/*"
             ],
             "@/components/pricing/*": [
@@ -126,13 +127,13 @@
             ],
             "@/components/analytics/*": [
                 "Frontend/ops-console/src/components/analytics/*",
-                "Frontend/merchant-admin/src/components/analytics/*"
+                "Frontend/merchant/src/components/analytics/*"
             ],
             "@/config/*": [
-                "Frontend/merchant-admin/src/config/*"
+                "Frontend/merchant/src/config/*"
             ],
             "@/utils/*": [
-                "Frontend/merchant-admin/src/utils/*"
+                "Frontend/merchant/src/utils/*"
             ]
         }
     },

@@ -512,7 +512,6 @@ export function HeroSection(): React.JSX.Element {
               <div>
                 <h4 className="text-sm font-semibold text-white mb-4">Product</h4>
                 <ul className="space-y-2 text-sm text-zinc-500">
-                  <li><Link href="/features" className="hover:text-emerald-400 transition-colors">Features</Link></li>
                   <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing</Link></li>
                   <li><Link href="/industries" className="hover:text-emerald-400 transition-colors">Industries</Link></li>
                 </ul>

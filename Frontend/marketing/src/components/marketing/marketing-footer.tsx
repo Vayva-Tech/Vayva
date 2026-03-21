@@ -12,13 +12,13 @@ import {
 
 export function MarketingFooter(): React.JSX.Element {
   return (
-    <footer className="border-t border-slate-200/70 bg-white">
+    <footer className="border-t border-slate-200/40 bg-white/30 backdrop-blur-xl">
       <div className="max-w-[1600px] mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr_1fr_1fr_1fr] gap-8">
           <div className="space-y-4">
             <Logo href="/" size="sm" showText={true} text="Vayva" />
             <p className="text-sm text-slate-600 leading-relaxed max-w-xs">
-              The commerce operating system for African businesses. Turn every message, payment, and delivery into a repeatable workflow.
+              The business operating system that runs your business smoothly. From anywhere in the world, manage orders, payments, inventory, and deliveries in one unified platform.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/contact" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
@@ -50,14 +50,6 @@ export function MarketingFooter(): React.JSX.Element {
                   className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
                 >
                   Pricing Plans
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/features"
-                  className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
-                >
-                  Features
                 </Link>
               </li>
             </ul>
@@ -133,7 +125,7 @@ export function MarketingFooter(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="border-t border-slate-200/70 py-6">
+      <div className="border-t border-slate-200/40 py-6">
         <div className="max-w-[1600px] mx-auto px-6 flex flex-row items-center justify-between gap-4 whitespace-nowrap">
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400 flex-shrink-0">
             © {new Date().getFullYear()} Vayva Tech

@@ -23,23 +23,25 @@ export const GET = withVayvaAPI(
           comparisonStartDate = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
           comparisonEndDate = startDate;
           break;
-        case 'week':
+        case 'week': {
           const dayOfWeek = now.getDay();
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek);
           comparisonStartDate = new Date(startDate.getTime() - 7 * 24 * 60 * 60 * 1000);
           comparisonEndDate = startDate;
           break;
+        }
         case 'month':
           startDate = new Date(now.getFullYear(), now.getMonth(), 1);
           comparisonStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           comparisonEndDate = startDate;
           break;
-        case 'quarter':
+        case 'quarter': {
           const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
           startDate = new Date(now.getFullYear(), quarterStartMonth, 1);
           comparisonStartDate = new Date(now.getFullYear(), quarterStartMonth - 3, 1);
           comparisonEndDate = startDate;
           break;
+        }
         case 'year':
         default:
           startDate = new Date(now.getFullYear(), 0, 1);

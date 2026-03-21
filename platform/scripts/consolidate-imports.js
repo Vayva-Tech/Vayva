@@ -1,5 +1,5 @@
-const fs = require('fs');
-const _path = require('path');
+import fs from 'fs';
+import _path from 'path';
 
 function consolidateImports(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');

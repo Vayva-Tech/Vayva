@@ -718,7 +718,7 @@ export class CatalogMigrationService {
     const strValue = String(value).trim();
 
     switch (field) {
-      case "price":
+      case "price": {
         const price = parseFloat(strValue.replace(/[^\d.-]/g, ""));
         if (isNaN(price)) {
           errors.push({
@@ -730,8 +730,9 @@ export class CatalogMigrationService {
           });
         }
         return price;
+      }
 
-      case "quantity":
+      case "quantity": {
         const qty = parseInt(strValue);
         if (isNaN(qty)) {
           errors.push({
@@ -742,6 +743,7 @@ export class CatalogMigrationService {
           });
         }
         return qty;
+      }
 
       case "status":
         return ["active", "draft", "archived"].includes(strValue.toLowerCase())

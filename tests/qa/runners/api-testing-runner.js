@@ -5,9 +5,9 @@
  * Tests dashboard APIs, rate limiting, and performance as specified in Sprint 2
  */
 
-const autocannon = require('autocannon');
-const fs = require('fs').promises;
-const path = require('path');
+import autocannon from 'autocannon';
+import fs from 'fs';
+import path from 'path';
 
 class APITester {
   constructor() {

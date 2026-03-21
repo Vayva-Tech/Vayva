@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-type E2ETarget = "merchant-admin" | "storefront" | "ops-console" | "all";
+type E2ETarget = "merchant" | "storefront" | "ops-console" | "all";
 
 const e2eTarget = (process.env.VAYVA_E2E_TARGET || "all") as E2ETarget;
 
@@ -21,10 +21,10 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   projects: [
-    ...(e2eTarget === "all" || e2eTarget === "merchant-admin"
+    ...(e2eTarget === "all" || e2eTarget === "merchant"
       ? [
           {
-            name: "merchant-admin",
+            name: "merchant",
             use: {
               ...devices["Desktop Chrome"],
               baseURL: "http://127.0.0.1:3000",
@@ -56,11 +56,11 @@ export default defineConfig({
       : []),
   ],
   webServer: [
-    ...(e2eTarget === "all" || e2eTarget === "merchant-admin"
+    ...(e2eTarget === "all" || e2eTarget === "merchant"
       ? [
           {
             command:
-              "VAYVA_E2E_MODE=true pnpm --dir ../../Frontend/merchant-admin dev",
+              "VAYVA_E2E_MODE=true pnpm --dir ../../Frontend/merchant dev",
             url: "http://127.0.0.1:3000/api/health",
             reuseExistingServer: !process.env.CI,
             timeout: 300 * 1000,

@@ -46,7 +46,7 @@ class OfflineSyncService {
   private isOnline: boolean = false;
   private syncInProgress: boolean = false;
   private actionQueue: QueuedAction[] = [];
-  private syncInterval: NodeJS.Timeout | null = null;
+  private syncInterval: ReturnType<typeof setTimeout> | null = null;
   private readonly MAX_RETRIES = 3;
   private readonly SYNC_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 

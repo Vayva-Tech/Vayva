@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { CheckoutService } from "../../apps/merchant-admin/src/lib/checkout/checkoutService";
+import { CheckoutService } from "../../apps/merchant/src/lib/checkout/checkoutService";
 // @ts-expect-error - Module resolution pending
-import { RecoveryService } from "../../apps/merchant-admin/src/lib/checkout/recoveryService";
+import { RecoveryService } from "../../apps/merchant/src/lib/checkout/recoveryService";
 import { prisma } from "@vayva/db";
 
 test.describe("Checkout & Recovery", () => {

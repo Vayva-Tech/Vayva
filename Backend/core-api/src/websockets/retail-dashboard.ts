@@ -15,7 +15,7 @@ interface AuthenticatedSocket extends WebSocket {
 export class RetailWebSocketServer {
   private wss: WebSocketServer;
   private channels: ChannelSubscribers = {};
-  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private heartbeatInterval: ReturnType<typeof setTimeout> | null = null;
 
   constructor(server: Server) {
     this.wss = new WebSocketServer({ 

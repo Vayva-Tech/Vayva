@@ -18,7 +18,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'merchant-admin',
+      name: 'merchant',
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://127.0.0.1:3000',
@@ -41,7 +41,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'VAYVA_E2E_MODE=true pnpm --filter merchant-admin dev',
+      command: 'VAYVA_E2E_MODE=true pnpm --filter merchant dev',
       url: 'http://127.0.0.1:3000/api/health',
       reuseExistingServer: !process.env.CI,
       timeout: 300 * 1000,

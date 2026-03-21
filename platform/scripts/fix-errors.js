@@ -1,6 +1,6 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const logFile = process.argv[2];
 if (!logFile) {
@@ -12,8 +12,8 @@ const content = fs.readFileSync(logFile, 'utf8');
 const lines = content.split('\n');
 
 // Regex to capture error details
-// Format: merchant-admin:typecheck: src/file.ts(line,col): error TSXXXX: Message...
-const errorRegex = /merchant-admin:typecheck: (.+)\((\d+),(\d+)\): error (TS\d+): (.+)/;
+// Format: merchant:typecheck: src/file.ts(line,col): error TSXXXX: Message...
+const errorRegex = /merchant:typecheck: (.+)\((\d+),(\d+)\): error (TS\d+): (.+)/;
 
 const errors = [];
 
@@ -35,7 +35,7 @@ const fileErrors = {};
 errors.forEach(err => {
     let filePath = err.file;
     if (filePath.startsWith('src/') || filePath.startsWith('tests/')) {
-        filePath = path.join('apps/merchant-admin', filePath);
+        filePath = path.join('apps/merchant', filePath);
     }
 
     if (!fileErrors[filePath]) {

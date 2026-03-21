@@ -1,6 +1,5 @@
-import React from "react";
 import LegalDocPage from "../_components/LegalDocPage";
 
-export default function EULAPage(): React.JSX.Element {
+export default function EulaPage() {
   return <LegalDocPage slug="eula" />;
 }

@@ -20,6 +20,8 @@
     "check:runtime": "node platform/scripts/check-runtime-boundaries.mjs",
     "check:bundle": "node platform/scripts/check-bundle-size.mjs",
     "check:dead-code": "knip --no-exit-code",
+    "check:a11y": "node scripts/verify-accessibility.js",
+    "validate:accessibility": "pnpm check:a11y",
     "db:seed": "node platform/infra/db/prisma/seed.ts",
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",

@@ -70,9 +70,10 @@ export const CollectionAnalyzer: React.FC<CollectionAnalyzerProps> = ({
       case 'sellThrough':
         return b.sellThroughRate - a.sellThroughRate;
       case 'performance':
-      default:
+      default: {
         const ratingOrder = { star: 0, plowhorse: 1, puzzle: 2, dog: 3 };
         return ratingOrder[a.performanceRating] - ratingOrder[b.performanceRating];
+      }
     }
   });
 

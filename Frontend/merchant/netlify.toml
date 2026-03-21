@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm install && pnpm turbo run build --filter=merchant"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--version"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"

@@ -3783,6 +3783,38 @@ exports.Prisma.WholesaleCustomerScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.NPSSurveyScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  customerId: 'customerId',
+  email: 'email',
+  score: 'score',
+  status: 'status',
+  feedback: 'feedback',
+  metadata: 'metadata',
+  sentAt: 'sentAt',
+  respondedAt: 'respondedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PlaybookExecutionScalarFieldEnum = {
+  id: 'id',
+  playbookId: 'playbookId',
+  storeId: 'storeId',
+  status: 'status',
+  triggerType: 'triggerType',
+  triggerData: 'triggerData',
+  result: 'result',
+  error: 'error',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -5187,7 +5219,9 @@ exports.Prisma.ModelName = {
   Vehicle: 'Vehicle',
   DigitalReceipt: 'DigitalReceipt',
   WholesaleOrder: 'WholesaleOrder',
-  WholesaleCustomer: 'WholesaleCustomer'
+  WholesaleCustomer: 'WholesaleCustomer',
+  NPSSurvey: 'NPSSurvey',
+  PlaybookExecution: 'PlaybookExecution'
 };
 
 /**

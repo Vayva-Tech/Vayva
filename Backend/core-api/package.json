@@ -1,5 +1,5 @@
 {
-    "name": "@vayva/merchant-admin-api",
+    "name": "@vayva/merchant-api",
     "version": "0.0.0",
     "private": true,
     "scripts": {

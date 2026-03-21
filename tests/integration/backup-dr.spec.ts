@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { BackupService } from "../../apps/merchant-admin/src/lib/ops/backupService";
+import { BackupService } from "../../apps/merchant/src/lib/ops/backupService";
 import { prisma } from "@vayva/db";
 
 test.describe("Backup & DR Ops", () => {

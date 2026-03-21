@@ -179,8 +179,8 @@
         },
         {
             "files": [
-                "apps/merchant-admin/src/**/*.ts",
-                "apps/merchant-admin/src/**/*.tsx"
+                "apps/merchant/src/**/*.ts",
+                "apps/merchant/src/**/*.tsx"
             ],
             "rules": {
                 "@typescript-eslint/no-explicit-any": "off",
@@ -211,7 +211,22 @@
                 "no-var": "warn",
                 "no-empty": "off",
                 "@typescript-eslint/no-unused-vars": "off",
-                "no-console": "off"
+                "no-console": "off",
+                "no-restricted-imports": [
+                    "error",
+                    {
+                        "paths": [
+                            {
+                                "name": "@vayva/db",
+                                "message": "Direct database access is not allowed in frontend. Use API calls to backend instead via apiJson() helper."
+                            },
+                            {
+                                "name": "@/lib/prisma",
+                                "message": "Prisma client should only be used in backend code. Use backend API endpoints from frontend."
+                            }
+                        ]
+                    }
+                ]
             }
         },
         {

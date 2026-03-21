@@ -7,31 +7,31 @@
  * It handles common patterns and preserves functionality.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Files to process
 const filesToProcess = [
     // Control Center
-    'apps/merchant-admin/src/components/control-center/PlanUsage.tsx',
-    'apps/merchant-admin/src/components/control-center/TemplatePreview.tsx',
-    'apps/merchant-admin/src/components/control-center/OptimizationHub.tsx',
-    'apps/merchant-admin/src/components/control-center/AutomationsHub.tsx',
-    'apps/merchant-admin/src/components/control-center/MarketplaceGrid.tsx',
-    'apps/merchant-admin/src/components/control-center/SeasonalBanner.tsx',
-    'apps/merchant-admin/src/components/control-center/UsageAndSystem.tsx',
-    'apps/merchant-admin/src/components/control-center/DataSafety.tsx',
-    'apps/merchant-admin/src/components/control-center/PaymentOptimizationCard.tsx',
-    'apps/merchant-admin/src/components/control-center/UpsellModal.tsx',
+    'apps/merchant/src/components/control-center/PlanUsage.tsx',
+    'apps/merchant/src/components/control-center/TemplatePreview.tsx',
+    'apps/merchant/src/components/control-center/OptimizationHub.tsx',
+    'apps/merchant/src/components/control-center/AutomationsHub.tsx',
+    'apps/merchant/src/components/control-center/MarketplaceGrid.tsx',
+    'apps/merchant/src/components/control-center/SeasonalBanner.tsx',
+    'apps/merchant/src/components/control-center/UsageAndSystem.tsx',
+    'apps/merchant/src/components/control-center/DataSafety.tsx',
+    'apps/merchant/src/components/control-center/PaymentOptimizationCard.tsx',
+    'apps/merchant/src/components/control-center/UpsellModal.tsx',
 
     // Dashboard
-    'apps/merchant-admin/src/components/dashboard/InsightHub.tsx',
-    'apps/merchant-admin/src/components/dashboard/ProFeatureUpsell.tsx',
-    'apps/merchant-admin/src/components/dashboard/overview/ServicesOverview.tsx',
-    'apps/merchant-admin/src/components/dashboard/overview/FoodOverview.tsx',
-    'apps/merchant-admin/src/components/dashboard/AICoachWidget.tsx',
-    'apps/merchant-admin/src/components/dashboard/ActivationWelcome.tsx',
-    'apps/merchant-admin/src/components/dashboard/GoLiveCard.tsx',
+    'apps/merchant/src/components/dashboard/InsightHub.tsx',
+    'apps/merchant/src/components/dashboard/ProFeatureUpsell.tsx',
+    'apps/merchant/src/components/dashboard/overview/ServicesOverview.tsx',
+    'apps/merchant/src/components/dashboard/overview/FoodOverview.tsx',
+    'apps/merchant/src/components/dashboard/AICoachWidget.tsx',
+    'apps/merchant/src/components/dashboard/ActivationWelcome.tsx',
+    'apps/merchant/src/components/dashboard/GoLiveCard.tsx',
 ];
 
 function refactorFile(filePath) {

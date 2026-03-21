@@ -1,0 +1,98 @@
+import { NextRequest, NextResponse } from "next/server";
+import { apiJson } from "@/lib/api-client-shared";
+import { handleApiError } from "@/lib/api-error-handler";
+import { INDUSTRY_CONFIG } from "@/config/industry";
+import type { IndustrySlug } from "@/lib/templates/types";
+import { logger } from "@/lib/logger";
+
+export async function GET(request: NextRequest) {
+  try {
+    const storeId = request.headers.get("x-store-id") || "";
+    // Get store industry
+      const prisma = (await import("@/lib/prisma")).prisma;
+      const store = await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { industrySlug: true },
+      });
+
+      const industrySlug = (store?.industrySlug || "retail") as IndustrySlug;
+      const config = INDUSTRY_CONFIG[industrySlug] || INDUSTRY_CONFIG.retail;
+
+      // Dynamically import industry engine
+      let engineData: any = {};
+      
+      try {
+        // Map industry slug to package name
+        const packageMap: Record<string, string> = {
+          automotive: '@vayva/industry-automotive',
+          grocery: '@vayva/industry-grocery',
+          events: '@vayva/industry-events',
+          wholesale: '@vayva/industry-wholesale',
+          nightlife: '@vayva/industry-nightlife',
+          nonprofit: '@vayva/industry-nonprofit',
+          petcare: '@vayva/industry-petcare',
+          realestate: '@vayva/industry-realestate',
+          travel: '@vayva/industry-travel',
+          saas: '@vayva/industry-saas',
+          specialized: '@vayva/industry-specialized',
+          services: '@vayva/industry-services',
+          blogmedia: '@vayva/industry-blog-media',
+        };
+
+        const packageName = packageMap[industrySlug];
+        
+        if (packageName) {
+          const industryModule = await import(packageName);
+          
+          // Initialize engine if available
+          if (industryModule.EventsEngine && industrySlug === 'events') {
+            const engine = new industryModule.EventsEngine({});
+            await engine.initialize();
+            
+            // Get statistics from all features
+            engineData = {
+              hasNativeEngine: true,
+              industry: industrySlug,
+              features: Object.keys(engine.features || {}),
+              // Add specific data based on industry
+              ...(industrySlug === 'events' ? {
+                timeline: await engine.features?.timeline?.getStats?.(),
+                vendors: await engine.features?.vendors?.getStats?.(),
+                seating: await engine.features?.seating?.getStats?.(),
+                guests: await engine.features?.guests?.getStats?.(),
+              } : {}),
+            };
+          } else {
+            // For other industries, check for dashboard exports
+            engineData = {
+              hasNativeEngine: false,
+              industry: industrySlug,
+              hasDashboard: !!industryModule[`${industrySlug.charAt(0).toUpperCase()}${industrySlug.slice(1)}Dashboard`],
+            };
+          }
+        }
+      } catch (engineError) {
+        logger.warn(`[INDUSTRY_ENGINE] Failed to load engine for ${industrySlug}`, { error: engineError });
+        engineData = {
+          error: 'Engine not available',
+          industry: industrySlug,
+        };
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          industry: industrySlug,
+          displayName: config.displayName,
+          engineData,
+          features: config.features,
+        },
+      });
+  } catch (error) {
+    handleApiError(error, { endpoint: "/api/dashboard/industry-engine", operation: "GET" });
+    return NextResponse.json(
+      { error: "Failed to complete operation" },
+      { status: 500 }
+    );
+  }
+}

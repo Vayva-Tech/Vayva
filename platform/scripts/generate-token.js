@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const { prisma } = require('../infra/db/src/client');
+import jwt from 'jsonwebtoken';
+import { prisma } from '../infra/db/src/client';
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET || "dev-secret-change-in-production";
 const JWT_EXPIRES_IN = "30d"; // Long lived for testing

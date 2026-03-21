@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Code,
-  Webhook,
+  Lightning,
   Key,
   FileText,
   Book,
@@ -13,7 +13,6 @@ import {
   ArrowRight,
   Copy,
   Check,
-  Zap,
   Shield,
   Globe,
 } from "@phosphor-icons/react";
@@ -34,7 +33,7 @@ const staggerContainer = {
 
 // Code examples
 const codeExamples = {
-  authentication: `// Authenticate with API key
+  auth: `// Authenticate with API key
 const response = await fetch('https://api.vayva.ng/v1/orders', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY',
@@ -44,7 +43,7 @@ const response = await fetch('https://api.vayva.ng/v1/orders', {
 
 const data = await response.json();`,
 
-  createOrder: `// Create a new order
+  orders: `// Create a new order
 const order = await fetch('https://api.vayva.ng/v1/orders', {
   method: 'POST',
   headers: {
@@ -67,7 +66,7 @@ const order = await fetch('https://api.vayva.ng/v1/orders', {
   }),
 });`,
 
-  webhook: `// Webhook payload example
+  webhooks: `// Webhook payload example
 {
   "event": "order.created",
   "timestamp": "2026-03-10T12:00:00Z",
@@ -94,7 +93,7 @@ const features = [
     color: "from-blue-500 to-cyan-500",
   },
   {
-    icon: Webhook,
+    icon: Lightning,
     title: "Webhooks",
     description: "Real-time event notifications for orders, payments, and deliveries.",
     color: "from-purple-500 to-pink-500",
@@ -226,7 +225,7 @@ export default function DevelopersPage() {
             className="text-center"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full mb-6">
-              <Zap className="h-4 w-4 text-indigo-600" weight="fill" />
+              <Lightning className="h-4 w-4 text-indigo-600" weight="fill" />
               <span className="text-sm font-medium text-indigo-700">Developer Platform</span>
             </motion.div>
 
@@ -326,7 +325,7 @@ export default function DevelopersPage() {
                     step: 3,
                     title: "Handle Webhooks",
                     description: "Set up webhook endpoints to receive real-time event notifications.",
-                    icon: Webhook,
+                    icon: Lightning,
                   },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-4">
@@ -469,7 +468,7 @@ export default function DevelopersPage() {
                 {
                   title: "Webhooks Guide",
                   description: "Learn how to receive and verify webhook events.",
-                  icon: Webhook,
+                  icon: Lightning,
                   href: "#",
                   color: "bg-purple-500",
                 },

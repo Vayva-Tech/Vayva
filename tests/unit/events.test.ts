@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 // @ts-expect-error - Module resolution pending
-import { EVENT_CATALOG } from "../../apps/merchant-admin/src/lib/events/catalog";
+import { EVENT_CATALOG } from "../../apps/merchant/src/lib/events/catalog";
 // @ts-expect-error - Module resolution pending
-import { EventBus } from "../../apps/merchant-admin/src/lib/events/eventBus";
+import { EventBus } from "../../apps/merchant/src/lib/events/eventBus";
 import { prisma } from "@vayva/db";
 
 vi.mock("@vayva/db", () => ({

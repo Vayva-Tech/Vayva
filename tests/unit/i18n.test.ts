@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { formatMoney } from "../../apps/merchant-admin/src/lib/i18n/formatMoney";
+import { formatMoney } from "../../apps/merchant/src/lib/i18n/formatMoney";
 // @ts-expect-error - Module resolution pending
-import { normalizePhone } from "../../apps/merchant-admin/src/lib/i18n/phone";
+import { normalizePhone } from "../../apps/merchant/src/lib/i18n/phone";
 // @ts-expect-error - Module resolution pending
-import { validateAddressNG } from "../../apps/merchant-admin/src/lib/i18n/addressNG";
+import { validateAddressNG } from "../../apps/merchant/src/lib/i18n/addressNG";
 
 test.describe("I18n Utils", () => {
   test("formatMoney uses NGN", () => {

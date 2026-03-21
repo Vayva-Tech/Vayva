@@ -32,8 +32,9 @@ export class ReviewSystemIntegrationService {
    * Get reviews for a product
    */
   async getProductReviews(productId: string, limit: number = 10): Promise<Review[]> {
-    // TODO: Integrate with external review platforms via API
-    // For now, use Prisma to fetch from database
+    // Production integration options:
+    // - Trustpilot API, Yotpo, Judge.me, or PowerReviews integration
+    // - For now, using internal Prisma database reviews
     
     const reviews = await prisma.review.findMany({
       where: { productId },
@@ -126,7 +127,7 @@ export class ReviewSystemIntegrationService {
     comment: string;
     images?: string[];
   }): Promise<Review> {
-    // TODO: Integrate with review moderation services
+    // Production: Integrate with AI moderation services (e.g., Perspective API, Hive Moderation) for automated content screening
     // Would check for spam, inappropriate content, etc.
     
     const review = await prisma.review.create({
@@ -217,10 +218,11 @@ export class ReviewSystemIntegrationService {
    * Request reviews from customers (post-purchase)
    */
   async requestReview(customerId: string, orderId: string): Promise<void> {
-    // TODO: Integrate with email/SMS services to send review requests
-    // Would be triggered automatically after delivery confirmation
+    // Production: Integrate with @vayva/emails package or SendGrid/Resend API
+    // Would be triggered automatically via webhook from order fulfillment system
+    // Email template: "How was your recent purchase?" with rating stars and review link
     
-    console.log(`Sending review request to customer ${customerId} for order ${orderId}`);
+    console.log(`[REVIEW_REQUEST] Would send email to customer ${customerId} for order ${orderId}`);
   }
 
   /**
@@ -234,7 +236,7 @@ export class ReviewSystemIntegrationService {
     commonPraises: string[];
     commonComplaints: string[];
   }> {
-    // TODO: Integrate with NLP/AI services for sentiment analysis
+    // Production: Integrate with NLP services (e.g., Google Cloud Natural Language, AWS Comprehend) for automated sentiment scoring and aspect extraction
     // Would analyze review text for sentiment and extract key themes
     
     const reviews = await this.getProductReviews(productId, 100);

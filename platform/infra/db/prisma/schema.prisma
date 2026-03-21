@@ -6269,3 +6269,47 @@ model WholesaleCustomer {
   @@index([email])
   @@map("wholesale_customers")
 }
+
+// NPS Survey - Net Promoter Score tracking
+model NPSSurvey {
+  id          String   @id @default(cuid())
+  storeId     String
+  customerId  String?
+  email       String?
+  score       Int?     // 0-10 score
+  status      String   @default("sent") // sent | responded | expired
+  feedback    String?  @db.Text
+  metadata    Json     @default("{}")
+  sentAt      DateTime @default(now())
+  respondedAt DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([storeId, sentAt])
+  @@index([status, respondedAt])
+  @@index([customerId])
+  @@map("nps_survey")
+}
+
+// Playbook Execution - Automated workflow execution tracking
+model PlaybookExecution {
+  id         String   @id @default(cuid())
+  playbookId String
+  storeId    String
+  status     String   @default("pending") // pending | running | completed | failed
+  triggerType String  // manual | scheduled | event
+  triggerData Json    @default("{}")
+  result     Json?    @db.JsonB
+  error      String?  @db.Text
+  startedAt  DateTime @default(now())
+  completedAt DateTime?
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([playbookId, startedAt])
+  @@index([storeId, startedAt])
+  @@index([status])
+  @@map("playbook_execution")
+}

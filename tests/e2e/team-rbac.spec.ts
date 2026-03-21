@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 // @ts-expect-error - Module resolution pending
-import { TeamService } from "../../apps/merchant-admin/src/lib/team/teamService";
+import { TeamService } from "../../apps/merchant/src/lib/team/teamService";
 import {
   can,
   ROLES,
   PERMISSIONS,
 // @ts-expect-error - Module resolution pending
-} from "../../apps/merchant-admin/src/lib/team/permissions";
+} from "../../apps/merchant/src/lib/team/permissions";
 import { prisma } from "@vayva/db";
 
 test.describe("Team RBAC v2", () => {

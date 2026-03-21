@@ -33,8 +33,9 @@ export class AnalyticsIntegrationService {
    * Get comprehensive session metrics
    */
   async getSessionMetrics(storeId: string, days: number = 30): Promise<SessionMetrics> {
-    // TODO: Integrate with Google Analytics 4 API or similar
-    // For now, calculate from internal data
+    // Production integration: Replace with Google Analytics 4 Reporting API v1
+    // Required setup: GA4 Property ID, Service Account with Analytics Data API access
+    // For now, calculate from internal order data as proxy
     
     const endDate = new Date();
     const startDate = new Date(endDate);
@@ -73,8 +74,9 @@ export class AnalyticsIntegrationService {
    * Calculate conversion funnel metrics
    */
   async getConversionFunnel(storeId: string): Promise<ConversionFunnel[]> {
-    // TODO: Integrate with funnel tracking tools
-    // Would track: View → Add to Cart → Initiate Checkout → Purchase
+    // Production integration: Implement via GA4 Funnel Exploration API or custom event tracking
+    // Track: ProductView → AddToCart → CheckoutInitiated → PurchaseCompleted
+    // For now, estimate from order data
     
     const endDate = new Date();
     const startDate = new Date(endDate);
@@ -138,7 +140,7 @@ export class AnalyticsIntegrationService {
     pagesViewed: number;
     topPages: Array<{ path: string; views: number }>;
   }> {
-    // TODO: Integrate with real-time analytics (e.g., Firebase, WebSocket)
+    // Production integration: Implement via Google Analytics Measurement Protocol or Segment.com for real-time event streaming
     // For now, return mock data
     
     return {

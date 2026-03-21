@@ -155,12 +155,14 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
     switch (timeFilter) {
       case 'today':
         return reservationDate.toDateString() === now.toDateString();
-      case 'week':
+      case 'week': {
         const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
         return reservationDate >= now && reservationDate <= weekFromNow;
-      case 'month':
+      }
+      case 'month': {
         const monthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
         return reservationDate >= now && reservationDate <= monthFromNow;
+      }
       default:
         return true;
     }

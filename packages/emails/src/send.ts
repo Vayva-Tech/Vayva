@@ -15,6 +15,9 @@ import { KycStatusEmail } from "./templates/kycStatus";
 import { DisputeOpenedEmail } from "./templates/disputeOpened";
 import { RefundRequestedEmail } from "./templates/refundRequested";
 import { AccountDeletionScheduledEmail, AccountDeletionCompletedEmail } from "./templates/accountDeletion";
+import { PaymentFailedEmail } from "./templates/paymentFailed";
+import { PaymentRecoveredEmail } from "./templates/paymentRecovered";
+import { SubscriptionEndedEmail } from "./templates/subscriptionEnded";
 
 let _resend: Resend | null = null;
 function getResend(): Resend {
@@ -255,6 +258,48 @@ export async function sendAccountDeletionCompleted(
     to,
     replyTo: REPLY_TO,
     subject: `Account deleted — ${args.storeName}`,
+    html,
+  });
+}
+
+export async function sendPaymentFailed(
+  to: string,
+  args: { storeName: string; amount: string; currency: string; retryDate: string; billingUrl: string }
+) {
+  const html = await render(PaymentFailedEmail(args));
+  return getResend().emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: `Payment failed — ${args.storeName}`,
+    html,
+  });
+}
+
+export async function sendPaymentRecovered(
+  to: string,
+  args: { storeName: string; amount: string; currency: string }
+) {
+  const html = await render(PaymentRecoveredEmail(args));
+  return getResend().emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: `Payment successful — ${args.storeName}`,
+    html,
+  });
+}
+
+export async function sendSubscriptionEnded(
+  to: string,
+  args: { storeName: string; planName: string; reactivationUrl: string }
+) {
+  const html = await render(SubscriptionEndedEmail(args));
+  return getResend().emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: `Subscription ended — ${args.storeName}`,
     html,
   });
 }

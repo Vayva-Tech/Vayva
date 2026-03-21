@@ -1,8 +1,8 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const rootDir = 'apps/merchant-admin/src';
+const rootDir = 'apps/merchant/src';
 
 function walk(dir) {
     let results = [];

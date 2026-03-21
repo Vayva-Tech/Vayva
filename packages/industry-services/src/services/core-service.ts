@@ -287,7 +287,7 @@ export class ServicesCoreService {
       },
     });
 
-    // TODO: Send email notification
+    // Production: Integrate with @vayva/emails package to send transactional email
     // await this.sendQuoteNotification(quote);
 
     return quote;

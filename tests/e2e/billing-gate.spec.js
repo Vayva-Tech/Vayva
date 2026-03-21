@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { formatMoneyNGN } from "../../apps/merchant-admin/src/lib/billing/formatters";
+import { formatMoneyNGN } from "../../apps/merchant/src/lib/billing/formatters";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 const GROWTH_PRICE_STR = "₦25,000";
 const PRO_PRICE_STR = "₦40,000";

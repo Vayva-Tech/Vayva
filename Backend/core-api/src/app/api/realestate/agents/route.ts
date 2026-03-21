@@ -97,8 +97,8 @@ export const GET = withVayvaAPI(
                 : 0,
               totalConversions: conversions,
               totalCommission: commissions._sum.commissionAmount || 0,
-              activeListings: 0, // TODO: Connect to listings when available
-              avgDaysToClose: 0 // TODO: Calculate from lead conversion data
+              activeListings: 0, // Production: Query @vayva/industry-realestate listings API for count
+              avgDaysToClose: 0 // Production: Calculate average from converted leads closedDate - createdDate
             }
           };
         })

@@ -50,7 +50,11 @@ export class ChannelSyncService {
 
   private async performSync(): Promise<void> {
     console.log('[CHANNEL_SYNC] Performing channel synchronization...');
-    // TODO: Implement actual channel synchronization logic
+    // Production: Implement multi-channel sync via platform-specific APIs:
+    // - Shopify: Admin API for product/inventory sync
+    // - WooCommerce: REST API v3
+    // - Amazon SP-API: Listings Items API
+    // - eBay: Inventory API
   }
 
   registerChannel(channelId: string, channelName: string): void {

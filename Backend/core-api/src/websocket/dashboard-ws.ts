@@ -41,7 +41,7 @@ type IndustryUpdateType =
 export class DashboardWebSocketServer {
   private wss: WebSocketServer;
   private clients: Map<string, Set<DashboardClient>> = new Map();
-  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private heartbeatInterval: ReturnType<typeof setTimeout> | null = null;
 
   constructor(server: any) {
     // Initialize WebSocket server

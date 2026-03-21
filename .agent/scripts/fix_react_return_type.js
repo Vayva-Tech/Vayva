@@ -11,7 +11,7 @@ const LINT_FILE = 'final_lint.txt'; // or final_lint_v2.txt? using original for 
 // Actually, the previous script parsed "final_lint.txt". I'll stick to that but maybe I should have used "final_lint_v2.txt"?
 // I'll update it to check both or just 'final_lint_v2.txt' if exists.
 
-const SEARCH_DIRS = ['apps/merchant-admin/src']; // Target directory
+const SEARCH_DIRS = ['apps/merchant/src']; // Target directory
 
 function isPascalCase(str) {
     return /^[A-Z][a-zA-Z0-9]*$/.test(str);

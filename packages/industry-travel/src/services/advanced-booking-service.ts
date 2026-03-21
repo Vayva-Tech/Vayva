@@ -179,11 +179,10 @@ export class AdvancedBookingService {
         // Record payment
         await this.bookingService.recordPayment(bookingId, verification.amountKobo ? verification.amountKobo / 100 : 0);
         
-        // Send confirmation
-        // TODO: Get booking by ID instead of customer ID
-        const bookings = await this.bookingService.getBookings({ customerId: 'temp' });
-        if (bookings.length > 0) {
-          await this.sendBookingConfirmed(bookings[0]);
+        // Send confirmation - get booking by ID
+        const booking = await this.bookingService.getBookingById(bookingId);
+        if (booking) {
+          await this.sendBookingConfirmed(booking);
         }
 
         return {

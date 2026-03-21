@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { EnvHealth } from "../../apps/merchant-admin/src/lib/ops/envHealth";
+import { EnvHealth } from "../../apps/merchant/src/lib/ops/envHealth";
 // @ts-expect-error - Module resolution pending
-import { ServiceHealth } from "../../apps/merchant-admin/src/lib/ops/serviceHealth";
+import { ServiceHealth } from "../../apps/merchant/src/lib/ops/serviceHealth";
 
 test.describe("Launch System Health", () => {
   test("Env Health Logic", () => {

@@ -3,8 +3,8 @@ name: Prevent Nav/Footer Drift
 on:
   pull_request:
     paths:
-      - 'apps/merchant-admin/src/components/layout/GlobalHeader.tsx'
-      - 'apps/merchant-admin/src/components/layout/GlobalFooter.tsx'
+      - 'apps/merchant/src/components/layout/GlobalHeader.tsx'
+      - 'apps/merchant/src/components/layout/GlobalFooter.tsx'
 
 jobs:
   nav-guard:

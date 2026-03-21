@@ -12,3 +12,4 @@ packages:
   - "packages/ui"
   - "packages/load-test"
   - "packages/policies"
+  - "packages/customer-success"

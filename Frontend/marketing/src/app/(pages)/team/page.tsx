@@ -54,11 +54,6 @@ export default function TeamPage(): React.JSX.Element {
                     Start Free Trial
                   </Button>
                 </Link>
-                <Link href="/features">
-                  <Button variant="outline" className="px-8 py-6 text-base font-semibold rounded-xl">
-                    See All Features
-                  </Button>
-                </Link>
               </div>
             </motion.div>
           </div>

@@ -25,10 +25,11 @@ export const GET = withVayvaAPI(
         case 'month':
           startDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
-        case 'quarter':
+        case 'quarter': {
           const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
           startDate = new Date(now.getFullYear(), quarterStartMonth, 1);
           break;
+        }
         case 'year':
           startDate = new Date(now.getFullYear(), 0, 1);
           break;

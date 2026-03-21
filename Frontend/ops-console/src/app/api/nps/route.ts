@@ -44,25 +44,22 @@ export async function GET(req: NextRequest) {
         orderBy: { sentAt: 'desc' },
       });
 
-      const respondedSurveys = surveys.filter((s) => s.status === 'responded');
+      const respondedSurveys = surveys.filter((s: { status: string }) => s.status === 'responded');
       const scores = respondedSurveys
-        .map((s) => s.score)
+        .map((s: { score: number | null }) => s.score)
         .filter((s): s is number => s !== null);
 
       const metrics =
-        scores.length > 0
+        respondedSurveys.length > 0
           ? {
-              totalSent: surveys.length,
-              totalResponded: respondedSurveys.length,
               responseRate: (respondedSurveys.length / surveys.length) * 100,
-              averageScore:
-                scores.reduce((a, b) => a + b, 0) / scores.length,
-              promoters: scores.filter((s) => s >= 9).length,
-              passives: scores.filter((s) => s >= 7 && s <= 8).length,
-              detractors: scores.filter((s) => s <= 6).length,
+              averageScore: scores.reduce((a: number, b: number) => a + b, 0) / scores.length,
+              promoters: scores.filter((s: number) => s >= 9).length,
+              passives: scores.filter((s: number) => s >= 7 && s <= 8).length,
+              detractors: scores.filter((s: number) => s <= 6).length,
               npsScore:
-                ((scores.filter((s) => s >= 9).length -
-                  scores.filter((s) => s <= 6).length) /
+                ((scores.filter((s: number) => s >= 9).length -
+                  scores.filter((s: number) => s <= 6).length) /
                   scores.length) *
                 100,
             }

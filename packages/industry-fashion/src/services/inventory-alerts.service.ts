@@ -55,8 +55,9 @@ export class InventoryAlertService {
   }
 
   private async detectAlerts(): Promise<void> {
-    // TODO: Integrate with actual inventory data source
-    console.log('[INVENTORY_ALERTS] Detecting inventory alerts...');
+    // Production: Integrate with @vayva/inventory package or warehouse management system
+    // Would query real-time stock levels from inventory service
+    console.log('[INVENTORY_ALERTS] Inventory detection would connect to inventory management system');
   }
 
   createAlert(alert: Omit<InventoryAlert, 'id' | 'createdAt'>): InventoryAlert {

@@ -1002,14 +1002,6 @@ export const allFeatures: Feature[] = [
     category: "integrations",
   },
   {
-    id: "whatsapp-business",
-    name: "WhatsApp Business API",
-    description: "Official WhatsApp Business API integration",
-    tier: "starter",
-    icon: "MessageCircle",
-    category: "integrations",
-  },
-  {
     id: "instagram-shop",
     name: "Instagram Shopping",
     description: "Sync products with Instagram Shop tags",

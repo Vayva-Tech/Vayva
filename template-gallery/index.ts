@@ -2689,6 +2689,56 @@ export const EVENTS_TEMPLATES: TemplateGalleryItem[] = [
 ];
 
 // ============================================================================
+// MEAL KIT TEMPLATES (1)
+// ============================================================================
+
+export const MEAL_KIT_TEMPLATES: TemplateGalleryItem[] = [
+  {
+    id: "meal-kit",
+    slug: "demo",
+    displayName: "HelloFresh Meal Kit",
+    category: "Food",
+    industry: "meal-kit",
+    businessModel: "Subscription Commerce",
+    primaryUseCase: "Meal Kit Delivery Service",
+    requiredPlan: "pro",
+    defaultTheme: "light",
+    status: "active",
+    preview: {
+      thumbnailUrl: "/template-gallery/meal-kit/hellofresh/thumbnail.jpg",
+      mobileUrl: "/template-gallery/meal-kit/hellofresh/mobile.jpg",
+      desktopUrl: "/template-gallery/meal-kit/hellofresh/desktop.jpg",
+    },
+    compare: {
+      headline: "Fresh ingredients, delivered ready-to-cook.",
+      bullets: [
+        "Weekly recipe selection interface",
+        "Subscription plan builder",
+        "Delivery scheduling system",
+      ],
+      bestFor: ["Meal kit startups", "Farm-to-table delivery", "Prepared meal services"],
+      keyModules: ["Subscription Management", "Meal Selector", "Delivery Scheduler", "Recipe Database"],
+    },
+    routes: ["/", "/menu", "/delivery", "/subscribe"],
+    layoutKey: "MealKitHome",
+    onboardingProfile: {
+      prefill: {
+        industryCategory: "meal-kit",
+        deliveryEnabled: true,
+        paymentsEnabled: true,
+      },
+      skipSteps: ["logistics"],
+      requireSteps: ["finance", "products"],
+    },
+    source: { 
+      type: "standalone",
+      folderPath: "/templates/meal-kit/food",
+      demoUrl: "/templates/meal-kit/food",
+    },
+  },
+];
+
+// ============================================================================
 // ALL TEMPLATES COMBINED
 // ============================================================================
 
@@ -2704,6 +2754,7 @@ export const ALL_TEMPLATES: TemplateGalleryItem[] = [
   ...CREATIVE_TEMPLATES,
   ...OUTDOOR_LIFESTYLE_TEMPLATES,
   ...EVENTS_TEMPLATES,
+  ...MEAL_KIT_TEMPLATES,
 ];
 
 // ============================================================================
@@ -2787,6 +2838,13 @@ export const TEMPLATE_CATEGORIES = [
     description: "Event management and ticket sales",
     isActive: true,
     templates: EVENTS_TEMPLATES.map(t => t.id),
+  },
+  {
+    slug: "meal-kit",
+    displayName: "Meal Kit & Food Delivery",
+    description: "Subscription-based meal kit delivery",
+    isActive: true,
+    templates: MEAL_KIT_TEMPLATES.map(t => t.id),
   },
 ];
 

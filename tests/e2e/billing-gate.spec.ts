@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { formatMoneyNGN } from "../../apps/merchant-admin/src/lib/billing/formatters";
+import { formatMoneyNGN } from "../../apps/merchant/src/lib/billing/formatters";
 
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 

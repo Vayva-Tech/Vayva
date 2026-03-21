@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Add fraudCheck model to Prisma schema (Phase 6)
 /**
  * ML-Based Risk Scorer for Fraud Detection
  *

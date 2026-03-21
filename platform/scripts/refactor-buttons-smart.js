@@ -5,9 +5,9 @@
  * Hybrid approach: Automated for simple cases, manual review for complex
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 const WORKSPACE_ROOT = '/Users/fredrick/Documents/GitHub/Vayva-platform';
 

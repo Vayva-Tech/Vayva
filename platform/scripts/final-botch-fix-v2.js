@@ -1,9 +1,9 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const dirs = [
-    'apps/merchant-admin/src',
+    'apps/merchant/src',
     'packages/policies/src'
 ];
 

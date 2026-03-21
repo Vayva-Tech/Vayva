@@ -190,25 +190,129 @@ class EightySixBoardController extends BaseIndustryController {
   }
 
   private async getAffectedMenuItems(storeId: string, eightySixItems: any[]) {
-    // TODO: Query actual menu items that contain these ingredients
-    // This is a placeholder implementation
-    return eightySixItems.map(item => ({
-      menuItemId: `menu_${item.itemId}`,
-      menuItemName: `Menu Item using ${item.itemName}`,
-      ingredientId: item.itemId,
-      canSubstitute: true,
-      suggestedSubstitution: "Similar ingredient",
-    }));
+    // Query actual menu items and their recipes from database
+    const menuItems = await prisma.menuItem.findMany({
+      where: { 
+        storeId,
+        active: true,
+      },
+      include: {
+        recipe: {
+          include: {
+            ingredients: {
+              include: {
+                ingredient: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Find menu items affected by 86'd ingredients
+    const affectedItems = menuItems
+      .filter(item => {
+        if (!item.recipe?.ingredients) return false;
+        
+        return item.recipe.ingredients.some(recipeIng => 
+          eightySixItems.some(ing86 => 
+            recipeIng.ingredient.id === ing86.itemId ||
+            recipeIng.ingredient.name.toLowerCase() === ing86.itemName.toLowerCase()
+          )
+        );
+      })
+      .map(item => {
+        const affectedIngredients = item.recipe!.ingredients!.filter(recipeIng =>
+          eightySixItems.some(ing86 =>
+            recipeIng.ingredient.id === ing86.itemId ||
+            recipeIng.ingredient.name.toLowerCase() === ing86.itemName.toLowerCase()
+          )
+        );
+
+        // Find possible substitutions from inventory
+        const hasSubstitute = affectedIngredients.every(ing => {
+          // Check if similar ingredient exists in inventory
+          return false; // Production: Query @vayva/inventory for substitutes
+        });
+
+        return {
+          menuItemId: item.id,
+          menuItemName: item.name,
+          ingredientId: affectedIngredients[0]?.ingredient.id || '',
+          ingredientName: affectedIngredients[0]?.ingredient.name || '',
+          canSubstitute: hasSubstitute,
+          suggestedSubstitution: null, // Production: Suggest from inventory
+          impactLevel: affectedIngredients.length > 3 ? 'high' : 
+                       affectedIngredients.length > 1 ? 'medium' : 'low',
+        };
+      });
+
+    return affectedItems;
   }
 
   private async autoHideMenuItems(storeId: string, ingredientId: string) {
-    // TODO: Auto-hide menu items containing this ingredient
-    console.log(`[AUTO_HIDE] Store: ${storeId}, Ingredient: ${ingredientId}`);
+    // Auto-hide menu items containing this ingredient
+    const menuItems = await prisma.menuItem.findMany({
+      where: {
+        storeId,
+        active: true,
+        recipe: {
+          ingredients: {
+            some: {
+              ingredientId,
+            },
+          },
+        },
+      },
+    });
+
+    // Update menu items to hidden status
+    await prisma.menuItem.updateMany({
+      where: {
+        id: { in: menuItems.map(item => item.id) },
+      },
+      data: {
+        active: false,
+        metadata: {
+          hiddenReason: 'ingredient_86d',
+          hiddenAt: new Date().toISOString(),
+          hiddenIngredient: ingredientId,
+        },
+      },
+    });
+
+    logger.info('[KDS_86_AUTO_HIDE]', {
+      storeId,
+      ingredientId,
+      hiddenCount: menuItems.length,
+    });
   }
 
   private async unhideMenuItems(storeId: string, ingredientId: string) {
-    // TODO: Unhide menu items containing this ingredient
-    console.log(`[UNHIDE] Store: ${storeId}, Ingredient: ${ingredientId}`);
+    // Unhide menu items that were hidden due to this ingredient
+    const result = await prisma.menuItem.updateMany({
+      where: {
+        storeId,
+        active: false,
+        metadata: {
+          path: ['hiddenReason'],
+          equals: 'ingredient_86d',
+        },
+      },
+      data: {
+        active: true,
+        metadata: {
+          restoredAt: new Date().toISOString(),
+          restoredIngredient: ingredientId,
+        },
+      },
+    });
+
+    logger.info('[KDS_86_UNHIDE]', {
+      storeId,
+      ingredientId,
+      restoredCount: result.count,
+    });
   }
 }
 

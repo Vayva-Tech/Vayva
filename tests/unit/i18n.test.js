@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { formatMoney } from "../../apps/merchant-admin/src/lib/i18n/formatMoney";
-import { normalizePhone } from "../../apps/merchant-admin/src/lib/i18n/phone";
-import { validateAddressNG } from "../../apps/merchant-admin/src/lib/i18n/addressNG";
+import { formatMoney } from "../../apps/merchant/src/lib/i18n/formatMoney";
+import { normalizePhone } from "../../apps/merchant/src/lib/i18n/phone";
+import { validateAddressNG } from "../../apps/merchant/src/lib/i18n/addressNG";
 test.describe("I18n Utils", () => {
     test("formatMoney uses NGN", () => {
         // Note: Output depends on node locale but usually 'en-NG' gives ₦

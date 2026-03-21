@@ -1,0 +1,75 @@
+appId: ng.vayva.desktop
+productName: Vayva Desktop
+copyright: Copyright © 2026 Vayva
+
+directories:
+  output: release
+  buildResources: public
+
+files:
+  - dist/**/*
+  - package.json
+  - node_modules/**/*
+  - '!node_modules/.cache/**/*'
+  - '!node_modules/.pnpm-store/**/*'
+
+extraMetadata:
+  main: dist/main.js
+  version: 1.0.0
+
+# Windows configuration
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-Setup-${version}.${ext}
+  icon: public/icon.ico
+
+# NSIS installer configuration
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Vayva Desktop
+  runAfterFinish: true
+  installerHeaderIcon: public/icon.ico
+  installerIcon: public/icon.ico
+  uninstallerIcon: public/icon.ico
+
+# Mac configuration
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.business
+  icon: public/icon.icns
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  hardenedRuntime: false
+  gatekeeperAssess: false
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+
+# Linux configuration (optional)
+linux:
+  target:
+    - AppImage
+  maintainer: vayva.ng
+  category: Office
+
+# Don't publish to GitHub by default (can be overridden)
+publish: null
+
+# Build hooks
+afterPack: build/after-pack-hook.js
+afterSign: build/after-sign-hook.js

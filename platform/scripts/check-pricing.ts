@@ -19,7 +19,7 @@ const EXCLUDED_FILES = [
   "pnpm-lock.yaml",
 ];
 
-const ROOT_DIRS = ["apps/marketing/src", "apps/merchant-admin/src"];
+const ROOT_DIRS = ["apps/marketing/src", "apps/merchant/src"];
 
 function scanDir(dir: string) {
   if (!fs.existsSync(dir)) return;

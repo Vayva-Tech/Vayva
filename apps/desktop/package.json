@@ -1,0 +1,34 @@
+{
+  "name": "@vayva/desktop",
+  "version": "1.0.0",
+  "description": "Vayva Desktop Application - Professional offline-first merchant management software",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "concurrently \"pnpm run dev:electron\" \"pnpm run dev:renderer\"",
+    "dev:electron": "wait-on http://localhost:3001 && NODE_ENV=development electron .",
+    "dev:renderer": "cd ../../apps/merchant && pnpm dev",
+    "build": "tsc && pnpm run build:renderer",
+    "build:renderer": "cd ../../apps/merchant && pnpm build",
+    "build:win": "pnpm run build && electron-builder --win --x64",
+    "build:mac": "pnpm run build && electron-builder --mac",
+    "build:all": "pnpm run build && electron-builder --win --mac",
+    "pack": "electron-builder --dir",
+    "clean": "rm -rf dist release"
+  },
+  "author": "Vayva",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "conf": "^10.2.0",
+    "dot-prop": "^7.2.0",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.7"
+  }
+}

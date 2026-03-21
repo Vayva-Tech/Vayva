@@ -10,6 +10,11 @@ import { refundPolicy } from "./legal/refund-policy";
 import { merchantAgreement } from "./legal/merchant-agreement";
 import { kycExplainer } from "./legal/kyc-explainer";
 import { eula } from "./legal/eula";
+// New comprehensive legal documents
+import { dataProcessingAgreement } from "./legal/data-processing-agreement";
+import { copyrightPolicy } from "./legal/copyright-policy";
+import { securityPolicy } from "./legal/security-policy";
+import { accessibilityStatement } from "./legal/accessibility-statement";
 
 // Templates
 import {
@@ -31,6 +36,11 @@ export const legalRegistry: LegalRegistry = {
   [merchantAgreement.slug]: merchantAgreement,
   [kycExplainer.slug]: kycExplainer,
   [eula.slug]: eula,
+  // New comprehensive legal documents
+  [dataProcessingAgreement.slug]: dataProcessingAgreement,
+  [copyrightPolicy.slug]: copyrightPolicy,
+  [securityPolicy.slug]: securityPolicy,
+  [accessibilityStatement.slug]: accessibilityStatement,
 };
 
 export const storeTemplates = {

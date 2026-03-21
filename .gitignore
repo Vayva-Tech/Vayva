@@ -148,3 +148,5 @@ worker.env.*
 .env.production
 .env.local
 logs_59765035677/
+.pnpm-store/
+.agents/

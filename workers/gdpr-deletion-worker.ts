@@ -8,6 +8,12 @@
  * Schedule: 0 0 * * * (daily at midnight)
  */
 
+// Cloudflare Worker global types
+declare type ExecutionContext = {
+  waitUntil(promise: Promise<any>): void;
+  passThroughOnException(): void;
+};
+
 import { GdprAutomation, StorageProvider, WhatsAppNotifier } from "@vayva/compliance";
 
 export interface Env {

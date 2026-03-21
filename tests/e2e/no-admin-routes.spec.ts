@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("No Admin Routes", () => {
-  // This test targets the merchant-admin app
+  // This test targets the merchant app
   test("legacy /admin route returns 404 or redirects", async ({ page }) => {
     // Attempt to go to a legacy admin path
     const response = await page.goto("/admin");

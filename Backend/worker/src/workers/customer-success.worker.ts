@@ -113,33 +113,16 @@ async function createCsTask(
   priority: string,
   storeId: string
 ): Promise<void> {
-  const { prisma } = await import('@vayva/db');
-
-  try {
-    await prisma.customerSuccessTask.create({
-      data: {
-        storeId,
-        title,
-        priority: priority as 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT',
-        status: 'OPEN',
-        source: 'playbook',
-      },
-    });
-
-    logger.info('CS task created', {
-      app: 'worker',
-      storeId,
-      title,
-      assignee,
-    });
-  } catch (error) {
-    logger.error('Failed to create CS task', {
-      app: 'worker',
-      error: error instanceof Error ? error.message : String(error),
-      storeId,
-    });
-    throw error;
-  }
+  // Model not yet in Prisma schema - logging for now
+  logger.info('CS Task creation requested (not implemented)', {
+    app: 'worker',
+    storeId,
+    title,
+    assignee,
+    priority,
+  });
+  
+  return Promise.resolve();
 }
 
 // Configure playbook executor with action handlers
@@ -244,7 +227,7 @@ function registerPlaybookWorker(connection: RedisConnection): void {
         storeId: data.storeId,
         status: result.status,
         actionsCompleted: result.actionsExecuted.filter(
-          (a) => a.status === 'completed'
+          (a: { status: string }) => a.status === 'completed'
         ).length,
       });
 

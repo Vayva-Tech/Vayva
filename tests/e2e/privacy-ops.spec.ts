@@ -3,7 +3,7 @@ import {
   redactPhone,
   redactEmail,
 // @ts-expect-error - Module resolution pending
-} from "../../apps/merchant-admin/src/lib/privacy/redact";
+} from "../../apps/merchant/src/lib/privacy/redact";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 
 test.describe("Privacy Ops", () => {

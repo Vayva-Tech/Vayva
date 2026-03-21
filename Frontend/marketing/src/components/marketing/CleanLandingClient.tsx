@@ -24,12 +24,19 @@ import {
   Star,
   Lightbulb,
   Cog,
+  AlertCircle,
+  MoreHorizontal,
+  Bot,
+  MessageSquare,
+  Image as ImageIcon,
 } from "lucide-react";
 import {
   IconBrandWhatsapp,
   IconBrandInstagram,
 } from "@tabler/icons-react";
-import { FeatureArc } from "./FeatureArc";
+import { IndustryFeatureRequest } from "./IndustryFeatureRequest";
+import { DashboardPreviewSection } from "./DashboardPreview";
+import { ProDashboardMarketing } from "./ProDashboardMarketing";
 
 // ============================================
 // LIGHT GREEN & WHITE THEME - VAYVA BRAND
@@ -44,34 +51,26 @@ import { FeatureArc } from "./FeatureArc";
 // ============================================
 function HeroSection() {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/20">
-      {/* Soft green organic shapes background */}
+    <section className="relative min-h-screen overflow-hidden bg-transparent">
+      {/* Subtle decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-emerald-200/20 via-teal-100/20 to-transparent rounded-full blur-3xl transform translate-x-1/4 -translate-y-1/4" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-teal-100/20 via-emerald-50/20 to-transparent rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4" />
-        <div className="absolute inset-0 opacity-[0.02]">
-          <svg width="100%" height="100%">
-            <pattern id="greenDots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1.5" fill="#10b981" />
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#greenDots)" />
-          </svg>
-        </div>
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-emerald-100/10 via-teal-50/10 to-transparent rounded-full blur-3xl transform translate-x-1/4 -translate-y-1/4" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-teal-50/10 via-emerald-50/10 to-transparent rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4" />
       </div>
 
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 pt-8 pb-16">
         {/* Centered Content */}
         <div className="flex flex-col items-center text-center">
-          
-          {/* AI + WhatsApp badge */}
+       
+          {/* Business OS + AI badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-sm font-semibold text-emerald-700 mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-sm font-semibold text-slate-700 mb-6"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            AI-powered • WhatsApp-integrated
+            Business Operating System • Powered by Artificial Intelligence
           </motion.div>
           
           {/* Headline - Centered */}
@@ -81,42 +80,56 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-slate-900 max-w-4xl"
           >
-            Running <span className="relative inline-block text-emerald-600">
-              your African
+            The <span className="relative inline-block text-emerald-600">
+              operating system
               <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" preserveAspectRatio="none">
                 <path d="M0,8 Q50,0 100,8 T200,8" stroke="#10b981" strokeWidth="3" fill="none" />
               </svg>
-            </span> business just got easier
+            </span> that runs your business smoothly with AI
           </motion.h1>
           
-          {/* Dashboard Mockup - Centered and Scaled */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative w-full max-w-[850px] mx-auto mt-8 mb-8"
-          >
-            {/* Glow effect behind dashboard */}
-            <div className="absolute -inset-8 bg-gradient-to-br from-emerald-500/20 via-teal-400/15 to-emerald-400/20 rounded-[40px] blur-3xl opacity-60" />
-            
-            {/* Dashboard with scale transform */}
-            <div className="relative transform scale-[0.95] origin-center">
-              {/* Dashboard mock removed */}
-            </div>
-          </motion.div>
-          
-          {/* Description Text - Below Dashboard */}
+          {/* Description Text - Above Dashboard */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mb-8"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mb-8"
           >
-            We just launched Vayva to solve a problem we know too well—running an African business 
-            shouldn&apos;t require juggling five different apps. Our all-in-one platform brings your 
-            storefront, WhatsApp orders, inventory, payments, and deliveries into one intelligent dashboard. 
-            Be among the first merchants to shape what Vayva becomes.
+            Vayva is the complete operating system for your business. Manage orders, inventory, 
+            payments, deliveries, and customer relationships in one unified dashboard. 
+            Artificial intelligence handles the busywork while you focus on growth.
           </motion.p>
+
+          {/* Dashboard Mockup - Smaller Size */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="relative w-full max-w-[1000px] mx-auto mt-8 mb-8"
+          >
+            {/* Subtle glow effect */}
+            <div className="absolute -inset-4 bg-gradient-to-br from-emerald-500/15 via-teal-400/10 to-emerald-400/15 rounded-3xl blur-2xl opacity-40" />
+            
+            {/* Pro Dashboard UI Replica */}
+            <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/50 overflow-hidden">
+              {/* Browser Header */}
+              <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                </div>
+                <div className="flex-1 bg-white rounded-md px-3 py-1.5 text-xs text-slate-500 font-mono">
+                  merchant.vayva.ng/dashboard
+                </div>
+              </div>
+
+              {/* Dashboard Content - Scrollable */}
+              <div className="p-4 max-h-[600px] overflow-auto">
+                <ProDashboardMarketing />
+              </div>
+            </div>
+          </motion.div>
 
           {/* CTA Buttons */}
           <motion.div
@@ -163,14 +176,14 @@ function HeroSection() {
 // ============================================
 function TrustBarSection() {
   const stats = [
-    { value: "Just", label: "Launched" },
-    { value: "100%", label: "Free Beta" },
+    { value: "OS", label: "Business Platform" },
+    { value: "Global", label: "Works from Anywhere" },
     { value: "0₦", label: "Setup Cost" },
     { value: "24/7", label: "Support" },
   ];
 
   return (
-    <section className="relative py-8 bg-white border-b border-emerald-100">
+    <section className="relative py-8 bg-transparent border-b border-emerald-100/50">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div className="flex flex-wrap items-center gap-6 text-sm text-slate-600">
@@ -181,7 +194,7 @@ function TrustBarSection() {
             <span className="w-px h-4 bg-emerald-200 hidden sm:block" />
             <span className="flex items-center gap-2">
               <Heart className="w-4 h-4 text-emerald-500" />
-              Made with love in Lagos
+              Built for businesses everywhere
             </span>
             <span className="w-px h-4 bg-emerald-200 hidden sm:block" />
             <span className="flex items-center gap-2">
@@ -209,7 +222,7 @@ function TrustBarSection() {
 // ============================================
 function RealityGapSection() {
   return (
-    <section className="relative py-20 lg:py-28 bg-gradient-to-b from-white to-emerald-50/30 overflow-hidden">
+    <section className="relative py-20 lg:py-28 bg-transparent overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left: Smaller Image */}
@@ -229,8 +242,8 @@ function RealityGapSection() {
                 className="w-full h-auto object-cover"
                 unoptimized
               />
-              {/* Light green overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-transparent to-transparent" />
+              {/* Subtle overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 via-transparent to-transparent" />
             </div>
             {/* Floating element */}
             <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-lg border border-emerald-100">
@@ -254,24 +267,24 @@ function RealityGapSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <span className="text-emerald-600 text-sm font-bold uppercase tracking-wider mb-4 block">
-              Commerce in Africa Today
+              The Problem Today
             </span>
             
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight mb-6">
-              Running a commerce business means juggling
+              Running a business means juggling
               <span className="relative inline-block text-emerald-600 mx-2">
-                too many tools
+                too many disconnected tools
                 <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
                   <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
                 </svg>
               </span>
-at once.
+at once—no matter where you are.
             </h2>
 
             <p className="text-lg text-slate-600 leading-relaxed mb-4">
               You&apos;re managing orders on WhatsApp, tracking inventory in spreadsheets, 
               handling payments manually, and coordinating delivery through phone calls. 
-              It&apos;s exhausting, and it&apos;s holding your business back.
+              It&apos;s exhausting whether you&apos;re in Lagos, Dubai, or London—and it&apos;s holding your business back.
             </p>
 
             <p className="text-lg text-slate-600 leading-relaxed mb-6">
@@ -283,7 +296,7 @@ at once.
             <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
               <span className="text-2xl">💡</span>
               <p className="text-slate-700 font-medium">
-                What if all your commerce tools worked together in one place?
+                What if your entire business ran smoothly from one unified operating system powered by AI?
               </p>
             </div>
           </motion.div>
@@ -321,10 +334,7 @@ function SolutionSection() {
   ];
 
   return (
-    <section className="relative py-20 lg:py-28 bg-white overflow-hidden">
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-teal-50/30 via-transparent to-emerald-50/20" />
-      </div>
+    <section className="relative py-20 lg:py-28 bg-transparent overflow-hidden">
 
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -347,19 +357,20 @@ function SolutionSection() {
                 <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
                   <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
                 </svg>
-              </span>.
+              </span>—powered by artificial intelligence.
             </h2>
 
             <p className="text-lg text-slate-600 leading-relaxed mb-6">
               Imagine managing your entire commerce operation from a single dashboard. 
               Orders flow in automatically. Inventory updates in real-time. Payments 
-              settle instantly. Delivery is coordinated with a click.
+              settle instantly. Delivery is coordinated with a click. All powered by 
+              intelligent automation that learns your business.
             </p>
 
             <p className="text-lg text-slate-600 leading-relaxed mb-6">
               No more switching between apps. No more manual data entry. No more wondering 
               if you&apos;re missing something important. Just clarity, control, and the 
-              freedom to focus on growing your business.
+              freedom to focus on growing your business with AI-powered insights.
             </p>
 
             <Link href={`${APP_URL}/signup`}>
@@ -454,19 +465,19 @@ function IndustrySection() {
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-sm font-bold text-emerald-600 uppercase tracking-wider">
-            For Every African Entrepreneur
+            For Every Business Owner
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mt-3 mb-4">
-            Whatever you sell,
+            Whatever you sell, wherever you are,
             <span className="relative inline-block text-emerald-600 mx-2">
-              we&apos;ve got you
+              we&apos;ve got you covered
               <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
                 <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
               </svg>
             </span>.
           </h2>
           <p className="text-lg text-slate-600">
-            From Lagos fashion boutiques to Abuja food vendors—Vayva adapts to how your business actually works.
+            From Lagos fashion boutiques to Dubai online sellers—Vayva adapts to how your business actually works.
           </p>
         </div>
 
@@ -534,17 +545,16 @@ function GrowthTechSection() {
             Technology That Grows With You
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mt-3 mb-4">
-            Built to scale from
+            Built to scale from your first sale to your thousandth—
             <span className="relative inline-block text-emerald-600 mx-2">
-              your first sale
+              from any location
               <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
                 <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
               </svg>
-            </span>
-            to your thousandth.
+            </span>.
           </h2>
           <p className="text-lg text-slate-600">
-            Our technology grows alongside your ambition—whether you&apos;re just starting or scaling to new heights.
+            Our operating system grows alongside your ambition—whether you&apos;re just starting or scaling to new heights.
           </p>
         </div>
 
@@ -638,24 +648,23 @@ function FeatureAccordion() {
   const arcStep = features.length > 1 ? arcSpan / (features.length - 1) : 0;
 
   return (
-    <section className="relative py-16 bg-white">
+    <section className="relative py-16 bg-transparent">
       <div className="max-w-[1000px] mx-auto px-6 lg:px-12">
         <div className="text-center mb-16">
           <span className="text-sm font-bold text-emerald-600 uppercase tracking-wider">
             Everything You Need
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mt-3 mb-4">
-            All the tools to
+            All the tools to run and grow your business—
             <span className="relative inline-block text-emerald-600 mx-2">
-              run and grow
+              powered by AI
               <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
                 <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
               </svg>
-            </span>
-            your business.
+            </span>.
           </h2>
           <p className="text-lg text-slate-600 max-w-xl mx-auto">
-            A complete suite of commerce tools designed specifically for African businesses.
+            A complete suite of commerce tools designed for modern businesses with intelligent automation.
           </p>
         </div>
 
@@ -921,161 +930,14 @@ function FeatureAccordion() {
 }
 
 // ============================================
-// SECTION 9: FEATURE REQUEST - CUSTOMER-DRIVEN
-// ============================================
-function FeatureRequestSection() {
-  const requestedFeatures = [
-    { industry: "Fashion", feature: "Size chart customization", votes: 12, status: "live" },
-    { industry: "Food", feature: "Kitchen display system", votes: 8, status: "building" },
-    { industry: "Beauty", feature: "Appointment scheduling", votes: 15, status: "live" },
-    { industry: "Retail", feature: "Barcode scanning", votes: 6, status: "planned" },
-  ];
-
-  return (
-    <section className="relative py-16 bg-gradient-to-b from-white to-emerald-50/50 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-teal-200/20 to-transparent rounded-full blur-3xl" />
-
-      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="text-emerald-600 text-sm font-bold uppercase tracking-wider mb-4 block">
-              Built With You, For You
-            </span>
-            
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6">
-              Need something
-              <span className="relative inline-block text-emerald-600 mx-2">
-                for your industry
-                <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
-                  <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
-                </svg>
-              </span>?
-              <br />
-              We&apos;ll build it.
-            </h2>
-
-            <p className="text-lg text-slate-600 leading-relaxed mb-6">
-              Every industry has unique challenges. Tell us what your business needs, 
-              and our team will research, design, and build it. From fashion boutiques 
-              needing size charts to food vendors wanting kitchen displays—we listen, 
-              then we deliver.
-            </p>
-
-            <p className="text-lg text-slate-600 leading-relaxed mb-8">
-              This is how we&apos;ve built tools for agriculture exports, event ticketing, 
-              salon appointments, and auto parts inventory. Your request could be next.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Link href="/contact">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 rounded-xl text-base font-semibold shadow-xl shadow-emerald-500/20">
-                  <Lightbulb className="w-5 h-5 mr-2" />
-                  Request a feature
-                </Button>
-              </Link>
-              <Link href="/features">
-                <Button variant="outline" className="border-2 border-emerald-200 text-slate-700 hover:bg-emerald-50 px-8 py-6 rounded-xl text-base font-medium">
-                  See all features
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* Right: Feature cards */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-4"
-          >
-            <p className="text-sm font-semibold text-emerald-600 uppercase tracking-wider mb-4">
-              Recently requested & shipped
-            </p>
-
-            {requestedFeatures.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="p-4 rounded-xl bg-white border border-emerald-100 shadow-lg shadow-emerald-100/30 hover:border-emerald-200 transition-all group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
-                      <span className="text-lg">
-                        {item.industry === "Fashion" && "👗"}
-                        {item.industry === "Food" && "🍲"}
-                        {item.industry === "Beauty" && "💄"}
-                        {item.industry === "Retail" && "🛍️"}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900">{item.feature}</h3>
-                      <p className="text-sm text-slate-500">Requested by {item.industry} merchants</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-600">
-                      {item.votes} votes
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      item.status === "live" 
-                        ? "bg-emerald-100 text-emerald-700" 
-                        : item.status === "building"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-slate-100 text-slate-700"
-                    }`}>
-                      {item.status === "live" && "✓ Live"}
-                      {item.status === "building" && "🔨 Building"}
-                      {item.status === "planned" && "📋 Planned"}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-
-            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-center">
-              <p className="text-slate-600 text-sm">
-                <span className="font-semibold text-emerald-700">Dozens of features</span> shipped based on merchant feedback
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================
 // SECTION 10: FINAL CTA - LIGHT GREEN
 // ============================================
 function FinalCTASection() {
   return (
-    <section className="relative py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-emerald-100 via-teal-50 to-emerald-50">
-      {/* Light green decorative elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-200/30 to-transparent rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-teal-200/30 to-transparent rounded-full blur-3xl" />
-      
-      {/* Pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <svg width="100%" height="100%">
-          <pattern id="ctaPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            <circle cx="20" cy="20" r="2" fill="#10b981" />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#ctaPattern)" />
-        </svg>
-      </div>
+    <section className="relative py-16 lg:py-20 overflow-hidden bg-transparent">
+      {/* Subtle decorative elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-100/15 to-transparent rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-teal-100/15 to-transparent rounded-full blur-3xl" />
 
       <div className="relative max-w-4xl mx-auto px-6 lg:px-12 text-center">
         <motion.div
@@ -1090,19 +952,12 @@ function FinalCTASection() {
           </div>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-            Ready to transform
-            <br />
-            <span className="relative inline-block text-emerald-600">
-              your business
-              <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" preserveAspectRatio="none">
-                <path d="M0,8 Q50,0 100,8 T200,8" stroke="#10b981" strokeWidth="3" fill="none" />
-              </svg>
-            </span>?
+            Ready to transform your business?
           </h2>
           
           <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-            Join thousands of African entrepreneurs who&apos;ve moved from chaos to clarity. 
-            Your free trial starts today.
+            Join thousands of entrepreneurs worldwide who&apos;ve moved from chaos to clarity. 
+            Your free trial starts today—no matter where you are.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
@@ -1133,15 +988,15 @@ function FinalCTASection() {
 // ============================================
 export function CleanLandingClient(): React.JSX.Element {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-transparent">
       <HeroSection />
       <TrustBarSection />
       <RealityGapSection />
       <SolutionSection />
       <IndustrySection />
       <GrowthTechSection />
-      <FeatureArc />
-      <FeatureRequestSection />
+      <DashboardPreviewSection />
+      <IndustryFeatureRequest industry="your business" />
       <FinalCTASection />
     </main>
   );

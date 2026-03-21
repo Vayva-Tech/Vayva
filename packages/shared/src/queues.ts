@@ -9,5 +9,6 @@ export const QUEUES = {
     CALENDAR_SYNC_SCHEDULER: "calendar.sync.scheduler",
     MANIFEST_SYNC: "manifest.sync",
     MAINTENANCE_CLEANUP: "maintenance.cleanup",
-    THUMBNAIL_GENERATION: "thumbnail.generation"
+    THUMBNAIL_GENERATION: "thumbnail.generation",
+    HEALTH_SCORE_CALCULATION: "health.score.calculation"
 };

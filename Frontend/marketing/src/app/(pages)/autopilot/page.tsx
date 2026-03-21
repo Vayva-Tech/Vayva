@@ -116,11 +116,6 @@ export default function AutopilotPage(): React.JSX.Element {
                     Start with Autopilot
                   </Button>
                 </Link>
-                <Link href="/features">
-                  <Button variant="outline" className="px-8 py-6 text-base font-semibold rounded-xl">
-                    See all features
-                  </Button>
-                </Link>
               </div>
 
               <div className="flex items-center gap-8 text-sm text-slate-500">
@@ -152,7 +147,7 @@ export default function AutopilotPage(): React.JSX.Element {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
         <div className="max-w-[1600px] mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
@@ -302,39 +297,10 @@ export default function AutopilotPage(): React.JSX.Element {
             Simple, transparent pricing
           </h2>
           <p className="text-lg text-slate-600 mb-12">
-            AI Autopilot is included free with Pro. For Starter, add it for just ₦10,000/month.
+            AI Autopilot is included free with Pro.
           </p>
 
-          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <div className="relative">
-              <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[26px] border-2 border-emerald-200/60" />
-              <div className="relative p-8 bg-white rounded-2xl border-2 border-slate-900/10 shadow-[0_18px_45px_rgba(15,23,42,0.1)]">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Starter + Autopilot</h3>
-                <p className="text-slate-600 mb-4">For growing businesses</p>
-                <p className="text-4xl font-bold text-slate-900 mb-2">₦35,000<span className="text-lg text-slate-500 font-normal">/mo</span></p>
-                <p className="text-sm text-slate-500 mb-6">₦25,000 plan + ₦10,000 add-on</p>
-                <ul className="space-y-3 text-sm text-slate-600 text-left mb-8">
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500">✓</span> All 35+ AI rules
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500">✓</span> Daily analysis
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500">✓</span> Email notifications
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-emerald-500">✓</span> Up to 500 products
-                  </li>
-                </ul>
-                <Link href={`${APP_URL}/signup?plan=starter`}>
-                  <Button variant="outline" className="w-full py-5 font-semibold rounded-xl">
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
+          <div className="max-w-xl mx-auto">
             <div className="relative">
               <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[26px] border-2 border-violet-300/50" />
               <div className="relative p-8 bg-violet-600 rounded-2xl text-white border-2 border-violet-500/40 shadow-[0_18px_45px_rgba(76,29,149,0.4)]">
@@ -372,13 +338,17 @@ export default function AutopilotPage(): React.JSX.Element {
           </div>
 
           <p className="mt-8 text-sm text-slate-500">
+            Looking for Starter? <Link href="/pricing" className="text-violet-600 font-semibold hover:underline">View all pricing plans →</Link>
+          </p>
+
+          <p className="mt-4 text-sm text-slate-500">
             7-day free trial. No credit card required. Cancel anytime.
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
         <div className="max-w-[1600px] mx-auto px-6">
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">
             Frequently asked questions

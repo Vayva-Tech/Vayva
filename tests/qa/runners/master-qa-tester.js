@@ -5,9 +5,9 @@
  * Orchestrates all 5 sprints of the QA testing assignment
  */
 
-const { spawn } = require('child_process');
-const fs = require('fs').promises;
-const path = require('path');
+import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 class MasterQATester {
   constructor() {

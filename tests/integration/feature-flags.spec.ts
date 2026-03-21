@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { FlagService } from "../../apps/merchant-admin/src/lib/flags/flagService";
+import { FlagService } from "../../apps/merchant/src/lib/flags/flagService";
 import { prisma } from "@vayva/db";
 
 test.describe("Feature Flags & Kill Switches", () => {

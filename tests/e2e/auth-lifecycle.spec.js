@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { AuthFlowService } from "../../apps/merchant-admin/src/lib/security/authFlowService";
-import { LifecycleService } from "../../apps/merchant-admin/src/lib/security/lifecycleService";
+import { AuthFlowService } from "../../apps/merchant/src/lib/security/authFlowService";
+import { LifecycleService } from "../../apps/merchant/src/lib/security/lifecycleService";
 import { prisma } from "@vayva/db";
 test.describe("Account Lifecycle & Security", () => {
     const userId = "user_test_lifecycle";

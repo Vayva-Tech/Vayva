@@ -506,7 +506,7 @@ export class PatientSchedulingService {
     strategy: ConflictResolutionStrategy
   ): Promise<SchedulingResult> {
     switch (strategy.type) {
-      case 'suggest_alternative':
+      case 'suggest_alternative': {
         const alternatives = await this.findAlternativeSlots(
           requestData.doctorId,
           requestData.requestedDate,
@@ -519,8 +519,9 @@ export class PatientSchedulingService {
           suggestedAlternatives: alternatives,
           conflictsDetected: conflicts
         };
+      }
 
-      case 'waitlist':
+      case 'waitlist': {
         const waitlistEntry = await this.addToWaitlist({
           patientId: requestData.patientId,
           doctorId: requestData.doctorId,

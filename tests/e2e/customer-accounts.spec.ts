@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { CustomerAuthService } from "../../apps/merchant-admin/src/lib/storefront/customerAuthService";
+import { CustomerAuthService } from "../../apps/merchant/src/lib/storefront/customerAuthService";
 // @ts-expect-error - Module resolution pending
-import { CustomerOrderService } from "../../apps/merchant-admin/src/lib/storefront/customerOrderService";
+import { CustomerOrderService } from "../../apps/merchant/src/lib/storefront/customerOrderService";
 import { prisma } from "@vayva/db";
 
 test.describe("Customer Accounts", () => {

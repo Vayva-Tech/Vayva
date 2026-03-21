@@ -1,6 +1,5 @@
-import React from "react";
 import LegalDocPage from "../_components/LegalDocPage";
 
-export default function RefundPolicyPage(): React.JSX.Element {
+export default function RefundPolicyPage() {
   return <LegalDocPage slug="refund-policy" />;
 }

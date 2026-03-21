@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { CustomerAuthService } from "../../apps/merchant-admin/src/lib/storefront/customerAuthService";
-import { CustomerOrderService } from "../../apps/merchant-admin/src/lib/storefront/customerOrderService";
+import { CustomerAuthService } from "../../apps/merchant/src/lib/storefront/customerAuthService";
+import { CustomerOrderService } from "../../apps/merchant/src/lib/storefront/customerOrderService";
 import { prisma } from "@vayva/db";
 test.describe("Customer Accounts", () => {
     const storeId = "store_cust_test";

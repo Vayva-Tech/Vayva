@@ -50,7 +50,9 @@ function LoginContent(): React.JSX.Element {
       const data = await res.json();
 
       if (!res.ok && res.status !== 202) {
-        throw new Error(data.error || "Invalid credentials");
+        // Extract error message from standardized error response
+        const errorMessage = data?.error?.message || data?.error || "Invalid credentials";
+        throw new Error(typeof errorMessage === 'string' ? errorMessage : String(errorMessage));
       }
 
       // MFA required - show MFA input

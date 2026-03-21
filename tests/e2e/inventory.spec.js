@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { InventoryService } from "../../apps/merchant-admin/src/lib/inventory/inventoryService";
+import { InventoryService } from "../../apps/merchant/src/lib/inventory/inventoryService";
 import { prisma } from "@vayva/db";
 test.describe("Inventory System", () => {
     const merchantId = "test_inv_merchant";

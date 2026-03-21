@@ -5,8 +5,9 @@ export const tokens = {
     background: "#f0fdf4", // Light Green (Matched to crm-canvas start)
     surface: "#FFFFFF",
     text: {
-      primary: "#1d1d1f",
-      secondary: "rgba(29, 29, 31, 0.6)",
+      primary: "#1d1d1f", // Passes WCAG AAA on white backgrounds
+      secondary: "#52525B", // Zinc-600 - passes WCAG AA 4.5:1 on white
+      tertiary: "#71717A",  // Zinc-500 - passes WCAG AA 4.5:1 on white
       inverse: "#FFFFFF",
     },
     border: "#E5E7EB",

@@ -37,7 +37,7 @@ function scanFiles(baseDir, checks) {
   return violations;
 }
 
-const merchantViolations = scanFiles("apps/merchant-admin", [
+const merchantViolations = scanFiles("apps/merchant", [
   {
     name: "merchant-hardcodes-marketing",
     test: (t) => t.includes("https://vayva.ng/"),

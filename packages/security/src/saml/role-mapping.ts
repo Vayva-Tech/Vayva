@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Add samlRoleMapping model to Prisma schema (Phase 6)
 /**
  * SAML Role Mapping Service
  *

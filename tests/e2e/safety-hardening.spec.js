@@ -44,9 +44,9 @@ test.describe("Safety Hardening Enforcement", () => {
     test("should resolve /ops/login correctly and not be intercepted by merchant auth", async ({ page, }) => {
         // Using ops-console port if possible, or via proxy if set up.
         // The requirement says "Confirm rewrite is proxy-style and keeps user-visible path /ops/*"
-        // Assuming we access via the main domain (merchant-admin which proxies).
+        // Assuming we access via the main domain (merchant which proxies).
         // Visit /ops/login
-        const opsLoginUrl = "http://localhost:3000/ops/login"; // Adjust port if needed, or use baseURL if it points to merchant-admin
+        const opsLoginUrl = "http://localhost:3000/ops/login"; // Adjust port if needed, or use baseURL if it points to merchant
         await page.goto(opsLoginUrl);
         // Expect to land on Ops Login, not Merchant Signin
         await expect(page).toHaveURL(/.*\/ops\/login/);

@@ -87,7 +87,7 @@ export async function GET(
         filename = `itinerary-${itinerary.id}.pdf`;
         break;
 
-      case "csv":
+      case "csv": {
         // CSV export of activities
         const csvRows = [
           ["Day", "Time", "Activity", "Location", "Description", "Estimated Cost"],
@@ -104,6 +104,7 @@ export async function GET(
         contentType = "text/csv";
         filename = `itinerary-${itinerary.id}-activities.csv`;
         break;
+      }
 
       case "json":
         exportData = JSON.stringify({
@@ -121,7 +122,7 @@ export async function GET(
         filename = `itinerary-${itinerary.id}.json`;
         break;
 
-      case "ical":
+      case "ical": {
         // iCalendar format for calendar imports
         const icalEvents = itinerary.activities.map(activity => {
           const eventDate = new Date(itinerary.startDate.getTime() + (activity.day - 1) * 24 * 60 * 60 * 1000);
@@ -146,6 +147,7 @@ export async function GET(
         contentType = "text/calendar";
         filename = `itinerary-${itinerary.id}.ics`;
         break;
+      }
     }
 
     // Log the export

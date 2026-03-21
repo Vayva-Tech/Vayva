@@ -13,7 +13,7 @@ import { join } from 'path';
 // Bundle size budgets in bytes (Total for all chunks)
 // Increased to accommodate multi-template architecture (16+ dynamic templates in storefront)
 const BUDGETS = {
-    'apps/merchant-admin/.next/static/chunks': 7.0 * 1024 * 1024, // 7MB for total admin chunks
+    'apps/merchant/.next/static/chunks': 7.0 * 1024 * 1024, // 7MB for total admin chunks
     'apps/storefront/.next/static/chunks': 6.0 * 1024 * 1024, // 6MB for total storefront chunks
 };
 

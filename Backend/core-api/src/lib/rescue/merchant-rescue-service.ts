@@ -1,10 +1,5 @@
 import { prisma, RescueIncidentStatus, Prisma } from "@vayva/db";
 import { logger } from "@vayva/shared";
-import Groq from "groq-sdk";
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY_RESCUE || process.env.GROQ_API_KEY || "",
-});
 
 export class MerchantRescueService {
   /**
@@ -77,30 +72,51 @@ export class MerchantRescueService {
     });
     if (!incident) return;
     try {
-      const completion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content: `
-              You are Vayva Rescue AI.
-              Classify the error: AUTH, DATABASE, NETWORK, UI_RENDER, UNKNOWN.
-              Suggest a USER-FACING-ACTION: "REFRESH", "RELOGIN", "WAIT", "CONTACT_SUPPORT".
-              Suggest a remediation for engineers (short codes snippet idea).
-              
-              Return JSON: { "classification": "...", "USER_FACING_ACTION": "...", "remediation": "..." }
-              
-              Context:
-              - App: Merchant Admin
-              - Error: ${incident.errorMessage}
-            `,
-          },
-          { role: "user", content: "Analyze this incident." },
-        ],
-        model: "llama-3.1-70b-versatile",
-        response_format: { type: "json_object" },
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      if (!apiKey) {
+        logger.warn("[RescueAI] No OpenRouter API key found");
+        return;
+      }
+      
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://vayva.tech",
+          "X-Title": "Vayva Rescue",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `
+                You are Vayva Rescue AI.
+                Classify the error: AUTH, DATABASE, NETWORK, UI_RENDER, UNKNOWN.
+                Suggest a USER-FACING-ACTION: "REFRESH", "RELOGIN", "WAIT", "CONTACT_SUPPORT".
+                Suggest a remediation for engineers (short codes snippet idea).
+                
+                Return JSON: { "classification": "...", "USER_FACING_ACTION": "...", "remediation": "..." }
+                
+                Context:
+                - App: Merchant Admin
+                - Error: ${incident.errorMessage}
+              `,
+            },
+            { role: "user", content: "Analyze this incident." },
+          ],
+          response_format: { type: "json_object" },
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`OpenRouter API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
       const analysis = JSON.parse(
-        completion.choices[0]?.message?.content || "{}",
+        data.choices[0]?.message?.content || "{}",
       );
       // Determine next status based on analysis
       let nextStatus: RescueIncidentStatus = "NEEDS_ENGINEERING" as RescueIncidentStatus;

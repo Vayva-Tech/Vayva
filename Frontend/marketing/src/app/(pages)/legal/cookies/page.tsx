@@ -1,6 +1,5 @@
-import React from "react";
 import LegalDocPage from "../_components/LegalDocPage";
 
-export default function CookiesPage(): React.JSX.Element {
+export default function CookiesPage() {
   return <LegalDocPage slug="cookies" />;
 }

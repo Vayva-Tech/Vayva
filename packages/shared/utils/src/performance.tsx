@@ -8,7 +8,7 @@
  * - Image optimization
  */
 
-import { lazy, Suspense, useMemo, useCallback, memo, useState, useRef, useEffect } from 'react';
+import { lazy, Suspense, useMemo, useCallback, memo, useRef, useState, useEffect } from 'react';
 
 // ============================================================================
 // LAZY LOADING UTILITIES
@@ -91,7 +91,7 @@ export function memoize<T extends (...args: any[]) => any>(
     }
 
     const result = fn(...args);
-    cache.set(key, result);
+    cache.set(key, result as ReturnType<T>);
     
     return result;
   }) as T;

@@ -38,12 +38,13 @@ export class AdvancedAnalyticsService {
           comparisonStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           comparisonEndDate = startDate;
           break;
-        case 'quarter':
+        case 'quarter': {
           const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
           startDate = new Date(now.getFullYear(), quarterStartMonth, 1);
           comparisonStartDate = new Date(now.getFullYear(), quarterStartMonth - 3, 1);
           comparisonEndDate = startDate;
           break;
+        }
         case 'year':
           startDate = new Date(now.getFullYear(), 0, 1);
           comparisonStartDate = new Date(now.getFullYear() - 1, 0, 1);

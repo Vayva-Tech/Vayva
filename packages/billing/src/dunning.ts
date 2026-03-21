@@ -153,8 +153,67 @@ export class DunningManager {
           billingUrl,
           attemptNumber,
         });
+        
+        // Implement payment retry via Paystack
+        try {
+          const subscription = await prisma.subscription.findUnique({
+            where: { id: subscriptionId },
+            include: { 
+              box: { include: { store: true } },
+              paymentMethod: true,
+            },
+          });
+
+          if (subscription?.paymentMethod?.paystackAuthorizationCode) {
+            // Charge customer using saved authorization code
+            const retryResponse = await fetch('https://api.paystack.co/transaction/charge_authorization', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: subscription.box?.store?.owner?.email,
+                amount: Math.round(parseFloat(amount.toString()) * 100), // Convert to kobo
+                authorization_code: subscription.paymentMethod.paystackAuthorizationCode,
+                reference: `DUNNING_${subscriptionId}_${Date.now()}`,
+              }),
+            });
+
+            const result = await retryResponse.json();
+            
+            if (result.status && result.data.status === 'success') {
+              // Payment successful - update subscription status
+              await prisma.subscription.update({
+                where: { id: subscriptionId },
+                data: {
+                  status: 'ACTIVE',
+                  currentPeriodStart: new Date(),
+                  currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                },
+              });
+
+              // Record successful payment
+              await prisma.payment.create({
+                data: {
+                  subscriptionId,
+                  amount: parseFloat(amount.toString()),
+                  currency: 'NGN',
+                  status: 'SUCCESS',
+                  paystackReference: result.data.reference,
+                  paidAt: new Date(),
+                },
+              });
+
+              console.log(`[DUNNING] Payment retry successful for subscription ${subscriptionId}`);
+            }
+          }
+        } catch (error) {
+          console.error('[DUNNING] Payment retry failed:', error);
+          // Will continue with notification workflow even if payment fails
+        }
+        
         await this.updateAttemptStatus(subscriptionId, 'RETRY_SCHEDULED');
-        // TODO: Implement actual payment retry via Paystack
         break;
 
       case 'final_notice':

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT_DIRS = ['apps/marketing/src', 'apps/marketplace/src', 'apps/merchant-admin/src'];
+const ROOT_DIRS = ['apps/marketing/src', 'apps/marketplace/src', 'apps/merchant/src'];
 
 function processFile(filePath) {
     let content = fs.readFileSync(filePath, 'utf8');

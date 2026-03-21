@@ -302,11 +302,12 @@ export class AutoReplenishmentService {
         orderQuantity = rule.reorderQuantity || 200;
         break;
         
-      case 'economic-order-quantity':
+      case 'economic-order-quantity': {
         // Calculate EOQ
         const eoq = await this.calculateEOQ(rule.productId, 1000, 50, 2);
         orderQuantity = Math.max(eoq, supplier.minimumOrderQuantity);
         break;
+      }
         
       case 'supplier-minimum':
         orderQuantity = supplier.minimumOrderQuantity;

@@ -5,9 +5,9 @@
  * Tests dashboard functionality across 6 mobile devices and orientations
  */
 
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
-const path = require('path');
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 class MobileTester {
   constructor() {

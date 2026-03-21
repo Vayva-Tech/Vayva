@@ -122,14 +122,6 @@ export function IndustryPageClient({ content }: { content: IndustryContent }): R
                       {content.ctaButton}
                     </Button>
                   </Link>
-                  <Link href="/features">
-                    <Button
-                      variant="outline"
-                      className="px-8 py-6 text-base font-semibold rounded-2xl border-2 border-slate-900/15 text-slate-700 hover:bg-white/70"
-                    >
-                      See All Features
-                    </Button>
-                  </Link>
                 </div>
               </div>
 

@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
-const API_DIR = path.join(ROOT_DIR, 'apps/merchant-admin/src/app/api');
+const API_DIR = path.join(ROOT_DIR, 'apps/merchant/src/app/api');
 
 const UNSAFE_PATTERNS = [
   /\.(findUnique|findUniqueOrThrow|update|delete|upsert)\(\{\s*where:\s*\{/g,
@@ -116,7 +116,7 @@ const STORE_OWNED_SUBTREES = [
   'api/whatsapp',
 ];
 
-// Ops routes that should NOT be in merchant-admin
+// Ops routes that should NOT be in merchant
 const FORBIDDEN_OPS_SUBTREE = 'api/ops';
 
 let idorViolations = 0;
@@ -132,7 +132,7 @@ function walk(dir) {
       walk(fullPath);
     } else if (stats.isFile() && (file.endsWith('.ts') || file.endsWith('.tsx'))) {
       const relativePath = path.relative(ROOT_DIR, fullPath);
-      const apiRelativePath = path.relative(path.join(ROOT_DIR, 'apps/merchant-admin/src/app'), fullPath);
+      const apiRelativePath = path.relative(path.join(ROOT_DIR, 'apps/merchant/src/app'), fullPath);
 
       // Check for forbidden ops routes
       if (apiRelativePath.startsWith(FORBIDDEN_OPS_SUBTREE)) {
@@ -175,7 +175,7 @@ function walk(dir) {
   }
 }
 
-console.log('🔍 Checking for IDOR patterns and forbidden ops routes in merchant-admin API...');
+console.log('🔍 Checking for IDOR patterns and forbidden ops routes in merchant API...');
 walk(API_DIR);
 
 if (idorViolations > 0 || opsViolations > 0) {

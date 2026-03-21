@@ -3,7 +3,7 @@ import {
   signReferralToken,
   verifyReferralToken,
 // @ts-expect-error - Module resolution pending
-} from "../../apps/merchant-admin/src/lib/partners/referral";
+} from "../../apps/merchant/src/lib/partners/referral";
 
 test.describe("Referral Crypto", () => {
   test("signs and verifies token correctly", () => {

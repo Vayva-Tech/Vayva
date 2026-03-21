@@ -16,3 +16,6 @@ export * from "./templates/kycStatus";
 export * from "./templates/disputeOpened";
 export * from "./templates/refundRequested";
 export * from "./templates/accountDeletion";
+export * from "./templates/paymentFailed";
+export * from "./templates/paymentRecovered";
+export * from "./templates/subscriptionEnded";

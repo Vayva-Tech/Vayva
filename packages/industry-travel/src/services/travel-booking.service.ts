@@ -128,6 +128,11 @@ export class TravelBookingService {
     return true;
   }
 
+  getBookingById(bookingId: string): TravelBooking | null {
+    const booking = this.bookings.get(bookingId);
+    return booking || null;
+  }
+
   createItinerary(itineraryData: Partial<Itinerary>): Itinerary {
     const itinerary: Itinerary = {
       ...itineraryData,

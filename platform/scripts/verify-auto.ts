@@ -1,4 +1,4 @@
-import { prisma } from "../apps/merchant-admin/src/lib/prisma"; // Adjust import path if needed, or use @vayva/db
+import { prisma } from "../apps/merchant/src/lib/prisma"; // Adjust import path if needed, or use @vayva/db
 // Actually simpler to use @vayva/db directly if possible, or relative path to prisma client
 // Let's assume we run this with ts-node and can import from @vayva/db or local prisma
 
@@ -7,7 +7,7 @@ import { prisma } from "../apps/merchant-admin/src/lib/prisma"; // Adjust import
 // const prisma = new PrismaClient()
 
 // Given the monorepo structure, let's use the local db package approach if we can run it.
-// Or just use the one in merchant-admin for simplicity of path.
+// Or just use the one in merchant for simplicity of path.
 
 // Let's try to find a valid prisma client import.
 // Using relative path to infra/db/prisma/client if generated there?

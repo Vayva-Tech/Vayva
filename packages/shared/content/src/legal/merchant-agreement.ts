@@ -3,7 +3,8 @@ import { LegalDocument } from "../types";
 export const merchantAgreement: LegalDocument = {
   slug: "merchant-agreement",
   title: "Merchant Agreement",
-  lastUpdated: "February 6, 2026",
+  lastUpdated: "March 18, 2026",
+  version: "1.0",
   summary: "Specific obligations and terms for merchants selling on Vayva.",
   sections: [
     {

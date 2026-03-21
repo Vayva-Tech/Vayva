@@ -146,31 +146,42 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
       features: ["basic_dashboard", "paystack_payments"],
     },
     starter: {
-      maxProducts: 100,
+      maxProducts: 500,
       maxOrders: 500,
-      maxTeamMembers: 2,
+      maxTeamMembers: 1,
       features: [
         "basic_dashboard",
         "paystack_payments",
         "csv_import",
         "basic_analytics",
+        "advanced_analytics",
         "email_support",
+        "industry_dashboards",
+        "custom_domain",
+        "remove_branding",
+        "automation",
       ],
     },
     pro: {
-      maxProducts: 1000,
+      maxProducts: -1, // Unlimited
       maxOrders: 10000,
-      maxTeamMembers: 10,
+      maxTeamMembers: 3,
       features: [
         "basic_dashboard",
         "paystack_payments",
         "csv_import",
+        "basic_analytics",
         "advanced_analytics",
         "accounting",
         "multi_store",
         "priority_support",
         "api_access",
         "webhooks",
+        "industry_dashboards",
+        "custom_domain",
+        "remove_branding",
+        "automation",
+        "custom_integrations",
       ],
     },
     enterprise: {
@@ -265,7 +276,7 @@ export async function checkSubscriptionLimits(
 export async function startTrial(
   storeId: string,
   tier: SubscriptionTier = "pro",
-  trialDays = 14
+  trialDays = 7
 ): Promise<void> {
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + trialDays);

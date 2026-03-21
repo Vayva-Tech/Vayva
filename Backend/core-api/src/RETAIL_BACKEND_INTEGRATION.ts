@@ -29,7 +29,7 @@
  * Add to .env.local or .env.production:
  */
 
-const environmentVariables = {
+const _environmentVariables = {
   // WebSocket Configuration
   NEXT_PUBLIC_WS_URL: 'ws://localhost:3001', // Client-side WebSocket URL
   ENABLE_RETAIL_REALTIME: 'true', // Enable/disable realtime features
@@ -271,7 +271,7 @@ const layout: DashboardLayout = {
  * Message Format:
  */
 
-const messageFormat = {
+const _messageFormat = {
   // Client → Server
   subscribe: {
     type: 'subscribe',

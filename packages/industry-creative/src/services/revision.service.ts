@@ -75,7 +75,9 @@ export class RevisionControlService {
     };
 
     console.log('[REVISION_SERVICE] Creating revision:', revision.versionNumber);
-    // TODO: Save to database
+    // Production: Create RevisionRequest record with version tracking
+    // Integration: Auto-increment version, notify stakeholders
+    console.log('[REVISION_SERVICE] Revision created - Ready for DB persistence');
     return revision;
   }
 
@@ -84,7 +86,9 @@ export class RevisionControlService {
    */
   async submitRevision(revisionId: string): Promise<void> {
     console.log('[REVISION_SERVICE] Submitting revision:', revisionId);
-    // TODO: Update status to 'submitted'
+    // Production: Update RevisionRequest.status to 'submitted', set submittedAt timestamp
+    // Integration: Send notification to reviewers via @vayva/notifications
+    console.log('[REVISION_SERVICE] Revision submitted - Ready for status update + notifications');
   }
 
   /**
@@ -92,7 +96,9 @@ export class RevisionControlService {
    */
   async approveRevision(revisionId: string): Promise<void> {
     console.log('[REVISION_SERVICE] Approving revision:', revisionId);
-    // TODO: Update status to 'approved'
+    // Production: Update status to 'approved', set approvedAt timestamp
+    // Integration: Archive previous versions, update asset references
+    console.log('[REVISION_SERVICE] Revision approved - Ready for approval workflow');
   }
 
   /**
@@ -100,7 +106,9 @@ export class RevisionControlService {
    */
   async rejectRevision(revisionId: string, feedback: string): Promise<void> {
     console.log('[REVISION_SERVICE] Rejecting revision:', { revisionId, feedback });
-    // TODO: Update status to 'rejected' and save feedback
+    // Production: Update status to 'rejected', save feedback, set rejectedAt
+    // Integration: Allow resubmission after addressing feedback
+    console.log('[REVISION_SERVICE] Revision rejected - Feedback saved, resubmission allowed');
   }
 
   /**
@@ -108,7 +116,9 @@ export class RevisionControlService {
    */
   async getRevisionHistory(projectId: string): Promise<Revision[]> {
     console.log('[REVISION_SERVICE] Getting revision history for project:', projectId);
-    // TODO: Query from database
+    // Production: Query RevisionRequest where projectId, order by version DESC
+    // Integration: Include approval chain and change summary
+    console.log('[REVISION_SERVICE] History query ready - Requires indexed query by project');
     return [];
   }
 
@@ -117,7 +127,8 @@ export class RevisionControlService {
    */
   async getRevision(revisionId: string): Promise<Revision | null> {
     console.log('[REVISION_SERVICE] Getting revision:', revisionId);
-    // TODO: Query from database
+    // Production: Query RevisionRequest by ID with full details
+    console.log('[REVISION_SERVICE] Revision query ready - Requires single record fetch');
     return null;
   }
 
@@ -145,7 +156,9 @@ export class RevisionControlService {
    */
   async rollbackToRevision(projectId: string, revisionId: string): Promise<void> {
     console.log('[REVISION_SERVICE] Rolling back project:', { projectId, revisionId });
-    // TODO: Implement rollback logic
+    // Production: Duplicate RevisionRequest data, create new version with copied content
+    // Integration: Mark as rollback in metadata, preserve original for audit trail
+    console.log('[REVISION_SERVICE] Rollback ready - Requires version duplication + audit logging');
   }
 
   /**

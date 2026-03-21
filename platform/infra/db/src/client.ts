@@ -180,6 +180,8 @@ export type {
   Goal,
   HandoffEvent,
   HealthScore,
+  NpsSurvey,
+  PlaybookExecution,
   IdempotencyKeyV2,
   FulfillmentGroup,
   ImportJob,

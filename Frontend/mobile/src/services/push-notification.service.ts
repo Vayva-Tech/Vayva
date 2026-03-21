@@ -13,6 +13,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface NotificationPreferences {
   enabled: boolean;
@@ -372,7 +373,7 @@ class PushNotificationService {
     for (const channel of config.channels) {
       await Notifications.setNotificationChannelAsync(channel.id, {
         name: channel.name,
-        importance: Notifications.AndroidImportance[channel.importance.toUpperCase() as any],
+        importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: channel.vibrationPattern,
         sound: channel.sound || 'default',
       });

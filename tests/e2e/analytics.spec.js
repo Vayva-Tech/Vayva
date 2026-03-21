@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { AnalyticsService } from "../../apps/merchant-admin/src/lib/analytics/analyticsService";
+import { AnalyticsService } from "../../apps/merchant/src/lib/analytics/analyticsService";
 import { prisma } from "@vayva/db";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 test.describe("Analytics System", () => {

@@ -219,12 +219,13 @@ function calculateNextRun(frequency: string): Date {
       now.setHours(8, 0, 0, 0);
       break;
     
-    case "weekly":
+    case "weekly": {
       // Next Monday at 8 AM
       const daysUntilMonday = (1 - now.getDay() + 7) % 7 || 7;
       now.setDate(now.getDate() + daysUntilMonday);
       now.setHours(8, 0, 0, 0);
       break;
+    }
     
     case "monthly":
       // 1st of next month at 8 AM
@@ -233,7 +234,7 @@ function calculateNextRun(frequency: string): Date {
       now.setHours(8, 0, 0, 0);
       break;
     
-    case "quarterly":
+    case "quarterly": {
       // 1st of next quarter at 8 AM
       const currentMonth = now.getMonth();
       const nextQuarterMonth = Math.floor(currentMonth / 3) * 3 + 3;
@@ -241,6 +242,7 @@ function calculateNextRun(frequency: string): Date {
       now.setDate(1);
       now.setHours(8, 0, 0, 0);
       break;
+    }
   }
 
   return now;

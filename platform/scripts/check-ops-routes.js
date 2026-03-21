@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const UI_BASE = 'apps/ops-console/src/app/ops/(app)';
 const API_BASE = 'apps/ops-console/src/app/api/ops';

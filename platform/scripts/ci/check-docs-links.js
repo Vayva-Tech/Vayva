@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const ROOT = process.cwd();
 const DOCS_ROOT = path.join(ROOT, 'docs');

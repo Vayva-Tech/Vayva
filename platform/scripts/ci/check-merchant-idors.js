@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = process.cwd();
-const apiRoot = path.join(ROOT, "apps/merchant-admin/src/app/api");
+const apiRoot = path.join(ROOT, "apps/merchant/src/app/api");
 
 function walk(dir) {
   const out = [];

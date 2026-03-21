@@ -57,8 +57,26 @@ class TicketBumpController extends BaseIndustryController {
   }
 
   private async notifyExpoStation(storeId: string, fromStationId: string) {
-    // TODO: Send WebSocket notification to expo station
-    console.log(`[EXPO_NOTIFY] Store: ${storeId}, From Station: ${fromStationId}`);
+    // Send WebSocket notification to expo station
+    try {
+      const { getLiveDashboard } = await import('@vayva/realtime');
+      const liveDashboard = getLiveDashboard();
+      
+      await liveDashboard.emitEvent(storeId, {
+        type: 'kds:update',
+        data: {
+          eventType: 'ticket_bumped_to_expo',
+          storeId,
+          fromStationId,
+          targetStation: 'expo',
+          timestamp: Date.now(),
+        },
+      });
+      
+      console.log(`[EXPO_WS] Notified expo station - Store: ${storeId}, From: ${fromStationId}`);
+    } catch (error) {
+      console.error('[EXPO_WS] Failed to notify expo station:', error);
+    }
   }
 }
 

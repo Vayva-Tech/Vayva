@@ -3,7 +3,7 @@
  * Business logic for workflow management
  */
 
-import type { Workflow, WorkflowStatus } from '@vayva/workflow-engine';
+import type { Workflow, WorkflowStatus, IndustrySlug } from '@vayva/workflow-engine';
 import { getAllTemplates, getTemplatesByIndustry } from '@vayva/workflow-templates';
 
 // In-memory storage for now - would be replaced with database
@@ -98,7 +98,7 @@ export class WorkflowService {
 
   async getTemplates(industry?: string) {
     if (industry) {
-      return getTemplatesByIndustry(industry);
+      return getTemplatesByIndustry(industry as IndustrySlug);
     }
     return getAllTemplates();
   }

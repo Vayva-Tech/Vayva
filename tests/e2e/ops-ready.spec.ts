@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { OPS_PRICING_GUARDRAILS } from "../../apps/merchant-admin/src/lib/ops/readinessContract";
+import { OPS_PRICING_GUARDRAILS } from "../../apps/merchant/src/lib/ops/readinessContract";
 
 // Mock values for test (since we can't import directly from apps in tests usually depending on tsconfig)
 const GROWTH_PRICE = "₦25,000";

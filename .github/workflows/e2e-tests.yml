@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e-merchant-admin:
+  e2e-merchant:
     name: Merchant Admin E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -49,7 +49,7 @@ jobs:
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
-        working-directory: Frontend/merchant-admin
+        working-directory: Frontend/merchant
 
       - name: Generate Prisma Client
         run: pnpm --filter @vayva/db db:generate
@@ -75,8 +75,8 @@ jobs:
             ON CONFLICT (\"userId\", \"storeId\") DO NOTHING;
           "
 
-      - name: Build merchant-admin
-        run: pnpm --filter merchant-admin build
+      - name: Build merchant
+        run: pnpm --filter merchant build
         env:
           NODE_ENV: test
           CI: "true"
@@ -96,7 +96,7 @@ jobs:
 
       - name: Run E2E tests
         # continue-on-error removed - failures now block merges
-        run: pnpm --filter merchant-admin playwright test
+        run: pnpm --filter merchant playwright test
         env:
           NODE_ENV: test
           CI: "true"
@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: Frontend/merchant-admin/playwright-report/
+          path: Frontend/merchant/playwright-report/
           retention-days: 7
 
       - name: Upload test videos
@@ -127,7 +127,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-videos
-          path: Frontend/merchant-admin/test-results/
+          path: Frontend/merchant/test-results/
           retention-days: 7
 
       - name: Comment PR with test results
@@ -136,7 +136,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const reportPath = 'Frontend/merchant-admin/playwright-report/index.html';
+            const reportPath = 'Frontend/merchant/playwright-report/index.html';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,

@@ -7,6 +7,8 @@
     "access": "public"
   },
   "files": [
-    "base.json"
+    "base.json",
+    "nextjs.json",
+    "library.json"
   ]
 }

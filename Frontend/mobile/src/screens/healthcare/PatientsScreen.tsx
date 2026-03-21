@@ -18,7 +18,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { backendAPIService } from '../../services/api/backend-api.service';
 import { database } from '../../database';
-import Patient from '../../database/models/Patient';
+import type { Patient } from '../../database/models/Patient';
 import Icon from 'lucide-react-native';
 
 interface PatientItemProps {

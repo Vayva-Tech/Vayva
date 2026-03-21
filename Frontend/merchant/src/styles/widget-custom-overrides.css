@@ -1,0 +1,167 @@
+/**
+ * Vayva Widgets - Custom CSS Override System
+ * 
+ * Merchants can create a custom CSS file and override any widget styles
+ * 
+ * Usage in widget:
+ * <div id="vayva-widget" data-custom-css="/path/to/custom.css"></div>
+ */
+
+/* ============================================
+   EXAMPLE CUSTOM CSS OVERRIDES FOR MERCHANTS
+   Copy and customize this file for your brand
+   ============================================ */
+
+/* --- Support Chat Widget Overrides --- */
+.vayva-chat-button {
+  /* Change chat button color to your brand color */
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+}
+
+.vayva-chat-header {
+  /* Customize header gradient */
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+}
+
+.vayva-send-btn {
+  /* Custom send button */
+  background: #10b981 !important;
+}
+
+/* --- Order Tracker Widget Overrides --- */
+.vayva-tracker-title {
+  /* Custom title color */
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.vayva-timeline-dot.active {
+  /* Custom timeline dot color */
+  background: #3b82f6 !important;
+}
+
+/* --- Loyalty Points Widget Overrides --- */
+.vayva-loyalty-card {
+  /* Custom loyalty card gradient */
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+}
+
+.vayva-claim-btn {
+  /* Custom claim button */
+  background: #f59e0b !important;
+  color: #ffffff !important;
+}
+
+/* --- Review Widget Overrides --- */
+.vayva-submit-btn {
+  /* Custom submit button */
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+}
+
+.vayva-star-filled {
+  /* Custom star color */
+  color: #fbbf24 !important;
+}
+
+/* --- Affiliate Dashboard Overrides --- */
+.vayva-withdraw-btn {
+  /* Custom withdraw button */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.vayva-stat-value {
+  /* Custom stat text color */
+  color: #1f2937 !important;
+}
+
+/* --- Global Font Overrides --- */
+.vayva-dashboard,
+.vayva-tracker,
+.vayva-chat-window,
+.vayva-loyalty-card,
+.vayva-reviews-container {
+  /* Use your brand font */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* --- Border Radius Overrides --- */
+.vayva-chat-button,
+.vayva-input,
+.vayva-btn,
+.vayva-card {
+  /* Adjust roundness: 0px = square, 999px = fully rounded */
+  border-radius: 8px !important;
+}
+
+/* --- Shadow Overrides --- */
+.vayva-chat-window,
+.vayva-stat-card,
+.vayva-review-card {
+  /* Adjust shadow intensity */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- Spacing Overrides --- */
+.vayva-section {
+  /* Adjust padding */
+  padding: 24px !important;
+}
+
+/* --- Mobile Responsive Overrides --- */
+@media (max-width: 768px) {
+  .vayva-chat-window {
+    /* Full width on mobile */
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+  
+  .vayva-stat-card {
+    /* Stack stats vertically on mobile */
+    margin-bottom: 12px;
+  }
+}
+
+/* --- Dark Mode Specific Overrides --- */
+[data-theme="dark"] .vayva-chat-window {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .vayva-input {
+  background: #374151 !important;
+  border-color: #4b5563 !important;
+}
+
+/* --- Animation Overrides --- */
+.vayva-btn:hover {
+  /* Custom hover animation */
+  transform: translateY(-4px) scale(1.05);
+  transition: all 0.3s ease;
+}
+
+/* --- Loading Spinner Customization --- */
+.vayva-spinner {
+  border-top-color: #6366f1 !important;
+}
+
+/* --- Badge/Status Colors --- */
+.vayva-badge-success {
+  background: #10b981 !important;
+  color: white !important;
+}
+
+.vayva-badge-pending {
+  background: #f59e0b !important;
+  color: white !important;
+}
+
+/* ============================================
+   TIPS FOR MERCHANTS:
+   1. Replace YOUR_* placeholders with actual colors
+   2. Use hex codes (#FF5733) or RGB (rgb(255, 87, 51))
+   3. Test changes in browser DevTools first
+   4. Keep mobile responsiveness in mind
+   5. Ensure sufficient color contrast for accessibility
+   ============================================ */

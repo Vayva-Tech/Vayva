@@ -1,25 +1,25 @@
 import type { IndustryContent } from "@/components/marketing/IndustryPageClient";
 
 export const landingContent = {
-  heroBadge: "New: AI Automation for WhatsApp & Instagram",
-  heroTitle: "The commerce platform",
-  heroHighlight: "for African businesses",
+  heroBadge: "Business Operating System • Powered by Artificial Intelligence",
+  heroTitle: "The commerce operating system",
+  heroHighlight: "that runs your business smoothly",
   heroDescription:
-    "Turn WhatsApp conversations into organized business records. Track orders, manage inventory, and grow your revenue—all in one command center.",
-  heroStats: ["7-day free trial", "No credit card", "Founded 2026"],
-  trustTitle: "Powering commerce for modern Nigerian merchants.",
+    "Turn WhatsApp conversations into organized business records. Track orders, manage inventory, and grow your revenue—all in one command center. AI handles the busywork while you focus on growth.",
+  heroStats: ["7-day free trial", "No credit card", "AI-powered automation"],
+  trustTitle: "Powering commerce with intelligent automation.",
   trustHighlights: [
     "Paystack payments",
     "Kwik delivery",
     "AI order capture",
-    "Automation",
+    "Smart insights",
     "WhatsApp & Instagram",
   ],
   platformPillars: [
     {
       title: "Unified order capture",
       description:
-        "AI converts WhatsApp, Instagram, and web requests into structured orders automatically.",
+        "Smart system converts WhatsApp, Instagram, and web requests into structured orders automatically.",
     },
     {
       title: "Instant payments",
@@ -34,7 +34,7 @@ export const landingContent = {
     {
       title: "Operational command",
       description:
-        "Inventory, delivery, customers, campaigns, and payouts—all in sync.",
+        "Inventory, delivery, customers, campaigns, and payouts—all in sync. AI-powered insights guide your decisions.",
     },
   ],
   workflowSteps: [
@@ -50,7 +50,7 @@ export const landingContent = {
     },
     {
       step: "03",
-      title: "Let AI capture orders",
+      title: "Automate order capture",
       description: "Every request from WhatsApp or Instagram is parsed and logged automatically.",
     },
     {
@@ -71,14 +71,14 @@ export const landingContent = {
         "Choose from ready-made designs. Free plan includes 4 templates; upgrade to unlock the full library.",
     },
     {
-      title: "AI Automation",
+      title: "AI-Powered Automation",
       description:
         "WhatsApp and Instagram conversations automatically converted into structured orders.",
     },
     {
-      title: "Nigeria-first performance",
+      title: "Intelligent performance",
       description:
-        "Optimized for low bandwidth and real merchant workflows across multiple industries.",
+        "Optimized with AI for multiple industries, providing smart recommendations.",
     },
     {
       title: "Bank-grade security",
@@ -91,7 +91,7 @@ export const landingContent = {
     },
     {
       title: "Human support",
-      description: "Success managers who understand Nigerian commerce at scale.",
+      description: "Success managers who understand commerce at scale.",
     },
   ],
 };
@@ -100,12 +100,13 @@ export const pricingPlans = [
   {
     name: "Free",
     price: 0,
-    description: "Perfect for testing ideas",
+    description: "Perfect for testing ideas and side hustles",
     features: [
       "4 included templates",
-      "Basic storefront",
-      "Vayva branding",
-      "Standard analytics",
+      "Basic storefront with Vayva branding",
+      "Standard analytics dashboard",
+      "WhatsApp order capture",
+      "Paystack payment integration",
     ],
     cta: "Start Free",
     href: "/signup",
@@ -113,13 +114,16 @@ export const pricingPlans = [
   {
     name: "Starter",
     price: 25000,
-    description: "For growing brands",
+    description: "For growing businesses ready to scale",
     features: [
       "Up to 500 products",
+      "Unlimited orders",
       "Vayva Automation (WhatsApp & Instagram)",
-      "Storefront setup",
-      "Conversation customization",
+      "Storefront setup & customization",
+      "Advanced conversation customization",
       "Remove Vayva branding",
+      "Priority support & training",
+      "7-day free trial included",
     ],
     cta: "Start Growing",
     href: "/checkout?plan=starter",
@@ -129,14 +133,15 @@ export const pricingPlans = [
   {
     name: "Pro",
     price: 40000,
-    description: "High volume scaling",
+    description: "High-volume sellers scaling operations",
     features: [
-      "Everything in Starter",
+      "Everything in Starter, plus:",
       "Advanced conversation customization",
-      "Multi-location support",
-      "API access",
+      "Multi-location & warehouse support",
+      "API access for custom integrations",
       "Dedicated account manager",
       "Custom integrations",
+      "White-label options available",
     ],
     cta: "Scale Your Business",
     href: "/checkout?plan=pro",
@@ -144,15 +149,15 @@ export const pricingPlans = [
 ];
 
 export const aboutContent = {
-  heroTitle: "Building the future of",
-  heroHighlight: "African commerce",
+  heroTitle: "Building tools that support",
+  heroHighlight: "business owners everywhere",
   heroDescription:
-    "Vayva was born from a simple observation: millions of Nigerian businesses run on WhatsApp, but the platform wasn’t built for commerce. We’re changing that.",
+    "Vayva was born from a simple observation: millions of businesses run on WhatsApp, but the platform wasn't built for commerce. We're changing that.",
   stats: [
     { value: "2026", label: "Founded" },
-    { value: "Nigeria", label: "Built for African commerce" },
+    { value: "Global", label: "Built for businesses worldwide" },
     { value: "99.9%", label: "Uptime" },
-    { value: "24/7", label: "AI availability" },
+    { value: "24/7", label: "System availability" },
   ],
   founder: {
     name: "Nyamsi Fredrick",
@@ -1198,6 +1203,10 @@ export const legalContent = {
     { title: "Legal Hub", href: "/legal" },
     { title: "Terms of Service", href: "/legal/terms" },
     { title: "Privacy Policy", href: "/legal/privacy" },
+    { title: "Data Processing Agreement", href: "/legal/dpa" },
+    { title: "Copyright & DMCA Policy", href: "/legal/copyright" },
+    { title: "Security Policy", href: "/legal/security" },
+    { title: "Accessibility", href: "/legal/accessibility" },
     { title: "Acceptable Use Policy", href: "/legal/acceptable-use" },
     { title: "Prohibited Items", href: "/legal/prohibited-items" },
     { title: "Refund Policy", href: "/legal/refund-policy" },
@@ -1213,31 +1222,60 @@ export const legalContent = {
           title: "Terms of Service",
           href: "/legal/terms",
           description:
-            "Governs platform use and defines the legal contract between Vayva and merchants.",
+            "Governs platform use and defines the legal contract between Vayva and merchants. Comprehensive provisions for eligibility, fees, prohibited uses, IP rights, liability limitations, and dispute resolution.",
         },
         {
           title: "Privacy Policy",
           href: "/legal/privacy",
           description:
-            "Explains data handling practices and compliance with data protection requirements.",
+            "Explains data handling practices and compliance with GDPR, NDPR, and other data protection laws. Details data collection, processing purposes, user rights, and international transfer safeguards.",
+        },
+        {
+          title: "Data Processing Agreement (DPA)",
+          href: "/legal/dpa",
+          description:
+            "GDPR and NDPR compliant agreement governing personal data processing. Includes controller/processor obligations, breach notification, data subject rights, and audit provisions.",
         },
         {
           title: "Acceptable Use Policy",
           href: "/legal/acceptable-use",
           description:
-            "Defines permitted behavior and prohibited activities on the Vayva platform.",
+            "Defines permitted behavior and prohibited activities on the Vayva platform including messaging automation and community standards.",
         },
         {
           title: "Prohibited Items",
           href: "/legal/prohibited-items",
           description:
-            "Lists restricted goods and services that cannot be sold using Vayva.",
+            "Comprehensive list of restricted goods and services that cannot be sold using Vayva. Includes illegal items, regulated products, and offensive materials.",
         },
         {
           title: "Refund Policy",
           href: "/legal/refund-policy",
           description:
-            "Explains billing practices and refund eligibility for Vayva subscriptions.",
+            "Explains billing practices and refund eligibility for Vayva subscription fees including free trials and chargeback procedures.",
+        },
+      ],
+    },
+    {
+      title: "Intellectual Property & Security",
+      items: [
+        {
+          title: "Copyright & DMCA Policy",
+          href: "/legal/copyright",
+          description:
+            "Policy for responding to copyright infringement claims under DMCA and Nigeria Copyright Act. Includes takedown procedures, counter-notice process, and repeat infringer policy.",
+        },
+        {
+          title: "Security Policy",
+          href: "/legal/security",
+          description:
+            "Comprehensive security measures including encryption standards (TLS 1.3, AES-256), access controls, network security, incident response, and SOC 2 Type II compliance.",
+        },
+        {
+          title: "End User License Agreement (EULA)",
+          href: "/legal/eula",
+          description:
+            "License terms for the Vayva application including content standards, warranty disclaimers, and usage restrictions.",
         },
       ],
     },
@@ -1248,19 +1286,19 @@ export const legalContent = {
           title: "KYC & Compliance",
           href: "/legal/kyc-safety",
           description:
-            "Identity verification requirements, risk mitigation, and enforcement procedures.",
+            "Identity verification requirements including NIN, BVN, and CAC checks. Explains risk mitigation and enforcement procedures.",
         },
         {
-          title: "Cookie Management",
+          title: "Cookie Policy",
           href: "/legal/cookies",
           description:
-            "Consent controls and tracking preferences for Vayva web properties.",
+            "Information about cookie usage, types of cookies (essential, functional, analytics), and browser control options.",
         },
         {
-          title: "End User License Agreement (EULA)",
-          href: "/legal/eula",
+          title: "Accessibility Statement",
+          href: "/legal/accessibility",
           description:
-            "License terms for the Vayva mobile application, including content moderation and user conduct policies.",
+            "Commitment to WCAG 2.1 Level AA compliance. Details accessibility features, assistive technology compatibility, and feedback mechanisms.",
         },
       ],
     },

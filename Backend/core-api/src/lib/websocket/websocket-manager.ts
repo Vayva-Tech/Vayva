@@ -49,7 +49,7 @@ export class WebSocketManager extends EventEmitter {
   private static instance: WebSocketManager;
   private connections: Map<string, ClientConnection> = new Map();
   private channelSubscriptions: Map<string, Set<string>> = new Map();
-  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private heartbeatInterval: ReturnType<typeof setTimeout> | null = null;
 
   private constructor() {
     super();

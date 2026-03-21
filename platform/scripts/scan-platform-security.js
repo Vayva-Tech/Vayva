@@ -1,7 +1,7 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 const TARGET_SCAN_DIRS = ['.']; // Scan whole project
 const EXCLUDE_DIRS = ['node_modules', '.git', '.next', 'dist', '.turbo'];
@@ -68,8 +68,8 @@ FORBIDDEN_WORDS.forEach(word => {
                 if (/console\.(log|warn|info)/.test(line)) return false;
                 // Allow: packages used only in dev (load-test)
                 if (/packages\/load-test/.test(line)) return false;
-                // Allow: merchant-admin dev scripts
-                if (/merchant-admin\/scripts\//.test(line)) return false;
+                // Allow: merchant dev scripts
+                if (/merchant\/scripts\//.test(line)) return false;
                 return true;
             });
             if (lines.length > 0) {
@@ -118,7 +118,7 @@ apiRoutes.forEach(routePath => {
 // 4. Scan for Transactional mutations in Merchant Admin (Audit Trail Check)
 console.log('📝 Scanning Merchant Admin for Audit Log Coverage...');
 try {
-    const cmd = `grep -rE "export async function (POST|PATCH|DELETE)" apps/merchant-admin/src/app/api --include="route.ts"`;
+    const cmd = `grep -rE "export async function (POST|PATCH|DELETE)" apps/merchant/src/app/api --include="route.ts"`;
     const output = execSync(cmd, { encoding: 'utf-8' });
     const lines = output.trim().split('\n');
 

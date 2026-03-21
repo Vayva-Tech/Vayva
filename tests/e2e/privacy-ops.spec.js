@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { redactPhone, redactEmail, } from "../../apps/merchant-admin/src/lib/privacy/redact";
+import { redactPhone, redactEmail, } from "../../apps/merchant/src/lib/privacy/redact";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 test.describe("Privacy Ops", () => {
     test.beforeEach(async ({ page }) => {

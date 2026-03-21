@@ -100,23 +100,56 @@ class RecipeController extends BaseIndustryController {
           },
         });
 
-        // Calculate profitability metrics for each recipe
-        const matrix = recipes.map(recipe => {
-          const margin = ((recipe.suggestedPrice - recipe.totalCost) / recipe.suggestedPrice) * 100;
-          
-          // TODO: Get actual sales data from orders
-          const popoularityScore = Math.random() * 100; // Placeholder
+        // Calculate profitability metrics for each recipe with actual sales data
+        const matrix = await Promise.all(
+          recipes.map(async (recipe) => {
+            const margin = ((recipe.suggestedPrice - recipe.totalCost) / recipe.suggestedPrice) * 100;
+            
+            // Get actual sales data from orders in the last 30 days
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            const orderItems = await prisma.orderItem.findMany({
+              where: {
+                storeId: context.storeId,
+                recipeId: recipe.id,
+                createdAt: { gte: thirtyDaysAgo },
+              },
+              include: {
+                order: {
+                  select: {
+                    status: true,
+                    createdAt: true,
+                  },
+                },
+              },
+            });
 
-          return {
-            recipeId: recipe.id,
-            name: recipe.name,
-            cost: recipe.totalCost,
-            price: recipe.suggestedPrice,
-            margin: margin.toFixed(2),
-            popularity: popoularityScore.toFixed(2),
-            category: this.categorizeMenuItem(margin, popoularityScore),
-          };
-        });
+            // Calculate popularity score based on order frequency and recency
+            let popularityScore = 0;
+            if (orderItems.length > 0) {
+              const totalQuantity = orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+              const recentOrders = orderItems.filter(
+                (item) => item.order.status === 'COMPLETED' && 
+                         new Date(item.order.createdAt) > thirtyDaysAgo
+              ).length;
+              
+              // Popularity based on frequency (0-50 points) and recency (0-50 points)
+              const frequencyScore = Math.min(50, totalQuantity * 2);
+              const recencyScore = Math.min(50, recentOrders * 3);
+              popularityScore = frequencyScore + recencyScore;
+            }
+
+            return {
+              recipeId: recipe.id,
+              name: recipe.name,
+              cost: recipe.totalCost,
+              price: recipe.suggestedPrice,
+              margin: margin.toFixed(2),
+              popularity: popularityScore.toFixed(2),
+              category: this.categorizeMenuItem(margin, popularityScore),
+              salesCount: orderItems.length,
+            };
+          })
+        );
 
         // Group by BCG matrix categories
         const categorized = {

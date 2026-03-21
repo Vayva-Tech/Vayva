@@ -1,0 +1,85 @@
+version: '3.8'
+
+# ============================================================================
+# VAYVA COMPLETE LOCAL STACK WITH VPS DATABASE
+# - All services run on localhost
+# - Uses VPS PostgreSQL for data (remote connection)
+# - Local Redis, MinIO for performance
+# ============================================================================
+
+services:
+  # ============================================================================
+  # Database Proxy - Connects to VPS PostgreSQL
+  # ============================================================================
+  postgres-proxy:
+    image: postgres:16-alpine
+    container_name: vayva-postgres-local
+    environment:
+      POSTGRES_USER: vayva
+      POSTGRES_PASSWORD: vayva_password
+      POSTGRES_DB: vayva_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./platform/infra/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vayva"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vayva-network
+    command: >
+      postgres -c 'max_connections=200'
+               -c 'shared_buffers=256MB'
+               -c 'work_mem=16MB'
+
+  # ============================================================================
+  # Cache - Local Redis (for performance)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: vayva-redis-local
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_local_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vayva-network
+
+  # ============================================================================
+  # Object Storage - Local MinIO (S3-compatible)
+  # ============================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: vayva-minio-local
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: vayva_admin
+      MINIO_ROOT_PASSWORD: VayvaMinIO2026!
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    volumes:
+      - minio_local_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - vayva-network
+
+networks:
+  vayva-network:
+    driver: bridge
+
+volumes:
+  redis_local_data:
+  minio_local_data:

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { ApiKeyService } from "../../apps/merchant-admin/src/lib/security/apiKeys";
-import { WebhookService } from "../../apps/merchant-admin/src/lib/integrations/webhookService";
+import { ApiKeyService } from "../../apps/merchant/src/lib/security/apiKeys";
+import { WebhookService } from "../../apps/merchant/src/lib/integrations/webhookService";
 import { prisma } from "@vayva/db";
 test.describe("Integrations Framework", () => {
     test("API Key Lifecycle", async () => {

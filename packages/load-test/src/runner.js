@@ -1,6 +1,6 @@
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Configuration
 const TARGET_URL = process.env.TARGET_URL || "http://localhost:3000";

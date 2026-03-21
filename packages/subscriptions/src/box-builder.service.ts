@@ -290,7 +290,7 @@ export class SubscriptionBoxService {
         selected.push(...contents.filter((c) => c.isDefault).map((c) => c.productId!));
         break;
 
-      case "hybrid":
+      case "hybrid": {
         // Mix of curated and customer choice
         const curatedCount = Math.floor(contents.length * 0.7);
         const choiceCount = contents.length - curatedCount;

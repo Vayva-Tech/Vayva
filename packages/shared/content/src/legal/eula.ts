@@ -3,7 +3,8 @@ import { LegalDocument } from "../types";
 export const eula: LegalDocument = {
   slug: "eula",
   title: "End User License Agreement",
-  lastUpdated: "February 6, 2026",
+  lastUpdated: "March 18, 2026",
+  version: "1.0",
   summary:
     "This agreement governs your use of the Vayva application and related services.",
   sections: [

@@ -2,7 +2,7 @@
 
 /**
  * CI Error Correction Script Part 4
- * The absolute final cleanup for merchant-admin settings pages.
+ * The absolute final cleanup for merchant settings pages.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
@@ -58,10 +58,10 @@ function walkDir(dir, callback) {
     });
 }
 
-console.log('🔧 Starting absolute final CI cleanup in merchant-admin dashboard...\n');
+console.log('🔧 Starting absolute final CI cleanup in merchant dashboard...\n');
 
 let fixCount = 0;
-const dir = 'apps/merchant-admin/src/app/(dashboard)';
+const dir = 'apps/merchant/src/app/(dashboard)';
 
 walkDir(dir, (file) => {
     if (fixFile(file)) {
@@ -70,4 +70,4 @@ walkDir(dir, (file) => {
     }
 });
 
-console.log(`\n✨ Fixed ${fixCount} files in merchant-admin settings`);
+console.log(`\n✨ Fixed ${fixCount} files in merchant settings`);

@@ -2,18 +2,18 @@
 
 /**
  * Comprehensive Button Refactoring Script - Batch 3+
- * Processes all remaining merchant-admin files
+ * Processes all remaining merchant files
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 // Get all files with <button tags
 const getFilesWithButtons = () => {
     try {
         const output = execSync(
-            'find apps/merchant-admin/src -name "*.tsx" -type f -exec grep -l "<button" {} \\;',
+            'find apps/merchant/src -name "*.tsx" -type f -exec grep -l "<button" {} \\;',
             { encoding: 'utf8', cwd: process.cwd() }
         );
         return output.trim().split('\n').filter(Boolean);

@@ -62,6 +62,143 @@ export interface WorkflowEdge {
 // Workflow Status
 export type WorkflowStatus = 'draft' | 'active' | 'paused' | 'archived';
 
+// Workflow Execution Status
+export type ExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+// Workflow Execution
+export interface WorkflowExecution {
+  id: string;
+  workflowId: string;
+  merchantId: string;
+  status: ExecutionStatus;
+  triggerData: Record<string, unknown>;
+  startedAt: Date;
+  completedAt?: Date;
+  result?: unknown;
+  error?: string;
+}
+
+// Executor Interface
+export interface WorkflowExecutor {
+  execute(workflow: Workflow, triggerData: Record<string, unknown>, executionId: string): Promise<WorkflowExecution>;
+}
+
+// Default Executor Implementation
+export class DefaultExecutor implements WorkflowExecutor {
+  async execute(
+    workflow: Workflow,
+    triggerData: Record<string, unknown>,
+    executionId: string
+  ): Promise<WorkflowExecution> {
+    const execution: WorkflowExecution = {
+      id: executionId,
+      workflowId: workflow.id,
+      merchantId: workflow.merchantId,
+      status: 'running',
+      triggerData,
+      startedAt: new Date(),
+    };
+
+    // Basic execution logic - can be extended
+    try {
+      // Execute nodes in order
+      for (const node of workflow.nodes) {
+        // Process each node based on type
+        switch (node.type) {
+          case 'trigger':
+            // Initialize trigger
+            break;
+          case 'action':
+            // Execute action
+            break;
+          case 'condition':
+            // Evaluate condition
+            break;
+          case 'delay':
+            // Handle delay
+            break;
+          case 'approval':
+            // Wait for approval
+            break;
+        }
+      }
+
+      execution.status = 'completed';
+      execution.completedAt = new Date();
+    } catch (error) {
+      execution.status = 'failed';
+      execution.error = error instanceof Error ? error.message : 'Unknown error';
+      execution.completedAt = new Date();
+    }
+
+    return execution;
+  }
+}
+
+// Get default executor instance
+export function getDefaultExecutor(): WorkflowExecutor {
+  return new DefaultExecutor();
+}
+
+// Trigger Definitions
+export interface TriggerDefinition {
+  type: TriggerType;
+  label: string;
+  description: string;
+}
+
+export const TRIGGER_DEFINITIONS: TriggerDefinition[] = [
+  {
+    type: 'webhook',
+    label: 'Webhook',
+    description: 'Triggered by an HTTP request',
+  },
+  {
+    type: 'schedule',
+    label: 'Schedule',
+    description: 'Triggered at scheduled times',
+  },
+  {
+    type: 'event',
+    label: 'Event',
+    description: 'Triggered by a system event',
+  },
+];
+
+// Trigger Registry
+export interface TriggerRegistry {
+  getDefinitions(): TriggerDefinition[];
+  evaluate(trigger: { type: TriggerType; config: Record<string, unknown> }, eventData: Record<string, unknown>): Promise<boolean>;
+}
+
+export class DefaultTriggerRegistry implements TriggerRegistry {
+  getDefinitions(): TriggerDefinition[] {
+    return TRIGGER_DEFINITIONS;
+  }
+
+  async evaluate(
+    trigger: { type: TriggerType; config: Record<string, unknown> },
+    eventData: Record<string, unknown>
+  ): Promise<boolean> {
+    // Basic evaluation logic - can be extended based on trigger type
+    switch (trigger.type) {
+      case 'webhook':
+        return true; // Always trigger for webhooks
+      case 'schedule':
+        return true; // Always trigger for scheduled events
+      case 'event':
+        // Check if event type matches configuration
+        return trigger.config.eventType === eventData.type || true;
+      default:
+        return false;
+    }
+  }
+}
+
+export function getDefaultTriggerRegistry(): TriggerRegistry {
+  return new DefaultTriggerRegistry();
+}
+
 // Workflow Definition
 export interface Workflow {
   id: string;

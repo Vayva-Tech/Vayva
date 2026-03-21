@@ -70,7 +70,7 @@ export class RuleEngine {
           }
           break;
 
-        case 'threshold':
+        case 'threshold': {
           if (!rule.trigger.threshold) return false;
           const metricValue = this.getNestedValue(context.eventData, rule.trigger.threshold.metric);
           if (metricValue === undefined) return false;
@@ -90,6 +90,7 @@ export class RuleEngine {
               return false;
           }
           break;
+        }
 
         case 'schedule':
           // Schedule-based rules would be evaluated by a scheduler service

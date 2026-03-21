@@ -9,18 +9,25 @@ import { TrackingInfo } from "@/types/tracking";
 import { MapPin, Package, Truck, CheckCircle, Clock, AlertCircle, ExternalLink } from "lucide-react";
 
 interface TrackingPageProps {
-  params: {
-    code: string;
-  };
+  params: Promise<{ code: string }>;
 }
 
 export default function TrackingPage({ params }: TrackingPageProps): React.JSX.Element {
   const { store } = useStore();
-  const [trackingCode, setTrackingCode] = useState(params?.code || "");
+  const [trackingCode, setTrackingCode] = useState("");
   const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [searchInput, setSearchInput] = useState(params?.code || "");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Resolve params on mount
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      const code = resolvedParams?.code || "";
+      setTrackingCode(code);
+      setSearchInput(code);
+    });
+  }, [params]);
 
   const fetchTracking = async (code: string) => {
     if (!code.trim()) {
@@ -47,12 +54,14 @@ export default function TrackingPage({ params }: TrackingPageProps): React.JSX.E
 
   // Auto-fetch if code is provided in URL
   useEffect(() => {
-    if (params?.code) {
-      const code = params.code;
-      queueMicrotask(() => { void fetchTracking(code); });
-    }
+    params.then((resolvedParams) => {
+      if (resolvedParams?.code) {
+        const code = resolvedParams.code;
+        queueMicrotask(() => { void fetchTracking(code); });
+      }
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.code]);
+  }, [params]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

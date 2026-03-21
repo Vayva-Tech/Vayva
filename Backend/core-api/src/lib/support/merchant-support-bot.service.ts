@@ -1,4 +1,3 @@
-import Groq from "groq-sdk";
 import { SupportContextService } from "./support-context.service";
 import { EscalationService } from "./escalation.service";
 import { EscalationPolicy } from "./escalation-policy";
@@ -6,15 +5,6 @@ import { logger } from "@/lib/logger";
 import { prisma as prismaClient } from "@vayva/db";
 import fs from "fs";
 import path from "path";
-
-// Global prisma type for hot reloading scenarios
-declare global {
-  // eslint-disable-next-line no-var
-  var prisma: typeof prismaClient | undefined;
-}
-const groq = new Groq({
-  apiKey: process.env.GROQ_ADMIN_KEY || "",
-});
 export class MerchantSupportBot {
   private static getNumber(value: unknown): number | null {
     return typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -78,19 +68,39 @@ Support Guidelines:
 3. If they don't see the info in the context, say: "I can't see that specific detail right now. Let me connect you to a human expert to check."
 4. For billing or payment issues, always offer to escalate immediately.
 5. If they seem frustrated, skip the AI talk and offer a human handoff.`;
-      // 4. LLM Call
-      const response = await groq.chat.completions.create({
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...history,
-          { role: "user", content: query },
-        ],
-        model: "llama-3.1-70b-versatile",
-        temperature: 0.2,
-      });
-      const reply =
-        response.choices[0].message.content ||
-        "I'm here to help. How can I assist you with your store today?";
+      // 4. LLM Call via OpenRouter
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      let reply = "I'm here to help. How can I assist you with your store today?";
+      
+      if (apiKey) {
+        try {
+          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "https://vayva.tech",
+              "X-Title": "Vayva Support Bot",
+            },
+            body: JSON.stringify({
+              model: "openai/gpt-4o-mini",
+              messages: [
+                { role: "system", content: systemPrompt },
+                ...history,
+                { role: "user", content: query },
+              ],
+              temperature: 0.2,
+            }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            reply = data.choices[0].message.content || reply;
+          }
+        } catch (error) {
+          logger.warn("[SupportBot] AI generation failed, using fallback");
+        }
+      }
       // 5. Auto-Escalation Check (Using Policy)
       // We use a test confidence score for now, but RAG could return this
       const decision = EscalationPolicy.evaluate(query, 0.95);

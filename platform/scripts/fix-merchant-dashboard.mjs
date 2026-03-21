@@ -2,7 +2,7 @@
 
 /**
  * CI Error Correction Script Part 3
- * Fixes remaining 'unknown' type errors and specific dashboard errors in merchant-admin.
+ * Fixes remaining 'unknown' type errors and specific dashboard errors in merchant.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
@@ -57,10 +57,10 @@ function walkDir(dir, callback) {
     });
 }
 
-console.log('🔧 Starting final dashboard type cleanup in merchant-admin...\n');
+console.log('🔧 Starting final dashboard type cleanup in merchant...\n');
 
 let fixCount = 0;
-const dir = 'apps/merchant-admin/src/app/(dashboard)';
+const dir = 'apps/merchant/src/app/(dashboard)';
 
 walkDir(dir, (file) => {
     if (fixFile(file)) {
@@ -69,4 +69,4 @@ walkDir(dir, (file) => {
     }
 });
 
-console.log(`\n✨ Fixed ${fixCount} files in merchant-admin dashboard`);
+console.log(`\n✨ Fixed ${fixCount} files in merchant dashboard`);

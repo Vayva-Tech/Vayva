@@ -1,11 +1,11 @@
 import { PLANS as CONFIG_PLANS } from "@/config/pricing";
 export const PLAN_PRICING = {
-  GROWTH: CONFIG_PLANS.find((p) => p.key === "GROWTH")?.monthlyAmount || 30000,
+  STARTER: CONFIG_PLANS.find((p) => p.key === "STARTER")?.monthlyAmount || 25000,
   PRO: CONFIG_PLANS.find((p) => p.key === "PRO")?.monthlyAmount || 40000,
 };
 export const PLANS = {
-  STARTER: {
-    slug: "STARTER",
+  FREE: {
+    slug: "FREE",
     name: "Free",
     priceNgn: 0,
     limits: {
@@ -20,12 +20,12 @@ export const PLANS = {
       advancedAnalytics: false,
     },
   },
-  GROWTH: {
-    slug: "GROWTH",
+  STARTER: {
+    slug: "STARTER",
     name: "Starter",
-    priceNgn: PLAN_PRICING.GROWTH,
+    priceNgn: PLAN_PRICING.STARTER,
     limits: {
-      teamSeats: 2,
+      teamSeats: 1,
       templatesAvailable: "limited",
       monthlyCampaignSends: 1000,
     },
@@ -33,15 +33,15 @@ export const PLANS = {
       approvals: false,
       inboxOps: true,
       reports: true,
-      advancedAnalytics: false,
+      advancedAnalytics: true,
     },
   },
   PRO: {
     slug: "PRO",
-    name: "₦40,000",
+    name: "Pro",
     priceNgn: PLAN_PRICING.PRO,
     limits: {
-      teamSeats: 5,
+      teamSeats: 3,
       templatesAvailable: "all",
       monthlyCampaignSends: 10000,
     },

@@ -27,7 +27,7 @@ export class RevenueService {
       return {
         allowed: false,
         reason:
-          "Multiple trials detected from this device. To protect our community, we limit free trials to 2 per household/business every 90 days. Please upgrade to a Growth plan to continue.",
+          "Multiple trials detected from this device. To protect our community, we limit free trials to 2 per household/business every 90 days. Please upgrade to a Starter plan to continue.",
       };
     }
     // Upsert signal logic to track counts

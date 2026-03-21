@@ -8,8 +8,8 @@ if (process.env.NODE_ENV === "production") {
 import {
   KillSwitchService,
   _KillSwitchFeature,
-} from "../apps/merchant-admin/src/lib/ops/KillSwitch";
-import { logger } from "../apps/merchant-admin/src/lib/logger";
+} from "../apps/merchant/src/lib/ops/KillSwitch";
+import { logger } from "../apps/merchant/src/lib/logger";
 
 // Mock Logger
 logger.info = console.log;

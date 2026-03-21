@@ -42,12 +42,10 @@ import {
 const NAV_ITEMS = [
   {
     label: "Product",
-    href: "/features",
+    href: "/autopilot",
     items: [
-      { href: "/features", label: "Features", icon: Sparkles, description: "Powerful tools for your business" },
       { href: "/autopilot", label: "Autopilot", icon: Rocket, description: "AI-powered automation" },
       { href: "/ai-agent", label: "AI Agent", icon: Sparkles, description: "Your intelligent assistant" },
-      { href: "/store-builder", label: "Store Builder", icon: Building2, description: "Create your online store" },
     ]
   },
   {
@@ -83,7 +81,6 @@ const NAV_ITEMS = [
 ];
 
 const NAV_LINKS = [
-  { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
   { href: "/help", label: "Help" },
 ];
@@ -93,7 +90,7 @@ export function MarketingHeader(): React.JSX.Element {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-transparent backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-slate-200/40 bg-white/30 backdrop-blur-xl">
       <div className="max-w-[1600px] mx-auto h-16 md:h-[72px] flex items-center justify-between px-6">
         {/* Logo */}
         <Logo href="/" size="sm" showText={true} />
@@ -129,8 +126,8 @@ export function MarketingHeader(): React.JSX.Element {
 
               {/* Dropdown Menu - only render if items exist */}
               {item.items && activeDropdown === item.label && (
-                <div className="absolute top-full left-0 w-72 bg-white shadow-2xl rounded-2xl py-3 border border-slate-200 animate-in fade-in slide-in-from-top-1 duration-200 z-50">
-                  <div className="px-4 py-2 border-b border-slate-100 mb-2">
+                <div className="absolute top-full left-0 w-72 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl py-3 border border-slate-200/50 animate-in fade-in slide-in-from-top-1 duration-200 z-50">
+                  <div className="px-4 py-2 border-b border-slate-200/40 mb-2">
                     <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
                       {item.label}
                     </span>
@@ -144,7 +141,7 @@ export function MarketingHeader(): React.JSX.Element {
                         className="flex items-start gap-3 px-4 py-3 hover:bg-emerald-50/60 transition-colors group"
                         onClick={() => setActiveDropdown(null)}
                       >
-                        <div className="p-2 bg-emerald-100 rounded-xl group-hover:bg-emerald-200 transition-colors">
+                        <div className="p-2 bg-emerald-100/80 rounded-xl group-hover:bg-emerald-200/80 transition-colors">
                           <Icon size={18} className="text-emerald-600" />
                         </div>
                         <div>
@@ -184,7 +181,7 @@ export function MarketingHeader(): React.JSX.Element {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-4 right-4 mt-2 bg-white shadow-2xl py-6 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200 rounded-2xl border border-slate-200 max-h-[80vh] overflow-y-auto">
+        <div className="lg:hidden absolute top-full left-4 right-4 mt-2 bg-white/80 backdrop-blur-xl shadow-2xl py-6 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200 rounded-2xl border border-slate-200/50 max-h-[80vh] overflow-y-auto">
           {NAV_ITEMS.map((section) => (
             <div key={section.label} className="flex flex-col gap-2">
               {section.items ? (

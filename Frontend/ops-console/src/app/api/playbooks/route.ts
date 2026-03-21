@@ -44,9 +44,9 @@ export async function GET(req: NextRequest) {
 
       const stats = {
         total: executions.length,
-        completed: executions.filter((e) => e.status === 'completed').length,
-        failed: executions.filter((e) => e.status === 'failed').length,
-        pending: executions.filter((e) => e.status === 'pending').length,
+        completed: executions.filter((e: { status: string }) => e.status === 'completed').length,
+        failed: executions.filter((e: { status: string }) => e.status === 'failed').length,
+        pending: executions.filter((e: { status: string }) => e.status === 'pending').length,
       };
 
       return NextResponse.json({
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     // Get all playbooks with stats
     const playbooks = getEnabledPlaybooks();
     const playbookStats = await Promise.all(
-      playbooks.map(async (playbook) => {
+      playbooks.map(async (playbook: { id: string }) => {
         const executions = await prisma.playbookExecution.findMany({
           where: { playbookId: playbook.id },
         });
@@ -79,9 +79,9 @@ export async function GET(req: NextRequest) {
           ...playbook,
           stats: {
             totalExecutions: executions.length,
-            successful: executions.filter((e) => e.status === 'completed')
+            successful: executions.filter((e: { status: string }) => e.status === 'completed')
               .length,
-            failed: executions.filter((e) => e.status === 'failed').length,
+            failed: executions.filter((e: { status: string }) => e.status === 'failed').length,
           },
         };
       })

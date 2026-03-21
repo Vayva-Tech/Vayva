@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@vayva/db";
+import { sendPaymentFailed, sendPaymentRecovered, sendSubscriptionEnded } from "@vayva/emails";
 
 // Note: boxSubscription / dunningAttempt / dunningConfig models pending migration
 // The platform `prisma.subscription` is SaaS billing – box subscriptions use (prisma as any)
@@ -327,11 +328,84 @@ export class DunningService {
     event: string,
     attempt: DunningAttempt | null
   ): Promise<void> {
-    console.log(
-      `[Dunning] Notify customer for ${subscription.id}: ${event}`,
-      attempt?.attemptNumber
-    );
-    // TODO: Wire up to @vayva/emails
+    try {
+      const box = subscription.box as Record<string, unknown> | undefined;
+      const storeId = box?.storeId as string | undefined;
+      
+      if (!storeId) {
+        console.warn('[Dunning] Cannot send email: storeId not found');
+        return;
+      }
+
+      // Get store owner email
+      const store = await (prisma as any).store?.findUnique({
+        where: { id: storeId },
+        include: { owner: true },
+      }).catch(() => null);
+
+      const ownerEmail = store?.owner?.email as string | undefined;
+      if (!ownerEmail) {
+        console.warn('[Dunning] Cannot send email: owner email not found');
+        return;
+      }
+
+      const storeName = (store?.name as string) || 'Your Store';
+      const currency = 'NGN';
+
+      switch (event) {
+        case 'payment_failed': {
+          if (!attempt) break;
+          const retryDate = attempt.nextAttemptAt 
+            ? new Date(attempt.nextAttemptAt).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })
+            : 'soon';
+          
+          await sendPaymentFailed(ownerEmail, {
+            storeName,
+            amount: String(attempt.amount),
+            currency,
+            retryDate,
+            billingUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
+          });
+          
+          console.log(`[Dunning] Sent payment failed email to ${ownerEmail}`);
+          break;
+        }
+
+        case 'payment_recovered': {
+          if (!attempt) break;
+          
+          await sendPaymentRecovered(ownerEmail, {
+            storeName,
+            amount: String(attempt.amount),
+            currency,
+          });
+          
+          console.log(`[Dunning] Sent payment recovered email to ${ownerEmail}`);
+          break;
+        }
+
+        case 'subscription_ended': {
+          await sendSubscriptionEnded(ownerEmail, {
+            storeName,
+            planName: (subscription.planName as string) || 'Premium',
+            reactivationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/reactivate`,
+          });
+          
+          console.log(`[Dunning] Sent subscription ended email to ${ownerEmail}`);
+          break;
+        }
+
+        default:
+          console.warn(`[Dunning] Unknown email event: ${event}`);
+      }
+    } catch (error) {
+      console.error('[Dunning] Failed to send customer notification:', error);
+    }
   }
 }
 

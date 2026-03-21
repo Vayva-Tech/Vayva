@@ -1,5 +1,6 @@
 import { logger } from "@/lib/logger";
 import { prisma } from "@vayva/db";
+import { AICreditService } from "./credit-service";
 
 // Regex to identify potential emails and phone numbers for stripping
 const PII_REGEX = {
@@ -67,19 +68,18 @@ export class OpenRouterClient {
 
   /**
    * Get recommended model based on use case
+   * DEFAULT: GPT-4o Mini for all requests (cheapest & best value)
    */
   getRecommendedModel(useCase: string = "general"): string {
     const models = {
-      // Cost-effective general purpose
-      general: "deepseek/deepseek-chat",
-      // High reasoning capability
-      reasoning: "deepseek/deepseek-reasoner",
-      // Fast response for real-time
-      realtime: "mistralai/mistral-large",
-      // Code and technical tasks
-      technical: "nousresearch/hermes-3-llama-3.1-405b",
-      // Creative and writing tasks
-      creative: "openai/gpt-4o-mini"
+      // PRIMARY MODEL - Used for 95% of requests
+      general: "openai/gpt-4o-mini",
+      
+      // FALLBACK MODELS - Auto-routed for specific complex tasks
+      reasoning: "anthropic/claude-3-sonnet", // Complex business logic
+      realtime: "openai/gpt-4o-mini", // Fast & cheap
+      technical: "mistralai/mistral-large", // Code generation
+      creative: "openai/gpt-4o-mini", // Writing & content
     };
 
     return models[useCase as keyof typeof models] || models.general;
@@ -144,20 +144,84 @@ export class OpenRouterClient {
 
       const data: ChatCompletionResponse = await response.json();
 
-      // 5. Real Audit Logging (No secrets)
+      // 5. Calculate credits consumed
+      const inputTokens = data.usage?.prompt_tokens ?? 0;
+      const outputTokens = data.usage?.completion_tokens ?? 0;
+      const toolCallsCount = data.choices[0]?.message.tool_calls?.length ?? 0;
+      
+      const creditConsumption = AICreditService.calculateCreditConsumption(
+        data.model,
+        inputTokens,
+        outputTokens,
+        0, // imageCount
+        toolCallsCount
+      );
+
+      // 6. Deduct credits and log usage
       if (options.storeId && typeof options.storeId === "string") {
+        // First check if enough credits
+        const creditCheck = await AICreditService.deductCredits(
+          options.storeId,
+          creditConsumption.creditsUsed,
+          { requestId: options.requestId as string, skipInsufficientCheck: false }
+        );
+
+        if (!creditCheck.success || creditCheck.blocked) {
+          logger.warn("[OpenRouterClient] Request blocked due to insufficient credits", {
+            storeId: options.storeId,
+            creditsRequired: creditConsumption.creditsUsed,
+            creditsRemaining: creditCheck.remainingCredits,
+          });
+          
+          // Still log the event but mark as blocked
+          await prisma.aiUsageEvent
+            .create({
+              data: {
+                storeId: options.storeId,
+                model: data.model,
+                inputTokens,
+                outputTokens,
+                toolCallsCount,
+                creditsUsed: 0, // No credits charged for blocked request
+                success: false,
+                errorType: "INSUFFICIENT_CREDITS",
+                channel: this.context === "MERCHANT" ? "INAPP" : "WHATSAPP",
+              },
+            })
+            .catch((e: unknown) =>
+              logger.warn("[OpenRouterClient] Audit log failed", undefined, {
+                error: e,
+              })
+            );
+
+          // Return special response for insufficient credits
+          return {
+            id: "blocked",
+            choices: [{
+              message: {
+                role: "assistant",
+                content: "I'm sorry, but you've run out of AI credits. Please top up your credits to continue using AI features. You can add 1,000 credits for ₦3,000.",
+              },
+              finish_reason: "stop",
+            }],
+            model: data.model,
+            usage: data.usage,
+          } as ChatCompletionResponse;
+        }
+
+        // Log successful usage with credits
         await prisma.aiUsageEvent
           .create({
             data: {
               storeId: options.storeId,
               model: data.model,
-              inputTokens: data.usage?.prompt_tokens ?? 0,
-              outputTokens: data.usage?.completion_tokens ?? 0,
-              toolCallsCount:
-                data.choices[0]?.message.tool_calls?.length ?? 0,
-              requestId: (options.requestId as string) || "",
+              inputTokens,
+              outputTokens,
+              toolCallsCount,
+              creditsUsed: creditConsumption.creditsUsed,
               success: true,
               channel: this.context === "MERCHANT" ? "INAPP" : "WHATSAPP",
+              requestId: (options.requestId as string) || "",
             },
           })
           .catch((e: unknown) =>

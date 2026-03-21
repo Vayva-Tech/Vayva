@@ -133,7 +133,7 @@ class IndustryUtils {
   }
 
   static isValidPhoneNumber(phone: string): boolean {
-    return /^[\+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-\(\)]/g, ''));
+    return /^[+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-()]/g, ''));
   }
 
   static isValidEmail(email: string): boolean {

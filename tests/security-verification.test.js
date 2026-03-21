@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { rateLimitService } from "../apps/merchant-admin/src/lib/security/rate-limit"; // Testing the logic directly
+import { rateLimitService } from "../apps/merchant/src/lib/security/rate-limit"; // Testing the logic directly
 // Note: We can't easily test the API routes integration without a full integration test setup
 // But we can test the service logic and the auth-utils logic
 describe("Security Hardening Verification", () => {
@@ -41,9 +41,9 @@ describe("Security Hardening Verification", () => {
         });
         it("Manual Checklist: Merchant Verification", () => {
             const filesFixed = [
-                "apps/merchant-admin/src/app/api/market/orders/[id]/prep-time/route.ts",
-                "apps/merchant-admin/src/app/api/account/store/route.ts",
-                "apps/merchant-admin/src/app/api/escrow/status/[orderId]/route.ts"
+                "apps/merchant/src/app/api/market/orders/[id]/prep-time/route.ts",
+                "apps/merchant/src/app/api/account/store/route.ts",
+                "apps/merchant/src/app/api/escrow/status/[orderId]/route.ts"
             ];
             expect(filesFixed.length).toBe(3);
         });

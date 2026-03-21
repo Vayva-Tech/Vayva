@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, CheckCircle, TrendingUp, Clock, Target } from '@phosphor-icons/react';
+import { Activity, AlertTriangle, CheckCircle, TrendingUp, Clock, Target } from 'lucide-react';
 
 interface Metric {
   name: string;

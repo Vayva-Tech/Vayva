@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Add scimUser, scimGroup, scimToken models to Prisma schema (Phase 6)
 /**
  * SCIM 2.0 Provisioning Service
  *

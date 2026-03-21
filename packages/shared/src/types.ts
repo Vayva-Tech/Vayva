@@ -500,7 +500,7 @@ export type NotificationSeverity =
   | "info"
   | "success"
   | "insight";
-export type NotificationChannel = "in_app" | "banner" | "whatsapp" | "email";
+export type NotificationChannel = "in_app" | "banner" | "email";
 export type NotificationCategory = "orders" | "payments" | "account" | "system";
 
 export interface Notification {

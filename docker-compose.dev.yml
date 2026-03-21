@@ -1,0 +1,104 @@
+version: '3.8'
+
+# ============================================================================
+# VAYVA LOCAL DEVELOPMENT DOCKER COMPOSE
+# Start all infrastructure services for local development
+# ============================================================================
+
+services:
+  # ============================================================================
+  # Database - PostgreSQL
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: vayva-postgres-dev
+    environment:
+      POSTGRES_USER: vayva
+      POSTGRES_PASSWORD: vayva_password
+      POSTGRES_DB: vayva_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vayva"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vayva-network
+
+  # ============================================================================
+  # Cache - Redis
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: vayva-redis-dev
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vayva-network
+
+  # ============================================================================
+  # Object Storage - MinIO (S3-compatible)
+  # ============================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: vayva-minio-dev
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    volumes:
+      - minio_dev_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - vayva-network
+
+  # ============================================================================
+  # WhatsApp - Evolution API (Optional)
+  # ============================================================================
+  evolution-api:
+    image: atendai/evolution-api:latest
+    container_name: vayva-evolution-dev
+    environment:
+      SERVER_URL: http://localhost:8080
+      DATABASE_CONNECTION_CONNECTION_URI: postgresql://vayva:vayva_password@postgres:5432/vayva_evolution
+      RABBITMQ_ENABLED: false
+      REDIS_ENABLED: true
+      REDIS_URI: redis://redis:6379
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vayva-network
+    profiles:
+      - whatsapp  # Only start with: docker-compose --profile whatsapp up
+
+networks:
+  vayva-network:
+    driver: bridge
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+  minio_dev_data:

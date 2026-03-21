@@ -1,7 +1,6 @@
-import { useToast as useSonnerToast } from "sonner";
+import { useToast as useSonnerToast, Toaster as SonnerToaster } from "sonner";
 
 export function Toaster() {
-  import { Toaster as SonnerToaster } from "sonner";
   return <SonnerToaster position="bottom-right" />;
 }
 

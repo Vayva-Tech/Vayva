@@ -56,12 +56,13 @@ export function startOfPeriod(date: Date, period: 'day' | 'week' | 'month' | 'ye
     case 'day':
       result.setHours(0, 0, 0, 0);
       break;
-    case 'week':
+    case 'week': {
       const day = result.getDay();
       const diff = result.getDate() - day + (day === 0 ? -6 : 1);
       result.setDate(diff);
       result.setHours(0, 0, 0, 0);
       break;
+    }
     case 'month':
       result.setDate(1);
       result.setHours(0, 0, 0, 0);

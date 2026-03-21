@@ -8,8 +8,8 @@ if (process.env.NODE_ENV === "production") {
 import {
   KillSwitchService,
   KillSwitchFeature,
-} from "../apps/merchant-admin/src/lib/ops/KillSwitch";
-import { _prisma } from "../apps/merchant-admin/src/lib/prisma";
+} from "../apps/merchant/src/lib/ops/KillSwitch";
+import { _prisma } from "../apps/merchant/src/lib/prisma";
 
 async function _main() {
   console.log("--- Testing Kill Switch ---");

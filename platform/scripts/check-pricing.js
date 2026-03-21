@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const FORBIDDEN = [
     "25k", "40k",
@@ -20,7 +20,7 @@ const EXCLUDED_FILES = [
 
 const ROOT_DIRS = [
     'apps/marketing/src',
-    'apps/merchant-admin/src'
+    'apps/merchant/src'
 ];
 
 function scanDir(dir) {

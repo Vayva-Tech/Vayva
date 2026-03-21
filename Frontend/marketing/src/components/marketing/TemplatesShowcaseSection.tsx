@@ -394,11 +394,6 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
                   Start Free Trial
                 </Button>
               </Link>
-              <Link href="/features">
-                <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800 px-8 py-6 rounded-xl text-base font-semibold h-auto">
-                  See All Features
-                </Button>
-              </Link>
             </div>
           </div>
         </div>

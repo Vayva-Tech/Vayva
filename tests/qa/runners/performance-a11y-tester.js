@@ -5,11 +5,11 @@
  * Runs Lighthouse audits, keyboard navigation tests, and accessibility validation
  */
 
-const lighthouse = require('lighthouse');
-const chromeLauncher = require('chrome-launcher');
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
-const path = require('path');
+import lighthouse from 'lighthouse';
+import chromeLauncher from 'chrome-launcher';
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 class PerformanceA11yTester {
   constructor() {

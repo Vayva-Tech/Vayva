@@ -5,8 +5,8 @@
  * Manages bug documentation, severity rating, and reporting
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 class BugReporter {
   constructor() {

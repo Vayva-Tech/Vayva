@@ -11,7 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Mirror merchant-admin dashboard palette
+        // Mirror merchant dashboard palette
         background: {
           DEFAULT: "hsl(var(--background))",
           subtle: "hsl(var(--muted))",

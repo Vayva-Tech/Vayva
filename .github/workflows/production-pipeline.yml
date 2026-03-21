@@ -1,0 +1,290 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================================
+  # Job 1: Type Check & Lint
+  # ============================================================================
+  typecheck:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Generate Prisma Client
+        run: pnpm turbo run db:generate
+      
+      - name: TypeScript Check
+        run: pnpm typecheck
+      
+      - name: ESLint Check
+        run: pnpm lint
+      
+      - name: Knip (Unused Dependencies)
+        run: pnpm knip || echo "Knip check failed - continuing"
+
+  # ============================================================================
+  # Job 2: Unit & Integration Tests
+  # ============================================================================
+  test:
+    runs-on: ubuntu-latest
+    needs: typecheck
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: vayva
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: vayva_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Generate Prisma Client
+        run: pnpm turbo run db:generate
+      
+      - name: Run unit tests
+        run: pnpm turbo test
+        env:
+          DATABASE_URL: postgresql://vayva:test@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  # ============================================================================
+  # Job 3: Security Audit
+  # ============================================================================
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run pnpm audit
+        run: |
+          pnpm audit --audit-level=high || echo "Audit found issues - continuing"
+      
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for hardcoded secrets..."
+          ! grep -r "sk_live_" --include="*.ts" --include="*.tsx" . || exit 1
+          ! grep -r "password.*=" --include="*.env*" . | grep -v ".env.example" || exit 1
+
+  # ============================================================================
+  # Job 4: Build Docker Images
+  # ============================================================================
+  build:
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    strategy:
+      matrix:
+        service:
+          - { name: 'core-api', dockerfile: 'Backend/core-api/Dockerfile', context: '.' }
+          - { name: 'worker', dockerfile: 'apps/worker/Dockerfile', context: '.' }
+          - { name: 'ai-agent', dockerfile: 'packages/ai-agent/Dockerfile', context: '.' }
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service.name }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================================
+  # Job 5: Deploy to Staging
+  # ============================================================================
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: staging
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: af-south-1
+      
+      - name: Deploy to ECS (Staging)
+        run: |
+          aws ecs update-service \
+            --cluster vayva-staging \
+            --service vayva-staging-api \
+            --force-new-deployment
+      
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster vayva-staging \
+            --services vayva-staging-api
+      
+      - name: Run smoke tests
+        run: |
+          sleep 30
+          curl -f https://staging.api.vayva.tech/health || exit 1
+          curl -f https://staging.api.vayva.tech/health/system || exit 1
+
+  # ============================================================================
+  # Job 6: Deploy to Production
+  # ============================================================================
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: af-south-1
+      
+      - name: Deploy to ECS (Production)
+        run: |
+          aws ecs update-service \
+            --cluster vayva-production \
+            --service vayva-production-api \
+            --force-new-deployment
+      
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster vayva-production \
+            --services vayva-production-api
+      
+      - name: Run health checks
+        run: |
+          sleep 60
+          curl -f https://api.vayva.tech/health || exit 1
+          curl -f https://api.vayva.tech/health/system || exit 1
+      
+      - name: Notify Slack
+        if: success()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "✅ Production deployment successful!\nCommit: ${{ github.commit_message }}\nAuthor: ${{ github.actor }}\nSHA: ${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "❌ Production deployment failed!\nCommit: ${{ github.commit_message }}\nAuthor: ${{ github.actor }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

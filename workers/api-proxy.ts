@@ -8,6 +8,21 @@
  * - Geographic routing
  */
 
+// Cloudflare Worker global types
+declare type ExecutionContext = {
+  waitUntil(promise: Promise<any>): void;
+  passThroughOnException(): void;
+};
+
+declare type KVNamespace = {
+  get(key: string, type?: 'text' | 'json' | 'arrayBuffer' | 'stream'): Promise<string | any>;
+  put(key: string, value: string | ReadableStream | ArrayBuffer, options?: {
+    expiration?: number;
+    expirationTtl?: number;
+  }): Promise<void>;
+  delete(key: string): Promise<void>;
+};
+
 export interface Env {
   CACHE_KV: KVNamespace;
   IMAGES: ImagesBinding;

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const net = require('net');
+import fs from 'fs';
+import path from 'path';
+import net from 'net';
 
 const APPS = [
     { name: 'Merchant Admin', port: 3000 },

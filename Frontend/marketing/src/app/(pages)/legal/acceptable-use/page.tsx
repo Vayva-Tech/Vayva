@@ -1,6 +1,5 @@
-import React from "react";
 import LegalDocPage from "../_components/LegalDocPage";
 
-export default function AcceptableUsePage(): React.JSX.Element {
+export default function AcceptableUsePage() {
   return <LegalDocPage slug="acceptable-use" />;
 }

@@ -5,9 +5,9 @@
  * Processes storefront, ops-console, marketing, and any other apps
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 // Get all files with <button tags across all apps
 const getFilesWithButtons = () => {

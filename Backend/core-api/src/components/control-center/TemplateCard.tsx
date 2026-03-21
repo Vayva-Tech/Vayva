@@ -26,7 +26,7 @@ export const TemplateCard = ({
   recommendation,
 }: TemplateCardProps) => {
   // Determine if locked based on plan
-  const planLevels = ["free", "growth", "pro"];
+  const planLevels = ["free", "starter", "pro"];
   const userLevelIndex = planLevels.indexOf(userPlan);
   const requiredLevelIndex = planLevels.indexOf(template.tier);
   const isPlanLocked = requiredLevelIndex > userLevelIndex;

@@ -1,0 +1,320 @@
+version: '3.8'
+
+# ============================================================================
+# VAYVA PRODUCTION DOCKER COMPOSE
+# Complete stack with all services
+# ============================================================================
+
+services:
+  # ============================================================================
+  # Database - PostgreSQL
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: vayva-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vayva}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-vayva}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./platform/infra/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vayva}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vayva-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+
+  # ============================================================================
+  # Cache - Redis
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: vayva-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vayva-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+  # ============================================================================
+  # Core API Service
+  # ============================================================================
+  core-api:
+    build:
+      context: .
+      dockerfile: Backend/core-api/Dockerfile
+    container_name: vayva-core-api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vayva}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-vayva}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      ALERTING_PROVIDER: ${ALERTING_PROVIDER:-slack}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      DD_API_KEY: ${DD_API_KEY:-}
+      APM_PROVIDER: ${APM_PROVIDER:-datadog}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - vayva-network
+    volumes:
+      - ./uploads:/app/uploads
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # ============================================================================
+  # Worker Service
+  # ============================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    container_name: vayva-worker
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vayva}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-vayva}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-5}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "node.*worker"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - vayva-network
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # ============================================================================
+  # AI Agent Service
+  # ============================================================================
+  ai-agent:
+    build:
+      context: .
+      dockerfile: packages/ai-agent/Dockerfile
+    container_name: vayva-ai-agent
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vayva}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-vayva}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${AI_AGENT_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - vayva-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # ============================================================================
+  # Ops Console (Frontend)
+  # ============================================================================
+  ops-console:
+    build:
+      context: ./Frontend/ops-console
+      dockerfile: Dockerfile
+    container_name: vayva-ops-console
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://core-api:3000}
+    ports:
+      - "${OPS_CONSOLE_PORT:-3002}:3000"
+    depends_on:
+      - core-api
+    networks:
+      - vayva-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # ============================================================================
+  # Merchant Admin (Frontend)
+  # ============================================================================
+  merchant:
+    build:
+      context: ./Frontend/merchant
+      dockerfile: Dockerfile
+    container_name: vayva-merchant
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000}
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://core-api:3000}
+    ports:
+      - "${MERCHANT_ADMIN_PORT:-3003}:3000"
+    depends_on:
+      - core-api
+    networks:
+      - vayva-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  # ============================================================================
+  # Prometheus (Metrics Collection)
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: vayva-prometheus
+    volumes:
+      - ./platform/infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - vayva-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+  # ============================================================================
+  # Grafana (Visualization & Dashboards)
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: vayva-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change_me}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "${GRAFANA_PORT:-3004}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./platform/infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./platform/infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - vayva-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+networks:
+  vayva-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

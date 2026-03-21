@@ -29,7 +29,7 @@ describe("generateDefaultPolicies", () => {
 
     const policies = generateDefaultPolicies(options);
 
-    // Only TERMS and PRIVACY include store name
+    // TERMS and PRIVACY include store name
     const termsPolicy = policies.find(p => p.type === "TERMS");
     const privacyPolicy = policies.find(p => p.type === "PRIVACY");
     expect(termsPolicy?.contentMd).toContain("My Awesome Store");

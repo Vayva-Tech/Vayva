@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { signReferralToken, verifyReferralToken, } from "../../apps/merchant-admin/src/lib/partners/referral";
+import { signReferralToken, verifyReferralToken, } from "../../apps/merchant/src/lib/partners/referral";
 test.describe("Referral Crypto", () => {
     test("signs and verifies token correctly", () => {
         const token = signReferralToken("partner_123", "CODE_ABC");

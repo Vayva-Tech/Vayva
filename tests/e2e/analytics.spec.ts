@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { AnalyticsService } from "../../apps/merchant-admin/src/lib/analytics/analyticsService";
+import { AnalyticsService } from "../../apps/merchant/src/lib/analytics/analyticsService";
 import { prisma } from "@vayva/db";
 
 import { createAuthenticatedMerchantContext } from "../helpers/auth";

@@ -1,6 +1,6 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const ERROR_FILE = 'all_errors.txt';
 const ROOT_DIR = process.cwd();
@@ -17,15 +17,15 @@ let fixed = 0;
 let skipped = 0;
 
 lines.forEach(line => {
-    // Format: merchant-admin:typecheck: src/app/api/account/domains/route.ts(23,53): error TS2339: Property 'lastCheckedAt' does not exist on type '...'
+    // Format: merchant:typecheck: src/app/api/account/domains/route.ts(23,53): error TS2339: Property 'lastCheckedAt' does not exist on type '...'
     const match = line.match(/^([^:]+):typecheck: (.*)\((\d+),(\d+)\): error (TS\d+): (.*)$/);
     if (!match) return;
 
     const [_, project, relPath, lineNum, colNum, errorCode, message] = match;
-    // We only target merchant-admin for now as most errors are there
-    if (project !== 'merchant-admin') return;
+    // We only target merchant for now as most errors are there
+    if (project !== 'merchant') return;
 
-    const fullPath = path.join(ROOT_DIR, 'apps/merchant-admin', relPath);
+    const fullPath = path.join(ROOT_DIR, 'apps/merchant', relPath);
     if (!fs.existsSync(fullPath)) return;
 
     let content = fs.readFileSync(fullPath, 'utf8').split('\n');

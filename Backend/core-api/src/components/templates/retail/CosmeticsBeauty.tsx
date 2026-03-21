@@ -25,7 +25,7 @@ export const CosmeticsBeautyTemplate: React.FC<TemplateProps> = ({
         <div className="aspect-[4/5] rounded-[2rem] overflow-hidden relative shadow-xl shadow-[#D88CA3]/20">
           <img
             src="https://images.unsplash.com/photo-1596462502278-27bfdd403348?w=800&q=80"
-            alt="Glow"
+            alt="Glow Radiance Kit skincare collection featuring rose-themed packaging with 3-step routine products"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#4A0E1F]/60 to-transparent flex flex-col justify-end p-8 text-white">

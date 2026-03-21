@@ -4,7 +4,7 @@ import { resolve } from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./apps/merchant-admin/src"),
+      "@": resolve(__dirname, "./apps/merchant/src"),
       "@vayva/shared": resolve(__dirname, "./packages/shared/src"),
       "@vayva/db": resolve(__dirname, "./infra/db/src/client.ts"),
     },

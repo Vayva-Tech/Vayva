@@ -3,8 +3,7 @@
  * Test data factory for Order entity
  */
 
-import { prisma } from '@vayva/db';
-import type { Order, Prisma } from '@vayva/db';
+import { prisma, type Order, type Prisma } from '@vayva/db';
 
 export type OrderCreateInput = Partial<Prisma.OrderCreateInput> & {
   storeId: string;

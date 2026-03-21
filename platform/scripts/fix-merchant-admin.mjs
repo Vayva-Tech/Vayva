@@ -2,7 +2,7 @@
 
 /**
  * CI Error Correction Script Part 2
- * Fixes 'unknown' type errors in catch blocks across merchant-admin
+ * Fixes 'unknown' type errors in catch blocks across merchant
  * to achieve 0-error state efficiently.
  */
 
@@ -51,10 +51,10 @@ function walkDir(dir, callback) {
     });
 }
 
-console.log('🔧 Starting final CI error cleanup in merchant-admin...\n');
+console.log('🔧 Starting final CI error cleanup in merchant...\n');
 
 let fixCount = 0;
-const dir = 'apps/merchant-admin/src';
+const dir = 'apps/merchant/src';
 
 walkDir(dir, (file) => {
     if (fixFile(file)) {
@@ -63,4 +63,4 @@ walkDir(dir, (file) => {
     }
 });
 
-console.log(`\n✨ Fixed ${fixCount} files in merchant-admin`);
+console.log(`\n✨ Fixed ${fixCount} files in merchant`);

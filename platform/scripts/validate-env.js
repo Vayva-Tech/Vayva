@@ -1,7 +1,7 @@
 
-const _fs = require('fs');
-const _path = require('path');
-const dotenv = require('dotenv');
+import _fs from 'fs';
+import _path from 'path';
+import dotenv from 'dotenv';
 
 // Load .env
 dotenv.config();

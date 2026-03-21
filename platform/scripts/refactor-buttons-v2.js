@@ -5,26 +5,26 @@
  * Direct file search approach
  */
 
-const fs = require('fs');
-const path = require('path');
-const { _execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { _execSync } from 'child_process';
 
 const WORKSPACE_ROOT = '/Users/fredrick/Documents/GitHub/Vayva-platform';
 
 // Priority files to refactor
 const PRIORITY_FILES = [
-    'apps/merchant-admin/src/components/dashboard/StoreSwitcher.tsx',
-    'apps/merchant-admin/src/components/ai/CommandPalette.tsx',
-    'apps/merchant-admin/src/components/products/ProductCard.tsx',
-    'apps/merchant-admin/src/components/products/ProductDrawer.tsx',
-    'apps/merchant-admin/src/components/support/SupportDrawer.tsx',
-    'apps/merchant-admin/src/components/support/SupportInbox.tsx',
-    'apps/merchant-admin/src/components/control-center/TemplateCard.tsx',
-    'apps/merchant-admin/src/components/control-center/IntegrationsPanel.tsx',
-    'apps/merchant-admin/src/components/control-center/ThemeSelector.tsx',
-    'apps/merchant-admin/src/components/dashboard/StorefrontSnapshot.tsx',
-    'apps/merchant-admin/src/components/dashboard/LaunchChecklist.tsx',
-    'apps/merchant-admin/src/components/dashboard/DashboardSetupChecklist.tsx',
+    'apps/merchant/src/components/dashboard/StoreSwitcher.tsx',
+    'apps/merchant/src/components/ai/CommandPalette.tsx',
+    'apps/merchant/src/components/products/ProductCard.tsx',
+    'apps/merchant/src/components/products/ProductDrawer.tsx',
+    'apps/merchant/src/components/support/SupportDrawer.tsx',
+    'apps/merchant/src/components/support/SupportInbox.tsx',
+    'apps/merchant/src/components/control-center/TemplateCard.tsx',
+    'apps/merchant/src/components/control-center/IntegrationsPanel.tsx',
+    'apps/merchant/src/components/control-center/ThemeSelector.tsx',
+    'apps/merchant/src/components/dashboard/StorefrontSnapshot.tsx',
+    'apps/merchant/src/components/dashboard/LaunchChecklist.tsx',
+    'apps/merchant/src/components/dashboard/DashboardSetupChecklist.tsx',
 ];
 
 // Determine appropriate variant

@@ -1,4 +1,4 @@
-// Permission constants for team/merchant-admin
+// Permission constants for team/merchant
 export const PERMISSIONS = {
   STORE_MANAGE: 'store:manage',
   ORDERS_MANAGE: 'orders:manage',

@@ -192,7 +192,6 @@ export async function generateSitemap(): Promise<string> {
   const staticRoutes = [
     { url: "/", priority: 1.0, changefreq: "weekly" },
     { url: "/pricing", priority: 0.9, changefreq: "monthly" },
-    { url: "/features", priority: 0.9, changefreq: "monthly" },
     { url: "/about", priority: 0.7, changefreq: "monthly" },
     { url: "/contact", priority: 0.7, changefreq: "monthly" },
     { url: "/help", priority: 0.6, changefreq: "monthly" },

@@ -21,22 +21,7 @@ export async function GET(req: NextRequest) {
     if (storeId) {
       const healthScore = await prisma.healthScore.findFirst({
         where: { storeId },
-        orderBy: { calculatedAt: 'desc' },
-        include: {
-          store: {
-            include: {
-              owner: {
-                select: {
-                  id: true,
-                  firstName: true,
-                  lastName: true,
-                  email: true,
-                  phone: true,
-                },
-              },
-            },
-          },
-        },
+        orderBy: { createdAt: 'desc' },
       });
 
       if (!healthScore) {

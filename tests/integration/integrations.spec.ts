@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { ApiKeyService } from "../../apps/merchant-admin/src/lib/security/apiKeys";
+import { ApiKeyService } from "../../apps/merchant/src/lib/security/apiKeys";
 // @ts-expect-error - Module resolution pending
-import { WebhookService } from "../../apps/merchant-admin/src/lib/integrations/webhookService";
+import { WebhookService } from "../../apps/merchant/src/lib/integrations/webhookService";
 import { prisma } from "@vayva/db";
 
 test.describe("Integrations Framework", () => {

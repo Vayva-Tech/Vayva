@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { TEMPLATE_CATEGORIES, CANONICAL_TEMPLATES, getTemplatesByCategory, } from "../../apps/merchant-admin/src/lib/templates-registry";
-import { recommendTemplate, } from "../../apps/merchant-admin/src/lib/templates/recommendation-engine";
+import { TEMPLATE_CATEGORIES, CANONICAL_TEMPLATES, getTemplatesByCategory, } from "../../apps/merchant/src/lib/templates-registry";
+import { recommendTemplate, } from "../../apps/merchant/src/lib/templates/recommendation-engine";
 describe("Template Registry Integrity", () => {
     it("Hardening-01: Every category must have at least one template", () => {
         TEMPLATE_CATEGORIES.forEach((category) => {

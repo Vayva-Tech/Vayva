@@ -8,7 +8,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const corePages = [
     "",
     "/pricing",
-    "/features",
     "/about",
     "/contact",
     "/legal",

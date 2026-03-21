@@ -1,0 +1,96 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "target": "es2017",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "preserve",
+        "incremental": true,
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "paths": {
+            "@/*": [
+                "src/*"
+            ],
+            "@vayva/db": [
+                "../../infra/db/src/client.ts"
+            ],
+            "@vayva/payments": [
+                "../../packages/payments/src/index.ts"
+            ],
+            "@vayva/payments/*": [
+                "../../packages/payments/src/*"
+            ],
+            "@vayva/compliance": [
+                "../../packages/compliance/src/index.ts"
+            ],
+            "@vayva/templates": [
+                "../../packages/shared/templates/src/index.ts"
+            ],
+            "@vayva/templates/*": [
+                "../../packages/shared/templates/src/*"
+            ],
+            "@vayva/shared": [
+                "../../packages/shared/utils/src/index.ts"
+            ],
+            "@vayva/shared/*": [
+                "../../packages/shared/utils/src/*"
+            ],
+            "@vayva/ui": [
+                "../../packages/ui/src/index.ts"
+            ],
+            "@vayva/ui/*": [
+                "../../packages/ui/src/*"
+            ],
+            "@/template-gallery": [
+                "../../template-gallery/index.ts"
+            ],
+            "@vayva/addons": [
+                "../../packages/addons/src/index.ts"
+            ],
+            "@vayva/addons/*": [
+                "../../packages/addons/src/*"
+            ],
+            "@vayva/affiliate": [
+                "../../packages/affiliate/src/index.ts"
+            ],
+            "@vayva/shared/content": [
+                "../../packages/shared/content/src/index.ts"
+            ]
+        }
+    },
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "src/types/**/*.ts",
+        "src/types/**/*.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        ".next",
+        "src/app/api/addons.bak/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "vitest.config.ts",
+        "scripts"
+    ]
+}

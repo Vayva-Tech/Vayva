@@ -3,8 +3,7 @@
  * Test data factory for User entity
  */
 
-import { prisma } from '@vayva/db';
-import type { User, Prisma } from '@vayva/db';
+import { prisma, type User, type Prisma } from '@vayva/db';
 
 export type UserCreateInput = Partial<Prisma.UserCreateInput>;
 

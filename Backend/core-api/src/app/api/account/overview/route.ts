@@ -63,12 +63,12 @@ export const GET = withVayvaAPI(
         profile: {
           name: store.name || "Unset",
           category: store.category || "General",
-          plan: store.plan || "GROWTH",
+          plan: store.plan || "STARTER",
           isLive: store.isLive || false,
           onboardingCompleted: store.onboardingCompleted || false,
         },
         subscription: {
-          plan: store.plan || "GROWTH",
+          plan: store.plan || "STARTER",
           status: "ACTIVE",
           renewalDate: null,
           canUpgrade: true,

@@ -135,6 +135,7 @@ model AiUsageEvent {
   success           Boolean  @default(true)
   errorType         String?
   costEstimateKobo  BigInt   @default(0)
+  creditsUsed       Int      @default(0) // Credits consumed by this request
   requestId         String?  @unique
   correlationId     String?
   createdAt         DateTime @default(now())
@@ -230,12 +231,21 @@ model MerchantAiSubscription {
   id          String               @id @default(uuid())
   storeId     String               @unique
   planId      String
-  planKey     String               @default("STARTER") // STARTER, GROWTH, PRO
+  planKey     String               @default("STARTER") // STARTER, PRO
   periodStart DateTime
   periodEnd   DateTime
   status      AiSubscriptionStatus @default(TRIAL_ACTIVE)
 
-  // Usage Counters (MTD)
+  // Merchant's preferred currency for top-ups
+  currency String @default("NGN") // NGN, USD, EUR, GBP, KES, GHS, ZAR
+
+  // Credit System (Replaces old token counters)
+  totalCreditsPurchased Int       @default(0) // Total credits from plan + top-ups
+  creditsRemaining      Int       @default(0) // Current available credits
+  lastTopupAt           DateTime?
+  lastCreditAlertAt     DateTime? // Last time low-credit alert was shown
+
+  // Usage Counters (MTD) - For analytics only, credits are primary
   monthTokensUsed   Int @default(0)
   monthImagesUsed   Int @default(0)
   monthRequestsUsed Int @default(0)
@@ -256,15 +266,17 @@ model MerchantAiSubscription {
 }
 
 model AiAddonPurchase {
-  id             String   @id @default(uuid())
-  storeId        String
-  subscriptionId String
-  packType       String   @default("MESSAGES_1000")
-  priceKobo      BigInt
-  transactionId  String   @unique
-  messagesAdded  Int      @default(1000)
-  imagesAdded    Int      @default(100)
-  createdAt      DateTime @default(now())
+  id              String   @id @default(uuid())
+  storeId         String
+  subscriptionId  String
+  packType        String   @default("CREDITS_3000") // CREDITS_3000, CREDITS_8000, CREDITS_20000
+  priceKobo       BigInt
+  currency        String   @default("NGN") // NGN, USD, EUR, GBP, KES, GHS, ZAR
+  priceInCurrency Float // Actual price paid in merchant's currency (e.g., 2000 NGN, 5 USD)
+  transactionId   String   @unique
+  creditsAdded    Int      @default(3000)
+  bonusCredits    Int      @default(0)
+  createdAt       DateTime @default(now())
 
   subscription MerchantAiSubscription @relation(fields: [subscriptionId], references: [id])
 }
@@ -1833,6 +1845,30 @@ model PaymentTransaction {
   @@index([orderId])
 }
 
+model BNPLAgreement {
+  id              String    @id @default(uuid())
+  storeId         String
+  orderId         String    @unique
+  provider        String // e.g. "klarna", "affirm", "laybuy"
+  providerRef     String?
+  status          String    @default("PENDING") // PENDING | ACTIVE | COMPLETED | CANCELLED | DEFAULTED
+  totalAmount     Decimal   @db.Decimal(10, 2)
+  currency        String    @default("NGN")
+  installments    Int       @default(4)
+  installmentData Json? // provider-specific instalment schedule
+  metadata        Json?
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+  store Store @relation(fields: [storeId], references: [id])
+
+  @@index([storeId, status])
+  @@index([orderId])
+  @@map("bnpl_agreements")
+}
+
 model PaymentWebhookEvent {
   id              String             @id @default(uuid())
   storeId         String?
@@ -2027,6 +2063,15 @@ model Store {
   currentDeploymentId      String?
   draftDeploymentId        String?
 
+  // Trial & Credit System (Re-gating Plan V2)
+  trialStartDate DateTime? @default(now())
+  trialEndDate   DateTime?
+  trialExpired   Boolean   @default(false)
+  ownedTemplates String[] // Array of template IDs owned by store
+
+  // Relations for credit system
+  creditAllocation CreditAllocation?
+
   // Relations
   deliverySettings StoreDeliverySettings?
   deployments      StoreDeployment[]
@@ -2072,6 +2117,7 @@ model Store {
   paymentCustomers        PaymentCustomer[]
   paymentIntents          PaymentIntent[]
   paymentTransactions     PaymentTransaction[]
+  bnplAgreements          BNPLAgreement[]
   payouts                 Payout[]
   fulfillmentGroups       FulfillmentGroup[]
   products                Product[]
@@ -2086,7 +2132,7 @@ model Store {
   staffInvites            StaffInvite[]
   customerNotes           CustomerNote[]
   tenant                  Tenant?                  @relation(fields: [tenantId], references: [id])
-  wallet                  Wallet?
+  // wallet                  Wallet?  // Temporarily commented out due to incomplete Wallet model
   whatsAppChannel         WhatsappChannel?
   withdrawals             Withdrawal[]
   domainMappings          DomainMapping[]
@@ -2723,6 +2769,9 @@ model User {
   sourcingRequests    SourcingRequest[]
   carts               Cart[]
   uploadsCreated      Upload[]             @relation("UserUploadsCreated")
+  scimUsers           ScimUser[]
+  samlSessions        SamlSession[]
+  samlUserLinks       SamlUserLink[]
 }
 
 model PasswordResetToken {
@@ -2739,30 +2788,406 @@ model PasswordResetToken {
   @@index([expiresAt])
 }
 
-model Wallet {
-  id                   String               @id @default(uuid())
-  storeId              String               @unique
-  kycStatus            KycStatus            @default(NOT_STARTED)
-  pinHash              String?
-  pinSet               Boolean              @default(false)
-  isLocked             Boolean              @default(false)
-  failedPinAttempts    Int                  @default(0)
-  lockedUntil          DateTime?
-  availableKobo        BigInt               @default(0)
-  pendingKobo          BigInt               @default(0)
-  vaStatus             VirtualAccountStatus @default(NOT_CREATED)
-  vaBankName           String?
-  vaAccountNumber      String?
-  vaAccountName        String?
-  vaProviderRef        String?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
-  twoFactorSecret      String?
-  twoFactorEnabled     Boolean              @default(false)
-  twoFactorBackupCodes String[]             @default([])
-  pinVersion           Int                  @default(1)
-  store                Store                @relation(fields: [storeId], references: [id])
+// ============================================================================
+// SCIM 2.0 Provisioning Models (RFC 7643)
+// ============================================================================
+
+model ScimUser {
+  id           String   @id @default(cuid())
+  userId       String
+  tenantId     String
+  externalId   String?
+  userName     String
+  active       Boolean  @default(true)
+  title        String?
+  department   String?
+  organization String?
+  rawData      Json     @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId, externalId])
+  @@index([userName])
+  @@map("scim_users")
 }
+
+model ScimGroup {
+  id          String   @id @default(cuid())
+  tenantId    String
+  externalId  String?
+  displayName String
+  members     Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, externalId])
+  @@index([tenantId])
+  @@map("scim_groups")
+}
+
+model ScimToken {
+  id        String   @id @default(cuid())
+  tenantId  String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId])
+  @@index([token])
+  @@map("scim_tokens")
+}
+
+// ============================================================================
+// SAML 2.0 SSO Models
+// ============================================================================
+
+model SamlIdentityProvider {
+  id          String   @id @default(cuid())
+  name        String
+  entityId    String   @unique
+  ssoUrl      String
+  sloUrl      String?
+  certificate String
+  metadataUrl String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authRequests SamlAuthRequest[]
+  sessions     SamlSession[]
+  userLinks    SamlUserLink[]
+
+  @@index([isActive])
+  @@map("saml_identity_providers")
+}
+
+model SamlServiceProvider {
+  id          String   @id @default(cuid())
+  entityId    String   @unique
+  acsUrl      String
+  sloUrl      String?
+  privateKey  String
+  certificate String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("saml_service_providers")
+}
+
+model SamlAuthRequest {
+  id          String   @id @default(cuid())
+  idpId       String
+  samlRequest String
+  relayState  String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  identityProvider SamlIdentityProvider @relation(fields: [idpId], references: [id], onDelete: Cascade)
+
+  @@index([idpId, createdAt])
+  @@index([expiresAt])
+  @@map("saml_auth_requests")
+}
+
+model SamlSession {
+  id           String   @id @default(cuid())
+  userId       String
+  idpId        String
+  sessionIndex String
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  identityProvider SamlIdentityProvider @relation(fields: [idpId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([idpId, expiresAt])
+  @@map("saml_sessions")
+}
+
+model SamlUserLink {
+  id          String    @id @default(cuid())
+  userId      String
+  idpId       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  identityProvider SamlIdentityProvider @relation(fields: [idpId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, idpId])
+  @@index([idpId])
+  @@map("saml_user_links")
+}
+
+model SamlRoleMapping {
+  id           String   @id @default(cuid())
+  idpId        String
+  idpGroupName String
+  vayvaRole    String
+  storeId      String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([idpId, isActive])
+  @@index([idpGroupName])
+  @@map("saml_role_mappings")
+}
+
+// ============================================================================
+// Fraud Detection Models
+// ============================================================================
+
+model FraudCheck {
+  id                String   @id @default(cuid())
+  storeId           String
+  customerId        String?
+  email             String
+  ipAddress         String
+  amount            Int
+  billingCountry    String
+  shippingCountry   String
+  deviceFingerprint String?
+  riskScore         Int?
+  riskLevel         String?
+  recommendation    String?
+  actionTaken       String?
+  checkedAt         DateTime @default(now())
+
+  @@index([storeId, email, checkedAt])
+  @@index([storeId, ipAddress, checkedAt])
+  @@index([storeId, customerId, checkedAt])
+  @@map("fraud_checks")
+}
+
+model FraudModelFeedback {
+  id            String   @id @default(cuid())
+  storeId       String
+  originalScore Int
+  actualOutcome String
+  features      Json     @default("{}")
+  modelVersion  String
+  createdAt     DateTime @default(now())
+
+  @@index([storeId, createdAt])
+  @@map("fraud_model_feedback")
+}
+
+// ============================================================================
+// Specialized Industry Models
+// ============================================================================
+
+model Farm {
+  id             String   @id @default(cuid())
+  storeId        String
+  name           String
+  location       String
+  size           Float
+  certifications String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  crops     Crop[]
+  livestock Livestock[]
+  equipment FarmEquipment[]
+
+  @@index([storeId])
+  @@map("farms")
+}
+
+model Crop {
+  id            String     @id @default(cuid())
+  farmId        String
+  name          String
+  variety       String
+  plantingDate  DateTime
+  harvestDate   DateTime?
+  expectedYield Float
+  actualYield   Float?
+  status        CropStatus @default(PLANTED)
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([farmId])
+  @@map("crops")
+}
+
+model Livestock {
+  id            String   @id @default(cuid())
+  farmId        String
+  type          String
+  breed         String
+  count         Int
+  healthRecords Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([farmId])
+  @@map("livestock")
+}
+
+model FarmEquipment {
+  id                  String   @id @default(cuid())
+  farmId              String
+  name                String
+  type                String
+  purchaseDate        DateTime
+  maintenanceSchedule Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([farmId])
+  @@map("farm_equipment")
+}
+
+model Book {
+  id              String     @id @default(cuid())
+  storeId         String
+  title           String
+  author          String
+  isbn            String     @unique
+  publisher       String
+  publicationDate DateTime
+  genre           String[]
+  price           Float
+  stock           Int
+  format          BookFormat
+  pages           Int?
+  language        String
+  description     String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@unique([storeId, isbn])
+  @@index([storeId])
+  @@map("books")
+}
+
+model ElectronicProduct {
+  id             String   @id @default(cuid())
+  storeId        String
+  name           String
+  brand          String
+  model          String
+  category       String
+  specifications Json
+  warranty       Json
+  price          Float
+  stock          Int
+  releaseDate    DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([storeId, category])
+  @@map("electronic_products")
+}
+
+model FurnitureItem {
+  id         String   @id @default(cuid())
+  storeId    String
+  name       String
+  brand      String
+  material   String
+  dimensions Json
+  style      String
+  price      Float
+  stock      Int
+  assembly   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([storeId])
+  @@map("furniture_items")
+}
+
+model JewelryItem {
+  id        String   @id @default(cuid())
+  storeId   String
+  name      String
+  type      String
+  material  String
+  carat     Float?
+  gemstone  String?
+  price     Float
+  stock     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+  @@map("jewelry_items")
+}
+
+model Toy {
+  id          String   @id @default(cuid())
+  storeId     String
+  name        String
+  brand       String
+  ageRange    String
+  category    String
+  price       Float
+  stock       Int
+  safetyCerts String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([storeId])
+  @@map("toys")
+}
+
+model ServerInstance {
+  id           String       @id @default(cuid())
+  storeId      String
+  name         String
+  provider     String // AWS, GCP, Azure, etc.
+  instanceType String
+  region       String
+  status       ServerStatus @default(RUNNING)
+  config       Json
+  priceMonthly Float
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([storeId, provider])
+  @@map("server_instances")
+}
+
+enum CropStatus {
+  PLANTED
+  GROWING
+  HARVESTED
+  FAILED
+}
+
+enum BookFormat {
+  PAPERBACK
+  HARDCOVER
+  EBOOK
+  AUDIOBOOK
+}
+
+enum ServerStatus {
+  RUNNING
+  STOPPED
+  TERMINATED
+}
+
+// model Wallet {
+//   Temporarily commented out due to incomplete definition
+// }
 
 model WebhookDelivery {
   id                  String                @id @default(uuid())
@@ -4158,6 +4583,7 @@ enum SubscriptionStatus {
 }
 
 enum AddOnStatus {
+  DRAFT // Not yet published
   PENDING // Waiting to be installed
   INSTALLING // Installation in progress
   ACTIVE // Successfully installed and running
@@ -7851,6 +8277,111 @@ model GrocerySubscription {
 }
 
 // ============================================================================
+// MEAL KIT SUBSCRIPTION MODELS
+// ============================================================================
+
+model MealKitSubscription {
+  id              String          @id @default(uuid())
+  storeId         String
+  customerId      String
+  planType        MealKitPlanType
+  portionsPerMeal Int             @default(4)
+  mealsPerWeek    Int             @default(3)
+  status          String          @default("active") // active, paused, cancelled
+  preferences     Json            @default("{}")
+  skipWeeks       String[]        @default([])
+  nextDelivery    DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([storeId, customerId])
+  @@index([status, nextDelivery])
+  @@map("meal_kit_subscriptions")
+}
+
+model WeeklyMenu {
+  id            String   @id @default(uuid())
+  storeId       String
+  weekStartDate DateTime
+  weekEndDate   DateTime
+  recipes       Json     @default("[]") // [{ recipeId, name, category, difficulty }]
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@unique([storeId, weekStartDate])
+  @@index([storeId, isActive])
+  @@map("weekly_menus")
+}
+
+model MealKitRecipe {
+  id            String   @id @default(uuid())
+  storeId       String
+  name          String
+  description   String   @db.Text
+  category      String
+  difficulty    String   @default("medium") // easy, medium, hard
+  prepTime      Int      @default(15) // minutes
+  cookTime      Int      @default(30) // minutes
+  servings      Int      @default(4)
+  calories      Int?
+  ingredients   Json     @default("[]") // [{ ingredientId, quantity, unit }]
+  instructions  String[] @default([])
+  imageUrl      String?
+  tags          String[] @default([])
+  isAvailable   Boolean  @default(true)
+  weeklyMenuIds String[] @default([])
+  createdAt     DateTime @default(now())
+
+  @@index([storeId, category])
+  @@index([storeId, isAvailable])
+  @@map("meal_kit_recipes")
+}
+
+model CustomerMealPreference {
+  id             String   @id @default(uuid())
+  storeId        String
+  customerId     String
+  subscriptionId String?
+  dislikes       String[] @default([])
+  allergies      String[] @default([])
+  dietaryType    String?
+  spiceLevel     String   @default("medium") // mild, medium, hot
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([storeId, customerId])
+  @@index([storeId, dietaryType])
+  @@map("customer_meal_preferences")
+}
+
+model DeliverySlot {
+  id          String   @id @default(uuid())
+  storeId     String
+  date        DateTime
+  startTime   String
+  endTime     String
+  maxCapacity Int      @default(20)
+  bookedCount Int      @default(0)
+  isAvailable Boolean  @default(true)
+  zipCodes    String[] @default([])
+  createdAt   DateTime @default(now())
+
+  @@index([storeId, date])
+  @@index([date, isAvailable])
+  @@map("delivery_slots")
+}
+
+enum MealKitPlanType {
+  BASIC
+  PREMIUM
+  FAMILY
+  VEGAN
+  KETO
+  LOW_CARB
+}
+
+// ============================================================================
 // PHASE 2: FOOD & RESTAURANT
 // ============================================================================
 
@@ -8848,483 +9379,656 @@ model ProgressAnalytics {
 // HEALTHCARE MODELS
 // ============================================================================
 
-model Patient {
-  id               String    @id @default(uuid())
+// ============================================================================
+// CREATIVE ADD-ON MODELS
+// ============================================================================
+
+model Project {
+  id               String    @id @default(cuid())
   storeId          String
-  patientId        String    @unique
-  firstName        String
-  lastName         String
-  email            String
-  phone            String?
-  dateOfBirth      DateTime?
-  gender           String?
-  bloodType        String?
-  allergies        String[]  @default([])
-  medications      Json?
-  conditions       String[]  @default([])
-  emergencyContact Json?
-  insuranceInfo    Json?
-  address          String?
-  isActive         Boolean   @default(true)
-  lastVisit        DateTime?
-  totalVisits      Int       @default(0)
+  slug             String
+  title            String
+  subtitle         String?
+  description      String    @db.Text
+  shortDescription String?
+  clientId         String?
+  clientName       String?
+  categoryId       String?
+  status           String    @default("COMPLETED")
+  isFeatured       Boolean   @default(false)
+  thumbnailUrl     String?
+  coverImageUrl    String?
+  projectUrl       String?
+  caseStudyUrl     String?
+  year             Int?
+  duration         String?
+  teamSize         Int?
+  budget           String?
+  technologies     String[]
+  services         String[]
+  challenge        String?   @db.Text
+  solution         String?   @db.Text
+  results          String?   @db.Text
+  testimonialId    String?
+  viewCount        Int       @default(0)
+  likeCount        Int       @default(0)
+  sortOrder        Int       @default(0)
+  completedAt      DateTime?
+  publishedAt      DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  @@index([storeId, isActive])
-  @@map("patients")
+  @@unique([storeId, slug])
+  @@index([storeId, status, isFeatured])
+  @@map("projects")
 }
 
-model Provider {
-  id              String    @id @default(uuid())
-  storeId         String
-  userId          String    @unique
-  firstName       String
-  lastName        String
-  email           String
-  phone           String?
-  title           String
-  specialty       String[]  @default([])
-  licenseNumber   String?
-  licenseExpiry   DateTime?
-  bio             String?   @db.Text
-  services        String[]  @default([])
-  availability    Json?
-  profileImageUrl String?
-  rating          Decimal   @default(0)
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+model ProjectCategory {
+  id           String   @id @default(cuid())
+  storeId      String
+  slug         String
+  name         String
+  description  String?
+  icon         String?
+  color        String?
+  parentId     String?
+  sortOrder    Int      @default(0)
+  projectCount Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
+  @@unique([storeId, slug])
   @@index([storeId, isActive])
-  @@map("providers")
+  @@map("project_categories")
 }
 
-model HealthcareAppointment {
-  id                 String    @id @default(uuid())
-  storeId            String
-  patientId          String
-  providerId         String
-  serviceId          String?
-  appointmentDate    DateTime
-  startTime          String
-  endTime            String
-  status             String    @default("scheduled")
-  type               String    @default("in_person")
-  chiefComplaint     String?
-  notes              String?
-  diagnosis          String?
-  treatment          String?
-  prescriptions      Json?
-  followUpDate       DateTime?
-  checkedInAt        DateTime?
-  completedAt        DateTime?
-  cancelledAt        DateTime?
-  cancellationReason String?
+model ProjectImage {
+  id         String   @id @default(cuid())
+  projectId  String
+  url        String
+  alt        String?
+  caption    String?
+  sortOrder  Int      @default(0)
+  isPrimary  Boolean  @default(false)
+  fileSize   Int?
+  dimensions String?
+  type       String   @default("image")
+  createdAt  DateTime @default(now())
+
+  @@index([projectId, sortOrder])
+  @@map("project_images")
+}
+
+model ProjectTestimonial {
+  id                String    @id @default(cuid())
+  storeId           String
+  projectId         String?
+  clientName        String
+  clientTitle       String?
+  clientCompany     String?
+  clientLogoUrl     String?
+  clientWebsite     String?
+  content           String    @db.Text
+  rating            Int?
+  isVideo           Boolean   @default(false)
+  videoUrl          String?
+  videoThumbnailUrl String?
+  isFeatured        Boolean   @default(false)
+  sortOrder         Int       @default(0)
+  isApproved        Boolean   @default(true)
+  projectRole       String?
+  projectDuration   String?
+  results           String?
+  isPublished       Boolean   @default(true)
+  publishedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([storeId, isFeatured])
+  @@index([projectId])
+  @@map("project_testimonials")
+}
+
+model Skill {
+  id               String   @id @default(cuid())
+  storeId          String
+  categoryId       String?
+  name             String
+  slug             String
+  description      String?
+  icon             String?
+  proficiency      Int?
+  yearsExperience  Int?
+  isFeatured       Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  endorsementCount Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([storeId, slug])
+  @@index([storeId, categoryId, isActive])
+  @@map("skills")
+}
+
+model SkillCategory {
+  id          String   @id @default(cuid())
+  storeId     String
+  slug        String
+  name        String
+  description String?
+  icon        String?
+  color       String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([storeId, slug])
+  @@index([storeId, isActive])
+  @@map("skill_categories")
+}
+
+model SkillEndorsement {
+  id                String   @id @default(cuid())
+  storeId           String
+  skillId           String
+  endorserId        String
+  endorserName      String
+  endorserTitle     String?
+  endorserCompany   String?
+  endorserAvatarUrl String?
+  message           String?
+  relationship      String?
+  isVerified        Boolean  @default(false)
+  isPublished       Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@unique([skillId, endorserId])
+  @@index([storeId, skillId])
+  @@map("skill_endorsements")
+}
+
+model ResumeProfile {
+  id                String    @id @default(cuid())
+  storeId           String
+  userId            String    @unique
+  fullName          String
+  title             String
+  email             String
+  phone             String?
+  website           String?
+  linkedinUrl       String?
+  githubUrl         String?
+  portfolioUrl      String?
+  location          String?
+  summary           String?   @db.Text
+  headline          String?
+  avatarUrl         String?
+  resumePdfUrl      String?
+  isAvailable       Boolean   @default(true)
+  availabilityDate  DateTime?
+  preferredWorkType String[]  @default(["FULL_TIME"])
+  preferredLocation String[]
+  salaryExpectation String?
+  willingToRelocate Boolean   @default(false)
+  visaStatus        String?
+  languages         Json?
+  interests         String[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([storeId, isAvailable])
+  @@map("resume_profiles")
+}
+
+model Experience {
+  id             String    @id @default(cuid())
+  profileId      String
+  companyName    String
+  companyLogoUrl String?
+  companyWebsite String?
+  title          String
+  location       String?
+  isRemote       Boolean   @default(false)
+  startDate      DateTime
+  endDate        DateTime?
+  isCurrent      Boolean   @default(false)
+  description    String?   @db.Text
+  achievements   String[]
+  skills         String[]
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([profileId, startDate])
+  @@map("experiences")
+}
+
+model Education {
+  id                 String    @id @default(cuid())
+  profileId          String
+  institution        String
+  institutionLogoUrl String?
+  degree             String
+  fieldOfStudy       String?
+  location           String?
+  startDate          DateTime
+  endDate            DateTime?
+  isCurrent          Boolean   @default(false)
+  grade              String?
+  activities         String[]
+  description        String?
+  sortOrder          Int       @default(0)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  @@index([storeId, status])
-  @@index([providerId, appointmentDate])
-  @@map("healthcare_appointments")
+  @@index([profileId, startDate])
+  @@map("educations")
 }
 
-model MedicalRecord {
-  id             String   @id @default(uuid())
+model Certification {
+  id                  String    @id @default(cuid())
+  profileId           String
+  name                String
+  issuingOrganization String
+  issueDate           DateTime
+  expirationDate      DateTime?
+  credentialId        String?
+  credentialUrl       String?
+  certificateImageUrl String?
+  isNeverExpires      Boolean   @default(false)
+  skills              String[]
+  sortOrder           Int       @default(0)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([profileId, issueDate])
+  @@map("certifications")
+}
+
+model FeedPost {
+  id           String    @id @default(cuid())
+  storeId      String
+  authorId     String
+  type         String    @default("POST")
+  title        String?
+  content      String?   @db.Text
+  excerpt      String?
+  mediaUrls    String[]
+  thumbnailUrl String?
+  externalUrl  String?
+  projectId    String?
+  skills       String[]
+  tags         String[]
+  isFeatured   Boolean   @default(false)
+  isPublished  Boolean   @default(true)
+  publishedAt  DateTime?
+  viewCount    Int       @default(0)
+  likeCount    Int       @default(0)
+  commentCount Int       @default(0)
+  shareCount   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([storeId, isPublished, publishedAt])
+  @@index([isFeatured])
+  @@map("feed_posts")
+}
+
+model FeedSubscriber {
+  id                String    @id @default(cuid())
+  storeId           String
+  feedId            String
+  subscriberId      String
+  subscriberType    String    @default("EMAIL")
+  status            String    @default("ACTIVE")
+  subscribedAt      DateTime  @default(now())
+  unsubscribedAt    DateTime?
+  unsubscribeReason String?
+  lastNotifiedAt    DateTime?
+  notificationCount Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([feedId, subscriberId])
+  @@index([storeId, subscriberId])
+  @@map("feed_subscribers")
+}
+
+model FeedComment {
+  id              String   @id @default(cuid())
+  storeId         String
+  postId          String
+  parentId        String?
+  authorId        String
+  authorName      String
+  authorAvatarUrl String?
+  authorWebsite   String?
+  content         String   @db.Text
+  isApproved      Boolean  @default(true)
+  isDeleted       Boolean  @default(false)
+  likeCount       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@map("feed_comments")
+}
+
+model HireInquiry {
+  id                      String    @id @default(cuid())
+  storeId                 String
+  clientId                String?
+  clientEmail             String
+  clientName              String
+  clientCompany           String?
+  clientWebsite           String?
+  projectType             String
+  budgetRange             String?
+  timeline                String?
+  description             String    @db.Text
+  attachmentUrl           String?
+  status                  String    @default("NEW")
+  priority                String    @default("MEDIUM")
+  source                  String    @default("WEBSITE")
+  ipAddress               String?
+  respondedAt             DateTime?
+  respondedBy             String?
+  notes                   String?   @db.Text
+  estimatedValue          Decimal?
+  quotedAmount            Decimal?
+  consultationScheduledAt DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([storeId, status])
+  @@index([createdAt])
+  @@map("hire_inquiries")
+}
+
+model ConsultationSlot {
+  id             String    @id @default(cuid())
   storeId        String
-  patientId      String
-  appointmentId  String?
-  recordType     String
-  date           DateTime
-  providerId     String?
-  summary        String   @db.Text
-  details        Json?
-  attachments    Json?
-  isConfidential Boolean  @default(false)
+  startTime      DateTime
+  endTime        DateTime
+  type           String    @default("VIDEO")
+  status         String    @default("AVAILABLE")
+  bookedById     String?
+  bookedByEmail  String?
+  bookedByName   String?
+  inquiryId      String?
+  timezone       String    @default("UTC")
+  meetingUrl     String?
+  notes          String?
+  reminderSentAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([storeId, startTime, status])
+  @@map("consultation_slots")
+}
+
+model ServiceOffering {
+  id               String   @id @default(cuid())
+  storeId          String
+  slug             String
+  name             String
+  description      String   @db.Text
+  shortDescription String?
+  icon             String?
+  thumbnailUrl     String?
+  category         String?
+  deliverables     String[]
+  processSteps     Json?
+  startingPrice    Decimal?
+  priceRange       String?
+  pricingModel     String   @default("FIXED")
+  timeline         String?
+  revisions        Int      @default(2)
+  isFeatured       Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  faqs             Json?
+  requirements     String[]
+  portfolioIds     String[]
+  testimonialIds   String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([storeId, slug])
+  @@index([storeId, isActive, isFeatured])
+  @@map("service_offerings")
+}
+
+model CreativeProcess {
+  id          String   @id @default(cuid())
+  storeId     String
+  slug        String
+  name        String
+  description String?
+  icon        String?
+  color       String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([storeId, slug])
+  @@index([storeId, isActive])
+  @@map("creative_processes")
+}
+
+model ProcessStep {
+  id               String   @id @default(cuid())
+  processId        String
+  title            String
+  description      String?  @db.Text
+  icon             String?
+  color            String?
+  sortOrder        Int      @default(0)
+  durationEstimate String?
+  deliverables     String[]
+  details          String?  @db.Text
+  imageUrl         String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([processId, sortOrder])
+  @@map("process_steps")
+}
+
+model ProcessDeliverable {
+  id          String   @id @default(cuid())
+  storeId     String
+  processId   String?
+  stepId      String?
+  name        String
+  description String?
+  examples    String[]
+  fileType    String?
+  isRequired  Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([processId, stepId])
+  @@map("process_deliverables")
+}
+
+model ClientLogo {
+  id               String    @id @default(cuid())
+  storeId          String
+  categoryId       String?
+  name             String
+  logoUrl          String
+  websiteUrl       String?
+  isFeatured       Boolean   @default(false)
+  sortOrder        Int       @default(0)
+  projectId        String?
+  testimonialId    String?
+  isDarkVersion    Boolean   @default(false)
+  grayscale        Boolean   @default(false)
+  maxHeight        Int?
+  isActive         Boolean   @default(true)
+  featuredText     String?
+  partnershipSince DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([storeId, categoryId, isActive])
+  @@map("client_logos")
+}
+
+model ClientCategory {
+  id          String   @id @default(cuid())
+  storeId     String
+  slug        String
+  name        String
+  description String?
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([storeId, slug])
+  @@index([storeId, isActive])
+  @@map("client_categories")
+}
+
+// ============================================================================
+// COMPLIANCE MODULES - GDPR, WCAG, EPRIVACY DIRECTIVE
+// ============================================================================
+
+model Subprocessor {
+  id            String   @id @default(cuid())
+  name          String   @db.VarChar(255)
+  category      String   @db.VarChar(100) // Payment Processing, Cloud Infrastructure, Analytics, etc.
+  purpose       String   @db.Text
+  dataProcessed String   @db.Text
+  location      String   @db.Text
+  safeguards    String   @db.Text
+  website       String?  @db.Text
+  dpaStatus     String   @db.VarChar(100) // "Signed with SCCs", "Pending", etc.
+  dateAdded     DateTime @default(now())
+  lastReviewed  DateTime
+  status        String   @default("active") // active, inactive, pending
+
+  auditLogs SubprocessorAuditLog[]
+
+  @@index([category])
+  @@index([status])
+  @@map("subprocessors")
+}
+
+model SubprocessorAuditLog {
+  id             String       @id @default(cuid())
+  subprocessor   Subprocessor @relation(fields: [subprocessorId], references: [id], onDelete: Cascade)
+  subprocessorId String
+
+  action      String // "added", "edited", "removed", "notice_sent"
+  performedBy String // User ID or email
+  performedAt DateTime @default(now())
+  changes     Json? // { old: {}, new: {} }
+
+  @@index([subprocessorId])
+  @@index([performedAt])
+  @@map("subprocessor_audit_logs")
+}
+
+model CookieConsentEvent {
+  id         String   @id @default(cuid())
+  eventId    String   @unique // UUID for deduplication
+  choice     String // "accept_all", "reject_all", "customize"
+  functional Boolean  @default(false)
+  analytics  Boolean  @default(false)
+  marketing  Boolean  @default(false)
+  region     String? // Detected from IP (NG, EU, UK, US)
+  userAgent  String?  @db.Text
+  timestamp  DateTime
+
+  @@index([timestamp])
+  @@index([choice, timestamp])
+  @@index([region, timestamp])
+  @@map("cookie_consent_events")
+}
+
+model AccessibilityIssue {
+  id           String  @id @default(cuid())
+  issueNumber  String  @unique // ACC-001, ACC-002, etc. (will be set via trigger or application logic)
+  title        String  @db.VarChar(500)
+  category     String // Images & Media, Color Contrast, Keyboard Navigation, etc.
+  severity     String // low, medium, high, critical
+  status       String  @default("reported") // reported, triaged, in-progress, resolved, wont-fix
+  wcagCriteria String? @db.VarChar(50) // e.g., "1.1.1 Non-text Content (Level A)"
+  description  String  @db.Text
+  workarounds  String? @db.Text
+
+  reportedBy   String?   @db.VarChar(255)
+  reportedDate DateTime  @default(now())
+  assignedTo   String?   @db.VarChar(255) // Team name
+  targetDate   DateTime
+  resolvedDate DateTime?
+
+  updates IssueUpdate[]
+
+  @@index([status])
+  @@index([severity])
+  @@index([targetDate])
+  @@index([category])
+  @@map("accessibility_issues")
+}
+
+model IssueUpdate {
+  id      String             @id @default(cuid())
+  issue   AccessibilityIssue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issueId String
+
+  date    DateTime @default(now())
+  author  String   @db.VarChar(255)
+  comment String   @db.Text
+
+  @@index([issueId])
+  @@index([date])
+  @@map("issue_updates")
+}
+
+// ============================================================================
+// CREDIT SYSTEM (Re-gating Plan V2)
+// ============================================================================
+
+model CreditAllocation {
+  id             String   @id @default(cuid())
+  storeId        String   @unique
+  plan           String // FREE, STARTER, PRO
+  monthlyCredits Int // 0, 5000, or 10000
+  usedCredits    Int      @default(0)
+  resetDate      DateTime
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  @@index([storeId, patientId])
-  @@index([recordType])
-  @@map("medical_records")
+  store     Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  usageLogs CreditUsageLog[]
+
+  @@index([plan])
+  @@index([resetDate])
+  @@map("credit_allocations")
 }
 
-// ============================================
-// SAAS SUITE MODELS
-// ============================================
-
-model SaaSPlan {
-  id           String  @id @default(uuid())
-  storeId      String
-  name         String
-  description  String? @db.Text
-  planCode     String // Unique identifier like "starter", "pro", "enterprise"
-  priceMonthly Decimal @db.Decimal(10, 2)
-  priceYearly  Decimal @db.Decimal(10, 2)
-  currency     String  @default("USD")
-  trialDays    Int     @default(0)
-  isPublic     Boolean @default(true)
-  isDefault    Boolean @default(false)
-  sortOrder    Int     @default(0)
-
-  // Features included in this plan (JSON array of feature codes)
-  includedFeatures Json?
-
-  // Usage limits
-  maxUsers     Int?
-  maxProjects  Int?
-  maxStorageGB Int?
-  maxApiCalls  Int? // Monthly API call limit
-
-  // Plan metadata
-  highlightFeature String? // Feature to highlight on pricing page
-  badge            String? // Badge like "Popular", "Best Value"
-
-  status String @default("active") // active, archived, draft
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  subscriptions SaaSSubscription[]
-
-  @@unique([storeId, planCode])
-  @@index([storeId, status])
-  @@index([isPublic, status])
-  @@map("saas_plans")
-}
-
-model SaaSTenant {
-  id      String @id @default(uuid())
-  storeId String
-
-  // Tenant identification
-  name        String
-  tenantCode  String // Unique tenant identifier/slug
-  description String? @db.Text
-
-  // Contact & billing info
-  billingEmail   String
-  billingName    String?
-  billingAddress Json?
-  taxId          String?
-
-  // Tenant status
-  status       String  @default("active") // active, suspended, cancelled, pending
-  statusReason String? // Reason for suspension/cancellation
-
-  // Tenant configuration
-  customDomain String?
-  timezone     String  @default("UTC")
-  locale       String  @default("en")
-
-  // Settings and metadata
-  settings Json? // Tenant-specific settings
-  metadata Json? // Flexible metadata storage
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  subscriptions SaaSSubscription[]
-  apiKeys       SaaSApiKey[]
-  usageMetrics  SaaSUsageMetric[]
-
-  @@unique([storeId, tenantCode])
-  @@unique([customDomain])
-  @@index([storeId, status])
-  @@index([billingEmail])
-  @@map("saas_tenants")
-}
-
-model SaaSSubscription {
-  id      String @id @default(uuid())
-  storeId String
-
-  // Relations
-  tenantId String
-  tenant   SaaSTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  planId   String
-  plan     SaaSPlan   @relation(fields: [planId], references: [id])
-
-  // Subscription details
-  status       String @default("active") // active, trialing, past_due, cancelled, paused
-  billingCycle String @default("monthly") // monthly, yearly
-
-  // Pricing
-  price    Decimal @db.Decimal(10, 2)
-  currency String  @default("USD")
-
-  // Trial
-  isTrial     Boolean   @default(false)
-  trialEndsAt DateTime?
-
-  // Billing periods
-  currentPeriodStart DateTime
-  currentPeriodEnd   DateTime
-
-  // Cancellation
-  cancelledAt        DateTime?
-  cancellationReason String?
-
-  // Payment
-  paymentMethodId String?
-  lastPaymentAt   DateTime?
-  nextPaymentAt   DateTime?
-
-  // Features & limits for this subscription (snapshot from plan + custom)
-  customLimits   Json?
-  customFeatures Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId, status])
-  @@index([tenantId, status])
-  @@index([planId])
-  @@index([nextPaymentAt])
-  @@map("saas_subscriptions")
-}
-
-model SaaSFeatureFlag {
-  id      String @id @default(uuid())
-  storeId String
-
-  // Feature identification
-  name        String
-  key         String // Unique feature key like "new_dashboard", "ai_assistant"
-  description String? @db.Text
-
-  // Feature type
-  type String @default("boolean") // boolean, percentage, user_segment, plan_based
-
-  // Targeting rules (JSON)
-  // For boolean: { enabled: true/false }
-  // For percentage: { enabled: true, percentage: 50 }
-  // For user_segment: { enabled: true, segments: ["enterprise"] }
-  // For plan_based: { enabled: true, plans: ["pro", "enterprise"] }
-  targetingRules Json
-
-  // Status
-  isEnabled Boolean @default(false)
-
-  // Evaluation context
-  environment String @default("production") // development, staging, production
-
-  // Scheduling
-  startAt DateTime?
-  endAt   DateTime?
-
-  // Metadata
-  createdBy String?
-  updatedBy String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([storeId, key, environment])
-  @@index([storeId, isEnabled])
-  @@index([storeId, environment])
-  @@map("saas_feature_flags")
-}
-
-model SaaSApiKey {
-  id      String @id @default(uuid())
-  storeId String
-
-  // Relations
-  tenantId String
-  tenant   SaaSTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  // Key details
-  name      String // Human-readable name
-  keyPrefix String // First 8 chars of key for identification
-  keyHash   String // Hashed full key (never store raw key)
-
-  // Scopes/permissions (JSON array)
-  scopes Json // ["read:users", "write:orders", "admin"]
-
-  // Rate limiting
-  rateLimitPerMinute Int? @default(60)
-  rateLimitPerHour   Int? @default(1000)
-
-  // Usage tracking
-  lastUsedAt DateTime?
-  usageCount Int       @default(0)
-
-  // Status
-  status String @default("active") // active, revoked, expired
-
-  // Expiration
-  expiresAt DateTime?
-
-  // IP restrictions (JSON array of allowed IPs)
-  allowedIps Json?
-
-  createdBy    String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  revokedAt    DateTime?
-  revokedBy    String?
-  revokeReason String?
-
-  @@index([storeId, status])
-  @@index([tenantId, status])
-  @@index([keyPrefix])
-  @@map("saas_api_keys")
-}
-
-model SaaSUsageMetric {
-  id      String @id @default(uuid())
-  storeId String
-
-  // Relations
-  tenantId String
-  tenant   SaaSTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  // Metric details
-  metricType  String // api_calls, storage_gb, users, projects, bandwidth
-  metricValue Decimal @db.Decimal(15, 4)
-
-  // Time period
-  periodStart DateTime
-  periodEnd   DateTime
-  periodType  String   @default("daily") // hourly, daily, monthly
-
-  // Additional metadata
-  metadata Json? // Context like endpoint, feature used, etc.
-
-  createdAt DateTime @default(now())
-
-  @@index([storeId, metricType, periodStart])
-  @@index([tenantId, metricType, periodStart])
-  @@index([periodType, periodStart])
-  @@map("saas_usage_metrics")
-}
-
-// ============================================================================
-// INDUSTRY-SPECIFIC MODELS FOR ADMIN TOOLS
-// ============================================================================
-
-// ============================================================================
-// EDUCATION INDUSTRY MODELS
-// ============================================================================
-
-// ============================================================================
-// BNPL (BUY NOW PAY LATER) MODELS
-// ============================================================================
-
-model BNPLAgreement {
-  id                  String  @id @default(uuid())
-  orderId             String  @unique
-  customerId          String
-  merchantId          String
-  storeId             String
-  provider            String // paystack, carbon, credpal
-  providerAgreementId String? // External provider's agreement ID
-
-  // Financial details
-  totalAmount          Int // in kobo
-  upfrontAmount        Int // in kobo
-  installmentAmount    Int // in kobo
-  numberOfInstallments Int    @default(3)
-  installmentInterval  String @default("monthly") // weekly, biweekly, monthly
-
-  // Status tracking
-  status      BNPLStatus @default(PENDING)
-  appliedAt   DateTime   @default(now())
-  approvedAt  DateTime?
-  completedAt DateTime?
-  defaultedAt DateTime?
-
-  // Metadata
-  metadata      Json? // Provider-specific data
-  failureReason String?
-
-  // Relations
-  order        Order             @relation(fields: [orderId], references: [id])
-  installments BNPLInstallment[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId, status])
-  @@index([customerId, status])
-  @@index([merchantId, status])
-  @@index([provider, status])
-  @@map("bnpl_agreements")
-}
-
-model BNPLInstallment {
-  id          String @id @default(uuid())
-  agreementId String
-
-  // Payment details
-  amount            Int // in kobo
-  installmentNumber Int
-  dueDate           DateTime
-  paidDate          DateTime?
-
-  // Status
-  status InstallmentStatus @default(PENDING)
-
-  // Transaction reference
-  transactionRef String?
-  paymentMethod  String? // card, bank_transfer, wallet
-  failureReason  String?
-
-  // Relations
-  agreement BNPLAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([agreementId, installmentNumber])
-  @@index([agreementId, status])
-  @@index([dueDate, status])
-  @@map("bnpl_installments")
-}
-
-enum BNPLStatus {
-  PENDING
-  APPROVED
-  ACTIVE
-  COMPLETED
-  DEFAULTED
-  CANCELLED
-  REJECTED
-}
-
-enum InstallmentStatus {
-  PENDING
-  PAID
-  OVERDUE
-  FAILED
-  WAIVED
-}
-
-model BNPLProviderConfig {
-  id       String @id @default(uuid())
-  storeId  String
-  provider String // paystack, carbon, credpal
-
-  // Provider settings
-  isEnabled     Boolean @default(false)
-  apiKey        String? // Encrypted
-  apiSecret     String? // Encrypted
-  webhookSecret String? // For webhook verification
-
-  // Business rules
-  minAmount           Int     @default(1000000) // ₦10,000 in kobo
-  maxAmount           Int     @default(50000000) // ₦500,000 in kobo
-  upfrontRate         Decimal @default(0.25) // 25% upfront
-  defaultInstallments Int     @default(3)
-
-  // Provider-specific config
-  settings Json? // { merchantCode, partnerId, etc }
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([storeId, provider])
-  @@index([storeId, isEnabled])
-  @@map("bnpl_provider_configs")
+model CreditUsageLog {
+  id          String   @id @default(cuid())
+  storeId     String
+  amount      Int
+  feature     String // ai_message, template_change, autopilot_run, etc.
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+
+  allocation CreditAllocation @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([feature])
+  @@index([createdAt])
+  @@map("credit_usage_logs")
 }

@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { prisma } from "@vayva/db";
 // @ts-expect-error - Module resolution pending
-import { DisputeService } from "../../apps/merchant-admin/src/lib/disputes/disputeService";
+import { DisputeService } from "../../apps/merchant/src/lib/disputes/disputeService";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 
 // We mock the service calls if needed, or rely on seeded data

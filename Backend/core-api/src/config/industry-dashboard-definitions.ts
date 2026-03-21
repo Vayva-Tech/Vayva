@@ -1435,6 +1435,141 @@ const MARKETPLACE_DASHBOARD: IndustryDashboardDefinition = {
 };
 
 // ---------------------------------------------------------------------------
+// Meal Kit Dashboard
+// ---------------------------------------------------------------------------
+
+const MEAL_KIT_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "meal-kit",
+  title: "Meal Kit Command Center",
+  subtitle: "Fresh ingredients, zero waste, happy subscribers",
+  primaryObjectLabel: "Subscription Box",
+  defaultTimeHorizon: "week",
+  sections: [
+    "primary_object_health",
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+  ],
+
+  primaryObjectHealth: [
+    {
+      key: "activeSubscriptions",
+      label: "Active Subscriptions",
+      format: "number",
+      icon: "Users",
+    },
+    {
+      key: "weeklyMealSelections",
+      label: "Meals Selected This Week",
+      format: "percent",
+      icon: "CheckCircle",
+    },
+    {
+      key: "upcomingDeliveries",
+      label: "Scheduled Deliveries",
+      format: "list",
+      icon: "Truck",
+    },
+  ],
+
+  liveOps: [
+    {
+      key: "pendingDeliveries",
+      label: "Out for Delivery",
+      format: "number",
+      icon: "Package",
+      emptyText: "No deliveries today",
+    },
+    {
+      key: "recipeSelectionDeadline",
+      label: "Selection Deadline",
+      format: "duration",
+      icon: "Clock",
+      emptyText: "No deadline",
+    },
+    {
+      key: "ingredientShortages",
+      label: "Ingredient Alerts",
+      format: "number",
+      icon: "AlertTriangle",
+      emptyText: "All ingredients stocked",
+    },
+    {
+      key: "subscriptionRenewals",
+      label: "Renewals This Week",
+      format: "number",
+      icon: "RefreshCw",
+      emptyText: "No renewals",
+    },
+  ],
+
+  alertThresholds: [
+    {
+      key: "lowIngredientCount",
+      label: "Low Ingredients",
+      operator: "gte",
+      value: 3,
+      severity: "warning",
+      message: "{count} ingredients running low for next week's recipes",
+    },
+    {
+      key: "unselectedMeals",
+      label: "Unselected Meals",
+      operator: "gt",
+      value: 0,
+      severity: "info",
+      message: "{count} customers haven't selected meals yet",
+    },
+    {
+      key: "deliveryDelayRisk",
+      label: "Delivery Delay Risk",
+      operator: "gte",
+      value: 1,
+      severity: "critical",
+      message: "{count} deliveries at risk of delay",
+    },
+  ],
+
+  suggestedActionRules: [
+    {
+      id: "send_reminder",
+      title: "Send meal selection reminder",
+      reason: "Deadline approaching for unsubscribed customers",
+      conditionKey: "hasUnselectedMeals",
+      severity: "info",
+      href: "/dashboard/marketing/email",
+      icon: "Mail",
+    },
+    {
+      id: "adjust_portions",
+      title: "Adjust portion planning",
+      reason: "Ingredient surplus detected",
+      conditionKey: "hasIngredientSurplus",
+      severity: "warning",
+      href: "/dashboard/kitchen/inventory",
+      icon: "Scale",
+    },
+    {
+      id: "restock_ingredients",
+      title: "Restock critical ingredients",
+      reason: "Running low on recipe essentials",
+      conditionKey: "hasLowIngredients",
+      severity: "warning",
+      href: "/dashboard/inventory",
+      icon: "PackagePlus",
+    },
+  ],
+
+  failureModes: [
+    "Missed delivery windows",
+    "Ingredient spoilage",
+    "Subscription churn from poor variety",
+    "Over-portioning waste",
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // Registry — maps industry slugs to their native dashboard definition.
 // Industries without a specific definition fall back to the closest match.
 // ---------------------------------------------------------------------------
@@ -1488,6 +1623,7 @@ const DEFINITIONS: Record<string, IndustryDashboardDefinition> = {
   blog_media: BLOG_MEDIA_DASHBOARD,
   creative_portfolio: CREATIVE_PORTFOLIO_DASHBOARD,
   marketplace: MARKETPLACE_DASHBOARD,
+  "meal-kit": MEAL_KIT_DASHBOARD,
 };
 
 export function getIndustryDashboardDefinition(

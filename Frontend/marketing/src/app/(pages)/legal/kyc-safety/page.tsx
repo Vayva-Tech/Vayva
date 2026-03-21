@@ -1,6 +1,5 @@
-import React from "react";
 import LegalDocPage from "../_components/LegalDocPage";
 
-export default function KYCSafetyPage(): React.JSX.Element {
+export default function KycSafetyPage() {
   return <LegalDocPage slug="kyc-explainer" />;
 }

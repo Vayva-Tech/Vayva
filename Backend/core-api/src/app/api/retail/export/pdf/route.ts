@@ -246,7 +246,7 @@ async function fetchReportData(
   }
 
   switch (type) {
-    case "orders":
+    case "orders": {
       if (filters?.status) where.status = filters.status;
       const orders = await prisma.order.findMany({
         where,
@@ -262,8 +262,9 @@ async function fetchReportData(
         totalAmount: order.totalAmount,
         createdAt: order.createdAt,
       }));
+    }
 
-    case "inventory":
+    case "inventory": {
       const inventory = await prisma.inventoryItem.findMany({
         where,
         include: { product: true },
@@ -277,8 +278,9 @@ async function fetchReportData(
         reorderPoint: item.reorderPoint,
         status: item.quantity <= item.reorderPoint ? "Low Stock" : "In Stock",
       }));
+    }
 
-    case "customers":
+    case "customers": {
       const customers = await prisma.customer.findMany({
         where,
         include: {
@@ -294,6 +296,7 @@ async function fetchReportData(
         totalOrders: customer._count.orders,
         totalSpent: customer.totalSpent || 0,
       }));
+    }
 
     default:
       return [];

@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { EmailService } from "../../apps/merchant-admin/src/lib/email/emailService";
+import { EmailService } from "../../apps/merchant/src/lib/email/emailService";
 // @ts-expect-error - Module resolution pending
-import { TeamService } from "../../apps/merchant-admin/src/lib/team/teamService";
+import { TeamService } from "../../apps/merchant/src/lib/team/teamService";
 // @ts-expect-error - Module resolution pending
-import { ROLES } from "../../apps/merchant-admin/src/lib/team/permissions";
+import { ROLES } from "../../apps/merchant/src/lib/team/permissions";
 import { prisma } from "@vayva/db";
 
 test.describe("Email System", () => {

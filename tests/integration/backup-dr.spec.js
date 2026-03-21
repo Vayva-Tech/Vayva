@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { BackupService } from "../../apps/merchant-admin/src/lib/ops/backupService";
+import { BackupService } from "../../apps/merchant/src/lib/ops/backupService";
 import { prisma } from "@vayva/db";
 test.describe("Backup & DR Ops", () => {
     test("Backup Health Check", async () => {

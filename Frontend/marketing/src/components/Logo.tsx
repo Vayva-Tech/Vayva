@@ -29,7 +29,7 @@ export function Logo({
     <div className={`flex items-center gap-2 ${className}`}>
       <Image
         src="/vayva-logo-official.svg"
-        alt="Vayva Logo"
+        alt="Vayva - E-commerce Platform for Modern Businesses"
         width={217}
         height={150}
         className={`${logo} h-auto object-contain`}

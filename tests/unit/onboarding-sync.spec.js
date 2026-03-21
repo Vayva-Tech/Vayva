@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { prisma } from "@vayva/db";
-import { syncOnboardingData } from "../../apps/merchant-admin/src/lib/onboarding-sync";
+import { syncOnboardingData } from "../../apps/merchant/src/lib/onboarding-sync";
 // Mock Onboarding State
 const mockState = {
     isComplete: true,

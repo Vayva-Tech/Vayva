@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 // @ts-expect-error - Module resolution pending
-import { AuthFlowService } from "../../apps/merchant-admin/src/lib/security/authFlowService";
+import { AuthFlowService } from "../../apps/merchant/src/lib/security/authFlowService";
 // @ts-expect-error - Module resolution pending
-import { LifecycleService } from "../../apps/merchant-admin/src/lib/security/lifecycleService";
+import { LifecycleService } from "../../apps/merchant/src/lib/security/lifecycleService";
 import { prisma } from "@vayva/db";
 
 test.describe("Account Lifecycle & Security", () => {

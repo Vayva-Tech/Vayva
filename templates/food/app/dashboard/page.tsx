@@ -101,11 +101,12 @@ export default function RestaurantDashboardPage() {
           // Update tickets when new orders come in
           setTickets(kdsService.getTickets({ status: 'cooking' }));
           break;
-        case 'order_created':
+        case 'order_created': {
           // Refresh KPIs when new order is created
           const kpiMetrics = restaurantDashboardService.getKPIMetrics();
           setKpis(kpiMetrics);
           break;
+        }
         case 'ticket_started':
         case 'ticket_completed':
         case 'ticket_bumped':

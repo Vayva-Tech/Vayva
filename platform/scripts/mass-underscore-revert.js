@@ -1,8 +1,8 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const targetDir = '/Users/fredrick/Documents/GitHub/vayva/apps/merchant-admin/src';
+const targetDir = '/Users/fredrick/Documents/GitHub/vayva/apps/merchant/src';
 
 const patterns = [
     '_Button', '_Card', '_Icon', '_Badge', '_Input', '_Select', '_Textarea',

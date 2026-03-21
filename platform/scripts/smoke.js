@@ -1,4 +1,4 @@
-const https = require('http');
+import https from 'http';
 
 const _CONFIG = {
     BASE_URL: process.env.VAYVA_CANONICAL_ORIGIN || "https://vayva.ng",

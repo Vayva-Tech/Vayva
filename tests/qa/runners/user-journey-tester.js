@@ -5,9 +5,9 @@
  * Executes the 3 critical user journeys as defined in the QA assignment
  */
 
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
-const path = require('path');
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 class UserJourneyTester {
   constructor() {

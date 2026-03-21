@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import Groq from "groq-sdk";
 import { logger } from "@/lib/logger";
-const groq = new Groq({
-  apiKey: process.env.GROQ_ADMIN_KEY,
-});
-
-function isConfigValid(): boolean {
-  return !!process.env.GROQ_ADMIN_KEY;
-}
 export async function GET(req: NextRequest) {
   // Basic auth check for cron (e.g., Vercel Cron Secret)
   const authHeader = req.headers.get("authorization");
@@ -66,19 +58,40 @@ export async function GET(req: NextRequest) {
         products: store._count.products,
         conversations: store._count.conversations,
       };
-      // 2. Generate Personalized Message via Groq
+      // 2. Generate Personalized Message via OpenRouter
       const prompt = `You are a helpful business assistant for Vayva. Write a short, professional WhatsApp message to ${owner.firstName || "Merchant"}. 
             Mention they have 48 hours left on their trial. 
             Highlight that they have already ${stats.products} products live and the AI has handled ${stats.conversations} conversations. 
             Emphasize that to keep their store live and not lose their progress or their ${stats.leads} customer leads, they should upgrade now.
             Keep it under 60 words. No emojis except one at the end.`;
-      const completion = await groq.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "llama-3.1-70b-versatile",
-      });
-      const messageText =
-        completion.choices[0]?.message?.content ||
-        `Hi ${owner.firstName}, your Vayva trial ends in 48 hours. You have ${stats.products} products and ${stats.conversations} AI chats live. Upgrade now to keep your progress safe!`;
+      
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      let messageText = `Hi ${owner.firstName}, your Vayva trial ends in 48 hours. You have ${stats.products} products and ${stats.conversations} AI chats live. Upgrade now to keep your progress safe!`;
+      
+      if (apiKey) {
+        try {
+          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "https://vayva.tech",
+              "X-Title": "Vayva Trial Reminders",
+            },
+            body: JSON.stringify({
+              model: "openai/gpt-4o-mini",
+              messages: [{ role: "user", content: prompt }],
+            }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            messageText = data.choices[0]?.message?.content || messageText;
+          }
+        } catch (error) {
+          logger.warn("[TRIAL_REMINDERS] AI generation failed, using fallback");
+        }
+      }
       // 3. Dispatch via Evolution API
       const dispatchResult = await dispatchWhatsApp(owner.phone, messageText);
       results.push({ storeId: store.id, success: dispatchResult.success });

@@ -1,0 +1,92 @@
+/**
+ * High Contrast Mode Focus Indicators
+ * Ensures visible focus states for users with increased contrast preferences
+ * WCAG 2.1 AA Compliance - Success Criterion 1.4.10 (Reflow) and 2.4.7 (Focus Visible)
+ */
+
+/* Force visible focus in high contrast mode */
+@media (prefers-contrast: more) {
+  /* Global focus override for all interactive elements */
+  *:focus-visible {
+    outline: 3px solid currentColor !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Enhanced focus ring for buttons and interactive elements */
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    box-shadow: 
+      0 0 0 2px white,
+      0 0 0 4px currentColor !important;
+  }
+
+  /* Card and container focus */
+  [tabindex]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="option"]:focus-visible {
+    outline: 3px solid currentColor !important;
+    outline-offset: 2px !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Standard focus enhancements for better visibility */
+.focus-ring-high-contrast {
+  position: relative;
+}
+
+.focus-ring-high-contrast:focus-visible::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 3px solid currentColor;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Ensure focus is visible on dark backgrounds */
+.bg-dark:focus-visible,
+.bg-black:focus-visible,
+.bg-gray-900:focus-visible {
+  outline-color: white !important;
+}
+
+/* Skip link focus styles - always visible when focused */
+.skip-link:focus {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 9999;
+  padding: 1rem 1.5rem;
+  background: white;
+  color: black;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+/* Focus visible utility classes */
+.focus-visible-ring-2:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.focus-visible-ring-4:focus-visible {
+  outline: 4px solid currentColor;
+  outline-offset: 2px;
+}
+
+.focus-visible-ring-offset-2:focus-visible {
+  outline-offset: 2px;
+}
+
+.focus-visible-none:focus-visible {
+  outline: none;
+}

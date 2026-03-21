@@ -8,7 +8,7 @@
  * - Error handling & retry logic
  */
 
-import { offlineSyncService } from '../services/offline-sync.service';
+import { offlineSyncService } from '../offline-sync.service';
 
 export interface APIConfig {
   baseUrl: string;

@@ -1,8 +1,21 @@
 module.exports = {
   apps: [
     {
-      name: "merchant-admin",
-      cwd: "/opt/vayva/apps/merchant-admin",
+      name: "core-api",
+      cwd: "/opt/vayva/apps/core-api",
+      script: "npx",
+      args: "next start -p 4000",
+      env: {
+        NODE_ENV: "production",
+        PORT: 4000,
+      },
+      max_memory_restart: "1G",
+      instances: 1,
+      exec_mode: "fork",
+    },
+    {
+      name: "merchant",
+      cwd: "/opt/vayva/apps/merchant",
       script: "npx",
       args: "next start -p 3000",
       env: {

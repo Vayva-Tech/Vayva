@@ -3,8 +3,7 @@
  * Test data factory for Product entity
  */
 
-import { prisma } from '@vayva/db';
-import type { Product, Prisma } from '@vayva/db';
+import { prisma, type Product, type Prisma } from '@vayva/db';
 
 export type ProductCreateInput = Partial<Prisma.ProductCreateInput> & {
   storeId: string;

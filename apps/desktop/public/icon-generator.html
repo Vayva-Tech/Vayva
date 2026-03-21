@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vayva Desktop Icon Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #059669;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .preview-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .icon-container {
+            width: 256px;
+            height: 256px;
+            margin: 0 auto 20px;
+            border-radius: 60px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .icon-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .size-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 15px;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"],
+        input[type="color"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .instructions {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .instructions h3 {
+            color: #059669;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #374151;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .download-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .icon-container {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Vayva Desktop Icon Generator</h1>
+        <p class="subtitle">Create beautiful icons with emerald blur background</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="logoUpload">1. Upload Vayva Logo (PNG with transparency)</label>
+                <input type="file" id="logoUpload" accept="image/png,image/svg+xml">
+            </div>
+
+            <div class="control-group">
+                <label for="gradientStart">2. Gradient Start Color</label>
+                <input type="color" id="gradientStart" value="#34d399">
+            </div>
+
+            <div class="control-group">
+                <label for="gradientEnd">3. Gradient End Color</label>
+                <input type="color" id="gradientEnd" value="#059669">
+            </div>
+
+            <div class="control-group">
+                <label for="blurAmount">4. Background Blur Amount</label>
+                <input type="range" id="blurAmount" min="0" max="50" value="20">
+                <span id="blurValue">20px</span>
+            </div>
+
+            <div class="control-group">
+                <label for="logoSize">5. Logo Size (% of icon)</label>
+                <input type="range" id="logoSize" min="40" max="80" value="65">
+                <span id="logoSizeValue">65%</span>
+            </div>
+        </div>
+
+        <div class="preview-grid">
+            <div class="preview-card">
+                <div class="preview-title">Large Preview (512px)</div>
+                <div class="icon-container" style="width: 256px; height: 256px;">
+                    <canvas id="preview512" width="512" height="512" style="width: 100%; height: 100%;"></canvas>
+                </div>
+                <div class="size-label">512×512 pixels</div>
+            </div>
+
+            <div class="preview-card">
+                <div class="preview-title">Medium Preview (256px)</div>
+                <div class="icon-container" style="width: 128px; height: 128px; border-radius: 30px;">
+                    <canvas id="preview256" width="256" height="256" style="width: 100%; height: 100%;"></canvas>
+                </div>
+                <div class="size-label">256×256 pixels</div>
+            </div>
+
+            <div class="preview-card">
+                <div class="preview-title">Small Preview (64px)</div>
+                <div class="icon-container" style="width: 64px; height: 64px; border-radius: 15px;">
+                    <canvas id="preview64" width="64" height="64" style="width: 100%; height: 100%;"></canvas>
+                </div>
+                <div class="size-label">64×64 pixels</div>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <button class="button" id="downloadBtn" disabled>📥 Download High-Res Icon (1024px)</button>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 How to Use:</h3>
+            <ol>
+                <li>Upload your Vayva logo (PNG with transparent background works best)</li>
+                <li>Adjust gradient colors to match your brand</li>
+                <li>Fine-tune blur amount for desired effect</li>
+                <li>Set logo size for perfect balance</li>
+                <li>Preview at different sizes in real-time</li>
+                <li>Download high-resolution version for icon generation</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const logoUpload = document.getElementById('logoUpload');
+        const gradientStart = document.getElementById('gradientStart');
+        const gradientEnd = document.getElementById('gradientEnd');
+        const blurAmount = document.getElementById('blurAmount');
+        const logoSizeSlider = document.getElementById('logoSize');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        const preview512 = document.getElementById('preview512');
+        const preview256 = document.getElementById('preview256');
+        const preview64 = document.getElementById('preview64');
+        
+        const ctx512 = preview512.getContext('2d');
+        const ctx256 = preview256.getContext('2d');
+        const ctx64 = preview64.getContext('2d');
+        
+        let logoImage = null;
+
+        // Update slider value displays
+        blurAmount.addEventListener('input', () => {
+            document.getElementById('blurValue').textContent = blurAmount.value + 'px';
+            render();
+        });
+
+        logoSizeSlider.addEventListener('input', () => {
+            document.getElementById('logoSizeValue').textContent = logoSizeSlider.value + '%';
+            render();
+        });
+
+        // Handle logo upload
+        logoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    logoImage = img;
+                    downloadBtn.disabled = false;
+                    render();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Render all previews
+        function render() {
+            if (!logoImage) return;
+            
+            drawIcon(ctx512, 512);
+            drawIcon(ctx256, 256);
+            drawIcon(ctx64, 64);
+        }
+
+        // Draw icon on canvas
+        function drawIcon(ctx, size) {
+            ctx.clearRect(0, 0, size, size);
+            
+            // Draw gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, gradientStart.value);
+            gradient.addColorStop(1, gradientEnd.value);
+            ctx.fillStyle = gradient;
+            
+            // Apply blur to background
+            ctx.filter = `blur(${blurAmount.value}px)`;
+            ctx.fillRect(0, 0, size, size);
+            ctx.filter = 'none';
+            
+            // Calculate logo size
+            const logoPercent = parseInt(logoSizeSlider.value) / 100;
+            const logoSize = size * logoPercent;
+            const logoX = (size - logoSize) / 2;
+            const logoY = (size - logoSize) / 2;
+            
+            // Draw logo centered
+            ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+        }
+
+        // Download high-res version
+        downloadBtn.addEventListener('click', () => {
+            if (!logoImage) return;
+            
+            // Create temporary canvas for 1024px version
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 1024;
+            tempCanvas.height = 1024;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            drawIcon(tempCtx, 1024);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = 'vayva-desktop-icon-1024.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Initial render with placeholder
+        gradientStart.addEventListener('input', render);
+        gradientEnd.addEventListener('input', render);
+    </script>
+</body>
+</html>

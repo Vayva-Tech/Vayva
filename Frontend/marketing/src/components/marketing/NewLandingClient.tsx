@@ -468,10 +468,10 @@ export function NewLandingClient(): React.JSX.Element {
                 <h3 className="font-bold text-slate-900 mb-2">{pillar.title}</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">{pillar.desc}</p>
                 <Link 
-                  href="/features" 
+                  href={`${APP_URL}/signup`} 
                   className={`inline-flex items-center gap-1 mt-4 text-sm font-semibold text-${pillar.color}-600 hover:gap-2 transition-all`}
                 >
-                  Learn more →
+                  Start free trial →
                 </Link>
               </motion.div>
             ))}

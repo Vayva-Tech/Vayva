@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 
 import { Package } from "@phosphor-icons/react/dist/ssr/Package";

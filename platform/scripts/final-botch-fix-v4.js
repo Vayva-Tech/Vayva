@@ -1,9 +1,9 @@
 /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const dirs = [
-    'apps/merchant-admin/src',
+    'apps/merchant/src',
 ];
 
 function walk(dir) {
@@ -24,7 +24,7 @@ function walk(dir) {
     return results;
 }
 
-const files = walk('apps/merchant-admin/src');
+const files = walk('apps/merchant/src');
 
 const replacements = [
     { from: /: unknown(?=[, )=])/g, to: ': any' },
@@ -36,14 +36,14 @@ const replacements = [
 
 // Target specific files for more aggressive any-fication to clear the build
 const targetFiles = [
-    'apps/merchant-admin/src/services/onboarding.service.ts',
-    'apps/merchant-admin/src/services/offline.service.ts',
-    'apps/merchant-admin/src/services/kyc.ts',
-    'apps/merchant-admin/src/lib/support/support-context.service.ts',
-    'apps/merchant-admin/src/lib/templates/layout-resolver.ts',
-    'apps/merchant-admin/src/lib/templates/templateService.ts',
-    'apps/merchant-admin/src/lib/template-presets.ts',
-    'apps/merchant-admin/src/lib/validation/resource-validator.ts'
+    'apps/merchant/src/services/onboarding.service.ts',
+    'apps/merchant/src/services/offline.service.ts',
+    'apps/merchant/src/services/kyc.ts',
+    'apps/merchant/src/lib/support/support-context.service.ts',
+    'apps/merchant/src/lib/templates/layout-resolver.ts',
+    'apps/merchant/src/lib/templates/templateService.ts',
+    'apps/merchant/src/lib/template-presets.ts',
+    'apps/merchant/src/lib/validation/resource-validator.ts'
 ];
 
 targetFiles.forEach(file => {

@@ -10,12 +10,12 @@ jobs:
       
       - name: Tripwire - Merchant Admin Platform Leakage
         run: |
-          if grep -r "src/app/admin" apps/merchant-admin/src/app --include="*.ts" --include="*.tsx" 2>/dev/null; then
-            echo "FAIL: Found legacy admin routes in merchant-admin"
+          if grep -r "src/app/admin" apps/merchant/src/app --include="*.ts" --include="*.tsx" 2>/dev/null; then
+            echo "FAIL: Found legacy admin routes in merchant"
             exit 1
           fi
-          if grep -r "/api/admin/ops" apps/merchant-admin/src --include="*.ts" --include="*.tsx" 2>/dev/null; then
-             echo "FAIL: Found legacy ops api calls in merchant-admin"
+          if grep -r "/api/admin/ops" apps/merchant/src --include="*.ts" --include="*.tsx" 2>/dev/null; then
+             echo "FAIL: Found legacy ops api calls in merchant"
              exit 1
           fi
 
@@ -37,7 +37,7 @@ jobs:
       - name: Tripwire - Domain Safety
         run: |
           # Fail if new .com references are introduced in code (exclude docs if needed)
-          if grep -r "vayva.com" apps/merchant-admin/src --include=*.ts --include=*.tsx; then
-            echo "FAIL: Found vayva.com references in merchant-admin source"
+          if grep -r "vayva.com" apps/merchant/src --include=*.ts --include=*.tsx; then
+            echo "FAIL: Found vayva.com references in merchant source"
             exit 1
           fi

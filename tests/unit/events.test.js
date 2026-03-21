@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { EVENT_CATALOG } from "../../apps/merchant-admin/src/lib/events/catalog";
-import { EventBus } from "../../apps/merchant-admin/src/lib/events/eventBus";
+import { EVENT_CATALOG } from "../../apps/merchant/src/lib/events/catalog";
+import { EventBus } from "../../apps/merchant/src/lib/events/eventBus";
 import { prisma } from "@vayva/db";
 vi.mock("@vayva/db", () => ({
     prisma: {
