@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm install && pnpm turbo run build --filter=merchant",
-  "installCommand": "pnpm install",
+  "buildCommand": "cd ../.. && pnpm install --frozen-lockfile && pnpm turbo run build --filter=@vayva/merchant",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "crons": [
