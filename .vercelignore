@@ -1,0 +1,27 @@
+# Ignore unnecessary files for Vercel upload
+node_modules
+.next
+.git
+.pnpm-store
+.agents
+*.md
+docs
+tests
+governance
+platform/ci
+platform/scripts
+apps/desktop
+apps/merchant
+Backend/worker
+Backend/workflow
+Frontend/storefront
+Frontend/mobile
+Frontend/ops-console
+*.test.ts
+*.test.tsx
+*.spec.ts
+coverage
+playwright-report
+test-results
+.windsurf
+.claude
