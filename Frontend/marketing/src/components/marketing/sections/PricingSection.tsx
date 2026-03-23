@@ -32,6 +32,7 @@ export function PricingSection(): React.JSX.Element {
       features: plan.bullets,
       cta: plan.ctaLabel,
       popular: Boolean(plan.featured),
+      promoBadge: plan.promoBadge,
       icon,
       color: "emerald",
     };
@@ -87,6 +88,16 @@ export function PricingSection(): React.JSX.Element {
                     <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400 text-amber-900 text-sm font-semibold shadow-lg">
                       <Sparkles className="w-4 h-4" />
                       Most popular
+                    </span>
+                  </div>
+                )}
+
+                {/* Promo badge */}
+                {plan.promoBadge && !plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-500 text-white text-sm font-semibold shadow-lg">
+                      <Zap className="w-4 h-4" />
+                      {plan.promoBadge}
                     </span>
                   </div>
                 )}

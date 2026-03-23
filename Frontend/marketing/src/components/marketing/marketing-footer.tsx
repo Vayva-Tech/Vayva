@@ -38,14 +38,6 @@ export function MarketingFooter(): React.JSX.Element {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/how-vayva-works"
-                  className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
-                >
-                  How Vayva Works
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/pricing"
                   className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
                 >

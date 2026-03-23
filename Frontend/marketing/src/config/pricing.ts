@@ -22,6 +22,8 @@ export type Plan = {
   monthlyAmount: number; // NGN (Total)
   tagline: string;
   trialDays?: number;
+  promoBadge?: string;
+  promoMonths?: number; // Number of free months
   bullets: string[];
   ctaLabel: string;
   featured?: boolean;
@@ -34,6 +36,8 @@ export const PLANS: Plan[] = [
     monthlyAmount: 25000,
     tagline: "For growing brands.",
     trialDays: 7,
+    promoBadge: "1 Month Free",
+    promoMonths: 1,
     bullets: [
       "Up to 500 Products",
       "Vayva Automation (WhatsApp and Instagram)",

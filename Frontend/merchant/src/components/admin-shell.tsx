@@ -509,11 +509,23 @@ export const AdminShell = ({
                 {(isMobile || isSidebarExpanded) && (
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-gray-900 truncate">
-                      {merchantName?.split(' ')[0] || 'Merchant'}
+                      Merchant
                     </span>
-                    <span className="text-xs text-gray-400 truncate">
-                      {storeDisplayName}
-                    </span>
+                    {storeLink && (
+                      <a
+                        href={storeLink.startsWith("http") ? storeLink : `https://${storeLink}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-green-500 hover:text-green-600 truncate"
+                      >
+                        {storeLink.replace(/^https?:\/\//, '')}
+                      </a>
+                    )}
+                    {!storeLink && (
+                      <span className="text-xs text-gray-400 truncate">
+                        {storeDisplayName}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -629,12 +641,12 @@ export const AdminShell = ({
               {/* Help, Settings, Invite teams */}
               <div className="mb-3 space-y-0.5">
                 <a
-                  href="/help"
+                  href="https://vayva.ng/help"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-2 py-2 rounded-xl text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-lg">❓</span>
+                  <Icon name="CircleHelp" size={20} className="text-gray-400" />
                   {(isMobile || isSidebarExpanded) && (
                     <span className="truncate">Help Center</span>
                   )}
@@ -663,7 +675,11 @@ export const AdminShell = ({
               
               {/* User profile section */}
               <div className="pt-3 border-t border-gray-100 px-2">
-                <div className="flex items-center gap-3">
+                <Link
+                  href="/dashboard/settings/profile"
+                  onClick={() => isMobile && setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 hover:bg-gray-50 rounded-xl p-1.5 transition-colors"
+                >
                   <Avatar
                     src={storeLogo || undefined}
                     fallback={initials}
@@ -679,7 +695,16 @@ export const AdminShell = ({
                       </span>
                     </div>
                   )}
-                </div>
+                </Link>
+                {(isMobile || isSidebarExpanded) && (
+                  <button
+                    onClick={() => logout()}
+                    className="flex items-center gap-3 px-2 py-2 mt-1 rounded-xl text-sm text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors w-full"
+                  >
+                    <LogOut size={18} className="text-red-400" />
+                    <span className="truncate">Sign Out</span>
+                  </button>
+                )}
               </div>
             </div>
           </aside>

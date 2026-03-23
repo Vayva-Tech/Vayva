@@ -447,10 +447,10 @@ export default function DashboardPage() {
       <div className="max-w-[1400px] mx-auto space-y-6">
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Store Dashboard</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Track performance and manage your store</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Monitor sales, track orders, and manage your business</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Time filter dropdown */}

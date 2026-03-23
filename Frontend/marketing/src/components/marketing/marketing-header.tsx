@@ -25,7 +25,6 @@ import {
   IconConfetti as PartyPopper,
   IconTicket as Ticket,
   IconBuilding as Building2,
-  IconUsers as Users,
   IconBriefcase as Briefcase,
   IconLifebuoy as LifeBuoy,
   IconFileText as FileText,
@@ -63,7 +62,6 @@ const NAV_ITEMS = [
     href: "/about",
     items: [
       { href: "/about", label: "About Us", icon: Building2, description: "Our story & mission" },
-      { href: "/team", label: "Team", icon: Users, description: "Meet the people behind Vayva" },
       { href: "/trust", label: "Trust & Security", icon: Sparkles, description: "Your data is safe with us" },
       { href: "/system-status", label: "System Status", icon: Smartphone, description: "Platform availability" },
       { href: "/contact", label: "Contact", icon: LifeBuoy, description: "Get in touch" },
@@ -74,7 +72,6 @@ const NAV_ITEMS = [
     href: "/help",
     items: [
       { href: "/help", label: "Help Center", icon: LifeBuoy, description: "Guides & tutorials" },
-      { href: "/how-vayva-works", label: "How It Works", icon: Sparkles, description: "Learn the basics" },
       { href: "/legal", label: "Legal", icon: FileText, description: "Terms & policies" },
     ]
   },
