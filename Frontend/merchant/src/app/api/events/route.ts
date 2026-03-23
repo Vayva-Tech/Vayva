@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { logger } from "@vayva/shared";
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';

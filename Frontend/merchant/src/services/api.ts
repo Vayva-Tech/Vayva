@@ -25,9 +25,12 @@ api.interceptors.request.use((config) => {
 // Response Interceptor: Handle 401
 api.interceptors.response.use((response) => response, (error) => {
     if (error.response?.status === 401) {
-        // Clear session and redirect if needed
-        // Cookies.remove('vayva_token');
-        // window.location.href = '/signin';
+        // Clear session and redirect to signin
+        Cookies.remove('vayva_token');
+        Cookies.remove('vayva_store_id');
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/signin')) {
+            window.location.href = '/signin';
+        }
     }
     return Promise.reject(error);
 });

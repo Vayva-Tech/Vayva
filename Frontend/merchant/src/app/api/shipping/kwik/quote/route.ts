@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { logger } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";

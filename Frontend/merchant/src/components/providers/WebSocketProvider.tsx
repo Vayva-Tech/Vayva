@@ -30,7 +30,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     wsRef.current = new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
-      console.log('WebSocket connected');
+      // connected
       setIsConnected(true);
     };
 
@@ -38,7 +38,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       try {
         const message: WebSocketMessage = JSON.parse(event.data);
         setLastMessage(message);
-        console.log('WebSocket message received:', message);
+        // message received
         
         // Dispatch custom event for components to listen
         window.dispatchEvent(new CustomEvent('saas-metrics-update', { detail: message }));
@@ -48,7 +48,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     };
 
     wsRef.current.onclose = () => {
-      console.log('WebSocket disconnected');
+      // disconnected
       setIsConnected(false);
       
       // Attempt reconnection after 5 seconds

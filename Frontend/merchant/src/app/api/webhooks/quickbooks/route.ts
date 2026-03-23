@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const eventType = request.headers.get('event-type') || 'unknown';
 
-    console.log('QuickBooks Webhook Received:', { eventType, ...body });
+    // QuickBooks webhook received
 
     // Store webhook event for processing
     await apiJson<{
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         await handleCustomerEvent(body);
         break;
       default:
-        console.log('Unhandled QuickBooks event type:', eventType);
+        // Unhandled QuickBooks event type
     }
 
     return NextResponse.json({ success: true });

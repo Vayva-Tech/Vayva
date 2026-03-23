@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const eventType = body.event ? body.event.category : 'unknown';
 
-    console.log('Xero Webhook Received:', { eventType, ...body });
+    // Xero webhook received - eventType logged by backend
 
     // Store webhook event for processing
     await apiJson<{
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         await handleContactEvent(body);
         break;
       default:
-        console.log('Unhandled Xero event type:', eventType);
+        // Unhandled Xero event type
     }
 
     return NextResponse.json({ success: true });

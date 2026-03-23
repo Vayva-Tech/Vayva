@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
+import { apiJson } from "@/lib/api-client-shared";
 
 export async function GET() {
-  return NextResponse.json(null, {
-    headers: {
-      "Cache-Control": "no-store",
-    },
-  });
+  try {
+    const data = await apiJson("/system/incidents/active", { method: "GET" });
+    return NextResponse.json(data, {
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch {
+    // If backend unreachable, return no active incidents (non-critical)
+    return NextResponse.json({ incidents: [] }, {
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
 }

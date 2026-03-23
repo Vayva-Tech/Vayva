@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { logger } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { checkRateLimitCustom } from "@/lib/ratelimit";
