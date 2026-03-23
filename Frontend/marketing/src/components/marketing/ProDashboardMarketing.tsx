@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 
 // ============================================================================
-// Sub-Components — Matching Relatel Design System
+// Sub-Components — Matching Vayva Design System
 // ============================================================================
 
 const WidgetActions = () => (
@@ -137,7 +137,7 @@ const StatusPill = ({ status, count }: { status: string; count: number }) => {
 };
 
 // ============================================================================
-// Main Dashboard Component — Vayva Merchant Dashboard (Relatel Design System)
+// Main Dashboard Component — Vayva Merchant Dashboard (Vayva Design System)
 // ============================================================================
 export function ProDashboardMarketing() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
@@ -160,8 +160,8 @@ export function ProDashboardMarketing() {
             </div>
             {sidebarExpanded && (
               <div className="leading-tight whitespace-nowrap">
-                <span className="text-sm font-bold text-gray-900">Vayva</span>
-                <p className="text-[10px] text-gray-400">merchant.vayva.ng</p>
+                <span className="text-sm font-bold text-gray-900">Merchant</span>
+                <p className="text-[10px] text-green-500 hover:text-green-600 cursor-pointer">luxefashion.vayva.ng</p>
               </div>
             )}
           </div>
@@ -315,7 +315,7 @@ export function ProDashboardMarketing() {
           </div>
 
           {/* User Profile */}
-          <div className={`flex items-center ${sidebarExpanded ? "gap-2.5 px-2.5" : "justify-center px-1"} py-2 mt-2 rounded-xl bg-gray-50 border border-gray-100`}>
+          <div className={`flex items-center ${sidebarExpanded ? "gap-2.5 px-2.5" : "justify-center px-1"} py-2 mt-1 rounded-xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors`}>
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-semibold text-xs shrink-0">
               AO
             </div>
@@ -326,6 +326,12 @@ export function ProDashboardMarketing() {
               </div>
             )}
           </div>
+          {sidebarExpanded && (
+            <div className="flex items-center gap-2 px-2.5 py-[7px] rounded-lg text-red-500 hover:bg-red-50 transition-colors cursor-pointer mt-1">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span className="text-xs font-medium whitespace-nowrap">Sign Out</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -333,7 +339,7 @@ export function ProDashboardMarketing() {
       {/* MAIN CONTENT                                                   */}
       {/* ============================================================== */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Breadcrumb / Top Bar — Relatel Style */}
+        {/* Breadcrumb / Top Bar — Vayva Style */}
         <div className="h-12 bg-white border-b border-gray-200 px-5 flex items-center gap-3">
           <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
             <ArrowLeft size={16} className="text-gray-400" />
@@ -343,7 +349,7 @@ export function ProDashboardMarketing() {
             <span className="text-gray-700 font-medium">Dashboard</span>
             <ChevronRight size={12} className="text-gray-300" />
             <FolderClosed size={14} className="text-gray-400" />
-            <span className="text-gray-700 font-medium">Store overview</span>
+            <span className="text-gray-700 font-medium">Overview</span>
           </div>
 
           {/* Search */}
@@ -372,9 +378,9 @@ export function ProDashboardMarketing() {
           {/* Page Header */}
           <div className="flex items-start justify-between mb-5">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Store Dashboard</h2>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Dashboard</h2>
               <p className="text-sm text-gray-500 mt-0.5 max-w-lg">
-                Monitor your sales, track orders and manage your business — all in one place.
+                Monitor sales, track orders, and manage your business.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -503,7 +509,7 @@ export function ProDashboardMarketing() {
 
             {/* AI Commerce Agent */}
             <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <WidgetHeader icon={Bot} title="AI Agent" subtitle="PRO" />
+              <WidgetHeader icon={Bot} title="AI Agent" subtitle="Active" />
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-2.5 bg-green-50 rounded-xl border border-green-100">
                   <div className="flex items-center gap-2">

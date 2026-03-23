@@ -36,14 +36,23 @@ export function MarketingFooter(): React.JSX.Element {
               Product
             </h4>
             <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/pricing"
-                  className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
-                >
-                  Pricing Plans
-                </Link>
-              </li>
+              {[
+                { label: "Pricing Plans", href: "/pricing" },
+                { label: "AI Agent", href: "/ai-agent" },
+                { label: "Autopilot", href: "/autopilot" },
+                { label: "All Features", href: "/all-features" },
+                { label: "Industries", href: "/industries" },
+                { label: "Templates", href: "/templates" },
+              ].map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -56,6 +65,8 @@ export function MarketingFooter(): React.JSX.Element {
               {[
                 { label: "About Vayva", href: "/about" },
                 { label: "Contact Us", href: "/contact" },
+                { label: "Blog", href: "/blog" },
+                { label: "Developers", href: "/developers" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -79,6 +90,7 @@ export function MarketingFooter(): React.JSX.Element {
                 { label: "Help Center", href: "/help" },
                 { label: "System Status", href: "/system-status" },
                 { label: "Trust & Security", href: "/trust" },
+                { label: "Solutions", href: "/solutions" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -102,6 +114,8 @@ export function MarketingFooter(): React.JSX.Element {
                 { label: "Legal Hub", href: "/legal" },
                 { label: "Privacy Policy", href: "/legal/privacy" },
                 { label: "Terms of Service", href: "/legal/terms" },
+                { label: "Cookie Policy", href: "/legal/cookies" },
+                { label: "Refund Policy", href: "/legal/refund-policy" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
