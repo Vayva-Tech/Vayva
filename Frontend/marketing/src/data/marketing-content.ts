@@ -165,7 +165,6 @@ export const aboutContent = {
   founder: {
     name: "Nyamsi Fredrick",
     role: "Founder",
-    image: "/images/founder.jpg", // Add your founder's image path here
   },
   storyTitle: "It started with a side hustle",
   storyParagraphs: [
