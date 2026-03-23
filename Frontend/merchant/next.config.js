@@ -1,5 +1,4 @@
 /** @type {import('next').NextConfig} */
-const { withSentryConfig } = require("@sentry/nextjs");
 const path = require("path");
 
 const nextConfig = {
@@ -19,7 +18,7 @@ const nextConfig = {
     //     root: "/Users/fredrick/Documents/GitHub/vayva-platform"
     // },
     turbopack: {
-        root: path.resolve(__dirname, "../../.."),
+        root: path.resolve(__dirname, "../.."),
     },
     webpack: (config, { isServer }) => {
         if (!isServer) {
@@ -47,24 +46,25 @@ const nextConfig = {
         ],
     },
     async rewrites() {
-        return [
-            {
+        const rewrites = [];
+        // Only proxy to external API if MERCHANT_API_URL is explicitly set
+        if (process.env.MERCHANT_API_URL) {
+            rewrites.push({
                 source: "/api/auth/:path*",
-                destination: "/api/auth/:path*", // Keep Auth in UI Tier
-            },
-            {
+                destination: "/api/auth/:path*",
+            });
+            rewrites.push({
                 source: "/api/:path*",
-                destination: `${process.env.MERCHANT_API_URL || "http://localhost:3001"}/api/:path*`,
-            },
-            {
-                source: "/ops",
-                destination: `${process.env.OPS_CONSOLE_URL || "http://localhost:3002"}/ops`,
-            },
-            {
+                destination: `${process.env.MERCHANT_API_URL}/api/:path*`,
+            });
+        }
+        if (process.env.OPS_CONSOLE_URL) {
+            rewrites.push({
                 source: "/ops/:path*",
-                destination: `${process.env.OPS_CONSOLE_URL || "http://localhost:3002"}/ops/:path*`,
-            },
-        ];
+                destination: `${process.env.OPS_CONSOLE_URL}/ops/:path*`,
+            });
+        }
+        return rewrites;
     },
     async redirects() {
         return [
@@ -97,44 +97,4 @@ const nextConfig = {
     },
 };
 
-const withPWA = require("@ducanh2912/next-pwa").default({
-    dest: "public",
-    // Optimized for dashboard data freshness
-    cacheOnFrontEndNav: false,
-    aggressiveFrontEndNavCaching: false,
-    reloadOnOnline: true,
-    swcMinify: true,
-    disable: process.env.NODE_ENV === "development",
-    workboxOptions: {
-        disableDevLogs: true,
-        skipWaiting: true,
-        clientsClaim: true,
-    },
-});
-
-module.exports = withSentryConfig(
-    withPWA(nextConfig),
-    {
-        // For all available options, see:
-        // https://github.com/getsentry/sentry-webpack-plugin#options
-
-        // Suppresses source map uploading logs during build
-        silent: true,
-    },
-    {
-        // For all available options, see:
-        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-        // Upload a larger set of source maps for prettier stack traces (increases build time)
-        widenClientFileUpload: true,
-
-        // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-        tunnelRoute: "/monitoring",
-
-        // Hides source maps from generated client bundles
-        hideSourceMaps: true,
-
-        // Automatically tree-shake Sentry logger statements to reduce bundle size
-        disableLogger: true,
-    }
-);
+module.exports = nextConfig;
