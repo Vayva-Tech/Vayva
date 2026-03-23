@@ -101,7 +101,6 @@ export function EnhancedSaasDashboard() {
         75000, // previous month MRR
         tenants.map(t => ({ amount: t.mrr, status: t.status }))
       );
-      console.log('Calculated metrics:', result);
     } catch (error) {
       console.error('Failed to calculate metrics:', error);
     }

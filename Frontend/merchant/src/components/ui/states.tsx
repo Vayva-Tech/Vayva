@@ -26,7 +26,7 @@ export function EmptyState({
       )}
     >
       {icon && (
-        <div className="w-16 h-16 rounded-full bg-white-2/50 flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
           {icon}
         </div>
       )}
@@ -113,7 +113,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className }: SkeletonProps) {
-  return <div className={cn("animate-pulse bg-white-2/50 rounded", className)} />;
+  return <div className={cn("animate-pulse bg-gray-100 rounded", className)} />;
 }
 
 export function CardSkeleton() {

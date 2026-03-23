@@ -49,6 +49,12 @@ export default function SigninPage() {
     setLoading(true);
     setError(null);
 
+    if (!password) {
+      setFieldErrors(prev => ({ ...prev, password: "Password is required" }));
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await AuthService.login({
         email,
@@ -178,7 +184,7 @@ export default function SigninPage() {
           <div className="flex items-center justify-between mt-3">
             <label
               htmlFor="remember-me"
-              className="flex items-center gap-3 rounded-2xl border border-studio-border bg-white/80 px-3 py-2 cursor-pointer group"
+              className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/80 px-3 py-2 cursor-pointer group"
             >
               <input
                 id="remember-me"

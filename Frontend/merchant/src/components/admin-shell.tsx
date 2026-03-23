@@ -509,7 +509,7 @@ export const AdminShell = ({
                 {(isMobile || isSidebarExpanded) && (
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-gray-900 truncate">
-                      Merchant
+                      {storeDisplayName || merchantName || "Merchant"}
                     </span>
                     {storeLink && (
                       <a
@@ -571,11 +571,10 @@ export const AdminShell = ({
                 return (
                   <div key={group.name || groupIdx} className="mb-4">
                     {group.name && (isMobile || isSidebarExpanded) && (
-                      <div className="px-2 py-1.5 flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
+                      <div className="px-2 py-1.5">
                         <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
                           {group.name}
                         </span>
-                        <ChevronDown size={14} className="text-gray-400" />
                       </div>
                     )}
                     <div className="flex flex-col gap-0.5 mt-1">
@@ -754,6 +753,13 @@ export const AdminShell = ({
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
+                  <button
+                    className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                    onClick={() => typeof window !== 'undefined' && (window as any).triggerCommandPalette?.()}
+                    aria-label="Search"
+                  >
+                    <Search size={20} className="text-gray-600" />
+                  </button>
                   <Button variant="outline" size="sm" onClick={handlePreview} className="rounded-xl h-9 px-3 gap-2">
                     <Eye size={16} className="text-gray-400" />
                     <span className="text-sm font-medium text-gray-700">Preview</span>
@@ -906,7 +912,7 @@ export const AdminShell = ({
                 </div>
                 <span
                   className={cn(
-                    "text-[9px] font-bold uppercase tracking-tight",
+                    "text-[10px] font-bold uppercase tracking-tight",
                     mobileMoreOpen ? "text-gray-900" : "text-gray-400",
                   )}
                 >

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import AdvancedAnalyticsDashboard from "@/components/analytics/AdvancedAnalyticsDashboard";

@@ -7,7 +7,7 @@ interface PageSkeletonProps {
 function Bone({ className }: { className?: string }) {
   return (
     <div
-      className={`bg-white rounded-xl animate-pulse ${className || ""}`}
+      className={`bg-gray-100 rounded-xl animate-pulse ${className || ""}`}
     />
   );
 }
@@ -30,7 +30,7 @@ export function PageSkeleton({
           {Array.from({ length: columns }).map((_, i) => (
             <div
               key={i}
-              className="bg-white  p-6 rounded-2xl border border-gray-100 h-32 flex flex-col justify-between animate-pulse"
+              className="bg-white p-6 rounded-2xl border border-gray-100 h-32 flex flex-col justify-between animate-pulse"
             >
               <Bone className="h-4 w-24" />
               <Bone className="h-8 w-1/2" />
@@ -109,7 +109,7 @@ export function PageSkeleton({
         <Bone className="h-8 w-48" />
         <Bone className="h-10 w-32 rounded-lg" />
       </div>
-      <div className="bg-white  rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="h-12 bg-white border-b border-gray-100" />
         {Array.from({ length: rows }).map((_, i) => (
           <div

@@ -41,8 +41,6 @@ export function useServiceWorker(): ServiceWorkerRegistrationResult {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 // New content available
-                console.log('New content available, refresh to update.');
-                
                 // Dispatch custom event for UI to show update prompt
                 window.dispatchEvent(new CustomEvent('sw-update-available'));
               }
@@ -53,11 +51,9 @@ export function useServiceWorker(): ServiceWorkerRegistrationResult {
         // Listen for messages from service worker
         navigator.serviceWorker.addEventListener('message', (event) => {
           if (event.data.type === 'CACHE_UPDATED') {
-            console.log('Cache updated:', event.data.payload);
           }
         });
 
-        console.log('Service Worker registered successfully:', reg.scope);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);

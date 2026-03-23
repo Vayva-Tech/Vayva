@@ -218,7 +218,7 @@ export default function MealKitDashboardPage() {
               <MealPreferenceTracker
                 storeId="store_123"
                 customerId="customer_456"
-                onSave={(prefs) => console.log('Saved preferences:', prefs)}
+                onSave={(prefs) => {}}
               />
             </TabsContent>
           </Tabs>
@@ -238,7 +238,7 @@ export default function MealKitDashboardPage() {
               <IngredientInventoryManager
                 storeId="store_123"
                 weekStartDate={new Date()}
-                onRestockRequest={(items) => console.log('Restock request:', items)}
+                onRestockRequest={(items) => {}}
               />
             </CardContent>
           </Card>

@@ -9,9 +9,9 @@ export default function Loading() {
           <PageSkeleton variant="table" rows={5} />
         </div>
         <div className="rounded-2xl border border-gray-100 bg-white p-6 space-y-4 animate-pulse">
-          <div className="h-5 w-24 bg-white rounded-xl" />
-          <div className="h-48 w-full bg-white rounded-lg" />
-          <div className="h-4 w-3/4 bg-white rounded-xl" />
+          <div className="h-5 w-24 bg-gray-200 rounded-xl" />
+          <div className="h-48 w-full bg-gray-100 rounded-lg" />
+          <div className="h-4 w-3/4 bg-gray-100 rounded-xl" />
         </div>
       </div>
     </div>

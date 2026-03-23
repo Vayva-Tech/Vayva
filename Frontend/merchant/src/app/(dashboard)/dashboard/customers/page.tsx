@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
+  TrendingDown,
   Heart,
   DollarSign,
   Crown,
@@ -170,12 +171,13 @@ function StatCard({
   value: string;
   trend: string;
 }) {
+  const isPositive = !String(trend || "").startsWith("-");
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-all">
       <div className="flex items-start justify-between mb-3">
         <div className={`p-2.5 rounded-xl ${iconBg}`}>{icon}</div>
-        <div className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg text-green-700 bg-green-50">
-          <TrendingUp size={12} />
+        <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg ${isPositive ? "text-green-700 bg-green-50" : "text-red-700 bg-red-50"}`}>
+          {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
           {trend}
         </div>
       </div>
@@ -193,7 +195,7 @@ export default function CustomersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [segmentFilter, setSegmentFilter] = useState<SegmentFilter>("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 5;
+  const perPage = 10;
 
   const { data, error, isLoading, mutate } = useSWR<CustomersData>(
     '/api/customers',

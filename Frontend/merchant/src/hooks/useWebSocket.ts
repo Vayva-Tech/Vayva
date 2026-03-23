@@ -53,7 +53,6 @@ export function useWebSocket({
         setRetryCount(0);
         reconnectAttemptsRef.current = 0;
         onOpen?.();
-        console.log('WebSocket connected');
       };
 
       ws.onmessage = (event) => {
@@ -68,7 +67,6 @@ export function useWebSocket({
       ws.onclose = () => {
         setIsConnected(false);
         onClose?.();
-        console.log('WebSocket disconnected');
 
         // Attempt reconnection
         if (reconnect && reconnectAttemptsRef.current < maxReconnectAttempts) {

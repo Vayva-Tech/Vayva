@@ -310,10 +310,10 @@ export default function ProductsPage() {
             <Download size={15} />
             Export
           </button>
-          <button className="inline-flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-600 transition-colors">
+          <Link href="/dashboard/products/new" className="inline-flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-600 transition-colors">
             <Plus size={16} />
             Add Product
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -466,13 +466,13 @@ export default function ProductsPage() {
                       isHovered ? "opacity-100" : "opacity-0"
                     }`}
                   >
-                    <button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Edit">
+                    <button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Edit" aria-label={`Edit ${product.name}`}>
                       <Pencil size={16} />
                     </button>
-                    <button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Duplicate">
+                    <button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Duplicate" aria-label={`Duplicate ${product.name}`}>
                       <Copy size={16} />
                     </button>
-                    <button className="p-2 rounded-xl bg-white/90 text-red-600 hover:bg-white transition-colors" title="Delete">
+                    <button className="p-2 rounded-xl bg-white/90 text-red-600 hover:bg-white transition-colors" title="Delete" aria-label={`Delete ${product.name}`}>
                       <Trash2 size={16} />
                     </button>
                   </div>

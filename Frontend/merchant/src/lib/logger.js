@@ -131,7 +131,6 @@ class Logger {
         const safeEntry = this.redactPII(entry);
         // In production, enforce JSON for Datadog/CloudWatch
         if (this.isProduction) {
-            console.log(JSON.stringify(safeEntry));
         }
     }
     redactPII(data) {

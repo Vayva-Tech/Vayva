@@ -231,7 +231,7 @@ export default function BillingPage() {
               )}
             >
               {isCurrent && (
-                <span className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider text-green-600">
+                <span className="absolute top-4 right-4 text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
                   Current Plan
                 </span>
               )}

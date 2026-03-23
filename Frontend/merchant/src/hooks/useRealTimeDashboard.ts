@@ -100,11 +100,9 @@ export function useRealTimeDashboard({
       }
     },
     onOpen: () => {
-      console.log('Real-time connection established');
       toast.success('Connected to real-time updates');
     },
     onClose: () => {
-      console.log('Real-time connection closed');
     },
     onError: (error) => {
       console.error('WebSocket error:', error);

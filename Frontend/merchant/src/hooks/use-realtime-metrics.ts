@@ -23,8 +23,6 @@ export function useRealTimeMetrics() {
     const handleMetricsUpdate = (event: CustomEvent<WebSocketMessage>) => {
       const { type, payload } = event.detail;
 
-      console.log('Real-time update received:', type, payload);
-
       switch (type) {
         case 'metrics_update':
           // Update aggregate metrics in cache

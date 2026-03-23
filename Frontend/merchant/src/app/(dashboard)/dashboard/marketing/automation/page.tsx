@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import MarketingAutomationDashboard from "@/components/marketing/MarketingAutomationDashboard";

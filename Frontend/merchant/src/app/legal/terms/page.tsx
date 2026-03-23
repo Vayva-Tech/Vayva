@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { getLegalDocument } from "@vayva/shared/content";

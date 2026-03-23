@@ -116,8 +116,6 @@ export default function WorkflowsPage() {
       
       if (response.ok) {
         setWorkflows(workflows.filter((w) => w.id !== id));
-        // Show success message
-        console.log('Workflow deleted successfully');
       } else {
         throw new Error('Failed to delete workflow');
       }

@@ -39,15 +39,12 @@ export function AdvancedRetailDashboardExample({
     storeId,
     enabled: true,
     onOrderUpdate: (order) => {
-      console.log('New order received:', order);
       // Show toast notification
     },
     onInventoryUpdate: (inventory) => {
-      console.log('Inventory updated:', inventory);
       // Trigger alert if low stock
     },
     onTransferUpdate: (transfer) => {
-      console.log('Transfer status updated:', transfer);
     },
   });
 
@@ -74,24 +71,20 @@ export function AdvancedRetailDashboardExample({
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
     // Apply filters to data fetching
-    console.log('Filters updated:', newFilters);
   };
 
   // Handle export
   const handleExport = (options: any) => {
-    console.log('Exporting data:', options);
     // Track analytics
   };
 
   // Handle schedule report
   const handleScheduleReport = (report: any) => {
-    console.log('Scheduling report:', report);
     // Call API to schedule report
   };
 
   // Handle layout save
   const handleSaveLayout = (layout: any[]) => {
-    console.log('Saved layout:', layout);
     // Send to backend for persistence
   };
 

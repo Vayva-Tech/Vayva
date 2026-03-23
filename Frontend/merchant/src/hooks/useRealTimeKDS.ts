@@ -100,7 +100,6 @@ export function useRealTimeKDS(): UseRealTimeKDSResult {
         ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/ws/kds/${storeId}`);
         
         ws.onopen = () => {
-          console.log('KDS WebSocket connected');
           reconnectAttempts = 0; // Reset reconnect counter on successful connection
         };
 
@@ -118,11 +117,9 @@ export function useRealTimeKDS(): UseRealTimeKDSResult {
         };
 
         ws.onclose = (event) => {
-          console.log('KDS WebSocket closed:', event.code, event.reason);
           // Attempt to reconnect if not closed intentionally
           if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            console.log(`Attempting to reconnect... (${reconnectAttempts}/${maxReconnectAttempts})`);
             setTimeout(connectWebSocket, reconnectDelay * reconnectAttempts);
           }
         };

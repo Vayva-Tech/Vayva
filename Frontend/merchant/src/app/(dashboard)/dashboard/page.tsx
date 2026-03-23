@@ -10,7 +10,6 @@ import {
   ShoppingCart,
   Users,
   Target,
-  Bell,
   ChevronDown,
   Package,
   Truck,
@@ -321,7 +320,7 @@ export default function DashboardPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 md:p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50/50">
         <div className="max-w-[1400px] mx-auto">
           <div className="bg-white rounded-2xl border border-red-100 p-8 text-center">
             <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -345,7 +344,7 @@ export default function DashboardPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 md:p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50/50">
         <div className="max-w-[1400px] mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <div className="animate-pulse">
@@ -428,7 +427,7 @@ export default function DashboardPage() {
   // No data / empty store state
   if (!kpis && !isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 md:p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50/50">
         <div className="max-w-[1400px] mx-auto">
           <EmptyState
             icon={ShoppingCart}
@@ -443,7 +442,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50/50">
       <div className="max-w-[1400px] mx-auto space-y-6">
 
         {/* ── Header ──────────────────────────────────────────────────────── */}
@@ -457,6 +456,7 @@ export default function DashboardPage() {
             <div className="relative">
               <button
                 onClick={() => setFilterOpen(!filterOpen)}
+                aria-label={`Filter: ${filterLabels[timeFilter]}`}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
               >
                 {filterLabels[timeFilter]}
@@ -471,6 +471,7 @@ export default function DashboardPage() {
                         setTimeFilter(key);
                         setFilterOpen(false);
                       }}
+                      aria-label={`Filter: ${filterLabels[key]}`}
                       className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
                         timeFilter === key
                           ? "bg-green-50 text-green-700 font-medium"
@@ -489,17 +490,11 @@ export default function DashboardPage() {
               onClick={() => mutate()}
               className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
               title="Refresh data"
+              aria-label="Refresh dashboard data"
             >
               <RefreshCw className="w-5 h-5 text-gray-600" />
             </button>
 
-            {/* Notification bell */}
-            <button className="relative p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
-              <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
-                3
-              </span>
-            </button>
           </div>
         </div>
 

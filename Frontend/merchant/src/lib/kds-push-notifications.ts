@@ -62,8 +62,6 @@ class KDSPushNotificationService {
         applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey),
       });
 
-      console.log('[KDS_Push] Subscribed to push notifications');
-      
       // Send subscription to backend
       await this.sendSubscriptionToBackend(this.subscription);
     } catch (error) {
@@ -79,7 +77,6 @@ class KDSPushNotificationService {
     if (this.subscription) {
       await this.subscription.unsubscribe();
       this.subscription = null;
-      console.log('[KDS_Push] Unsubscribed from push notifications');
     }
   }
 

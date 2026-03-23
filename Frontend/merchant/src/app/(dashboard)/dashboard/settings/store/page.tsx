@@ -154,7 +154,11 @@ export default function StoreSettingsPage() {
     );
   }
 
-  if (!profile) return null;
+  if (!profile) return (
+  <div className="flex flex-col items-center justify-center py-20 text-center">
+    <p className="text-sm text-gray-500">Could not load store profile. Please refresh.</p>
+  </div>
+);
 
   return (
     <div className="max-w-4xl space-y-8">
@@ -176,7 +180,7 @@ export default function StoreSettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Branding Section */}
-        <div className="bg-white  p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <Store className="h-5 w-5 text-green-600" />
             Branding & Identity
@@ -224,7 +228,7 @@ export default function StoreSettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5 text-left">
                   Store URL Slug
                 </label>
-                <div className="flex items-center gap-1 bg-white  px-3 py-2 rounded-lg border border-gray-100 text-gray-500 text-sm">
+                <div className="flex items-center gap-1 bg-white px-3 py-2 rounded-lg border border-gray-100 text-gray-500 text-sm">
                   <Globe className="h-4 w-4" />
                   <span>vayva.store/</span>
                   <span className="font-medium text-gray-900">
@@ -281,7 +285,7 @@ export default function StoreSettingsPage() {
         </div>
 
         {/* Contact Section */}
-        <div className="bg-white  p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <Mail className="h-5 w-5 text-green-600" />
             Support & Communication
@@ -360,7 +364,7 @@ export default function StoreSettingsPage() {
         </div>
 
         {/* Store Status Section */}
-        <div className="bg-white  p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
             {profile.isActive ? (
               <Unlock className="h-5 w-5 text-green-600" />
@@ -370,7 +374,7 @@ export default function StoreSettingsPage() {
             Store Status
           </h2>
 
-          <div className="flex items-center justify-between p-4 bg-white  rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white rounded-lg">
             <div>
               <p className="font-semibold text-gray-900">
                 {profile.isActive
@@ -392,7 +396,7 @@ export default function StoreSettingsPage() {
               className={
                 profile.isActive
                   ? "border-red-500/20 text-red-500 hover:bg-red-500"
-                  : "bg-green-500 hover:bg-green-50"
+                  : "bg-green-500 hover:bg-green-600"
               }
               disabled={saving}
             >
@@ -402,7 +406,7 @@ export default function StoreSettingsPage() {
         </div>
 
         {/* Operating Hours Section */}
-        <div className="bg-white  p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <Clock className="h-5 w-5 text-green-600" />
             Operating Hours
@@ -487,7 +491,7 @@ export default function StoreSettingsPage() {
           <Button
             type="submit"
             disabled={saving}
-            className="bg-green-500 hover:bg-green-500 text-white flex items-center gap-2 px-8"
+            className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 px-8"
           >
             {saving ? (
               <Loader2 className="h-4 w-4 animate-spin" />

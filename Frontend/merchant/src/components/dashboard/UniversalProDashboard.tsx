@@ -370,7 +370,6 @@ function DashboardContent({
                 icon={getActionIcon(action.category)}
                 onToggle={(id, completed) => {
                   // Handle task completion
-                  console.log('Task toggled:', id, completed);
                 }}
               />
             ))}

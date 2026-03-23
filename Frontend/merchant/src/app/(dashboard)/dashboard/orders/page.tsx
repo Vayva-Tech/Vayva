@@ -400,7 +400,7 @@ export default function OrdersPage() {
           accent="border-l-amber-500"
         />
         <SummaryCard
-          icon={<Loader2 size={20} />}
+          icon={<Package size={20} />}
           iconBg="bg-blue-100 text-blue-600"
           label="Processing"
           value={summary.processing.toString()}
@@ -553,6 +553,7 @@ export default function OrdersPage() {
                         type="checkbox"
                         checked={allSelected}
                         onChange={toggleSelectAll}
+                        aria-label="Select all orders on this page"
                         className="w-4 h-4 rounded border-gray-300 text-green-500 focus:ring-green-500/20 cursor-pointer"
                       />
                     </th>
@@ -585,6 +586,7 @@ export default function OrdersPage() {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelect(order.id)}
+                            aria-label={`Select order ${order.id}`}
                             className="w-4 h-4 rounded border-gray-300 text-green-500 focus:ring-green-500/20 cursor-pointer"
                           />
                         </td>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Simplified Socials Step using Enhanced Connection Manager
  */

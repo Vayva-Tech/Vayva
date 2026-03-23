@@ -136,7 +136,6 @@ export default function WorkflowEditorPage() {
       setWorkflow(updatedWorkflow);
       
       // Show success message (you could use a toast here)
-      console.log('Workflow saved successfully');
     } catch (err) {
       console.error('Failed to save workflow:', err);
       throw err;
@@ -150,7 +149,6 @@ export default function WorkflowEditorPage() {
       // Replace with actual API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      console.log('Workflow tested successfully');
       // Show test results modal or notification
     } catch (err) {
       console.error('Failed to test workflow:', err);
