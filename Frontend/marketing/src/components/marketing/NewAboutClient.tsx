@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { Button } from "@vayva/ui";
 import { APP_URL } from "@/lib/constants";
 import {
@@ -139,31 +138,9 @@ export function NewAboutClient(): React.JSX.Element {
       <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-[1600px] mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="absolute -inset-4 bg-emerald-200/40 rounded-3xl blur-2xl opacity-60" />
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-white/70 border border-white/60">
-                <Image
-                  src={aboutContent.founder.image}
-                  alt={`${aboutContent.founder.name}, ${aboutContent.founder.role}`}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-4 -right-4 bg-white/90 backdrop-blur rounded-xl p-4 shadow-xl border border-slate-100">
-                <p className="text-xs text-slate-500 uppercase tracking-wide">{aboutContent.founder.role}</p>
-                <p className="font-semibold text-slate-900">{aboutContent.founder.name}</p>
-              </div>
-            </motion.div>
-
             {/* Content */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="space-y-6"
@@ -174,6 +151,27 @@ export function NewAboutClient(): React.JSX.Element {
                   <p key={paragraph}>{paragraph}</p>
                 ))}
                 <p className="font-medium text-slate-900">{aboutContent.storyQuote}</p>
+              </div>
+            </motion.div>
+
+            {/* Founder Info Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="absolute -inset-4 bg-emerald-200/40 rounded-3xl blur-2xl opacity-60" />
+              <div className="relative bg-white/90 backdrop-blur rounded-2xl border border-white/60 p-8 shadow-xl">
+                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-6 mx-auto">
+                  <span className="text-3xl font-bold text-emerald-600">
+                    {aboutContent.founder.name.charAt(0)}
+                  </span>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-slate-900 mb-2">{aboutContent.founder.name}</p>
+                  <p className="text-sm text-emerald-600 font-semibold uppercase tracking-wide">{aboutContent.founder.role}</p>
+                </div>
               </div>
             </motion.div>
           </div>
