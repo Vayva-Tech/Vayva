@@ -66,7 +66,7 @@ export function PricingSection(): React.JSX.Element {
         </motion.div>
 
         {/* Pricing cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((plan, index) => {
             const Icon = plan.icon;
             return (
@@ -78,14 +78,14 @@ export function PricingSection(): React.JSX.Element {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className={`relative rounded-3xl p-8 ${
                   plan.popular
-                    ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-2xl shadow-emerald-200 scale-105 md:scale-110 z-10"
-                    : "bg-white border border-emerald-100 shadow-xl shadow-emerald-100/50 hover:shadow-emerald-200/50 transition-shadow"
+                    ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-md z-10"
+                    : "bg-white border border-emerald-100 shadow-sm hover:shadow-md transition-shadow"
                 }`}
               >
                 {/* Popular badge */}
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400 text-amber-900 text-sm font-semibold shadow-lg">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400 text-amber-900 text-sm font-semibold shadow-sm">
                       <Sparkles className="w-4 h-4" />
                       Most popular
                     </span>
@@ -95,7 +95,7 @@ export function PricingSection(): React.JSX.Element {
                 {/* Promo badge */}
                 {plan.promoBadge && !plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-500 text-white text-sm font-semibold shadow-lg">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-green-500 text-white text-sm font-semibold shadow-sm">
                       <Zap className="w-4 h-4" />
                       {plan.promoBadge}
                     </span>
@@ -164,8 +164,8 @@ export function PricingSection(): React.JSX.Element {
                   <Button
                     className={`w-full rounded-xl h-12 font-semibold transition-all ${
                       plan.popular
-                        ? "bg-white hover:bg-emerald-50 text-emerald-700 shadow-lg"
-                        : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg"
+                        ? "bg-white hover:bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow-md"
                     }`}
                   >
                     {plan.cta}
@@ -185,7 +185,7 @@ export function PricingSection(): React.JSX.Element {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white shadow-lg border border-emerald-100">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white shadow-sm border border-emerald-100">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-sm text-slate-600">
               <span className="font-medium text-emerald-700">7-day free trial</span> on paid plans. 

@@ -98,7 +98,7 @@ export function DashboardPreviewSection(): React.JSX.Element {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.08 }}
-              className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:border-emerald-200 transition-all group"
+              className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group h-full"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">

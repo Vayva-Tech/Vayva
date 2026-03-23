@@ -6,8 +6,25 @@
  */
 
 import { NextResponse } from "next/server";
-import * as Sentry from "@sentry/nextjs";
 import { logger } from "@vayva/shared";
+
+/**
+ * Safely capture exception to Sentry (no-op if SDK not initialized)
+ */
+function safeSentryCaptureException(
+  error: unknown,
+  extra?: Record<string, unknown>
+): void {
+  try {
+    // Dynamic import to avoid crash if @sentry/nextjs is not initialized
+    const Sentry = require("@sentry/nextjs");
+    if (typeof Sentry?.captureException === "function") {
+      Sentry.captureException(error, { extra });
+    }
+  } catch {
+    // Sentry not available or not initialized — silently ignore
+  }
+}
 
 /**
  * Standardized API Error Codes
@@ -212,13 +229,11 @@ export function handleInternalError(
     requestId,
   });
 
-  // Send to Sentry
-  Sentry.captureException(error, {
-    extra: {
-      endpoint: context?.endpoint,
-      userId: context?.userId,
-      requestId,
-    },
+  // Send to Sentry (safe — won't crash if SDK not initialized)
+  safeSentryCaptureException(error, {
+    endpoint: context?.endpoint,
+    userId: context?.userId,
+    requestId,
   });
 
   // Return generic message to client

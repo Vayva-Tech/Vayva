@@ -100,7 +100,7 @@ function HeroSection() {
             Artificial intelligence handles the busywork while you focus on growth.
           </motion.p>
 
-          {/* Dashboard Mockup - Responsive */}
+          {/* Dashboard Mockup - Desktop */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -111,7 +111,7 @@ function HeroSection() {
             <div className="absolute -inset-4 bg-gradient-to-br from-emerald-500/15 via-teal-400/10 to-emerald-400/15 rounded-3xl blur-2xl opacity-40" />
 
             {/* Pro Dashboard UI Replica */}
-            <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/50 overflow-hidden">
+            <div className="relative bg-white rounded-2xl shadow-md border border-slate-200/50 overflow-hidden">
               {/* Browser Header */}
               <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center gap-3">
                 <div className="flex gap-1.5">
@@ -131,15 +131,15 @@ function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Mobile Dashboard Preview - Compact card version */}
+          {/* Mobile Dashboard Preview - Scaled down full dashboard */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="relative w-full mx-auto mt-6 mb-6 md:hidden"
+            className="relative w-full mx-auto mt-6 mb-6 md:hidden overflow-hidden rounded-xl border border-slate-200/50 shadow-md"
           >
             <div className="absolute -inset-3 bg-gradient-to-br from-emerald-500/15 via-teal-400/10 to-emerald-400/15 rounded-2xl blur-xl opacity-40" />
-            <div className="relative bg-white rounded-xl shadow-xl border border-slate-200/50 overflow-hidden">
+            <div className="relative bg-white overflow-hidden">
               {/* Mini browser bar */}
               <div className="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
                 <div className="flex gap-1">
@@ -148,50 +148,12 @@ function HeroSection() {
                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
                 </div>
                 <div className="flex-1 bg-white rounded px-2 py-1 text-[10px] text-slate-500 font-mono">
-                  merchant.vayva.ng
+                  merchant.vayva.ng/dashboard
                 </div>
               </div>
-              {/* Mobile KPI cards */}
-              <div className="p-3 space-y-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-[10px]">V</span>
-                  </div>
-                  <span className="text-xs font-bold text-gray-900">Merchant Dashboard</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { label: "Revenue", value: "₦2.4M", change: "+12.5%", color: "bg-green-500" },
-                    { label: "Orders", value: "384", change: "+8.2%", color: "bg-blue-500" },
-                    { label: "Customers", value: "1,247", change: "+5.1%", color: "bg-purple-500" },
-                    { label: "AI Orders", value: "27", change: "today", color: "bg-orange-500" },
-                  ].map((kpi) => (
-                    <div key={kpi.label} className="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-                      <div className={`w-6 h-6 rounded-md ${kpi.color} flex items-center justify-center mb-1.5`}>
-                        <div className="w-3 h-3 bg-white/30 rounded-sm" />
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">{kpi.value}</p>
-                      <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-gray-500">{kpi.label}</p>
-                        <span className="text-[10px] font-semibold text-green-600">{kpi.change}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Mini chart placeholder */}
-                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                  <p className="text-[10px] font-semibold text-gray-700 mb-2">Revenue Trend (30d)</p>
-                  <svg viewBox="0 0 200 40" className="w-full h-8" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="mobileGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0.2" />
-                        <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <polygon fill="url(#mobileGrad)" points="0,40 0,25 28,22 56,28 84,18 112,15 140,22 168,12 200,8 200,40" />
-                    <polyline fill="none" stroke="#22c55e" strokeWidth="2" strokeLinejoin="round" points="0,25 28,22 56,28 84,18 112,15 140,22 168,12 200,8" />
-                  </svg>
-                </div>
+              {/* Scaled-down full dashboard */}
+              <div className="origin-top-left" style={{ transform: "scale(0.55)", width: "182%", maxHeight: "400px", overflow: "hidden" }}>
+                <ProDashboardMarketing />
               </div>
             </div>
           </motion.div>
@@ -204,7 +166,7 @@ function HeroSection() {
             className="flex flex-wrap items-center justify-center gap-4 mb-6"
           >
             <Link href={`${APP_URL}/signup`}>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 rounded-xl text-base font-semibold shadow-xl shadow-emerald-500/20 hover:shadow-2xl hover:shadow-emerald-500/30 transition-all">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 rounded-xl text-base font-semibold shadow-md hover:shadow-lg transition-all">
                 Start your free trial
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -298,7 +260,7 @@ function RealityGapSection() {
             transition={{ duration: 0.6 }}
             className="relative max-w-[480px] mx-auto lg:mx-0"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-xl shadow-emerald-900/10">
+            <div className="relative rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/images/chaos-problem.jpg"
                 alt="African business owner managing orders"
@@ -311,7 +273,7 @@ function RealityGapSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 via-transparent to-transparent" />
             </div>
             {/* Floating element */}
-            <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-lg border border-emerald-100">
+            <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-sm border border-emerald-100">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                   <span className="text-xl">😰</span>
@@ -439,7 +401,7 @@ function SolutionSection() {
             </p>
 
             <Link href={`${APP_URL}/signup`}>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 rounded-xl text-base font-semibold shadow-xl shadow-emerald-500/20">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 rounded-xl text-base font-semibold shadow-md">
                 Experience the difference
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -454,7 +416,7 @@ function SolutionSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="order-1 lg:order-2 relative max-w-[480px] mx-auto lg:mx-0 lg:ml-auto"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-xl shadow-emerald-900/10">
+            <div className="relative rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/images/calm-solution.jpg"
                 alt="Business owner using Vayva"
@@ -466,7 +428,7 @@ function SolutionSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-transparent to-transparent" />
             </div>
             {/* Floating element */}
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-3 shadow-lg border border-emerald-100">
+            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-3 shadow-sm border border-emerald-100">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                   <span className="text-xl">😌</span>
@@ -489,7 +451,7 @@ function SolutionSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="p-5 rounded-xl bg-white border border-emerald-100 shadow-lg shadow-emerald-100/30 hover:shadow-xl hover:border-emerald-200 transition-all group"
+              className="p-5 rounded-xl bg-white border border-emerald-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group h-full"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                 <pillar.icon className="w-5 h-5 text-emerald-600" />
@@ -554,14 +516,14 @@ function IndustrySection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group p-8 rounded-2xl bg-white border border-emerald-100 shadow-lg shadow-emerald-100/30 hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all cursor-pointer"
+              className="group p-8 rounded-2xl bg-white border border-emerald-100 shadow-sm hover:shadow-md hover:border-emerald-300 hover:-translate-y-1 transition-all cursor-pointer h-full flex flex-col"
             >
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${industry.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                 <span className="text-3xl">{industry.icon}</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">{industry.name}</h3>
-              <p className="text-slate-600 mb-4">{industry.desc}</p>
-              <div className="flex items-center text-emerald-600 text-sm font-semibold group-hover:translate-x-1 transition-transform">
+              <p className="text-slate-600 mb-4 flex-grow">{industry.desc}</p>
+              <div className="flex items-center text-emerald-600 text-sm font-semibold group-hover:translate-x-1 transition-transform mt-auto">
                 Learn more
                 <ArrowRight className="w-4 h-4 ml-1" />
               </div>
@@ -631,7 +593,7 @@ function GrowthTechSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="p-6 rounded-2xl bg-white border border-emerald-100 shadow-lg shadow-emerald-100/30 hover:shadow-xl hover:border-emerald-200 transition-all group"
+              className="p-6 rounded-2xl bg-white border border-emerald-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group h-full"
             >
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <feature.icon className="w-6 h-6 text-emerald-600" />
@@ -743,7 +705,7 @@ function FeatureAccordion() {
               transition={{ delay: i * 0.05 }}
               className={`rounded-2xl border-2 transition-all ${
                 openIndex === i
-                  ? "bg-white border-emerald-300 shadow-lg shadow-emerald-100/50"
+                  ? "bg-white border-emerald-300 shadow-sm"
                   : "bg-slate-50 border-slate-100 hover:border-emerald-200"
               }`}
             >
@@ -854,7 +816,7 @@ function FeatureAccordion() {
 
               {/* Center Logo Circle */}
               <div className="absolute left-1/2 bottom-[40px] -translate-x-1/2 z-20">
-                <div className="w-[160px] h-[80px] rounded-t-full bg-white border-2 border-emerald-300 shadow-xl flex items-center justify-center pt-4">
+                <div className="w-[160px] h-[80px] rounded-t-full bg-white border-2 border-emerald-300 shadow-sm flex items-center justify-center pt-4">
                   <Image
                     src="/vayva-logo-official.svg"
                     alt="Vayva"
@@ -962,7 +924,7 @@ function FeatureAccordion() {
                   key={activeIndex}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/95 backdrop-blur-sm rounded-xl border-2 border-emerald-200 shadow-xl px-6 py-4 text-center"
+                  className="bg-white/95 backdrop-blur-sm rounded-xl border-2 border-emerald-200 shadow-md px-6 py-4 text-center"
                 >
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
@@ -1027,7 +989,7 @@ function FinalCTASection() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Link href={`${APP_URL}/signup`}>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-7 rounded-xl text-lg font-bold shadow-xl shadow-emerald-500/30">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-7 rounded-xl text-lg font-bold shadow-md">
                 Start free trial
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
