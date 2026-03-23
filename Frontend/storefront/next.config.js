@@ -18,7 +18,7 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(__dirname, "../.."),
   },
-  transpilePackages: ["@vayva/ui", "@vayva/theme", "@vayva/schemas", "@vayva/api-client", "@vayva/content", "@vayva/emails", "@vayva/templates", "@vayva/addons"],
+  transpilePackages: ["@vayva/ui", "@vayva/theme", "@vayva/schemas", "@vayva/api-client", "@vayva/content", "@vayva/emails", "@vayva/templates", "@vayva/addons", "@vayva/db", "@vayva/shared"],
   reactCompiler: true,
   experimental: {
     optimizePackageImports: ["lucide-react", "@vayva/ui", "@vayva/shared", "@vayva/api-client", "framer-motion", "date-fns"]
