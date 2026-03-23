@@ -72,7 +72,7 @@ vayva/
 | **Language** | TypeScript 5.9, React 19 |
 | **Database** | PostgreSQL + Prisma ORM |
 | **Cache & Queues** | Redis, BullMQ |
-| **AI** | Groq (GPT-4o Mini, Llama 3.3 70B), OpenRouter |
+| **AI** | (GPT-4o Mini, Llama 3.3 70B), OpenRouter |
 | **Payments** | Paystack |
 | **Messaging** | Evolution API (WhatsApp) |
 | **UI** | Tailwind CSS, Radix UI, Framer Motion |
