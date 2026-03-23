@@ -9,7 +9,6 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const result = await apiJson(
       `${process.env.BACKEND_API_URL}/api/portfolio/${id}`,
@@ -32,7 +31,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
     const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const body = await request.json().catch(() => ({}));

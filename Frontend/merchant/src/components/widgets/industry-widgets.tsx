@@ -6,22 +6,22 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Package, 
+import {
+  Package,
   ShoppingCart,
   Users,
-  TrendingUp,
+  TrendUp as TrendingUp,
   Clock,
-  AlertTriangle,
+  Warning as AlertTriangle,
   CheckCircle,
   Target,
-  BarChart,
-  PieChart,
+  ChartBar as BarChart,
+  ChartPie as PieChart,
   Calendar,
-  Store,
+  Storefront as Store,
   Heart,
   Car,
-  Plane,
+  AirplaneTilt as Plane,
   GraduationCap,
   Building,
   MusicNote,
@@ -30,7 +30,7 @@ import {
   Camera,
   Palette
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';

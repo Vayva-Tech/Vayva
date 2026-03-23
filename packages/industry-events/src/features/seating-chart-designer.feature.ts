@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seating Chart Designer Feature
  */

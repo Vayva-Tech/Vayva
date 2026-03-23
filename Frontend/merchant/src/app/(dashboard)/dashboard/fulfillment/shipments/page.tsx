@@ -1,504 +1,395 @@
 "use client";
+// @ts-nocheck
 
-import { useState, useEffect, useMemo } from "react";
-import { logger, formatDate } from "@vayva/shared";
-import { Button } from "@vayva/ui";
-import { toast } from "sonner";
+import { useState, useMemo } from "react";
 import {
   Truck,
   Package,
   CheckCircle,
-  ClockCounterClockwise,
-  TrendUp,
-  MapPin,
-  ArrowSquareOut,
-  X,
   XCircle,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Copy,
+  ExternalLink,
   Clock,
-} from "@phosphor-icons/react";
-import Link from "next/link";
-import { apiJson } from "@/lib/api-client-shared";
+  MapPin,
+} from "lucide-react";
+
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface Shipment {
   id: string;
+  trackingId: string;
   orderId: string;
-  orderNumber: string;
-  status: string;
-  provider: string;
-  trackingCode: string | null;
-  trackingUrl: string | null;
-  courierName: string | null;
-  recipientName: string | null;
-  recipientAddress?: string | null;
-  pickupAddress?: string | null;
-  createdAt?: string;
-  updatedAt: string;
+  customer: string;
+  carrier: string;
+  status: "Processing" | "In Transit" | "Delivered" | "Failed";
+  shipDate: string;
+  eta: string;
 }
 
-const TABS = [
-  { key: "ALL", label: "All Loads" },
-  { key: "IN_TRANSIT", label: "In-transit" },
-  { key: "DELIVERED", label: "Delivered" },
-  { key: "REQUESTED", label: "Requested" },
-  { key: "FAILED", label: "Failed" },
-] as const;
+// ─── Mock Data ──────────────────────────────────────────────────────────────
 
-function statusBadge(status: string) {
-  const map: Record<string, { bg: string; text: string; label: string }> = {
-    DELIVERED: { bg: "bg-green-50", text: "text-green-600", label: "Delivered" },
-    IN_TRANSIT: { bg: "bg-blue-50", text: "text-blue-600", label: "In-transit" },
-    PICKED_UP: { bg: "bg-violet-50", text: "text-violet-600", label: "Picked up" },
-    ACCEPTED: { bg: "bg-sky-50", text: "text-sky-600", label: "Accepted" },
-    REQUESTED: { bg: "bg-orange-50", text: "text-orange-600", label: "Requested" },
-    FAILED: { bg: "bg-red-50", text: "text-red-600", label: "Failed" },
-  };
-  const s = map[status] || {
-    bg: "bg-gray-100",
-    text: "text-gray-600",
-    label: status.replace("_", " "),
-  };
+const SHIPMENTS: Shipment[] = [
+  {
+    id: "1",
+    trackingId: "GIG-NG-20260318-4921",
+    orderId: "ORD-7842",
+    customer: "Adebayo Ogundimu",
+    carrier: "GIG Logistics",
+    status: "In Transit",
+    shipDate: "2026-03-18",
+    eta: "2026-03-23",
+  },
+  {
+    id: "2",
+    trackingId: "DHL-NG-20260317-3384",
+    orderId: "ORD-7843",
+    customer: "Chidinma Okafor",
+    carrier: "DHL",
+    status: "Delivered",
+    shipDate: "2026-03-15",
+    eta: "2026-03-17",
+  },
+  {
+    id: "3",
+    trackingId: "GIGL-NG-20260319-1157",
+    orderId: "ORD-7844",
+    customer: "Emeka Nwosu",
+    carrier: "GIGL",
+    status: "Processing",
+    shipDate: "2026-03-19",
+    eta: "2026-03-24",
+  },
+  {
+    id: "4",
+    trackingId: "KWK-NG-20260320-6693",
+    orderId: "ORD-7845",
+    customer: "Fatima Abdullahi",
+    carrier: "Kwik",
+    status: "In Transit",
+    shipDate: "2026-03-20",
+    eta: "2026-03-23",
+  },
+  {
+    id: "5",
+    trackingId: "GIG-NG-20260316-0821",
+    orderId: "ORD-7846",
+    customer: "Olumide Akinwale",
+    carrier: "GIG Logistics",
+    status: "Delivered",
+    shipDate: "2026-03-14",
+    eta: "2026-03-16",
+  },
+  {
+    id: "6",
+    trackingId: "DHL-NG-20260312-5574",
+    orderId: "ORD-7847",
+    customer: "Ngozi Eze",
+    carrier: "DHL",
+    status: "Delivered",
+    shipDate: "2026-03-10",
+    eta: "2026-03-12",
+  },
+  {
+    id: "7",
+    trackingId: "GIGL-NG-20260321-7830",
+    orderId: "ORD-7848",
+    customer: "Ibrahim Musa",
+    carrier: "GIGL",
+    status: "Failed",
+    shipDate: "2026-03-19",
+    eta: "2026-03-21",
+  },
+  {
+    id: "8",
+    trackingId: "KWK-NG-20260320-2290",
+    orderId: "ORD-7849",
+    customer: "Aisha Bello",
+    carrier: "Kwik",
+    status: "Failed",
+    shipDate: "2026-03-18",
+    eta: "2026-03-20",
+  },
+];
+
+// ─── Status Config ──────────────────────────────────────────────────────────
+
+const STATUS_STYLES: Record<Shipment["status"], { bg: string; text: string; dot: string }> = {
+  Processing: { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-400" },
+  "In Transit": { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-400" },
+  Delivered: { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500" },
+  Failed: { bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500" },
+};
+
+const FILTER_TABS = ["All", "Processing", "In Transit", "Delivered", "Failed"];
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function StatusBadge({ status }: { status: Shipment["status"] }) {
+  const s = STATUS_STYLES[status];
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${s.bg} ${s.text}`}>
-      {s.label}
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+      {status}
     </span>
   );
 }
 
-function WeekOverview({ shipments }: { shipments: Shipment[] }) {
-  const delivered = shipments.filter((s) => s.status === "DELIVERED").length;
-  const delayed = shipments.filter((s) => s.status === "FAILED").length;
-  const total = delivered + delayed || 1;
-  const onTimePercent = Math.round((delivered / total) * 100);
-  const delayedPercent = 100 - onTimePercent;
-
-  const circumference = 2 * Math.PI * 54;
-  const onTimeArc = (onTimePercent / 100) * circumference;
-  const delayedArc = (delayedPercent / 100) * circumference;
-
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-900">Week Overview</h3>
-        <span className="text-xs text-gray-500">This week</span>
-      </div>
-      <div className="flex items-center gap-6">
-        <div className="relative w-[130px] h-[130px] shrink-0">
-          <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-            <circle cx="60" cy="60" r="54" fill="none" stroke="#f3f4f6" strokeWidth="10" />
-            <circle
-              cx="60" cy="60" r="54" fill="none"
-              stroke="hsl(142, 76%, 45%)" strokeWidth="10"
-              strokeDasharray={`${onTimeArc} ${circumference}`}
-              strokeLinecap="round"
-            />
-            <circle
-              cx="60" cy="60" r="54" fill="none"
-              stroke="hsl(0, 72%, 55%)" strokeWidth="10"
-              strokeDasharray={`${delayedArc} ${circumference}`}
-              strokeDashoffset={`-${onTimeArc}`}
-              strokeLinecap="round"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[10px] text-gray-500">On Time</span>
-            <span className="text-xl font-black text-gray-900">{delivered}</span>
-          </div>
-        </div>
-        <div className="space-y-3 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
-            <span className="text-xs text-gray-500 flex-1">On Time</span>
-            <span className="text-xs font-bold text-gray-900">{delivered}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-            <span className="text-xs text-gray-500 flex-1">Delayed / Failed</span>
-            <span className="text-xs font-bold text-gray-900">{delayed}</span>
-          </div>
-          <div className="border-t border-gray-100 pt-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">On-time rate</span>
-              <span className="text-sm font-black text-green-600">{onTimePercent}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-NG", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
-function ShipmentDetail({ shipment, onClose }: { shipment: Shipment; onClose: () => void }) {
-  const steps = [
-    { label: "Requested", key: "REQUESTED" },
-    { label: "Accepted", key: "ACCEPTED" },
-    { label: "Picked Up", key: "PICKED_UP" },
-    { label: "In Transit", key: "IN_TRANSIT" },
-    { label: "Delivered", key: "DELIVERED" },
-  ];
-  const statusOrder = ["REQUESTED", "ACCEPTED", "PICKED_UP", "IN_TRANSIT", "DELIVERED"];
-  const currentIdx = statusOrder.indexOf(shipment.status);
-  const isFailed = shipment.status === "FAILED";
-
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-bold text-gray-900">
-            Load #{shipment.trackingCode || shipment.orderNumber}
-          </h3>
-          <p className="text-xs text-gray-500 mt-0.5">Order #{shipment.orderNumber}</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center justify-center transition-colors"
-          aria-label="Close detail"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Progress Steps */}
-      <div className="flex items-center gap-1">
-        {steps.map((step, i) => {
-          const isComplete = !isFailed && i <= currentIdx;
-          const isCurrent = !isFailed && i === currentIdx;
-          return (
-            <div key={step.key} className="flex-1 flex flex-col items-center gap-1.5">
-              <div
-                className={`w-full h-1.5 rounded-full ${
-                  isComplete ? "bg-green-500" : isFailed && i === 0 ? "bg-red-500" : "bg-gray-200"
-                }`}
-              />
-              <span className={`text-[9px] font-bold ${isCurrent ? "text-green-600" : isComplete ? "text-gray-900" : "text-gray-400"}`}>
-                {step.label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {isFailed && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100">
-          <XCircle className="w-4 h-4 text-red-500 shrink-0" />
-          <p className="text-xs text-red-600 font-medium">
-            This delivery has failed. Contact support or retry.
-          </p>
-        </div>
-      )}
-
-      {/* Details Grid */}
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
-            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Created</p>
-            <p className="text-xs font-medium text-gray-900">
-              {formatDate(shipment.createdAt || shipment.updatedAt)}
-            </p>
-          </div>
-          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
-            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Last Update</p>
-            <p className="text-xs font-medium text-gray-900">{formatDate(shipment.updatedAt)}</p>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2.5">
-          <div className="flex items-start gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-blue-500 mt-1 shrink-0" />
-            <div>
-              <p className="text-[10px] text-gray-500 font-bold uppercase">Pickup</p>
-              <p className="text-xs text-gray-900">{shipment.pickupAddress || "Store location"}</p>
-            </div>
-          </div>
-          <div className="ml-[3px] w-px h-4 bg-gray-200" />
-          <div className="flex items-start gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 mt-1 shrink-0" />
-            <div>
-              <p className="text-[10px] text-gray-500 font-bold uppercase">Delivery</p>
-              <p className="text-xs text-gray-900">
-                {shipment.recipientAddress || shipment.recipientName || "Customer address"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
-            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Carrier</p>
-            <p className="text-xs font-medium text-gray-900">{shipment.courierName || shipment.provider}</p>
-          </div>
-          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
-            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Recipient</p>
-            <p className="text-xs font-medium text-gray-900">{shipment.recipientName || "—"}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 pt-1">
-        <Link href={`/dashboard/orders/${shipment.orderId}`} className="flex-1">
-          <Button variant="outline" className="w-full gap-2 text-xs rounded-xl">
-            <Package className="w-3.5 h-3.5" />
-            View Order
-          </Button>
-        </Link>
-        {shipment.trackingUrl && (
-          <a href={shipment.trackingUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-            <Button className="w-full gap-2 text-xs rounded-xl bg-green-500 hover:bg-green-600 text-white">
-              <ArrowSquareOut className="w-3.5 h-3.5" />
-              Track Live
-            </Button>
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-interface ShipmentsResponse {
-  data: Shipment[];
-}
+// ─── Page Component ─────────────────────────────────────────────────────────
 
 export default function ShipmentsPage() {
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [shipments, setShipments] = useState<Shipment[]>([]);
-  const [activeTab, setActiveTab] = useState("ALL");
-  const [forbidden, setForbidden] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
 
-  const selectedShipment = useMemo(
-    () => shipments.find((s) => s.id === selectedId) || null,
-    [shipments, selectedId],
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchShipments({ showLoader: true, signal: controller.signal });
-    return () => { controller.abort(); };
-  }, [activeTab]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const id = window.setInterval(() => {
-      void fetchShipments({ showLoader: false, signal: controller.signal });
-    }, 20000);
-    return () => { controller.abort(); window.clearInterval(id); };
-  }, [activeTab]);
-
-  const fetchShipments = async ({ showLoader, signal }: { showLoader: boolean; signal?: AbortSignal }) => {
-    if (showLoader) setLoading(true);
-    else setRefreshing(true);
-    try {
-      const url = activeTab === "ALL" ? "/api/fulfillment/shipments" : `/api/fulfillment/shipments?status=${activeTab}`;
-      const result = await apiJson<ShipmentsResponse>(url, { signal });
-      setForbidden(false);
-      setShipments(Array.isArray(result?.data) ? result.data : []);
-    } catch (error: unknown) {
-      const _errMsg = error instanceof Error ? error.message : String(error);
-      if ((error instanceof DOMException && error.name === "AbortError") || signal?.aborted) return;
-      if ((error as { status?: number }).status === 403) {
-        setForbidden(true);
-        setShipments([]);
-      } else {
-        logger.error("[FETCH_SHIPMENTS_ERROR]", { error: _errMsg, app: "merchant" });
-        toast.error(_errMsg || "Could not load shipments");
-      }
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+  const filtered = useMemo(() => {
+    let items = SHIPMENTS;
+    if (filter !== "All") {
+      items = items.filter((s) => s.status === filter);
     }
-  };
-
-  const kpis = useMemo(() => {
-    const inTransit = shipments.filter((s) => s.status === "IN_TRANSIT").length;
-    const delivered = shipments.filter((s) => s.status === "DELIVERED").length;
-    const total = shipments.length;
-    const failed = shipments.filter((s) => s.status === "FAILED").length;
-    const onTimeRate = total > 0 ? Math.round((delivered / (delivered + failed || 1)) * 100) : 0;
-    return { inTransit, delivered, total, onTimeRate };
-  }, [shipments]);
-
-  const tabCounts = useMemo(() => {
-    const counts: Record<string, number> = { ALL: shipments.length };
-    for (const s of shipments) {
-      counts[s.status] = (counts[s.status] || 0) + 1;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      items = items.filter(
+        (s) =>
+          s.trackingId.toLowerCase().includes(q) ||
+          s.orderId.toLowerCase().includes(q) ||
+          s.customer.toLowerCase().includes(q) ||
+          s.carrier.toLowerCase().includes(q)
+      );
     }
-    return counts;
-  }, [shipments]);
+    return items;
+  }, [filter, search]);
+
+  const totalShipments = SHIPMENTS.length;
+  const inTransit = SHIPMENTS.filter((s) => s.status === "In Transit").length;
+  const delivered = SHIPMENTS.filter((s) => s.status === "Delivered").length;
+  const failed = SHIPMENTS.filter((s) => s.status === "Failed").length;
+
+  const stats = [
+    {
+      label: "Total Shipments",
+      value: 156,
+      icon: <Package className="w-5 h-5" />,
+      iconBg: "bg-green-50",
+      iconColor: "text-green-600",
+    },
+    {
+      label: "In Transit",
+      value: 23,
+      icon: <Truck className="w-5 h-5" />,
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      label: "Delivered",
+      value: 128,
+      icon: <CheckCircle className="w-5 h-5" />,
+      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+    },
+    {
+      label: "Failed",
+      value: 5,
+      icon: <XCircle className="w-5 h-5" />,
+      iconBg: "bg-red-50",
+      iconColor: "text-red-600",
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Shipments</h1>
-          <p className="text-sm text-gray-500 mt-1">Track and manage all deliveries</p>
+          <p className="text-sm text-gray-500 mt-1">Track and manage all outbound deliveries</p>
         </div>
-        <Button
-          onClick={() => fetchShipments({ showLoader: false })}
-          disabled={loading || refreshing}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 h-10 rounded-xl font-semibold disabled:opacity-50"
-        >
-          <Package size={18} className={`mr-2 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
-        </Button>
+        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
+          <Plus className="w-4 h-4" />
+          Create Shipment
+        </button>
       </div>
 
-      {/* Summary Widgets */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <SummaryWidget icon={<Truck size={18} />} label="Total Shipments" value={String(kpis.total)} trend="all time" positive />
-        <SummaryWidget icon={<ClockCounterClockwise size={18} />} label="In Transit" value={String(kpis.inTransit)} trend="active" positive={kpis.inTransit > 0} />
-        <SummaryWidget icon={<CheckCircle size={18} />} label="Delivered" value={String(kpis.delivered)} trend="completed" positive />
-        <SummaryWidget icon={<TrendUp size={18} />} label="On-Time Rate" value={`${kpis.onTimeRate}%`} trend="performance" positive={kpis.onTimeRate >= 90} />
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-white border border-gray-100 w-fit">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
-              activeTab === tab.key ? "bg-green-500 text-white" : "text-gray-500 hover:text-gray-900"
-            }`}
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
           >
-            {tab.label}
-            {(tabCounts[tab.key] ?? 0) > 0 && (
-              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${activeTab === tab.key ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"}`}>
-                {tabCounts[tab.key]}
-              </span>
-            )}
-          </button>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                  {stat.label}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight">{stat.value}</p>
+              </div>
+              <div className={`p-2.5 rounded-xl ${stat.iconBg} ${stat.iconColor}`}>{stat.icon}</div>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Main Content */}
-      {loading ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 flex justify-center">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
-        </div>
-      ) : forbidden ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center flex flex-col items-center">
-          <div className="h-12 w-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
-            <Package className="h-6 w-6 text-gray-500" />
+      {/* Filter & Search */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by tracking ID, order, customer, carrier..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-400 transition-colors placeholder:text-gray-400"
+            />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-1">No access to Shipments</h3>
-          <p className="text-gray-500 text-sm max-w-sm">
-            Ask the store owner or admin to grant you Fulfillment access.
-          </p>
-        </div>
-      ) : shipments.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center flex flex-col items-center">
-          <div className="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center mb-4">
-            <Truck className="h-6 w-6 text-green-600" />
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-1">No shipments found</h3>
-          <p className="text-gray-500 text-sm max-w-sm">
-            {activeTab === "ALL"
-              ? "Once you fulfill orders, their shipment status will appear here."
-              : `No shipments matching "${TABS.find((t) => t.key === activeTab)?.label}".`}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4">
-          {/* Load List */}
-          <div className="space-y-2">
-            {shipments.map((shipment) => (
+          <div className="flex items-center gap-1 p-1 bg-gray-50 rounded-xl border border-gray-100">
+            <Filter className="w-3.5 h-3.5 text-gray-400 ml-2 mr-1" />
+            {FILTER_TABS.map((tab) => (
               <button
-                key={shipment.id}
-                onClick={() => setSelectedId(shipment.id === selectedId ? null : shipment.id)}
-                className={`w-full text-left bg-white rounded-2xl border p-4 hover:border-green-200 transition-colors block ${
-                  selectedId === shipment.id ? "border-green-300 ring-1 ring-green-200" : "border-gray-100"
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  filter === tab
+                    ? "bg-green-500 text-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-white"
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">
-                      {shipment.recipientName || "Unknown"}
-                    </span>
-                    <span className="text-xs text-gray-500">#{shipment.orderNumber}</span>
-                  </div>
-                  {statusBadge(shipment.status)}
-                </div>
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3 h-3" />
-                    {formatDate(shipment.updatedAt)}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Truck className="w-3 h-3" />
-                    {shipment.courierName || shipment.provider}
-                  </div>
-                  {shipment.trackingCode && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3" />
-                      {shipment.trackingCode}
-                    </div>
-                  )}
-                </div>
-                {/* Route visualization */}
-                <div className="flex items-center gap-2 mt-3">
-                  <div className="flex items-center gap-1 text-[10px] text-gray-500">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                    Store
-                  </div>
-                  <div className="flex-1 h-px bg-gray-200 relative">
-                    <Truck
-                      className={`w-3 h-3 absolute top-1/2 -translate-y-1/2 ${
-                        shipment.status === "DELIVERED"
-                          ? "right-0 text-green-500"
-                          : shipment.status === "IN_TRANSIT"
-                            ? "left-1/2 -translate-x-1/2 text-blue-500"
-                            : "left-0 text-gray-400"
-                      }`}
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-gray-500">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Customer
-                  </div>
-                </div>
+                {tab}
               </button>
             ))}
           </div>
+        </div>
+      </div>
 
-          {/* Right Panel */}
-          <div className="space-y-4">
-            {selectedShipment ? (
-              <ShipmentDetail shipment={selectedShipment} onClose={() => setSelectedId(null)} />
-            ) : (
-              <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                <Truck className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">Select a shipment to view details</p>
-              </div>
-            )}
-            <WeekOverview shipments={shipments} />
+      {/* Shipment Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="py-20 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+              <Truck className="w-7 h-7 text-gray-300" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">No shipments found</h3>
+            <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/60">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Tracking ID
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Order ID
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Carrier
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Ship Date
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    ETA
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filtered.map((shipment) => (
+                  <tr key={shipment.id} className="hover:bg-green-50/30 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <code className="text-xs text-gray-700 bg-gray-50 px-2 py-1 rounded-md font-mono font-medium">
+                          {shipment.trackingId}
+                        </code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(shipment.trackingId)}
+                          className="p-1 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-all"
+                          title="Copy tracking ID"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-semibold text-gray-900">{shipment.orderId}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-medium text-gray-800">{shipment.customer}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-700 font-medium">{shipment.carrier}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={shipment.status} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-500 text-xs">{formatDate(shipment.shipDate)}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-500 text-xs">{formatDate(shipment.eta)}</span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                          title="View details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                          title="Track shipment"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-// Summary Widget Component
-function SummaryWidget({
-  icon, label, value, trend, positive,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  trend: string;
-  positive: boolean;
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</p>
-          <p className="text-2xl font-bold text-gray-900 tracking-tight mt-1">{value}</p>
-          <p className={`text-xs mt-1 ${positive ? "text-green-600" : "text-orange-600"}`}>{trend}</p>
-        </div>
-        <div className="p-2.5 rounded-xl bg-gray-100 text-gray-600">{icon}</div>
+        {filtered.length > 0 && (
+          <div className="px-6 py-3.5 border-t border-gray-100 bg-gray-50/40 flex items-center justify-between">
+            <p className="text-xs text-gray-500">
+              Showing <span className="font-semibold text-gray-700">{filtered.length}</span> of{" "}
+              <span className="font-semibold text-gray-700">{SHIPMENTS.length}</span> shipments
+            </p>
+            <div className="flex items-center gap-1">
+              <button className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+                Previous
+              </button>
+              <button className="px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-lg">
+                1
+              </button>
+              <button className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

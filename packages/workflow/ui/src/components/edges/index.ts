@@ -4,11 +4,11 @@
  */
 
 import type { EdgeTypes } from '@xyflow/react';
-import { ConditionEdge } from './ConditionEdge.js';
+import { ConditionEdge } from './ConditionEdge';
 
 export const edgeTypes: EdgeTypes = {
   condition: ConditionEdge,
   default: ConditionEdge,
 };
 
-export { ConditionEdge } from './ConditionEdge.js';
+export { ConditionEdge } from './ConditionEdge';

@@ -98,20 +98,6 @@ export const landingContent = {
 
 export const pricingPlans = [
   {
-    name: "Free",
-    price: 0,
-    description: "Perfect for testing ideas and side hustles",
-    features: [
-      "4 included templates",
-      "Basic storefront with Vayva branding",
-      "Standard analytics dashboard",
-      "WhatsApp order capture",
-      "Paystack payment integration",
-    ],
-    cta: "Start Free",
-    href: "/signup",
-  },
-  {
     name: "Starter",
     price: 25000,
     description: "For growing businesses ready to scale",
@@ -127,12 +113,11 @@ export const pricingPlans = [
     ],
     cta: "Start Growing",
     href: "/checkout?plan=starter",
-    popular: true,
     trialDays: 7,
   },
   {
     name: "Pro",
-    price: 40000,
+    price: 35000,
     description: "High-volume sellers scaling operations",
     features: [
       "Everything in Starter, plus:",
@@ -145,6 +130,24 @@ export const pricingPlans = [
     ],
     cta: "Scale Your Business",
     href: "/checkout?plan=pro",
+    popular: true,
+  },
+  {
+    name: "Pro Plus",
+    price: 50000,
+    description: "Full power with industry tools and visual automation",
+    features: [
+      "Everything in Pro, plus:",
+      "Industry-specific operational tools",
+      "Merged industry dashboard",
+      "Visual workflow builder",
+      "25,000 AI credits/mo",
+      "5 team seats",
+      "5 templates",
+      "Priority support",
+    ],
+    cta: "Unlock Full Power",
+    href: "/checkout?plan=pro_plus",
   },
 ];
 

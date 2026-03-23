@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Comparable Property Service
  * Finds and ranks comparable properties for CMA

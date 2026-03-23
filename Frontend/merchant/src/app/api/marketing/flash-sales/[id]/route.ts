@@ -11,9 +11,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const { id } = await params;
         const body = await request.json();
         // Validate ownership
         const existing = await prisma.flashSale.findFirst({
@@ -55,9 +53,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const { id } = await params;
         // Validate ownership
         const deleted = await prisma.flashSale.deleteMany({
             where: { id, storeId },

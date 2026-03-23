@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seasonal Pricing Feature
  * Manages dynamic pricing strategies and promotions

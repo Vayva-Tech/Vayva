@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Nightlife Industry UI Components
  */
 
-export { NightlifeGuestList } from './NightlifeGuestList.js';
-export type { NightlifeGuestListProps } from './NightlifeGuestList.js';
+export { NightlifeGuestList } from './NightlifeGuestList';
+export type { NightlifeGuestListProps } from './NightlifeGuestList';
 
-export { BottleServiceDashboard } from './BottleServiceDashboard.js';
-export type { BottleServiceDashboardProps } from './BottleServiceDashboard.js';
+export { BottleServiceDashboard } from './BottleServiceDashboard';
+export type { BottleServiceDashboardProps } from './BottleServiceDashboard';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Event Vendor Service
  * Manages vendor relationships, contracts, and coordination

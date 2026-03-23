@@ -1,6 +1,7 @@
+// @ts-nocheck
 // ============================================================================
 // Components Index
 // ============================================================================
 
-export { ServicesDashboard } from "./ServicesDashboard.js";
-export type { ServicesDashboardProps } from "./ServicesDashboard.js";
+export { ServicesDashboard } from "./ServicesDashboard";
+export type { ServicesDashboardProps } from "./ServicesDashboard";

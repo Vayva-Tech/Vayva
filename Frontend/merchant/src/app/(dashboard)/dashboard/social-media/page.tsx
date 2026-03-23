@@ -7,8 +7,8 @@
  */
 
 import { useState, useEffect } from "react";
-import { 
-  TelegramLogo, 
+import {
+  TelegramLogo,
   DiscordLogo,
   CheckCircle,
   Warning,
@@ -16,7 +16,7 @@ import {
   Gear,
   ChartLine,
   Users,
-  MessageCircle,
+  ChatCircle as MessageCircle,
   TrendUp,
   Bell,
   Eye

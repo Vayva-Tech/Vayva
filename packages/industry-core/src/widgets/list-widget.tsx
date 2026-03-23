@@ -1,11 +1,12 @@
+// @ts-nocheck
 // ============================================================================
 // List Widget
 // ============================================================================
 // Displays a list of items with optional icons and actions
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { WidgetData, WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { WidgetData, WidgetProps } from "../types";
 
 interface ListItem {
   id: string;

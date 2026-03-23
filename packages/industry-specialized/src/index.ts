@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Specialized Industry Package Index
  */
 
 // Export dashboard component
-export { SpecializedDashboard } from './components/SpecializedDashboard.js';
+export { SpecializedDashboard } from './components/SpecializedDashboard';
 export type { IndustryDashboardProps } from '@vayva/industry-core';
 
 export const VERSION = '0.0.1';

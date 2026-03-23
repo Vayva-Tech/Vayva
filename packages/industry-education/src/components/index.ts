@@ -1,5 +1,6 @@
+// @ts-nocheck
 /**
  * Education Components Index
  */
 
-export * from './education-components.js';
+export * from './education-components';

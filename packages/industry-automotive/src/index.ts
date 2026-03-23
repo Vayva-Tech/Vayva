@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @vayva/industry-automotive
  * Vayva Automotive Industry Engine
@@ -18,14 +19,14 @@ export {
   type AutomotiveEngineConfig,
   type AutomotiveFeatureId,
   type AutomotiveEngineStatus,
-} from './automotive.engine.js';
+} from './automotive.engine';
 
 // Services (export specific items to avoid conflicts)
 export {
   VehicleGalleryService,
   TestDriveCoordinatorService,
   CRMConnectorService,
-} from './services/index.js';
+} from './services/index';
 
 export type {
   Vehicle,
@@ -40,35 +41,35 @@ export type {
   Lead,
   Interaction,
   CRMConfig,
-} from './services/index.js';
+} from './services/index';
 
 // Features
 export {
   VehicleShowcaseFeature,
   TestDriveCoordinatorFeature,
   CRMIntegrationFeature,
-} from './features/index.js';
+} from './features/index';
 
 export type {
   VehicleShowcaseConfig,
   TestDriveCoordinatorConfig,
   CRMIntegrationConfig,
-} from './features/index.js';
+} from './features/index';
 
 // Components
 export {
   CRMIntegration,
   FinancingCalculator,
   InventoryManager,
-} from './components/index.js';
+} from './components/index';
 
 // Dashboard
-export * from './dashboard/index.js';
+export * from './dashboard/index';
 
 // Types (only export types not already exported)
 export type {
   AutomotiveIndustrySlug,
-} from './types/index.js';
+} from './types/index';
 
 export const VERSION = '0.1.0';
 

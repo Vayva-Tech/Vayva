@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Financing Calculator Component
  * Interactive tool for calculating auto loan payments

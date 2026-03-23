@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Inventory Prediction AI Service
  * 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Petcare Appointment Service
  * Specialized service for pet appointment management

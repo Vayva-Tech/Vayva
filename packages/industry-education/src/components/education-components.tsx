@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Education Components
  * UI components for education industry

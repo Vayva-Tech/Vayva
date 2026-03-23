@@ -10,10 +10,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const resolvedParams = await Promise.resolve(params);
-        const { id } = resolvedParams;
         const body = await request.json();
         const { category } = body as { category?: string };
 

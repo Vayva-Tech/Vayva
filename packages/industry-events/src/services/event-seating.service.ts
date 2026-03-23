@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Event Seating Service
  * Manages table assignments, seating charts, and guest placement

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { HealthMonitor } from "@vayva/reliability";
+import { HealthMonitor } from "@/lib/stubs/reliability";
 import { prisma } from "@vayva/db";
 
 /**

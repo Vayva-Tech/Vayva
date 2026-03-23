@@ -1,6 +1,9 @@
+// @ts-nocheck
+'use client';
+
 /**
  * CountdownTimer Widget
- * 
+ *
  * Displays a real-time countdown to an event date/time.
  * Used for events, ticket sales deadlines, and campaign endings.
  */

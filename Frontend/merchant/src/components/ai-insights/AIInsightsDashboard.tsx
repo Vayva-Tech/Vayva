@@ -6,10 +6,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Sparkles, 
+import {
+  Sparkle as Sparkles,
   Lightbulb,
-  TrendingUp,
+  TrendUp as TrendingUp,
   Warning,
   CheckCircle,
   XCircle,
@@ -23,7 +23,7 @@ import {
   ShoppingCart,
   CurrencyDollar
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';

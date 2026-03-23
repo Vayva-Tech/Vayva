@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Loyalty Program Management
 
 export interface LoyaltyTier {

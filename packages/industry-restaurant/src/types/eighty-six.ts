@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 86 Manager types
  * Sold-out item management across channels

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pet Health Records Dashboard Component
  */

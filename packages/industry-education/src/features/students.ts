@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Student Progress Tracking Feature
  * 

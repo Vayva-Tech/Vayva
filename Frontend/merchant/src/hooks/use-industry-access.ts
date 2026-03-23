@@ -23,7 +23,7 @@ export function useIndustryAccess() {
       
       // Upgrade information
       needsUpgrade: !canAccessIndustryDashboards(currentTier),
-      upgradePath: currentTier === 'FREE' ? 'STARTER' : 'PRO',
+      upgradePath: currentTier === 'STARTER' ? 'PRO' : 'PRO_PLUS',
       upgradeUrl: '/dashboard/billing'
     };
   }, [currentTier]);
@@ -48,11 +48,9 @@ export function useTrialStatus() {
   // In a real implementation, this would check actual trial expiration
   // For now, we'll return trial information based on tier
   const trialInfo = {
-    isOnTrial: currentTier === 'FREE', // Simplified logic
-    trialDaysRemaining: currentTier === 'FREE' ? 14 : 0,
-    trialEndDate: currentTier === 'FREE' ? 
-      new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) : 
-      null
+    isOnTrial: false, // Trial status should come from subscription API
+    trialDaysRemaining: 0,
+    trialEndDate: null
   };
 
   return trialInfo;

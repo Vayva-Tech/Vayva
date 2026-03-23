@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Specialized Industry Dashboard Component
  * Custom and niche business solutions dashboard

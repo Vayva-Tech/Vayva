@@ -12,7 +12,7 @@ import { QUEUES } from '@vayva/shared';
 import {
   BUILT_IN_PLAYBOOKS,
   getEnabledPlaybooks,
-} from '@vayva/customer-success';
+} from '@/lib/stubs/customer-success';
 
 // GET /api/playbooks - Get playbooks and execution stats
 export async function GET(req: NextRequest) {

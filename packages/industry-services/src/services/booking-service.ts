@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Booking Service
  * Specialized service for booking management

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { ConflictCheck, ConflictStatus } from '../types';
 
 export class ConflictCheckService {

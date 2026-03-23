@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Zap, Plus, Clock, Timer, PencilSimple as Edit, Trash as TrashIcon, TrendUp, Target, Users } from "@phosphor-icons/react";
+import { Lightning as Zap, Plus, Clock, Timer, PencilSimple as Edit, Trash as TrashIcon, TrendUp, Target, Users } from "@phosphor-icons/react";
 import { formatDate, logger } from "@vayva/shared";
 import {
   Dialog,

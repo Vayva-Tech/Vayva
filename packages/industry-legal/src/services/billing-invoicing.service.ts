@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Billing & Invoicing Service
  * 

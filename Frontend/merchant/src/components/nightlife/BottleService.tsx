@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "@vayva/ui";
 import { toast } from "sonner";
-import { Wine, AlertTriangle, Clock } from "@phosphor-icons/react";
+import { Wine, Warning as AlertTriangle, Clock } from "@phosphor-icons/react";
 import type { BottleOrder } from "@/types/nightlife";
 import { apiJson } from "@/lib/api-client-shared";
 

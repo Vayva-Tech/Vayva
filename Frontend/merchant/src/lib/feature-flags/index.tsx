@@ -19,7 +19,7 @@ export interface FeatureConfig {
   key: FeatureFlag;
   name: string;
   description: string;
-  enabledForTiers: ('FREE' | 'STARTER' | 'PRO')[];
+  enabledForTiers: ('STARTER' | 'PRO' | 'PRO_PLUS')[];
   requiresCondition?: (context: any) => boolean;
 }
 
@@ -102,7 +102,7 @@ export class FeatureFlags {
   /**
    * Initialize feature flags based on user's plan tier
    */
-  initialize(tier: 'FREE' | 'STARTER' | 'PRO'): void {
+  initialize(tier: 'STARTER' | 'PRO' | 'PRO_PLUS'): void {
     this.flags.clear();
     
     FEATURE_FLAGS.forEach(flag => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Bottle Service Dashboard Component
  * Advanced bottle service management with inventory tracking

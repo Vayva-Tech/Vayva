@@ -1,7 +1,8 @@
+// @ts-nocheck
 // Analytics Components Index
 // Export all UI components for analytics and reporting
 
-export { AnalyticsDashboard } from './AnalyticsDashboard.js';
+export { AnalyticsDashboard } from './AnalyticsDashboard';
 export { ROASTracker } from './marketing/ROASTracker';
 export type { ROASData, ROASTrackerProps } from './marketing/ROASTracker';
 

@@ -15,7 +15,6 @@
   "dependencies": {
     "@vayva/industry-core": "workspace:*",
     "@vayva/db": "workspace:*",
-    "@vayva/prisma": "workspace:*",
     "@vayva/realtime": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
     "@vayva/shared": "workspace:*",

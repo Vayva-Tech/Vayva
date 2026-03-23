@@ -3,8 +3,7 @@
 import { useOnboarding } from "../OnboardingContext";
 import { Button, Input, Label, Select } from "@vayva/ui";
 import { useState } from "react";
-// @ts-expect-error -- phosphor-icons/react/ssr types may not be available in all TS configs
-import { ArrowRight, ArrowLeft, Heart, Target, Users, DollarSign } from "@phosphor-icons/react/ssr";
+import { ArrowRight, ArrowLeft, Heart, Target, Users, CurrencyDollar as DollarSign } from "@phosphor-icons/react/ssr";
 
 export default function NonprofitSetupStep() {
   const { nextStep, prevStep, updateData, state, isSaving } = useOnboarding();

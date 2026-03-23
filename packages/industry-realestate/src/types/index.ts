@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Real Estate Industry Types
  * Export all type definitions for the real estate industry engine

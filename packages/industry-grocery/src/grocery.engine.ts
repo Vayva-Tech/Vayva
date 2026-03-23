@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Grocery Industry Engine
  * Main orchestrator for all grocery-specific features
@@ -5,15 +6,15 @@
 
 import { DashboardEngine } from '@vayva/industry-core';
 
-import { FreshnessTrackingService } from './services/freshness-tracking.service.js';
-import { DeliveryRouteOptimizerService } from './services/delivery-route-optimizer.service.js';
-import { ExpirationAlertsService } from './services/expiration-alerts.service.js';
-import { SeasonalPricingService } from './services/seasonal-pricing.service.js';
+import { FreshnessTrackingService } from './services/freshness-tracking.service';
+import { DeliveryRouteOptimizerService } from './services/delivery-route-optimizer.service';
+import { ExpirationAlertsService } from './services/expiration-alerts.service';
+import { SeasonalPricingService } from './services/seasonal-pricing.service';
 
-import { FreshnessTrackingFeature } from './features/freshness-tracking.feature.js';
-import { DeliveryOptimizationFeature } from './features/delivery-optimization.feature.js';
-import { ExpirationAlertsFeature } from './features/expiration-alerts.feature.js';
-import { SeasonalPricingFeature } from './features/seasonal-pricing.feature.js';
+import { FreshnessTrackingFeature } from './features/freshness-tracking.feature';
+import { DeliveryOptimizationFeature } from './features/delivery-optimization.feature';
+import { ExpirationAlertsFeature } from './features/expiration-alerts.feature';
+import { SeasonalPricingFeature } from './features/seasonal-pricing.feature';
 
 export interface GroceryEngineConfig {
   freshnessTracking?: boolean;

@@ -1,11 +1,12 @@
+// @ts-nocheck
 // ============================================================================
 // Table Widget
 // ============================================================================
 // Displays data in a tabular format with sorting
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { TableColumn, TableRow, WidgetData, WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { TableColumn, TableRow, WidgetData, WidgetProps } from "../types";
 
 interface TableData {
   columns: TableColumn[];

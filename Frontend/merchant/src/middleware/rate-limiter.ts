@@ -1,35 +1,20 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-
-// Initialize Redis client
-const redis = new Redis({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-  token: process.env.REDIS_PASSWORD || '',
-});
-
-// Create rate limiter
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, '10 s'), // 10 requests per 10 seconds
-  analytics: true,
-});
 
 export async function rateLimiter(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 
-             request.headers.get('x-real-ip') ?? 
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ??
+             request.headers.get('x-real-ip') ??
              '127.0.0.1';
-  
-  const { success } = await ratelimit.limit(ip);
-  
-  if (!success) {
+
+  const result = simpleRateLimit(ip);
+
+  if (!result.success) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 }
     );
   }
-  
+
   return null; // Continue with request
 }
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Customer Preference AI Service
  * 

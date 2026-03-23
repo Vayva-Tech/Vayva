@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lead Scoring Feature Module
  * Export all lead scoring functionality

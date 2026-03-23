@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { apiJson } from "@/lib/api-client-shared";
 import { formatCurrency } from "@vayva/shared";
 import {
-  FlaskConical,
+  Flask as FlaskConical,
   Plus,
   ArrowsClockwise,
   ChartBar,
@@ -33,7 +33,7 @@ import {
   Percent,
   Sigma,
   BezierCurve,
-  Award,
+  Trophy as Award,
 } from "@phosphor-icons/react";
 
 // Types
@@ -167,14 +167,18 @@ export default function ABTestingDashboard() {
     }
   };
 
+  const runningTests = tests.filter((t) => t.status === "running");
+  const completedTests = tests.filter((t) => t.status === "completed");
+  const draftTests = tests.filter((t) => t.status === "draft");
+
   // Calculate metrics for SummaryWidgets
-  const totalVisitors = tests.reduce((sum, t) => 
+  const totalVisitors = tests.reduce((sum, t) =>
     sum + t.variants.reduce((vSum, v) => vSum + v.stats.visitors, 0), 0
   );
   const avgUplift = completedTests.length > 0
     ? (completedTests.reduce((sum, t) => sum + (t.results?.uplift || 0), 0) / completedTests.length).toFixed(1)
     : "0";
-  const totalConversions = tests.reduce((sum, t) => 
+  const totalConversions = tests.reduce((sum, t) =>
     sum + t.variants.reduce((vSum, v) => vSum + v.stats.conversions, 0), 0
   );
   const conversionRate = totalVisitors > 0 ? ((totalConversions / totalVisitors) * 100).toFixed(2) : "0";
@@ -186,10 +190,6 @@ export default function ABTestingDashboard() {
       </div>
     );
   }
-
-  const runningTests = tests.filter((t) => t.status === "running");
-  const completedTests = tests.filter((t) => t.status === "completed");
-  const draftTests = tests.filter((t) => t.status === "draft");
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -440,7 +440,7 @@ function TestCard({
                 {totalVisitors.toLocaleString()} visitors
               </span>
               <span className="flex items-center gap-1 text-gray-500">
-                <MousePointer className="w-4 h-4" />
+                <CursorClick className="w-4 h-4" />
                 {overallConversionRate.toFixed(2)}% conversion
               </span>
             </div>
@@ -469,7 +469,7 @@ function TestCard({
               </>
             )}
             <Button size="sm" variant="outline" onClick={onViewDetails}>
-              <BarChart3 className="w-4 h-4 mr-1" />
+              <ChartBar className="w-4 h-4 mr-1" />
               Details
             </Button>
           </div>

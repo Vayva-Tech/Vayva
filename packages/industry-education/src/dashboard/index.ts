@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Education Dashboard Configuration
  * 

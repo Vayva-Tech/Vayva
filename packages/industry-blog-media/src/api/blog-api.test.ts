@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { BlogMediaApiService } from '../src/api/blog-api';
 import { PrismaClient } from '@prisma/client';

@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 // ============================================================================
 // useLayoutPersistence Hook
 // ============================================================================
@@ -5,7 +8,7 @@
 // ============================================================================
 
 import { useCallback, useState } from "react";
-import type { IndustrySlug, LayoutPreset } from "../types.js";
+import type { IndustrySlug, LayoutPreset } from "../types";
 
 interface UseLayoutPersistenceOptions {
   storeId?: string;

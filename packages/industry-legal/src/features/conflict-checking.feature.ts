@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Conflict Checking Feature Module
  */

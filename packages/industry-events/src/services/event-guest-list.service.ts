@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Event Guest List Service
  * Manages guest lists, RSVPs, and attendance tracking

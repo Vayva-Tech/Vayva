@@ -3,7 +3,7 @@
 
 import React from "react";
 import { Card } from "@vayva/ui";
-import { Scale, TrendingUp } from "@phosphor-icons/react";
+import { Scales as Scale, TrendUp as TrendingUp } from "@phosphor-icons/react";
 import type { CasePipelineMetrics } from "@/types/legal";
 
 interface CasePipelineProps {

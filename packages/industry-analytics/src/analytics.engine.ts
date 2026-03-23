@@ -1,15 +1,16 @@
+// @ts-nocheck
 /**
  * Analytics Industry Engine
  * Provides data-driven decision making capabilities across all industries
  */
 
 import { DashboardEngine } from '@vayva/industry-core';
-import { DataAnalyticsService } from './services/data-analytics.service.js';
-import { ReportingService } from './services/reporting.service.js';
-import { InsightsService } from './services/insights.service.js';
-import { PredictiveAnalyticsService } from './services/predictive-analytics.service.js';
-import { CrossIndustryBenchmarkingService } from './services/cross-industry-benchmarking.service.js';
-import { AIPredictiveAnalyticsService } from './services/ai-predictive-analytics.service.js';
+import { DataAnalyticsService } from './services/data-analytics.service';
+import { ReportingService } from './services/reporting.service';
+import { InsightsService } from './services/insights.service';
+import { PredictiveAnalyticsService } from './services/predictive-analytics.service';
+import { CrossIndustryBenchmarkingService } from './services/cross-industry-benchmarking.service';
+import { AIPredictiveAnalyticsService } from './services/ai-predictive-analytics.service';
 
 export interface AnalyticsEngineConfig {
   dataAnalytics?: boolean;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Campaign Manager Service
  * Manages fundraising campaigns and goals

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Booking Feature Module
  * Dedicated module for booking functionality

@@ -9,26 +9,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Scale, 
+  Scales,
   FileText,
   Calendar,
   Users,
   Building,
   Clock,
-  DollarSign,
+  CurrencyDollar,
   CheckCircle,
-  AlertTriangle,
+  Warning,
   Eye,
-  Filter,
-  Search,
+  Funnel,
+  MagnifyingGlass,
   Plus,
-  MoreHorizontal,
-  TrendingUp,
-  BarChart3,
-  PieChart,
-  Activity
+  DotsThree,
+  TrendUp,
+  ChartBar,
+  ChartPie,
+  Pulse
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -103,6 +103,28 @@ interface LegalMetrics {
   upcomingDeadlines: number;
 }
 
+// Helper functions used across sub-components
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'open': return 'bg-blue-100 text-blue-800';
+    case 'in-progress': return 'bg-yellow-100 text-yellow-800';
+    case 'closed': return 'bg-green-100 text-green-800';
+    case 'settled': return 'bg-purple-100 text-purple-800';
+    case 'dismissed': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getPriorityColor(priority: string) {
+  switch (priority) {
+    case 'urgent': return 'bg-red-100 text-red-800';
+    case 'high': return 'bg-orange-100 text-orange-800';
+    case 'medium': return 'bg-yellow-100 text-yellow-800';
+    case 'low': return 'bg-green-100 text-green-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
 // Main Legal Dashboard Component
 export default function LegalDashboard() {
   const { store } = useStore();
@@ -162,33 +184,12 @@ export default function LegalDashboard() {
   ) || [];
 
   const tabs = [
-    { id: 'cases', label: 'Cases', icon: <Scale className="h-4 w-4" /> },
+    { id: 'cases', label: 'Cases', icon: <Scales className="h-4 w-4" /> },
     { id: 'clients', label: 'Clients', icon: <Users className="h-4 w-4" /> },
     { id: 'documents', label: 'Documents', icon: <FileText className="h-4 w-4" /> },
-    { id: 'billing', label: 'Billing', icon: <DollarSign className="h-4 w-4" /> },
-    { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4 w-4" /> }
+    { id: 'billing', label: 'Billing', icon: <CurrencyDollar className="h-4 w-4" /> },
+    { id: 'analytics', label: 'Analytics', icon: <ChartBar className="h-4 w-4" /> }
   ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-800';
-      case 'in-progress': return 'bg-yellow-100 text-yellow-800';
-      case 'closed': return 'bg-green-100 text-green-800';
-      case 'settled': return 'bg-purple-100 text-purple-800';
-      case 'dismissed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -197,7 +198,7 @@ export default function LegalDashboard() {
           title="Legal Practice Management"
           subtitle="Manage cases, track billing, and monitor practice performance"
           industry={store?.industrySlug || 'default'}
-          icon={<Scale className="h-8 w-8" />}
+          icon={<Scales className="h-8 w-8" />}
         />
         <a
           href="https://vayva.com/legal"
@@ -244,7 +245,7 @@ export default function LegalDashboard() {
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.primary}15` }}>
-                <Scale className="h-6 w-6" style={{ color: colors.primary }} />
+                <Scales className="h-6 w-6" style={{ color: colors.primary }} />
               </div>
             </div>
           </ThemedCard>
@@ -258,7 +259,7 @@ export default function LegalDashboard() {
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.secondary}15` }}>
-                <DollarSign className="h-6 w-6" style={{ color: colors.secondary }} />
+                <CurrencyDollar className="h-6 w-6" style={{ color: colors.secondary }} />
               </div>
             </div>
           </ThemedCard>
@@ -272,7 +273,7 @@ export default function LegalDashboard() {
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.accent}15` }}>
-                <AlertTriangle className="h-6 w-6" style={{ color: colors.accent }} />
+                <Warning className="h-6 w-6" style={{ color: colors.accent }} />
               </div>
             </div>
           </ThemedCard>
@@ -295,7 +296,7 @@ export default function LegalDashboard() {
 
       {/* Search Bar */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <input
           type="text"
           placeholder="Search cases, clients, or case numbers..."
@@ -408,11 +409,11 @@ function CasesView({ cases, loading, selectedCase, onSelectCase }: any) {
                   {caseItem.documents} docs
                 </span>
                 <span className="flex items-center gap-1">
-                  <DollarSign className="h-4 w-4" />
+                  <CurrencyDollar className="h-4 w-4" />
                   ${(caseItem.billing.outstandingBalance / 1000).toFixed(1)}K owed
                 </span>
               </div>
-              <MoreHorizontal className="h-4 w-4 text-gray-500" />
+              <DotsThree className="h-4 w-4 text-gray-500" />
             </div>
           </ThemedCard>
         </motion.div>
@@ -546,7 +547,7 @@ function DocumentsView() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Draft</span>
-                <MoreHorizontal className="h-4 w-4 text-gray-500" />
+                <DotsThree className="h-4 w-4 text-gray-500" />
               </div>
             </div>
           ))}
@@ -661,7 +662,7 @@ function AnalyticsView({ metrics, loading }: { metrics: LegalMetrics | null; loa
           <h3 className="font-semibold mb-6">Practice Performance</h3>
           <div className="h-80 bg-gradient-to-br from-muted/20 to-muted/5 rounded-xl border border-gray-100 flex items-center justify-center">
             <div className="text-center">
-              <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+              <ChartBar className="h-12 w-12 mx-auto mb-4 text-gray-500" />
               <p className="font-medium">Revenue & Case Trends</p>
               <p className="text-sm text-gray-500 mt-1">
                 Total Revenue: ${(metrics.revenue / 1000).toFixed(1)}K | Success Rate: {metrics.caseSuccessRate}%

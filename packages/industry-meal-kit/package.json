@@ -22,7 +22,7 @@
   "dependencies": {
     "@vayva/industry-core": "workspace:*",
     "@vayva/ui": "workspace:*",
-    "@vayva/prisma": "workspace:*",
+    "@vayva/db": "workspace:*",
     "react": "^18.x",
     "react-dom": "^18.x",
     "date-fns": "^3.x",

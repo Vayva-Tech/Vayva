@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Creative Industry Dashboard Component
  * Design studio, creative agency, and artistic portfolio management

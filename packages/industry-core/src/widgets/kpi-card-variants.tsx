@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================================================
 // KPI Card Variations
 // ============================================================================
@@ -5,8 +6,8 @@
 // CompareKPICard   – side-by-side period comparison (current vs previous)
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { KPIData, WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { KPIData, WidgetProps } from "../types";
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
 

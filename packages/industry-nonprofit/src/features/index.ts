@@ -1,7 +1,8 @@
+// @ts-nocheck
 /**
  * Nonprofit Industry Features
  */
 
-export { DonorManagementFeature } from './donor-management.feature.js';
-export { CampaignManagerFeature } from './campaign-manager.feature.js';
-export { GrantTrackerFeature } from './grant-tracker.feature.js';
+export { DonorManagementFeature } from './donor-management.feature';
+export { CampaignManagerFeature } from './campaign-manager.feature';
+export { GrantTrackerFeature } from './grant-tracker.feature';

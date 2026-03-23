@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Button, Dialog } from '@vayva/ui';
-import { Zap, AlertTriangle, Info } from '@phosphor-icons/react';
+import { Lightning as Zap, Warning as AlertTriangle, Info } from '@phosphor-icons/react';
 import { useTemplatePurchase } from '@/hooks/useTemplatePurchase';
 
 interface TemplatePurchaseModalProps {
@@ -179,6 +179,6 @@ export function TemplatePurchaseModal({
 }
 
 // Helper imports
-import { Link } from '@vayva/ui';
-import { Loader2 } from '@phosphor-icons/react';
+import Link from 'next/link';
+import { Spinner as Loader2 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';

@@ -14,7 +14,7 @@ export const FEES = {
   WITHDRAWAL_PERCENTAGE: 3, // 3% fee on every withdrawal
 };
 
-export type PlanKey = "free" | "starter" | "pro";
+export type PlanKey = "starter" | "pro" | "pro_plus";
 
 export type Plan = {
   key: PlanKey;
@@ -29,19 +29,6 @@ export type Plan = {
 
 export const PLANS: Plan[] = [
   {
-    key: "free",
-    name: "Free",
-    monthlyAmount: 0,
-    tagline: "Perfect for testing ideas.",
-    bullets: [
-      "4 Included Templates",
-      "Basic Storefront",
-      "Vayva Branding",
-      "Standard Analytics",
-    ],
-    ctaLabel: "Start Free",
-  },
-  {
     key: "starter",
     name: "Starter",
     monthlyAmount: 25000,
@@ -55,12 +42,11 @@ export const PLANS: Plan[] = [
       "Remove Branding",
     ],
     ctaLabel: "Start Growing",
-    featured: true,
   },
   {
     key: "pro",
     name: "Pro",
-    monthlyAmount: 40000,
+    monthlyAmount: 35000,
     tagline: "High volume scaling.",
     bullets: [
       "Everything in Starter",
@@ -71,6 +57,24 @@ export const PLANS: Plan[] = [
       "Custom Integrations",
     ],
     ctaLabel: "Scale Your Business",
+    featured: true,
+  },
+  {
+    key: "pro_plus",
+    name: "Pro Plus",
+    monthlyAmount: 50000,
+    tagline: "Full power for operations-heavy businesses.",
+    bullets: [
+      "Everything in Pro",
+      "Industry-specific operational tools",
+      "Merged industry dashboard",
+      "Visual workflow builder",
+      "25,000 AI credits/mo",
+      "5 team seats",
+      "5 templates",
+      "Priority support",
+    ],
+    ctaLabel: "Unlock Full Power",
   },
 ];
 

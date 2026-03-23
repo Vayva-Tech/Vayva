@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Industry Engine Resolver
  * ========================

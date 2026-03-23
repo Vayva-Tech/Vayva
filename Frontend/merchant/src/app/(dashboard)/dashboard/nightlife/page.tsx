@@ -6,11 +6,11 @@ import React, { useState, useEffect } from "react";
 import { Card, Button } from "@vayva/ui";
 import { toast } from "sonner";
 import {
-  TrendingUp,
+  TrendUp as TrendingUp,
   Users,
-  UserStar,
+  UserCirclePlus as UserStar,
   Wine,
-  Activity,
+  Pulse as Activity,
   Calendar,
   Plus,
   FileText,

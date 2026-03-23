@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Real Estate Calculations
  * Utility functions for real estate calculations

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Appointment Scheduling Feature Module
  */

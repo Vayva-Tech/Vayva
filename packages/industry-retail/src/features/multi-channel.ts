@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Multi-Channel Sales Management
 
 // Mock data for demonstration

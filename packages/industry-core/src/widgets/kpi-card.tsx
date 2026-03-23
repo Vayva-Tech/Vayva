@@ -1,11 +1,12 @@
+// @ts-nocheck
 // ============================================================================
 // KPI Card Widget
 // ============================================================================
 // Displays a single KPI metric with trend indicator
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { KPIData, WidgetData, WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { KPIData, WidgetData, WidgetProps } from "../types";
 
 interface KPICardWidgetProps extends Omit<WidgetProps, "data"> {
   data?: WidgetData<KPIData>;

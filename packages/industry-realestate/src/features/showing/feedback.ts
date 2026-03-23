@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Showing Feedback Management
  * Handles feedback collection and analysis

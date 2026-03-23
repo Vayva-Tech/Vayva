@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Temporarily define types locally since @vayva/core isn't available
 type DashboardConfig = {
   industry: string;

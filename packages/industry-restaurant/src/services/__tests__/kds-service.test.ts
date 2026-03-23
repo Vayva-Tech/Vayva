@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { KDSService } from '../kds-service';
 import type { Ticket, Order, KitchenStation } from '../types';

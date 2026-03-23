@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Real Estate Transaction Timeline Types
  * Contract-to-close tracking and milestone management

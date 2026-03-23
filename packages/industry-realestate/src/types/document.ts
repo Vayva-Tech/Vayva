@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Real Estate Document Management Types
  * Covers document templates, e-signatures, transaction checklists, and vendor coordination

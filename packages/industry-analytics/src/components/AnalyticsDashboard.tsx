@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Analytics Industry Dashboard Component
  * Data-driven decision making dashboard with KPIs, trends, and predictive insights

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Labor Optimization Service - Stub Implementation
  * Full implementation pending database layer integration

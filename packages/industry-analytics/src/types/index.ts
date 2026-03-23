@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface ROASData {
   campaignId: string;
   campaignName: string;

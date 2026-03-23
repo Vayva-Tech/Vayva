@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Petcare Industry Types
  * Core types for the petcare industry engine

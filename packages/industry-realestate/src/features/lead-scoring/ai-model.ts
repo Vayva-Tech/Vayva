@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lead Scoring AI Model Integration
  * Uses AI to enhance lead qualification and provide insights

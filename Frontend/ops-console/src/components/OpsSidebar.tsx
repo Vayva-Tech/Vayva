@@ -4,7 +4,7 @@ import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@vayva/ui";
-import { DollarSign, LayoutDashboard, MessageSquare, Scale, Shield, Truck, Users, Receipt, MessageCircle, FileText, BarChart, Gavel, TrendingUp, Accessibility } from "lucide-react";
+import { DollarSign, LayoutDashboard, MessageSquare, Scale, Shield, Truck, Users, Receipt, MessageCircle, FileText, BarChart, Gavel, TrendingUp, Accessibility, Brain } from "lucide-react";
 
 function WalletIcon({ size = 20, className }: { size?: number; className?: string }) {
   return (
@@ -217,6 +217,14 @@ const MENU_ITEMS: SidebarSection[] = [
       { label: "Support Inbox", href: "/ops/inbox", icon: MessageSquare },
       { label: "Disputes", href: "/ops/disputes", icon: Scale },
       { label: "Refund Requests", href: "/ops/refunds", icon: DollarSign },
+    ],
+  },
+  {
+    header: "AI & Automation",
+    items: [
+      { label: "AI Cost Monitor", href: "/ops/ai/costs", icon: Brain },
+      { label: "AI Quality", href: "/ops/ai/quality", icon: BarChart },
+      { label: "AI Overview", href: "/ops/ai", icon: Brain },
     ],
   },
   {

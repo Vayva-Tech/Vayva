@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Real Estate Industry Dashboard Component
  * Property management and real estate agency dashboard

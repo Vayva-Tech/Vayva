@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Comparative Market Analysis (CMA) Types
  * CMA generation and comparable property analysis

@@ -1,11 +1,11 @@
-import { NotificationDispatcher } from './services/notification-dispatcher.service.js';
-import { RuleEngine } from './services/rule-engine.service.js';
-import { QuietHoursEnforcer } from './services/quiet-hours-enforcer.service.js';
+import { NotificationDispatcher } from './services/notification-dispatcher.service';
+import { RuleEngine } from './services/rule-engine.service';
+import { QuietHoursEnforcer } from './services/quiet-hours-enforcer.service';
 import { 
   NotificationPayload, 
   DispatchResult,
   NotificationRule 
-} from './types/index.js';
+} from './types/index';
 
 /**
  * NotificationEngine - Main orchestrator for the notification system

@@ -1,13 +1,13 @@
 // @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Badge, Button, Card } from "@vayva/ui";
 import {
   Users,
   TrendUp,
   Warning,
-  Sparkles,
+  Sparkle as Sparkles,
   Envelope,
   CurrencyDollar,
   ShoppingCart,
@@ -32,6 +32,41 @@ interface InsightsData {
 }
 
 import { apiJson } from "@/lib/api-client-shared";
+
+const segments = [
+  {
+    id: "vip",
+    title: "VIP Customers",
+    icon: Sparkles,
+    color: "text-amber-600",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+  },
+  {
+    id: "loyal",
+    title: "Loyal Regulars",
+    icon: Users,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+  },
+  {
+    id: "new",
+    title: "Recent & Promising",
+    icon: TrendUp,
+    color: "text-green-600",
+    bg: "bg-green-50",
+    border: "border-green-200",
+  },
+  {
+    id: "atRisk",
+    title: "At Risk",
+    icon: Warning,
+    color: "text-red-600",
+    bg: "bg-red-50",
+    border: "border-red-200",
+  },
+];
 
 export default function InsightsPage() {
   const [data, setData] = useState<InsightsData | null>(null);
@@ -63,41 +98,6 @@ export default function InsightsPage() {
     const segData = data?.segments?.[s.id] || { count: 0, revenue: 0 };
     return sum + segData.count;
   }, 0);
-
-  const segments = [
-    {
-      id: "vip",
-      title: "VIP Customers",
-      icon: Sparkles,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-      border: "border-amber-200",
-    },
-    {
-      id: "loyal",
-      title: "Loyal Regulars",
-      icon: Users,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-      border: "border-blue-200",
-    },
-    {
-      id: "new",
-      title: "Recent & Promising",
-      icon: TrendUp,
-      color: "text-green-600",
-      bg: "bg-green-50",
-      border: "border-green-200",
-    },
-    {
-      id: "atRisk",
-      title: "At Risk",
-      icon: Warning,
-      color: "text-red-600",
-      bg: "bg-red-50",
-      border: "border-red-200",
-    },
-  ];
 
   if (loading)
     return (

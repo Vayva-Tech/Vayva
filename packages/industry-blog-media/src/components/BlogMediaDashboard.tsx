@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Blog/Media Industry Dashboard Component
  * Content publishing, audience analytics, and monetization dashboard

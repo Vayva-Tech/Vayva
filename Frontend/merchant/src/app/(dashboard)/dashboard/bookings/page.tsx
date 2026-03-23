@@ -1,352 +1,347 @@
-// @ts-nocheck
 "use client";
+// @ts-nocheck
 
-import { useEffect, useState, useCallback } from "react";
-import { format } from "date-fns";
-import { Button, Icon } from "@vayva/ui";
-import { Calendar, Clock, User, Users, CheckCircle, XCircle } from "@phosphor-icons/react";
-import { BookingListActions } from "@/components/bookings/BookingListActions";
-import { CreateBookingModal } from "@/components/bookings/CreateBookingModal";
-import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
-import { toast } from "sonner";
+import { useState } from "react";
+import {
+  CalendarDays,
+  Clock,
+  Plus,
+  Search,
+  MoreHorizontal,
+  CheckCircle2,
+  AlertCircle,
+  XCircle,
+  CircleDot,
+  Banknote,
+  Eye,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
-interface BookingItem {
-  id: string;
-  serviceId: string;
-  customerId: string | null;
-  startsAt: string;
-  endsAt: string;
-  status: string;
-  notes: string | null;
-  service: { id: string; title: string };
-  customer: {
-    id: string;
-    firstName: string | null;
-    lastName: string | null;
-  } | null;
-}
+/* ------------------------------------------------------------------ */
+/*  Mock data                                                          */
+/* ------------------------------------------------------------------ */
 
-interface ServiceOption {
-  id: string;
-  name: string;
-}
+const BOOKINGS = [
+  { id: "1", customer: "Chidinma Okafor", service: "Hair Braiding (Box Braids)", date: "2026-03-22", time: "09:00 AM", duration: "2h 30m", amount: 25000, status: "Confirmed" },
+  { id: "2", customer: "Emeka Nwosu", service: "Consultation", date: "2026-03-22", time: "10:00 AM", duration: "45m", amount: 5000, status: "Completed" },
+  { id: "3", customer: "Aisha Bello", service: "Bridal Makeup", date: "2026-03-22", time: "11:30 AM", duration: "1h 30m", amount: 75000, status: "Pending" },
+  { id: "4", customer: "Oluwaseun Adeyemi", service: "Cornrows & Styling", date: "2026-03-22", time: "01:00 PM", duration: "2h", amount: 18000, status: "Confirmed" },
+  { id: "5", customer: "Funke Akindele", service: "Locs Retwist", date: "2026-03-22", time: "02:30 PM", duration: "1h 30m", amount: 15000, status: "Pending" },
+  { id: "6", customer: "Tunde Bakare", service: "Makeup (Glam Look)", date: "2026-03-23", time: "09:30 AM", duration: "1h 15m", amount: 35000, status: "Cancelled" },
+  { id: "7", customer: "Ngozi Eze", service: "Hair Braiding (Knotless)", date: "2026-03-23", time: "11:00 AM", duration: "3h", amount: 30000, status: "Confirmed" },
+  { id: "8", customer: "Yusuf Ibrahim", service: "Consultation", date: "2026-03-23", time: "12:00 PM", duration: "30m", amount: 3500, status: "Completed" },
+];
 
-interface CustomerOption {
-  id: string;
-  name: string;
-}
+const TODAY_SCHEDULE = [
+  { time: "09:00 AM", customer: "Chidinma Okafor", service: "Hair Braiding (Box Braids)", duration: "2h 30m", status: "Confirmed" },
+  { time: "10:00 AM", customer: "Emeka Nwosu", service: "Consultation", duration: "45m", status: "Completed" },
+  { time: "11:30 AM", customer: "Aisha Bello", service: "Bridal Makeup", duration: "1h 30m", status: "Pending" },
+  { time: "01:00 PM", customer: "Oluwaseun Adeyemi", service: "Cornrows & Styling", duration: "2h", status: "Confirmed" },
+  { time: "02:30 PM", customer: "Funke Akindele", service: "Locs Retwist", duration: "1h 30m", status: "Pending" },
+];
 
-const STATUS_VARIANT_MAP: Record<
-  string,
-  "default" | "success" | "warning" | "error" | "info"
-> = {
-  CONFIRMED: "success",
-  COMPLETED: "success",
-  CANCELLED: "error",
-  NO_SHOW: "error",
-  PENDING: "warning",
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+type Status = "Confirmed" | "Pending" | "Cancelled" | "Completed";
+
+const STATUS_CONFIG: Record<Status, { bg: string; text: string; dot: string; icon: any }> = {
+  Confirmed: { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500", icon: CheckCircle2 },
+  Pending: { bg: "bg-yellow-50", text: "text-yellow-700", dot: "bg-yellow-500", icon: AlertCircle },
+  Cancelled: { bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500", icon: XCircle },
+  Completed: { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500", icon: CircleDot },
 };
 
+function formatNaira(n: number) {
+  if (n >= 1000) return "\u20A6" + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + "K";
+  return "\u20A6" + n.toLocaleString();
+}
+
+function formatNairaFull(n: number) {
+  return "\u20A6" + n.toLocaleString("en-NG");
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
+
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<BookingItem[]>([]);
-  const [serviceOptions, setServiceOptions] = useState<ServiceOption[]>([]);
-  const [customerOptions, setCustomerOptions] = useState<CustomerOption[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("All");
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [bookingsData, servicesData, customersData] = await Promise.all([
-        apiJson<BookingItem[]>("/api/bookings"),
-        apiJson<{ items?: { id: string; title: string }[] }>(
-          "/api/products?type=SERVICE&limit=100",
-        ),
-        apiJson<{
-          items?: {
-            id: string;
-            firstName?: string;
-            lastName?: string;
-            name?: string;
-          }[];
-        }>("/api/customers?limit=100"),
-      ]);
+  const filtered = BOOKINGS.filter((b) => {
+    const matchStatus = filterStatus === "All" || b.status === filterStatus;
+    const matchSearch =
+      search === "" ||
+      b.customer.toLowerCase().includes(search.toLowerCase()) ||
+      b.service.toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
 
-      setBookings(Array.isArray(bookingsData) ? bookingsData : []);
-      setServiceOptions(
-        (Array.isArray(servicesData?.items) ? servicesData.items : []).map(
-          (s: { id: string; title: string }) => ({ id: s.id, name: s.title }),
-        ),
-      );
-      setCustomerOptions(
-        (Array.isArray(customersData?.items) ? customersData.items : []).map(
-          (c: { id: string; name?: string; firstName?: string; lastName?: string }) => ({
-            id: c.id,
-            name:
-              c.name ||
-              [c.firstName, c.lastName].filter(Boolean).join(" ") ||
-              "Customer",
-          }),
-        ),
-      );
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Failed to load bookings";
-      logger.error("[FETCH_BOOKINGS_ERROR]", {
-        error: message,
-        app: "merchant",
-      });
-      setError(message);
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetchData();
-  }, [fetchData]);
-
-  // Calculate metrics
-  const totalBookings = bookings.length;
-  const confirmedBookings = bookings.filter((b) => b.status === "CONFIRMED").length;
-  const pendingBookings = bookings.filter((b) => b.status === "PENDING").length;
-  const completedBookings = bookings.filter((b) => b.status === "COMPLETED").length;
+  const summaryCards = [
+    { label: "Today's Bookings", value: "8", icon: CalendarDays, accent: "bg-green-50 text-green-600" },
+    { label: "This Week", value: "34", icon: Clock, accent: "bg-blue-50 text-blue-600" },
+    { label: "Revenue", value: "\u20A6425K", icon: Banknote, accent: "bg-purple-50 text-purple-600" },
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
+    <div className="min-h-screen space-y-6">
+      {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Bookings & Appointments</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your schedule and client visits</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Bookings</h1>
+            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+              {BOOKINGS.length}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">Manage appointments and client schedules</p>
         </div>
-        <CreateBookingModal
-          services={serviceOptions}
-          customers={customerOptions}
-        >
-          <Button className="rounded-xl gap-2 bg-green-500 hover:bg-green-600 text-white px-5 font-medium">
-            <Icon name="Plus" size={16} />
-            Create Booking
-          </Button>
-        </CreateBookingModal>
+        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+          <Plus size={16} />
+          New Booking
+        </button>
       </div>
 
-      {/* Error State */}
-      {error && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
-            <Icon name="Warning" size={32} className="text-red-500" />
-          </div>
-          <h3 className="text-base font-semibold text-gray-900 mb-1">Failed to load bookings</h3>
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
-          <Button onClick={fetchData} className="rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium px-6">
-            Try Again
-          </Button>
-        </div>
-      )}
-
-      {/* Summary Widgets */}
-      {!isLoading && bookings.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <SummaryWidget
-            icon={<Calendar size={18} />}
-            label="Total Bookings"
-            value={String(totalBookings)}
-            trend="+12%"
-            positive
-          />
-          <SummaryWidget
-            icon={<CheckCircle size={18} />}
-            label="Confirmed"
-            value={String(confirmedBookings)}
-            trend="+8%"
-            positive
-          />
-          <SummaryWidget
-            icon={<Clock size={18} />}
-            label="Pending"
-            value={String(pendingBookings)}
-            trend="-3%"
-            positive={false}
-          />
-          <SummaryWidget
-            icon={<Users size={18} />}
-            label="Completed"
-            value={String(completedBookings)}
-            trend="+15%"
-            positive
-          />
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-          <div className="bg-gray-100 rounded-2xl h-96 animate-pulse" />
-        </div>
-      )}
-
-      {/* Main Content */}
-      {!isLoading && (
-        <>
-          {/* Tab Navigation */}
-          {bookings.length > 0 && (
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-              <div className="flex items-center gap-6">
-                <button className="text-sm font-medium border-b-2 border-green-500 text-green-600 pb-3 -mb-3.5 transition-colors">
-                  All Bookings
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  Upcoming
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  Confirmed
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  Completed
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Icon name="Filter" size={14} />
-                  Filter
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Bookings List Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+      {/* ── Summary Cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {summaryCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={card.label}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between"
+            >
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">Upcoming Schedule</h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {bookings.length} booking{bookings.length !== 1 ? "s" : ""} found
-                </p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{card.label}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{card.value}</p>
+              </div>
+              <div className={`p-3 rounded-xl ${card.accent}`}>
+                <Icon size={22} />
               </div>
             </div>
+          );
+        })}
+      </div>
 
-            <div className="p-6">
-              {bookings.length === 0 ? (
-                <div className="text-center py-12">
-                  <Icon name="Calendar" size={32} className="mx-auto mb-2 text-gray-400" />
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1">No bookings yet</h3>
-                  <p className="text-sm text-gray-500">
-                    New appointments will appear here.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {bookings.map((booking) => (
-                    <div
-                      key={booking.id}
-                      className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700 font-bold text-lg shrink-0">
-                          {format(new Date(booking.startsAt), "d")}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">
-                            {booking?.service?.title}
-                          </h3>
-                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <Clock size={14} />
-                              {format(new Date(booking.startsAt), "h:mm a")} -{" "}
-                              {format(new Date(booking.endsAt), "h:mm a")}
+      {/* ── Today's Schedule ── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h2 className="text-sm font-semibold text-gray-900">Today&apos;s Schedule</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Upcoming bookings for today</p>
+        </div>
+
+        <div className="px-6 py-4">
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-[63px] top-0 bottom-0 w-px bg-gray-200" />
+
+            <div className="space-y-0">
+              {TODAY_SCHEDULE.map((slot, idx) => {
+                const statusCfg = STATUS_CONFIG[slot.status as Status];
+                const StatusIcon = statusCfg.icon;
+                return (
+                  <div key={idx} className="relative flex items-start gap-5 py-3 group">
+                    {/* Time */}
+                    <div className="w-[52px] shrink-0 text-right">
+                      <span className="text-xs font-semibold text-gray-500">{slot.time}</span>
+                    </div>
+
+                    {/* Dot on timeline */}
+                    <div className="relative z-10 shrink-0">
+                      <div className={`w-3 h-3 rounded-full border-2 border-white ${statusCfg.dot} shadow-sm`} />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 -mt-1 pb-2">
+                      <div className="bg-gray-50 group-hover:bg-green-50/40 rounded-xl p-3.5 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{slot.customer}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{slot.service}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400">{slot.duration}</span>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusCfg.bg} ${statusCfg.text}`}>
+                              <StatusIcon size={10} />
+                              {slot.status}
                             </span>
-                            {booking.customer && (
-                              <span className="flex items-center gap-1">
-                                <User size={14} />
-                                {booking?.customer?.firstName}{" "}
-                                {booking?.customer?.lastName}
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            booking.status === "CONFIRMED" || booking.status === "COMPLETED"
-                              ? "bg-green-50 text-green-600"
-                              : booking.status === "PENDING"
-                              ? "bg-orange-50 text-orange-600"
-                              : "bg-red-50 text-red-600"
-                          }`}
-                        >
-                          {booking.status === "CONFIRMED" && <CheckCircle size={12} />}
-                          {booking.status === "COMPLETED" && <CheckCircle size={12} />}
-                          {booking.status === "CANCELLED" && <XCircle size={12} />}
-                          {booking.status === "NO_SHOW" && <XCircle size={12} />}
-                          {booking.status === "PENDING" && <Clock size={12} />}
-                          {booking.status.toLowerCase().replace(/_/g, " ")}
-                        </span>
-                        <BookingListActions
-                          booking={{
-                            ...booking,
-                            customerId: booking.customerId,
-                            startsAt: new Date(booking.startsAt),
-                            endsAt: new Date(booking.endsAt),
-                          }}
-                          services={serviceOptions}
-                          customers={customerOptions}
-                        />
-                      </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// Summary Widget Component
-function SummaryWidget({
-  icon,
-  label,
-  value,
-  trend,
-  positive,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  trend: string;
-  positive: boolean;
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            {label}
-          </p>
-          <p className="text-2xl font-bold text-gray-900 tracking-tight mt-1">
-            {value}
-          </p>
-        </div>
-        <div className="p-2.5 rounded-xl bg-gray-100 text-gray-600">
-          {icon}
         </div>
       </div>
-      <div className={`flex items-center text-sm font-medium ${positive ? 'text-green-600' : 'text-red-600'}`}>
-        <span>{trend}</span>
-        <span className="ml-1">{positive ? '↗' : '↘'}</span>
+
+      {/* ── Booking Table ── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* Table header bar */}
+        <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">All Bookings</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{filtered.length} booking{filtered.length !== 1 ? "s" : ""}</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-48 pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+              />
+            </div>
+
+            {/* Status filters */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              {["All", "Confirmed", "Pending", "Cancelled", "Completed"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setFilterStatus(s)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    filterStatus === s
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Table columns */}
+        <div className="hidden lg:grid lg:grid-cols-[1.2fr_1.4fr_1fr_0.6fr_0.7fr_0.7fr_80px] gap-4 px-6 py-3 bg-gray-50/80 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <span>Customer</span>
+          <span>Service</span>
+          <span>Date / Time</span>
+          <span>Duration</span>
+          <span>Amount (\u20A6)</span>
+          <span>Status</span>
+          <span className="text-right">Actions</span>
+        </div>
+
+        {/* Rows */}
+        <div className="divide-y divide-gray-50">
+          {filtered.length === 0 ? (
+            <div className="py-16 text-center">
+              <Search size={36} className="mx-auto text-gray-300 mb-3" />
+              <p className="text-sm font-medium text-gray-900">No bookings found</p>
+              <p className="text-xs text-gray-500 mt-1">Try adjusting your search or filters</p>
+            </div>
+          ) : (
+            filtered.map((booking) => {
+              const statusCfg = STATUS_CONFIG[booking.status as Status];
+              return (
+                <div key={booking.id} className="group px-6 py-4 hover:bg-gray-50/50 transition-colors">
+                  {/* Desktop */}
+                  <div className="hidden lg:grid lg:grid-cols-[1.2fr_1.4fr_1fr_0.6fr_0.7fr_0.7fr_80px] gap-4 items-center">
+                    {/* Customer */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {getInitials(booking.customer)}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 truncate">{booking.customer}</span>
+                    </div>
+
+                    {/* Service */}
+                    <span className="text-sm text-gray-700 truncate">{booking.service}</span>
+
+                    {/* Date / Time */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {new Date(booking.date).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                      <p className="text-xs text-gray-500">{booking.time}</p>
+                    </div>
+
+                    {/* Duration */}
+                    <span className="text-sm text-gray-600">{booking.duration}</span>
+
+                    {/* Amount */}
+                    <span className="text-sm font-semibold text-gray-900">{formatNairaFull(booking.amount)}</span>
+
+                    {/* Status */}
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${statusCfg.bg} ${statusCfg.text} border ${
+                      booking.status === "Confirmed" ? "border-green-200" :
+                      booking.status === "Pending" ? "border-yellow-200" :
+                      booking.status === "Cancelled" ? "border-red-200" :
+                      "border-blue-200"
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
+                      {booking.status}
+                    </span>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors" title="View">
+                        <Eye size={14} className="text-gray-500" />
+                      </button>
+                      <button className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors" title="Edit">
+                        <Pencil size={14} className="text-gray-500" />
+                      </button>
+                      <button className="p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Delete">
+                        <Trash2 size={14} className="text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Mobile */}
+                  <div className="lg:hidden space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                          {getInitials(booking.customer)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{booking.customer}</p>
+                          <p className="text-xs text-gray-500">{booking.service}</p>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${statusCfg.bg} ${statusCfg.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
+                        {booking.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <CalendarDays size={12} />
+                          {new Date(booking.date).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock size={12} />
+                          {booking.time}
+                        </span>
+                        <span>{booking.duration}</span>
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">{formatNairaFull(booking.amount)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );

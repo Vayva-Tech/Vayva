@@ -4,10 +4,12 @@
  * Visual workflow builder, template library, and execution monitoring
  */
 
+"use client";
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Shuffle, 
+import {
+  Shuffle,
   Play,
   Pause,
   Stop,
@@ -24,11 +26,12 @@ import {
   Gear,
   ChartLine
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
 import { toast } from 'sonner';
+import WorkflowCanvas, { WorkflowCanvasLocked } from './WorkflowCanvas';
 
 // Types
 interface WorkflowNode {
@@ -81,11 +84,12 @@ interface WorkflowExecution {
 }
 
 // Main Workflow Automation Dashboard
-export default function WorkflowAutomationDashboard() {
+export default function WorkflowAutomationDashboard({ planTier = 'pro' }: { planTier?: string }) {
   const { store } = useStore();
   const colors = getThemeColors(store?.industrySlug || 'default');
   const [activeTab, setActiveTab] = useState<'builder' | 'templates' | 'monitor'>('builder');
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowDefinition | null>(null);
+  const isProPlus = planTier === 'pro_plus' || planTier === 'PRO_PLUS';
 
   // Fetch workflows
   const { data: workflows, isLoading: workflowsLoading } = useSWR<WorkflowDefinition[]>(
@@ -164,12 +168,11 @@ export default function WorkflowAutomationDashboard() {
 
       {/* Tab Content */}
       {activeTab === 'builder' && (
-        <WorkflowBuilder 
-          workflows={workflows || []}
-          loading={workflowsLoading}
-          selectedWorkflow={selectedWorkflow}
-          onSelectWorkflow={setSelectedWorkflow}
-        />
+        isProPlus ? (
+          <WorkflowCanvas />
+        ) : (
+          <WorkflowCanvasLocked />
+        )
       )}
       
       {activeTab === 'templates' && (

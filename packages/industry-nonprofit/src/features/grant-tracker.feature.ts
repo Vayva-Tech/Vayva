@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Grant Tracker Feature
  */

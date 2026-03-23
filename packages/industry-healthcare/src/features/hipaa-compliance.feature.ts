@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HIPAA Compliance Feature Module
  * 

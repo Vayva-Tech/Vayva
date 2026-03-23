@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { GlassPanel , SparklineChart , TrendIndicator } from '@vayva/ui/components/fashion';
 

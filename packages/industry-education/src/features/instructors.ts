@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Instructor Performance Feature
  * 

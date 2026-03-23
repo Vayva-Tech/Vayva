@@ -22,11 +22,11 @@ exports.$Enums = {}
 
 /**
  * Prisma Client JS version: 6.19.2
- * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+ * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
  */
 Prisma.prismaVersion = {
   client: "6.19.2",
-  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
+  engine: "605197351a3c8bdd595af2d2a9bc3025bca48ea2"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -6456,6 +6456,49 @@ exports.Prisma.CreditUsageLogScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.NpsSurveyScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  customerId: 'customerId',
+  score: 'score',
+  feedback: 'feedback',
+  status: 'status',
+  sentAt: 'sentAt',
+  respondedAt: 'respondedAt',
+  channel: 'channel',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PlaybookExecutionScalarFieldEnum = {
+  id: 'id',
+  playbookId: 'playbookId',
+  storeId: 'storeId',
+  status: 'status',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  result: 'result',
+  errorMsg: 'errorMsg',
+  triggeredBy: 'triggeredBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WalletScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  balance: 'balance',
+  currency: 'currency',
+  isLocked: 'isLocked',
+  lockReason: 'lockReason',
+  lockedAt: 'lockedAt',
+  lockedBy: 'lockedBy',
+  totalDeposits: 'totalDeposits',
+  totalPayouts: 'totalPayouts',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -8223,7 +8266,10 @@ exports.Prisma.ModelName = {
   AccessibilityIssue: 'AccessibilityIssue',
   IssueUpdate: 'IssueUpdate',
   CreditAllocation: 'CreditAllocation',
-  CreditUsageLog: 'CreditUsageLog'
+  CreditUsageLog: 'CreditUsageLog',
+  NpsSurvey: 'NpsSurvey',
+  PlaybookExecution: 'PlaybookExecution',
+  Wallet: 'Wallet'
 };
 
 /**

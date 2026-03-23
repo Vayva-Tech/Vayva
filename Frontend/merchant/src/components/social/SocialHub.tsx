@@ -10,16 +10,16 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, 
-  MessageCircle,
+  ChatCircle,
   Heart,
   Share,
-  TrendingUp,
+  TrendUp,
   Calendar,
   Bell,
-  Settings,
+  GearSix,
   Plus,
-  Search,
-  Filter,
+  MagnifyingGlass,
+  Funnel,
   Globe,
   TwitterLogo,
   InstagramLogo,
@@ -30,12 +30,13 @@ import {
   WhatsappLogo,
   TelegramLogo,
   DiscordLogo,
+  Smiley,
   ChartBar,
-  BarChart3,
-  PieChart,
-  Activity
+  ChartPie,
+  Pulse,
+  DotsThree
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -88,6 +89,29 @@ interface SocialMetrics {
   topPerformingPosts: number;
   communityGrowth: number;
   sentimentScore: number;
+}
+
+// Helper functions used across sub-components
+function getPlatformIcon(platform: string) {
+  switch (platform) {
+    case 'twitter': return <TwitterLogo className="h-5 w-5 text-blue-400" />;
+    case 'instagram': return <InstagramLogo className="h-5 w-5 text-pink-500" />;
+    case 'facebook': return <FacebookLogo className="h-5 w-5 text-blue-600" />;
+    case 'linkedin': return <LinkedinLogo className="h-5 w-5 text-blue-700" />;
+    case 'youtube': return <YoutubeLogo className="h-5 w-5 text-red-600" />;
+    case 'tiktok': return <TiktokLogo className="h-5 w-5 text-black" />;
+    default: return <Globe className="h-5 w-5 text-gray-500" />;
+  }
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'published': return 'bg-green-100 text-green-800';
+    case 'scheduled': return 'bg-blue-100 text-blue-800';
+    case 'draft': return 'bg-gray-100 text-gray-800';
+    case 'failed': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
 }
 
 // Main Social Hub Component
@@ -148,33 +172,11 @@ export default function SocialHub() {
   ) || [];
 
   const tabs = [
-    { id: 'posts', label: 'Content', icon: <MessageCircle className="h-4 w-4" /> },
+    { id: 'posts', label: 'Content', icon: <ChatCircle className="h-4 w-4" /> },
     { id: 'community', label: 'Community', icon: <Users className="h-4 w-4" /> },
-    { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4 w-4" /> },
+    { id: 'analytics', label: 'Analytics', icon: <ChartBar className="h-4 w-4" /> },
     { id: 'schedule', label: 'Schedule', icon: <Calendar className="h-4 w-4" /> }
   ];
-
-  const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case 'twitter': return <TwitterLogo className="h-5 w-5 text-blue-400" />;
-      case 'instagram': return <InstagramLogo className="h-5 w-5 text-pink-500" />;
-      case 'facebook': return <FacebookLogo className="h-5 w-5 text-blue-600" />;
-      case 'linkedin': return <LinkedinLogo className="h-5 w-5 text-blue-700" />;
-      case 'youtube': return <YoutubeLogo className="h-5 w-5 text-red-600" />;
-      case 'tiktok': return <TiktokLogo className="h-5 w-5 text-black" />;
-      default: return <Globe className="h-5 w-5 text-gray-500" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'published': return 'bg-green-100 text-green-800';
-      case 'scheduled': return 'bg-blue-100 text-blue-800';
-      case 'draft': return 'bg-gray-100 text-gray-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -242,7 +244,7 @@ export default function SocialHub() {
                   {metrics.avgEngagementRate}%
                 </p>
               </div>
-              <TrendingUp className="h-5 w-5 text-gray-500" />
+              <TrendUp className="h-5 w-5 text-gray-500" />
             </div>
           </ThemedCard>
           
@@ -266,7 +268,7 @@ export default function SocialHub() {
                   +{metrics.communityGrowth}%
                 </p>
               </div>
-              <Activity className="h-5 w-5 text-gray-500" />
+              <Pulse className="h-5 w-5 text-gray-500" />
             </div>
           </ThemedCard>
           
@@ -278,7 +280,7 @@ export default function SocialHub() {
                   {metrics.sentimentScore}/10
                 </p>
               </div>
-              <Smile className="h-5 w-5 text-gray-500" />
+              <Smiley className="h-5 w-5 text-gray-500" />
             </div>
           </ThemedCard>
         </motion.div>
@@ -286,7 +288,7 @@ export default function SocialHub() {
 
       {/* Search Bar */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <input
           type="text"
           placeholder="Search posts, platforms, or content..."
@@ -392,12 +394,12 @@ function PostsView({ posts, loading, selectedPost, onSelectPost }: any) {
                   {post.metrics.shares?.toLocaleString() || '0'}
                 </span>
                 <span className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4 text-green-500" />
+                  <ChatCircle className="h-4 w-4 text-green-500" />
                   {post.metrics.comments?.toLocaleString() || '0'}
                 </span>
               </div>
               <button className="p-1 hover:bg-gray-100 rounded">
-                <MoreHorizontal className="h-4 w-4" />
+                <DotsThree className="h-4 w-4" />
               </button>
             </div>
           </ThemedCard>
@@ -515,7 +517,7 @@ function AnalyticsView({ metrics, loading }: { metrics: SocialMetrics | null; lo
           <h3 className="font-semibold mb-6">Social Media Performance</h3>
           <div className="h-80 bg-gradient-to-br from-muted/20 to-muted/5 rounded-xl border border-gray-100 flex items-center justify-center">
             <div className="text-center">
-              <BarChart3 className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+              <ChartBar className="h-12 w-12 mx-auto mb-4 text-gray-500" />
               <p className="font-medium">Engagement Trends</p>
               <p className="text-sm text-gray-500 mt-1">
                 Avg Rate: {metrics.avgEngagementRate}% | Top Posts: {metrics.topPerformingPosts}

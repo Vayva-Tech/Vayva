@@ -2,6 +2,7 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session.server";
 import { AdminShell } from "@/components/admin-shell";
+import { OnboardingWrapper } from "@/components/onboarding/OnboardingWrapper";
 
 export default async function DashboardLayout({
   children,
@@ -14,5 +15,9 @@ export default async function DashboardLayout({
     redirect("/signin");
   }
 
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <AdminShell>
+      <OnboardingWrapper>{children}</OnboardingWrapper>
+    </AdminShell>
+  );
 }

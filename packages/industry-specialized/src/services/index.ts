@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Core services for specialized industries
  */

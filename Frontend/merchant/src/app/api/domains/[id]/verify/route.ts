@@ -9,7 +9,6 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const result = await apiJson<{
       domain?: { id: string; domain: string; status: string };

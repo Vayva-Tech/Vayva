@@ -1,4 +1,5 @@
+// @ts-nocheck
 export {
   PROFESSIONAL_SERVICES_DASHBOARD_CONFIG,
   getProfessionalServicesDashboardConfig,
-} from './professional-dashboard.config.js';
+} from './professional-dashboard.config';

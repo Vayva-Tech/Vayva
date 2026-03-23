@@ -11,10 +11,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const resolvedParams = await params;
-    const id = resolvedParams?.id as string;
+    const correlationId = request.headers.get("x-request-id") || crypto.randomUUID();
 
     if (!id) {
       return NextResponse.json(

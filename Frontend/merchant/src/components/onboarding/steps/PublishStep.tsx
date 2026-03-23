@@ -7,14 +7,14 @@ import { Button, cn } from "@vayva/ui";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
 import { IndustrySlug } from "@/lib/templates/types";
-import { 
-  Storefront as Store, 
-  Palette, 
-  SkipForward, 
+import {
+  Storefront as Store,
+  Palette,
+  SkipForward,
   CheckCircle,
   ShoppingBag,
-  Utensils,
-  Dumbbell,
+  ForkKnife as Utensils,
+  Barbell as Dumbbell,
   GraduationCap,
   House,
   Briefcase,

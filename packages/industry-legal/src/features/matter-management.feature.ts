@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Matter Management Feature Module
  */

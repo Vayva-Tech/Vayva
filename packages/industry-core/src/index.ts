@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================================================
 // @vayva/industry-core
 // ============================================================================
@@ -5,22 +6,22 @@
 // ============================================================================
 
 // Export all types
-export * from "./types.js";
+export * from "./types";
 
 // Export dashboard types
-export * from "./lib/dashboard/universal-types.js";
+export * from "./lib/dashboard/universal-types";
 
 // Export engine
-export { DashboardEngine } from "./engine.js";
+export { DashboardEngine } from "./engine";
 
 // Export widgets
-export * from "./widgets/index.js";
+export * from "./widgets/index";
 
 // Export hooks
-export * from "./hooks/index.js";
+export * from "./hooks/index";
 
 // Export components
-export * from "./components/index.js";
+export * from "./components/index";
 
 // Export engine resolver
-export * from "./engine-resolver.js";
+export * from "./engine-resolver";

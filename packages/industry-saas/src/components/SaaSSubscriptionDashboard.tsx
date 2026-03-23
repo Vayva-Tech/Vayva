@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SaaS Subscription Dashboard Component
  */

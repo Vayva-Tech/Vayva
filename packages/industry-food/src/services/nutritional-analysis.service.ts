@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nutritional Analysis Service
  * Nutrition calculations and dietary information

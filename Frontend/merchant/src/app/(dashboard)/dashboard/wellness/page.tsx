@@ -5,18 +5,17 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@vayva/ui";
-import { 
+import {
   Calendar,
   Users,
-  DollarSign,
-  TrendingUp,
+  CurrencyDollar as DollarSign,
+  TrendUp as TrendingUp,
   Star,
   Package,
   Bell,
-  Settings
+  Gear as Settings
 } from "@phosphor-icons/react/ssr";
-import { applyTheme } from "@vayva/theme";
-import { wellnessThemes } from "@vayva/theme/industry-themes";
+import { applyTheme, wellnessThemes } from "@vayva/theme";
 import { 
   WellnessCard, 
   AppointmentStatus, 

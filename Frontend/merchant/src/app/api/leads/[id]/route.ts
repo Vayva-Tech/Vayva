@@ -10,9 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const { id } = await params;
         
         // Call backend API to fetch lead
         const result = await apiJson<{
@@ -51,9 +49,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const { id } = await params;
         const body = await request.json().catch(() => ({})) as LeadBody;
         const { firstName, lastName, email, phone, notes, status, tags } = body;
 

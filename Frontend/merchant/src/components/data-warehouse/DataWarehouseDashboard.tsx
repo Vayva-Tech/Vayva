@@ -4,13 +4,15 @@
  * Query interface, pipeline monitoring, and dataset management
  */
 
+"use client";
+
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Database, 
   Play,
-  Save,
-  History,
+  FloppyDisk,
+  ClockCounterClockwise,
   Table,
   ChartBar,
   Clock,
@@ -20,10 +22,10 @@ import {
   Code,
   Download,
   Upload,
-  Filter,
+  Funnel,
   MagnifyingGlass
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -247,7 +249,7 @@ function QueryEditor({
             </h3>
             <div className="flex gap-2">
               <button className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
-                <Save className="h-4 w-4" />
+                <FloppyDisk className="h-4 w-4" />
                 Save
               </button>
               <button 
@@ -330,7 +332,7 @@ function QueryEditor({
       {/* Query History */}
       <ThemedCard industry={store?.industrySlug || 'default'}>
         <h3 className="font-semibold mb-4 flex items-center gap-2">
-          <History className="h-5 w-5" />
+          <ClockCounterClockwise className="h-5 w-5" />
           Recent Queries
         </h3>
         

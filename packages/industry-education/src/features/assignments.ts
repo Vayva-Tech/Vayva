@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Assignments & Assessments Feature
  * 

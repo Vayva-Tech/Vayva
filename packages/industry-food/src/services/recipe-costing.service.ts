@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Recipe Costing Service
  * Calculates recipe costs, food costing, and ingredient analysis

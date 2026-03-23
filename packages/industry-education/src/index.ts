@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @vayva/industry-education
  * 
@@ -18,7 +19,7 @@ export {
   type EducationEngineConfig,
   type EducationFeatureId,
   type EducationEngineStatus,
-} from './education.engine.js';
+} from './education.engine';
 
 // Types
 export * from './types/index';

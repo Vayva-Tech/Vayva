@@ -3,7 +3,7 @@
  * Minimal implementation focusing on dashboard settings
  */
 
-import type { DashboardSettings, WidgetConfig } from './schemas/dashboard-settings.schema.js';
+import type { DashboardSettings, WidgetConfig } from './schemas/dashboard-settings.schema';
 
 export interface SimpleSettings {
   dashboard: DashboardSettings;

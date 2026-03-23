@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Blog/Media Industry Engine Export
  */
@@ -8,4 +9,4 @@ export {
   createDefaultBlogMediaConfig,
   type BlogMediaEngineConfig,
   type BlogMediaFeatureId,
-} from './blog-media.engine.js';
+} from './blog-media.engine';

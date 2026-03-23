@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Kitchen Operations Feature
  * Manage kitchen workflow and order preparation

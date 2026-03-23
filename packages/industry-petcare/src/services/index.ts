@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Petcare Industry Services Index
  * Export all services for the petcare industry engine

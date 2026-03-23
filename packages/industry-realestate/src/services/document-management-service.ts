@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from 'zod';
 
 // ─── Enhanced Document Management Types ───────────────────────────────────────

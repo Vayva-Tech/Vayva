@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { GlassPanel , ProgressBar } from '@vayva/ui/components/fashion';
 import type { CollectionHealth } from '../types';

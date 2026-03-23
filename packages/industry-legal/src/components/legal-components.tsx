@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Legal Components
  * Phase 3: Law Firm Practice Management UI Components

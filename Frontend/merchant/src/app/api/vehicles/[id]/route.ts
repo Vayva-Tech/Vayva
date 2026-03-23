@@ -10,11 +10,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const resolvedParams = await Promise.resolve(params);
-        const { id } = resolvedParams;
-        
+
         // Call backend API to fetch vehicle
         const result = await apiJson<{
             vehicle?: {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================================================
 // Gauge Widget
 // ============================================================================
@@ -5,8 +6,8 @@
 // Great for: conversion rate, capacity utilisation, NPS, satisfaction score
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { WidgetProps } from "../types";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

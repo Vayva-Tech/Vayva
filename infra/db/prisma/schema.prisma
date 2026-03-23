@@ -2132,7 +2132,9 @@ model Store {
   staffInvites            StaffInvite[]
   customerNotes           CustomerNote[]
   tenant                  Tenant?                  @relation(fields: [tenantId], references: [id])
-  // wallet                  Wallet?  // Temporarily commented out due to incomplete Wallet model
+  wallet                  Wallet?
+  npsSurveys              NpsSurvey[]
+  playbookExecutions      PlaybookExecution[]
   whatsAppChannel         WhatsappChannel?
   withdrawals             Withdrawal[]
   domainMappings          DomainMapping[]
@@ -10031,4 +10033,80 @@ model CreditUsageLog {
   @@index([feature])
   @@index([createdAt])
   @@map("credit_usage_logs")
+}
+
+// ============================================================================
+// NPS SURVEY
+// ============================================================================
+
+model NpsSurvey {
+  id          String    @id @default(cuid())
+  storeId     String
+  customerId  String?
+  score       Int?      // 0-10 NPS score
+  feedback    String?   @db.Text
+  status      String    @default("sent") // sent, responded, expired
+  sentAt      DateTime  @default(now())
+  respondedAt DateTime?
+  channel     String    @default("email") // email, whatsapp, in-app
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([status])
+  @@index([sentAt])
+  @@index([score])
+  @@map("nps_surveys")
+}
+
+// ============================================================================
+// PLAYBOOK EXECUTION
+// ============================================================================
+
+model PlaybookExecution {
+  id          String    @id @default(cuid())
+  playbookId  String
+  storeId     String
+  status      String    @default("pending") // pending, running, completed, failed
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  result      Json?
+  errorMsg    String?   @db.Text
+  triggeredBy String?   // system, manual, schedule
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([playbookId])
+  @@index([storeId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("playbook_executions")
+}
+
+// ============================================================================
+// WALLET
+// ============================================================================
+
+model Wallet {
+  id            String   @id @default(cuid())
+  storeId       String   @unique
+  balance       Int      @default(0) // Balance in kobo
+  currency      String   @default("NGN")
+  isLocked      Boolean  @default(false)
+  lockReason    String?
+  lockedAt      DateTime?
+  lockedBy      String?
+  totalDeposits Int      @default(0)
+  totalPayouts  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@map("wallets")
 }

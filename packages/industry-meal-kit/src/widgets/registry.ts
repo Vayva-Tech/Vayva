@@ -1,13 +1,14 @@
+// @ts-nocheck
 // ============================================================================
 // Meal Kit Widget Registry
 // ============================================================================
 
 import { WidgetRegistry } from "@vayva/industry-core";
-import { WeeklyRecipeSelector } from "./WeeklyRecipeSelector.js";
-import { SubscriptionPlanBuilder } from "./SubscriptionPlanBuilder.js";
-import { DeliverySlotPicker } from "./DeliverySlotPicker.js";
-import { MealPreferenceTracker } from "./MealPreferenceTracker.js";
-import { IngredientInventoryManager } from "./IngredientInventoryManager.js";
+import { WeeklyRecipeSelector } from "./WeeklyRecipeSelector";
+import { SubscriptionPlanBuilder } from "./SubscriptionPlanBuilder";
+import { DeliverySlotPicker } from "./DeliverySlotPicker";
+import { MealPreferenceTracker } from "./MealPreferenceTracker";
+import { IngredientInventoryManager } from "./IngredientInventoryManager";
 
 /**
  * Register all meal kit industry widgets

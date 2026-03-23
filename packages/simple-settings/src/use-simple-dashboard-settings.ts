@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getSimpleSettingsManager } from './simple-settings-manager.js';
-import type { DashboardSettings, WidgetConfig } from './simple-settings-manager.js';
+import { getSimpleSettingsManager } from './simple-settings-manager';
+import type { DashboardSettings, WidgetConfig } from './simple-settings-manager';
 
 /**
  * React Hook: useSimpleDashboardSettings

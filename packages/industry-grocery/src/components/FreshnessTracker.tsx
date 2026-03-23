@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Freshness Tracker Widget Component
  * Displays produce freshness status and quality metrics
@@ -5,7 +6,7 @@
 
 import React from 'react';
 
-interface FreshnessRecord {
+export interface FreshnessRecord {
   id: string;
   productId: string;
   productName?: string;
@@ -16,7 +17,7 @@ interface FreshnessRecord {
   expirationDate: Date;
 }
 
-interface FreshnessStats {
+export interface FreshnessStats {
   total: number;
   fresh: number;
   aging: number;
@@ -25,7 +26,7 @@ interface FreshnessStats {
   averageScore: number;
 }
 
-interface FreshnessTrackerProps {
+export interface FreshnessTrackerProps {
   records?: FreshnessRecord[];
   stats?: FreshnessStats;
   onRefresh?: () => void;

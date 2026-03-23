@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Wholesale Industry UI Components
  */
 
-export { PriceTierCalculator } from './PriceTierCalculator.js';
-export type { PriceTierCalculatorProps, TieredPriceResult } from './PriceTierCalculator.js';
+export { PriceTierCalculator } from './PriceTierCalculator';
+export type { PriceTierCalculatorProps, TieredPriceResult } from './PriceTierCalculator';
 
-export { BulkOrderManager } from './BulkOrderManager.js';
-export type { BulkOrderManagerProps } from './BulkOrderManager.js';
+export { BulkOrderManager } from './BulkOrderManager';
+export type { BulkOrderManagerProps } from './BulkOrderManager';

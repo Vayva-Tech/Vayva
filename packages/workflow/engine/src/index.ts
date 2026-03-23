@@ -62,21 +62,21 @@ export type {
   
   // Industry types
   IndustrySlug,
-} from './types.js';
+} from './types';
 
 // Engine
 export { 
   WorkflowExecutor, 
   createDefaultNodeExecutors, 
   getDefaultExecutor 
-} from './engine/executor.js';
+} from './engine/executor';
 
 export { 
   WorkflowScheduler, 
   delay, 
   isBusinessHours, 
   nextBusinessDay 
-} from './engine/scheduler.js';
+} from './engine/scheduler';
 
 // Nodes
 export { 
@@ -86,7 +86,7 @@ export {
   getNodesByIndustry,
   getAllNodeTypes,
   isValidNodeType 
-} from './nodes/registry.js';
+} from './nodes/registry';
 
 // Triggers
 export { 
@@ -94,13 +94,13 @@ export {
   TriggerRegistry, 
   createDefaultTriggerHandlers,
   getDefaultTriggerRegistry 
-} from './triggers/registry.js';
+} from './triggers/registry';
 
 // Validation
 export { 
   WorkflowValidator, 
   getDefaultValidator 
-} from './validation/workflow-validator.js';
+} from './validation/workflow-validator';
 
 // Re-export types from validation
-export type { ValidationError, ValidationResult } from './validation/workflow-validator.js';
+export type { ValidationError, ValidationResult } from './validation/workflow-validator';

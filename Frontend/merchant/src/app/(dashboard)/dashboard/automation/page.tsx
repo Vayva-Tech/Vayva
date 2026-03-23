@@ -6,7 +6,7 @@ import { Button, Input } from "@vayva/ui";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
 import { logger } from "@vayva/shared";
-import { Bell, Clock, Package, CheckCircle, Plus, ToggleRight, Zap, Envelope, ChatCircleText, Warning } from "@phosphor-icons/react";
+import { Bell, Clock, Package, CheckCircle, Plus, ToggleRight, Lightning as Zap, Envelope, ChatCircleText, Warning } from "@phosphor-icons/react";
 
 interface AutomationRule {
   id: string;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================================================
 // Heatmap Widget
 // ============================================================================
@@ -5,8 +6,8 @@
 // (e.g. hourly order volumes, site traffic by day-of-week × hour)
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { WidgetProps } from "../types";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

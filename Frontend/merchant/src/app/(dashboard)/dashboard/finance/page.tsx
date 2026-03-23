@@ -1,604 +1,586 @@
-// @ts-nocheck
 "use client";
+// @ts-nocheck
 
-import { logger, formatCurrency } from "@vayva/shared";
-import { useState, useEffect } from "react";
-import { Button, Icon, IconName, Input, cn, Card } from "@vayva/ui";
+import { useState } from "react";
+import useSWR from "swr";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import {
-  Wallet,
-  TrendUp,
   DollarSign,
-  CreditCard,
-  Building,
+  TrendingUp,
+  Wallet,
   Clock,
-  Download,
-  Plus,
-  Trash,
-  CheckCircle,
-  Warning,
-  ArrowRight
-} from "@phosphor-icons/react/ssr";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import Link from "next/link";
-import { apiJson } from "@/lib/api-client-shared";
+  ArrowUpRight,
+  ArrowDownRight,
+  Building2,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Lock,
+  Banknote,
+  RefreshCw,
+} from "lucide-react";
 
-interface FinanceOverview {
-  totalSales: number;
-  platformFees: number;
-  netEarnings: number;
-  pendingBalance: number;
-  availableBalance: number;
-  currency: string;
-  dailySales?: { name: string; sales: number }[];
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+interface FinanceData {
+  revenueData: { month: string; value: number }[];
+  transactions: { id: number; date: string; description: string; amount: number; type: "Credit" | "Debit"; status: "Completed" | "Pending" | "Failed" }[];
+  payouts: { id: number; amount: number; bank: string; date: string; status: "Completed" | "Pending" | "Failed" }[];
+  expenseBreakdown: { label: string; value: number; color: string }[];
+  profitMarginData: { month: string; margin: number }[];
+  kpis: {
+    totalRevenue: string;
+    revenueTrend: string;
+    revenueTrendUp: boolean;
+    availableBalance: string;
+    balanceTrend: string;
+    balanceTrendUp: boolean;
+    pendingPayouts: string;
+    payoutsTrend: string;
+    payoutsTrendUp: boolean;
+    monthlyGrowth: string;
+    growthTrend: string;
+    growthTrendUp: boolean;
+    totalExpenses: string;
+    currentMargin: string;
+  };
 }
 
-interface Payout {
-  id: string;
-  amount: number;
-  status: string;
-  destination?: { bankName?: string; accountNumber?: string };
-  reference: string;
-  createdAt: string;
-}
+/* ------------------------------------------------------------------ */
+/*  SWR Fetcher                                                        */
+/* ------------------------------------------------------------------ */
 
-interface BankBeneficiary {
-  id: string;
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-  isDefault: boolean;
-}
+const fetcher = (url: string) => fetch(url).then((res) => {
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json();
+});
 
-interface StoreStatus {
-  kycStatus: "NONE" | "PENDING" | "VERIFIED" | "FAILED";
-}
+/* ------------------------------------------------------------------ */
+/*  Skeleton Components                                                */
+/* ------------------------------------------------------------------ */
 
-// Balance Overview Card Component
-function BalanceOverviewCard({
-  availableBalance,
-  pendingBalance,
-  currency,
-  onWithdraw,
-}: {
-  availableBalance: number;
-  pendingBalance: number;
-  currency: string;
-  onWithdraw: () => void;
-}) {
+function KPICardSkeleton() {
   return (
-    <Card className="bg-white rounded-2xl border border-gray-100 p-8 mb-6">
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-            Available Balance
-          </p>
-          <p className="text-4xl font-bold text-gray-900 tracking-tight mb-1">
-            {formatCurrency(availableBalance, currency)}
-          </p>
-          <p className="text-sm text-gray-500 flex items-center gap-1 mt-2">
-            <Clock size={14} />
-            Pending: {formatCurrency(pendingBalance, currency)}
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button onClick={onWithdraw} className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 h-12 font-medium">
-            Withdraw Funds
-            <ArrowRight size={18} className="ml-2" />
-          </Button>
-          <Button variant="outline" className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 rounded-xl px-6 h-12 font-medium">
-            View Transactions
-          </Button>
-        </div>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 animate-pulse">
+      <div className="flex items-start justify-between mb-3">
+        <div className="w-10 h-10 bg-gray-100 rounded-xl" />
+        <div className="w-16 h-6 bg-gray-100 rounded-lg" />
       </div>
-    </Card>
+      <div className="w-20 h-7 bg-gray-100 rounded mb-1" />
+      <div className="w-24 h-4 bg-gray-100 rounded" />
+    </div>
   );
 }
 
-// KPI Card Component
-function FinanceKpiCard({
-  title,
-  value,
-  subtitle,
-  icon,
-  trend,
-}: {
-  title: string;
-  value: string;
-  subtitle: string;
-  icon: IconName;
-  trend?: { value: number; positive: boolean };
-}) {
+function ChartSkeleton() {
   return (
-    <Card className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            {title}
-          </p>
-          <p className="text-3xl font-bold text-gray-900 tracking-tight mt-2">
-            {value}
-          </p>
-          {trend && (
-            <div className={`flex items-center mt-2 text-sm font-medium ${trend.positive ? 'text-green-600' : 'text-red-500'}`}>
-              <TrendUp size={14} className="mr-1" />
-              {Math.abs(trend.value)}% from last period
-            </div>
-          )}
-          {!trend && (
-            <p className="text-sm text-gray-500 mt-2">{subtitle}</p>
-          )}
-        </div>
-        <div className="p-3 rounded-xl bg-gray-100 text-gray-600">
-          <Icon name={icon} size={20} />
-        </div>
-      </div>
-    </Card>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse">
+      <div className="w-40 h-5 bg-gray-100 rounded mb-2" />
+      <div className="w-56 h-4 bg-gray-100 rounded mb-6" />
+      <div className="w-full h-52 bg-gray-50 rounded-xl" />
+    </div>
   );
 }
 
-interface FinanceStatsResponse {
-  totalSales: number;
-  platformFees: number;
-  netEarnings: number;
-  pendingBalance: number;
-  availableBalance: number;
-  currency: string;
-  dailySales?: { name: string; sales: number }[];
+function TableSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse">
+      <div className="w-36 h-5 bg-gray-100 rounded mb-2" />
+      <div className="w-52 h-4 bg-gray-100 rounded mb-6" />
+      <div className="space-y-4">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4">
+            <div className="w-20 h-4 bg-gray-100 rounded" />
+            <div className="w-32 h-4 bg-gray-100 rounded" />
+            <div className="flex-1" />
+            <div className="w-20 h-4 bg-gray-100 rounded" />
+            <div className="w-16 h-5 bg-gray-100 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-interface WithdrawResponse {
-  success: boolean;
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function formatNaira(value: number): string {
+  const abs = Math.abs(value);
+  if (abs >= 1000000) return `${value < 0 ? "-" : ""}₦${(abs / 1000000).toFixed(1)}M`;
+  if (abs >= 1000) return `${value < 0 ? "-" : ""}₦${(abs / 1000).toFixed(0)}K`;
+  return `${value < 0 ? "-" : ""}₦${abs.toLocaleString()}`;
 }
+
+function formatNairaFull(value: number): string {
+  return `${value < 0 ? "-" : ""}₦${Math.abs(value).toLocaleString()}`;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Revenue Area Chart SVG                                             */
+/* ------------------------------------------------------------------ */
+
+function RevenueChart({ revenueData }: { revenueData: { month: string; value: number }[] }) {
+  if (!revenueData || revenueData.length === 0) return null;
+
+  const width = 600;
+  const height = 200;
+  const paddingX = 40;
+  const paddingY = 20;
+  const chartW = width - paddingX * 2;
+  const chartH = height - paddingY * 2 - 20;
+
+  const maxVal = Math.max(...revenueData.map((d) => d.value)) * 1.1;
+  const minVal = 0;
+
+  const getX = (i: number) => paddingX + (i / (revenueData.length - 1)) * chartW;
+  const getY = (v: number) => paddingY + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
+
+  const linePath = revenueData.map((d, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(d.value)}`).join(" ");
+  const areaPath = `${linePath} L ${getX(revenueData.length - 1)} ${getY(0)} L ${getX(0)} ${getY(0)} Z`;
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
+      <defs>
+        <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#22C55E" stopOpacity={0.25} />
+          <stop offset="100%" stopColor="#22C55E" stopOpacity={0.02} />
+        </linearGradient>
+      </defs>
+
+      {/* Grid lines */}
+      {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => {
+        const y = paddingY + chartH - pct * chartH;
+        const val = minVal + pct * (maxVal - minVal);
+        return (
+          <g key={i}>
+            <line x1={paddingX} x2={width - paddingX} y1={y} y2={y} stroke="#f3f4f6" strokeWidth={1} />
+            <text x={paddingX - 6} y={y + 4} textAnchor="end" fill="#9ca3af" style={{ fontSize: "10px" }}>
+              {val >= 1000000 ? `${(val / 1000000).toFixed(1)}M` : `${(val / 1000).toFixed(0)}K`}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Area */}
+      <path d={areaPath} fill="url(#revGrad)" />
+
+      {/* Line */}
+      <path d={linePath} fill="none" stroke="#22C55E" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+
+      {/* Dots */}
+      {revenueData.map((d, i) => (
+        <circle key={i} cx={getX(i)} cy={getY(d.value)} r={4} fill="#22C55E" stroke="white" strokeWidth={2} />
+      ))}
+
+      {/* X labels */}
+      {revenueData.map((d, i) => (
+        <text key={i} x={getX(i)} y={height - 4} textAnchor="middle" fill="#9ca3af" style={{ fontSize: "11px" }}>
+          {d.month}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Donut Chart for Expenses                                           */
+/* ------------------------------------------------------------------ */
+
+function ExpenseDonut({ expenseBreakdown, totalExpenses }: { expenseBreakdown: { label: string; value: number; color: string }[]; totalExpenses: string }) {
+  if (!expenseBreakdown || expenseBreakdown.length === 0) return null;
+
+  const size = 160;
+  const strokeWidth = 22;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {expenseBreakdown.map((seg, i) => {
+          const arc = (seg.value / 100) * circumference;
+          const dashOffset = -offset;
+          offset += arc;
+          return (
+            <circle
+              key={i}
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={seg.color}
+              strokeWidth={strokeWidth}
+              strokeDasharray={`${arc} ${circumference - arc}`}
+              strokeDashoffset={dashOffset}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          );
+        })}
+        <text x={size / 2} y={size / 2 - 6} textAnchor="middle" fill="#111827" style={{ fontSize: "20px", fontWeight: 700 }}>
+          {totalExpenses}
+        </text>
+        <text x={size / 2} y={size / 2 + 12} textAnchor="middle" fill="#9ca3af" style={{ fontSize: "11px" }}>
+          Total Expenses
+        </text>
+      </svg>
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+        {expenseBreakdown.map((seg) => (
+          <div key={seg.label} className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: seg.color }} />
+            <span className="text-xs text-gray-600">{seg.label} ({seg.value}%)</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Profit Margin Line Chart                                           */
+/* ------------------------------------------------------------------ */
+
+function ProfitMarginChart({ profitMarginData }: { profitMarginData: { month: string; margin: number }[] }) {
+  if (!profitMarginData || profitMarginData.length === 0) return null;
+
+  const width = 300;
+  const height = 140;
+  const px = 30;
+  const py = 15;
+  const cw = width - px * 2;
+  const ch = height - py * 2 - 16;
+  const maxM = 30;
+
+  const getX = (i: number) => px + (i / (profitMarginData.length - 1)) * cw;
+  const getY = (v: number) => py + ch - (v / maxM) * ch;
+
+  const path = profitMarginData.map((d, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(d.margin)}`).join(" ");
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
+      {[0, 10, 20, 30].map((v) => (
+        <g key={v}>
+          <line x1={px} x2={width - px} y1={getY(v)} y2={getY(v)} stroke="#f3f4f6" strokeWidth={1} />
+          <text x={px - 4} y={getY(v) + 4} textAnchor="end" fill="#9ca3af" style={{ fontSize: "9px" }}>
+            {v}%
+          </text>
+        </g>
+      ))}
+      <path d={path} fill="none" stroke="#22C55E" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      {profitMarginData.map((d, i) => (
+        <g key={i}>
+          <circle cx={getX(i)} cy={getY(d.margin)} r={3} fill="#22C55E" stroke="white" strokeWidth={1.5} />
+          <text x={getX(i)} y={height - 2} textAnchor="middle" fill="#9ca3af" style={{ fontSize: "9px" }}>
+            {d.month}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Status Badge                                                       */
+/* ------------------------------------------------------------------ */
+
+function StatusBadge({ status }: { status: "Completed" | "Pending" | "Failed" }) {
+  const styles = {
+    Completed: "bg-green-50 text-green-700 border-green-200",
+    Pending: "bg-amber-50 text-amber-700 border-amber-200",
+    Failed: "bg-red-50 text-red-700 border-red-200",
+  };
+  const icons = {
+    Completed: <CheckCircle2 size={12} />,
+    Pending: <Clock size={12} />,
+    Failed: <XCircle size={12} />,
+  };
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${styles[status]}`}>
+      {icons[status]}
+      {status}
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page Component                                                     */
+/* ------------------------------------------------------------------ */
 
 export default function FinancePage() {
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<FinanceOverview | null>(null);
-  const [payouts, setPayouts] = useState<Payout[]>([]);
-  const [bankAccounts, setBankAccounts] = useState<BankBeneficiary[]>([]);
-  const [storeStatus, setStoreStatus] = useState<StoreStatus | null>(null);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [userPlan] = useState<"FREE" | "STARTER" | "PRO">("FREE");
 
-  const [withdrawAmount, setWithdrawAmount] = useState<string>("");
-  const [selectedBankId, setSelectedBankId] = useState<string>("");
-  const [password, setPassword] = useState("");
-  const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"DETAILS" | "AUTH">("DETAILS");
+  const { data, error, isLoading, mutate } = useSWR<FinanceData>(
+    '/api/finance/overview',
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [statsData, payoutsData, banksData, statusData] = await Promise.all(
-        [
-          apiJson<FinanceStatsResponse>("/api/finance/stats"),
-          apiJson<Payout[]>("/api/finance/payouts"),
-          apiJson<BankBeneficiary[]>("/api/finance/banks"),
-          apiJson<StoreStatus>("/api/merchant/store/status"),
-        ],
-      );
+  const revenueData = data?.revenueData || [];
+  const transactions = data?.transactions || [];
+  const payouts = data?.payouts || [];
+  const expenseBreakdown = data?.expenseBreakdown || [];
+  const profitMarginData = data?.profitMarginData || [];
+  const finKpis = data?.kpis;
 
-      setStats(statsData);
-      setPayouts(Array.isArray(payoutsData) ? payoutsData : []);
-      setBankAccounts(Array.isArray(banksData) ? banksData : []);
-      setStoreStatus(statusData);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load finance data";
-      logger.error("[FETCH_FINANCE_DATA_ERROR]", {
-        error: message,
-        app: "merchant",
-      });
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    void fetchData();
-  }, []);
-
-  const handleWithdraw = async () => {
-    if (!selectedBankId || !withdrawAmount || !password) return;
-
-    setIsWithdrawing(true);
-    try {
-      const selectedBank = bankAccounts.find((b) => b.id === selectedBankId);
-      await apiJson<WithdrawResponse>("/api/finance/withdraw", {
-        method: "POST",
-        body: JSON.stringify({
-          amount: Number(withdrawAmount),
-          bankDetails: {
-            bankCode: "000",
-            accountNumber: selectedBank?.accountNumber,
-          },
-          password,
-        }),
-      });
-
-      toast.success("Payout requested successfully");
-      setOpen(false);
-      setWithdrawAmount("");
-      setPassword("");
-      setStep("DETAILS");
-      void fetchData();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      logger.error("[WITHDRAW_ERROR]", { error: message, app: "merchant" });
-      toast.error("Withdrawal failed");
-    } finally {
-      setIsWithdrawing(false);
-    }
-  };
-
-  if (loading) {
+  // Error state
+  if (error) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm text-gray-600">Loading finance data...</span>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-red-100 p-8 text-center max-w-md">
+          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-7 h-7 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load financial data</h3>
+          <p className="text-sm text-gray-500 mb-4">There was a problem fetching your finance data. Please try again.</p>
+          <button
+            onClick={() => mutate()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </button>
         </div>
       </div>
     );
   }
 
-  const overview = stats;
-  const beneficiaries = bankAccounts;
-  const dailySales = stats?.dailySales || [];
-  const currency = overview?.currency || "NGN";
-  const canWithdraw =
-    overview &&
-    overview.availableBalance > 0 &&
-    storeStatus?.kycStatus === "VERIFIED";
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="animate-pulse">
+            <div className="w-32 h-7 bg-gray-100 rounded mb-2" />
+            <div className="w-64 h-4 bg-gray-100 rounded" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => <KPICardSkeleton key={i} />)}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2"><ChartSkeleton /></div>
+          <ChartSkeleton />
+        </div>
+        <TableSkeleton />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartSkeleton />
+          <ChartSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (!data || (revenueData.length === 0 && transactions.length === 0)) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Finance</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage your revenue, payouts, and financial health</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+            <DollarSign className="w-7 h-7 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">No financial data yet</h3>
+          <p className="text-sm text-gray-500 max-w-sm mb-4">Revenue and transactions will appear after your first sale</p>
+        </div>
+      </div>
+    );
+  }
+
+  const kpis = [
+    { label: "Total Revenue", value: finKpis?.totalRevenue ?? "--", icon: DollarSign, iconBg: "bg-green-100 text-green-600", trend: finKpis?.revenueTrend ?? "--", trendUp: finKpis?.revenueTrendUp ?? true },
+    { label: "Available Balance", value: finKpis?.availableBalance ?? "--", icon: Wallet, iconBg: "bg-blue-100 text-blue-600", trend: finKpis?.balanceTrend ?? "--", trendUp: finKpis?.balanceTrendUp ?? true },
+    { label: "Pending Payouts", value: finKpis?.pendingPayouts ?? "--", icon: Clock, iconBg: "bg-amber-100 text-amber-600", trend: finKpis?.payoutsTrend ?? "--", trendUp: finKpis?.payoutsTrendUp ?? false },
+    { label: "Monthly Growth", value: finKpis?.monthlyGrowth ?? "--", icon: TrendingUp, iconBg: "bg-purple-100 text-purple-600", trend: finKpis?.growthTrend ?? "--", trendUp: finKpis?.growthTrendUp ?? true },
+  ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-1">Finance Hub</h1>
-        <p className="text-sm text-gray-500">Manage your earnings, withdrawals, and financial analytics</p>
-      </div>
-
-      {/* Balance Overview Card */}
-      {overview && (
-        <BalanceOverviewCard
-          availableBalance={overview.availableBalance}
-          pendingBalance={overview.pendingBalance}
-          currency={currency}
-          onWithdraw={() => setOpen(true)}
-        />
-      )}
-
-      {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <FinanceKpiCard
-          title="Total Sales"
-          value={formatCurrency(overview?.totalSales || 0, currency)}
-          subtitle="Gross sales volume"
-          icon="TrendUp"
-          trend={{ value: 12.5, positive: true }}
-        />
-        <FinanceKpiCard
-          title="Platform Fees"
-          value={formatCurrency(overview?.platformFees || 0, currency)}
-          subtitle="3% platform commission"
-          icon="CreditCard"
-        />
-        <FinanceKpiCard
-          title="Net Earnings"
-          value={formatCurrency(overview?.netEarnings || 0, currency)}
-          subtitle="After fees deduction"
-          icon="DollarSign"
-          trend={{ value: 8.2, positive: true }}
-        />
-        <FinanceKpiCard
-          title="This Month"
-          value={formatCurrency(overview?.availableBalance || 0, currency)}
-          subtitle="Available for withdrawal"
-          icon="Wallet"
-        />
-      </div>
-
-      {/* Two Column Layout: Chart + Payouts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sales Chart - 2 columns */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-base font-semibold text-gray-900">Sales Overview</h3>
-              <p className="text-sm text-gray-500 mt-1">Daily revenue breakdown (Last 7 days)</p>
-            </div>
-            <Button variant="outline" size="sm" className="border-gray-200">
-              <Download size={16} className="mr-2" />
-              Export
-            </Button>
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailySales}>
-                <defs>
-                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22C55E" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#22C55E" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#9CA3AF", fontSize: 12 }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#9CA3AF", fontSize: 12 }}
-                  tickFormatter={(v) => `₦${Math.round(Number(v) / 1000)}k`}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#FFFFFF",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                  }}
-                  itemStyle={{ color: "#1F2937", fontSize: 13, fontWeight: 600 }}
-                  labelStyle={{ color: "#6B7280", fontSize: 12, marginBottom: 6 }}
-                  formatter={(value: number | string | undefined) => [
-                    formatCurrency(Number(value || 0), currency),
-                    "Revenue",
-                  ]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="sales"
-                  stroke="#22C55E"
-                  strokeWidth={2}
-                  fill="url(#colorSales)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+    <div className="min-h-screen space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Finance</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage your revenue, payouts, and financial health</p>
         </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => mutate()}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+            <Banknote size={16} />
+            Request Payout
+          </button>
+        </div>
+      </div>
 
-        {/* Payout History - 1 column */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-base font-semibold text-gray-900">Payout History</h3>
-              <p className="text-sm text-gray-500 mt-1">Recent withdrawals</p>
-            </div>
-            <Link href="/dashboard/finance/payouts">
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
-                View All
-              </Button>
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {payouts.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                  <Wallet size={24} className="text-gray-400" />
-                </div>
-                <p className="text-sm text-gray-500">No payouts yet</p>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpis.map((kpi) => (
+          <div key={kpi.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className={`p-2.5 rounded-xl ${kpi.iconBg}`}>
+                <kpi.icon size={20} />
               </div>
-            ) : (
-              payouts.slice(0, 5).map((payout) => (
-                <div
-                  key={payout.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {formatCurrency(payout.amount, currency)}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {new Date(payout.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Badge
-                    variant={payout.status === "SUCCESS" ? "success" : payout.status === "FAILED" ? "error" : "warning"}
-                    className="text-xs"
-                  >
-                    {payout.status}
-                  </Badge>
-                </div>
-              ))
-            )}
+              <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg ${kpi.trendUp ? "text-green-700 bg-green-50" : "text-red-600 bg-red-50"}`}>
+                {kpi.trendUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                {kpi.trend}
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 tracking-tight">{kpi.value}</p>
+            <p className="text-xs font-medium text-gray-500 mt-1">{kpi.label}</p>
           </div>
-        </div>
+        ))}
       </div>
 
-      {/* Bank Accounts Section */}
-      {bankAccounts.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
+      {/* Revenue Chart + Transactions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Revenue Chart (2 col span) */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base font-semibold text-gray-900">Bank Accounts</h3>
-              <p className="text-sm text-gray-500 mt-1">Your linked withdrawal destinations</p>
+              <h3 className="text-base font-semibold text-gray-900">Revenue Overview</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Last 6 months performance</p>
             </div>
-            <Link href="/dashboard/settings/payments">
-              <Button variant="outline" size="sm" className="border-gray-200">
-                <Plus size={16} className="mr-2" />
-                Add Account
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-0.5 bg-green-500 rounded" />
+                Revenue
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {bankAccounts.map((bank) => (
-              <div
-                key={bank.id}
-                className="p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                      <Building size={20} className="text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">{bank.bankName}</p>
-                      <p className="text-xs text-gray-500">•••• {bank.accountNumber.slice(-4)}</p>
-                    </div>
+          <div className="h-52">
+            <RevenueChart revenueData={revenueData} />
+          </div>
+        </div>
+
+        {/* Transactions Summary */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h3 className="text-base font-semibold text-gray-900 mb-1">Recent Transactions</h3>
+          <p className="text-xs text-gray-500 mb-4">Latest 5 transactions</p>
+          <div className="space-y-3">
+            {transactions.map((txn) => (
+              <div key={txn.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${txn.type === "Credit" ? "bg-green-50" : "bg-red-50"}`}>
+                    {txn.type === "Credit" ? (
+                      <ArrowUpRight size={14} className="text-green-600" />
+                    ) : (
+                      <ArrowDownRight size={14} className="text-red-600" />
+                    )}
                   </div>
-                  {bank.isDefault && (
-                    <Badge variant="info" className="text-xs">
-                      Default
-                    </Badge>
-                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{txn.description}</p>
+                    <p className="text-[11px] text-gray-400">{txn.date}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-700">{bank.accountName}</p>
+                <div className="text-right flex-shrink-0 ml-2">
+                  <p className={`text-sm font-semibold ${txn.type === "Credit" ? "text-green-600" : "text-red-600"}`}>
+                    {txn.type === "Credit" ? "+" : ""}{formatNairaFull(txn.amount)}
+                  </p>
+                  <StatusBadge status={txn.status} />
+                </div>
               </div>
             ))}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* KYC Warning */}
-      {storeStatus?.kycStatus !== "VERIFIED" && (
-        <div className="bg-orange-50 rounded-2xl border border-orange-200 p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-              <Warning size={20} className="text-orange-600" />
+      {/* Payout History */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h3 className="text-base font-semibold text-gray-900">Payout History</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Track your withdrawal status</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bank Account</th>
+                <th className="text-left py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="text-center py-3 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payouts.map((payout) => (
+                <tr key={payout.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                  <td className="py-3.5 px-6">
+                    <span className="text-sm font-semibold text-gray-900">{formatNairaFull(payout.amount)}</span>
+                  </td>
+                  <td className="py-3.5 px-6">
+                    <div className="flex items-center gap-2">
+                      <Building2 size={14} className="text-gray-400" />
+                      <span className="text-sm text-gray-700">{payout.bank}</span>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-6">
+                    <span className="text-sm text-gray-500">{payout.date}</span>
+                  </td>
+                  <td className="py-3.5 px-6 text-center">
+                    <StatusBadge status={payout.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Financial Charts (Gated) */}
+      <div className="relative">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Expense Breakdown Donut */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-1">Expense Breakdown</h3>
+            <p className="text-xs text-gray-500 mb-4">Where your money goes</p>
+            <ExpenseDonut expenseBreakdown={expenseBreakdown} totalExpenses={finKpis?.totalExpenses ?? "₦0"} />
+          </div>
+
+          {/* Profit Margin Trend */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-1">Profit Margin Trend</h3>
+            <p className="text-xs text-gray-500 mb-4">Monthly profit margin (%)</p>
+            <div className="h-36">
+              <ProfitMarginChart profitMarginData={profitMarginData} />
             </div>
-            <div className="flex-1">
-              <h3 className="text-base font-semibold text-gray-900 mb-1">KYC Verification Required</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                You must verify your identity before withdrawing funds. This is a one-time process.
-              </p>
-              <Link href="/dashboard/settings/kyc">
-                <Button className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 h-10 font-medium">
-                  Complete KYC Verification
-                  <ArrowRight size={16} className="ml-2" />
-                </Button>
-              </Link>
+            <div className="mt-4 flex items-center gap-2 text-sm">
+              <TrendingUp size={14} className="text-green-500" />
+              <span className="text-gray-600">Current margin:</span>
+              <span className="font-semibold text-gray-900">{finKpis?.currentMargin ?? "--"}</span>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Withdrawal Dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-gray-900">Withdraw Funds</DialogTitle>
-            <DialogDescription className="text-sm text-gray-500">
-              Select your destination bank and enter the amount to withdraw
-            </DialogDescription>
-          </DialogHeader>
-
-          {step === "DETAILS" ? (
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="bank" className="text-sm font-medium text-gray-700">
-                  Destination Account
-                </Label>
-                <Select value={selectedBankId} onValueChange={setSelectedBankId}>
-                  <SelectTrigger className="h-12">
-                    <SelectValue placeholder="Select bank account" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {beneficiaries.map((b) => (
-                      <SelectItem key={b.id} value={b.id}>
-                        {b.bankName} - {b.accountNumber}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {beneficiaries.length === 0 && (
-                  <p className="text-xs text-red-600">No bank accounts found. Please add one in Settings.</p>
-                )}
+        {/* Gate overlay for FREE users */}
+        {userPlan === "FREE" && (
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
+            <div className="text-center p-8 max-w-sm">
+              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Lock size={24} className="text-gray-400" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="amount" className="text-sm font-medium text-gray-700">
-                  Amount
-                </Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={withdrawAmount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setWithdrawAmount(e.target?.value)
-                  }
-                  placeholder="0.00"
-                  min={1000}
-                  className="h-12"
-                />
-                <p className="text-xs text-gray-500">Minimum withdrawal: ₦1,000</p>
-              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Unlock Financial Analytics</h3>
+              <p className="text-sm text-gray-500 mb-5">
+                Get detailed expense breakdowns and profit margin trends to make smarter financial decisions.
+              </p>
+              <button className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+                Upgrade to Starter
+                <ArrowUpRight size={14} />
+              </button>
             </div>
-          ) : (
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                  Confirm Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setPassword(e.target?.value)
-                  }
-                  placeholder="Enter your password"
-                  className="h-12"
-                />
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                if (step === "AUTH") {
-                  setStep("DETAILS");
-                } else {
-                  setOpen(false);
-                }
-              }}
-              className="border-gray-200"
-            >
-              {step === "AUTH" ? "Back" : "Cancel"}
-            </Button>
-            <Button
-              type="button"
-              onClick={handleWithdraw}
-              disabled={isWithdrawing || !withdrawAmount || (!selectedBankId && step === "DETAILS")}
-              className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 font-medium"
-            >
-              {isWithdrawing ? "Processing..." : step === "DETAILS" ? "Continue" : "Confirm Withdrawal"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

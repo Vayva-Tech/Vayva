@@ -10,11 +10,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const { id } = await params;
+    const { id: orderId } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const resolvedParams = params instanceof Promise ? await params : params;
-        const orderId = resolvedParams?.id;
+    const correlationId = request.headers.get("x-request-id") || crypto.randomUUID();
         if (!orderId) {
             return NextResponse.json({ error: "Order ID required", requestId: correlationId }, { status: 400, headers: standardHeaders(correlationId) });
         }

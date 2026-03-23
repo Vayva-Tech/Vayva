@@ -9,7 +9,6 @@ export async function GET(
 ) {
   try {
     const { primaryObject, id } = await params;
-    const { primaryObject, id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const result = await apiJson(
       `${process.env.BACKEND_API_URL}/api/resources/${primaryObject}/${id}`,
@@ -32,7 +31,6 @@ export async function PATCH(
   { params }: { params: Promise<{ primaryObject: string, id: string }> }
 ) {
   try {
-    const { primaryObject, id } = await params;
     const { primaryObject, id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const body = await request.json();

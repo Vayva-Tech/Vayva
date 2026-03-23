@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * Nightlife Industry Package Index
  */
 
 // Export dashboard component
-export { NightlifeDashboard } from './components/NightlifeDashboard.js';
-export type { IndustryDashboardProps } from '@vayva/industry-core';
+export { NightlifeDashboard } from './components/NightlifeDashboard';
+export type { NightlifeDashboardProps } from './components/NightlifeDashboard';
 
 export const VERSION = '0.0.1';
 

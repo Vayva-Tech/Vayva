@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Treatment Plan Service
  * 

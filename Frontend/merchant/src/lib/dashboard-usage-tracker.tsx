@@ -9,7 +9,8 @@
 'use client';
 
 import React, { useEffect, useCallback, useRef } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/context/AuthContext';
+const useUser = () => { const { merchant } = useAuth(); return { user: merchant ? { id: (merchant as any)?.id, fullName: (merchant as any)?.name } : null }; };
 import { logger } from '@/lib/logger';
 import { trackEvents } from '@/lib/analytics';
 

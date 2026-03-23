@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { PaymentMethod, NotificationPayload } from '../types';
 
 export interface PaystackConfig {

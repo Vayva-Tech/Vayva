@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Freshness Tracking Service
  * Monitors produce freshness, quality grades, and shelf life

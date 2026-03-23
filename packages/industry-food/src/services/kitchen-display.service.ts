@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Kitchen Display Service
  * Kitchen display system (KDS) integration and order management

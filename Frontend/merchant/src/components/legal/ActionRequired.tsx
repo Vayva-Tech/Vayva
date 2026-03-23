@@ -24,8 +24,8 @@ export function ActionRequired({ items, onRefresh }: ActionRequiredProps) {
   };
 
   const pendingItems = items.filter(item => !completed.has(item.id));
-  const urgentItems = pendingItems.filter(item => item.priority === 'urgent' || item.priority === 'critical');
-  const normalItems = pendingItems.filter(item => item.priority !== 'urgent' && item.priority !== 'critical');
+  const urgentItems = pendingItems.filter(item => item.priority === 'high');
+  const normalItems = pendingItems.filter(item => item.priority !== 'high');
 
   return (
     <Card className="p-6 border-l-4 border-orange-600 shadow-lg  bg-white/90">

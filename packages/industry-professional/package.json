@@ -19,7 +19,6 @@
     "@vayva/shared": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
     "@vayva/realtime": "workspace:*",
-    "@vayva/prisma": "workspace:*",
     "zod": "^3.25.76"
   },
   "devDependencies": {

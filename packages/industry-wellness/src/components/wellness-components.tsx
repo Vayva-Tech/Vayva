@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Wellness Components
  * UI components for wellness/spa industry

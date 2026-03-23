@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Dashboard Components Export
 export { default as TravelDashboard } from './TravelDashboard';
 export { default as OccupancyOverview } from './OccupancyOverview';

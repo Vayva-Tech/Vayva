@@ -3,7 +3,10 @@
  * Implementation Plan 3: Customer Experience & Marketing
  */
 
-import { PrismaClient } from '@vayva/db';
+import { prisma as sharedPrisma } from '@vayva/db';
+
+// Use a type alias since PrismaClient may not be directly exported
+type PrismaClient = typeof sharedPrisma;
 import type {
   WhatsAppBroadcast,
   WhatsAppTemplate,
@@ -71,10 +74,10 @@ type WhatsAppBroadcastRecipientDb = {
 };
 
 export class WhatsAppBroadcastService {
-  private db: PrismaClient;
+  private db: any;
 
   constructor() {
-    this.db = new PrismaClient();
+    this.db = sharedPrisma;
   }
 
   // ==================== TEMPLATE MANAGEMENT ====================
@@ -178,7 +181,7 @@ export class WhatsAppBroadcastService {
       skip: options?.offset ?? 0,
     });
 
-    return templates.map((t) => this.mapTemplate(t as WhatsAppTemplateDb));
+    return templates.map((t: WhatsAppTemplateDb) => this.mapTemplate(t));
   }
 
   async approveTemplate(
@@ -489,7 +492,7 @@ export class WhatsAppBroadcastService {
       deliveryRate,
       readRate: openRate,
       clickRate,
-      topPerforming: topPerforming.map((b) => this.mapBroadcast(b as WhatsAppBroadcastDb)),
+      topPerforming: topPerforming.map((b: WhatsAppBroadcastDb) => this.mapBroadcast(b)),
     };
   }
 

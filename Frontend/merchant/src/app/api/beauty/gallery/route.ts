@@ -4,15 +4,20 @@ import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma } from "@vayva/db";
-import { v2 as cloudinary } from "cloudinary";
-
-// Configure Cloudinary
-if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
-  cloudinary.config({
-    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-  });
+// Cloudinary is optional — only used when configured
+let cloudinary: any = null;
+try {
+  const mod = require("cloudinary");
+  cloudinary = mod.v2;
+  if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+  }
+} catch {
+  // cloudinary not installed — upload features will be disabled
 }
 
 /**
@@ -22,6 +27,7 @@ if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const storeId = request.headers.get("x-store-id") || "";
     const category = searchParams.get("category");
     const status = searchParams.get("status") || "approved";
     const stylistId = searchParams.get("stylistId");

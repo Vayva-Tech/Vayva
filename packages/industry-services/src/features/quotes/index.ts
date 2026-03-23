@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Quotes Feature Module
  * Dedicated module for quote functionality

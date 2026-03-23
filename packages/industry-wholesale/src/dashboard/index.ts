@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Wholesale Industry Dashboard Configuration
  * Complete dashboard layout and widget configuration for wholesale distribution

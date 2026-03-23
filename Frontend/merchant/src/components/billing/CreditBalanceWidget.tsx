@@ -10,10 +10,11 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Zap, AlertTriangle, TrendUp, Info } from '@phosphor-icons/react';
+import { Lightning as Zap, Warning as AlertTriangle, TrendUp, Info } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { Link, Button } from '@vayva/ui';
+import Link from 'next/link';
+import { Button } from '@vayva/ui';
 
 interface CreditBalance {
   monthlyCredits: number;

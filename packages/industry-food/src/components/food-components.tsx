@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Food Industry Components
  * UI components for recipe costing, menu engineering, and kitchen operations

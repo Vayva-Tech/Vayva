@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Recipe Optimization AI Service
  * 

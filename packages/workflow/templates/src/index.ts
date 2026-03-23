@@ -8,38 +8,38 @@ export {
   FASHION_WORKFLOW_TEMPLATES,
   getFashionTemplates,
   getFashionTemplateById,
-} from './fashion-workflows.js';
+} from './fashion-workflows';
 
 // Restaurant templates
 export {
   RESTAURANT_WORKFLOW_TEMPLATES,
   getRestaurantTemplates,
   getRestaurantTemplateById,
-} from './restaurant-workflows.js';
+} from './restaurant-workflows';
 
 // Healthcare templates
 export {
   HEALTHCARE_WORKFLOW_TEMPLATES,
   getHealthcareTemplates,
   getHealthcareTemplateById,
-} from './healthcare-workflows.js';
+} from './healthcare-workflows';
 
 // Real Estate templates
 export {
   REALESTATE_WORKFLOW_TEMPLATES,
   getRealestateTemplates,
   getRealestateTemplateById,
-} from './realestate-workflows.js';
+} from './realestate-workflows';
 
 // Types
-export type { TemplateCategory, TemplateGalleryProps } from './types.js';
+export type { TemplateCategory, TemplateGalleryProps } from './types';
 
 // Combined exports
 import type { WorkflowTemplate } from '@vayva/workflow-engine';
-import { FASHION_WORKFLOW_TEMPLATES } from './fashion-workflows.js';
-import { RESTAURANT_WORKFLOW_TEMPLATES } from './restaurant-workflows.js';
-import { HEALTHCARE_WORKFLOW_TEMPLATES } from './healthcare-workflows.js';
-import { REALESTATE_WORKFLOW_TEMPLATES } from './realestate-workflows.js';
+import { FASHION_WORKFLOW_TEMPLATES } from './fashion-workflows';
+import { RESTAURANT_WORKFLOW_TEMPLATES } from './restaurant-workflows';
+import { HEALTHCARE_WORKFLOW_TEMPLATES } from './healthcare-workflows';
+import { REALESTATE_WORKFLOW_TEMPLATES } from './realestate-workflows';
 
 export const ALL_TEMPLATES: WorkflowTemplate[] = [
   ...FASHION_WORKFLOW_TEMPLATES,

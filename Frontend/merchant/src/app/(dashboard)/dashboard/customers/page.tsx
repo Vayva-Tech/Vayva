@@ -1,431 +1,546 @@
-// @ts-nocheck
 "use client";
+// @ts-nocheck
 
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { Customer, CustomerStatus, logger, formatCurrency } from "@vayva/shared";
-import { apiJson } from "@/lib/api-client-shared";
-import { Button, Icon } from "@vayva/ui";
-import { Users, TrendUp, UserPlus, ShoppingBag, Crown, Star } from "@phosphor-icons/react";
-import { toast } from "sonner";
-import { useStore } from "@/context/StoreContext";
+import { useState, useMemo } from "react";
+import useSWR from "swr";
+import {
+  Users,
+  UserPlus,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  Heart,
+  DollarSign,
+  Crown,
+  Star,
+  AlertTriangle,
+  Sparkles,
+  Phone,
+  Mail,
+  RefreshCw,
+  AlertCircle,
+  Plus,
+} from "lucide-react";
 
-interface CustomerApiItem {
-  id: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-  ordersCount?: number;
-  totalSpend?: number;
-  lastOrderAt?: string;
-  createdAt?: string;
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+type Segment = "VIP" | "Regular" | "New" | "At-risk";
+type SegmentFilter = "All" | Segment;
+
+interface Customer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  orders: number;
+  totalSpent: number;
+  lastOrder: string;
+  segment: Segment;
 }
 
-interface CustomersResponse {
-  items: CustomerApiItem[];
+interface CustomersData {
+  customers: Customer[];
+  summary: {
+    total: number;
+    totalTrend: string;
+    newThisMonth: number;
+    newTrend: string;
+    returningPct: string;
+    returningTrend: string;
+    avgLtv: string;
+    ltvTrend: string;
+  };
 }
 
-export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { store } = useStore();
-  const currency = store?.currency || "NGN";
+/* ------------------------------------------------------------------ */
+/*  SWR Fetcher                                                        */
+/* ------------------------------------------------------------------ */
 
-  const fetchCustomers = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    const controller = new AbortController();
+const fetcher = (url: string) => fetch(url).then((res) => {
+  if (!res.ok) throw new Error("Failed to fetch");
+  return res.json();
+});
 
-    try {
-      const data = await apiJson<CustomersResponse>("/api/customers?limit=50", {
-        signal: controller.signal,
-      });
-      const items = Array.isArray(data?.items) ? data.items : [];
+/* ------------------------------------------------------------------ */
+/*  Skeleton Components                                                */
+/* ------------------------------------------------------------------ */
 
-      const mapped: Customer[] = items.map((c: CustomerApiItem) => {
-        const totalOrders = Number(c.ordersCount || 0);
-        const totalSpend = Number(c.totalSpend || 0);
-        let status = CustomerStatus.NEW;
-        if (totalOrders > 5) status = CustomerStatus.VIP;
-        else if (totalOrders > 1) status = CustomerStatus.RETURNING;
-
-        return {
-          id: c.id,
-          name: c.name || "Guest",
-          email: c.email || "",
-          phone: c.phone || "",
-          totalOrders,
-          totalSpend,
-          status,
-          lastSeenAt: c.lastOrderAt || c.createdAt || "",
-          joinedAt: c.createdAt || "",
-          merchantId: "",
-          firstSeenAt: c.createdAt || "",
-          avatarUrl: null,
-        };
-      });
-      setCustomers(mapped);
-    } catch (err: unknown) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      const message =
-        err instanceof Error ? err.message : "Failed to load customers";
-      logger.error("[FETCH_CUSTOMERS_ERROR]", {
-        error: message,
-        app: "merchant",
-      });
-      setError(message);
-      toast.error(message);
-      setCustomers([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetchCustomers();
-  }, [fetchCustomers]);
-
-  // Calculate metrics
-  const metrics = useMemo(() => {
-    const total = customers.length;
-    const vip = customers.filter((c) => c.status === CustomerStatus.VIP).length;
-    const returning = customers.filter(
-      (c) => c.status === CustomerStatus.RETURNING
-    ).length;
-    const newCustomers = customers.filter(
-      (c) => c.status === CustomerStatus.NEW
-    ).length;
-    const totalSpend = customers.reduce((sum, c) => sum + (c.totalSpend || 0), 0);
-
-    return {
-      total,
-      vip,
-      returning,
-      newCustomers,
-      totalSpend,
-    };
-  }, [customers]);
-
-  // Filter customers
-  const filteredCustomers = useMemo(() => {
-    if (!searchQuery) return customers;
-    const query = searchQuery.toLowerCase();
-    return customers.filter(
-      (c) =>
-        c.name?.toLowerCase().includes(query) ||
-        c.email?.toLowerCase().includes(query) ||
-        c.phone?.toLowerCase().includes(query)
-    );
-  }, [customers, searchQuery]);
-
-  // Calculate additional metrics for widgets
-  const newThisMonth = customers.filter((c) => {
-    const joinedDate = new Date(c.joinedAt);
-    const now = new Date();
-    return joinedDate.getMonth() === now.getMonth() && joinedDate.getFullYear() === now.getFullYear();
-  }).length;
-
-  const repeatRate = customers.length > 0
-    ? Math.round(((metrics.returning + metrics.vip) / customers.length) * 100)
-    : 0;
-
+function StatCardSkeleton() {
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customers</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your customer relationships</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={fetchCustomers}
-            variant="outline"
-            className="rounded-xl border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium"
-          >
-            <Icon name="Refresh" size={16} className="mr-2 text-gray-400" />
-            Refresh
-          </Button>
-        </div>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 animate-pulse">
+      <div className="flex items-start justify-between mb-3">
+        <div className="w-10 h-10 bg-gray-100 rounded-xl" />
+        <div className="w-16 h-6 bg-gray-100 rounded-lg" />
       </div>
-
-      {/* Error State */}
-      {error && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
-            <Icon name="Warning" size={32} className="text-red-500" />
-          </div>
-          <h3 className="text-base font-semibold text-gray-900 mb-1">Failed to load customers</h3>
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
-          <Button onClick={fetchCustomers} className="rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium px-6">
-            Try Again
-          </Button>
-        </div>
-      )}
-
-      {/* Summary Widgets - Following spec Section 5.8 */}
-      {!isLoading && customers.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <SummaryWidget
-            icon={<Users size={18} />}
-            label="Total Customers"
-            value={String(metrics.total)}
-            subValue={`${newThisMonth} new this month`}
-            trend="+12%"
-            positive
-          />
-          <SummaryWidget
-            icon={<Star size={18} />}
-            label="Repeat Rate"
-            value={`${repeatRate}%`}
-            trend="+8%"
-            positive
-          />
-          <SummaryWidget
-            icon={<Crown size={18} />}
-            label="VIP Customers"
-            value={String(metrics.vip)}
-            subValue={`${metrics.returning} returning`}
-            trend="+5%"
-            positive
-          />
-          <SummaryWidget
-            icon={<ShoppingBag size={18} />}
-            label="Total Revenue"
-            value={formatCurrency(metrics.totalSpend, currency)}
-            trend="+18%"
-            positive
-          />
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-          <div className="bg-gray-100 rounded-2xl h-96 animate-pulse" />
-        </div>
-      )}
-
-      {/* Main Content */}
-      {!isLoading && (
-        <>
-          {/* Tab Navigation */}
-          {customers.length > 0 && (
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-              <div className="flex items-center gap-6">
-                <button className="text-sm font-medium border-b-2 border-green-500 text-green-600 pb-3 -mb-3.5 transition-colors">
-                  All Customers
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  New
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  Returning
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  VIP
-                </button>
-                <button className="text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-3 -mb-3.5 transition-colors">
-                  At Risk
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Icon name="Filter" size={14} />
-                  Filter
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Customer List Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            {/* Search Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">Customer List</h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? "s" : ""} found
-                </p>
-              </div>
-              <div className="relative">
-                <Icon name="MagnifyingGlass" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search customers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-400 w-64"
-                />
-              </div>
-            </div>
-
-            {/* Customer Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Orders
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Total Spent
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Last Order
-                    </th>
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredCustomers.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="py-12 text-center">
-                        {searchQuery ? (
-                          <div>
-                            <Icon name="MagnifyingGlass" size={32} className="mx-auto mb-2 text-gray-400" />
-                            <p className="text-sm font-medium text-gray-900 mb-1">No customers found</p>
-                            <p className="text-sm text-gray-500">
-                              No customers matching &quot;{searchQuery}&quot;
-                            </p>
-                          </div>
-                        ) : (
-                          <div>
-                            <Icon name="UserPlus" size={32} className="mx-auto mb-2 text-gray-400" />
-                            <p className="text-sm font-medium text-gray-900 mb-1">No customers yet</p>
-                            <p className="text-sm text-gray-500">
-                              Customers will appear here when they place orders
-                            </p>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredCustomers.map((customer) => (
-                      <tr
-                        key={customer.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-sm font-semibold text-gray-700">
-                                {customer.name?.charAt(0) || "?"}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">
-                                {customer.name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {customer.email || customer.phone || "No contact"}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                              customer.status === CustomerStatus.VIP
-                                ? "bg-orange-50 text-orange-600"
-                                : customer.status === CustomerStatus.RETURNING
-                                ? "bg-green-50 text-green-600"
-                                : "bg-gray-50 text-gray-600"
-                            }`}
-                          >
-                            {customer.status === CustomerStatus.VIP && (
-                              <Crown size={12} />
-                            )}
-                            {customer.status === CustomerStatus.RETURNING && (
-                              <TrendUp size={12} />
-                            )}
-                            {customer.status === CustomerStatus.NEW && (
-                              <UserPlus size={12} />
-                            )}
-                            {customer.status}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-gray-900 font-medium">
-                            <ShoppingBag size={16} className="text-gray-400" />
-                            {customer.totalOrders}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4 font-semibold text-gray-900">
-                          {formatCurrency(customer.totalSpend || 0, currency)}
-                        </td>
-                        <td className="py-4 px-4 text-sm text-gray-500">
-                          {customer.lastSeenAt
-                            ? new Date(customer.lastSeenAt).toLocaleDateString()
-                            : "—"}
-                        </td>
-                        <td className="py-4 px-4 text-right">
-                          <button className="px-3 py-1.5 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
+      <div className="w-20 h-7 bg-gray-100 rounded mb-1" />
+      <div className="w-24 h-4 bg-gray-100 rounded" />
     </div>
   );
 }
 
-// Summary Widget Component
-function SummaryWidget({
+function TableRowSkeleton() {
+  return (
+    <tr className="border-b border-gray-50">
+      <td className="py-3.5 px-6">
+        <div className="flex items-center gap-3 animate-pulse">
+          <div className="w-10 h-10 bg-gray-100 rounded-full" />
+          <div className="w-28 h-4 bg-gray-100 rounded" />
+        </div>
+      </td>
+      <td className="py-3.5 px-4"><div className="w-32 h-4 bg-gray-100 rounded animate-pulse" /></td>
+      <td className="py-3.5 px-4"><div className="w-28 h-4 bg-gray-100 rounded animate-pulse" /></td>
+      <td className="py-3.5 px-4 text-center"><div className="w-8 h-4 bg-gray-100 rounded mx-auto animate-pulse" /></td>
+      <td className="py-3.5 px-4 text-right"><div className="w-20 h-4 bg-gray-100 rounded ml-auto animate-pulse" /></td>
+      <td className="py-3.5 px-4"><div className="w-24 h-4 bg-gray-100 rounded animate-pulse" /></td>
+      <td className="py-3.5 px-6 text-center"><div className="w-16 h-6 bg-gray-100 rounded-full mx-auto animate-pulse" /></td>
+    </tr>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}
+
+function getAvatarColor(name: string): string {
+  const colors = [
+    "bg-green-500",
+    "bg-blue-500",
+    "bg-purple-500",
+    "bg-amber-500",
+    "bg-cyan-500",
+    "bg-rose-500",
+    "bg-indigo-500",
+    "bg-teal-500",
+  ];
+  const idx = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length;
+  return colors[idx];
+}
+
+function segmentBadge(segment: Segment) {
+  const config = {
+    VIP: { bg: "bg-amber-50 border-amber-200 text-amber-700", icon: <Crown size={11} /> },
+    Regular: { bg: "bg-gray-50 border-gray-200 text-gray-600", icon: <Star size={11} /> },
+    New: { bg: "bg-blue-50 border-blue-200 text-blue-700", icon: <Sparkles size={11} /> },
+    "At-risk": { bg: "bg-red-50 border-red-200 text-red-700", icon: <AlertTriangle size={11} /> },
+  };
+  const c = config[segment];
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${c.bg}`}>
+      {c.icon}
+      {segment}
+    </span>
+  );
+}
+
+function formatNaira(value: number): string {
+  if (value >= 1000000) return `₦${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `₦${(value / 1000).toFixed(0)}K`;
+  return `₦${value.toLocaleString()}`;
+}
+
+function formatNairaFull(value: number): string {
+  return `₦${value.toLocaleString()}`;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Stat Card                                                          */
+/* ------------------------------------------------------------------ */
+
+function StatCard({
   icon,
+  iconBg,
   label,
   value,
-  subValue,
   trend,
-  positive,
 }: {
   icon: React.ReactNode;
+  iconBg: string;
   label: string;
   value: string;
-  subValue?: string;
   trend: string;
-  positive: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-all">
       <div className="flex items-start justify-between mb-3">
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            {label}
-          </p>
-          <p className="text-2xl font-bold text-gray-900 tracking-tight mt-1">
-            {value}
-          </p>
-          {subValue && <p className="text-xs text-gray-500 mt-1">{subValue}</p>}
-        </div>
-        <div className="p-2.5 rounded-xl bg-gray-100 text-gray-600">
-          {icon}
+        <div className={`p-2.5 rounded-xl ${iconBg}`}>{icon}</div>
+        <div className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg text-green-700 bg-green-50">
+          <TrendingUp size={12} />
+          {trend}
         </div>
       </div>
-      <div className={`flex items-center text-sm font-medium ${positive ? 'text-green-600' : 'text-red-500'}`}>
-        <span>{trend}</span>
-        <span className="ml-1">{positive ? '↗' : '↘'}</span>
+      <p className="text-2xl font-bold text-gray-900 tracking-tight">{value}</p>
+      <p className="text-xs font-medium text-gray-500 mt-1">{label}</p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page Component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function CustomersPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [segmentFilter, setSegmentFilter] = useState<SegmentFilter>("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const perPage = 5;
+
+  const { data, error, isLoading, mutate } = useSWR<CustomersData>(
+    '/api/customers',
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
+
+  const customers: Customer[] = data?.customers || [];
+  const summary = data?.summary;
+
+  const filtered = useMemo(() => {
+    let list = [...customers];
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q) ||
+          c.phone.includes(q)
+      );
+    }
+
+    if (segmentFilter !== "All") {
+      list = list.filter((c) => c.segment === segmentFilter);
+    }
+
+    return list;
+  }, [customers, searchQuery, segmentFilter]);
+
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
+
+  const segments: SegmentFilter[] = ["All", "VIP", "Regular", "New", "At-risk"];
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-red-100 p-8 text-center max-w-md">
+          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-7 h-7 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load customers</h3>
+          <p className="text-sm text-gray-500 mb-4">There was a problem fetching your customer data. Please try again.</p>
+          <button
+            onClick={() => mutate()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="animate-pulse">
+            <div className="w-40 h-7 bg-gray-100 rounded mb-2" />
+            <div className="w-64 h-4 bg-gray-100 rounded" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => <StatCardSkeleton key={i} />)}
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 animate-pulse">
+          <div className="w-full h-10 bg-gray-100 rounded-xl" />
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/50">
+                <th className="text-left py-3.5 px-6"><div className="w-20 h-3 bg-gray-100 rounded animate-pulse" /></th>
+                <th className="text-left py-3.5 px-4"><div className="w-12 h-3 bg-gray-100 rounded animate-pulse" /></th>
+                <th className="text-left py-3.5 px-4"><div className="w-12 h-3 bg-gray-100 rounded animate-pulse" /></th>
+                <th className="text-center py-3.5 px-4"><div className="w-12 h-3 bg-gray-100 rounded mx-auto animate-pulse" /></th>
+                <th className="text-right py-3.5 px-4"><div className="w-16 h-3 bg-gray-100 rounded ml-auto animate-pulse" /></th>
+                <th className="text-left py-3.5 px-4"><div className="w-16 h-3 bg-gray-100 rounded animate-pulse" /></th>
+                <th className="text-center py-3.5 px-6"><div className="w-16 h-3 bg-gray-100 rounded mx-auto animate-pulse" /></th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map((i) => <TableRowSkeleton key={i} />)}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (customers.length === 0) {
+    return (
+      <div className="min-h-screen space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customers</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage and grow your customer relationships</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+            <Users className="w-7 h-7 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">No customers yet</h3>
+          <p className="text-sm text-gray-500 max-w-sm mb-4">Your customers will appear as orders come in</p>
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
+            <Plus className="w-4 h-4" />
+            Add Customer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customers</h1>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                {summary?.total?.toLocaleString() ?? customers.length}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Manage and grow your customer relationships</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => mutate()}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+            <UserPlus size={16} />
+            Add Customer
+          </button>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={<Users size={20} />}
+          iconBg="bg-green-100 text-green-600"
+          label="Total Customers"
+          value={summary?.total?.toLocaleString() ?? String(customers.length)}
+          trend={summary?.totalTrend ?? "--"}
+        />
+        <StatCard
+          icon={<UserPlus size={20} />}
+          iconBg="bg-blue-100 text-blue-600"
+          label="New This Month"
+          value={summary?.newThisMonth?.toLocaleString() ?? "--"}
+          trend={summary?.newTrend ?? "--"}
+        />
+        <StatCard
+          icon={<Heart size={20} />}
+          iconBg="bg-purple-100 text-purple-600"
+          label="Returning"
+          value={summary?.returningPct ?? "--"}
+          trend={summary?.returningTrend ?? "--"}
+        />
+        <StatCard
+          icon={<DollarSign size={20} />}
+          iconBg="bg-amber-100 text-amber-600"
+          label="Average LTV"
+          value={summary?.avgLtv ?? "--"}
+          trend={summary?.ltvTrend ?? "--"}
+        />
+      </div>
+
+      {/* Search & Filter */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+          {/* Search */}
+          <div className="relative flex-1 w-full lg:max-w-md">
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name, email, or phone..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-400 transition-all"
+            />
+          </div>
+
+          {/* Segment Filter */}
+          <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
+            {segments.map((seg) => (
+              <button
+                key={seg}
+                onClick={() => {
+                  setSegmentFilter(seg);
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
+                  segmentFilter === seg
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                {seg}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Customer Table */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/50">
+                <th className="text-left py-3.5 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
+                <th className="text-center py-3.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Orders</th>
+                <th className="text-right py-3.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Spent</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Order</th>
+                <th className="text-center py-3.5 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Segment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-16 text-center">
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-3">
+                        <Search size={24} className="text-gray-400" />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-900 mb-1">No customers found</p>
+                      <p className="text-sm text-gray-500">Try adjusting your search or filter</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                paginated.map((customer) => (
+                  <tr
+                    key={customer.id}
+                    className="border-b border-gray-50 last:border-0 hover:bg-green-50/30 transition-colors"
+                  >
+                    {/* Name with avatar */}
+                    <td className="py-3.5 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full ${getAvatarColor(customer.name)} flex items-center justify-center shadow-sm`}>
+                          <span className="text-sm font-bold text-white">{getInitials(customer.name)}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900">{customer.name}</span>
+                      </div>
+                    </td>
+
+                    {/* Email */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                        <Mail size={13} className="text-gray-400" />
+                        {customer.email}
+                      </div>
+                    </td>
+
+                    {/* Phone */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                        <Phone size={13} className="text-gray-400" />
+                        {customer.phone}
+                      </div>
+                    </td>
+
+                    {/* Orders */}
+                    <td className="py-3.5 px-4 text-center">
+                      <span className="text-sm font-semibold text-gray-900">{customer.orders}</span>
+                    </td>
+
+                    {/* Total Spent */}
+                    <td className="py-3.5 px-4 text-right">
+                      <span className="text-sm font-semibold text-gray-900">{formatNairaFull(customer.totalSpent)}</span>
+                    </td>
+
+                    {/* Last Order */}
+                    <td className="py-3.5 px-4">
+                      <span className="text-sm text-gray-500">{customer.lastOrder}</span>
+                    </td>
+
+                    {/* Segment */}
+                    <td className="py-3.5 px-6 text-center">
+                      {segmentBadge(customer.segment)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <p className="text-sm text-gray-500">
+              Showing {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} of {filtered.length} customers
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={14} />
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
+                    currentPage === page
+                      ? "bg-green-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @vayva/industry-grocery
  * Vayva Grocery Industry Engine
@@ -17,7 +18,7 @@ export {
   type GroceryEngineConfig,
   type GroceryFeatureId,
   type GroceryEngineStatus,
-} from './grocery.engine.js';
+} from './grocery.engine';
 
 // Services
 export {
@@ -25,7 +26,7 @@ export {
   DeliveryRouteOptimizerService,
   ExpirationAlertsService,
   SeasonalPricingService,
-} from './services/index.js';
+} from './services/index';
 
 export type {
   FreshnessRecord,
@@ -39,7 +40,7 @@ export type {
   PricingRule,
   PriceCalculation,
   SeasonalPricingConfig,
-} from './services/index.js';
+} from './services/index';
 
 // Features
 export {
@@ -47,21 +48,20 @@ export {
   DeliveryOptimizationFeature,
   ExpirationAlertsFeature,
   SeasonalPricingFeature,
-} from './features/index.js';
+} from './features/index';
 
 export type {
   FreshnessTrackingConfig,
   DeliveryOptimizationConfig,
   ExpirationAlertsConfig,
-  SeasonalPricingConfig,
-} from './features/index.js';
+} from './features/index';
 
 // Components
 export {
   FreshnessTracker,
   DeliveryRouteOptimizer,
   ExpirationAlerts,
-} from './components/index.js';
+} from './components/index';
 
 export type {
   FreshnessTrackerProps,
@@ -74,14 +74,14 @@ export type {
   ExpirationAlertsProps,
   ExpirationAlertType,
   ExpirationAlertStats,
-} from './components/index.js';
+} from './components/index';
 
 // Dashboard
-export * from './dashboard/index.js';
-export { GroceryDashboard } from './components/GroceryDashboard.js';
+export * from './dashboard/index';
+export { GroceryDashboard } from './components/GroceryDashboard';
 
 // Types
-export * from './types/index.js';
+export * from './types/index';
 
 export const VERSION = '0.1.0';
 

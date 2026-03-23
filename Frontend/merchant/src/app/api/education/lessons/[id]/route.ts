@@ -9,7 +9,6 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const body = await request.json().catch(() => ({}));
     const result = await apiJson(

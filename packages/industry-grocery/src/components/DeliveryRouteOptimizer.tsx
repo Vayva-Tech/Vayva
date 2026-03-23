@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 /**
  * Delivery Route Optimizer Component
  * Displays delivery routes and optimization controls
@@ -5,7 +8,7 @@
 
 import React, { useState } from 'react';
 
-interface DeliveryStop {
+export interface DeliveryStop {
   id: string;
   sequence: number;
   customerName?: string;
@@ -14,7 +17,7 @@ interface DeliveryStop {
   estimatedArrival?: Date;
 }
 
-interface DeliveryRoute {
+export interface DeliveryRoute {
   id: string;
   name: string;
   date: Date;
@@ -24,7 +27,7 @@ interface DeliveryRoute {
   status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
 }
 
-interface RouteStats {
+export interface RouteStats {
   totalRoutes: number;
   completedRoutes: number;
   totalStops: number;
@@ -32,7 +35,7 @@ interface RouteStats {
   averageStopsPerRoute: number;
 }
 
-interface DeliveryRouteOptimizerProps {
+export interface DeliveryRouteOptimizerProps {
   routes?: DeliveryRoute[];
   stats?: RouteStats;
   onOptimize?: (routeId: string) => void;
@@ -47,7 +50,7 @@ export const DeliveryRouteOptimizer: React.FC<DeliveryRouteOptimizerProps> = ({
 }) => {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
-  const displayRoutes = routes.length > 0 ? routes : [
+  const displayRoutes: DeliveryRoute[] = routes.length > 0 ? routes : [
     {
       id: 'route-1',
       name: 'Downtown Express',

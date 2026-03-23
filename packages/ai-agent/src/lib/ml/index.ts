@@ -3,9 +3,9 @@
  * No paid APIs required - uses local inference and statistical models
  */
 
-export { MLInferenceClient } from "./ml-client.js";
-export { SentimentAnalyzer } from "./sentiment-analyzer.js";
-export { SalesForecaster } from "./sales-forecaster.js";
-export { RecommendationEngine } from "./recommendation-engine.js";
-export { IntentClassifier } from "./intent-classifier.js";
-export { SimpleEmbedding } from "./simple-embedding.js";
+export { MLInferenceClient } from "./ml-client";
+export { SentimentAnalyzer } from "./sentiment-analyzer";
+export { SalesForecaster } from "./sales-forecaster";
+export { RecommendationEngine } from "./recommendation-engine";
+export { IntentClassifier } from "./intent-classifier";
+export { SimpleEmbedding } from "./simple-embedding";

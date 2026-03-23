@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Portfolio Management Service
  * Handles portfolio creation, gallery management, and showcase features

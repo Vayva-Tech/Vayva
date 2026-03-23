@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMetricStats, metricsManager } from "@vayva/reliability";
+import { getMetricStats, metricsManager } from "@/lib/stubs/reliability";
 
 /**
  * GET /api/ops/health/metrics

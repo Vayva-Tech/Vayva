@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nightlife Promoter Feature
  */

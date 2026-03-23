@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@vayva/ui";
 import { toast } from "sonner";
-import { Users, TrendingUp } from "@phosphor-icons/react";
+import { Users, TrendUp as TrendingUp } from "@phosphor-icons/react";
 import type { PromoterSale } from "@/types/nightlife";
 import { apiJson } from "@/lib/api-client-shared";
 

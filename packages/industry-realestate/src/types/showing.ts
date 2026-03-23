@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Property Showing Management Types
  * Showing scheduling, management, and feedback

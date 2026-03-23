@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Creative Industry Engine
  * Main orchestrator for all creative-specific features
@@ -9,7 +10,7 @@ import {
   type DataResolver,
 } from '@vayva/industry-core';
 
-import { CREATIVE_DASHBOARD_CONFIG } from './dashboard/index.js';
+import { CREATIVE_DASHBOARD_CONFIG } from './dashboard/index';
 
 export interface CreativeEngineConfig {
   portfolioManagement?: boolean;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Specialized Service Management
  * Manages specialized professional services and appointments

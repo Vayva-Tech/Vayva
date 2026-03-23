@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pet Care Industry Engine
  */

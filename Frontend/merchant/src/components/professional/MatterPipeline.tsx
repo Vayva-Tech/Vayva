@@ -1,7 +1,9 @@
 // @ts-nocheck
+"use client";
+
 import React from "react";
 import { Card } from "@vayva/ui";
-import { Scale, Users, CurrencyDollar, ChartPie } from "@phosphor-icons/react";
+import { Scales as Scale, Users, CurrencyDollar, ChartPie } from "@phosphor-icons/react";
 import type { MatterPipelineData } from "@/types/professional";
 
 interface MatterPipelineProps {

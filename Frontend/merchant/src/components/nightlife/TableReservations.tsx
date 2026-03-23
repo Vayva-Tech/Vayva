@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "@vayva/ui";
 import { toast } from "sonner";
-import { Grid, Plus, Eye, TrendingUp } from "@phosphor-icons/react";
+import { GridFour as Grid, Plus, Eye, TrendUp as TrendingUp } from "@phosphor-icons/react";
 import type { Table } from "@/types/nightlife";
 import { apiJson } from "@/lib/api-client-shared";
 

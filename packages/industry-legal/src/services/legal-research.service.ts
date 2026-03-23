@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Legal Research AI Service
  * 

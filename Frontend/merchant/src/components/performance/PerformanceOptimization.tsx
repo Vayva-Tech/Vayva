@@ -4,6 +4,8 @@
  * System-wide speed and reliability enhancements
  */
 
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { 
   Gauge,
@@ -24,7 +26,7 @@ import {
   Medal,
   Target
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -82,6 +84,13 @@ interface PerformanceHealth {
     timestamp: string;
   }[];
   recommendations: OptimizationRecommendation[];
+}
+
+// Helper functions used across components
+function getScoreBg(score: number) {
+  if (score >= 90) return 'bg-green-100';
+  if (score >= 70) return 'bg-yellow-100';
+  return 'bg-red-100';
 }
 
 // Performance Monitoring Hook

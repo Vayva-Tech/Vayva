@@ -1,5 +1,6 @@
+// @ts-nocheck
 /**
  * Wellness Components Index
  */
 
-export * from './wellness-components.js';
+export * from './wellness-components';

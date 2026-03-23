@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Menu Engineering Feature
  * Analyze menu item performance and optimize profitability

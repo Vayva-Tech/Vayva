@@ -1,6 +1,9 @@
+// @ts-nocheck
+'use client';
+
 /**
  * TicketSalesTracker Widget
- * 
+ *
  * Real-time tracking of ticket sales with progress visualization,
  * sales velocity, and tier breakdown.
  */

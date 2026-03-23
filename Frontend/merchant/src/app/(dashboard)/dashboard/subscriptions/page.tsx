@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import {
 import {
   CreditCard,
   Plus,
-  Search,
+  MagnifyingGlass,
   DotsThree,
   CheckCircle,
   XCircle,
@@ -223,7 +223,7 @@ export default function SubscriptionsPage() {
         <CardContent className="p-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="relative flex-1 max-w-sm">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <Input
                 placeholder="Search by tenant or plan name..."
                 value={search}

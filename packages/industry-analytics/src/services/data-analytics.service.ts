@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Data Analytics Service
  * Handles data aggregation, processing, and trend analysis

@@ -5,26 +5,13 @@
  * This file is the single source of truth for all pricing, plans, and fees
  * across the Vayva platform (marketing, dashboard, and legal).
  */
-export const PRICING_VERSION = "2025-12-26_v2";
+export const PRICING_VERSION = "2026-03-23_v3";
 export const CURRENCY = "NGN";
 // Transaction Fees
 export const FEES = {
   WITHDRAWAL_PERCENTAGE: 3, // 3% fee on every withdrawal
 };
 export const PLANS = [
-  {
-    key: "FREE",
-    name: "Free",
-    monthlyAmount: 0,
-    tagline: "Start selling in minutes. Zero commitment.",
-    bullets: [
-      "1 Staff Seat",
-      "4 Included Templates",
-      "Basic Storefront",
-      "Vayva Branding",
-    ],
-    ctaLabel: "Start Free",
-  },
   {
     key: "STARTER",
     name: "Starter",
@@ -44,8 +31,8 @@ export const PLANS = [
   {
     key: "PRO",
     name: "Pro",
-    monthlyAmount: 40000,
-    baseAmount: 40000,
+    monthlyAmount: 35000,
+    baseAmount: 35000,
     trialDays: 7,
     tagline: "Scale with AI doing the heavy lifting. Your team, unlimited growth.",
     bullets: [
@@ -55,6 +42,21 @@ export const PLANS = [
       "Custom Integrations",
     ],
     ctaLabel: "Upgrade to Pro",
+  },
+  {
+    key: "PRO_PLUS",
+    name: "Pro+",
+    monthlyAmount: 50000,
+    baseAmount: 50000,
+    trialDays: 0,
+    tagline: "Everything unlocked. Maximum power for serious businesses.",
+    bullets: [
+      "5 Staff Seats",
+      "All Features Unlocked",
+      "Visual Workflow Builder",
+      "Priority Support & AI Autopilot",
+    ],
+    ctaLabel: "Upgrade to Pro+",
   },
 ];
 export function formatNGN(amount: number) {

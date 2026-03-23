@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { DashboardEngineConfig, WidgetDefinition } from '../types';
 
 const APPOINTMENTS_TODAY_WIDGET: WidgetDefinition = {

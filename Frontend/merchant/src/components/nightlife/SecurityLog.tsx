@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "@vayva/ui";
 import { toast } from "sonner";
-import { Shield, AlertTriangle, CheckCircle } from "@phosphor-icons/react";
+import { Shield, Warning as AlertTriangle, CheckCircle } from "@phosphor-icons/react";
 import type { SecurityIncident } from "@/types/nightlife";
 import { apiJson } from "@/lib/api-client-shared";
 

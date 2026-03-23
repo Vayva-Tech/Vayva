@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * CRM Integration Component
  * Displays CRM dashboard and customer management interface

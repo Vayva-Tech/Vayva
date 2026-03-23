@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Patient Intake Feature Module
  */

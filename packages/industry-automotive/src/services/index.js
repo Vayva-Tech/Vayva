@@ -2,6 +2,6 @@
  * Automotive Industry Services
  */
 
-export { VehicleGalleryService } from './vehicle-gallery.service.js';
-export { TestDriveCoordinatorService } from './test-drive-coordinator.service.js';
-export { CRMConnectorService } from './crm-connector.service.js';
+export { VehicleGalleryService } from './vehicle-gallery.service';
+export { TestDriveCoordinatorService } from './test-drive-coordinator.service';
+export { CRMConnectorService } from './crm-connector.service';

@@ -3,7 +3,7 @@
 
 import { useState, useRef, FormEvent } from "react";
 import { Button, Input, Textarea, Select } from "@vayva/ui";
-import { Lightbulb, Paperclip, X, Check, Send, AlertCircle } from "@phosphor-icons/react";
+import { Lightbulb, Paperclip, X, Check, PaperPlaneTilt as Send, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 import { apiJson } from "@/lib/api-client-shared";
 
 interface FeatureRequestFormProps {

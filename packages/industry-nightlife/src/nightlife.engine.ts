@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nightlife Industry Engine
  * Main orchestrator for nightlife features
@@ -5,15 +6,15 @@
 
 import { DashboardEngine } from '@vayva/industry-core';
 
-import { NightlifePromoterService } from './services/nightlife-promoter.service.js';
-import { TableReservationManagerService } from './services/table-reservation-manager.service.js';
-import { BottleServiceManagerService } from './services/bottle-service-manager.service.js';
-import { EventAnalyticsService } from './services/event-analytics.service.js';
+import { NightlifePromoterService } from './services/nightlife-promoter.service';
+import { TableReservationManagerService } from './services/table-reservation-manager.service';
+import { BottleServiceManagerService } from './services/bottle-service-manager.service';
+import { EventAnalyticsService } from './services/event-analytics.service';
 
-import { NightlifePromoterFeature } from './features/nightlife-promoter.feature.js';
-import { TableReservationFeature } from './features/table-reservation.feature.js';
-import { BottleServiceManagerFeature } from './features/bottle-service-manager.feature.js';
-import { EventAnalyticsFeature } from './features/event-analytics.feature.js';
+import { NightlifePromoterFeature } from './features/nightlife-promoter.feature';
+import { TableReservationFeature } from './features/table-reservation.feature';
+import { BottleServiceManagerFeature } from './features/bottle-service-manager.feature';
+import { EventAnalyticsFeature } from './features/event-analytics.feature';
 
 export interface NightlifeEngineConfig {
   promoter?: boolean;

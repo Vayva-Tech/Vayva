@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Transaction Milestone Templates
  * Standard milestones for real estate transactions

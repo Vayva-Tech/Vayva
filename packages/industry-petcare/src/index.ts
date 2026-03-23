@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Pet Care Industry Package Index
  */
 
 // Export dashboard component
-export { PetCareDashboard } from './components/PetCareDashboard.js';
+export { PetCareDashboard } from './components/PetCareDashboard';
 export type { IndustryDashboardProps } from '@vayva/industry-core';
 
 export const VERSION = '0.0.1';

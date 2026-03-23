@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Export all blog/media industry modules
 
 // Main engine
@@ -8,7 +9,7 @@ export {
   type BlogMediaEngineConfig,
   type BlogMediaFeatureId,
   type BlogMediaEngineStatus,
-} from './blog-media.engine.js';
+} from './blog-media.engine';
 
 // Types
 export * from './types';

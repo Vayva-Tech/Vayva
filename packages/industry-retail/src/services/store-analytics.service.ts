@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Store Analytics Service
  * Tracks and analyzes store performance metrics

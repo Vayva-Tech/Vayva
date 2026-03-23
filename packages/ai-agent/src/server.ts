@@ -5,9 +5,9 @@
  */
 
 import { createServer, IncomingMessage, ServerResponse } from "http";
-import { logger } from "./lib/logger.js";
-import { MLInferenceClient } from "./lib/ml/ml-client.js";
-import { isMLAvailable, getMLFeatures } from "./lib/ai/providers.js";
+import { logger } from "./lib/logger";
+import { MLInferenceClient } from "./lib/ml/ml-client";
+import { isMLAvailable, getMLFeatures } from "./lib/ai/providers";
 
 const PORT = process.env.PORT || 3000;
 const mlClient = new MLInferenceClient();

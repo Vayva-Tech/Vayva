@@ -5,8 +5,8 @@
  */
 
 // Simple Settings Manager
-export { SimpleSettingsManager, getSimpleSettingsManager, initializeSimpleSettingsManager } from './simple-settings-manager.js';
-export type { SimpleSettings, WidgetConfig, DashboardSettings } from './simple-settings-manager.js';
+export { SimpleSettingsManager, getSimpleSettingsManager, initializeSimpleSettingsManager } from './simple-settings-manager';
+export type { SimpleSettings, WidgetConfig, DashboardSettings } from './simple-settings-manager';
 
 // React Hooks
-export { useSimpleDashboardSettings } from './use-simple-dashboard-settings.js';
+export { useSimpleDashboardSettings } from './use-simple-dashboard-settings';

@@ -3,7 +3,7 @@
 
 import React from "react";
 import { Card, Button } from "@vayva/ui";
-import { Sparkles, TrendingUp, Users, AlertCircle } from "@phosphor-icons/react";
+import { Sparkle as Sparkles, TrendUp as TrendingUp, Users, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 
 interface InsightAction {
   label: string;

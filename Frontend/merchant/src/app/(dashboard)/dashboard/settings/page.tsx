@@ -1,247 +1,200 @@
 // @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
-import { Icon } from "@vayva/ui";
+import { useState } from "react";
+import Link from "next/link";
 import {
   User,
-  Building,
-  Users,
+  CreditCard,
+  Wallet,
+  Truck,
   Bell,
   Shield,
-  CreditCard,
-  FileText,
-  Storefront as Store,
-  Link,
-  List as ListIcon,
-  Truck,
-  Sparkle as Sparkles,
-  Desktop,
-} from "@phosphor-icons/react";
+  Users,
+  Puzzle,
+  Search,
+  MessageCircle,
+  ChevronRight,
+  Settings,
+} from "lucide-react";
 
-const settingsGroups: { title: string; items: HubModule[] }[] = [
+const settingsCategories = [
   {
-    title: "Account & Business",
-    items: [
-      {
-        id: "profile",
-        title: "Profile",
-        description: "Your personal account settings",
-        icon: User,
-        href: "/dashboard/settings/profile",
-        color: "blue",
-      },
-      {
-        id: "store",
-        title: "Store",
-        description: "Store name, branding, and policies",
-        icon: Store,
-        href: "/dashboard/settings/store",
-        color: "green",
-      },
-      {
-        id: "business",
-        title: "Business",
-        description: "Industry, KYC, and business details",
-        icon: Building,
-        href: "/dashboard/settings/industry",
-        color: "amber",
-      },
-    ],
+    id: "profile",
+    title: "Profile & Store",
+    description: "Business name, logo, contact info",
+    icon: User,
+    href: "/dashboard/settings/profile",
+    iconBg: "bg-blue-50",
+    iconColor: "text-blue-600",
   },
   {
-    title: "Team & Access",
-    items: [
-      {
-        id: "team",
-        title: "Team",
-        description: "Manage team members and roles",
-        icon: Users,
-        href: "/dashboard/settings/team",
-        color: "purple",
-      },
-      {
-        id: "roles",
-        title: "Roles",
-        description: "Configure permission roles",
-        icon: Shield,
-        href: "/dashboard/settings/roles",
-        color: "red",
-      },
-    ],
+    id: "billing",
+    title: "Billing & Plans",
+    description: "Subscription, invoices, credits",
+    icon: CreditCard,
+    href: "/dashboard/settings/billing",
+    iconBg: "bg-purple-50",
+    iconColor: "text-purple-600",
   },
   {
-    title: "Payments & Billing",
-    items: [
-      {
-        id: "payments",
-        title: "Payments",
-        description: "Payment methods and processors",
-        icon: CreditCard,
-        href: "/dashboard/settings/payments",
-        color: "emerald",
-      },
-      {
-        id: "billing",
-        title: "Billing",
-        description: "Subscription and invoices",
-        icon: FileText,
-        href: "/dashboard/settings/billing",
-        color: "cyan",
-      },
-    ],
+    id: "payments",
+    title: "Payments",
+    description: "Payment methods, payout accounts",
+    icon: Wallet,
+    href: "/dashboard/settings/payments",
+    iconBg: "bg-green-50",
+    iconColor: "text-green-600",
   },
   {
-    title: "Operations",
-    items: [
-      {
-        id: "shipping",
-        title: "Shipping",
-        description: "Shipping methods and rates",
-        icon: Truck,
-        href: "/dashboard/settings/shipping",
-        color: "orange",
-      },
-      {
-        id: "notifications",
-        title: "Notifications",
-        description: "Email and push notification settings",
-        icon: Bell,
-        href: "/dashboard/settings/notifications",
-        color: "pink",
-      },
-      {
-        id: "integrations",
-        title: "Integrations",
-        description: "Third-party app connections",
-        icon: Link,
-        href: "/dashboard/settings/integrations",
-        color: "indigo",
-      },
-      {
-        id: "navigation",
-        title: "Navigation",
-        description: "Customize your mobile bottom tabs",
-        icon: ListIcon,
-        href: "/dashboard/settings/navigation",
-        color: "blue",
-      },
-      {
-        id: "ai-agent",
-        title: "AI Agent",
-        description: "Configure AI assistant settings",
-        icon: Sparkles,
-        href: "/dashboard/settings/ai-agent",
-        color: "violet",
-      },
-    ],
+    id: "shipping",
+    title: "Shipping",
+    description: "Shipping rates, zones, carriers",
+    icon: Truck,
+    href: "/dashboard/settings/shipping",
+    iconBg: "bg-orange-50",
+    iconColor: "text-orange-600",
   },
   {
-    title: "🧪 Beta Apps",
-    items: [
-      {
-        id: "meal-kit",
-        title: "Meal Kit Manager",
-        description: "Manage meal kit subscriptions and menus",
-        icon: Utensils,
-        href: "/dashboard/meal-kit",
-        color: "emerald",
-        badge: "New",
-      },
-      {
-        id: "desktop-app",
-        title: "Desktop App",
-        description: "Download for Windows & Mac (Offline mode)",
-        icon: Desktop,
-        href: "/dashboard/beta/desktop-app",
-        color: "slate",
-        badge: "Beta",
-      },
-    ],
+    id: "notifications",
+    title: "Notifications",
+    description: "Email, push, WhatsApp alerts",
+    icon: Bell,
+    href: "/dashboard/settings/notifications",
+    iconBg: "bg-pink-50",
+    iconColor: "text-pink-600",
+  },
+  {
+    id: "security",
+    title: "Security",
+    description: "Password, 2FA, sessions",
+    icon: Shield,
+    href: "/dashboard/settings/security",
+    iconBg: "bg-red-50",
+    iconColor: "text-red-600",
+  },
+  {
+    id: "team",
+    title: "Team",
+    description: "Invite members, manage roles",
+    icon: Users,
+    href: "/dashboard/settings/team",
+    iconBg: "bg-indigo-50",
+    iconColor: "text-indigo-600",
+  },
+  {
+    id: "integrations",
+    title: "Integrations",
+    description: "Third-party connections",
+    icon: Puzzle,
+    href: "/dashboard/settings/integrations",
+    iconBg: "bg-cyan-50",
+    iconColor: "text-cyan-600",
+  },
+  {
+    id: "seo",
+    title: "SEO",
+    description: "Meta tags, sitemap, social previews",
+    icon: Search,
+    href: "/dashboard/settings/seo",
+    iconBg: "bg-amber-50",
+    iconColor: "text-amber-600",
+  },
+  {
+    id: "whatsapp",
+    title: "WhatsApp",
+    description: "AI agent, auto-replies",
+    icon: MessageCircle,
+    href: "/dashboard/settings/whatsapp",
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
   },
 ];
 
-export default function SettingsHubPage() {
-  const [loading, setLoading] = useState(true);
+export default function SettingsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    // Simulate data fetching - replace with actual API calls
-    const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
-  }, []);
+  const filteredCategories = settingsCategories.filter(
+    (cat) =>
+      cat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cat.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
+          <Settings className="w-6 h-6 text-green-600" />
+        </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Settings</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your account, store, and business preferences</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Settings
+          </h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Manage your store, account, and business preferences
+          </p>
         </div>
       </div>
 
-      {/* Loading State */}
-      {loading && (
-        <div className="space-y-8">
-          {["Account & Business", "Team & Access", "Payments & Billing", "Operations"].map((group) => (
-            <div key={group}>
-              <div className="h-6 w-32 bg-gray-100 rounded mb-4" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search settings..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all shadow-sm"
+        />
+      </div>
 
-      {/* Settings Groups */}
-      {!loading && (
-        <div className="space-y-8">
-          {settingsGroups.map((group) => (
-            <section key={group.title}>
-              <h2 className="text-base font-semibold text-gray-900 mb-4">
-                {group.title}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {group.items.map((module) => (
-                  <a
-                    key={module.id}
-                    href={module.href}
-                    className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-gray-300 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                        module.color === "blue" ? "bg-blue-50 text-blue-600" :
-                        module.color === "green" ? "bg-green-50 text-green-600" :
-                        module.color === "amber" ? "bg-amber-50 text-amber-600" :
-                        module.color === "purple" ? "bg-purple-50 text-purple-600" :
-                        module.color === "red" ? "bg-red-50 text-red-600" :
-                        module.color === "emerald" ? "bg-green-50 text-green-600" :
-                        module.color === "cyan" ? "bg-cyan-50 text-cyan-600" :
-                        module.color === "orange" ? "bg-orange-50 text-orange-600" :
-                        module.color === "pink" ? "bg-pink-50 text-pink-600" :
-                        module.color === "indigo" ? "bg-green-50 text-green-600" :
-                        module.color === "violet" ? "bg-violet-50 text-violet-600" :
-                        "bg-gray-50 text-gray-600"
-                      }`}>
-                        {module.icon && <module.icon size={24} />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
-                          {module.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {module.description}
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                ))}
+      {/* Settings Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredCategories.map((category) => {
+          const Icon = category.icon;
+          return (
+            <Link
+              key={category.id}
+              href={category.href}
+              className="group bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:border-green-200 transition-all duration-200"
+            >
+              <div className="flex items-start gap-4">
+                <div
+                  className={`w-11 h-11 rounded-xl ${category.iconBg} ${category.iconColor} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200`}
+                >
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
+                      {category.title}
+                    </h3>
+                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                    {category.description}
+                  </p>
+                </div>
               </div>
-            </section>
-          ))}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Empty State */}
+      {filteredCategories.length === 0 && (
+        <div className="text-center py-16">
+          <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+          <p className="text-sm text-gray-500">
+            No settings match &quot;{searchQuery}&quot;
+          </p>
+          <button
+            onClick={() => setSearchQuery("")}
+            className="mt-2 text-sm text-green-600 hover:text-green-700 font-medium"
+          >
+            Clear search
+          </button>
         </div>
       )}
     </div>

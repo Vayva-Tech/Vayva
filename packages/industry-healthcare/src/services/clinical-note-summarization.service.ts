@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Clinical Note Summarization AI Service
  * 

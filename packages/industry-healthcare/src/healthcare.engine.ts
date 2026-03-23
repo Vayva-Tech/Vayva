@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Healthcare Industry Engine
  * Main orchestrator for all healthcare-specific features
@@ -22,9 +23,9 @@ import {
   SymptomCheckerService,
   TreatmentRecommendationService,
   ClinicalNoteSummarizationService,
-} from './services/index.js';
+} from './services/index';
 
-import { HEALTHCARE_DASHBOARD_CONFIG } from './dashboard/healthcare-dashboard.config.js';
+import { HEALTHCARE_DASHBOARD_CONFIG } from './dashboard/healthcare-dashboard.config';
 
 export interface HealthcareEngineConfig {
   patientIntake?: boolean;

@@ -20,13 +20,13 @@ import {
   Share,
   Download,
   Star,
-  TrendingUp,
+  TrendUp,
   Users,
   Clock,
   CheckCircle,
   XCircle
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -92,6 +92,29 @@ interface CreativeMetrics {
   totalViews: number;
   avgEngagement: number;
   clientSatisfaction: number;
+}
+
+// Helper functions used across sub-components
+function getTypeIcon(type: string) {
+  switch (type) {
+    case 'graphic': return <Palette className="h-5 w-5 text-purple-600" />;
+    case 'video': return <Video className="h-5 w-5 text-red-600" />;
+    case 'photography': return <Camera className="h-5 w-5 text-blue-600" />;
+    case 'illustration': return <Pen className="h-5 w-5 text-green-600" />;
+    case 'ui-design': return <Star className="h-5 w-5 text-orange-600" />;
+    default: return <Palette className="h-5 w-5 text-gray-600" />;
+  }
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'completed': return 'bg-green-100 text-green-800';
+    case 'published': return 'bg-blue-100 text-blue-800';
+    case 'in-progress': return 'bg-yellow-100 text-yellow-800';
+    case 'review': return 'bg-purple-100 text-purple-800';
+    case 'draft': return 'bg-gray-100 text-gray-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
 }
 
 // Main Creative Dashboard Component
@@ -162,30 +185,8 @@ export default function CreativeDashboard() {
     { id: 'projects', label: 'Projects', icon: <Folder className="h-4 w-4" /> },
     { id: 'portfolio', label: 'Portfolio', icon: <Image className="h-4 w-4" /> },
     { id: 'feedback', label: 'Client Feedback', icon: <Users className="h-4 w-4" /> },
-    { id: 'analytics', label: 'Analytics', icon: <TrendingUp className="h-4 w-4" /> }
+    { id: 'analytics', label: 'Analytics', icon: <TrendUp className="h-4 w-4" /> }
   ];
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'graphic': return <Palette className="h-5 w-5 text-purple-600" />;
-      case 'video': return <Video className="h-5 w-5 text-red-600" />;
-      case 'photography': return <Camera className="h-5 w-5 text-blue-600" />;
-      case 'illustration': return <Pen className="h-5 w-5 text-green-600" />;
-      case 'ui-design': return <Star className="h-5 w-5 text-orange-600" />;
-      default: return <Palette className="h-5 w-5 text-gray-600" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'published': return 'bg-blue-100 text-blue-800';
-      case 'in-progress': return 'bg-yellow-100 text-yellow-800';
-      case 'review': return 'bg-purple-100 text-purple-800';
-      case 'draft': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -576,7 +577,7 @@ function AnalyticsView({ metrics, loading }: { metrics: CreativeMetrics | null; 
           <h3 className="font-semibold mb-6">Performance Trends</h3>
           <div className="h-80 bg-gradient-to-br from-muted/20 to-muted/5 rounded-xl border border-gray-100 flex items-center justify-center">
             <div className="text-center">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+              <TrendUp className="h-12 w-12 mx-auto mb-4 text-gray-500" />
               <p className="font-medium">Engagement Analytics</p>
               <p className="text-sm text-gray-500 mt-1">
                 Views: {(metrics.totalViews / 1000).toFixed(1)}K | Likes: {metrics.totalLikes?.toLocaleString() || '0'}

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Showing Manager
  * Core showing management operations

@@ -4,22 +4,24 @@
  * Supplier management, purchase orders, and inventory forecasting
  */
 
+"use client";
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Truck, 
   Package, 
   Factory,
-  TrendingUp,
-  AlertTriangle,
+  TrendUp,
+  Warning,
   CheckCircle,
   Clock,
   Calendar,
-  Filter,
-  Search,
+  Funnel,
+  MagnifyingGlass,
   MapPin
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -173,7 +175,7 @@ export default function SupplyChainDashboard() {
       {/* Controls */}
       <div className="flex flex-wrap gap-4">
         <div className="relative flex-1 min-w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
           <input
             type="text"
             placeholder="Search suppliers or orders..."
@@ -258,7 +260,7 @@ export default function SupplyChainDashboard() {
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.primary}15` }}>
-                <TrendingUp className="h-6 w-6" style={{ color: colors.primary }} />
+                <TrendUp className="h-6 w-6" style={{ color: colors.primary }} />
               </div>
             </div>
           </ThemedCard>
@@ -418,7 +420,7 @@ export default function SupplyChainDashboard() {
         <div className="space-y-6">
           <ThemedCard industry={store?.industrySlug || 'default'}>
             <h3 className="font-semibold mb-6 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
+              <TrendUp className="h-5 w-5" />
               Demand Forecasting
             </h3>
             
@@ -486,7 +488,7 @@ export default function SupplyChainDashboard() {
                 <span className="font-medium">Add New Supplier</span>
               </button>
               <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
-                <TrendingUp className="h-5 w-5 text-green-500" />
+                <TrendUp className="h-5 w-5 text-green-500" />
                 <span className="font-medium">Run Forecast</span>
               </button>
             </div>
@@ -495,7 +497,7 @@ export default function SupplyChainDashboard() {
           {/* Alerts */}
           <ThemedCard industry={store?.industrySlug || 'default'} className="border-red-200 bg-red-50/30">
             <h3 className="font-semibold mb-4 flex items-center gap-2 text-red-900">
-              <AlertTriangle className="h-5 w-5" />
+              <Warning className="h-5 w-5" />
               Supply Chain Alerts
             </h3>
             <div className="space-y-3">

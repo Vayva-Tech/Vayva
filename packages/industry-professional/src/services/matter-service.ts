@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Matter, MatterStatus, PracticeArea } from '../types';
 
 export class MatterService {

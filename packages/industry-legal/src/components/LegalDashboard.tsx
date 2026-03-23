@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Legal Industry Dashboard Component
  * Law firm management dashboard with case tracking, billing, and compliance

@@ -8,18 +8,18 @@ import { usePathname, useRouter } from "next/navigation";
 import { Avatar, Button, Icon, IconName, cn } from "@vayva/ui";
 import {
   X,
-  CaretDoubleLeft as PanelLeftClose,
-  CaretDoubleRight as PanelLeftOpen,
+  PanelLeftClose,
+  PanelLeftOpen,
   Lock,
   Eye,
-  Spinner as Loader2,
-  UploadSimple as Upload,
-  ArrowSquareOut as ExternalLink,
-  MagnifyingGlass as Search,
-  CaretDown as ChevronDown,
-  SignOut as LogOut,
-  List as Menu,
-} from "@phosphor-icons/react";
+  Loader2,
+  Upload,
+  ExternalLink,
+  Search,
+  ChevronDown,
+  LogOut,
+  Menu,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { StoreProvider } from "@/context/StoreContext";
 import { motion, AnimatePresence } from "framer-motion";

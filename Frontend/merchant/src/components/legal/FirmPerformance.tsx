@@ -3,7 +3,7 @@
 
 import React from "react";
 import { Card } from "@vayva/ui";
-import { Briefcase, Clock, DollarSign } from "@phosphor-icons/react";
+import { Briefcase, Clock, CurrencyDollar as DollarSign } from "@phosphor-icons/react";
 import type { FirmPerformanceMetrics } from "@/types/legal";
 
 interface FirmPerformanceProps {

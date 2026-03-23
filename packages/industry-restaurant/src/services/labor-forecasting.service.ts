@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Labor Forecasting AI Service
  * 

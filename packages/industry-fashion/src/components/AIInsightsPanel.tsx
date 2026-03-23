@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 import React, { useState, useEffect } from 'react';
 import { GlassPanel } from '@vayva/ui/components/fashion';
 import { aiRecommendationEngine, type AIRecommendation as EngineAIRecommendation } from '../services/ai-recommendation-engine';

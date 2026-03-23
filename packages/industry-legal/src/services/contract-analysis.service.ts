@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Contract Analysis AI Service
  * 

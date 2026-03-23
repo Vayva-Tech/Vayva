@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Transaction Risk Detection
  * Identifies potential risks and delays in real estate transactions

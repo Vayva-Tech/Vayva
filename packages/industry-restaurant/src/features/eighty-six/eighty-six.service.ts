@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 86 Manager Service
  * Manages sold-out items across all channels

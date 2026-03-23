@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { logger } from "@vayva/shared";
 import { toast } from "sonner";
-import { Shield, ShieldCheck, Smartphone, LockKey, Key, DeviceMobile as MobileDevice } from "@phosphor-icons/react";
+import { Shield, ShieldCheck, DeviceMobile as Smartphone, LockKey, Key, DeviceMobile as MobileDevice } from "@phosphor-icons/react";
 import { Button, Input } from "@vayva/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";

@@ -13,3 +13,6 @@ packages:
   - "packages/load-test"
   - "packages/policies"
   - "packages/customer-success"
+  - "packages/industry-*"
+  - "packages/tsconfig"
+  - "packages/realtime"

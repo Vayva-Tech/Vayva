@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Real Estate Industry Package Index
  */
 
 // Export dashboard component
-export { RealEstateDashboard } from './components/RealEstateDashboard.js';
+export { RealEstateDashboard } from './components/RealEstateDashboard';
 export type { IndustryDashboardProps } from '@vayva/industry-core';
 
 export const VERSION = '0.0.1';

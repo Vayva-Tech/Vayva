@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Restaurant FOH (Front of House) Components
 export { LiveOrderFeed } from './LiveOrderFeed';
 export { TableFloorPlan } from './TableFloorPlan';

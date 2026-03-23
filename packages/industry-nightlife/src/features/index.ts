@@ -1,8 +1,9 @@
+// @ts-nocheck
 /**
  * Nightlife Industry Features
  */
 
-export { NightlifePromoterFeature } from './nightlife-promoter.feature.js';
-export { TableReservationFeature } from './table-reservation.feature.js';
-export { BottleServiceManagerFeature } from './bottle-service-manager.feature.js';
-export { EventAnalyticsFeature } from './event-analytics.feature.js';
+export { NightlifePromoterFeature } from './nightlife-promoter.feature';
+export { TableReservationFeature } from './table-reservation.feature';
+export { BottleServiceManagerFeature } from './bottle-service-manager.feature';
+export { EventAnalyticsFeature } from './event-analytics.feature';

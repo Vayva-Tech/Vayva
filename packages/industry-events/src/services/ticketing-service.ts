@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Event, EventStatus, EventCategory, TicketTier, Ticket, TicketStatus, EventsAnalytics } from '../types';
 

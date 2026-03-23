@@ -4,6 +4,8 @@
  * Campaign workflows, personalization, and A/B testing with industry-specific metrics
  */
 
+"use client";
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -17,13 +19,13 @@ import {
   Target,
   Rocket,
   ShareNetwork,
-  TrendingUp,
+  TrendUp,
   Wrench,
   Lightning,
   Funnel,
   Flask
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -235,7 +237,7 @@ export default function MarketingAutomationDashboard() {
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.accent}15` }}>
-                <TrendingUp className="h-6 w-6" style={{ color: colors.accent }} />
+                <TrendUp className="h-6 w-6" style={{ color: colors.accent }} />
               </div>
             </div>
           </ThemedCard>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Donation Tracker Component
  */

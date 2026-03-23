@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
-import { withRateLimiting, RateLimitPresets } from '@/middleware/rate-limiter';
+import { rateLimiter } from '@/middleware/rate-limiter';
 
 const QUICKBOOKS_AUTH_URL = 'https://appcenter.intuit.com/connect/oauth2';
 const QUICKBOOKS_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
@@ -9,9 +9,11 @@ const QUICKBOOKS_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens
  * GET /api/integrations/quickbooks/oauth
  * Rate limited OAuth endpoint
  */
-export const GET = withRateLimiting(
-  async function handler(req: NextRequest) {
-    const action = req.nextUrl.searchParams.get('action');
+export async function GET(req: NextRequest) {
+  const rateLimitResponse = await rateLimiter(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
+  const action = req.nextUrl.searchParams.get('action');
 
   if (action === 'authorize') {
     return handleAuthorization();
@@ -24,9 +26,7 @@ export const GET = withRateLimiting(
   }
 
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  },
-  RateLimitPresets.oauth
-);
+}
 
 /**
  * Step 1: Redirect to QuickBooks for authorization

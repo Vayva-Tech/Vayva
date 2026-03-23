@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 // ============================================================================
 // Dashboard Grid
 // ============================================================================
@@ -5,9 +8,9 @@
 // ============================================================================
 
 import { useCallback, useState } from "react";
-import { WidgetRenderer } from "./widget-renderer.js";
-import { useDashboard } from "./dashboard-container.js";
-import type { LayoutItem, WidgetDefinition } from "../types.js";
+import { WidgetRenderer } from "./widget-renderer";
+import { useDashboard } from "./dashboard-container";
+import type { LayoutItem, WidgetDefinition } from "../types";
 
 interface DashboardGridProps {
   widgets: WidgetDefinition[];

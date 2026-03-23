@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from 'zod';
 
 export const AcquisitionType = z.enum(['purchase', 'trade_in', 'consignment']);

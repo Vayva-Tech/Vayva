@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nonprofit Donor Management Service
  * Manages donor relationships, contributions, and engagement

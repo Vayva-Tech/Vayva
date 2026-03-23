@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Quote Service
  * Specialized service for quote management

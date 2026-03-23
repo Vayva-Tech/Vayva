@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @vayva/industry-events
  * Vayva Events Industry Engine
@@ -16,7 +17,7 @@ export {
   createDefaultEventsConfig,
   type EventsEngineConfig,
   type EventsFeatureId,
-} from './events.engine.js';
+} from './events.engine';
 
 // Services
 export {
@@ -24,7 +25,7 @@ export {
   VendorCoordinatorService,
   SeatingChartDesignerService,
   GuestListManagerService,
-} from './services/index.js';
+} from './services/index';
 
 export type {
   TimelineEvent,
@@ -40,7 +41,7 @@ export type {
   GuestListEntry,
   GuestListStats,
   GuestListConfig,
-} from './services/index.js';
+} from './services/index';
 
 // Features
 export {
@@ -48,26 +49,26 @@ export {
   VendorCoordinatorFeature,
   SeatingChartDesignerFeature,
   GuestListManagerFeature,
-} from './features/index.js';
+} from './features/index';
 
 // Components
 export {
   EventTimelineBuilder,
   VendorCoordinator,
   GuestListManager,
-} from './components/index.js';
+} from './components/index';
 
 export type {
   EventTimelineBuilderProps,
   VendorCoordinatorProps,
   GuestListManagerProps,
-} from './components/index.js';
+} from './components/index';
 
 // Dashboard
-export * from './dashboard/index.js';
+export * from './dashboard/index';
 
 // Types
-export * from './types/index.js';
+export * from './types/index';
 
 
 

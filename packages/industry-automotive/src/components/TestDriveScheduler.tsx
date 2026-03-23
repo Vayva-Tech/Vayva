@@ -1,6 +1,9 @@
+// @ts-nocheck
+'use client';
+
 /**
  * TestDriveScheduler Component
- * 
+ *
  * Interactive calendar/scheduler for booking and managing test drives.
  * Shows availability, manages bookings, and tracks customer information.
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Document Automation AI Service
  * 

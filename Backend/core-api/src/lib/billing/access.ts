@@ -24,7 +24,7 @@ export async function checkFeatureAccess(
     throw new Error("Store not found");
   }
   
-  const plan = (store.plan as string) || "FREE";
+  const plan = (store.plan as string) || null;
   const creditManager = new CreditManager();
 
   // ============================================================================
@@ -41,131 +41,154 @@ export async function checkFeatureAccess(
   }
 
   // ============================================================================
-  // 2. TRIAL EXPIRATION CHECK (FREE Plan Only)
+  // 2. NO ACTIVE SUBSCRIPTION CHECK
   // ============================================================================
-  if (plan === "FREE" && store.trialEndDate) {
+  if (!plan && store.trialEndDate) {
     if (new Date() > store.trialEndDate && !store.trialExpired) {
       // Mark as expired
       await prisma.store.update({
         where: { id: storeId },
         data: { trialExpired: true },
       });
-      
+
       return {
         allowed: false,
         reason: "trial_expired",
-        message: "Your free trial has expired. Please upgrade to continue.",
+        message: "Your trial has expired. Please subscribe to continue.",
       };
     }
-    
+
     // If already expired
     if (store.trialExpired) {
       return {
         allowed: false,
         reason: "trial_expired",
-        message: "Your free trial has ended. Upgrade to restore access.",
+        message: "Your trial has ended. Subscribe to restore access.",
       };
     }
+  }
+
+  if (!plan) {
+    return {
+      allowed: false,
+      reason: "no_subscription",
+      message: "An active subscription is required. Please choose a plan.",
+    };
   }
 
   // ============================================================================
   // 3. FEATURE-SPECIFIC GATING
   // ============================================================================
 
-  // AUTOPILOT - PRO ONLY
+  // AUTOPILOT - PRO and PRO_PLUS
   if (feature === "autopilot" || feature === "autopilot_run") {
-    if (plan !== "PRO") {
+    if (!["PRO", "PRO_PLUS"].includes(plan)) {
       return {
         allowed: false,
         reason: "plan_restriction",
-        message: "AI Autopilot is available on Pro plan only.",
+        message: "AI Autopilot is available on Pro plan and above.",
       };
     }
   }
 
-  // INDUSTRY DASHBOARDS - STARTER+
+  // INDUSTRY DASHBOARDS - PRO and PRO_PLUS
   if (feature === "industry_dashboards" || feature === "industry_specific_dashboard") {
-    if (plan === "FREE") {
+    if (!["PRO", "PRO_PLUS"].includes(plan)) {
       return {
         allowed: false,
         reason: "plan_restriction",
-        message: "Industry-specific dashboards are available on Starter plan and above.",
+        message: "Industry-specific dashboards (35+) are available on Pro plan and above.",
       };
     }
   }
 
-  // CUSTOM DOMAIN - STARTER+
-  if (feature === "custom_domain") {
-    if (plan === "FREE") {
+  // MERGED INDUSTRY DASHBOARD - PRO_PLUS ONLY
+  if (feature === "merged_industry_dashboard") {
+    if (plan !== "PRO_PLUS") {
       return {
         allowed: false,
         reason: "plan_restriction",
-        message: "Custom domain support is available on Starter plan and above.",
+        message: "Merged industry dashboard is available on Pro Plus plan only.",
       };
     }
+  }
+
+  // VISUAL WORKFLOW BUILDER - PRO_PLUS ONLY
+  if (feature === "visual_workflow_builder") {
+    if (plan !== "PRO_PLUS") {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Visual workflow builder is available on Pro Plus plan only.",
+      };
+    }
+  }
+
+  // CUSTOM DOMAIN - PRO and PRO_PLUS
+  if (feature === "custom_domain") {
+    if (!["PRO", "PRO_PLUS"].includes(plan)) {
+      return {
+        allowed: false,
+        reason: "plan_restriction",
+        message: "Custom domain support is available on Pro plan and above.",
+      };
+    }
+  }
+
+  // DASHBOARD METRICS - Tiered widget limits (STARTER=6, PRO=10, PRO_PLUS=50)
+  if (feature === "dashboard_metrics") {
+    const widgetLimits: Record<string, number> = { STARTER: 6, PRO: 10, PRO_PLUS: 50 };
+    const maxWidgets = widgetLimits[plan] || 6;
+    return {
+      allowed: true,
+      reason: "widget_limit",
+      message: `Your plan allows up to ${maxWidgets} dashboard widgets.`,
+    };
+  }
+
+  // FINANCIAL CHARTS - STARTER+
+  if (feature === "financial_charts") {
+    // All subscribed plans (STARTER, PRO, PRO_PLUS) have access
   }
 
   // ADVANCED ANALYTICS - STARTER+
   if (feature === "advanced_analytics") {
-    if (plan === "FREE") {
-      return {
-        allowed: false,
-        reason: "plan_restriction",
-        message: "Advanced analytics are available on Starter plan and above.",
-      };
-    }
+    // All subscribed plans (STARTER, PRO, PRO_PLUS) have access
   }
 
-  // PREDICTIVE INSIGHTS - PRO ONLY
+  // PREDICTIVE INSIGHTS - PRO and PRO_PLUS
   if (feature === "predictive_insights") {
-    if (plan !== "PRO") {
+    if (!["PRO", "PRO_PLUS"].includes(plan)) {
       return {
         allowed: false,
         reason: "plan_restriction",
-        message: "Predictive insights are available on Pro plan only.",
+        message: "Predictive insights are available on Pro plan and above.",
       };
     }
   }
 
-  // CUSTOM LAYOUTS - PRO ONLY
+  // CUSTOM LAYOUTS - PRO and PRO_PLUS
   if (feature === "custom_layouts") {
-    if (plan !== "PRO") {
+    if (!["PRO", "PRO_PLUS"].includes(plan)) {
       return {
         allowed: false,
         reason: "plan_restriction",
-        message: "Custom dashboard layouts are available on Pro plan only.",
+        message: "Custom dashboard layouts are available on Pro plan and above.",
       };
     }
   }
 
-  // TEMPLATE CHANGING - FREE users cannot change after initial selection
+  // TEMPLATE CHANGING - Tiered template limits
   if (feature === "template_change") {
-    if (plan === "FREE") {
-      if (store.currentTemplateId) {
-        return {
-          allowed: false,
-          reason: "plan_restriction",
-          message: "Template changes require Starter plan or higher.",
-        };
+    if (plan === "STARTER") {
+      // 1 template included, can buy extras at ₦5,000 each
+      const ownedCount = store.ownedTemplates?.length || 0;
+      if (ownedCount >= 1) {
+        return { allowed: true, reason: "requires_payment" };
       }
-      // First template selection is OK for FREE
       return { allowed: true };
     }
-    
-    if (plan === "STARTER") {
-      // Can own max 2 templates (1 included + 1 paid)
-      const ownedCount = store.ownedTemplates?.length || 0;
-      if (ownedCount >= 2) {
-        return {
-          allowed: false,
-          reason: "template_limit",
-          message: "Maximum 2 templates on Starter plan. Upgrade to Pro for more.",
-        };
-      }
-      // Second template costs credits
-      return { allowed: true, reason: "requires_payment" };
-    }
-    
+
     if (plan === "PRO") {
       // Can own 2 templates free, pay for 3rd+
       const ownedCount = store.ownedTemplates?.length || 0;
@@ -174,24 +197,20 @@ export async function checkFeatureAccess(
       }
       return { allowed: true };
     }
-  }
 
-  // AI MESSAGING - Check credits for all plans except FREE trial
-  if (feature === "ai_message" || feature === "whatsapp_ai") {
-    if (plan === "FREE") {
-      // FREE users get 100 messages during trial via Evolution API only
-      const messagesSent = await getWhatsAppMessageCount(storeId);
-      if (messagesSent >= 100) {
-        return {
-          allowed: false,
-          reason: "limit_reached",
-          message: "Free plan includes 100 AI messages. Upgrade to Starter for 5,000/month.",
-        };
+    if (plan === "PRO_PLUS") {
+      // Can own 5 templates free, pay for 6th+
+      const ownedCount = store.ownedTemplates?.length || 0;
+      if (ownedCount >= 5) {
+        return { allowed: true, reason: "requires_payment" };
       }
       return { allowed: true };
     }
-    
-    // STARTER and PRO: Check credit balance
+  }
+
+  // AI MESSAGING - Check credits for all subscribed plans
+  if (feature === "ai_message" || feature === "whatsapp_ai") {
+    // All subscribed plans: Check credit balance
     const creditCheck = await creditManager.checkCredits(storeId, 1); // 1 credit per message
     if (!creditCheck.allowed) {
       return {

@@ -5,11 +5,11 @@
  */
 
 import { logger } from "../logger.js";
-import { SentimentAnalyzer } from "./sentiment-analyzer.js";
-import { SalesForecaster } from "./sales-forecaster.js";
-import { RecommendationEngine } from "./recommendation-engine.js";
-import { IntentClassifier } from "./intent-classifier.js";
-import { SimpleEmbedding } from "./simple-embedding.js";
+import { SentimentAnalyzer } from "./sentiment-analyzer";
+import { SalesForecaster } from "./sales-forecaster";
+import { RecommendationEngine } from "./recommendation-engine";
+import { IntentClassifier } from "./intent-classifier";
+import { SimpleEmbedding } from "./simple-embedding";
 
 export interface SalesForecast {
   predictedRevenue: number;

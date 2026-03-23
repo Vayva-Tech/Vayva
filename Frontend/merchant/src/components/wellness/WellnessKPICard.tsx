@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import { TrendingUp, TrendingDown } from "@phosphor-icons/react/ssr";
+import { TrendUp as TrendingUp, TrendDown as TrendingDown } from "@phosphor-icons/react/ssr";
 
 interface KPICardProps {
   title: string;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI-Powered Predictive Analytics Service
  * 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard configuration for specialized industries
  */

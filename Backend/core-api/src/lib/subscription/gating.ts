@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@vayva/db";
 
-export type SubscriptionTier = "free" | "starter" | "pro" | "enterprise";
+export type SubscriptionTier = "free" | "starter" | "pro" | "pro_plus" | "enterprise";
 
 interface SubscriptionCheckResult {
   hasAccess: boolean;
@@ -17,7 +17,8 @@ const tierHierarchy: Record<SubscriptionTier, number> = {
   free: 0,
   starter: 1,
   pro: 2,
-  enterprise: 3,
+  pro_plus: 3,
+  enterprise: 4,
 };
 
 /**
@@ -25,11 +26,12 @@ const tierHierarchy: Record<SubscriptionTier, number> = {
  */
 function mapPlanKeyToTier(planKey: string): SubscriptionTier {
   const key = planKey.toLowerCase();
-  if (key === "free") return "free";
+  if (key === "free") return "starter"; // Legacy: map free to starter with no active subscription
   if (key === "starter" || key === "growth") return "starter";
   if (key === "pro") return "pro";
+  if (key === "pro_plus") return "pro_plus";
   if (key === "enterprise") return "enterprise";
-  return "free";
+  return "starter";
 }
 
 /**
@@ -140,10 +142,11 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
     }
   > = {
     free: {
+      // Legacy backward compat — mapped to starter with expired state
       maxProducts: 20,
       maxOrders: 50,
       maxTeamMembers: 1,
-      features: ["basic_dashboard", "paystack_payments"],
+      features: ["basic_dashboard", "paystack_payments", "dashboard_metrics_4"],
     },
     starter: {
       maxProducts: 500,
@@ -156,10 +159,10 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
         "basic_analytics",
         "advanced_analytics",
         "email_support",
-        "industry_dashboards",
-        "custom_domain",
         "remove_branding",
         "automation",
+        "financial_charts",
+        "dashboard_metrics_6",
       ],
     },
     pro: {
@@ -174,7 +177,6 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
         "advanced_analytics",
         "accounting",
         "multi_store",
-        "priority_support",
         "api_access",
         "webhooks",
         "industry_dashboards",
@@ -182,6 +184,36 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
         "remove_branding",
         "automation",
         "custom_integrations",
+        "financial_charts",
+        "dashboard_metrics_10",
+        "ai_autopilot",
+      ],
+    },
+    pro_plus: {
+      maxProducts: -1, // Unlimited
+      maxOrders: -1, // Unlimited
+      maxTeamMembers: 5,
+      features: [
+        "basic_dashboard",
+        "paystack_payments",
+        "csv_import",
+        "basic_analytics",
+        "advanced_analytics",
+        "accounting",
+        "multi_store",
+        "priority_support",
+        "api_access",
+        "webhooks",
+        "industry_dashboards",
+        "merged_industry_dashboard",
+        "visual_workflow_builder",
+        "custom_domain",
+        "remove_branding",
+        "automation",
+        "custom_integrations",
+        "financial_charts",
+        "dashboard_metrics_unlimited",
+        "ai_autopilot",
       ],
     },
     enterprise: {
@@ -196,9 +228,16 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
         "accounting",
         "multi_store",
         "dedicated_support",
+        "priority_support",
         "api_access",
         "webhooks",
+        "industry_dashboards",
+        "merged_industry_dashboard",
+        "visual_workflow_builder",
+        "custom_domain",
+        "remove_branding",
         "custom_integrations",
+        "ai_autopilot",
         "sla",
       ],
     },
@@ -229,7 +268,7 @@ export async function checkSubscriptionLimits(
     where: { storeId: membership.storeId },
   });
 
-  const tier = subscription ? mapPlanKeyToTier(subscription.planKey) : "free";
+  const tier = subscription ? mapPlanKeyToTier(subscription.planKey) : "starter";
   const limits = getSubscriptionLimits(tier);
 
   let current = 0;

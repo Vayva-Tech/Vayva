@@ -3,7 +3,7 @@
  * Defines feature availability and limitations for each plan tier
  */
 
-export type PlanTier = 'FREE' | 'STARTER' | 'PRO';
+export type PlanTier = 'STARTER' | 'PRO' | 'PRO_PLUS';
 
 export interface FeatureLimit {
   maxItems?: number | 'unlimited';
@@ -16,21 +16,28 @@ export interface TierLimits {
   products: FeatureLimit;
   orders: FeatureLimit;
   customers: FeatureLimit;
-  
+
   // Team & Collaboration
   teamMembers: FeatureLimit;
   staffSeats: FeatureLimit;
-  
+
   // AI & Automation
+  aiAutopilot: FeatureLimit;
   aiTokens: FeatureLimit;
   whatsappMessages: FeatureLimit;
   automationRules: FeatureLimit;
-  
-  // Marketing & Analytics
+
+  // Credits & Templates
+  credits: FeatureLimit;
+  templates: FeatureLimit;
+
+  // Dashboard & Analytics
+  dashboardMetrics: FeatureLimit;
+  financialCharts: FeatureLimit;
   campaigns: FeatureLimit;
   analyticsDepth: FeatureLimit;
   customReports: FeatureLimit;
-  
+
   // Advanced Features
   multiStore: FeatureLimit;
   apiAccess: FeatureLimit;
@@ -38,70 +45,65 @@ export interface TierLimits {
   prioritySupport: FeatureLimit;
   removeBranding: FeatureLimit;
   advancedAnalytics: FeatureLimit;
-  
+
   // Industry Dashboard Access
   industryDashboards: FeatureLimit;
+
+  // Pro Plus Features
+  mergedIndustryDashboard: FeatureLimit;
+  visualWorkflowBuilder: FeatureLimit;
 }
 
 // Trial period configuration (in days)
 export const TIER_TRIAL_PERIODS: Record<PlanTier, number> = {
-  FREE: 0,   // Free plan has no trial (it's already free)
-  STARTER: 7, // 7-day trial for Starter
-  PRO: 7      // 7-day trial for Pro
+  STARTER: 7,   // 7-day trial for Starter
+  PRO: 7,       // 7-day trial for Pro
+  PRO_PLUS: 0   // No trial for Pro Plus
 };
 
 export const TIER_LIMITS: Record<PlanTier, TierLimits> = {
-  FREE: {
-    products: { maxItems: 20, enabled: true },
-    orders: { maxItems: 50, enabled: true, quota: 50 },
-    customers: { maxItems: 100, enabled: true },
-    teamMembers: { maxItems: 1, enabled: true },
-    staffSeats: { maxItems: 1, enabled: true },
-    aiTokens: { maxItems: 0, enabled: false, quota: 0 }, // No AI access for Free users
-    whatsappMessages: { maxItems: 0, enabled: false, quota: 0 }, // No WhatsApp for Free users
-    automationRules: { maxItems: 0, enabled: false },
-    campaigns: { maxItems: 1, enabled: true },
-    analyticsDepth: { maxItems: 30, enabled: true }, // Last 30 days
-    customReports: { enabled: false },
-    multiStore: { enabled: false },
-    apiAccess: { enabled: false },
-    customDomains: { enabled: false },
-    prioritySupport: { enabled: false },
-    removeBranding: { enabled: false },
-    advancedAnalytics: { enabled: false },
-    industryDashboards: { enabled: false } // Block industry dashboards for Free users
-  },
-  
   STARTER: {
     products: { maxItems: 500, enabled: true },
     orders: { maxItems: 500, enabled: true, quota: 500 },
     customers: { maxItems: 1000, enabled: true },
     teamMembers: { maxItems: 1, enabled: true },
     staffSeats: { maxItems: 1, enabled: true },
-    aiTokens: { maxItems: 10000, enabled: true, quota: 10000 }, // AI available with quota
-    whatsappMessages: { maxItems: 500, enabled: true, quota: 500 }, // WhatsApp available with quota
+    aiAutopilot: { enabled: false },
+    aiTokens: { maxItems: 10000, enabled: true, quota: 10000 },
+    whatsappMessages: { maxItems: 500, enabled: true, quota: 500 },
     automationRules: { maxItems: 3, enabled: true },
+    credits: { maxItems: 5000, enabled: true, quota: 5000 },
+    templates: { maxItems: 1, enabled: true }, // 1 included, can buy extra at ₦5,000 each
+    dashboardMetrics: { maxItems: 6, enabled: true }, // 6 widgets
+    financialCharts: { enabled: true },
     campaigns: { maxItems: 5, enabled: true },
     analyticsDepth: { maxItems: 90, enabled: true }, // Last 90 days
     customReports: { enabled: false },
     multiStore: { enabled: false },
     apiAccess: { enabled: false },
-    customDomains: { enabled: true },
+    customDomains: { enabled: false }, // PRO only
     prioritySupport: { enabled: false },
     removeBranding: { enabled: true },
     advancedAnalytics: { enabled: true },
-    industryDashboards: { enabled: true } // Allow industry dashboards for paid users
+    industryDashboards: { enabled: false }, // PRO only
+    mergedIndustryDashboard: { enabled: false },
+    visualWorkflowBuilder: { enabled: false },
   },
-  
+
   PRO: {
-    products: { maxItems: 'unlimited', enabled: true },
-    orders: { maxItems: 'unlimited', enabled: true, quota: 10000 },
+    products: { maxItems: 1000, enabled: true },
+    orders: { maxItems: 10000, enabled: true, quota: 10000 },
     customers: { maxItems: 'unlimited', enabled: true },
     teamMembers: { maxItems: 3, enabled: true },
     staffSeats: { maxItems: 3, enabled: true },
+    aiAutopilot: { enabled: true },
     aiTokens: { maxItems: 100000, enabled: true, quota: 100000 },
     whatsappMessages: { maxItems: 5000, enabled: true, quota: 5000 },
     automationRules: { maxItems: 20, enabled: true },
+    credits: { maxItems: 10000, enabled: true, quota: 10000 },
+    templates: { maxItems: 2, enabled: true }, // 2 included, can buy 3rd+ at ₦5,000
+    dashboardMetrics: { maxItems: 10, enabled: true }, // 10 widgets
+    financialCharts: { enabled: true },
     campaigns: { maxItems: 'unlimited', enabled: true },
     analyticsDepth: { maxItems: 365, enabled: true }, // Full year
     customReports: { enabled: true },
@@ -111,7 +113,37 @@ export const TIER_LIMITS: Record<PlanTier, TierLimits> = {
     prioritySupport: { enabled: true },
     removeBranding: { enabled: true },
     advancedAnalytics: { enabled: true },
-    industryDashboards: { enabled: true } // Allow industry dashboards for Pro users
+    industryDashboards: { enabled: false }, // PRO_PLUS only
+    mergedIndustryDashboard: { enabled: false }, // PRO_PLUS only
+    visualWorkflowBuilder: { enabled: false }, // PRO_PLUS only
+  },
+
+  PRO_PLUS: {
+    products: { maxItems: 'unlimited', enabled: true },
+    orders: { maxItems: 'unlimited', enabled: true },
+    customers: { maxItems: 'unlimited', enabled: true },
+    teamMembers: { maxItems: 5, enabled: true },
+    staffSeats: { maxItems: 5, enabled: true },
+    aiAutopilot: { enabled: true },
+    aiTokens: { maxItems: 200000, enabled: true, quota: 200000 },
+    whatsappMessages: { maxItems: 10000, enabled: true, quota: 10000 },
+    automationRules: { maxItems: 'unlimited', enabled: true },
+    credits: { maxItems: 25000, enabled: true, quota: 25000 },
+    templates: { maxItems: 5, enabled: true }, // 5 included
+    dashboardMetrics: { maxItems: 'unlimited', enabled: true },
+    financialCharts: { enabled: true },
+    campaigns: { maxItems: 'unlimited', enabled: true },
+    analyticsDepth: { maxItems: 365, enabled: true }, // Full year
+    customReports: { enabled: true },
+    multiStore: { enabled: true },
+    apiAccess: { enabled: true },
+    customDomains: { enabled: true },
+    prioritySupport: { enabled: true },
+    removeBranding: { enabled: true },
+    advancedAnalytics: { enabled: true },
+    industryDashboards: { enabled: true },
+    mergedIndustryDashboard: { enabled: true },
+    visualWorkflowBuilder: { enabled: true },
   }
 };
 

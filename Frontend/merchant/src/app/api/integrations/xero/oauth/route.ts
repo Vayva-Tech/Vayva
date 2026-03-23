@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
-import { withRateLimiting, RateLimitPresets } from '@/middleware/rate-limiter';
+import { rateLimiter } from '@/middleware/rate-limiter';
 
 const XERO_AUTH_URL = 'https://login.xero.com/identity/connect/authorize';
 const XERO_TOKEN_URL = 'https://identity.xero.com/connect/token';
@@ -9,9 +9,11 @@ const XERO_TOKEN_URL = 'https://identity.xero.com/connect/token';
  * GET /api/integrations/xero/oauth
  * Rate limited OAuth endpoint
  */
-export const GET = withRateLimiting(
-  async function handler(req: NextRequest) {
-    const action = req.nextUrl.searchParams.get('action');
+export async function GET(req: NextRequest) {
+  const rateLimitResponse = await rateLimiter(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
+  const action = req.nextUrl.searchParams.get('action');
 
   if (action === 'authorize') {
     return handleAuthorization();
@@ -24,9 +26,7 @@ export const GET = withRateLimiting(
   }
 
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  },
-  RateLimitPresets.oauth
-);
+}
 
 /**
  * Step 1: Redirect to Xero for authorization

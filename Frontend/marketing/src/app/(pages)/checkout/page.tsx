@@ -52,10 +52,7 @@ export default function CheckoutPage(): React.JSX.Element {
   const handleProceed = async () => {
     setError(null);
 
-    if (planKey === "free") {
-      setError("Free plan does not require checkout. Please create your account.");
-      return;
-    }
+    // Free plan removed — all plans require checkout
 
     if (!agreed) {
       setError("Please agree to the Terms and Privacy Policy.");

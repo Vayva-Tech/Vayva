@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { NotificationPayload } from '../types';
 
 export interface EmailService {

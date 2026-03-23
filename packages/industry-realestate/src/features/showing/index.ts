@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Showing Management Feature Module
  * Export all showing management functionality

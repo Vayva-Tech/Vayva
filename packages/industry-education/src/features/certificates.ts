@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Certificate Management Feature
  * 

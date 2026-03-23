@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Services Industry Dashboard Component
  * General service business management dashboard

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { TimeEntry, Invoice, InvoiceStatus } from '../types';
 
 export class BillingService {

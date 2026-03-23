@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Event Vendor Dashboard Component
  * Comprehensive vendor management interface

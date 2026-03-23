@@ -256,7 +256,7 @@ async function callGroq(
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama3-70b-8192",
+        model: "meta-llama/llama-3.3-70b-instruct",
         temperature: 0.4,
         max_tokens: 800,
         messages: [
@@ -289,7 +289,7 @@ async function callGroq(
         .create({
           data: {
             storeId,
-            model: "llama3-70b-8192",
+            model: "meta-llama/llama-3.3-70b-instruct",
             inputTokens: usage.prompt_tokens || 0,
             outputTokens: usage.completion_tokens || 0,
             channel: "INAPP",

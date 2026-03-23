@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Lightbulb,
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  Filter,
-  RefreshCw,
+  WarningCircle as AlertCircle,
+  Funnel as Filter,
+  ArrowsClockwise as RefreshCw,
   Paperclip
 } from "@phosphor-icons/react/ssr";
 import { apiJson } from "@/lib/api-client-shared";

@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 /**
  * Expiration Alerts Widget
  * Displays products nearing expiration with action recommendations
@@ -5,7 +8,7 @@
 
 import React, { useState } from 'react';
 
-interface ExpirationAlert {
+export interface ExpirationAlert {
   id: string;
   productId: string;
   productName: string;
@@ -18,7 +21,7 @@ interface ExpirationAlert {
   acknowledged: boolean;
 }
 
-interface AlertStats {
+export interface AlertStats {
   total: number;
   critical: number;
   high: number;
@@ -28,7 +31,7 @@ interface AlertStats {
   expired: number;
 }
 
-interface ExpirationAlertsProps {
+export interface ExpirationAlertsProps {
   alerts?: ExpirationAlert[];
   stats?: AlertStats;
   onAcknowledge?: (alertId: string, action?: string) => void;

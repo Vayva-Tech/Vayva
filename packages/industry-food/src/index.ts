@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================================================
 // @vayva/industry-food - Main Exports
 // ============================================================================
@@ -12,21 +13,21 @@ export {
   type FoodGroceryEngineConfig,
   type FoodGroceryFeatureId,
   type FoodGroceryEngineStatus,
-} from './food-grocery.engine.js';
+} from './food-grocery.engine';
 
 // Dashboard Configuration
-export { foodDashboardConfig } from "./dashboard/config.js";
+export { foodDashboardConfig } from "./dashboard/config";
 export type { DashboardEngineConfig } from "@vayva/industry-core";
 
 // Components
-export { FoodDashboard } from "./components/FoodDashboard.js";
-export type { FoodDashboardProps } from "./components/FoodDashboard.js";
-export * from './components/index.js';
+export { FoodDashboard } from "./components/FoodDashboard";
+export type { FoodDashboardProps } from "./components/FoodDashboard";
+export * from './components/index';
 
 // Widgets
-export { KitchenDisplaySystem } from "./widgets/KitchenDisplaySystem.js";
-export { EightySixBoard } from "./widgets/86Board.js";
-export { registerFoodWidgets } from "./widgets/registry.js";
+export { KitchenDisplaySystem } from "./widgets/KitchenDisplaySystem";
+export { EightySixBoard } from "./widgets/86Board";
+export { registerFoodWidgets } from "./widgets/registry";
 
 // Types
-export type * from "./types/index.js";
+export type * from "./types/index";

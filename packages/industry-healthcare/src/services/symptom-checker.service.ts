@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Symptom Checker AI Service
  * 

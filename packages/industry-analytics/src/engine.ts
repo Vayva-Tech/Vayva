@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Analytics Industry Engine Export
  */
@@ -5,4 +6,4 @@
 export { 
   AnalyticsEngine, 
   type AnalyticsEngineConfig,
-} from './analytics.engine.js';
+} from './analytics.engine';

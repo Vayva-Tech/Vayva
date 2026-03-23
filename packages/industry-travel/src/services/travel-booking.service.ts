@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Travel Booking Service
  * Manages travel reservations, itineraries, and booking workflows

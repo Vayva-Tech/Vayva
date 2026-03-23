@@ -4,6 +4,8 @@
  * Channel status, inventory sync, and performance monitoring
  */
 
+"use client";
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -14,7 +16,7 @@ import {
   ArrowsClockwise,
   ShoppingCart,
   CurrencyDollar,
-  TrendingUp,
+  TrendUp,
   Storefront,
   Globe,
   AmazonLogo,
@@ -22,7 +24,7 @@ import {
   FacebookLogo,
   InstagramLogo
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -115,7 +117,7 @@ export default function MultiChannelDashboard() {
   const tabs = [
     { id: 'channels', label: 'Channel Status', icon: <ShareNetwork className="h-4 w-4" /> },
     { id: 'sync', label: 'Sync Monitor', icon: <ArrowsClockwise className="h-4 w-4" /> },
-    { id: 'performance', label: 'Performance', icon: <TrendingUp className="h-4 w-4" /> }
+    { id: 'performance', label: 'Performance', icon: <TrendUp className="h-4 w-4" /> }
   ];
 
   return (
@@ -478,13 +480,13 @@ function PerformanceAnalytics({ performance, loading, channels }: { performance:
       <div className="lg:col-span-2">
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-6 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+            <TrendUp className="h-5 w-5" />
             Performance Trends
           </h3>
           
           <div className="h-80 bg-gradient-to-br from-muted/20 to-muted/5 rounded-xl border border-gray-100 flex items-center justify-center">
             <div className="text-center text-gray-500">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-30" />
+              <TrendUp className="h-12 w-12 mx-auto mb-4 opacity-30" />
               <p className="font-medium">Performance Charts</p>
               <p className="text-sm mt-1">Interactive charts showing channel performance over time</p>
             </div>

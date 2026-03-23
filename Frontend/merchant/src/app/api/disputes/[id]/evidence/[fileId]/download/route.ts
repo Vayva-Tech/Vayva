@@ -9,7 +9,6 @@ export async function GET(
 ) {
   try {
     const { id, fileId } = await params;
-    const { id, fileId } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const result = await apiJson<{
       downloadUrl: string;

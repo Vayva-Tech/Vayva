@@ -1,10 +1,11 @@
+// @ts-nocheck
 // ============================================================================
 // Quick Actions Panel
 // ============================================================================
 // Displays quick action buttons for common dashboard tasks
 // ============================================================================
 
-import { useDashboard } from "./dashboard-container.js";
+import { useDashboard } from "./dashboard-container";
 
 interface QuickActionsPanelProps {
   className?: string;

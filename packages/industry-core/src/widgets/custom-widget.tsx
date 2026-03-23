@@ -1,11 +1,12 @@
+// @ts-nocheck
 // ============================================================================
 // Custom Widget
 // ============================================================================
 // Renders custom widget content provided via configuration
 // ============================================================================
 
-import { BaseWidget } from "./base-widget.js";
-import type { WidgetData, WidgetProps } from "../types.js";
+import { BaseWidget } from "./base-widget";
+import type { WidgetData, WidgetProps } from "../types";
 
 interface CustomWidgetProps extends Omit<WidgetProps, "data"> {
   data?: WidgetData<unknown>;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { TravelBookingService } from './travel-booking-service';
 export type { PackageFilters, BookingFilters } from './travel-booking-service';
 

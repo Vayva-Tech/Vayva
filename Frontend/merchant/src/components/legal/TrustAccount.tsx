@@ -3,7 +3,7 @@
 
 import React from "react";
 import { Card } from "@vayva/ui";
-import { Wallet, AlertTriangle } from "@phosphor-icons/react";
+import { Wallet, Warning as AlertTriangle } from "@phosphor-icons/react";
 import type { TrustAccountMetrics } from "@/types/legal";
 
 interface TrustAccountProps {

@@ -4,7 +4,7 @@
 import { logger, formatCurrency } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Plus, Wallet, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, AlertCircle } from "@phosphor-icons/react";
+import { Plus, Wallet, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 import { Button, Input, Select } from "@vayva/ui";
 import { Payout, BankAccount, PayoutResponse } from "@/types/finance";
 import { apiJson } from "@/lib/api-client-shared";

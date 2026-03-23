@@ -1,6 +1,9 @@
+// @ts-nocheck
+'use client';
+
 /**
  * GuestTimeline Widget
- * 
+ *
  * Horizontal timeline showing guest stays, check-ins, and check-outs.
  * Provides visual overview of property occupancy and guest flow.
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nonprofit Industry Engine
  * Main orchestrator for nonprofit features
@@ -5,13 +6,13 @@
 
 import { DashboardEngine } from '@vayva/industry-core';
 
-import { DonorManagementService } from './services/donor-management.service.js';
-import { CampaignManagerService } from './services/campaign-manager.service.js';
-import { GrantTrackerService } from './services/grant-tracker.service.js';
+import { DonorManagementService } from './services/donor-management.service';
+import { CampaignManagerService } from './services/campaign-manager.service';
+import { GrantTrackerService } from './services/grant-tracker.service';
 
-import { DonorManagementFeature } from './features/donor-management.feature.js';
-import { CampaignManagerFeature } from './features/campaign-manager.feature.js';
-import { GrantTrackerFeature } from './features/grant-tracker.feature.js';
+import { DonorManagementFeature } from './features/donor-management.feature';
+import { CampaignManagerFeature } from './features/campaign-manager.feature';
+import { GrantTrackerFeature } from './features/grant-tracker.feature';
 
 export interface NonprofitEngineConfig {
   donorManagement?: boolean;

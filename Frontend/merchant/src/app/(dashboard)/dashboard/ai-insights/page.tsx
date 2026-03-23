@@ -1,9 +1,10 @@
 // @ts-nocheck
 "use client";
 
-import { AIInsightsDashboard } from "@/components/ai-insights/AIInsightsDashboard";
+import AIInsightsDashboard from "@/components/ai-insights/AIInsightsDashboard";
 import { useAuth } from "@/context/AuthContext";
-import { Link, Button, Icon } from "@vayva/ui";
+import Link from "next/link";
+import { Button, Icon } from "@vayva/ui";
 
 // Normalize plan name
 function normalizePlan(rawPlan: string | null | undefined): string {

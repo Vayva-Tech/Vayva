@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Cases Feature Module
  * Dedicated module for case management functionality

@@ -6,18 +6,18 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Users, 
-  TrendingUp, 
-  Target, 
-  BarChart,
-  PieChart,
+import {
+  Users,
+  TrendUp as TrendingUp,
+  Target,
+  ChartBar as BarChart,
+  ChartPie as PieChart,
   Calendar,
-  Filter,
-  Download,
-  RefreshCw
+  Funnel as Filter,
+  DownloadSimple as Download,
+  ArrowsClockwise as RefreshCw
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';

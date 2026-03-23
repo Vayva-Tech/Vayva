@@ -4,7 +4,7 @@
 import { logger, formatCurrency } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ArrowUpRight, ArrowDownLeft, RefreshCcw, Download, Filter, MagnifyingGlass as Search, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, TrendUp } from "@phosphor-icons/react";
+import { ArrowUpRight, ArrowDownLeft, ArrowsClockwise as RefreshCcw, Download, Funnel as Filter, MagnifyingGlass as Search, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, TrendUp } from "@phosphor-icons/react";
 import { Button, Input, Select } from "@vayva/ui";
 import { MobileTransactionCard } from "@/components/transactions/MobileTransactionCard";
 import { Transaction, TransactionsResponse } from "@/types/finance";

@@ -8,8 +8,7 @@ import { APP_URL } from "@/lib/constants";
 import { pricingFaqs, pricingPlans } from "@/data/marketing-content";
 
 function formatPrice(naira: number): string {
-  if (naira === 0) return "Free";
-  return `₦${(naira / 1000).toFixed(1)}k`;
+  return `₦${(naira / 1000).toFixed(0)}k`;
 }
 
 function resolvePlanHref(href: string): string {
@@ -50,7 +49,7 @@ export function NewPricingClient(): React.JSX.Element {
             transition={{ delay: 0.1 }}
             className="mt-6 text-lg text-slate-600"
           >
-            Start free, then scale as your orders increase. Every plan includes Autopilot insights and local payment support.
+            Pick a plan that matches your growth stage. Every plan includes Autopilot insights and local payment support.
           </motion.p>
         </div>
       </section>
@@ -129,68 +128,89 @@ export function NewPricingClient(): React.JSX.Element {
               <thead className="bg-gradient-to-r from-emerald-50 to-purple-50 text-slate-700">
                 <tr>
                   <th className="text-left p-5 font-bold text-base">Capability</th>
-                  <th className="text-left p-5 font-bold text-base">Free</th>
                   <th className="text-left p-5 font-bold text-base">Starter</th>
                   <th className="text-left p-5 font-bold text-base">Pro</th>
+                  <th className="text-left p-5 font-bold text-base">Pro Plus</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
                   {
                     name: "Templates",
-                    free: "4 templates",
                     starter: "Full library",
                     pro: "Full library + custom",
+                    proPlus: "Full library + custom",
                     desc: "Storefront design templates"
                   },
                   {
                     name: "Products",
-                    free: "Basic catalog",
                     starter: "Up to 500",
                     pro: "Unlimited",
+                    proPlus: "Unlimited",
                     desc: "Maximum products in catalog"
                   },
                   {
                     name: "Automation",
-                    free: "Not included",
                     starter: "WhatsApp & Instagram",
                     pro: "WhatsApp & Instagram",
+                    proPlus: "WhatsApp & Instagram",
                     desc: "AI-powered order capture"
                   },
                   {
                     name: "Storefront",
-                    free: "Basic with branding",
                     starter: "Custom setup",
                     pro: "Custom development",
+                    proPlus: "Custom development",
                     desc: "Professional online presence"
                   },
                   {
                     name: "API access",
-                    free: "Not included",
                     starter: "Not included",
                     pro: "Full access",
+                    proPlus: "Full access",
                     desc: "Integrate with external systems"
                   },
                   {
                     name: "Support",
-                    free: "Community",
                     starter: "Priority support",
                     pro: "Dedicated manager",
+                    proPlus: "Priority support",
                     desc: "Get help when you need it"
                   },
                   {
                     name: "Branding",
-                    free: "Vayva branding",
                     starter: "Remove branding",
                     pro: "White-label option",
+                    proPlus: "White-label option",
                     desc: "Your brand identity"
                   },
                   {
                     name: "Multi-location",
-                    free: "Not included",
                     starter: "Not included",
                     pro: "Included",
+                    proPlus: "Included",
                     desc: "Manage multiple locations"
+                  },
+                  {
+                    name: "Industry Dashboards",
+                    starter: "Not included",
+                    pro: "Not included",
+                    proPlus: "Included",
+                    desc: "Industry-specific operational tools"
+                  },
+                  {
+                    name: "Visual Workflow Builder",
+                    starter: "Not included",
+                    pro: "Not included",
+                    proPlus: "Included",
+                    desc: "Drag-and-drop automation builder"
+                  },
+                  {
+                    name: "Merged Dashboard",
+                    starter: "Not included",
+                    pro: "Not included",
+                    proPlus: "Included",
+                    desc: "Unified industry dashboard view"
                   },
                 ].map((row) => (
                   <tr key={row.name} className="hover:bg-slate-50/50 transition-colors">
@@ -198,9 +218,9 @@ export function NewPricingClient(): React.JSX.Element {
                       <div className="font-medium text-slate-900">{row.name}</div>
                       <div className="text-xs text-slate-500 mt-0.5">{row.desc}</div>
                     </td>
-                    <td className="p-5 text-slate-600">{row.free}</td>
                     <td className="p-5 text-emerald-700 font-semibold">{row.starter}</td>
                     <td className="p-5 text-slate-900 font-medium">{row.pro}</td>
+                    <td className="p-5 text-purple-700 font-semibold">{row.proPlus}</td>
                   </tr>
                 ))}
               </tbody>
@@ -230,12 +250,12 @@ export function NewPricingClient(): React.JSX.Element {
         <div className="max-w-[1600px] mx-auto px-6 text-center text-slate-900">
           <h2 className="text-3xl md:text-4xl font-black">Let’s build your commerce engine.</h2>
           <p className="mt-4 text-lg text-slate-600">
-            Start free, or talk to the team about a custom rollout for multiple brands.
+            Start with a 7-day trial, or talk to the team about a custom rollout for multiple brands.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href={`${APP_URL}/signup`}>
               <Button className="bg-slate-900 hover:bg-slate-800 text-white px-7 py-6 rounded-2xl text-base font-semibold shadow-[0_20px_50px_rgba(15,23,42,0.25)]">
-                Start free
+                Get Started
               </Button>
             </Link>
             <Link href="/contact">

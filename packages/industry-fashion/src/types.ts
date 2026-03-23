@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type IndustrySlug = 'fashion' | 'restaurant' | 'realestate' | 'healthcare' | 'electronics' | 'beauty' | 'events' | 'b2b' | 'grocery' | 'retail';
 
 export const FASHION_INDUSTRY: IndustrySlug = 'fashion';

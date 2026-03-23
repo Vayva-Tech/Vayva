@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================================================
 // Base Widget
 // ============================================================================
@@ -5,7 +6,7 @@
 // ============================================================================
 
 import type { ReactNode } from "react";
-import type { WidgetProps } from "../types.js";
+import type { WidgetProps } from "../types";
 
 interface BaseWidgetProps extends WidgetProps {
   children: ReactNode;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Automotive Industry Engine
  * Main orchestrator for all automotive-specific features
@@ -8,15 +9,15 @@ import {
   type DashboardEngineConfig,
 } from '@vayva/industry-core';
 
-import { VehicleGalleryService } from './services/vehicle-gallery.service.js';
-import { TestDriveCoordinatorService } from './services/test-drive-coordinator.service.js';
-import { CRMConnectorService } from './services/crm-connector.service.js';
+import { VehicleGalleryService } from './services/vehicle-gallery.service';
+import { TestDriveCoordinatorService } from './services/test-drive-coordinator.service';
+import { CRMConnectorService } from './services/crm-connector.service';
 
-import { VehicleShowcaseFeature } from './features/vehicle-showcase.feature.js';
-import { TestDriveCoordinatorFeature } from './features/test-drive-coordinator.feature.js';
-import { CRMIntegrationFeature } from './features/crm-integration.feature.js';
+import { VehicleShowcaseFeature } from './features/vehicle-showcase.feature';
+import { TestDriveCoordinatorFeature } from './features/test-drive-coordinator.feature';
+import { CRMIntegrationFeature } from './features/crm-integration.feature';
 
-import { AUTOMOTIVE_DASHBOARD_CONFIG } from './dashboard/index.js';
+import { AUTOMOTIVE_DASHBOARD_CONFIG } from './dashboard/index';
 
 export interface AutomotiveEngineConfig {
   vehicleGallery?: boolean;

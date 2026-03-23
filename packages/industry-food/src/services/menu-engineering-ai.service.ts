@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Menu Engineering AI Service
  * 

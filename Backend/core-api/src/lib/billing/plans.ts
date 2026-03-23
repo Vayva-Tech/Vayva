@@ -1,39 +1,36 @@
 import { PLANS as CONFIG_PLANS } from "@/config/pricing";
 export const PLAN_PRICING = {
   STARTER: CONFIG_PLANS.find((p) => p.key === "STARTER")?.monthlyAmount || 25000,
-  PRO: CONFIG_PLANS.find((p) => p.key === "PRO")?.monthlyAmount || 40000,
+  PRO: CONFIG_PLANS.find((p) => p.key === "PRO")?.monthlyAmount || 35000,
+  PRO_PLUS: CONFIG_PLANS.find((p) => p.key === "PRO_PLUS")?.monthlyAmount || 50000,
 };
 export const PLANS = {
-  FREE: {
-    slug: "FREE",
-    name: "Free",
-    priceNgn: 0,
-    limits: {
-      teamSeats: 1,
-      templatesAvailable: "limited",
-      monthlyCampaignSends: 100,
-    },
-    features: {
-      approvals: false,
-      inboxOps: true,
-      reports: true,
-      advancedAnalytics: false,
-    },
-  },
   STARTER: {
     slug: "STARTER",
     name: "Starter",
     priceNgn: PLAN_PRICING.STARTER,
     limits: {
       teamSeats: 1,
+      templatesIncluded: 1, // 1 included, can buy extra at ₦5,000 each
       templatesAvailable: "limited",
+      creditsPerMonth: 5000,
       monthlyCampaignSends: 1000,
+      dashboardWidgets: 6,
     },
     features: {
       approvals: false,
       inboxOps: true,
       reports: true,
       advancedAnalytics: true,
+      financialCharts: true,
+      industryDashboards: false,
+      mergedIndustryDashboard: false,
+      visualWorkflowBuilder: false,
+      customDomain: false,
+      apiAccess: false,
+      aiAutopilot: false,
+      removeBranding: false,
+      prioritySupport: false,
     },
   },
   PRO: {
@@ -42,14 +39,54 @@ export const PLANS = {
     priceNgn: PLAN_PRICING.PRO,
     limits: {
       teamSeats: 3,
+      templatesIncluded: 2, // 2 included, can buy 3rd+ at ₦5,000
       templatesAvailable: "all",
+      creditsPerMonth: 10000,
       monthlyCampaignSends: 10000,
+      dashboardWidgets: 10,
     },
     features: {
       approvals: true,
       inboxOps: true,
       reports: true,
       advancedAnalytics: true,
+      financialCharts: true,
+      industryDashboards: true,
+      mergedIndustryDashboard: false,
+      visualWorkflowBuilder: false,
+      customDomain: true,
+      apiAccess: true,
+      aiAutopilot: true,
+      removeBranding: true,
+      prioritySupport: false,
+    },
+  },
+  PRO_PLUS: {
+    slug: "PRO_PLUS",
+    name: "Pro+",
+    priceNgn: PLAN_PRICING.PRO_PLUS,
+    limits: {
+      teamSeats: 5,
+      templatesIncluded: 5,
+      templatesAvailable: "all",
+      creditsPerMonth: 25000,
+      monthlyCampaignSends: 50000,
+      dashboardWidgets: 999,
+    },
+    features: {
+      approvals: true,
+      inboxOps: true,
+      reports: true,
+      advancedAnalytics: true,
+      financialCharts: true,
+      industryDashboards: true,
+      mergedIndustryDashboard: true,
+      visualWorkflowBuilder: true,
+      customDomain: true,
+      apiAccess: true,
+      aiAutopilot: true,
+      removeBranding: true,
+      prioritySupport: true,
     },
   },
 };

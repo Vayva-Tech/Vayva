@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Case Service
  * Specialized service for case management

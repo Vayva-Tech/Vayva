@@ -9,7 +9,7 @@ import {
   XCircle,
   Warning,
   Clock,
-  TrendLine,
+  ChartLine as TrendLine,
   Funnel,
   ArrowsClockwise as RefreshCw,
 } from "@phosphor-icons/react/ssr";

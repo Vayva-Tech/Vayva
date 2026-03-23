@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * CRM Connector Service
  * Integrates with CRM systems for customer management and follow-ups
  */
 
-import { z } from 'Zod';
+import { z } from 'zod';
 
 export interface Customer {
   id: string;

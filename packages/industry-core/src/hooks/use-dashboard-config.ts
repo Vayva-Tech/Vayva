@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 // ============================================================================
 // useDashboardConfig Hook
 // ============================================================================
@@ -5,7 +8,7 @@
 // ============================================================================
 
 import { useCallback, useEffect, useState } from "react";
-import type { DashboardConfigResponse, DashboardEngineConfig, IndustrySlug, LayoutPreset } from "../types.js";
+import type { DashboardConfigResponse, DashboardEngineConfig, IndustrySlug, LayoutPreset } from "../types";
 
 interface UseDashboardConfigOptions {
   storeId?: string;

@@ -4,14 +4,16 @@
  * AI-driven adaptive experiences for individual merchants
  */
 
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Brain,
   Target,
-  TrendingUp,
+  TrendUp,
   UserFocus,
-  Sparkles,
+  Sparkle,
   Lightbulb,
   Rocket,
   ChartLine,
@@ -20,7 +22,7 @@ import {
   Clock,
   MagicWand
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -240,7 +242,7 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
           </div>
           <div className="text-right">
             <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="h-5 w-5 text-yellow-500" />
+              <Sparkle className="h-5 w-5 text-yellow-500" />
               <span className="text-2xl font-bold">{adaptationScore}%</span>
             </div>
             <p className="text-sm text-gray-500">Adaptation Score</p>
@@ -268,7 +270,7 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
         {/* Adaptation Insights */}
         <ThemedCard industry={industry}>
           <h3 className="font-semibold mb-4 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+            <TrendUp className="h-5 w-5" />
             Adaptation Insights
           </h3>
           <div className="space-y-3">
@@ -375,11 +377,11 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 text-sm">
                   <span className="flex items-center gap-1">
-                    <Sparkles className="h-4 w-4 text-yellow-500" />
+                    <Sparkle className="h-4 w-4 text-yellow-500" />
                     {rec.confidence}% confidence
                   </span>
                   <span className="flex items-center gap-1">
-                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <TrendUp className="h-4 w-4 text-green-500" />
                     +{rec.estimatedImpact}% impact
                   </span>
                 </div>

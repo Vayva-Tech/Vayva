@@ -8,15 +8,20 @@ import { FEATURES } from "@/lib/env-validation";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 
+const DispatchSchema = z.object({
+  recipientName: z.string().min(1, "Recipient name is required"),
+  recipientPhone: z.string().min(1, "Recipient phone is required"),
+  addressLine1: z.string().min(1, "Address is required"),
+  addressCity: z.string().min(1, "City is required"),
+});
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
     const { id: orderId } = await params;
+    const storeId = request.headers.get("x-store-id") || "";
         
         // 1. Feature Flag Check
         if (!FEATURES.DELIVERY_ENABLED) {

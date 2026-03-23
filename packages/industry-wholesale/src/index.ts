@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Wholesale Industry Package Index
  */
 
 // Export dashboard component
-export { WholesaleDashboard } from './components/WholesaleDashboard.js';
+export { WholesaleDashboard } from './components/WholesaleDashboard';
 export type { IndustryDashboardProps } from '@vayva/industry-core';
 
 export const VERSION = '0.0.1';

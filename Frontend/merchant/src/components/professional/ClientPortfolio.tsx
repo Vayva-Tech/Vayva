@@ -1,7 +1,9 @@
 // @ts-nocheck
+"use client";
+
 import React from "react";
 import { Card, Button } from "@vayva/ui";
-import { Users, CurrencyDollar, TrendingUp, Star } from "@phosphor-icons/react";
+import { Users, CurrencyDollar, TrendUp as TrendingUp, Star } from "@phosphor-icons/react";
 import type { ClientPortfolioData } from "@/types/professional";
 
 interface ClientPortfolioProps {

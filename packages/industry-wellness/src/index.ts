@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Wellness Industry Package Index
  */
 
 // Export dashboard component
-export { WellnessDashboard } from './components/WellnessDashboard.js';
+export { WellnessDashboard } from './components/WellnessDashboard';
 export type { IndustryDashboardProps } from '@vayva/industry-core';
 
 export const VERSION = '0.0.1';

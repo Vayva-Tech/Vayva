@@ -11,10 +11,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
     const { id: shipmentId } = await params;
+    const storeId = request.headers.get("x-store-id") || "";
 
         const shipment = await prisma.shipment?.findUnique({
             where: { id: shipmentId },

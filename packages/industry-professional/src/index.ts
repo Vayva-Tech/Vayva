@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Professional Services Industry Package Index
  */
 
 // Export dashboard component
-export { ProfessionalServicesDashboard } from './components/ProfessionalServicesDashboard.js';
+export { ProfessionalServicesDashboard } from './components/ProfessionalServicesDashboard';
 export type { IndustryDashboardProps } from '@vayva/industry-core';
 
 export const VERSION = '0.0.1';

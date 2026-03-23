@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vehicle Gallery Service
  * Manages vehicle inventory display, filtering, and showcase features

@@ -27,10 +27,10 @@ import type {
   WorkflowEdge,
 } from '@vayva/workflow-engine';
 
-import { NodePalette } from './NodePalette.js';
-import { PropertiesPanel } from './PropertiesPanel.js';
-import { nodeTypes } from './nodes/index.js';
-import { edgeTypes } from './edges/index.js';
+import { NodePalette } from './NodePalette';
+import { PropertiesPanel } from './PropertiesPanel';
+import { nodeTypes } from './nodes/index';
+import { edgeTypes } from './edges/index';
 import { useWorkflow } from '../hooks/useWorkflow.js';
 
 export interface WorkflowBuilderProps {

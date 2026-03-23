@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
-  Building2,
-  Sparkles,
+  Building as Building2,
+  Sparkle as Sparkles,
   ArrowRight,
-  Mail,
-  CheckCircle2,
+  Envelope as Mail,
+  CheckCircle as CheckCircle2,
 } from "@phosphor-icons/react/ssr";
 import { Button } from "@vayva/ui";
 import { Input } from "@vayva/ui";

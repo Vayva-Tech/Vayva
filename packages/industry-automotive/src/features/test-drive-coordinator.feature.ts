@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Test Drive Coordinator Feature
  * Manages test drive scheduling and coordination

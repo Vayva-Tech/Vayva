@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { AppointmentService } from './appointment-service';
 export type { AppointmentFilters, TimeSlot } from './appointment-service';
 

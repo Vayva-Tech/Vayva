@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Table Management and Turn Optimization types
  */

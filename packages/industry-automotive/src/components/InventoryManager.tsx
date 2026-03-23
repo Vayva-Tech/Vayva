@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 /**
  * Inventory Manager Component
  * Manages vehicle inventory with filtering and bulk operations

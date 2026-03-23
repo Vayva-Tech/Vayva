@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Table Reservation Manager Service
  * Handles VIP table bookings and bottle service

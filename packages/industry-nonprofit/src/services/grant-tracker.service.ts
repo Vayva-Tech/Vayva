@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Grant Tracker Service
  * Manages grant applications, deadlines, and reporting

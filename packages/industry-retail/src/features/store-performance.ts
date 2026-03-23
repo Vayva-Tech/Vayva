@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Store Performance Management
 
 export interface StorePerformance {

@@ -9,7 +9,6 @@ export async function DELETE(
 ) {
   try {
     const { id, variantId } = await params;
-    const { id, variantId } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const result = await apiJson<{ success: boolean }>(
       `${process.env.BACKEND_API_URL}/api/products/${id}/variants/${variantId}`,
@@ -33,7 +32,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string, variantId: string }> }
 ) {
   try {
-    const { id, variantId } = await params;
     const { id, variantId } = await params;
     const storeId = request.headers.get("x-store-id") || "";
     const body = await request.json().catch(() => ({}));

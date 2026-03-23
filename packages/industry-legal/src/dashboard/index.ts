@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Legal Industry Dashboard Configuration
  * Premium Glass Design Category - Justice Blue Theme

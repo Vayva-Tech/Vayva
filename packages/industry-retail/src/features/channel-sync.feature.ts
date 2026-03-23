@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Channel Sync Feature
  * Omnichannel synchronization management

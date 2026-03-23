@@ -4,12 +4,12 @@
  */
 
 import type { NodeTypes } from '@xyflow/react';
-import { TriggerNode } from './TriggerNode.js';
-import { ActionNode } from './ActionNode.js';
-import { ConditionNode } from './ConditionNode.js';
-import { LogicNode } from './LogicNode.js';
-import { AINode } from './AINode.js';
-import { IndustryNode } from './IndustryNode.js';
+import { TriggerNode } from './TriggerNode';
+import { ActionNode } from './ActionNode';
+import { ConditionNode } from './ConditionNode';
+import { LogicNode } from './LogicNode';
+import { AINode } from './AINode';
+import { IndustryNode } from './IndustryNode';
 
 export const nodeTypes: NodeTypes = {
   trigger: TriggerNode,
@@ -43,9 +43,9 @@ export const nodeTypes: NodeTypes = {
   healthcare_send_reminder: IndustryNode,
 };
 
-export { TriggerNode } from './TriggerNode.js';
-export { ActionNode } from './ActionNode.js';
-export { ConditionNode } from './ConditionNode.js';
-export { LogicNode } from './LogicNode.js';
-export { AINode } from './AINode.js';
-export { IndustryNode } from './IndustryNode.js';
+export { TriggerNode } from './TriggerNode';
+export { ActionNode } from './ActionNode';
+export { ConditionNode } from './ConditionNode';
+export { LogicNode } from './LogicNode';
+export { AINode } from './AINode';
+export { IndustryNode } from './IndustryNode';

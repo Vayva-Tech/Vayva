@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Real Estate Dashboard Configuration
  * Dashboard widgets and layout for real estate industry

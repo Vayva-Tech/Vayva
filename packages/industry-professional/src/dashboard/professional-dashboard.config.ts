@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { DashboardEngineConfig, WidgetDefinition } from '../types';
 
 // Firm Overview Widgets

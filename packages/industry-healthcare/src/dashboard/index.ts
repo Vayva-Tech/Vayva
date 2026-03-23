@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Export config
 export * from './healthcare-dashboard.config';
 

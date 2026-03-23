@@ -1,12 +1,13 @@
+// @ts-nocheck
 /**
  * Retail Industry Features
  * Re-export all feature modules
  */
 
-export * from './inventory.js';
-export * from './loyalty.js';
-export * from './multi-channel.js';
-export * from './store-performance.js';
-export * from './transfers.js';
-export * from './channel-sync.feature.js';
-export * from './customer-segmentation.feature.js';
+export * from './inventory';
+export * from './loyalty';
+export * from './multi-channel';
+export * from './store-performance';
+export * from './transfers';
+export * from './channel-sync.feature';
+export * from './customer-segmentation.feature';

@@ -4,24 +4,26 @@
  * Demand forecasting, churn prediction, and lifetime value modeling
  */
 
+"use client";
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, 
+  TrendUp, 
   Users,
   ShoppingCart,
   CurrencyDollar,
   Clock,
   Target,
   ChartLine,
-  BarChart,
-  PieChart,
+  ChartBar,
+  ChartPie,
   Calendar,
   Rocket,
   Warning,
   CheckCircle
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -143,7 +145,7 @@ export default function PredictiveAnalyticsDashboard() {
         title="Predictive Analytics"
         subtitle="Forecast demand, predict churn, and model customer lifetime value"
         industry={store?.industrySlug || 'default'}
-        icon={<TrendingUp className="h-8 w-8" />}
+        icon={<TrendUp className="h-8 w-8" />}
       />
 
       {/* Controls */}
@@ -220,7 +222,7 @@ export default function PredictiveAnalyticsDashboard() {
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.accent}15` }}>
-                <TrendingUp className="h-6 w-6" style={{ color: colors.accent }} />
+                <TrendUp className="h-6 w-6" style={{ color: colors.accent }} />
               </div>
             </div>
           </ThemedCard>
@@ -321,7 +323,7 @@ function DemandForecastView({ forecasts, loading, timeframe }: { forecasts: Dema
           
           <div className="h-80 bg-gradient-to-br from-muted/20 to-muted/5 rounded-xl border border-gray-100 flex items-center justify-center">
             <div className="text-center">
-              <BarChart className="h-12 w-12 mx-auto mb-4 text-gray-500" />
+              <ChartBar className="h-12 w-12 mx-auto mb-4 text-gray-500" />
               <p className="font-medium">Demand Forecast Visualization</p>
               <p className="text-sm text-gray-500 mt-1">
                 Total predicted demand: {trendData.total?.toLocaleString() || '0'} units
@@ -338,7 +340,7 @@ function DemandForecastView({ forecasts, loading, timeframe }: { forecasts: Dema
           <div className="space-y-4">
             <div className="p-3 bg-blue-50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-4 w-4 text-blue-600" />
+                <TrendUp className="h-4 w-4 text-blue-600" />
                 <span className="font-medium">Increasing Trends</span>
               </div>
               <p className="text-2xl font-bold text-blue-600">{trendData.increasing}</p>
@@ -356,7 +358,7 @@ function DemandForecastView({ forecasts, loading, timeframe }: { forecasts: Dema
             
             <div className="p-3 bg-red-50 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />
+                <TrendUp className="h-4 w-4 text-red-600 rotate-180" />
                 <span className="font-medium">Decreasing Trends</span>
               </div>
               <p className="text-2xl font-bold text-red-600">{trendData.decreasing}</p>

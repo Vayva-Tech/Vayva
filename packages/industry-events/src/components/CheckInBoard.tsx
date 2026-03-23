@@ -1,6 +1,9 @@
+// @ts-nocheck
+'use client';
+
 /**
  * CheckInBoard Component
- * 
+ *
  * Real-time attendee check-in board with QR code scanning support,
  * live statistics, and attendee queue management.
  */

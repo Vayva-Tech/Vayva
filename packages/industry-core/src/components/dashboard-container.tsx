@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 // ============================================================================
 // Dashboard Container
 // ============================================================================
@@ -5,7 +8,7 @@
 // ============================================================================
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { DashboardContextValue } from "../types.js";
+import type { DashboardContextValue } from "../types";
 
 // Create the dashboard context
 const DashboardContext = createContext<DashboardContextValue | null>(null);

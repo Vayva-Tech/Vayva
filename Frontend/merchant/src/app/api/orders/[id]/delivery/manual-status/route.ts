@@ -9,11 +9,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const { id } = await params;
+    const { id: orderId } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const params = await Promise.resolve(rawParams);
-        const { id: orderId } = params;
         const body = await request.json().catch(() => ({})) as {
             status?: string;
             note?: string;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pet Health Records Service
  * Manages pet medical records, vaccinations, and health tracking

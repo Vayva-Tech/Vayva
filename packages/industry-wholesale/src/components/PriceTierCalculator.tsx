@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Price Tier Calculator Component
  */

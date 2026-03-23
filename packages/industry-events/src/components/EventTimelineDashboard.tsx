@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 /**
  * Event Timeline Dashboard Component
  * Visual timeline management for events

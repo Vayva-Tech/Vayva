@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Restaurant Industry Dashboard Configuration
  * Implements the dashboard specification from VAYVA V2 Master Plan

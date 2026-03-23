@@ -7,7 +7,7 @@ import { Button, cn, Label } from "@vayva/ui";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
 import { IndustrySlug } from "@/lib/templates/types";
-import { CheckCircle, Building, Utensils, ShoppingBag, Dumbbell, GraduationCap, House, Palette, Briefcase, Stethoscope, Ticket } from "@phosphor-icons/react/ssr";
+import { CheckCircle, Building, ForkKnife as Utensils, ShoppingBag, Barbell as Dumbbell, GraduationCap, House, Palette, Briefcase, Stethoscope, Ticket } from "@phosphor-icons/react/ssr";
 
 type PolicyType = "TERMS" | "PRIVACY" | "RETURNS" | "REFUNDS" | "SHIPPING_DELIVERY";
 

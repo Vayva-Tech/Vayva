@@ -3,4 +3,4 @@
  * React hooks for workflow-ui
  */
 
-export { useWorkflow, type UseWorkflowOptions, type UseWorkflowReturn } from './useWorkflow.js';
+export { useWorkflow, type UseWorkflowOptions, type UseWorkflowReturn } from './useWorkflow';

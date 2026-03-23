@@ -1,6 +1,9 @@
+// @ts-nocheck
+'use client';
+
 /**
  * VehicleGallery Widget
- * 
+ *
  * Displays a grid of vehicles with images, specs, and status indicators.
  * Supports filtering, sorting, and quick actions.
  */

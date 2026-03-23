@@ -16,6 +16,7 @@
     "@vayva/db": "workspace:*",
     "@vayva/shared": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
+    "lucide-react": "^0.460.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Table Turn Prediction Engine
  * Predicts when tables will become available

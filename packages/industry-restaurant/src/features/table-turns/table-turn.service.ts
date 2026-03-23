@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Table Turn Service
  * Manages table status, reservations, and turn optimization

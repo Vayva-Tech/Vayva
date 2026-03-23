@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   Folder,
   Clipboard,
   Users,
@@ -19,18 +19,19 @@ import {
   Flag,
   Bell,
   Plus,
-  Search,
-  Filter,
-  TrendingUp,
-  BarChart3,
-  PieChart,
-  Activity,
+  MagnifyingGlass as Search,
+  Funnel as Filter,
+  TrendUp as TrendingUp,
+  ChartBar as BarChart3,
+  ChartPie as PieChart,
+  Pulse as Activity,
   User,
   Tag,
   Paperclip,
-  MessageCircle
+  ChatCircle as MessageCircle,
+  Eye
 } from '@phosphor-icons/react';
-import { useSWR } from 'swr';
+import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
 import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
 import { useStore } from '@/providers/store-provider';
@@ -102,6 +103,38 @@ interface ProjectMetrics {
   avgProjectDuration: number;
 }
 
+// Helper functions used across sub-components
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'active': return 'bg-green-100 text-green-800';
+    case 'planning': return 'bg-blue-100 text-blue-800';
+    case 'on-hold': return 'bg-yellow-100 text-yellow-800';
+    case 'completed': return 'bg-purple-100 text-purple-800';
+    case 'cancelled': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getPriorityColor(priority: string) {
+  switch (priority) {
+    case 'urgent': return 'bg-red-100 text-red-800';
+    case 'high': return 'bg-orange-100 text-orange-800';
+    case 'medium': return 'bg-yellow-100 text-yellow-800';
+    case 'low': return 'bg-green-100 text-green-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getTaskStatusIcon(status: string) {
+  switch (status) {
+    case 'done': return <CheckCircle className="h-5 w-5 text-green-500" />;
+    case 'in-progress': return <Activity className="h-5 w-5 text-blue-500" />;
+    case 'review': return <Eye className="h-5 w-5 text-purple-500" />;
+    case 'blocked': return <Flag className="h-5 w-5 text-red-500" />;
+    default: return <Circle className="h-5 w-5 text-gray-300" />;
+  }
+}
+
 // Main Project Management Component
 export default function ProjectManagement() {
   const { store } = useStore();
@@ -165,37 +198,6 @@ export default function ProjectManagement() {
     { id: 'team', label: 'Team', icon: <Users className="h-4 w-4" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4 w-4" /> }
   ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'planning': return 'bg-blue-100 text-blue-800';
-      case 'on-hold': return 'bg-yellow-100 text-yellow-800';
-      case 'completed': return 'bg-purple-100 text-purple-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getTaskStatusIcon = (status: string) => {
-    switch (status) {
-      case 'done': return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'in-progress': return <Activity className="h-5 w-5 text-blue-500" />;
-      case 'review': return <Eye className="h-5 w-5 text-purple-500" />;
-      case 'blocked': return <Flag className="h-5 w-5 text-red-500" />;
-      default: return <Circle className="h-5 w-5 text-gray-300" />;
-    }
-  };
 
   return (
     <div className="space-y-6">

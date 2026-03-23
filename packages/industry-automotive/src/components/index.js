@@ -2,6 +2,6 @@
  * Automotive Industry Components
  */
 
-export { CRMIntegration } from './CRMIntegration.js';
-export { FinancingCalculator } from './FinancingCalculator.js';
-export { InventoryManager } from './InventoryManager.js';
+export { CRMIntegration } from './CRMIntegration';
+export { FinancingCalculator } from './FinancingCalculator';
+export { InventoryManager } from './InventoryManager';

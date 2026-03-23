@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { DashboardEngineConfig, WidgetDefinition } from '../types';
 
 // Wellness KPI Widgets

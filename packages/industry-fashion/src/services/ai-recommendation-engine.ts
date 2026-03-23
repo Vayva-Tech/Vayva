@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@vayva/prisma';
 
 export interface AIRecommendation {

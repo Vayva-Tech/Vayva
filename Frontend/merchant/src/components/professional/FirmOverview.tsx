@@ -1,7 +1,9 @@
 // @ts-nocheck
+"use client";
+
 import React from "react";
 import { Card } from "@vayva/ui";
-import { Briefcase, TrendingUp, CurrencyDollar, ChartBar } from "@phosphor-icons/react";
+import { Briefcase, TrendUp as TrendingUp, CurrencyDollar, ChartBar } from "@phosphor-icons/react";
 import type { FirmOverviewData } from "@/types/professional";
 
 interface FirmOverviewProps {

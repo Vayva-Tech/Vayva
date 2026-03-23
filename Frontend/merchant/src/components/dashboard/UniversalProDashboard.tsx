@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/context/AuthContext';
+const useUser = () => { const { merchant } = useAuth(); return { user: merchant ? { id: (merchant as any)?.id, fullName: (merchant as any)?.name } : null }; };
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ import { useRealTimeDashboard , useDashboardMetrics, useDashboardAlerts, useDash
 import { SettingsButton } from './SettingsButton';
 import type { UniversalDashboardProps } from '@/config/dashboard-universal-types';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { AlertCircle, RefreshCw, TrendingUp, BarChart3, ChefHat } from 'lucide-react';
+import { AlertCircle, RefreshCw, TrendingUp, BarChart3, ChefHat, Layers, Lock } from 'lucide-react';
 import {
   ActiveCoursesSection,
   StudentProgressPanel,
@@ -44,11 +45,11 @@ import {
 } from './education';
 
 // Import Nonprofit components
-import { NonprofitDashboard } from '@vayva/industry-nonprofit';
+import { NonprofitDashboard } from '@vayva/industry-nonprofit/dashboard';
 
-// Import Tier 2 Industry Components
-import { CountdownTimerWidget, TicketSalesTrackerWidget, CheckInBoardWidget } from '@vayva/industry-events';
-import { VehicleGalleryWidget, TestDriveSchedulerWidget } from '@vayva/industry-automotive';
+// Import Tier 2 Industry Components from their component sub-paths
+import { CountdownTimerWidget, TicketSalesTrackerWidget, CheckInBoardWidget } from '@vayva/industry-events/components';
+import { VehicleGalleryWidget, TestDriveSchedulerWidget } from '@vayva/industry-automotive/components';
 import { OccupancyHeatmapWidget, GuestTimelineWidget } from '@vayva/industry-travel';
 
 /**
@@ -377,154 +378,196 @@ function DashboardContent({
         </section>
       )}
 
-      {/* Industry-Specific Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {industry === 'events' ? (
-          <>
-            <CountdownTimerWidget
-              widget={{ id: 'event-countdown', type: 'custom', title: 'Event Countdown', industry: 'events', dataSource: { type: 'event' } }}
-              targetDate={dashboardData.event?.startDate || new Date()}
-              eventName={dashboardData.event?.title}
-              size="large"
-            />
-            <TicketSalesTrackerWidget
-              widget={{ id: 'ticket-sales', type: 'kpi-card', title: 'Ticket Sales', industry: 'events', dataSource: { type: 'analytics' } }}
-              eventId={dashboardData.event?.id || ''}
-              totalCapacity={dashboardData.event?.capacity || 0}
-              ticketsSold={dashboardData.event?.ticketsSold || 0}
-              tiers={dashboardData.tiers || []}
-            />
-          </>
-        ) : industry === 'automotive' ? (
-          <>
-            <VehicleGalleryWidget
-              widget={{ id: 'vehicle-gallery', type: 'custom', title: 'Vehicle Inventory', industry: 'automotive', dataSource: { type: 'entity' } }}
-              vehicles={dashboardData.vehicles || []}
-              viewMode="grid"
-              showFilters={true}
-            />
-            <TestDriveSchedulerWidget
-              widget={{ id: 'test-drive-schedule', type: 'calendar', title: 'Test Drives', industry: 'automotive', dataSource: { type: 'calendar' } }}
-              vehicles={dashboardData.vehicles || []}
-              testDrives={dashboardData.testDrives || []}
-            />
-          </>
-        ) : industry === 'travel_hospitality' ? (
-          <>
-            <OccupancyHeatmapWidget
-              widget={{ id: 'occupancy-heatmap', type: 'heatmap', title: 'Occupancy Rate', industry: 'travel_hospitality', dataSource: { type: 'analytics' } }}
-              occupancyData={dashboardData.occupancyHistory || []}
-              viewMode="month"
-            />
-            <GuestTimelineWidget
-              widget={{ id: 'guest-timeline', type: 'timeline', title: 'Guest Stays', industry: 'travel_hospitality', dataSource: { type: 'timeline' } }}
-              stays={dashboardData.guestStays || []}
-              viewMode="week"
-            />
-          </>
-        ) : industry === 'nonprofit' ? (
-          <NonprofitDashboard
-            industry={industry}
-            variant={variant}
-            userId={userId}
-            businessId={businessId}
-            designCategory={designCategory}
-            planTier={planTier}
-            className="col-span-full"
-          />
-        ) : industry === 'education' ? (
-          <>
-            <ActiveCoursesSection courses={dashboardData.courses || []} designCategory={designCategory} />
-            <StudentProgressPanel students={dashboardData.students || []} designCategory={designCategory} />
-          </>
-        ) : industry === 'food' && planTier !== 'basic' ? (
-          <>
-            <KitchenStatus 
-              designCategory={designCategory} 
-              industry={industry} 
-              planTier={planTier}
-            />
-            <ActiveTicketsByStation 
-              designCategory={designCategory} 
-              industry={industry} 
-              planTier={planTier}
-            />
-          </>
-        ) : (
-          <>
-            <PrimaryObjectHealth 
-              designCategory={designCategory} 
-              industry={industry} 
-              planTier={planTier}
-            />
-            
-            <LiveOperations 
-              designCategory={designCategory} 
-              industry={industry} 
-              planTier={planTier}
-            />
-          </>
-        )}
-      </div>
-
-      {/* Food/KDS Industry Additional Sections */}
-      {industry === 'food' && planTier !== 'basic' && (
+      {/* Industry Operations - PRO_PLUS merged view */}
+      {planTier === 'pro_plus' ? (
         <>
+          {/* Industry Operations Section Header */}
           <section>
-            <UniversalSectionHeader
-              title="Kitchen Operations"
-              subtitle="Real-time station management"
-              icon={<ChefHat className="h-5 w-5" />}
-            />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-              <StationWorkload 
-                designCategory={designCategory} 
-                industry={industry} 
-                planTier={planTier}
-              />
-              <EightySixBoard 
-                designCategory={designCategory} 
-                industry={industry} 
-                planTier={planTier}
-              />
+            <div className="bg-green-50 border border-green-200 rounded-xl px-5 py-4 flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+                <Layers className="h-5 w-5 text-green-700" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-green-900">Industry Operations</h2>
+                <p className="text-sm text-green-700">
+                  Live operational controls for your {industry?.replace(/_/g, ' ')} business
+                </p>
+              </div>
+            </div>
+
+            {/* Industry-Specific Sections (inline for PRO_PLUS) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {industry === 'events' ? (
+                <>
+                  <CountdownTimerWidget
+                    widget={{ id: 'event-countdown', type: 'custom', title: 'Event Countdown', industry: 'events', dataSource: { type: 'event' } }}
+                    targetDate={dashboardData.event?.startDate || new Date()}
+                    eventName={dashboardData.event?.title}
+                    size="large"
+                  />
+                  <TicketSalesTrackerWidget
+                    widget={{ id: 'ticket-sales', type: 'kpi-card', title: 'Ticket Sales', industry: 'events', dataSource: { type: 'analytics' } }}
+                    eventId={dashboardData.event?.id || ''}
+                    totalCapacity={dashboardData.event?.capacity || 0}
+                    ticketsSold={dashboardData.event?.ticketsSold || 0}
+                    tiers={dashboardData.tiers || []}
+                  />
+                </>
+              ) : industry === 'automotive' ? (
+                <>
+                  <VehicleGalleryWidget
+                    widget={{ id: 'vehicle-gallery', type: 'custom', title: 'Vehicle Inventory', industry: 'automotive', dataSource: { type: 'entity' } }}
+                    vehicles={dashboardData.vehicles || []}
+                    viewMode="grid"
+                    showFilters={true}
+                  />
+                  <TestDriveSchedulerWidget
+                    widget={{ id: 'test-drive-schedule', type: 'calendar', title: 'Test Drives', industry: 'automotive', dataSource: { type: 'calendar' } }}
+                    vehicles={dashboardData.vehicles || []}
+                    testDrives={dashboardData.testDrives || []}
+                  />
+                </>
+              ) : industry === 'travel_hospitality' ? (
+                <>
+                  <OccupancyHeatmapWidget
+                    widget={{ id: 'occupancy-heatmap', type: 'heatmap', title: 'Occupancy Rate', industry: 'travel_hospitality', dataSource: { type: 'analytics' } }}
+                    occupancyData={dashboardData.occupancyHistory || []}
+                    viewMode="month"
+                  />
+                  <GuestTimelineWidget
+                    widget={{ id: 'guest-timeline', type: 'timeline', title: 'Guest Stays', industry: 'travel_hospitality', dataSource: { type: 'timeline' } }}
+                    stays={dashboardData.guestStays || []}
+                    viewMode="week"
+                  />
+                </>
+              ) : industry === 'nonprofit' ? (
+                <NonprofitDashboard
+                  industry={industry}
+                  variant={variant}
+                  userId={userId}
+                  businessId={businessId}
+                  designCategory={designCategory}
+                  planTier={planTier}
+                  className="col-span-full"
+                />
+              ) : industry === 'education' ? (
+                <>
+                  <ActiveCoursesSection courses={dashboardData.courses || []} designCategory={designCategory} />
+                  <StudentProgressPanel students={dashboardData.students || []} designCategory={designCategory} />
+                </>
+              ) : industry === 'food' ? (
+                <>
+                  <KitchenStatus
+                    designCategory={designCategory}
+                    industry={industry}
+                    planTier={planTier}
+                  />
+                  <ActiveTicketsByStation
+                    designCategory={designCategory}
+                    industry={industry}
+                    planTier={planTier}
+                  />
+                </>
+              ) : (
+                <>
+                  <PrimaryObjectHealth
+                    designCategory={designCategory}
+                    industry={industry}
+                    planTier={planTier}
+                  />
+                  <LiveOperations
+                    designCategory={designCategory}
+                    industry={industry}
+                    planTier={planTier}
+                  />
+                </>
+              )}
             </div>
           </section>
+
+          {/* Food/KDS Industry Additional Sections (PRO_PLUS) */}
+          {industry === 'food' && (
+            <section>
+              <UniversalSectionHeader
+                title="Kitchen Operations"
+                subtitle="Real-time station management"
+                icon={<ChefHat className="h-5 w-5" />}
+              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                <StationWorkload
+                  designCategory={designCategory}
+                  industry={industry}
+                  planTier={planTier}
+                />
+                <EightySixBoard
+                  designCategory={designCategory}
+                  industry={industry}
+                  planTier={planTier}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Education-Specific Sections (PRO_PLUS) */}
+          {industry === 'education' && (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <AssignmentGradingQueue
+                  assignments={dashboardData.assignments || []}
+                  pendingSubmissions={dashboardData.pendingSubmissions || []}
+                  designCategory={designCategory}
+                />
+                <InstructorPerformanceCard
+                  instructors={dashboardData.instructors || []}
+                  designCategory={designCategory}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <CertificatesList
+                  certificates={dashboardData.certificates || []}
+                  designCategory={designCategory}
+                />
+                <EngagementMetricsPanel
+                  metrics={dashboardData.engagementMetrics || {}}
+                  designCategory={designCategory}
+                />
+              </div>
+
+              <div className="mb-8">
+                <AtRiskAlert
+                  students={dashboardData.atRiskStudents || []}
+                  designCategory={designCategory}
+                />
+              </div>
+            </>
+          )}
         </>
-      )}
-
-      {/* Education-Specific Sections */}
-      {industry === 'education' && (
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <AssignmentGradingQueue 
-              assignments={dashboardData.assignments || []}
-              pendingSubmissions={dashboardData.pendingSubmissions || []}
-              designCategory={designCategory}
-            />
-            <InstructorPerformanceCard 
-              instructors={dashboardData.instructors || []}
-              designCategory={designCategory}
-            />
+      ) : (
+        /* Non-PRO_PLUS: Show locked upgrade prompt instead of industry sections */
+        <section>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
+            <div className="flex flex-col items-center text-center py-6">
+              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                <Lock className="h-7 w-7 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Industry Operations
+              </h3>
+              <p className="text-sm text-gray-500 max-w-md mb-5">
+                Unlock inline industry-specific dashboards, real-time operational controls,
+                and advanced sector analytics by upgrading to PRO+.
+              </p>
+              <Button
+                onClick={() => window.location.href = '/dashboard/billing'}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Layers className="h-4 w-4 mr-2" />
+                Upgrade to PRO+
+              </Button>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <CertificatesList 
-              certificates={dashboardData.certificates || []}
-              designCategory={designCategory}
-            />
-            <EngagementMetricsPanel 
-              metrics={dashboardData.engagementMetrics || {}}
-              designCategory={designCategory}
-            />
-          </div>
-
-          <div className="mb-8">
-            <AtRiskAlert 
-              students={dashboardData.atRiskStudents || []}
-              designCategory={designCategory}
-            />
-          </div>
-        </>
+        </section>
       )}
 
       {/* Alerts Section */}

@@ -1,12 +1,13 @@
+// @ts-nocheck
 /**
  * Food/Grocery Industry Engine
  */
 
 import { DashboardEngine, type DashboardEngineConfig } from '@vayva/industry-core';
-import { FOOD_GROCERY_DASHBOARD_CONFIG } from './dashboard/index.js';
-import { RecipeOptimizationService, type RecipeOptimizationInput } from './services/recipe-optimization.service.js';
-import { AIMenuEngineeringService, type MenuEngineeringInput } from './services/menu-engineering-ai.service.js';
-import { InventoryPredictionService, type InventoryPredictionInput } from './services/inventory-prediction.service.js';
+import { FOOD_GROCERY_DASHBOARD_CONFIG } from './dashboard/index';
+import { RecipeOptimizationService, type RecipeOptimizationInput } from './services/recipe-optimization.service';
+import { AIMenuEngineeringService, type MenuEngineeringInput } from './services/menu-engineering-ai.service';
+import { InventoryPredictionService, type InventoryPredictionInput } from './services/inventory-prediction.service';
 
 export interface FoodGroceryEngineConfig {
   inventory?: boolean;

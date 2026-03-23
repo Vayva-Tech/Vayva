@@ -2,29 +2,34 @@
  * AI Credit Management Service
  * =============================
  * Handles credit allocation, consumption tracking, and top-up logic
- * 
+ *
  * Credit System Rules:
- * - PRO users: 10,000 credits on onboard (1M tokens)
- * - STARTER users: 5,000 credits on onboard (500k tokens)
+ * - PRO_PLUS users: 25,000 credits on onboard
+ * - PRO users: 10,000 credits on onboard
+ * - STARTER users: 5,000 credits on onboard
  * - Low credit alert at 200 credits remaining
  * - Top-up packages with multi-currency support:
- *   - Small: 3,000 credits for ₦2,000 / $5
- *   - Medium: 8,000 credits + 500 bonus for ₦5,000 / $12
- *   - Large: 20,000 credits + 2,000 bonus for ₦12,000 / $28
- * 
+ *   - Small: 3,000 credits for ₦3,000 / $7
+ *   - Medium: 8,000 credits for ₦7,000 / $16
+ *   - Large: 20,000 credits for ₦15,000 / $35
+ *
  * AI Model Strategy:
  * - PRIMARY MODEL: GPT-4o Mini via OpenRouter (95% of requests)
  *   - Cost: ₦0.24 per 1,000 tokens
  *   - Best value: cheap, fast, multilingual, capable
- * 
+ *
+ * - AUTOPILOT MODEL: Meta Llama 3.3 70B Instruct via Groq
+ *   - Cost: ₦0.34 per 1,000 tokens ($0.21/M ≈ ₦336/M)
+ *   - 67% cheaper than previous llama3-70b-8192
+ *
  * - FALLBACK MODELS (auto-routed):
  *   - Claude 3 Sonnet: Complex reasoning, legal docs (₦2.40/1k tokens)
  *   - Mistral Large: Code generation, technical tasks (₦1.60/1k tokens)
- * 
+ *
  * Credit Consumption Formula:
  * - Credits = (Actual Cost / 0.9) to maintain ~70% margin
- * - 1 credit ≈ ₦3 value (₦3,000 / 1,000 credits top-up)
- * - GPT-4o Mini: ~0.08 credits per 1,000 tokens (extremely efficient!)
+ * - 1 credit ≈ ₦1 OpenRouter cost (0.24 credits per 1K tokens)
+ * - GPT-4o Mini: ~0.24 credits per 1,000 tokens
  */
 
 import { prisma } from '@vayva/db';
@@ -74,7 +79,10 @@ export class AICreditService {
   private static MODEL_COST_RATES: Record<string, number> = {
     // Primary Model (DEFAULT)
     'openai/gpt-4o-mini': 0.24,     // $0.15/1M input + $0.60/1M output ≈ ₦0.24/1K avg
-    
+
+    // Autopilot Model (Groq)
+    'meta-llama/llama-3.3-70b-instruct': 0.34, // $0.21/M avg ≈ ₦336/M ≈ ₦0.34/1K
+
     // Fallback Models (auto-routed for complex tasks)
     'anthropic/claude-3-sonnet': 2.40, // $3/1M input + $15/1M output ≈ ₦2.40/1K avg
     'mistralai/mistral-large': 1.60,   // $0.80/1M input + $2.40/1M output ≈ ₦1.60/1K avg
@@ -171,10 +179,12 @@ export class AICreditService {
    */
   static getInitialCreditsForPlan(planKey: string): number {
     switch (planKey.toUpperCase()) {
+      case 'PRO_PLUS':
+        return 25000; // 25,000 credits
       case 'PRO':
-        return 10000; // 1,000,000 tokens (~$240 value at GPT-4o Mini rates)
+        return 10000; // 10,000 credits
       case 'STARTER':
-        return 5000;  // 500,000 tokens (~$120 value)
+        return 5000;  // 5,000 credits
       default:
         return 5000; // Fallback to STARTER
     }
@@ -190,13 +200,13 @@ export class AICreditService {
         id: 'small',
         credits: 3000,
         prices: {
-          NGN: 2000,    // ₦2,000 Nigeria
-          USD: 5,       // $5 International
-          EUR: 4.50,    // €4.50 Europe
-          GBP: 4,       // £4 UK
-          KES: 650,     // KSh 650 Kenya
-          GHS: 60,      // GH₵ 60 Ghana
-          ZAR: 90,      // R90 South Africa
+          NGN: 3000,    // ₦3,000 Nigeria
+          USD: 7,       // $7 International
+          EUR: 6.50,    // €6.50 Europe
+          GBP: 5.50,    // £5.50 UK
+          KES: 910,     // KSh 910 Kenya
+          GHS: 85,      // GH₵ 85 Ghana
+          ZAR: 130,     // R130 South Africa
         },
         bonusCredits: 0,
         popular: false,
@@ -205,30 +215,30 @@ export class AICreditService {
         id: 'medium',
         credits: 8000,
         prices: {
-          NGN: 5000,    // ₦5,000 (Save ₦1,000 vs small)
-          USD: 12,      // $12 (Save $3 vs small)
-          EUR: 11,      // €11
-          GBP: 9.50,    // £9.50
-          KES: 1600,    // KSh 1,600
-          GHS: 150,     // GH₵ 150
-          ZAR: 220,     // R220
+          NGN: 7000,    // ₦7,000
+          USD: 16,      // $16
+          EUR: 15,      // €15
+          GBP: 13,      // £13
+          KES: 2080,    // KSh 2,080
+          GHS: 195,     // GH₵ 195
+          ZAR: 295,     // R295
         },
-        bonusCredits: 500, // 6.25% bonus
+        bonusCredits: 0,
         popular: true,
       },
       {
         id: 'large',
         credits: 20000,
         prices: {
-          NGN: 12000,   // ₦12,000 (Save ₦8,000 vs small)
-          USD: 28,      // $28 (Save $17 vs small)
-          EUR: 25,      // €25
-          GBP: 22,      // £22
-          KES: 3800,    // KSh 3,800
-          GHS: 350,     // GH₵ 350
-          ZAR: 500,     // R500
+          NGN: 15000,   // ₦15,000
+          USD: 35,      // $35
+          EUR: 32,      // €32
+          GBP: 28,      // £28
+          KES: 4550,    // KSh 4,550
+          GHS: 425,     // GH₵ 425
+          ZAR: 645,     // R645
         },
-        bonusCredits: 2000, // 10% bonus
+        bonusCredits: 0,
         popular: false,
       },
     ];

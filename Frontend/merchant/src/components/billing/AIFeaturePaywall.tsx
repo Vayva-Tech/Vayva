@@ -94,7 +94,7 @@ export function AIFeaturePaywall({
         </div>
 
         <p className="text-xs text-gray-500 mt-4">
-          Current plan: {currentTier} • {currentTier === 'FREE' ? '14-day trial' : 'Paid plan'}
+          Current plan: {currentTier} • {currentTier === 'STARTER' ? 'Starter plan' : 'Paid plan'}
         </p>
       </div>
     </div>

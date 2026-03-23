@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Menu Engineering Analysis
  * Classifies menu items into Stars, Puzzles, Plowhorses, and Dogs

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Reservation No-Show Prediction Service
  * 

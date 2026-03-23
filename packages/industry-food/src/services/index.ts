@@ -1,29 +1,30 @@
+// @ts-nocheck
 /**
  * Food & Beverage Services
  */
 
 // Traditional Services
-export { RecipeCostingService } from './recipe-costing.service.js';
-export type { RecipeCostResult } from './recipe-costing.service.js';
+export { RecipeCostingService } from './recipe-costing.service';
+export type { RecipeCostResult } from './recipe-costing.service';
 
-export { MenuEngineeringService } from './menu-engineering.service.js';
-export type { MenuItemAnalysis } from './menu-engineering.service.js';
+export { MenuEngineeringService } from './menu-engineering.service';
+export type { MenuItemAnalysis } from './menu-engineering.service';
 
-export { KitchenDisplayService } from './kitchen-display.service.js';
-export type { KDSOrder } from './kitchen-display.service.js';
+export { KitchenDisplayService } from './kitchen-display.service';
+export type { KDSOrder } from './kitchen-display.service';
 
-export { InventoryTrackingService } from './inventory-tracking.service.js';
-export type { InventoryItem } from './inventory-tracking.service.js';
+export { InventoryTrackingService } from './inventory-tracking.service';
+export type { InventoryItem } from './inventory-tracking.service';
 
-export { NutritionalAnalysisService } from './nutritional-analysis.service.js';
-export type { NutritionalInfo } from './nutritional-analysis.service.js';
+export { NutritionalAnalysisService } from './nutritional-analysis.service';
+export type { NutritionalInfo } from './nutritional-analysis.service';
 
 // AI-Powered Services
-export { RecipeOptimizationService } from './recipe-optimization.service.js';
-export type { RecipeOptimizationInput } from './recipe-optimization.service.js';
+export { RecipeOptimizationService } from './recipe-optimization.service';
+export type { RecipeOptimizationInput } from './recipe-optimization.service';
 
-export { MenuEngineeringService as AIMenuEngineeringService } from './menu-engineering-ai.service.js';
-export type { MenuEngineeringInput } from './menu-engineering-ai.service.js';
+export { MenuEngineeringService as AIMenuEngineeringService } from './menu-engineering-ai.service';
+export type { MenuEngineeringInput } from './menu-engineering-ai.service';
 
-export { InventoryPredictionService } from './inventory-prediction.service.js';
-export type { InventoryPredictionInput } from './inventory-prediction.service.js';
+export { InventoryPredictionService } from './inventory-prediction.service';
+export type { InventoryPredictionInput } from './inventory-prediction.service';

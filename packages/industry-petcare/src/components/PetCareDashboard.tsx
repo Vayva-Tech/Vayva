@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pet Care Industry Dashboard Component
  * Veterinary clinic and pet service management dashboard

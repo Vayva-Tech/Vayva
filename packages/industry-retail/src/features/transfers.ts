@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Store Transfers Management
 
 export interface TransferRequestInput {

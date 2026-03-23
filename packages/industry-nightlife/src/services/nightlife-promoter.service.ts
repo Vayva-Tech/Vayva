@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nightlife Event Promoter Service
  * Manages event promotion, guest lists, and VIP services

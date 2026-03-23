@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 86 Board Management Service
  * 

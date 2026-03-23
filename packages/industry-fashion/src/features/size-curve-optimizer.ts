@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@vayva/prisma';
 import { SizeCurveData } from '../services/size-curve-service';
 

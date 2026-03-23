@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 // ============================================================================
 // useDashboardAlerts Hook
 // ============================================================================
@@ -5,7 +8,7 @@
 // ============================================================================
 
 import { useCallback, useEffect, useState } from "react";
-import type { Alert, IndustrySlug } from "../types.js";
+import type { Alert, IndustrySlug } from "../types";
 
 interface UseDashboardAlertsOptions {
   storeId?: string;

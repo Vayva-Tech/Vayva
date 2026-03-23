@@ -10,9 +10,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const { id } = await params;
     const storeId = request.headers.get("x-store-id") || "";
-    const { id } = await params;
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400, headers: { "Cache-Control": "no-store" } });
 
   // Call backend API to delete domain

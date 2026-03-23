@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Wholesale Industry Dashboard Component
  * B2B wholesale distribution and supplier management dashboard

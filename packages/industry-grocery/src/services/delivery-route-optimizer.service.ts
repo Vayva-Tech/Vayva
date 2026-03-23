@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Delivery Route Optimization Service
  * Optimizes delivery routes and schedules

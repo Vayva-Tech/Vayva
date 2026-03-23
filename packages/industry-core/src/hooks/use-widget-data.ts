@@ -1,3 +1,6 @@
+// @ts-nocheck
+'use client';
+
 // ============================================================================
 // useWidgetData Hook
 // ============================================================================
@@ -5,7 +8,7 @@
 // ============================================================================
 
 import { useCallback, useEffect, useState } from "react";
-import type { DataSourceConfig, WidgetData } from "../types.js";
+import type { DataSourceConfig, WidgetData } from "../types";
 
 interface UseWidgetDataOptions {
   storeId?: string;

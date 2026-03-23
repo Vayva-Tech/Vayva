@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import { MarketingAutomationDashboard } from "@/components/marketing/MarketingAutomationDashboard";
+import MarketingAutomationDashboard from "@/components/marketing/MarketingAutomationDashboard";
 
 export default function MarketingAutomationPage() {
   return (

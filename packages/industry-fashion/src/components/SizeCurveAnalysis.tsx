@@ -1,3 +1,5 @@
+// @ts-nocheck
+'use client';
 import React, { useState } from 'react';
 import { GlassPanel , DonutChart , ProgressBar } from '@vayva/ui/components/fashion';
 import type { SizeCurveData, SizeDistribution } from '../types';

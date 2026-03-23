@@ -5,7 +5,7 @@ import { logger } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button, Input, Switch } from "@vayva/ui";
-import { Building2, CreditCard, AlertCircle, Bank as PiggyBank, CurrencyDollar as DollarSign, CheckCircle, Wallet } from "@phosphor-icons/react";
+import { Building as Building2, CreditCard, WarningCircle as AlertCircle, Bank as PiggyBank, CurrencyDollar as DollarSign, CheckCircle, Wallet } from "@phosphor-icons/react";
 import { apiJson } from "@/lib/api-client-shared";
 
 interface SettlementAccount {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Project Workflow Service
  * Handles project boards, task management, and workflow automation

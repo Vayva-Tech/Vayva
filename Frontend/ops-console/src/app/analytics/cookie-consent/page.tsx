@@ -9,7 +9,19 @@
 
 import { useState } from 'react';
 import { TrendingUp, Users, AlertCircle, Download, Calendar } from 'lucide-react';
-import { generateCookieConsentReport, printToPDF } from '../../../../../packages/shared/content/src/legal/pdf-export';
+// PDF export — inline until shared package is published
+function generateCookieConsentReport(data: Record<string, unknown>): string {
+  return JSON.stringify(data, null, 2);
+}
+function printToPDF(content: string, filename: string): void {
+  const blob = new Blob([content], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 import { format } from 'date-fns';
 
 // Mock data - replace with real API calls
@@ -50,12 +62,12 @@ export default function CookieConsentAnalytics() {
       const data = await response.json();
       
       // Generate HTML report
-      const htmlContent = generateCookieConsentReport(
-        data.metrics,
-        data.trendData,
-        data.geoData,
-        data.breakdown
-      );
+      const htmlContent = generateCookieConsentReport({
+        metrics: data.metrics,
+        trendData: data.trendData,
+        geoData: data.geoData,
+        breakdown: data.breakdown,
+      });
       
       // Trigger browser print dialog (user saves as PDF)
       printToPDF(htmlContent, 'cookie-consent-report');

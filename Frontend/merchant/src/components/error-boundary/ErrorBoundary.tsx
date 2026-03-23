@@ -8,7 +8,7 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '@vayva/shared';
-import { AlertTriangle, RefreshCw, Home } from '@phosphor-icons/react';
+import { Warning as AlertTriangle, ArrowsClockwise as RefreshCw, House as Home } from '@phosphor-icons/react';
 
 interface Props {
   children: ReactNode;
