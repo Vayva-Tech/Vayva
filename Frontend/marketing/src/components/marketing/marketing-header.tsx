@@ -102,16 +102,17 @@ export function MarketingHeader(): React.JSX.Element {
               onMouseLeave={() => setActiveDropdown(null)}
             >
               {item.items ? (
-                <button
-                  onClick={() => setActiveDropdown(activeDropdown === item.label ? null : item.label)}
+                <Link
+                  href={item.href}
+                  onClick={() => setActiveDropdown(null)}
                   className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-emerald-700 transition-colors rounded-lg hover:bg-emerald-50"
                 >
                   {item.label}
-                  <ChevronDown 
-                    size={14} 
+                  <ChevronDown
+                    size={14}
                     className={`transition-transform duration-200 ${activeDropdown === item.label ? 'rotate-180' : ''}`}
                   />
-                </button>
+                </Link>
               ) : (
                 <Link
                   href={item.href}

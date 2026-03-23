@@ -62,7 +62,7 @@ const TESTIMONIALS: Testimonial[] = [
     role: "Jewelry Designer",
     location: "Kano",
     business: "Fatima's Gems",
-    quote: "Started with the free plan to test. Upgraded to Pro within 2 weeks because it helped me reach customers in Lagos and Abuja from Kano. Worth every naira!",
+    quote: "Started with the Starter trial to test. Upgraded to Pro within 2 weeks because it helped me reach customers in Lagos and Abuja from Kano. Worth every naira!",
     rating: 5,
     initials: "FB",
   },

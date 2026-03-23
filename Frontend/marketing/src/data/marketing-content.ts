@@ -6,7 +6,7 @@ export const landingContent = {
   heroHighlight: "that runs your business smoothly",
   heroDescription:
     "Turn WhatsApp conversations into organized business records. Track orders, manage inventory, and grow your revenue—all in one command center. AI handles the busywork while you focus on growth.",
-  heroStats: ["7-day free trial", "No credit card", "AI-powered automation"],
+  heroStats: ["7-day trial on Starter", "No credit card", "AI-powered automation"],
   trustTitle: "Powering commerce with intelligent automation.",
   trustHighlights: [
     "Paystack payments",
@@ -29,7 +29,7 @@ export const landingContent = {
     {
       title: "Storefront builder",
       description:
-        "Professional templates with easy customization. Free plan includes 4 templates; upgrade for full library.",
+        "Professional templates with easy customization. Starter includes 4 templates; Pro and Pro+ unlock the full library.",
     },
     {
       title: "Operational command",
@@ -68,7 +68,7 @@ export const landingContent = {
     {
       title: "Professional Templates",
       description:
-        "Choose from ready-made designs. Free plan includes 4 templates; upgrade to unlock the full library.",
+        "Choose from ready-made designs. Starter includes 4 templates; upgrade to unlock the full library.",
     },
     {
       title: "AI-Powered Automation",
@@ -165,7 +165,6 @@ export const aboutContent = {
   founder: {
     name: "Nyamsi Fredrick",
     role: "Founder",
-    image: "/images/nyamsi-fredrick.png",
   },
   storyTitle: "It started with a side hustle",
   storyParagraphs: [
@@ -364,7 +363,7 @@ export const howItWorksContent = {
       step: "2",
       title: "Choose a Store Template",
       description:
-        "Select from professionally designed templates. Free plan includes 4 templates; upgrade to unlock more designs. Preview, customize, and launch—no coding needed.",
+        "Select from professionally designed templates. Starter includes 4 templates; upgrade to unlock more designs. Preview, customize, and launch—no coding needed.",
     },
     {
       step: "3",
@@ -1255,7 +1254,7 @@ export const legalContent = {
           title: "Refund Policy",
           href: "/legal/refund-policy",
           description:
-            "Explains billing practices and refund eligibility for Vayva subscription fees including free trials and chargeback procedures.",
+            "Explains billing practices and refund eligibility for Vayva subscription fees including trial periods and chargeback procedures.",
         },
       ],
     },
@@ -1318,7 +1317,7 @@ export const pricingFaqs = [
   {
     question: "How does the free trial work?",
     answer:
-      "You get 7 days of full access to Starter features. No credit card required. If you don't subscribe after the trial, your account continues on the Free plan with limited features.",
+      "Starter plans include a 7-day trial with full access — no credit card required. If you don't subscribe after the trial, your account is paused until you choose a plan.",
   },
   {
     question: "Do I need design or coding skills?",
@@ -1343,7 +1342,7 @@ export const pricingFaqs = [
   {
     question: "What features are included?",
     answer:
-      "All plans include AI order capture, Paystack payments, inventory tracking, and delivery management. Free plan includes 4 templates. Starter and Pro plans unlock additional features like conversation customization, multi-location support, and API access.",
+      "All plans include AI order capture, Paystack payments, inventory tracking, and delivery management. Starter includes 4 templates. Pro and Pro+ unlock additional features like conversation customization, multi-location support, and API access.",
   },
   {
     question: "Is my data secure?",
@@ -1450,9 +1449,9 @@ export const templatesContent = {
   heroTitle: "Professional Website Templates",
   heroHighlight: "Ready to Launch",
   heroDescription:
-    "Choose from professionally designed templates for your business. Customize colors, fonts, and layouts with our visual editor—no code required. Free plan includes 4 templates; upgrade to unlock more.",
+    "Choose from professionally designed templates for your business. Customize colors, fonts, and layouts with our visual editor—no code required. Starter includes 4 templates; upgrade to unlock more.",
   heroStats: [
-    { value: "4+", label: "Templates (Free)", subtext: "Upgrade for full library" },
+    { value: "4+", label: "Templates (Starter)", subtext: "Upgrade for full library" },
     { value: "0", label: "Code Required", subtext: "Visual editing only" },
     { value: "<5min", label: "Setup Time", subtext: "From template to live store" },
   ],
@@ -1461,7 +1460,7 @@ export const templatesContent = {
     {
       step: "1",
       title: "Choose Your Template",
-      description: "Browse available designs. Free plan includes 4 templates; upgrade for more options.",
+      description: "Browse available designs. Starter includes 4 templates; upgrade for more options.",
     },
     {
       step: "2",

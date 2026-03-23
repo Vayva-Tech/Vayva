@@ -35,7 +35,7 @@ const featurePageSchema = {
     "@type": "Offer",
     price: "0",
     priceCurrency: "NGN",
-    description: "7-day free trial",
+    description: "7-day trial on Starter",
   },
   featureList: [
     "AI Order Capture",

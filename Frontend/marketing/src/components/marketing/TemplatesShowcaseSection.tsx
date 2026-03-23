@@ -209,8 +209,8 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto"
           >
-            Choose from professionally designed templates for your business. 
-            The Free plan includes 4 templates; upgrade to unlock more designs. 
+            Choose from professionally designed templates for your business.
+            Starter includes 4 templates; upgrade to unlock more designs.
             Each template is mobile-ready and fully customizable with our visual editor.
           </motion.p>
 

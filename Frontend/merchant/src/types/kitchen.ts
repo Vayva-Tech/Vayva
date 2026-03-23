@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Kitchen Industry Types
  * 

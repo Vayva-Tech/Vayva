@@ -20,7 +20,7 @@ const inter = Inter({
 export const metadata = {
   metadataBase: new URL(urls.marketingBase()),
   title:
-    "Vayva – WhatsApp Business & E-commerce Dashboard for Nigeria | Free Trial",
+    "Vayva – WhatsApp Business & E-commerce Dashboard for Nigeria | Start Free",
   description:
     "Turn WhatsApp chats into sales with Paystack payments, Naira payouts, and easy dashboard. Built for Nigerian merchants in Lagos, Abuja, Port Harcourt. Start free — no card needed.",
   keywords: [

@@ -5,7 +5,7 @@ import { TemplatesShowcaseSection } from "@/components/marketing/TemplatesShowca
 export const metadata = {
   title: "Store Templates | Professional Designs for Every Industry | Vayva",
   description:
-    "Choose from professionally designed storefront templates. Mobile-optimized, conversion-focused designs for retail, services, food, beauty, events, and more. Customize with our visual editor—no coding required. Free plan includes 4 templates.",
+    "Choose from professionally designed storefront templates. Mobile-optimized, conversion-focused designs for retail, services, food, beauty, events, and more. Customize with our visual editor—no coding required. Starter plan includes 4 templates.",
   keywords: [
     "ecommerce templates",
     "storefront designs",
@@ -20,7 +20,7 @@ export const metadata = {
   ],
   openGraph: {
     title: "Professional Store Templates | Vayva",
-    description: "Launch your online store with a template built for your industry. Mobile-optimized and conversion-focused. Free plan includes 4 templates.",
+    description: "Launch your online store with a template built for your industry. Mobile-optimized and conversion-focused. Starter plan includes 4 templates.",
     type: "website",
   },
 };
@@ -40,7 +40,7 @@ const structuredData = {
     price: "0",
     priceCurrency: "NGN",
     availability: "https://schema.org/InStock",
-    description: "Free plan includes 4 templates",
+    description: "Starter plan includes 4 templates",
   },
 };
 

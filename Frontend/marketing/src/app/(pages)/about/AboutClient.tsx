@@ -197,7 +197,7 @@ export function AboutClient(): React.JSX.Element {
             </p>
             <Link href={`${APP_URL}/signup`}>
               <PremiumButton className="px-16 py-8 text-xl rounded-2xl">
-                Get started for free
+                Get started today
               </PremiumButton>
             </Link>
           </div>
