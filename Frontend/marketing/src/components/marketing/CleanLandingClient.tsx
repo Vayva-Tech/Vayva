@@ -100,16 +100,16 @@ function HeroSection() {
             Artificial intelligence handles the busywork while you focus on growth.
           </motion.p>
 
-          {/* Dashboard Mockup - Smaller Size */}
+          {/* Dashboard Mockup - Responsive */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="relative w-full max-w-[1000px] mx-auto mt-8 mb-8"
+            className="relative w-full max-w-[1000px] mx-auto mt-8 mb-8 hidden md:block"
           >
             {/* Subtle glow effect */}
             <div className="absolute -inset-4 bg-gradient-to-br from-emerald-500/15 via-teal-400/10 to-emerald-400/15 rounded-3xl blur-2xl opacity-40" />
-            
+
             {/* Pro Dashboard UI Replica */}
             <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/50 overflow-hidden">
               {/* Browser Header */}
@@ -127,6 +127,71 @@ function HeroSection() {
               {/* Dashboard Content - Scrollable */}
               <div className="p-4 max-h-[600px] overflow-auto">
                 <ProDashboardMarketing />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Mobile Dashboard Preview - Compact card version */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="relative w-full mx-auto mt-6 mb-6 md:hidden"
+          >
+            <div className="absolute -inset-3 bg-gradient-to-br from-emerald-500/15 via-teal-400/10 to-emerald-400/15 rounded-2xl blur-xl opacity-40" />
+            <div className="relative bg-white rounded-xl shadow-xl border border-slate-200/50 overflow-hidden">
+              {/* Mini browser bar */}
+              <div className="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-rose-500" />
+                  <div className="w-2 h-2 rounded-full bg-amber-500" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                </div>
+                <div className="flex-1 bg-white rounded px-2 py-1 text-[10px] text-slate-500 font-mono">
+                  merchant.vayva.ng
+                </div>
+              </div>
+              {/* Mobile KPI cards */}
+              <div className="p-3 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-[10px]">V</span>
+                  </div>
+                  <span className="text-xs font-bold text-gray-900">Merchant Dashboard</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Revenue", value: "₦2.4M", change: "+12.5%", color: "bg-green-500" },
+                    { label: "Orders", value: "384", change: "+8.2%", color: "bg-blue-500" },
+                    { label: "Customers", value: "1,247", change: "+5.1%", color: "bg-purple-500" },
+                    { label: "AI Orders", value: "27", change: "today", color: "bg-orange-500" },
+                  ].map((kpi) => (
+                    <div key={kpi.label} className="bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+                      <div className={`w-6 h-6 rounded-md ${kpi.color} flex items-center justify-center mb-1.5`}>
+                        <div className="w-3 h-3 bg-white/30 rounded-sm" />
+                      </div>
+                      <p className="text-lg font-bold text-gray-900">{kpi.value}</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] text-gray-500">{kpi.label}</p>
+                        <span className="text-[10px] font-semibold text-green-600">{kpi.change}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Mini chart placeholder */}
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  <p className="text-[10px] font-semibold text-gray-700 mb-2">Revenue Trend (30d)</p>
+                  <svg viewBox="0 0 200 40" className="w-full h-8" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="mobileGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <polygon fill="url(#mobileGrad)" points="0,40 0,25 28,22 56,28 84,18 112,15 140,22 168,12 200,8 200,40" />
+                    <polyline fill="none" stroke="#22c55e" strokeWidth="2" strokeLinejoin="round" points="0,25 28,22 56,28 84,18 112,15 140,22 168,12 200,8" />
+                  </svg>
+                </div>
               </div>
             </div>
           </motion.div>
