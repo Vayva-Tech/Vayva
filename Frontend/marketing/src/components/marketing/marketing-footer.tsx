@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { APP_URL } from "@/lib/constants";
 import {
   IconBrandX as Twitter,
   IconBrandLinkedin as Linkedin,
@@ -43,6 +44,8 @@ export function MarketingFooter(): React.JSX.Element {
                 { label: "All Features", href: "/all-features" },
                 { label: "Industries", href: "/industries" },
                 { label: "Templates", href: "/templates" },
+                { label: "Solutions", href: "/solutions" },
+                { label: "Download App", href: "/download" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -67,6 +70,8 @@ export function MarketingFooter(): React.JSX.Element {
                 { label: "Contact Us", href: "/contact" },
                 { label: "Blog", href: "/blog" },
                 { label: "Developers", href: "/developers" },
+                { label: "Trust & Security", href: "/trust" },
+                { label: "System Status", href: "/system-status" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -88,9 +93,10 @@ export function MarketingFooter(): React.JSX.Element {
             <ul className="space-y-3">
               {[
                 { label: "Help Center", href: "/help" },
-                { label: "System Status", href: "/system-status" },
-                { label: "Trust & Security", href: "/trust" },
-                { label: "Solutions", href: "/solutions" },
+                { label: "Getting Started", href: "/help/getting-started" },
+                { label: "API Documentation", href: "/developers" },
+                { label: "Desktop App", href: "/desktop-download" },
+                { label: "Merchant Login", href: `${APP_URL}/signin` },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -116,6 +122,9 @@ export function MarketingFooter(): React.JSX.Element {
                 { label: "Terms of Service", href: "/legal/terms" },
                 { label: "Cookie Policy", href: "/legal/cookies" },
                 { label: "Refund Policy", href: "/legal/refund-policy" },
+                { label: "Acceptable Use", href: "/legal/acceptable-use" },
+                { label: "Data Processing", href: "/legal/dpa" },
+                { label: "KYC & Safety", href: "/legal/kyc-safety" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link

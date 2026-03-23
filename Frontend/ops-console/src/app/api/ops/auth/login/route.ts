@@ -97,9 +97,22 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    if (error instanceof Error && error.message?.includes("Unauthorized")) {
-      return handleAuthError(error, { ip });
+    try {
+      if (error instanceof Error && error.message?.includes("Unauthorized")) {
+        return handleAuthError(error, { ip });
+      }
+      return handleInternalError(error, { endpoint: "/api/ops/auth/login" });
+    } catch {
+      // Last-resort fallback: if even the error handler crashes, return plain JSON
+      console.error("[LOGIN_ROUTE] Error handler crashed:", error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: "SYS_001", message: "An unexpected error occurred. Please try again later." },
+          meta: { requestId: String(Date.now()), timestamp: new Date().toISOString() },
+        },
+        { status: 500 }
+      );
     }
-    return handleInternalError(error, { endpoint: "/api/ops/auth/login" });
   }
 }

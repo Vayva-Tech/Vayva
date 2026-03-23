@@ -167,7 +167,7 @@ function HeroSection() {
           >
             <Link href={`${APP_URL}/signup`}>
               <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 rounded-xl text-base font-semibold shadow-md hover:shadow-lg transition-all">
-                Start your free trial
+                Get Started
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -185,7 +185,7 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="flex flex-wrap justify-center gap-4 text-sm text-slate-500"
           >
-            {["7-day free trial", "No credit card needed", "Cancel anytime"].map((stat) => (
+            {["1 month free on Starter", "No credit card needed", "Cancel anytime"].map((stat) => (
               <span key={stat} className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                 {stat}
@@ -984,13 +984,14 @@ function FinalCTASection() {
           
           <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
             Join thousands of entrepreneurs worldwide who&apos;ve moved from chaos to clarity. 
-            Your free trial starts today—no matter where you are.
+            Join thousands of entrepreneurs who&apos;ve moved from chaos to clarity.
+            Get your first month free on the Starter plan.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
             <Link href={`${APP_URL}/signup`}>
               <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-7 rounded-xl text-lg font-bold shadow-md">
-                Start free trial
+                Get Started
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -1002,7 +1003,7 @@ function FinalCTASection() {
           </div>
 
           <p className="text-sm text-slate-500 mt-8">
-            7-day free trial • No credit card required • Cancel anytime
+            1 month free on Starter • No credit card required • Cancel anytime
           </p>
         </motion.div>
       </div>

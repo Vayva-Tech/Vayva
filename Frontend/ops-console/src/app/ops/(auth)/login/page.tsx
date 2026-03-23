@@ -47,6 +47,16 @@ function LoginContent(): React.JSX.Element {
         }),
       });
 
+      // Guard against non-JSON responses (e.g. HTML error pages)
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          res.status >= 500
+            ? "Server error — please try again in a moment."
+            : `Unexpected response (${res.status}). Please refresh and try again.`
+        );
+      }
+
       const data = await res.json();
 
       if (!res.ok && res.status !== 202) {
