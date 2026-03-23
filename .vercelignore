@@ -5,9 +5,9 @@ node_modules
 .pnpm-store
 .agents
 *.md
-docs
-tests
-governance
+/docs
+/tests
+/governance
 platform/ci
 platform/scripts
 apps/desktop
