@@ -132,7 +132,7 @@ The primary application where merchants manage their businesses. Key areas:
 - Nonprofit donation tracking
 - Professional services
 
-### 2. Customer Storefront (`store.vayva.ng`)
+### 2. Customer Storefront (`*.vayva.ng`)
 
 Customer-facing storefronts where end users browse and buy. Each merchant gets a branded store.
 
