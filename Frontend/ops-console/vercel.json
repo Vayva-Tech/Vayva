@@ -1,6 +1,6 @@
 {
-    "buildCommand": "pnpm install && pnpm turbo run build --filter=ops-console",
     "installCommand": "pnpm install",
+    "buildCommand": "next build",
     "framework": "nextjs",
     "outputDirectory": ".next",
     "headers": [

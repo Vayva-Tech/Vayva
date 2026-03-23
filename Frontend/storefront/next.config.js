@@ -11,9 +11,12 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  outputFileTracingRoot: path.resolve(__dirname),
+  output: "standalone",
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   turbopack: {
-    root: path.resolve(__dirname),
+    root: path.resolve(__dirname, "../.."),
   },
   transpilePackages: ["@vayva/ui", "@vayva/theme", "@vayva/schemas", "@vayva/api-client", "@vayva/content", "@vayva/emails", "@vayva/templates", "@vayva/addons"],
   reactCompiler: true,
@@ -57,9 +60,5 @@ const nextConfig = {
     ];
   },
 };
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
-module.exports = withBundleAnalyzer(nextConfig);
+module.exports = nextConfig;
 

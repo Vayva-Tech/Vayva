@@ -14,9 +14,7 @@ apps/desktop
 apps/merchant
 Backend/worker
 Backend/workflow
-Frontend/storefront
 Frontend/mobile
-Frontend/ops-console
 *.test.ts
 *.test.tsx
 *.spec.ts

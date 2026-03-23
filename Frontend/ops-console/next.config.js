@@ -13,6 +13,7 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "@vayva/ui", "@vayva/shared", "@vayva/api-client", "framer-motion", "date-fns"]
   },
   turbopack: {
+    root: path.resolve(__dirname, "../.."),
     resolveAlias: {
       "@/lib/*": "./src/lib/*",
       "@/components/*": "./src/components/*",
