@@ -4,10 +4,10 @@ const path = require("path");
 const nextConfig = {
     output: "standalone", // Ensures Vercel generates required .nft.json artifacts for middleware tracing
     transpilePackages: ["@vayva/ui", "@vayva/theme", "@vayva/schemas", "@vayva/shared", "@vayva/api-client", "@vayva/content", "@vayva/compliance", "@vayva/redis", "@vayva/emails", "@vayva/templates", "@vayva/industry-automotive", "@vayva/industry-core", "@vayva/industry-events", "@vayva/industry-grocery", "@vayva/industry-legal", "@vayva/industry-meal-kit", "@vayva/industry-nightlife", "@vayva/industry-nonprofit", "@vayva/industry-restaurant", "@vayva/industry-retail", "@vayva/industry-travel"],
-    serverExternalPackages: ["@prisma/client", "@vayva/db", "bullmq", "ioredis", "pg", "jsdom", "isomorphic-dompurify", "puppeteer", "puppeteer-core", "chrome-aws-lambda"],
+    serverExternalPackages: ["@prisma/client", "@vayva/db", "bullmq", "ioredis", "pg", "jsdom", "isomorphic-dompurify", "puppeteer", "puppeteer-core", "chrome-aws-lambda", "cloudinary"],
     reactCompiler: false,
     experimental: {
-        optimizePackageImports: ["@phosphor-icons/react", "@vayva/ui", "@vayva/shared", "@vayva/api-client", "date-fns", "framer-motion", "recharts"],
+        optimizePackageImports: ["@phosphor-icons/react", "@vayva/shared", "@vayva/api-client", "date-fns", "framer-motion", "recharts"],
         staleTimes: {
             dynamic: 30,
             static: 180,
