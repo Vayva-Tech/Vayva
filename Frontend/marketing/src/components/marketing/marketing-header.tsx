@@ -254,17 +254,17 @@ function HeaderActions(): React.JSX.Element {
 
   return (
     <div className="flex w-full sm:w-auto items-center gap-3">
-      <a href={`${process.env.NEXT_PUBLIC_APP_URL}/signin`} className="flex-1 sm:flex-none">
+      <a href={`${APP_URL}/signin`} className="flex-1 sm:flex-none">
         <Button
           variant="ghost"
           className="w-full sm:w-auto text-text-primary hover:bg-emerald-50"
         >
-          Login
+          Sign In
         </Button>
       </a>
-      <a href={`${process.env.NEXT_PUBLIC_APP_URL}/signup`} className="flex-1 sm:flex-none">
+      <a href={`${APP_URL}/signup`} className="flex-1 sm:flex-none">
         <Button className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-text-inverse shadow-card stroke-glow">
-          Get Started
+          Start Free Trial
         </Button>
       </a>
     </div>

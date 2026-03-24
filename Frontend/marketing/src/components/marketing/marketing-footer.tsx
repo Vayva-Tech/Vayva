@@ -43,9 +43,6 @@ export function MarketingFooter(): React.JSX.Element {
                 { label: "Autopilot", href: "/autopilot" },
                 { label: "All Features", href: "/all-features" },
                 { label: "Industries", href: "/industries" },
-                { label: "Templates", href: "/templates" },
-                { label: "Solutions", href: "/solutions" },
-                { label: "Download App", href: "/download" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -68,8 +65,6 @@ export function MarketingFooter(): React.JSX.Element {
               {[
                 { label: "About Vayva", href: "/about" },
                 { label: "Contact Us", href: "/contact" },
-                { label: "Blog", href: "/blog" },
-                { label: "Developers", href: "/developers" },
                 { label: "Trust & Security", href: "/trust" },
                 { label: "System Status", href: "/system-status" },
               ].map((link) => (
@@ -94,8 +89,6 @@ export function MarketingFooter(): React.JSX.Element {
               {[
                 { label: "Help Center", href: "/help" },
                 { label: "Getting Started", href: "/help/getting-started" },
-                { label: "API Documentation", href: "/developers" },
-                { label: "Desktop App", href: "/desktop-download" },
                 { label: "Merchant Login", href: `${APP_URL}/signin` },
               ].map((link) => (
                 <li key={link.label}>

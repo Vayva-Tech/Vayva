@@ -54,23 +54,56 @@ const capabilities = [
 
 const creditTiers = [
   {
-    plan: "Free",
-    credits: "₦0",
-    desc: "No AI access",
-    features: ["Basic storefront", "2 templates"],
-  },
-  {
     plan: "Starter",
-    credits: "₦25K/mo",
-    desc: "5K AI credits",
-    features: ["5,000 credits", "1 staff seat", "Analytics"],
-    highlight: true,
+    price: 25000,
+    description: "For growing businesses ready to scale",
+    features: [
+      "Up to 500 products",
+      "Unlimited orders",
+      "Vayva Automation (WhatsApp & Instagram)",
+      "Storefront setup & customization",
+      "Advanced conversation customization",
+      "Remove Vayva branding",
+      "Priority support & training",
+      "7-day free trial included",
+    ],
+    cta: "Start Growing",
+    href: "/signup?plan=starter",
+    trialDays: 7,
   },
   {
     plan: "Pro",
-    credits: "₦40K/mo",
-    desc: "10K AI credits",
-    features: ["10,000 credits", "3 staff seats", "Priority support"],
+    price: 35000,
+    description: "High-volume sellers scaling operations",
+    features: [
+      "Everything in Starter, plus:",
+      "Advanced conversation customization",
+      "Multi-location & warehouse support",
+      "API access for custom integrations",
+      "Dedicated account manager",
+      "Custom integrations",
+      "White-label options available",
+    ],
+    cta: "Scale Your Business",
+    href: "/signup?plan=pro",
+    popular: true,
+  },
+  {
+    plan: "Pro Plus",
+    price: 50000,
+    description: "Full power with industry tools and visual automation",
+    features: [
+      "Everything in Pro, plus:",
+      "Industry-specific operational tools",
+      "Merged industry dashboard",
+      "Visual workflow builder",
+      "25,000 AI credits/mo",
+      "5 team seats",
+      "5 templates",
+      "Priority support",
+    ],
+    cta: "Unlock Full Power",
+    href: "/signup?plan=pro_plus",
   },
 ];
 
@@ -327,25 +360,23 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`relative flex flex-col h-full ${i === 1 ? 'md:-mt-8' : ''}`}
+                className={`relative flex flex-col h-full ${tier.popular ? 'md:-mt-8' : ''}`}
               >
                 <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[28px] border-2 border-emerald-200/60" />
                 <div className={`relative flex flex-col flex-1 p-8 bg-white/90 backdrop-blur rounded-[28px] border-2 border-slate-900/10 shadow-[0_20px_50px_rgba(15,23,42,0.1)] hover:-translate-y-1 transition-all ${
-                  tier.highlight ? 'ring-2 ring-emerald-500' : ''
+                  tier.popular ? 'ring-2 ring-emerald-500' : ''
                 }`}>
-                  {tier.highlight && (
+                  {tier.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-emerald-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                       Most Popular
                     </div>
                   )}
                   <div className="flex-shrink-0">
                     <h3 className="text-xl font-bold text-slate-900 mb-2">{tier.plan}</h3>
-                    <p className="text-sm text-slate-500 mb-6">{tier.desc}</p>
+                    <p className="text-sm text-slate-500 mb-6">{tier.description}</p>
                     <div className="mb-6">
-                      <span className="text-4xl font-bold text-emerald-600">{tier.credits}</span>
-                      {tier.plan !== "Free" && (
-                        <span className="text-sm text-slate-500 ml-2">/month</span>
-                      )}
+                      <span className="text-4xl font-bold text-emerald-600">₦{(tier.price / 1000).toFixed(0)}k</span>
+                      <span className="text-sm text-slate-500 ml-2">/month</span>
                     </div>
                     <ul className="space-y-3 mb-8 flex-grow">
                       {tier.features.map((feature, j) => (
@@ -356,13 +387,13 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
                       ))}
                     </ul>
                   </div>
-                  <button className={`w-full py-4 rounded-2xl font-semibold transition-all mt-auto ${
-                    tier.highlight 
+                  <Link href={`${APP_URL}${tier.href}`} className={`w-full py-4 rounded-2xl font-semibold transition-all mt-auto text-center ${
+                    tier.popular 
                       ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/25' 
                       : 'bg-slate-900 hover:bg-slate-800 text-white'
                   }`}>
-                    Get Started
-                  </button>
+                    {tier.cta}
+                  </Link>
                 </div>
               </motion.div>
             ))}
