@@ -15,11 +15,11 @@
     "dependencies": {
         "@vayva/db": "workspace:*",
         "@vayva/shared": "workspace:*",
-        "@types/node": "^20.0.0",
+        "@types/node": "^20.19.37",
         "zod": "^3.25.76"
     },
     "devDependencies": {
-        "@types/node": "^22.15.21",
+        "@types/node": "^20.19.37",
         "typescript": "^5.9.3"
     }
 }
