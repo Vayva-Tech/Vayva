@@ -325,7 +325,7 @@ If VPS remains down >24 hours:
 - ❌ No automated health checks
 
 ### Recommendations
-1. **Migrate to Managed DB:** Supabase, or Neon
+1. **Migrate to Managed DB:** AWS RDS, Supabase, or Neon
 2. **Implement Monitoring:** Automated alerts for downtime
 3. **Document Credentials:** Secure vault for all access
 4. **Audit Migrations:** Ensure complete history

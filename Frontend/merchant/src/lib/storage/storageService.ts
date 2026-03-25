@@ -1,4 +1,4 @@
-import { Client } from "minio";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 function getS3Config() {
   const endpoint = process.env.MINIO_ENDPOINT;
@@ -62,21 +62,25 @@ export const StorageService = {
       region,
       publicBaseUrl,
     } = getS3Config();
-    const minioClient = new Client({
-      endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
-      port: parseInt(endpoint.split(":").pop() || "443"),
-      useSSL: endpoint.startsWith("https"),
-      accessKey: accessKeyId,
-      secretKey: secretAccessKey,
+    const s3 = new S3Client({
       region,
+      endpoint,
+      forcePathStyle: true,
+      credentials: { accessKeyId, secretAccessKey },
     });
 
     const arrayBuffer = await file.arrayBuffer();
     const body = Buffer.from(arrayBuffer);
 
-    await minioClient.putObject(bucket, key, body, {
-      "Content-Type": file.type || "application/octet-stream",
-    });
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: body,
+        ContentType: file.type || "application/octet-stream",
+        ACL: "public-read",
+      }),
+    );
 
     return buildPublicUrl({ publicBaseUrl, endpoint, bucket, key });
   },

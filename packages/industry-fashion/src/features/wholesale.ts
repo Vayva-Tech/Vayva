@@ -1,4 +1,4 @@
-import { fashionPrisma as prisma } from '../lib/prisma-fashion';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
 export interface WholesalePortalConfig {
   buyerApprovalRequired: boolean;

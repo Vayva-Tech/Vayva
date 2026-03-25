@@ -1,7 +1,5 @@
 # Vayva Platform Overview
 
-**Navigation:** [Documentation home](../README.md) lists all documentation by role and topic.
-
 ## What is Vayva?
 
 Vayva is an AI-powered commerce SaaS platform built for the Nigerian and African market. It provides merchants with everything they need to sell online and offline:

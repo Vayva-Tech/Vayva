@@ -11,7 +11,8 @@ import {
   ForbiddenError
 } from "@vayva/shared";
 import { rateLimit } from "@vayva/shared/rateLimit";
-import { Client } from "minio";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 function getS3Config() {
   const endpoint = process.env.MINIO_ENDPOINT;
@@ -185,21 +186,22 @@ export const POST = withVayvaAPI(
         region,
         publicBaseUrl,
       } = getS3Config();
-      const minioClient = new Client({
-        endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
-        port: parseInt(endpoint.split(":").pop() || "443"),
-        useSSL: endpoint.startsWith("https"),
-        accessKey: accessKeyId,
-        secretKey: secretAccessKey,
+      const s3 = new S3Client({
         region,
+        endpoint,
+        forcePathStyle: true,
+        credentials: { accessKeyId, secretAccessKey },
       });
 
-      // Generate presigned URL for MinIO
       const expiresIn = 300;
-      const uploadUrl = await minioClient.presignedPutObject(
-        bucket,
-        key,
-        expiresIn,
+      const uploadUrl = await getSignedUrl(
+        s3,
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          ContentType: config.allowedMimeTypes[0],
+        }),
+        { expiresIn },
       );
 
       // Create PENDING upload record

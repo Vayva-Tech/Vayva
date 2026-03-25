@@ -10,8 +10,6 @@
 
 Vayva is an AI-powered commerce SaaS platform built for the Nigerian market. Merchants use Vayva to sell online through branded storefronts and WhatsApp-powered AI agents. This guide will get you productive in your first week.
 
-For a **full map** of every docs folder (product, ops, security, business, compliance), start at the [documentation home](../../README.md).
-
 ---
 
 ## First Day Checklist

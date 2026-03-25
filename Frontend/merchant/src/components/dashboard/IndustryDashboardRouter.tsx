@@ -76,9 +76,7 @@ const SaaSDashboard = lazy(() =>
 );
 
 const BlogMediaDashboard = lazy(() =>
-  import("@/components/dashboard/industries/BlogMediaDashboard").then((m) => ({
-    default: m.BlogMediaDashboard,
-  }))
+  import('@vayva/industry-blog-media').then((m) => ({ default: m.BlogMediaDashboard }))
 );
 
 const AnalyticsDashboard = lazy(() =>

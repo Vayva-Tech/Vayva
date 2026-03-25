@@ -215,21 +215,6 @@ export const authOptions: NextAuthOptions = {
 // Export getServerSession for compatibility
 export { getServerSession } from "next-auth";
 
-/** Auth wrapper for route handlers - returns session or throws. */
-export async function auth() {
-  const session = await getServerSessionNext(authOptions);
-  return session;
-}
-
-/** Require authentication - throws if not authenticated. */
-export async function requireAuth() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-  return session;
-}
-
 /** Resolve store id from NextAuth session (BFF / route handlers). */
 export async function getAuthStoreId(_req: NextRequest): Promise<string | null> {
   const session = await getServerSessionNext(authOptions);

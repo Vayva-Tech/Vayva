@@ -13,7 +13,6 @@ import {
   IconTruck as Truck,
 } from "@tabler/icons-react";
 import { Button } from "@vayva/ui";
-import { cn } from "@/lib/utils";
 
 const tabs = [
   { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -259,21 +258,12 @@ function DashboardDemo() {
               { label: "Revenue", value: "₦847K", change: "+12%" },
               { label: "Orders", value: "156", change: "+8%" },
               { label: "Customers", value: "89", change: "+15%" },
-              { label: "Conversion", value: "3.2%", change: "−0.2%" },
+              { label: "Products", value: "47", change: "+3" },
             ].map((stat, i) => (
               <div key={i} className="bg-white p-2 rounded-lg border border-slate-200">
                 <p className="text-[10px] text-slate-500">{stat.label}</p>
                 <p className="text-sm font-bold text-slate-900">{stat.value}</p>
-                <p
-                  className={cn(
-                    "text-[10px]",
-                    stat.change.startsWith("−") || stat.change.startsWith("-")
-                      ? "text-rose-600"
-                      : "text-emerald-600",
-                  )}
-                >
-                  {stat.change}
-                </p>
+                <p className="text-[10px] text-emerald-600">{stat.change}</p>
               </div>
             ))}
           </div>

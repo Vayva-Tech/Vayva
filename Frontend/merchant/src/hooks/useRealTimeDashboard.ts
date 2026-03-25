@@ -24,11 +24,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/a
 /**
  * useRealTimeDashboard - Consolidated hook for real-time dashboard data
  * Merges multiple API endpoints and adds WebSocket support
- * 
- * Special handling for marketing demo mode:
- * - Detects demo user/business IDs (marketing-demo)
- * - Returns realistic pre-populated data for showcasing
- * - Maintains exact same UI/UX as production
  */
 export function useRealTimeDashboard({
   industry,
@@ -36,61 +31,9 @@ export function useRealTimeDashboard({
   businessId,
   enabled = true
 }: UseRealTimeDashboardOptions) {
-  // Detect marketing demo mode
-  const isDemoMode = userId === 'marketing-demo' || businessId === 'marketing-demo';
-  
-  // Generate realistic demo data for marketing showcase
-  const getDemoData = () => ({
-    success: true,
-    data: {
-      kpis: [
-        { key: "revenue", value: 2400000, change: 12.5, isPositive: true, format: "currency" as const },
-        { key: "orders", value: 384, change: 8.2, isPositive: true, format: "number" as const },
-        { key: "customers", value: 1247, change: 5.1, isPositive: true, format: "number" as const },
-        { key: "conversion_rate", value: 3.8, change: -0.4, isPositive: false, format: "percentage" as const },
-      ],
-      metrics: {},
-      overview: {
-        title: "Retail Operations",
-        subtitle: "Move the right inventory without stockouts or dead stock",
-      },
-      todosAlerts: [],
-      activity: [],
-      primaryObjects: {
-        top_products: [
-          { id: "1", name: "Ankara Print Maxi Dress", sold: 89, revenue: 445000, image: null },
-          { id: "2", name: "Handwoven Aso-Oke Set", sold: 64, revenue: 384000, image: null },
-          { id: "3", name: "Adire Silk Headwrap", sold: 52, revenue: 156000, image: null },
-          { id: "4", name: "Beaded Statement Necklace", sold: 41, revenue: 123000, image: null },
-        ],
-        low_stock: [],
-        dead_stock: [],
-      },
-      inventoryAlerts: [],
-      customerInsights: {},
-      earnings: {},
-      storeInfo: {
-        name: "Luxe Fashion",
-        currency: "NGN",
-      },
-      charts: {
-        revenue_trend: {
-          labels: ["Mar 1", "Mar 5", "Mar 10", "Mar 15", "Mar 20", "Mar 25"],
-          values: [180000, 220000, 195000, 320000, 275000, 240000],
-        },
-      },
-      liveOperations: {
-        pending_orders: { value: 12 },
-        active_carts: { value: 27 },
-        recent_signups: { value: 8 },
-      },
-    },
-    timestamp: new Date().toISOString(),
-  });
-
   // Fetch base dashboard data with industry-specific endpoint
   const { data: baseData, error: swrError, isLoading, mutate } = useSWR(
-    enabled && !isDemoMode ? [`/dashboard/universal`, userId, businessId, industry] : null,
+    enabled ? [`/dashboard/universal`, userId, businessId, industry] : null,
     async ([endpoint, uid, bid, ind]) => {
       const url = `${API_BASE_URL}${endpoint}?userId=${uid}&businessId=${bid}&industry=${ind}&range=month`;
       const response = await fetch(url);
@@ -100,13 +43,8 @@ export function useRealTimeDashboard({
     {
       refreshInterval: 30000, // Refresh every 30 seconds
       dedupingInterval: 5000,
-      fallbackData: isDemoMode ? getDemoData() : undefined,
-      revalidateOnFocus: !isDemoMode,
-      revalidateOnReconnect: !isDemoMode,
       onError: (error) => {
-        if (!isDemoMode) {
-          toast.error(`Failed to load ${industry} dashboard: ${error.message}`);
-        }
+        toast.error(`Failed to load ${industry} dashboard: ${error.message}`);
       }
     }
   );

@@ -4,7 +4,7 @@
  * No ML training required - pure math, zero cost
  */
 
-import { logger } from "../logger";
+import { logger } from "../logger.js";
 
 export interface SalesForecast {
   predictedRevenue: number;

@@ -79,7 +79,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (process.env?.RESEND_API_KEY) {
       try {
         const resend = new Resend(process.env?.RESEND_API_KEY);
-        const helloEmail = "hello@vayva.ng";
+        const helloEmail = process.env?.EMAIL_HELLO || "hello@vayva.ng"; // Default kept for safety if env missing, but we could use urls.supportEmail()
 
         // 1. Send to Vayva Team
         await resend.emails?.send({
@@ -125,37 +125,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       } catch (emailError: unknown) {
         const errMsg = emailError instanceof Error ? emailError.message : String(emailError);
         logger.error("[Contact Form] Email send failed", { error: errMsg });
-        // Continue even if email fails
+        // Continue to persist even if email fails
       }
     } else {
       logger.warn("[Contact Form] RESEND_API_KEY not configured, skipping email");
     }
 
-    // Persist to RescueIncident for Ops visibility (never block success response)
-    try {
-      await prisma.rescueIncident?.create({
-        data: {
-          surface: "MARKETING_CONTACT" as any,
-          severity: "LOW",
-          errorType: "CONTACT_FORM_SUBMISSION",
-          errorMessage: `[Subject: ${body.subject}] from ${body.email}`,
-          fingerprint: `contact-${Date.now()}-${Math.random()}`,
-          status: "OPEN",
-          diagnostics: {
-            name: `${body.firstName} ${body.lastName}`,
-            email: body.email,
-            message: body.message,
-            subject: body.subject,
-            source: body.source || "marketing_site",
-            emailSent,
-          },
+    // Persist to RescueIncident for Ops visibility
+    await prisma.rescueIncident?.create({
+      data: {
+        surface: "MARKETING_CONTACT" as any,
+        severity: "LOW",
+        errorType: "CONTACT_FORM_SUBMISSION",
+        errorMessage: `[Subject: ${body.subject}] from ${body.email}`,
+        fingerprint: `contact-${Date.now()}-${Math.random()}`,
+        status: "OPEN",
+        diagnostics: {
+          name: `${body.firstName} ${body.lastName}`,
+          email: body.email,
+          message: body.message,
+          subject: body.subject,
+          source: body.source || "marketing_site",
+          emailSent,
         },
-      });
-    } catch (persistError: unknown) {
-      const errMsg =
-        persistError instanceof Error ? persistError.message : String(persistError);
-      logger.warn("[Contact Form] Persist failed", { error: errMsg });
-    }
+      },
+    });
 
     return NextResponse.json({ success: true, message: "Message received" });
   } catch (error: unknown) {

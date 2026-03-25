@@ -602,7 +602,7 @@ export const AdminShell = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-xl bg-transparent text-emerald-600 hover:bg-transparent hover:text-emerald-700"
+                    className="rounded-xl hover:bg-gray-100 text-gray-500"
                     aria-label="Close navigation"
                   >
                     <X size={20} />
@@ -783,7 +783,7 @@ export const AdminShell = ({
             <TrialBanner />
             <GlobalBanner />
             {/* Header: safe-area inset above the bar; frosted glass on small screens */}
-            <header className="w-full shrink-0 sticky top-0 z-40 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
+            <header className="w-full shrink-0 relative z-30 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
               <div className="pt-safe-top md:pt-0">
                 <div className="h-14 w-full px-4 md:px-6 flex items-center justify-between gap-2 md:gap-4">
                 {/* Left: Menu + Back */}
@@ -792,8 +792,7 @@ export const AdminShell = ({
                     <Button
                       type="button"
                       onClick={() => setMobileMenuOpen(true)}
-                      variant="ghost"
-                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center bg-transparent text-emerald-600 hover:bg-transparent hover:text-emerald-700 transition-colors"
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
                       aria-label="Open navigation menu"
                     >
                       <PanelLeftOpen size={22} strokeWidth={2} />
@@ -803,8 +802,7 @@ export const AdminShell = ({
                     <Button
                       type="button"
                       onClick={() => router.back()}
-                      variant="ghost"
-                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl bg-transparent hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
                       aria-label="Go back"
                     >
                       <Icon name="ArrowLeft" size={20} />
@@ -836,8 +834,7 @@ export const AdminShell = ({
                 <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
                   <Button
                     type="button"
-                    variant="ghost"
-                    className="md:hidden min-w-[44px] min-h-[44px] rounded-xl bg-transparent hover:bg-gray-100 transition-colors flex items-center justify-center"
+                    className="md:hidden min-w-[44px] min-h-[44px] rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center"
                     onClick={() =>
                       typeof window !== "undefined" &&
                       (window as Window & { triggerCommandPalette?: () => void }).triggerCommandPalette?.()
@@ -1009,11 +1006,9 @@ export const AdminShell = ({
             </header>
 
             {/* Content: tinted canvas on mobile, extra bottom padding for tab bar */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-5 md:px-6 md:py-6 pb-28 md:pb-8 bg-gray-50 md:bg-white">
-              <div className="min-h-full w-full min-w-0 dashboard-page">
-                <div className="mx-auto w-full max-w-[1600px] min-w-0">
-                  {children}
-                </div>
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-5 md:px-6 md:py-6 pb-28 md:pb-8 bg-gray-50 md:bg-white">
+              <div className="min-h-full w-full dashboard-page">
+                <div className="mx-auto w-full max-w-[1600px]">{children}</div>
               </div>
             </div>
 
@@ -1113,7 +1108,7 @@ export const AdminShell = ({
                       </div>
                     </div>
 
-                    <div className="px-3 pb-safe-bottom max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
+                    <div className="px-3 pb-safe-bottom pb-4 max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
                       {moreSheetGroups.map((group: any, idx: number) => (
                         <div key={group.name || idx} className="mb-4">
                           {group.name && (
@@ -1178,7 +1173,7 @@ export const AdminShell = ({
                       </Button>
                     </div>
                   </div>
-                  <div className="px-4 pb-safe-bottom space-y-3">
+                  <div className="px-4 pb-safe-bottom pb-6 space-y-3">
                     <Button
                       variant="outline"
                       type="button"

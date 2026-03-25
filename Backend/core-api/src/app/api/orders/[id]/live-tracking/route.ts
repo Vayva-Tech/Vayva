@@ -3,12 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
 import { requireAuthFromRequest } from "@/lib/session.server";
 import { KwikProvider } from "@/lib/delivery/DeliveryProvider";
-import { FEATURES } from "@/lib/env-validation";
 
-function getKwikProvider(): KwikProvider | null {
-  if (!FEATURES.DELIVERY_ENABLED) return null;
-  return new KwikProvider();
-}
+const kwikProvider = new KwikProvider();
 
 /**
  * GET /api/orders/[id]/live-tracking
@@ -88,17 +84,12 @@ export async function GET(
     let liveTrackingData = null;
 
     if (dispatchJob?.providerJobId) {
-      const kwikProvider = getKwikProvider();
       try {
-        if (kwikProvider) {
-          const kwikJobDetails = await kwikProvider.getJobDetails(
-            dispatchJob.providerJobId,
-          );
-          const riderLocation = await kwikProvider.trackRider(
-            dispatchJob.providerJobId,
-          );
+        // Fetch live data from Kwik API
+        const kwikJobDetails = await kwikProvider.getJobDetails(dispatchJob.providerJobId);
+        const riderLocation = await kwikProvider.trackRider(dispatchJob.providerJobId);
 
-          liveTrackingData = {
+        liveTrackingData = {
           rider: {
             name: kwikJobDetails.rider?.name || dispatchJob.assignedRiderName,
             phone: kwikJobDetails.rider?.phone || dispatchJob.assignedRiderPhone,
@@ -121,9 +112,6 @@ export async function GET(
           eta: kwikJobDetails.etaMinutes || dispatchJob.deliveryEta,
           status: kwikJobDetails.status || dispatchJob.status,
         };
-        } else {
-          throw new Error("Kwik delivery not configured");
-        }
       } catch (kwikError) {
         logger.error("[LIVE_TRACKING] Kwik API error:", ErrorCategory.API, kwikError);
         // Return fallback data from our database

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { coercePlanTier, pricingPolicyAgent } from '@vayva/billing';
+import { pricingPolicyAgent } from '@vayva/billing/pricing-policy-agent';
 import { prisma } from '@vayva/db';
 import { logger } from '@/lib/logger';
 
@@ -34,11 +34,10 @@ export async function GET(_request: Request) {
     }
 
     // Generate usage report
-    const planKey = coercePlanTier(String(subscription.planKey));
     const report = await pricingPolicyAgent.generateUsageReport({
       id: subscription.id,
       userId: session.user.id,
-      planKey,
+      planKey: subscription.planKey as any,
       status: subscription.status,
       trialStartsAt: subscription.trialStartsAt,
       trialExpiresAt: subscription.trialExpiresAt,
@@ -52,7 +51,7 @@ export async function GET(_request: Request) {
       trialActive: !pricingPolicyAgent.isTrialExpired({
         id: subscription.id,
         userId: session.user.id,
-        planKey,
+        planKey: subscription.planKey as any,
         status: subscription.status,
         trialStartsAt: subscription.trialStartsAt,
         trialExpiresAt: subscription.trialExpiresAt,
@@ -63,8 +62,8 @@ export async function GET(_request: Request) {
       totalOverageCost: report.totalOverageCost,
       recommendations: report.recommendations,
       upgradeRecommended: pricingPolicyAgent.getRecommendedUpgradePath(
-        planKey,
-        {}
+        subscription.planKey as any,
+        {} // Would pass actual usage data here
       )
     });
 

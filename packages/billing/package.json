@@ -2,11 +2,8 @@
   "name": "@vayva/billing",
   "version": "1.0.0",
   "description": "Vayva billing services - usage-based billing and dunning management",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts"
-  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

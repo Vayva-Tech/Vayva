@@ -2,25 +2,38 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NotificationDispatcher } from '../services/notification-dispatcher.service.js';
 import { NotificationPayload } from '../types/index.js';
 
-// Mock the settings manager (minimal flat notifications → merged with engine defaults)
+// Mock the settings manager
 vi.mock('@vayva/settings', () => ({
   getSettingsManager: () => ({
-    getSettings: () => ({
-      notifications: {
-        email: true,
-        sms: true,
-        push: true,
-        inApp: true,
+    getNotificationSettings: () => ({
+      channels: {
+        email: { enabled: true },
+        sms: { enabled: true },
+        push: { enabled: true },
+        'in-app': { enabled: true }
       },
-    }),
-  }),
+      quietHours: {
+        enabled: true,
+        startTime: '22:00',
+        endTime: '08:00',
+        allowEmergencyContacts: true,
+        emergencyContactKeywords: ['urgent', 'emergency']
+      },
+      categories: {
+        sales: { newOrder: true },
+        inventory: { lowStock: true }
+      },
+      doNotDisturb: {
+        enabled: false
+      }
+    })
+  })
 }));
 
 describe('NotificationDispatcher', () => {
   let dispatcher: NotificationDispatcher;
 
   beforeEach(() => {
-    vi.clearAllMocks();
     dispatcher = new NotificationDispatcher();
   });
 

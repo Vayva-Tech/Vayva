@@ -336,7 +336,7 @@ export class ExternalAPIService {
    * Send SMS using external provider
    */
   async sendSMS(phone: string, message: string): Promise<boolean> {
-    // This would integrate with Twilio or another SMS provider
+    // This would integrate with Twilio, AWS SNS, or similar
     console.warn(`Sending SMS to ${phone}: ${message}`);
     return true; // Mock success
   }
@@ -345,7 +345,7 @@ export class ExternalAPIService {
    * Send email using external provider
    */
   async sendEmail(to: string, subject: string, _html: string): Promise<boolean> {
-    // This would integrate with Resend, SendGrid, or similar
+    // This would integrate with SendGrid, AWS SES, or similar
     console.warn(`Sending email to ${to} with subject: ${subject}`);
     return true; // Mock success
   }
@@ -354,7 +354,7 @@ export class ExternalAPIService {
    * Upload file to cloud storage
    */
   async uploadFile(file: Buffer, filename: string, folder?: string): Promise<string> {
-    // This would integrate with MinIO, Cloudinary, or similar
+    // This would integrate with AWS S3, Cloudinary, or similar
     console.warn(`Uploading file: ${filename}`);
     return `https://cdn.example.com/${folder || 'uploads'}/${filename}`;
   }

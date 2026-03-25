@@ -137,7 +137,7 @@ export const termsOfService: LegalDocument = {
         "• Labor disputes, strikes, shortages",
         "• Internet infrastructure failures, ISP outages, DDoS attacks",
         "• Power outages, telecommunications failures",
-        "• Cloud or hosting provider outages (e.g. Vercel, VPS provider, DNS/CDN)",
+        "• Cloud provider outages (AWS, Azure, Google Cloud)",
         "",
         "During force majeure events, we will:",
         "• Use commercially reasonable efforts to mitigate impact",

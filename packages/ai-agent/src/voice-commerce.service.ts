@@ -516,7 +516,7 @@ export class VoiceCommerceService {
   }
 
   private async transcribeAudio(audioData: Buffer, language: string): Promise<string> {
-    // In production, integrate a speech-to-text provider (e.g. Google, Azure, or another STT API).
+    // In production, use Google Speech-to-Text, AWS Transcribe, or Azure Speech
     // For now, simulate transcription
     console.log(`[Voice] Transcribing audio in ${language}`);
     return "simulated transcription";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { logger } from "@vayva/shared";
+import { logger, urls } from "@vayva/shared";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -257,6 +257,16 @@ export default function SigninPage() {
         >
           Create an account
         </Link>
+        <div className="mt-2">
+          <a
+            href={`${urls.marketingBase()}/help`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-gray-400 hover:text-gray-500 transition-colors"
+          >
+            Having trouble?
+          </a>
+        </div>
       </div>
     </SplitAuthLayout>
   );

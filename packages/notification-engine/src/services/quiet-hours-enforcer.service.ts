@@ -1,5 +1,4 @@
 import { getSettingsManager } from '@vayva/settings';
-import { getResolvedEngineNotificationSettings } from '../engine-notification-settings';
 
 /**
  * Quiet Hours Enforcement Service
@@ -30,7 +29,7 @@ export class QuietHoursEnforcer {
     reason?: string;
   }> {
     try {
-      const notificationSettings = getResolvedEngineNotificationSettings(this.settingsManager);
+      const notificationSettings = this.settingsManager.getSettings().notifications;
       const quietHours = notificationSettings.quietHours;
 
       // If quiet hours are disabled, allow immediate sending
@@ -177,7 +176,7 @@ export class QuietHoursEnforcer {
     }
 
     if (priority === 'urgent') {
-      const notificationSettings = getResolvedEngineNotificationSettings(this.settingsManager);
+      const notificationSettings = this.settingsManager.getSettings().notifications;
       const emergencyKeywords = notificationSettings.quietHours.emergencyContactKeywords || [];
       
       // In a real implementation, you might check:
@@ -197,7 +196,7 @@ export class QuietHoursEnforcer {
    */
   private async isVipContact(entityId: string): Promise<boolean> {
     try {
-      const notificationSettings = getResolvedEngineNotificationSettings(this.settingsManager);
+      const notificationSettings = this.settingsManager.getSettings().notifications;
       const vipContacts = notificationSettings.quietHours.vipContacts || [];
       
       // In a real implementation, this might:
@@ -223,7 +222,7 @@ export class QuietHoursEnforcer {
     timezone?: string;
   } {
     try {
-      const notificationSettings = getResolvedEngineNotificationSettings(this.settingsManager);
+      const notificationSettings = this.settingsManager.getSettings().notifications;
       return {
         enabled: notificationSettings.quietHours.enabled,
         startTime: notificationSettings.quietHours.startTime,

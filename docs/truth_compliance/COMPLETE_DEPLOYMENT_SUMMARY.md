@@ -14,7 +14,7 @@ Created 3 comprehensive legal documents:
 1. **Subprocessor List** (261 lines)
    - File: `packages/shared/content/src/legal/subprocessors.ts`
    - GDPR Article 28 compliant
-   - Lists all third-party data processors (Paystack, MinIO, Cloudflare, etc.)
+   - Lists all third-party data processors (Paystack, AWS, Cloudflare, etc.)
    - Includes DPA status, safeguards, international transfer mechanisms
 
 2. **Cookie Consent System** (598 lines total)

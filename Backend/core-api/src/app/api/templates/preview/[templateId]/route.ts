@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@vayva/db';
+import { prisma } from '@vayva/prisma';
 
 export async function GET(
   request: NextRequest,

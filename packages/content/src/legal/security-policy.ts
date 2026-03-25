@@ -54,7 +54,7 @@ export const securityPolicy: LegalDocument = {
     {
       heading: "6. Physical Security",
       content: [
-        "Vayva uses cloud and hosting providers (including Vercel for frontends and VPS providers for application data) that implement industry-standard physical and logical security controls. Specific certifications vary by vendor; see the subprocessor list and vendor trust pages for current attestations.",
+        "Vayva uses cloud infrastructure providers (AWS, Google Cloud, Azure) that maintain SOC 2 Type II and ISO 27001 certified data centers. These facilities implement 24/7 security monitoring, biometric access controls, video surveillance, and environmental protections.",
         "Physical access to servers is restricted to authorized personnel with documented business need. All visitors must be escorted and sign access logs. Equipment disposal follows secure destruction procedures including degaussing and physical destruction of storage media.",
       ],
       type: "text",

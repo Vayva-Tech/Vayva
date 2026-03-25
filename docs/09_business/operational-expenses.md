@@ -17,8 +17,6 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 
 Baseline launch costs (fixed monthly) are intentionally lean, while the biggest scaling driver is variable AI + delivery/payment volume.
 
-**Launch-phase envelope (see §5.0):** infrastructure + OpenRouter prepay + **paid marketing** (per `docs/09_business/marketing-plan.md` §9.0–9.1) + tooling (GitHub Team per seat, Resend Pro when volume exceeds the free tier).
-
 ---
 
 ## 2. Infrastructure Costs
@@ -134,27 +132,16 @@ Model pricing varies by model/provider. For Vayva’s current baseline assumptio
 
 ### 3.3 Resend (Transactional Email)
 
-| Plan | Included volume | Monthly Cost (USD) | Monthly Cost (₦)* |
+| Plan | Emails/Month | Monthly Cost (USD) | Monthly Cost (₦) |
 |---|---|---|---|
-| Free | Up to 3,000 emails/mo | $0 | ₦0 |
-| **Pro** | **50,000 emails/mo** | **$20** | **₦32,000** |
-| Business | Up to 100,000 emails/mo | $80 | ₦128,000 |
-
-\*At $1 = ₦1,600.
-
-**Pro plan (baseline when you outgrow Free):**
-- **Overage:** **$0.90 per 1,000** emails beyond 50,000 (budget explicitly when scaling; e.g. **60,000** sent = **10,000** over → **10 × $0.90 = $9**; **150,000** on Pro = **100,000** over → **$90** overage that month).
-- **Included capabilities (plan positioning):** sending and receiving, ticket support, **30-day** data retention, **up to 10 domains**, **no daily send cap** (still subject to fair use / reputation — monitor bounces and complaints).
-
-**Scaling playbook:**
-- Stay on **Free** until consistent volume approaches ~2,500 emails/mo (headroom for spikes).
-- Move to **Pro** before breaching 3,000/mo; track merchant count × emails/merchant (see estimates below).
-- Above 50,000/mo: model **$20 + ($0.90 × (thousands over 50k))** until **Business** (100k) or enterprise negotiation makes sense.
+| Free | Up to 3,000 | $0 | ₦0 |
+| Pro | Up to 50,000 | $20 | ₦31,000 |
+| Business | Up to 100,000 | $80 | ₦124,000 |
 
 **Email volume estimates:**
 - Per merchant: ~30--100 emails/mo (order confirmations, receipts, notifications)
-- 100 merchants: ~5,000--10,000 emails/mo (typically **Pro** once off Free)
-- 1,000 merchants: ~30,000--100,000 emails/mo (Pro with possible overage, or **Business**)
+- 100 merchants: ~5,000--10,000 emails/mo (Pro plan sufficient)
+- 1,000 merchants: ~30,000--100,000 emails/mo (Business plan)
 - 10,000 merchants: 300,000--1M emails/mo (Enterprise negotiation required)
 
 ### 3.4 Sentry (Error Monitoring)
@@ -187,7 +174,7 @@ If MinIO is self-hosted on the VPS, the main cost drivers are **disk + bandwidth
 |---|---|---|---|
 | OpenRouter (AI) | ₦1.2M | ₦10.5M | ₦85M |
 | Paystack (sub billing) | ₦385K | ₦3.85M | ₦38.5M |
-| Resend (email) | ₦32K+ | ₦128K+ | ₦500K+ |
+| Resend (email) | ₦31K | ₦124K | ₦500K+ |
 | Sentry | ₦0 | ₦40K | ₦124K |
 | Storage (MinIO self-hosted) | ₦0 | ₦0 | ₦0 |
 | WhatsApp (Evolution API) | ₦0 | ₦0 | ₦0 |
@@ -202,11 +189,9 @@ If MinIO is self-hosted on the VPS, the main cost drivers are **disk + bandwidth
 | Plan | Cost | Notes |
 |---|---|---|
 | Free (public/private repos) | $0 | Unlimited repos, 2,000 CI/CD minutes/mo |
-| **Team** | **$4 per user / month** | Per-seat billing on the org (see [GitHub Pricing](https://github.com/pricing)); fine-grained permissions, required policies, more CI minutes than Free |
+| Team | $4/user/mo | Required at 5+ collaborators for advanced permissions |
 
-**Budgeting:** `monthly USD = $4 × (number of paid seats)`; at ₦1,600/$, one seat ≈ **₦6,400/mo**, four seats ≈ **₦25,600/mo**.
-
-**Current:** Free plan is enough for early solo/small team. Move to **Team** when you need org-level branch protection, required reviewers, or centralized secrets across multiple collaborators — add seats only as headcount justifies it.
+**Current:** Free plan. Budget $4--16/mo ($6,200--₦24,800/mo) when team grows to 2--4 engineers.
 
 ### 4.2 Development Environment
 
@@ -221,37 +206,14 @@ If MinIO is self-hosted on the VPS, the main cost drivers are **disk + bandwidth
 
 | Category | Current (₦/mo) | At 5-Person Team (₦/mo) |
 |---|---|---|
-| GitHub Team (≈5 seats @ $4) | ₦0 | ₦32,000 |
+| GitHub | ₦0 | ₦31,000 |
 | CI/CD (GitHub Actions) | ₦0 | ₦15,500 (if exceeding free tier) |
 | Dev tools & licenses | ₦0 | ₦0 |
-| **Total** | **₦0** | **₦47,500** |
+| **Total** | **₦0** | **₦46,500** |
 
 ---
 
 ## 5. Total Cost of Operations
-
-### 5.0 Launch phase (Month 1 envelope)
-
-Use this when planning **cash needed to open publicly**: fixed infra, one-time AI prepay, **minimum paid marketing**, and optional tooling if you are already on paid tiers.
-
-| Line item | Type | Amount | Notes |
-|---|---|---:|---|
-| Infrastructure (Vercel + VPS + business email + domain/SSL equiv.) | Recurring monthly | **₦165,667** | §2 |
-| OpenRouter initial deposit | One-time prepaid | **₦80,000** ($50) | Not monthly; §3.0 |
-| **Paid marketing (launch)** | Recurring monthly | **₦200,000 – ₦250,000** | **₦50,000/week** paid ads (Meta + TikTok split) ≈ **₦200,000/mo**; optional **₦0 – ₦50,000/mo** content — see `docs/09_business/marketing-plan.md` §9.0–9.1 and §11.1 |
-| Resend | Recurring | **₦0** or **₦32,000+** | **Free** until ~3k emails/mo; then **Pro $20/mo** + possible **$0.90/1k** overage — §3.3 |
-| GitHub | Recurring | **₦0** or **₦6,400 × seats** | **Team @ $4/user/mo** when the org moves off Free — §4.1 |
-| Variable (AI, Paystack, etc.) | Usage-based | **₦0+** | Grows with merchants and GMV — §3 |
-
-**Indicative launch Month 1 cash (infra + OpenRouter deposit + minimum marketing, excluding variable AI/Paystack):**
-
-| Scenario | ₦ (approx.) |
-|---|---:|
-| Lean (no Resend Pro, no GitHub Team, **₦200k** marketing) | **₦445,667** |
-| With Resend Pro + **₦250k** marketing | **₦477,667** |
-| Above + **2× GitHub Team** seats | **+₦12,800** |
-
-**After Month 1:** you still pay **₦165,667/mo** infra + **₦200k–₦250k/mo** marketing for the “₦50k/week” launch cadence until you change the marketing plan; OpenRouter deposit is not repeated.
 
 ### 5.1 Current State (Pre-Launch / Early Merchants)
 
@@ -262,8 +224,6 @@ Use this when planning **cash needed to open publicly**: fixed infra, one-time A
 | OpenRouter initial deposit (prepaid) | **₦80,000** | **₦80,000** |
 | Development tools | ₦0 | ₦0 |
 | **Total Baseline (launch month cash)** | **₦245,667** | **₦2,068,000** |
-
-**Note:** **₦245,667** is **infra + OpenRouter deposit only** (no marketing, assumes Free-tier tooling). For **public launch** with paid acquisition, use **§5.0**.
 
 ### 5.2 Scaling Cost Projections
 
@@ -290,16 +250,6 @@ The per-merchant cost decreases at scale due to fixed infrastructure costs being
 | 10,000 merchants | ₦14,800 | ₦42,000 | ₦27,200 (65%) |
 
 **Note:** These operational costs exclude team salaries, office costs, and marketing. Including those, see the Financial Projections document for full P&L analysis.
-
-### 5.4 Expense strategy (launch → scale)
-
-1. **Lock the fixed stack first:** Vercel + dual VPS + domain/email are predictable; review quarterly against §2 scaling triggers.
-2. **Model variables before they bite:** OpenRouter (largest COGS at scale), Paystack deductions on subscription volume, Resend **$0.90/1k** overage above 50k — put **alerts** on provider dashboards at 70% of tier limits.
-3. **Marketing is a dial, not a surprise:** Launch at **₦50k/week** (`marketing-plan.md` §9.0); ramp only when CAC and activation metrics justify **§11.2** (Months 1–3 **₦1.05M/mo** is a different phase — align with cash runway).
-4. **Tooling tracks headcount:** GitHub Team **$4/seat**; add seats when a human needs org permissions, not preemptively.
-5. **Monitoring and support tiers:** Stay on Sentry Free until error volume forces Team (§3.4); keep support SLAs aligned with merchant count.
-6. **FX and prepay:** USD vendors (Vercel, Resend, GitHub, OpenRouter) — see **§6.4**; prepay annual plans when Naira/USD is favorable.
-7. **Contingency buffer:** Hold **≥1 month** of (infra + marketing + estimated AI) in liquid reserves before aggressive spend; full P&L scenarios in `docs/09_business/financial-projections.md`.
 
 ---
 

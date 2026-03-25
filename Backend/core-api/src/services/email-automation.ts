@@ -1,24 +1,17 @@
-import { Resend } from "resend";
+import { Resend } from 'resend';
 
 /**
  * Email Automation Service
- *
+ * 
  * Sends automated reports and notifications to clients
  * Uses Resend.com for email delivery (free tier available)
- *
+ * 
  * Environment variables required:
  * - RESEND_API_KEY
  * - EMAIL_FROM (verified domain in Resend)
  */
 
-let resendSingleton: Resend | null = null;
-
-function getResendClient(): Resend | null {
-  const key = process.env.RESEND_API_KEY?.trim();
-  if (!key) return null;
-  resendSingleton ??= new Resend(key);
-  return resendSingleton;
-}
+const resend = new Resend(process.env.RESEND_API_KEY || '');
 
 interface _EmailOptions {
   to: string;
@@ -62,11 +55,7 @@ export async function sendClientReport(
   clientEmail: string,
   data: ReportData
 ): Promise<{ success: boolean; error?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    return { success: false, error: "RESEND_API_KEY is not configured" };
-  }
-  return sendWithRetry("report", async () => {
+  return sendWithRetry('report', async () => {
     try {
       const html = generateReportHTML(data);
       const text = generateReportText(data);
@@ -101,10 +90,6 @@ export async function sendMilestoneNotification(
     nextMilestone?: string;
   }
 ): Promise<{ success: boolean; error?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    return { success: false, error: "RESEND_API_KEY is not configured" };
-  }
   try {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -156,10 +141,6 @@ export async function sendInvoiceReminder(
     daysOverdue?: number;
   }
 ): Promise<{ success: boolean; error?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    return { success: false, error: "RESEND_API_KEY is not configured" };
-  }
   try {
     const isOverdue = data.daysOverdue && data.daysOverdue > 0;
     

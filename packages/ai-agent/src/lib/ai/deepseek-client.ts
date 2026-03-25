@@ -1,4 +1,4 @@
-import { logger, ErrorCategory } from "../logger";
+import { logger, ErrorCategory } from "../logger.js";
 import { prisma } from "@vayva/db";
 
 // Regex to identify potential emails and phone numbers for stripping

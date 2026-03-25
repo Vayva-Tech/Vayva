@@ -1,24 +1,13 @@
 import { getSettingsManager } from '@vayva/settings';
-import {
-  EmailChannel,
-  SMSChannel,
-  PushChannel,
-  InAppChannel,
-  SlackChannel,
-  WhatsAppChannel,
-} from '../channels/email.channel';
+import type { NotificationSettings, NotificationRule } from '@vayva/settings';
+import { EmailChannel } from '../channels/email.channel';
+import { SMSChannel } from '../channels/sms.channel';
+import { PushChannel } from '../channels/push.channel';
+import { InAppChannel } from '../channels/in-app.channel';
+import { SlackChannel } from '../channels/slack.channel';
+import { WhatsAppChannel } from '../channels/whatsapp.channel';
 import { NotificationQueue } from '../utils/notification-queue';
 import { PriorityManager } from '../utils/priority-manager';
-import type {
-  NotificationPayload,
-  DispatchResult,
-  NotificationChannel,
-  NotificationRule,
-} from '../types/index';
-import {
-  getResolvedEngineNotificationSettings,
-  type EngineNotificationSettings,
-} from '../engine-notification-settings';
 
 export interface NotificationMessage {
   id?: string;
@@ -57,142 +46,60 @@ export class NotificationDispatcher {
     this.initializeChannels();
   }
 
-  private getNotificationSettings(): EngineNotificationSettings {
-    return getResolvedEngineNotificationSettings(this.settingsManager);
-  }
-
   private initializeChannels(): void {
-    const notificationSettings = this.getNotificationSettings();
-
+    const notificationSettings = this.settingsManager.getSettings().notifications;
+    
+    // Register enabled channels
     if (notificationSettings.channels.email.enabled) {
       this.channels.set('email', new EmailChannel(notificationSettings.channels.email));
     }
-
+    
     if (notificationSettings.channels.sms.enabled) {
       this.channels.set('sms', new SMSChannel(notificationSettings.channels.sms));
     }
-
+    
     if (notificationSettings.channels.push.enabled) {
       this.channels.set('push', new PushChannel(notificationSettings.channels.push));
     }
-
+    
     if (notificationSettings.channels.inApp.enabled) {
       this.channels.set('in-app', new InAppChannel(notificationSettings.channels.inApp));
     }
-
+    
     if (notificationSettings.channels.slack.enabled) {
       this.channels.set('slack', new SlackChannel(notificationSettings.channels.slack));
     }
-
+    
     if (notificationSettings.channels.whatsapp.enabled) {
       this.channels.set('whatsapp', new WhatsAppChannel(notificationSettings.channels.whatsapp));
     }
   }
 
-  private mapPayloadPriority(p: string): NotificationMessage['priority'] {
-    if (p === 'critical') return 'urgent';
-    const allowed: NotificationMessage['priority'][] = [
-      'low',
-      'normal',
-      'high',
-      'urgent',
-      'emergency',
-    ];
-    return (allowed.includes(p as NotificationMessage['priority'])
-      ? p
-      : 'normal') as NotificationMessage['priority'];
-  }
-
-  private recipientStrings(
-    recipient: NotificationPayload['recipient'],
-    channel: string,
-  ): string[] {
-    const out: string[] = [];
-    if (recipient.email) out.push(recipient.email);
-    if (recipient.phoneNumber) out.push(recipient.phoneNumber);
-    if (recipient.userId) out.push(`user:${recipient.userId}`);
-    if (recipient.storeId) out.push(`store:${recipient.storeId}`);
-    if (recipient.deviceId) out.push(recipient.deviceId);
-    if (recipient.slackChannel) out.push(recipient.slackChannel);
-    if (recipient.webhookUrl) out.push(recipient.webhookUrl);
-    if (out.length > 0) return out;
-    if (channel === 'in-app' || channel === 'push') return ['in-app'];
-    return ['unknown'];
-  }
-
-  private canDeliverOnChannel(payload: NotificationPayload, channel: string): boolean {
-    const r = payload.recipient;
-    if (channel === 'email') {
-      return typeof r.email === 'string' && r.email.length > 0;
-    }
-    if (channel === 'sms' || channel === 'whatsapp') {
-      return typeof r.phoneNumber === 'string' && r.phoneNumber.length > 0;
-    }
-    return true;
-  }
-
-  private buildInternalMessage(
-    payload: NotificationPayload,
-    channel: string,
-  ): NotificationMessage {
-    return {
+  async dispatch(payload: NotificationPayload): Promise<DispatchResult[]> {
+    const message: NotificationMessage = {
       id: this.generateMessageId(),
-      type: payload.category || 'general',
-      title: payload.subject,
-      content: payload.body,
-      recipients: this.recipientStrings(payload.recipient, channel),
-      channel,
-      priority: this.mapPayloadPriority(payload.priority),
+      subject: payload.subject,
+      body: payload.body,
+      recipients: [payload.recipient],
+      channel: payload.channels[0] || "in-app",
+      priority: payload.priority,
       category: payload.category,
       metadata: {
         source: payload.source,
         eventId: payload.eventId,
-        data: payload.data,
+        data: payload.data
       },
+      createdAt: new Date()
     };
-  }
-
-  async dispatch(payload: NotificationPayload): Promise<DispatchResult[]> {
-    if (!payload.channels?.length) return [];
-
-    const results: DispatchResult[] = [];
-
-    for (const channelName of payload.channels) {
-      if (!this.channels.has(channelName)) {
-        results.push({
-          success: false,
-          channel: channelName as NotificationChannel,
-          status: 'failed',
-          error: `Channel not registered: ${channelName}`,
-          timestamp: new Date(),
-        });
-        continue;
-      }
-
-      if (!this.canDeliverOnChannel(payload, channelName)) {
-        results.push({
-          success: false,
-          channel: channelName as NotificationChannel,
-          status: 'failed',
-          error: 'Missing recipient for channel',
-          timestamp: new Date(),
-        });
-        continue;
-      }
-
-      const message = this.buildInternalMessage(payload, channelName);
-      const success = await this.send(message);
-      results.push({
-        success,
-        messageId: message.id,
-        channel: channelName as NotificationChannel,
-        status: success ? 'delivered' : 'failed',
-        timestamp: new Date(),
-        metadata: { recipient: payload.recipient },
-      });
-    }
-
-    return results;
+    
+    const success = await this.send(message);
+    return [{
+      messageId: message.id,
+      channel: message.channel,
+      status: success ? "delivered" : "failed",
+      timestamp: new Date(),
+      recipient: payload.recipient
+    }];
   }
   
 
@@ -216,7 +123,7 @@ export class NotificationDispatcher {
       }
 
       // Check quiet hours
-      const notificationSettings = this.getNotificationSettings();
+      const notificationSettings = this.settingsManager.getSettings().notifications;
       if (this.shouldRespectQuietHours(message, notificationSettings)) {
         if (this.isQuietHours(notificationSettings.quietHours)) {
           if (this.canOverrideQuietHours(message, notificationSettings)) {
@@ -272,25 +179,19 @@ export class NotificationDispatcher {
   }
 
   private isCategoryEnabled(category: string): boolean {
-    const notificationSettings = this.getNotificationSettings();
+    const notificationSettings = this.settingsManager.getSettings().notifications;
     const categoryPath = category.split('.');
-    let current: unknown = notificationSettings.categories;
-
-    if (!current || typeof current !== 'object') return true;
-
+    let current: any = notificationSettings.categories;
+    
     for (const path of categoryPath) {
-      const next = (current as Record<string, unknown>)[path];
-      if (next === undefined) return true;
-      current = next;
+      if (!current[path]) return false;
+      current = current[path];
     }
-
+    
     return typeof current === 'boolean' ? current : true;
   }
 
-  private shouldRespectQuietHours(
-    message: NotificationMessage,
-    settings: EngineNotificationSettings,
-  ): boolean {
+  private shouldRespectQuietHours(message: NotificationMessage, settings: NotificationSettings): boolean {
     // Emergency messages always bypass quiet hours
     if (message.priority === 'emergency') return false;
     
@@ -320,10 +221,7 @@ export class NotificationDispatcher {
     }
   }
 
-  private canOverrideQuietHours(
-    message: NotificationMessage,
-    settings: EngineNotificationSettings,
-  ): boolean {
+  private canOverrideQuietHours(message: NotificationMessage, settings: NotificationSettings): boolean {
     // Emergency priority always overrides
     if (message.priority === 'emergency') return true;
     
@@ -364,7 +262,7 @@ export class NotificationDispatcher {
     return false;
   }
 
-  private isDoNotDisturbActive(settings: EngineNotificationSettings): boolean {
+  private isDoNotDisturbActive(settings: NotificationSettings): boolean {
     if (!settings.doNotDisturb?.enabled) return false;
     
     const now = new Date();
@@ -374,10 +272,7 @@ export class NotificationDispatcher {
     return now >= startDate && now <= endDate;
   }
 
-  private isEmergencyMessage(
-    message: NotificationMessage,
-    settings: EngineNotificationSettings,
-  ): boolean {
+  private isEmergencyMessage(message: NotificationMessage, settings: NotificationSettings): boolean {
     const content = `${message.title} ${message.content}`.toLowerCase();
     const emergencyKeywords = settings.priority.highPriorityKeywords || [];
     
@@ -387,13 +282,11 @@ export class NotificationDispatcher {
   }
 
   private async processRules(message: NotificationMessage): Promise<NotificationMessage> {
-    const notificationSettings = this.getNotificationSettings();
+    const notificationSettings = this.settingsManager.getSettings().notifications;
     const rules = notificationSettings.customRules || [];
-
+    
     // Find matching rules
-    const matchingRules = (rules as NotificationRule[]).filter((rule) =>
-      this.matchesRule(message, rule),
-    );
+    const matchingRules = rules.filter((rule: any) => this.matchesRule(message, rule));
     
     // Apply rule transformations
     const processedMessage = { ...message };
@@ -452,10 +345,10 @@ export class NotificationDispatcher {
   }
 
   private findMatchingRule(message: NotificationMessage): NotificationRule | undefined {
-    const notificationSettings = this.getNotificationSettings();
+    const notificationSettings = this.settingsManager.getSettings().notifications;
     const rules = notificationSettings.customRules || [];
-
-    return (rules as NotificationRule[]).find((rule) => this.matchesRule(message, rule));
+    
+    return rules.find((rule: any) => this.matchesRule(message, rule));
   }
 
   private async dispatchToChannel(message: NotificationMessage): Promise<boolean> {
@@ -469,7 +362,7 @@ export class NotificationDispatcher {
       const success = await channel.send(message);
       
       // Track engagement if enabled
-      const notificationSettings = this.getNotificationSettings();
+      const notificationSettings = this.settingsManager.getSettings().notifications;
       if (notificationSettings.trackEngagement) {
         this.trackEngagement(message);
       }

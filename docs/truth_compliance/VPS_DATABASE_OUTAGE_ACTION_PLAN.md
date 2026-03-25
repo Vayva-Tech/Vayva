@@ -132,7 +132,7 @@ npx prisma studio
 
 ### Option C: Alternative Database Host 🔄 AVAILABLE
 
-If you have access to another PostgreSQL instance (e.g., managed DB, Supabase, Neon):
+If you have access to another PostgreSQL instance (e.g., AWS RDS, Supabase, Neon):
 
 1. **Create new database instance**
 2. **Update `.env`:**

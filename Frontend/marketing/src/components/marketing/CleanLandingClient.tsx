@@ -130,6 +130,9 @@ function HeroSection() {
                 <div className="min-w-0 flex-1 rounded-md bg-white px-3 py-1.5 font-mono text-xs text-slate-500">
                   merchant.vayva.ng/dashboard
                 </div>
+                <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                  Example · not live data
+                </span>
               </div>
 
               {/* Dashboard Content - Scrollable */}
@@ -160,7 +163,7 @@ function HeroSection() {
                 </div>
               </div>
               <p className="border-b border-slate-100 bg-slate-50/80 px-2 py-1 text-center text-[9px] font-medium text-slate-400">
-                Live preview · Actual merchant dashboard
+                Example dashboard (sample data)
               </p>
               {/* Scaled-down full dashboard */}
               <div className="origin-top-left" style={{ transform: "scale(0.55)", width: "182%", maxHeight: "400px", overflow: "hidden" }}>

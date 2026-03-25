@@ -6,7 +6,7 @@
 
 Build, sell, and scale your business with intelligent automation — powered by AI agents that sell for you on WhatsApp, manage your store, and delight your customers.
 
-[Website](https://vayva.ng) &nbsp;&middot;&nbsp; [Merchant Dashboard](https://merchant.vayva.ng) &nbsp;&middot;&nbsp; [Documentation](./docs/README.md)
+[Website](https://vayva.ng) &nbsp;&middot;&nbsp; [Merchant Dashboard](https://merchant.vayva.ng) &nbsp;&middot;&nbsp; [Documentation](./docs)
 
 </div>
 
@@ -61,8 +61,7 @@ vayva/
 │
 ├── platform/                    # CI/CD, scripts, testing
 ├── docs/                        # Platform documentation
-├── vps-sync/                    # PM2 / VPS deploy config (production-style paths)
-└── infra/                       # DB/scripts adjacent to platform/infra (no AWS Terraform)
+└── infra/                       # Infrastructure (Terraform)
 ```
 
 ## Tech Stack
@@ -116,13 +115,13 @@ For detailed setup instructions, environment variable reference, and troubleshoo
 
 ## Documentation
 
-**Index:** [Documentation home](./docs/README.md) — role-based entry points, numbered-folder guide, and full directory map.
+Full documentation is available in the [`docs/`](./docs) directory:
 
 | Guide | Description |
 |---|---|
 | [Platform Overview](./docs/00_start-here/platform-overview.md) | Architecture, tech stack, and design principles |
 | [Getting Started](./docs/00_start-here/getting-started.md) | Local development setup and common workflows |
-| [Engineering](./docs/02_engineering/) | Architecture and backend/frontend references |
+| [Engineering](./docs/02_engineering/) | Engineering standards and conventions |
 | [Deployment](./docs/04_deployment/) | Production deployment and infrastructure |
 
 ## Production

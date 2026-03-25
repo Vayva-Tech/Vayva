@@ -230,7 +230,7 @@ The Vayva Legal Hub has undergone comprehensive enhancement to achieve world-cla
 #### Schedule 2: Technical and Organizational Measures (337 lines)
 - ✅ Encryption & cryptographic controls (TLS 1.3, AES-256-GCM, HSM key management, FIPS 140-2 Level 3 compliance)
 - ✅ Access control & authentication (RBAC, MFA mandatory, PAM with JIT access, password policy 14+ characters)
-- ✅ Network security (enterprise firewalls, IDS/IPS, DDoS mitigation via Cloudflare, WAF with OWASP CRS)
+- ✅ Network security (enterprise firewalls, IDS/IPS, DDoS mitigation via Cloudflare/AWS Shield, WAF with OWASP CRS)
 - ✅ Application security (secure SDLC, SAST/DAST in CI/CD, annual penetration tests, bug bounty program, vulnerability management SLAs)
 - ✅ Data protection & privacy engineering (minimization, pseudonymization, DLP agents, immutable backups, RTO 4h/RPO 1h)
 - ✅ Incident response & business continuity (24/7 CSIRT, SIEM aggregation, UEBA, playbooks, 72-hour breach notification)

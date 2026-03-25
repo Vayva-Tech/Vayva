@@ -680,7 +680,7 @@ export class CloudHostingService implements IndustryService<ServerInstance> {
     const server = await prisma.serverInstance.findUnique({ where: { id: serverId } });
     if (!server) return null;
     
-    // Production: Integrate with your observability stack (metrics/logs)
+    // Production: Integrate with cloud provider APIs (AWS CloudWatch, GCP Monitoring)
     return {
       serverId,
       name: server.name,

@@ -30,7 +30,7 @@ This audit confirms that all Vayva legal documents are:
 - [x] Complete subprocessor inventory by category
 - [x] Payment processors (Paystack)
 - [x] Identity verification (Manual KYC - truthful, no YouVerify claim)
-- [x] Cloud infrastructure (MinIO, Cloudflare)
+- [x] Cloud infrastructure (AWS, Cloudflare)
 - [x] Analytics (Google Analytics, Hotjar)
 - [x] Marketing (Meta, Google Ads, TikTok, LinkedIn)
 - [x] Communications (Self-hosted email, future WhatsApp)
@@ -45,7 +45,7 @@ This audit confirms that all Vayva legal documents are:
 ✅ **All Claims Verified:**
 - Paystack is actually used (PCI DSS Level 1 certified)
 - Manual KYC verification (no false YouVerify claim)
-- MinIO hosting with self-managed infrastructure
+- AWS hosting with Cape Town region (af-south-1)
 - Self-hosted email (not using SendGrid/SES)
 - Self-built fraud detection (no third-party claims)
 - GitHub used for source control
@@ -54,7 +54,7 @@ This audit confirms that all Vayva legal documents are:
 #### Accuracy Check:
 ✅ **DPA Status Accurate:**
 - Paystack: "Signed with SCCs" ✓
-- MinIO: Self-hosted, full control ✓
+- AWS: "Data Processing Addendum accepted" ✓
 - Cloudflare: "Signed" ✓
 - Google/Meta: Under Data Privacy Framework ✓
 
@@ -335,7 +335,7 @@ This audit confirms that all Vayva legal documents are:
 **Verification:** ✅ TRUE - No YouVerify API calls, manual checks only
 
 #### 3. "Self-Hosted Email"
-**Claim:** "Hosted on same infrastructure as main platform (MinIO)"
+**Claim:** "Hosted on same infrastructure as main platform (AWS)"
 **Verification:** ✅ TRUE - Not using SendGrid, SES, or Mailgun
 
 #### 4. "Partially Conformant" Accessibility

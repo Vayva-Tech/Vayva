@@ -2,7 +2,7 @@ import { logger } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { Client } from "minio";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 interface DeleteUploadBody {
   key: string;
@@ -70,16 +70,19 @@ export async function POST(request: NextRequest) {
     const { endpoint, accessKeyId, secretAccessKey, bucket, region } =
       getS3Config();
 
-    const minioClient = new Client({
-      endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
-      port: parseInt(endpoint.split(":").pop() || "443"),
-      useSSL: endpoint.startsWith("https"),
-      accessKey: accessKeyId,
-      secretKey: secretAccessKey,
+    const s3 = new S3Client({
       region,
+      endpoint,
+      forcePathStyle: true,
+      credentials: { accessKeyId, secretAccessKey },
     });
 
-    await minioClient.removeObject(bucket, key);
+    const command = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+
+    await s3.send(command);
 
     logger.info("[UPLOAD_DELETED]", {
       storeId,

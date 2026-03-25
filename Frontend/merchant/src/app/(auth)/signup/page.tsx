@@ -13,6 +13,8 @@ export default function SignupPage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [storeSlug, setStoreSlug] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,6 +24,22 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [slugError, setSlugError] = useState<string | null>(null);
+
+  // Generate store slug from business name
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const validateSlug = (value: string) => {
+    if (!value) return "Store URL is required";
+    if (value.length < 3) return "Must be at least 3 characters";
+    if (!/^[a-z0-9-]+$/.test(value)) return "Only lowercase letters, numbers, and hyphens allowed";
+    return undefined;
+  };
 
   // RFC 5322 compliant email validation
   const validateEmail = (value: string) => {
@@ -42,16 +60,22 @@ export default function SignupPage() {
       setError("Passwords do not match");
       return;
     }
+    const slugError = validateSlug(storeSlug);
+    if (slugError) {
+      setSlugError(slugError);
+      return;
+    }
     setLoading(true);
     setError(null);
+    setSlugError(null);
     try {
       await AuthService.register({
         email,
         password,
         firstName,
         lastName,
-        // Store details are collected during onboarding.
-        storeName: "",
+        storeName: businessName,
+        storeSlug,
       });
       router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err: unknown) {
@@ -107,6 +131,67 @@ export default function SignupPage() {
               required
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="businessName">Business name</Label>
+          <Input
+            id="businessName"
+            placeholder="Your Business Name"
+            value={businessName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setBusinessName(e.target?.value);
+              if (!storeSlug) {
+                setStoreSlug(generateSlug(e.target?.value));
+              }
+            }}
+            required
+            data-testid="auth-signup-business-name"
+          />
+          <p className="text-xs text-gray-400">
+            The official name of your business
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="storeSlug">
+            Your storefront URL
+            <span className="text-gray-400 font-normal ml-1">
+              (yourstore.vayva.ng)
+            </span>
+          </Label>
+          <div className="flex items-center gap-2">
+            <Input
+              id="storeSlug"
+              type="text"
+              placeholder="yourstore"
+              value={storeSlug}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setStoreSlug(e.target?.value);
+                if (slugError) setSlugError(null);
+              }}
+              onBlur={() => {
+                const err = validateSlug(storeSlug);
+                if (err) setSlugError(err);
+              }}
+              required
+              data-testid="auth-signup-store-slug"
+              aria-invalid={!!slugError}
+              aria-describedby={slugError ? "slug-error" : undefined}
+              className={slugError ? "border-red-400 focus:border-red-500 focus:ring-red-200" : ""}
+            />
+            <span className="text-sm text-gray-400 whitespace-nowrap">
+              .vayva.ng
+            </span>
+          </div>
+          {slugError && (
+            <p id="slug-error" className="text-xs text-red-600 mt-1" role="alert">
+              {slugError}
+            </p>
+          )}
+          <p className="text-xs text-gray-400">
+            Your unique storefront address - customers will visit this URL
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -213,37 +298,37 @@ export default function SignupPage() {
         </div>
 
         <div className="flex items-start gap-3">
-          <input
+          <Input
             id="terms-agreement"
             type="checkbox"
             checked={agreedToTerms}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setAgreedToTerms(e.target?.checked)
             }
-            className="mt-1 h-5 w-5 shrink-0 rounded border-gray-200 text-green-600 focus:ring-green-500 cursor-pointer"
+            className="w-5 h-5 mt-0.5 rounded border-gray-100 text-green-500 focus:ring-green-500 cursor-pointer"
           />
-          <label
-            htmlFor="terms-agreement"
-            className="text-sm leading-relaxed text-gray-600 cursor-pointer select-none"
-          >
+          <label htmlFor="terms-agreement" className="text-sm text-gray-500 cursor-pointer">
             By creating an account, you agree to our{" "}
             <Link
               href="/legal/terms"
-              className="text-gray-900 font-medium underline underline-offset-2"
+              target="_blank"
+              className="text-gray-900 font-medium underline"
             >
               Terms
             </Link>
             ,{" "}
             <Link
               href="/legal/privacy"
-              className="text-gray-900 font-medium underline underline-offset-2"
+              target="_blank"
+              className="text-gray-900 font-medium underline"
             >
               Privacy
             </Link>
             , and{" "}
             <Link
               href="/legal/eula"
-              className="text-gray-900 font-medium underline underline-offset-2"
+              target="_blank"
+              className="text-gray-900 font-medium underline"
             >
               EULA
             </Link>

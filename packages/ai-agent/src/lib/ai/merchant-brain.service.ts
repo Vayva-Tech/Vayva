@@ -1,6 +1,6 @@
 import { prisma, Prisma } from "@vayva/db";
-import { logger } from "../logger";
-import { MLInferenceClient } from "../ml/ml-client";
+import { logger } from "../logger.js";
+import { MLInferenceClient } from "../ml/ml-client.js";
 
 type UnknownRecord = Record<string, unknown>;
 

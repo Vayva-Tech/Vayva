@@ -1,10 +1,9 @@
 import { getSettingsManager } from '@vayva/settings';
-import {
-  NotificationPayload,
+import { 
+  NotificationPayload, 
   NotificationRule,
-  NotificationChannel,
+  NotificationChannel 
 } from '../types/index.js';
-import { getResolvedEngineNotificationSettings } from '../engine-notification-settings';
 
 /**
  * Rule Engine - Evaluates custom notification rules
@@ -18,15 +17,9 @@ import { getResolvedEngineNotificationSettings } from '../engine-notification-se
  */
 export class RuleEngine {
   private settingsManager;
-  /** Persisted rules are not stored in @vayva/settings minimal mode; keep in memory until DB-backed. */
-  private inMemoryRules: NotificationRule[] = [];
 
   constructor() {
     this.settingsManager = getSettingsManager();
-    const seeded = getResolvedEngineNotificationSettings(this.settingsManager).customRules;
-    if (Array.isArray(seeded) && seeded.length) {
-      this.inMemoryRules = [...(seeded as NotificationRule[])];
-    }
   }
 
   /**
@@ -39,9 +32,12 @@ export class RuleEngine {
     userId?: string;
   }): Promise<NotificationPayload[]> {
     try {
+      const notificationSettings = this.settingsManager.getSettings().notifications;
+      const customRules = notificationSettings.customRules || [];
+      
       const triggeredNotifications: NotificationPayload[] = [];
 
-      for (const rule of this.inMemoryRules) {
+      for (const rule of customRules) {
         if (!rule.enabled) continue;
 
         const matches = await this.evaluateRule(rule, context);
@@ -283,12 +279,16 @@ export class RuleEngine {
    */
   async addRule(rule: Omit<NotificationRule, 'id'>): Promise<NotificationRule> {
     try {
+      const notificationSettings = this.settingsManager.getSettings().notifications;
+      
       const newRule: NotificationRule = {
         ...rule,
-        id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       };
 
-      this.inMemoryRules.push(newRule);
+      const updatedRules = [...(notificationSettings.customRules || []), newRule];
+      
+      await this.settingsManager.updateNotificationSettings({ customRules: updatedRules });
 
       return newRule;
     } catch (error) {
@@ -302,9 +302,14 @@ export class RuleEngine {
    */
   async updateRule(ruleId: string, updates: Partial<NotificationRule>): Promise<void> {
     try {
-      this.inMemoryRules = this.inMemoryRules.map((rule) =>
-        rule.id === ruleId ? { ...rule, ...updates } : rule,
+      const notificationSettings = this.settingsManager.getSettings().notifications;
+      const rules = notificationSettings.customRules || [];
+      
+      const updatedRules = rules.map((rule: any) => 
+        rule.id === ruleId ? { ...rule, ...updates } : rule
       );
+      
+      await this.settingsManager.updateNotificationSettings({ customRules: updatedRules });
     } catch (error) {
       console.error('[RuleEngine] Error updating rule:', error);
       throw error;
@@ -316,7 +321,12 @@ export class RuleEngine {
    */
   async deleteRule(ruleId: string): Promise<void> {
     try {
-      this.inMemoryRules = this.inMemoryRules.filter((rule) => rule.id !== ruleId);
+      const notificationSettings = this.settingsManager.getSettings().notifications;
+      const rules = notificationSettings.customRules || [];
+      
+      const updatedRules = rules.filter((rule: any) => rule.id !== ruleId);
+      
+      await this.settingsManager.updateNotificationSettings({ customRules: updatedRules });
     } catch (error) {
       console.error('[RuleEngine] Error deleting rule:', error);
       throw error;
@@ -328,7 +338,8 @@ export class RuleEngine {
    */
   getRules(): NotificationRule[] {
     try {
-      return [...this.inMemoryRules];
+      const notificationSettings = this.settingsManager.getSettings().notifications;
+      return notificationSettings.customRules || [];
     } catch (error) {
       console.error('[RuleEngine] Error getting rules:', error);
       return [];

@@ -47,6 +47,3 @@ export { registerRetailWidgets } from './widgets/registry';
 
 // Services
 export * from './services/index';
-
-// API Service Layer
-export { RetailApiService } from './api/retail-api';
