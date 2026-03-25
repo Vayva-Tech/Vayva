@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -29,6 +29,7 @@ export function Sticker3D({ src, alt, className = '', size = 120 }: Sticker3DPro
   // Calculate rotation based on position
   const rotateX = useTransform(springY, [-100, 100], [15, -15]);
   const rotateY = useTransform(springX, [-100, 100], [-15, 15]);
+  const shineOpacity = useTransform(rotateY, [-15, 15], [0.1, 0.4]);
 
   return (
     <motion.div
@@ -72,11 +73,7 @@ export function Sticker3D({ src, alt, className = '', size = 120 }: Sticker3DPro
         <motion.div
           className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent pointer-events-none"
           style={{
-            opacity: prefersReducedMotion ? 0.2 : useTransform(
-              rotateY,
-              [-15, 15],
-              [0.1, 0.4]
-            ),
+            opacity: prefersReducedMotion ? 0.2 : shineOpacity,
           }}
         />
       </motion.div>

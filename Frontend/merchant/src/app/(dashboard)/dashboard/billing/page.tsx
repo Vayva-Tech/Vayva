@@ -1,12 +1,10 @@
-// @ts-nocheck
 "use client";
-
 import { logger, formatCurrency, formatDate } from "@vayva/shared";
 import React, { useEffect, useState } from "react";
 import {
   CreditCard,
   Check,
-  AlertCircle,
+  WarningCircle as AlertCircle,
   Info,
   Warning,
   Bank,
@@ -108,7 +106,7 @@ export default function BillingPage() {
 
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto py-12 space-y-6">
+      <div className="max-w-5xl py-8 space-y-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Billing & Plans</h1>
         <div className="bg-red-50 border border-red-100 p-5 rounded-2xl">
           <div className="font-semibold text-red-600 mb-1">Could not load billing</div>
@@ -128,7 +126,7 @@ export default function BillingPage() {
   const isPastDue = status?.status === "past_due";
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-20">
+    <div className="space-y-8 max-w-5xl pb-20">
       {/* Header */}
       <div>
         <div className="text-sm text-gray-500">Platform</div>
@@ -187,7 +185,7 @@ export default function BillingPage() {
       {/* Billing Cycle Toggle */}
       <div className="flex items-center justify-center">
         <div className="inline-flex items-center gap-2 p-1 rounded-xl bg-white border border-gray-100">
-          <button
+          <Button
             onClick={() => setBillingCycle("monthly")}
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-all",
@@ -197,8 +195,8 @@ export default function BillingPage() {
             )}
           >
             Monthly
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setBillingCycle("quarterly")}
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
@@ -211,7 +209,7 @@ export default function BillingPage() {
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
               Save 10%
             </span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -285,7 +283,7 @@ export default function BillingPage() {
                     Payment Method
                   </p>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => setPaymentMethod("card")}
                       className={cn(
                         "flex-1 px-3 py-2 rounded-xl text-sm font-medium border transition-all flex items-center justify-center gap-2",
@@ -296,8 +294,8 @@ export default function BillingPage() {
                     >
                       <CreditCard className="w-4 h-4" />
                       Card (Auto-debit)
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => setPaymentMethod("bank_transfer")}
                       className={cn(
                         "flex-1 px-3 py-2 rounded-xl text-sm font-medium border transition-all flex items-center justify-center gap-2",
@@ -308,7 +306,7 @@ export default function BillingPage() {
                     >
                       <Bank className="w-4 h-4" />
                       Bank Transfer
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

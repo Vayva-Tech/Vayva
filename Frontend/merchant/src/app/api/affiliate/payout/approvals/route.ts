@@ -1,23 +1,26 @@
-// @ts-nocheck
 import { logger, ErrorCategory } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { affiliateService } from "@vayva/affiliate";
 import { prisma } from "@vayva/db";
-import { apiJson } from "@/lib/api-client-shared";
-
 /**
  * GET /api/affiliate/payout/approvals
  * Get pending payouts requiring approval
  */
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const storeId = searchParams.get("storeId");
-
+    const auth = await buildBackendAuthHeaders(req);
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const storeId = auth.user.storeId;
     if (!storeId) {
       return NextResponse.json(
-        { success: false, error: "storeId is required" },
-        { status: 400 }
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
       );
     }
 
@@ -43,8 +46,30 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { payoutId, approvedBy } = body;
+    const auth = await buildBackendAuthHeaders(req);
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const body: unknown = await req.json().catch(() => ({}));
+    const record =
+      typeof body === "object" && body !== null
+        ? (body as Record<string, unknown>)
+        : {};
+    const payoutId =
+      typeof record.payoutId === "string" ? record.payoutId : undefined;
+    const approvedBy =
+      typeof record.approvedBy === "string" ? record.approvedBy : undefined;
 
     if (!payoutId || !approvedBy) {
       return NextResponse.json(
@@ -53,7 +78,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await affiliateService.approvePayout(payoutId, approvedBy);
+    const result = await affiliateService.approvePayout(payoutId, approvedBy, storeId);
 
     if (!result.success) {
       return NextResponse.json(
@@ -84,8 +109,29 @@ export async function POST(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { payoutId, rejectedBy, reason } = body;
+    const auth = await buildBackendAuthHeaders(req);
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body: unknown = await req.json().catch(() => ({}));
+    const record =
+      typeof body === "object" && body !== null
+        ? (body as Record<string, unknown>)
+        : {};
+    const payoutId =
+      typeof record.payoutId === "string" ? record.payoutId : undefined;
+    const rejectedBy =
+      typeof record.rejectedBy === "string" ? record.rejectedBy : undefined;
+    const reason =
+      typeof record.reason === "string" ? record.reason : undefined;
 
     if (!payoutId || !rejectedBy) {
       return NextResponse.json(
@@ -94,34 +140,26 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const storeId = req.headers.get("x-store-id") || "";
-    const payout = await apiJson<{
-        success: boolean;
-        data?: any;
-        error?: string;
-      }>(`${process.env.BACKEND_API_URL}/api/affiliatepayout/id`, {
-        headers: {
-          "x-store-id": storeId,
-        },
-      });
+    const existing = await prisma.affiliatePayout.findFirst({
+      where: { id: payoutId, storeId },
+    });
 
-    if (!payout) {
+    if (!existing) {
       return NextResponse.json(
         { success: false, error: "Payout not found" },
         { status: 404 }
       );
     }
 
-    if (payout.status !== "APPROVAL_REQUIRED") {
+    if (existing.status !== "APPROVAL_REQUIRED") {
       return NextResponse.json(
         { success: false, error: "Payout is not pending approval" },
         { status: 400 }
       );
     }
 
-    // Update payout status
-    await prisma.affiliatePayout.update({
-      where: { id: payoutId },
+    await prisma.affiliatePayout.updateMany({
+      where: { id: payoutId, storeId, status: "APPROVAL_REQUIRED" },
       data: {
         status: "CANCELLED",
         failureReason: reason || "Rejected by admin",
@@ -130,9 +168,9 @@ export async function PATCH(req: NextRequest) {
     });
 
     // Notify affiliate
-    await affiliateService["notifyAffiliate"](payout.affiliateId, "payout_rejected", {
+    await affiliateService.notifyAffiliate(existing.affiliateId, "payout_rejected", {
       payoutId,
-      amount: payout.amount,
+      amount: existing.amount,
       reason: reason || "Payout request rejected",
     });
 

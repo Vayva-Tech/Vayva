@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { Card, Button } from "@vayva/ui";
 
 interface CustomerSegment {
   segmentId: string;
@@ -100,27 +99,27 @@ export const CustomerSegmentExplorer: React.FC<CustomerSegmentExplorerProps> = (
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassPanel variant="bordered" className="p-4">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Total Segments</div>
           <div className="text-2xl font-bold text-white">{segments.length}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Total Customers</div>
           <div className="text-2xl font-bold text-white">{totalCustomers.toLocaleString()}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Total Revenue</div>
           <div className="text-2xl font-bold text-white">{formatCurrency(totalRevenue)}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Avg Engagement</div>
           <div className="text-2xl font-bold text-white">{avgEngagement}%</div>
-        </GlassPanel>
+        </Card>
       </div>
 
       {/* AI Insights */}
       {insights.length > 0 && (
-        <GlassPanel variant="elevated" className="p-6">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
           <h3 className="text-lg font-semibold text-white mb-4">🤖 AI Insights</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {insights.map((insight, index) => (
@@ -136,11 +135,11 @@ export const CustomerSegmentExplorer: React.FC<CustomerSegmentExplorerProps> = (
               </div>
             ))}
           </div>
-        </GlassPanel>
+        </Card>
       )}
 
       {/* Segments Grid */}
-      <GlassPanel variant="elevated" className="p-6">
+      <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Customer Segments</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {sortedSegments.map((segment) => (
@@ -209,7 +208,7 @@ export const CustomerSegmentExplorer: React.FC<CustomerSegmentExplorerProps> = (
                   variant="secondary"
                   size="sm"
                   className="flex-1"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     onViewCustomers?.(segment.segmentId);
                   }}
@@ -220,7 +219,7 @@ export const CustomerSegmentExplorer: React.FC<CustomerSegmentExplorerProps> = (
                   variant="primary"
                   size="sm"
                   className="flex-1"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     onCreateCampaign?.(segment.segmentId);
                   }}
@@ -231,10 +230,10 @@ export const CustomerSegmentExplorer: React.FC<CustomerSegmentExplorerProps> = (
             </div>
           ))}
         </div>
-      </GlassPanel>
+      </Card>
 
       {/* Segment Comparison Chart */}
-      <GlassPanel variant="elevated" className="p-6">
+      <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Revenue Comparison</h3>
         <div className="space-y-3">
           {sortedSegments.map((segment) => {
@@ -261,17 +260,17 @@ export const CustomerSegmentExplorer: React.FC<CustomerSegmentExplorerProps> = (
             );
           })}
         </div>
-      </GlassPanel>
+      </Card>
 
       {/* Empty State */}
       {segments.length === 0 && (
-        <GlassPanel variant="bordered" className="p-12 text-center">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-12 text-center">
           <svg className="w-16 h-16 text-white/20 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           <h3 className="text-lg font-semibold text-white mb-2">No Segments Found</h3>
           <p className="text-sm text-white/60">Create your first customer segment to get started</p>
-        </GlassPanel>
+        </Card>
       )}
     </div>
   );

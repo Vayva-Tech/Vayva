@@ -10,7 +10,7 @@ class EventsEngine {
   }
   
   async initialize() {
-    console.log('[EVENTS_ENGINE] Initialized');
+    console.warn('[EVENTS_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

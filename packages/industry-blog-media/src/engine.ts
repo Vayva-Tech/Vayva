@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Blog/Media Industry Engine Export
  */

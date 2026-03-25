@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Professional Services Industry Engine
  * Main orchestrator for all professional services-specific features

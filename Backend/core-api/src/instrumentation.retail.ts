@@ -5,7 +5,7 @@
  * WebSocket server and Prisma hooks on server startup
  */
 
-import { setupRetailRealtime } from './lib/retail-setup';
+import { setupRetailRealtime as _setupRetailRealtime } from './lib/retail-setup';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
@@ -17,7 +17,7 @@ export async function register() {
         // For Vercel deployment, use their real-time features instead
         
         if (process.env.ENABLE_RETAIL_REALTIME === 'true') {
-          console.log('[Instrumentation] Retail realtime initialization requested');
+          console.warn('[Instrumentation] Retail realtime initialization requested');
           // The actual server initialization happens in the custom server
           // or through the /api/retail/realtime endpoint
         }

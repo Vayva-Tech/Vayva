@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-nonprofit
  * Vayva Nonprofit Industry Engine
@@ -47,12 +46,12 @@ export {
 export {
   DonationTracker,
   GrantPipelineDashboard,
-} from './components/index.ts';
+} from './components/index';
 
 export type {
   DonationTrackerProps,
   GrantPipelineDashboardProps,
-} from './components/index.ts';
+} from './components/index';
 
 // Dashboard
 export * from './dashboard/index';

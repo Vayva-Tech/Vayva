@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Seating Service
  * Manages table assignments, seating charts, and guest placement
@@ -61,9 +60,9 @@ export class EventSeatingService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[EVENT_SEATING] Initializing service...');
+    console.warn('[EVENT_SEATING] Initializing service...');
     this.initializeSampleData();
-    console.log('[EVENT_SEATING] Service initialized');
+    console.warn('[EVENT_SEATING] Service initialized');
   }
 
   private initializeSampleData(): void {

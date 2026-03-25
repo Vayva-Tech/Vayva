@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Insights Service
  * Business intelligence, KPI tracking, and actionable recommendations

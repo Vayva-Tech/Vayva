@@ -1,49 +1,40 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { apiJson } from "@/lib/api-client-shared";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma } from "@vayva/db";
-import { z } from "zod";
-
-const updateProductSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  category: z.string().optional(),
-  price: z.number().optional(),
-  costPrice: z.number().optional(),
-  stockQuantity: z.number().optional(),
-  lowStockThreshold: z.number().optional(),
-  inventoryTracking: z.boolean().optional(),
-  productType: z.enum(["RETAIL", "PROFESSIONAL"]).optional(),
-  supplier: z.string().optional(),
-  sku: z.string().optional(),
-  barcode: z.string().optional(),
-  imageUrl: z.string().optional(),
-  status: z.enum(["active", "inactive", "discontinued"]).optional(),
-  metadata: z.any().optional(),
-});
 
 /**
  * GET /api/beauty/inventory/[id]
  * Get specific product details
  */
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    
-    const product = await prisma.product.findUnique({
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const product = await prisma.product.findFirst({
       where: {
         id,
-        merchantId: storeId,
+        storeId,
       },
     });
 
     if (!product) {
-      return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     const orderItems = await prisma.orderItem.findMany({
@@ -59,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
       },
       orderBy: {
-        createdAt: "desc",
+        order: { createdAt: "desc" },
       },
       take: 20,
     });
@@ -76,9 +67,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       endpoint: "/api/beauty/inventory/[id]",
       operation: "GET_INVENTORY_ITEM",
     });
-    return NextResponse.json(
-      { error: "Failed to fetch inventory item" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch inventory item" }, { status: 500 });
   }
 }

@@ -1,6 +1,10 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../tsconfig/base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@fashion-prisma": ["./src/lib/prisma-fashion.ts"]
+    },
     "outDir": "./dist",
     "rootDir": "./src",
     "noEmit": false,

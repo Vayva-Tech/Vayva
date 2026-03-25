@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Project Workflow Service
  * Handles project boards, task management, and workflow automation
  */
 
-import { PrismaClient } from '@vayva/prisma';
+import { PrismaClient } from '@vayva/db';
 
 export interface WorkflowBoard {
   id: string;

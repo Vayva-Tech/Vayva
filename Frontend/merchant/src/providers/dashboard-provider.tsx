@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Unified Dashboard Provider
  * Central management for dashboard state, access control, and feature flags
@@ -6,36 +5,43 @@
 
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useStore } from '@/providers/store-provider';
 import { FeatureFlags } from '@/lib/feature-flags';
-import { 
-  PlanTier, 
-  TIER_LIMITS, 
-  isFeatureAvailable, 
-  getMaxItems, 
+import {
+  type PlanTier,
+  type TierLimits,
+  isFeatureAvailable,
+  getMaxItems,
   hasExceededQuota,
-  getRemainingQuota
+  getRemainingQuota,
 } from '@/lib/access-control/tier-limits';
+
+/** Session / display tier (FREE is not a billing PlanTier but is used in UI). */
+export type DashboardSessionTier = PlanTier | 'FREE';
+
+function effectivePlanTierForLimits(tier: DashboardSessionTier): PlanTier {
+  return tier === 'FREE' ? 'STARTER' : tier;
+}
 
 interface DashboardContextType {
   // Current state
-  currentTier: PlanTier;
+  currentTier: DashboardSessionTier;
   industry: string;
-  
+
   // Feature access
-  isFeatureEnabled: (feature: keyof typeof TIER_LIMITS.FREE) => boolean;
-  getMaxItems: (feature: keyof typeof TIER_LIMITS.FREE) => number | 'unlimited';
-  hasExceededQuota: (feature: keyof typeof TIER_LIMITS.FREE, currentUsage: number) => boolean;
-  getRemainingQuota: (feature: keyof typeof TIER_LIMITS.FREE, currentUsage: number) => number;
-  
+  isFeatureEnabled: (feature: keyof TierLimits) => boolean;
+  getMaxItems: (feature: keyof TierLimits) => number | 'unlimited';
+  hasExceededQuota: (feature: keyof TierLimits, currentUsage: number) => boolean;
+  getRemainingQuota: (feature: keyof TierLimits, currentUsage: number) => number;
+
   // Feature flags
   featureFlags: FeatureFlags;
-  
+
   // Upgrade information
   canUpgrade: boolean;
   upgradeUrl: string;
-  
+
   // Dashboard preferences
   dashboardType: 'universal' | 'industry-native';
   setDashboardType: (type: 'universal' | 'industry-native') => void;
@@ -47,41 +53,38 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const { store } = useStore();
-  const [currentTier, setCurrentTier] = useState<PlanTier>('FREE');
+  const [currentTier, setCurrentTier] = useState<DashboardSessionTier>('FREE');
   const [dashboardType, setDashboardType] = useState<'universal' | 'industry-native'>('universal');
-  const [activeView, setActiveView] = useState<string>(store?.industrySlug || 'retail');
-  
-  // Initialize feature flags
+  const [activeView, setActiveView] = useState<string>(store?.industrySlug ?? 'retail');
+
   const featureFlags = FeatureFlags.getInstance();
 
-  // Update tier when store changes
   useEffect(() => {
-    if (store?.subscription?.plan) {
-      const planKey = store.subscription.plan.key.toUpperCase();
-      if (planKey === 'FREE' || planKey === 'STARTER' || planKey === 'PRO') {
-        setCurrentTier(planKey as PlanTier);
-        featureFlags.initialize(planKey as PlanTier);
-      } else {
-        setCurrentTier('FREE');
-        featureFlags.initialize('FREE');
-      }
-    } else {
-      setCurrentTier('FREE');
-      featureFlags.initialize('FREE');
+    const flags = FeatureFlags.getInstance();
+    const plan = store?.plan;
+    if (plan === 'PRO') {
+      setCurrentTier('PRO');
+      flags.initialize('PRO');
+      return;
     }
-  }, [store?.subscription?.plan]);
+    if (plan === 'STARTER') {
+      setCurrentTier('STARTER');
+      flags.initialize('STARTER');
+      return;
+    }
+    setCurrentTier('FREE');
+    flags.initialize('STARTER');
+  }, [store?.plan]);
 
-  // Initialize dashboard preferences from localStorage
   useEffect(() => {
     const savedType = localStorage.getItem('dashboard-type') as 'universal' | 'industry-native' | null;
     const savedView = localStorage.getItem('dashboard-view');
-    
+
     if (savedType) setDashboardType(savedType);
     if (savedView) setActiveView(savedView);
     else if (store?.industrySlug) setActiveView(store.industrySlug);
   }, [store?.industrySlug]);
 
-  // Save preferences to localStorage
   useEffect(() => {
     localStorage.setItem('dashboard-type', dashboardType);
   }, [dashboardType]);
@@ -90,29 +93,28 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('dashboard-view', activeView);
   }, [activeView]);
 
+  const limitsTier = effectivePlanTierForLimits(currentTier);
+
   const contextValue: DashboardContextType = {
-    // Current state
     currentTier,
-    industry: store?.industrySlug || 'default',
-    
-    // Feature access
-    isFeatureEnabled: (feature) => isFeatureAvailable(currentTier, feature),
-    getMaxItems: (feature) => getMaxItems(currentTier, feature),
-    hasExceededQuota: (feature, currentUsage) => hasExceededQuota(currentTier, feature, currentUsage),
-    getRemainingQuota: (feature, currentUsage) => getRemainingQuota(currentTier, feature, currentUsage),
-    
-    // Feature flags
+    industry: store?.industrySlug ?? 'default',
+
+    isFeatureEnabled: (feature) => isFeatureAvailable(limitsTier, feature),
+    getMaxItems: (feature) => getMaxItems(limitsTier, feature),
+    hasExceededQuota: (feature, currentUsage) =>
+      hasExceededQuota(limitsTier, feature, currentUsage),
+    getRemainingQuota: (feature, currentUsage) =>
+      getRemainingQuota(limitsTier, feature, currentUsage),
+
     featureFlags,
-    
-    // Upgrade information
-    canUpgrade: currentTier !== 'PRO',
+
+    canUpgrade: currentTier !== 'PRO' && currentTier !== 'PRO_PLUS',
     upgradeUrl: '/dashboard/billing',
-    
-    // Dashboard preferences
+
     dashboardType,
     setDashboardType,
     activeView,
-    setActiveView
+    setActiveView,
   };
 
   return (

@@ -30,21 +30,21 @@ export function LandingHero({
   showGlobalBadge,
 }: LandingHeroProps): React.JSX.Element {
   return (
-    <section className="relative overflow-hidden pt-4 pb-8 md:pt-8 md:pb-12 px-4">
-      <div className="relative max-w-[1760px] mx-auto">
-        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-12 xl:gap-20 items-center min-h-[70vh]">
+    <section className="relative w-full min-w-0 overflow-x-hidden pt-4 pb-8 md:pt-8 md:pb-12 px-4">
+      <div className="relative max-w-[1760px] mx-auto min-w-0">
+        <div className="grid lg:grid-cols-[1fr_1.1fr] gap-12 xl:gap-20 items-center min-h-[70vh] min-w-0">
           {/* Left: Text Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="relative z-10"
+            className="relative z-10 min-w-0"
           >
-            <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] xl:text-[4rem] font-black text-foreground mb-6 leading-[1.08] tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] xl:text-[4rem] font-black text-foreground mb-6 leading-[1.08] tracking-tight">
               {headline}
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-lg">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-lg">
               {sub}
             </p>
 
@@ -53,9 +53,9 @@ export function LandingHero({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="mb-8 w-full max-w-xl"
+              className="mb-8 w-full max-w-xl min-w-0"
             >
-              <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+              <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 min-w-0">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -71,8 +71,8 @@ export function LandingHero({
                 </div>
                 
                 {/* Metrics Grid */}
-                <div className="p-4 grid grid-cols-3 gap-3">
-                  <div className="bg-slate-50 rounded-xl p-3">
+                <div className="p-4 grid grid-cols-3 gap-2 sm:gap-3 min-w-0">
+                  <div className="bg-slate-50 rounded-xl p-2.5 sm:p-3 min-w-0">
                     <p className="text-[10px] text-slate-500 uppercase font-medium">Revenue</p>
                     <p className="text-lg font-bold text-slate-900">₦847k</p>
                     <div className="flex items-center gap-1 mt-1">
@@ -80,12 +80,12 @@ export function LandingHero({
                       <span className="text-[10px] text-emerald-600">+23%</span>
                     </div>
                   </div>
-                  <div className="bg-slate-50 rounded-xl p-3">
+                  <div className="bg-slate-50 rounded-xl p-2.5 sm:p-3 min-w-0">
                     <p className="text-[10px] text-slate-500 uppercase font-medium">Orders</p>
                     <p className="text-lg font-bold text-slate-900">47</p>
                     <span className="text-[10px] text-slate-400">Active</span>
                   </div>
-                  <div className="bg-slate-50 rounded-xl p-3">
+                  <div className="bg-slate-50 rounded-xl p-2.5 sm:p-3 min-w-0">
                     <p className="text-[10px] text-slate-500 uppercase font-medium">Inventory</p>
                     <p className="text-lg font-bold text-slate-900">156</p>
                     <span className="text-[10px] text-amber-500">3 low stock</span>
@@ -124,8 +124,8 @@ export function LandingHero({
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="bg-slate-50 px-4 py-2 flex items-center justify-between border-t border-slate-100">
-                  <div className="flex items-center gap-3">
+                <div className="bg-slate-50 px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
                     <div className="flex items-center gap-1">
                       <LayoutDashboard className="w-3 h-3 text-slate-400" />
                       <span className="text-[10px] text-slate-500">Dashboard</span>
@@ -139,13 +139,15 @@ export function LandingHero({
                       <span className="text-[10px] text-slate-500">AI</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-slate-400">vayva.ng/amina</span>
+                  <span className="text-[10px] text-slate-400 truncate max-w-[40%] sm:max-w-none">
+                    vayva.ng/amina
+                  </span>
                 </div>
               </div>
             </motion.div>
 
             {/* CTA Row */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8 min-w-0">
               <a href={`${APP_URL}/signup`}>
                 <PremiumButton
                   data-testid="landing-get-started"
@@ -170,7 +172,7 @@ export function LandingHero({
               </a>
 
               {/* Avatars + Rating */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3 min-w-0">
                 <div className="flex -space-x-2">
                   {[1, 2, 3].map((i) => (
                     <div
@@ -388,8 +390,8 @@ export function LandingHero({
           </div>
 
           {/* Mobile: Simplified visual */}
-          <div className="lg:hidden mt-4">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="lg:hidden mt-4 min-w-0">
+            <div className="grid grid-cols-2 gap-3 min-w-0">
               <div className="bg-background/80 backdrop-blur-xl rounded-2xl p-4 shadow-card">
                 <div className="flex items-center gap-2 mb-2">
                   <LayoutDashboard className="w-4 h-4 text-primary" />

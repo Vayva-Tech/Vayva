@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Creative Industry Dashboard
  * Portfolio management, design tools, and creative project tracking
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -94,6 +93,17 @@ interface CreativeMetrics {
   clientSatisfaction: number;
 }
 
+const EMPTY_CREATIVE_METRICS: CreativeMetrics = {
+  totalProjects: 0,
+  activeProjects: 0,
+  completedProjects: 0,
+  portfolioItems: 0,
+  totalLikes: 0,
+  totalViews: 0,
+  avgEngagement: 0,
+  clientSatisfaction: 0,
+};
+
 // Helper functions used across sub-components
 function getTypeIcon(type: string) {
   switch (type) {
@@ -134,7 +144,7 @@ export default function CreativeDashboard() {
       } catch (error) {
         console.error('Failed to fetch creative metrics:', error);
         toast.error('Failed to load creative dashboard data');
-        return null;
+        return EMPTY_CREATIVE_METRICS;
       }
     }
   );
@@ -200,7 +210,7 @@ export default function CreativeDashboard() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -211,7 +221,7 @@ export default function CreativeDashboard() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -305,7 +315,7 @@ export default function CreativeDashboard() {
       )}
       
       {activeTab === 'analytics' && (
-        <AnalyticsView metrics={metrics} loading={metricsLoading} />
+        <AnalyticsView metrics={metrics ?? null} loading={metricsLoading} />
       )}
     </div>
   );
@@ -333,13 +343,20 @@ function ProjectsView({ projects, loading, selectedProject, onSelectProject }: a
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
+          className={`cursor-pointer ${selectedProject === project.id ? 'ring-2 ring-green-500 rounded-2xl' : ''}`}
+          onClick={() => onSelectProject(project.id)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onSelectProject(project.id);
+            }
+          }}
         >
           <ThemedCard 
             industry={store?.industrySlug || 'default'}
-            className={`cursor-pointer transition-all hover:shadow-lg ${
-              selectedProject === project.id ? 'ring-2 ring-green-500' : ''
-            }`}
-            onClick={() => onSelectProject(project.id)}
+            className="transition-all hover:shadow-lg"
           >
             <div className="relative mb-4">
               <div className="aspect-video bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg flex items-center justify-center">
@@ -454,9 +471,9 @@ function PortfolioView({ portfolio, loading }: { portfolio: PortfolioItem[]; loa
                   {item.engagement.shares}
                 </span>
               </div>
-              <button className="p-1 hover:bg-gray-100 rounded">
+              <Button className="p-1 hover:bg-gray-100 rounded">
                 <Download className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </ThemedCard>
         </motion.div>
@@ -534,12 +551,12 @@ function FeedbackView({ feedback, loading }: { feedback: ClientFeedback[]; loadi
             )}
             
             <div className="flex gap-2 mt-3">
-              <button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+              <Button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                 Respond
-              </button>
-              <button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+              </Button>
+              <Button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                 Mark Addressed
-              </button>
+              </Button>
             </div>
           </motion.div>
         ))}
@@ -644,15 +661,15 @@ function AnalyticsView({ metrics, loading }: { metrics: CreativeMetrics | null; 
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+            <Button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
               Create New Project
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Add Portfolio Item
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Review Feedback
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>

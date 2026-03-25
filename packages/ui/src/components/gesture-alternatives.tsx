@@ -74,7 +74,7 @@ export function AccessibleCarousel({ images }: CarouselProps) {
       {/* Progress indicators */}
       <div className="carousel-indicators flex gap-2 mt-2 justify-center" role="tablist" aria-label="Carousel navigation">
         {images.map((_, index) => (
-          <button
+          <Button
             key={index}
             role="tab"
             aria-selected={index === currentIndex}

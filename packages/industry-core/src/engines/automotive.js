@@ -10,7 +10,7 @@ class AutomotiveEngine {
   }
   
   async initialize() {
-    console.log('[AUTOMOTIVE_ENGINE] Initialized');
+    console.warn('[AUTOMOTIVE_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

@@ -1,6 +1,8 @@
-// @ts-nocheck
 import { GenerateSW } from 'workbox-webpack-plugin';
 import type { NextConfig } from 'next';
+
+type NextWebpackConfig = Parameters<NonNullable<NextConfig['webpack']>>[0];
+type NextWebpackContext = Parameters<NonNullable<NextConfig['webpack']>>[1];
 
 interface WithServiceWorkerOptions {
   swDest?: string;
@@ -24,7 +26,7 @@ export function withServiceWorker(
 
   return {
     ...nextConfig,
-    webpack: (config, context) => {
+    webpack: (config: NextWebpackConfig, context: NextWebpackContext) => {
       const { dev, isServer } = context;
 
       // Only generate SW in production client builds

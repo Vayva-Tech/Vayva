@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
@@ -105,8 +104,8 @@ export function AIInsightsPanel({
                 />
                 <YAxis />
                 <Tooltip 
-                  formatter={(value: number) => [
-                    `$${value.toLocaleString()}`,
+                  formatter={(value) => [
+                    `$${Number(value ?? 0).toLocaleString()}`,
                     'Predicted Revenue'
                   ]}
                   labelFormatter={(label) => new Date(label).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}

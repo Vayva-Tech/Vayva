@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { IndustrySlug } from "../../types";
 
 // ========================================================================
@@ -286,4 +285,42 @@ export interface UniversalDashboardResponse {
   data: UniversalDashboardData;
   timestamp: string;
   cacheHit?: boolean;
+}
+
+// ========================================================================
+// Merchant / universal dashboard shell props (shared by industry packages)
+// ========================================================================
+
+export type DashboardVariant =
+  | "basic"
+  | "standard"
+  | "advanced"
+  | "pro"
+  | "legacy";
+
+export type DesignCategory =
+  | "signature"
+  | "glass"
+  | "bold"
+  | "dark"
+  | "natural";
+
+export interface IndustryDashboardProps {
+  userId: string;
+  businessId: string;
+  designCategory?: DesignCategory;
+  planTier?: string;
+  className?: string;
+}
+
+export interface UniversalDashboardProps extends IndustryDashboardProps {
+  industry: IndustrySlug;
+  variant: DashboardVariant;
+  onConfigChange?: (config: Partial<Record<string, unknown>>) => void;
+  onError?: (error: {
+    code: string;
+    message: string;
+    retryable?: boolean;
+    details?: unknown;
+  }) => void;
 }

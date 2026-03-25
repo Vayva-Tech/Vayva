@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   parseEnv,
   DomainEnvSchema,
-  validateDomainConsistency,
+  validateDomainConsistency
 } from "@vayva/shared";
 
 const MerchantEnvSchema = DomainEnvSchema.extend({

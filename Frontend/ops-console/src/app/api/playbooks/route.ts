@@ -13,33 +13,45 @@ import {
   BUILT_IN_PLAYBOOKS,
   getEnabledPlaybooks,
 } from '@/lib/stubs/customer-success';
+import { OpsAuthService } from '@/lib/ops-auth';
+import { opsApiAuthErrorResponse } from '@/lib/ops-api-auth';
+
+async function requirePlaybooksRead(): Promise<void> {
+  const { user } = await OpsAuthService.requireSession();
+  OpsAuthService.requireRole(user, 'OPS_SUPPORT');
+}
+
+async function requirePlaybooksMutate(): Promise<void> {
+  const { user } = await OpsAuthService.requireSession();
+  OpsAuthService.requireRole(user, 'OPERATOR');
+}
 
 // GET /api/playbooks - Get playbooks and execution stats
 export async function GET(req: NextRequest) {
   try {
+    try {
+      await requirePlaybooksRead();
+    } catch (authErr) {
+      const res = opsApiAuthErrorResponse(authErr);
+      if (res) return res;
+      throw authErr;
+    }
+
     const { searchParams } = new URL(req.url);
     const playbookId = searchParams.get('playbookId');
     const storeId = searchParams.get('storeId');
 
     // If playbookId provided, get specific stats
     if (playbookId) {
+      const playbookMeta = BUILT_IN_PLAYBOOKS.find((p) => p.id === playbookId);
+      if (!playbookMeta) {
+        return NextResponse.json({ error: 'Playbook not found' }, { status: 404 });
+      }
+
       const executions = await prisma.playbookExecution.findMany({
         where: { playbookId },
         orderBy: { startedAt: 'desc' },
         take: 100,
-        include: {
-          store: {
-            select: {
-              name: true,
-              owner: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                },
-              },
-            },
-          },
-        },
       });
 
       const stats = {
@@ -50,7 +62,7 @@ export async function GET(req: NextRequest) {
       };
 
       return NextResponse.json({
-        playbook: BUILT_IN_PLAYBOOKS[playbookId],
+        playbook: playbookMeta,
         stats,
         executions,
       });
@@ -67,8 +79,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ executions });
     }
 
-    // Get all playbooks with stats
-    const playbooks = getEnabledPlaybooks();
+    // Get all playbooks with stats (stub: no store context)
+    const playbooks = await getEnabledPlaybooks('');
     const playbookStats = await Promise.all(
       playbooks.map(async (playbook: { id: string }) => {
         const executions = await prisma.playbookExecution.findMany({
@@ -100,6 +112,14 @@ export async function GET(req: NextRequest) {
 // POST /api/playbooks/execute - Manually execute a playbook
 export async function POST(req: NextRequest) {
   try {
+    try {
+      await requirePlaybooksMutate();
+    } catch (authErr) {
+      const res = opsApiAuthErrorResponse(authErr);
+      if (res) return res;
+      throw authErr;
+    }
+
     const body = await req.json();
     const { playbookId, storeId, triggerData } = body;
 
@@ -111,7 +131,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify playbook exists
-    const playbook = BUILT_IN_PLAYBOOKS[playbookId];
+    const playbook = BUILT_IN_PLAYBOOKS.find((p) => p.id === playbookId);
     if (!playbook) {
       return NextResponse.json(
         { error: 'Playbook not found' },

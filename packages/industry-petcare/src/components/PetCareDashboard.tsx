@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Pet Care Industry Dashboard Component
  * Veterinary clinic and pet service management dashboard
@@ -18,7 +17,7 @@ export function PetCareDashboard({
   return (
     <UniversalProDashboard
       industry="petcare"
-      variant="petcare-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

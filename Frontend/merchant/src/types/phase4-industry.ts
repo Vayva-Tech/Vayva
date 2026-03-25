@@ -125,7 +125,12 @@ export interface CreateRequisitionInput {
 // EVENTS & TICKETING
 // ============================================================================
 
-export type EventStatus = 'draft' | 'published' | 'cancelled' | 'completed';
+export type EventStatus =
+  | 'draft'
+  | 'published'
+  | 'cancelled'
+  | 'completed'
+  | 'sold_out';
 export type TicketStatus = 'active' | 'refunded' | 'cancelled' | 'used';
 
 export interface Event {
@@ -139,6 +144,8 @@ export interface Event {
   endDate: Date;
   timezone: string;
   status: EventStatus;
+  /** Lowest ticket price (display); optional when not ticketed */
+  price?: number;
   capacity: number;
   bannerImage?: string;
   organizerId: string;

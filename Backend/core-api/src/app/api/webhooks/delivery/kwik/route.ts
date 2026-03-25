@@ -12,27 +12,51 @@ function getString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
+function safeJsonParse(input: string): unknown {
+  try {
+    return JSON.parse(input) as unknown;
+  } catch {
+    return {};
+  }
+}
+
+function normalizeSignature(sig: string): string {
+  // Support "sha256=<hex>" and raw hex formats.
+  const s = sig.trim();
+  const idx = s.indexOf("=");
+  if (idx > 0) return s.slice(idx + 1).trim();
+  return s;
+}
+
+function timingSafeEqualHex(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a, "hex");
+  const bBuf = Buffer.from(b, "hex");
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.KWIK_WEBHOOK_SECRET;
   const signature = req.headers.get("x-kwik-signature");
-  // 1. Security Guard
+  // 1. Security Guard (HMAC-SHA256 on raw body)
   if (!secret || !signature) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 },
-    );
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
-  // Verify Signature using constant-time comparison to prevent timing attacks
-  const signatureBuf = Buffer.from(signature, "utf8");
-  const secretBuf = Buffer.from(secret, "utf8");
-  if (signatureBuf.length !== secretBuf.length || !crypto.timingSafeEqual(signatureBuf, secretBuf)) {
-    return NextResponse.json(
-      { success: false, error: "Invalid Signature" },
-      { status: 403 },
-    );
+
+  const rawBody = await req.text().catch(() => "");
+  const computed = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
+
+  const incoming = normalizeSignature(signature);
+  if (!timingSafeEqualHex(incoming, computed)) {
+    return NextResponse.json({ success: false, error: "Invalid Signature" }, { status: 403 });
   }
-  const parsedBody: unknown = await req.json().catch(() => ({}));
+
+  const parsedBody: unknown = safeJsonParse(rawBody);
   const body = isRecord(parsedBody) ? parsedBody : {};
+
   const jobId = getString(body.job_id) || String(body.job_id || "");
   const status = body.status;
   const jobStatus = body.job_status;
@@ -74,9 +98,15 @@ export async function POST(req: NextRequest) {
   // E.g. If already DELIVERED, don't set back to IN_TRANSIT.
   // Valid transitions map could be complex, but for MVP:
   // Don't update if already same status.
-  const shipment = await prisma.shipment.findFirst({
-    where: { trackingCode: jobId },
-  });
+  // Webhook may send job hash or other identifier; try trackingCode first, then search in notes metadata.
+  const shipment =
+    (await prisma.shipment.findFirst({ where: { trackingCode: jobId } })) ??
+    (await prisma.shipment.findFirst({
+      where: {
+        provider: "KWIK",
+        notes: { contains: jobId },
+      },
+    }));
   if (!shipment)
     return NextResponse.json(
       { success: false, error: "Shipment Not Found" },
@@ -96,6 +126,20 @@ export async function POST(req: NextRequest) {
       // Append to history/notes?
     },
   });
+
+  try {
+    await prisma.trackingEvent.create({
+      data: {
+        shipmentId: shipment.id,
+        status: vayvaStatus,
+        locationText: null,
+        description: `Kwik webhook update (${jobId})`,
+        occurredAt: new Date(),
+      },
+    });
+  } catch {
+    // non-blocking
+  }
 
   // 4. Send status update notification to customer (for significant status changes)
   const significantStatuses = ["PICKED_UP", "IN_TRANSIT", "DELIVERED", "FAILED"];

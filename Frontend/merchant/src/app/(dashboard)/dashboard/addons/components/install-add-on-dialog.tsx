@@ -1,5 +1,4 @@
 'use client';
-
 /**
  * Install Add-On Dialog
  * 
@@ -253,9 +252,9 @@ export function InstallAddOnDialog({
                   <p className="text-sm text-gray-500">Step {getStepNumber(currentStep)} of {getTotalSteps(addon)}</p>
                 </div>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+              <Button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             {/* Progress bar */}
@@ -680,3 +679,4 @@ function getProgressPercentage(step: InstallStep, addon: AddOnDefinition): numbe
   if (index === -1) return 0;
   return ((index + 1) / steps.length) * 100;
 }
+

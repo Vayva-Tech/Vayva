@@ -11,7 +11,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Spinner as Loader2 } from "@phosphor-icons/react/ssr";

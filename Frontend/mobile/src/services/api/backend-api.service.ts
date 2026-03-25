@@ -89,7 +89,7 @@ class BackendAPIService {
   /**
    * Get authentication headers
    */
-  private async getAuthHeaders(): Promise<HeadersInit> {
+  private async getAuthHeaders(): Promise<Record<string, string>> {
     if (!this.authToken) {
       throw new Error('Not authenticated');
     }
@@ -140,12 +140,12 @@ class BackendAPIService {
   /**
    * Generic GET request
    */
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<APIResponse<T>> {
+  async get<T>(endpoint: string, params?: Record<string, unknown>): Promise<APIResponse<T>> {
     const url = new URL(`${this.config.baseUrl}${endpoint}`);
     
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
+        url.searchParams.append(key, String(value));
       });
     }
 
@@ -155,7 +155,7 @@ class BackendAPIService {
   /**
    * Generic POST request
    */
-  async post<T>(endpoint: string, data: any): Promise<APIResponse<T>> {
+  async post<T>(endpoint: string, data: unknown): Promise<APIResponse<T>> {
     const url = `${this.config.baseUrl}${endpoint}`;
     return this.request<T>('POST', url, data);
   }
@@ -163,7 +163,7 @@ class BackendAPIService {
   /**
    * Generic PUT request
    */
-  async put<T>(endpoint: string, data: any): Promise<APIResponse<T>> {
+  async put<T>(endpoint: string, data: unknown): Promise<APIResponse<T>> {
     const url = `${this.config.baseUrl}${endpoint}`;
     return this.request<T>('PUT', url, data);
   }
@@ -182,7 +182,7 @@ class BackendAPIService {
   private async request<T>(
     method: string,
     url: string,
-    body?: any
+    body?: unknown
   ): Promise<APIResponse<T>> {
     let lastError: Error | null = null;
 
@@ -211,12 +211,17 @@ class BackendAPIService {
           status: response.status,
           headers: response.headers,
         };
-      } catch (error: any) {
-        lastError = error;
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error("Request failed");
         
         // Don't retry on auth errors
-        if (error.status === 401) {
-          throw error;
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "status" in error &&
+          (error as { status?: unknown }).status === 401
+        ) {
+          throw lastError;
         }
 
         // Wait before retrying (exponential backoff)
@@ -237,7 +242,7 @@ class BackendAPIService {
   async queueRequest(
     type: 'create' | 'update' | 'delete',
     entity: string,
-    data: any
+    data: unknown
   ): Promise<string> {
     return offlineSyncService.queueAction({
       type,
@@ -252,63 +257,63 @@ class BackendAPIService {
 
   // Healthcare APIs
   async getPatients() {
-    return this.get<any[]>('/healthcare/patients');
+    return this.get<unknown[]>('/healthcare/patients');
   }
 
   async getAppointments(date?: string) {
-    return this.get<any[]>('/healthcare/appointments', { date });
+    return this.get<unknown[]>('/healthcare/appointments', { date });
   }
 
   async getClinicalNotes(patientId: string) {
-    return this.get<any[]>(`/healthcare/patients/${patientId}/notes`);
+    return this.get<unknown[]>(`/healthcare/patients/${patientId}/notes`);
   }
 
   // Retail APIs
   async getProducts() {
-    return this.get<any[]>('/retail/products');
+    return this.get<unknown[]>('/retail/products');
   }
 
   async getInventory() {
-    return this.get<any[]>('/retail/inventory');
+    return this.get<unknown[]>('/retail/inventory');
   }
 
-  async processOrder(orderData: any) {
-    return this.post<any>('/retail/orders', orderData);
+  async processOrder(orderData: unknown) {
+    return this.post<unknown>('/retail/orders', orderData);
   }
 
   // Restaurant APIs
   async getTables() {
-    return this.get<any[]>('/restaurant/tables');
+    return this.get<unknown[]>('/restaurant/tables');
   }
 
   async getReservations(date?: string) {
-    return this.get<any[]>('/restaurant/reservations', { date });
+    return this.get<unknown[]>('/restaurant/reservations', { date });
   }
 
-  async createOrder(orderData: any) {
-    return this.post<any>('/restaurant/orders', orderData);
+  async createOrder(orderData: unknown) {
+    return this.post<unknown>('/restaurant/orders', orderData);
   }
 
   // Legal APIs
   async getMatters() {
-    return this.get<any[]>('/legal/matters');
+    return this.get<unknown[]>('/legal/matters');
   }
 
   async getDocuments(matterId: string) {
-    return this.get<any[]>(`/legal/matters/${matterId}/documents`);
+    return this.get<unknown[]>(`/legal/matters/${matterId}/documents`);
   }
 
   // Food APIs
   async getIngredients() {
-    return this.get<any[]>('/food/ingredients');
+    return this.get<unknown[]>('/food/ingredients');
   }
 
   async getRecipes() {
-    return this.get<any[]>('/food/recipes');
+    return this.get<unknown[]>('/food/recipes');
   }
 
   async updateInventory(itemId: string, quantity: number) {
-    return this.put<any>(`/food/inventory/${itemId}`, { quantity });
+    return this.put<unknown>(`/food/inventory/${itemId}`, { quantity });
   }
 }
 

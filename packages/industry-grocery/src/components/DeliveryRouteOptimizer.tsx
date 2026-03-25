@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Delivery Route Optimizer Component
@@ -170,7 +170,7 @@ export const DeliveryRouteOptimizer: React.FC<DeliveryRouteOptimizerProps> = ({
                     {route.status}
                   </span>
                   {onOptimize && route.status === 'planned' && (
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onOptimize(route.id);
@@ -178,7 +178,7 @@ export const DeliveryRouteOptimizer: React.FC<DeliveryRouteOptimizerProps> = ({
                       className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                     >
                       ⚡ Optimize
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -209,3 +209,4 @@ export const DeliveryRouteOptimizer: React.FC<DeliveryRouteOptimizerProps> = ({
     </div>
   );
 };
+

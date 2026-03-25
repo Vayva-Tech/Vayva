@@ -599,14 +599,14 @@ export class POSSyncService {
   // Private methods for provider-specific APIs
   private async validateCredentials(
     provider: string,
-    credentials: Record<string, string>
+    _credentials: Record<string, string>
   ): Promise<{ valid: boolean; error?: string }> {
     // Implement provider-specific validation
-    console.log(`[POS] Validating ${provider} credentials`);
+    console.warn(`[POS] Validating ${provider} credentials`);
     return { valid: true };
   }
 
-  private async fetchSquareProducts(credentials: Record<string, string>): Promise<
+  private async fetchSquareProducts(_credentials: Record<string, string>): Promise<
     Array<{
       externalId: string;
       name: string;
@@ -619,11 +619,11 @@ export class POSSyncService {
     }>
   > {
     // Square API implementation
-    console.log("[POS] Fetching Square products");
+    console.warn("[POS] Fetching Square products");
     return [];
   }
 
-  private async fetchShopifyProducts(credentials: Record<string, string>): Promise<
+  private async fetchShopifyProducts(_credentials: Record<string, string>): Promise<
     Array<{
       externalId: string;
       name: string;
@@ -636,62 +636,62 @@ export class POSSyncService {
     }>
   > {
     // Shopify API implementation
-    console.log("[POS] Fetching Shopify products");
+    console.warn("[POS] Fetching Shopify products");
     return [];
   }
 
-  private async fetchSquareInventory(credentials: Record<string, string>): Promise<
+  private async fetchSquareInventory(_credentials: Record<string, string>): Promise<
     Array<{ externalProductId: string; quantity: number; locationId?: string }>
   > {
-    console.log("[POS] Fetching Square inventory");
+    console.warn("[POS] Fetching Square inventory");
     return [];
   }
 
-  private async fetchShopifyInventory(credentials: Record<string, string>): Promise<
+  private async fetchShopifyInventory(_credentials: Record<string, string>): Promise<
     Array<{ externalProductId: string; quantity: number; locationId?: string }>
   > {
-    console.log("[POS] Fetching Shopify inventory");
+    console.warn("[POS] Fetching Shopify inventory");
     return [];
   }
 
   private async fetchSquareOrders(
-    credentials: Record<string, string>,
-    since?: Date
+    _credentials: Record<string, string>,
+    _since?: Date
   ): Promise<POSOrder[]> {
-    console.log("[POS] Fetching Square orders");
+    console.warn("[POS] Fetching Square orders");
     return [];
   }
 
   private async fetchShopifyOrders(
-    credentials: Record<string, string>,
-    since?: Date
+    _credentials: Record<string, string>,
+    _since?: Date
   ): Promise<POSOrder[]> {
-    console.log("[POS] Fetching Shopify orders");
+    console.warn("[POS] Fetching Shopify orders");
     return [];
   }
 
   private async pushSquareOrder(
-    credentials: Record<string, string>,
-    order: Record<string, unknown>
+    _credentials: Record<string, string>,
+    _order: Record<string, unknown>
   ): Promise<{ success: boolean; externalId?: string; error?: string }> {
-    console.log("[POS] Pushing order to Square");
+    console.warn("[POS] Pushing order to Square");
     return { success: true, externalId: "mock_square_order" };
   }
 
   private async pushShopifyOrder(
-    credentials: Record<string, string>,
-    order: Record<string, unknown>
+    _credentials: Record<string, string>,
+    _order: Record<string, unknown>
   ): Promise<{ success: boolean; externalId?: string; error?: string }> {
-    console.log("[POS] Pushing order to Shopify");
+    console.warn("[POS] Pushing order to Shopify");
     return { success: true, externalId: "mock_shopify_order" };
   }
 
   private async pushSquareInventory(
-    credentials: Record<string, string>,
-    externalProductId: string,
-    quantity: number
+    _credentials: Record<string, string>,
+    _externalProductId: string,
+    _quantity: number
   ): Promise<{ success: boolean; error?: string }> {
-    console.log("[POS] Pushing inventory to Square");
+    console.warn("[POS] Pushing inventory to Square");
     return { success: true };
   }
 

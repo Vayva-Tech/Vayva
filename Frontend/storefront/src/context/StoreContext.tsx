@@ -9,6 +9,7 @@ interface Store {
   industry?: string;
   tagline?: string;
   settings?: Record<string, unknown>;
+  enabledAddOns?: string[];
   theme?: {
     templateId?: string;
     primaryColor?: string;

@@ -128,7 +128,7 @@ export default function ToolsStep() {
             {tools.map((t) => {
               const isChecked = t.isRequired ? true : selected.has(t.id);
               return (
-                <button
+                <Button
                   key={t.id}
                   type="button"
                   aria-pressed={isChecked}
@@ -172,7 +172,7 @@ export default function ToolsStep() {
                       Required (core)
                     </p>
                   ) : null}
-                </button>
+                </Button>
               );
             })}
           </div>

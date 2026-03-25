@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button, Icon, IconName, cn } from "@vayva/ui";
 import { toast } from "sonner";
 import { Spinner as Loader2 } from "@phosphor-icons/react/ssr";
+import { apiJson } from "@/lib/api-client-shared";
 
 interface Extension {
   id: string;
@@ -19,8 +20,6 @@ interface Extension {
 interface ExtensionsResponse {
   extensions: Extension[];
 }
-
-import { apiJson } from "@/lib/api-client-shared";
 
 export const ExtensionsGallery = () => {
   const router = useRouter();

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Analytics Dashboard Index
 // Export dashboard configuration and components
 

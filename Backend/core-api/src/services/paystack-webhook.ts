@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { PaystackService } from "@vayva/payments";
+import { PaystackService as _PaystackService } from "@vayva/payments";
 import { logger } from "@/lib/logger";
 import crypto from "crypto";
 

@@ -139,7 +139,7 @@ export const POST = withVayvaAPI(
         appointmentId,
         priority,
         reason,
-        notes,
+        _notes,
       } = body;
 
       // Validation

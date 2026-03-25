@@ -38,13 +38,23 @@ export const POST = withVayvaAPI(
         );
       }
 
-      // Update booking status to cancelled
-      const cancelledBooking = await prisma.travelBooking.update({
-        where: { id },
+      const cancelResult = await prisma.travelBooking.updateMany({
+        where: { id, storeId },
         data: {
           status: "cancelled",
           cancelledAt: new Date(),
         },
+      });
+
+      if (cancelResult.count === 0) {
+        return NextResponse.json(
+          { error: "Booking not found" },
+          { status: 404, headers: standardHeaders(requestId) }
+        );
+      }
+
+      const cancelledBooking = await prisma.travelBooking.findFirst({
+        where: { id, storeId },
         include: {
           customer: {
             select: {
@@ -62,6 +72,13 @@ export const POST = withVayvaAPI(
           },
         },
       });
+
+      if (!cancelledBooking) {
+        return NextResponse.json(
+          { error: "Booking not found" },
+          { status: 404, headers: standardHeaders(requestId) }
+        );
+      }
 
       // Log cancellation reason (if provided in request body)
       try {

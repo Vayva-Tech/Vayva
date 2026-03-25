@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Trend Analysis Service
  * Analyzes fashion trends, seasonal patterns, and market dynamics

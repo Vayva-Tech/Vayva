@@ -3,6 +3,7 @@ import { withVayvaAPI } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma, Prisma, type AutopilotStatus } from "@vayva/db";
 import { logger, standardHeaders } from "@vayva/shared";
+import { getAiPackage } from "@/lib/ai/ai-packages";
 
 const VALID_AUTOPILOT_STATUSES = new Set<string>([
   "PROPOSED",
@@ -51,7 +52,14 @@ async function handler(req: NextRequest, context: APIContext) {
       }
     }
 
-    const [runs, total, pendingCount] = await Promise.all([
+    const sub = await prisma.merchantAiSubscription.findUnique({
+      where: { storeId },
+      select: { planKey: true },
+    });
+    const pkg = getAiPackage(sub?.planKey);
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+    const [runs, total, pendingCount, runsThisMonth] = await Promise.all([
       prisma.autopilotRun.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -61,6 +69,14 @@ async function handler(req: NextRequest, context: APIContext) {
       prisma.autopilotRun.count({ where }),
       prisma.autopilotRun.count({
         where: { storeId, status: "PROPOSED" },
+      }),
+      prisma.aiUsageEvent.count({
+        where: {
+          storeId,
+          model: "VAYVA_AUTOPILOT_EVAL",
+          createdAt: { gte: monthStart },
+          success: true,
+        },
       }),
     ]);
 
@@ -80,6 +96,11 @@ async function handler(req: NextRequest, context: APIContext) {
         })),
         total,
         pendingCount,
+        usage: {
+          runsThisMonth,
+          runsLimit: pkg.includedAutopilotRunsPerMonth,
+          messagesPerRun: pkg.autopilotRunMessageCost,
+        },
         requestId: correlationId,
       },
       { headers: getHeaders(correlationId) },

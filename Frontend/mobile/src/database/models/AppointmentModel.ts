@@ -16,5 +16,5 @@ export class AppointmentModel extends Model {
   @field('practitioner_id') practitionerId?: string;
 
   // Relationships
-  @relation('patients', 'patient_id') patient!: any;
+  @relation('patients', 'patient_id') patient!: unknown;
 }

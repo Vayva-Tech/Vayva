@@ -87,7 +87,7 @@ Key variables to fill in for local development:
 | `BETTER_AUTH_SECRET` | Auth signing secret | Generate: `openssl rand -hex 32` |
 | `NEXTAUTH_SECRET` | NextAuth signing secret | Generate: `openssl rand -hex 32` |
 | `INTERNAL_API_SECRET` | Inter-service auth | Generate: `openssl rand -hex 32` |
-| `GROQ_API_KEY` | AI features (Groq) | Get from [console.groq.com](https://console.groq.com/keys) |
+| `OPENROUTER_API_KEY` | AI features (OpenRouter) | Get from [openrouter.ai/keys](https://openrouter.ai/keys) |
 | `PAYSTACK_SECRET_KEY` | Payments | Use test key from Paystack dashboard |
 | `EVOLUTION_API_URL` | WhatsApp gateway | `http://163.245.209.202:8080` (staging) or local |
 | `EVOLUTION_API_KEY` | WhatsApp API key | Provided by ops |

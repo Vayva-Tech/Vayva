@@ -1,6 +1,6 @@
 import { prisma } from "@vayva/db";
 import { logger } from "@/lib/logger";
-import { RescueGroqClient } from "./rescue-client";
+import { RescueOpenRouterClient } from "./rescue-client";
 
 export interface IncidentReport {
   requestId: string;
@@ -21,7 +21,7 @@ export interface IncidentAnalysis {
   severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }
 
-const rescueClient = new RescueGroqClient();
+const rescueClient = new RescueOpenRouterClient();
 
 export class RescueService {
   /**

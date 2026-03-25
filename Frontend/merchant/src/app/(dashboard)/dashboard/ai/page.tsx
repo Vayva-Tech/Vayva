@@ -95,7 +95,7 @@ export default function AIPage() {
   const currentTool = tools.find((t) => t.id === activeTool) || tools[0];
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto p-6">
+    <div className="space-y-6 max-w-5xl">
       <div className="flex items-center gap-3">
         <div className="p-2 bg-green-500 rounded-lg">
           <Sparkles className="h-6 w-6 text-white" />

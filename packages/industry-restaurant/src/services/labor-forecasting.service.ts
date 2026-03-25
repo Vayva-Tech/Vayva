@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Labor Forecasting AI Service
  * 
@@ -44,7 +43,7 @@ export interface LaborForecastInput {
   };
 }
 
-export class LaborForecastingService extends BaseAIService<LaborForecastInput, {
+export type LaborForecastOutput = {
   forecastPeriod: {
     start: string;
     end: string;
@@ -71,7 +70,9 @@ export class LaborForecastingService extends BaseAIService<LaborForecastInput, {
     estimatedSavings: number;
     impactOnService: 'positive' | 'neutral' | 'negative';
   }>;
-}> {
+};
+
+export class LaborForecastingService extends BaseAIService<LaborForecastInput, LaborForecastOutput> {
   constructor() {
     super({
       model: 'restaurant-optimizer',
@@ -79,6 +80,24 @@ export class LaborForecastingService extends BaseAIService<LaborForecastInput, {
       requireHumanValidation: true, // Schedule changes need manager approval
       confidenceThreshold: 0.75,
     });
+  }
+
+  protected defaultOutput(input: LaborForecastInput): LaborForecastOutput {
+    return {
+      forecastPeriod: input.period,
+      predictedVolume: {
+        totalSales: 0,
+        totalCovers: 0,
+        dailyBreakdown: [],
+        confidence: 0,
+      },
+      staffingRecommendation: {
+        totalLaborHours: 0,
+        laborCostPercentage: 0,
+        positions: [],
+      },
+      optimizationOpportunities: [],
+    };
   }
 
   protected async buildPrompt(input: LaborForecastInput): Promise<string> {
@@ -164,7 +183,10 @@ Balance cost control with maintaining quality service.`;
     return prompt;
   }
 
-  protected async parseResponse(rawResponse: string, input: LaborForecastInput): Promise<any> {
+  protected async parseResponse(
+    rawResponse: string,
+    input: LaborForecastInput
+  ): Promise<LaborForecastOutput> {
     try {
       const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
@@ -185,21 +207,22 @@ Balance cost control with maintaining quality service.`;
       // Add validation rules
       this.addValidationRule({
         id: 'has_volume_forecast',
-        validate: (data) => data.predictedVolume.totalSales > 0 && data.predictedVolume.totalCovers > 0,
+        validate: (data: LaborForecastOutput) =>
+          data.predictedVolume.totalSales > 0 && data.predictedVolume.totalCovers > 0,
         errorMessage: 'Invalid volume forecast',
         isCritical: true,
       });
 
       this.addValidationRule({
         id: 'has_staffing_plan',
-        validate: (data) => data.staffingRecommendation.positions.length > 0,
+        validate: (data: LaborForecastOutput) => data.staffingRecommendation.positions.length > 0,
         errorMessage: 'No staffing plan provided',
         isCritical: true,
       });
 
       this.addValidationRule({
         id: 'realistic_labor_percent',
-        validate: (data) => 
+        validate: (data: LaborForecastOutput) =>
           data.staffingRecommendation.laborCostPercentage >= 15 &&
           data.staffingRecommendation.laborCostPercentage <= 40,
         errorMessage: 'Labor percentage outside realistic range (15-40%)',
@@ -208,8 +231,8 @@ Balance cost control with maintaining quality service.`;
 
       this.addValidationRule({
         id: 'valid_skill_levels',
-        validate: (data) => 
-          data.staffingRecommendation.positions.every(p => 
+        validate: (data: LaborForecastOutput) =>
+          data.staffingRecommendation.positions.every((p) =>
             ['entry', 'experienced', 'expert'].includes(p.skillLevel)
           ),
         errorMessage: 'Invalid skill level',
@@ -221,7 +244,7 @@ Balance cost control with maintaining quality service.`;
         predictedVolume: parsed.predictedVolume,
         staffingRecommendation: parsed.staffingRecommendation,
         optimizationOpportunities: parsed.optimizationOpportunities || [],
-      };
+      } as LaborForecastOutput;
     } catch (error) {
       console.error('[LaborForecasting] Failed to parse response:', error);
       throw error;

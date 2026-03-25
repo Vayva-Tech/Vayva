@@ -23,7 +23,7 @@ import {
   ChatCircleText as MessageSquare,
 } from "@phosphor-icons/react/ssr";
 import { motion } from "framer-motion";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 type SettingsItem = {
   title: string;
@@ -169,18 +169,12 @@ export default function SettingsOverviewPage() {
   ];
 
   return (
-    <div className="relative max-w-5xl mx-auto space-y-10 pb-20">
-      <Breadcrumbs />
+    <div className="relative max-w-5xl space-y-10 pb-20">
       {/* Header */}
-      <div>
-        <div className="text-sm text-gray-700">Platform</div>
-        <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 tracking-tight">
-          Settings
-        </h1>
-        <p className="text-sm text-gray-700 mt-1">
-          Everything that controls your store, team, and system behavior.
-        </p>
-      </div>
+      <PageHeader
+        title="Settings"
+        subtitle="Everything that controls your store, team, and system behavior."
+      />
 
       {/* Grouped Sections */}
       {groups.map((group, gi) => (

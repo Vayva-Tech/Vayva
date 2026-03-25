@@ -1,5 +1,5 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState } from "react";
 import {
@@ -275,7 +275,7 @@ export default function AICostMonitorPage() {
           {/* Date range tabs */}
           <div className="flex bg-white rounded-xl border border-gray-200 p-1">
             {ranges.map((r) => (
-              <button
+              <Button
                 key={r.value}
                 onClick={() => setRange(r.value)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -285,16 +285,16 @@ export default function AICostMonitorPage() {
                 }`}
               >
                 {r.label}
-              </button>
+              </Button>
             ))}
           </div>
 
-          <button className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" title="Refresh">
+          <Button className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" title="Refresh">
             <RefreshCw size={16} className="text-gray-500" />
-          </button>
-          <button className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" title="Export CSV">
+          </Button>
+          <Button className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" title="Export CSV">
             <Download size={16} className="text-gray-500" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -365,3 +365,4 @@ export default function AICostMonitorPage() {
     </div>
   );
 }
+

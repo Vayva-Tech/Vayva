@@ -37,7 +37,7 @@ export function StickyCTABar(): React.JSX.Element | null {
             Ready to turn WhatsApp chats into cash? 🚀
           </p>
           <p className="text-xs text-muted-foreground">
-            Join 500+ Nigerian sellers using Vayva
+            Trusted by merchants across Nigeria
           </p>
         </div>
 
@@ -62,13 +62,15 @@ export function StickyCTABar(): React.JSX.Element | null {
               Ask on WhatsApp
             </Button>
           </a>
-          <button
+          <Button
+            type="button"
+            variant="ghost"
             onClick={() => setIsDismissed(true)}
-            className="p-2 hover:bg-muted rounded-full transition-colors"
+            className="p-2 hover:bg-muted rounded-full transition-colors h-auto min-h-0 min-w-0 w-10"
             aria-label="Dismiss banner"
           >
             <X className="w-4 h-4 text-muted-foreground" />
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>

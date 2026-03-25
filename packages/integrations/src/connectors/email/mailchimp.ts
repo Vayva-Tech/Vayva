@@ -3,6 +3,7 @@
  * Integration with Mailchimp Email Marketing API
  */
 
+import { createHash } from 'node:crypto';
 import type { ConnectorConfig, SyncResult } from '../../marketplace/types';
 
 export interface MailchimpConfig extends ConnectorConfig {
@@ -267,8 +268,7 @@ export class MailchimpConnector {
    * MD5 hash of lowercased email (Mailchimp subscriber hash)
    */
   private emailHash(email: string): string {
-    const crypto = require('crypto') as typeof import('crypto');
-    return crypto.createHash('md5').update(email.toLowerCase()).digest('hex');
+    return createHash('md5').update(email.toLowerCase()).digest('hex');
   }
 
   /**

@@ -10,7 +10,12 @@ import type {
 export class BeautyService {
   // ===== SKIN PROFILES =====
 
-  async getSkinProfile(customerId: string): Promise<SkinProfile | null> {
+  async getSkinProfile(storeId: string, customerId: string): Promise<SkinProfile | null> {
+    const customer = await prisma.customer.findFirst({
+      where: { id: customerId, storeId },
+    });
+    if (!customer) return null;
+
     const profile = await prisma.skinProfile?.findUnique({
       where: { customerId },
     });
@@ -31,7 +36,14 @@ export class BeautyService {
     };
   }
 
-  async createSkinProfile(data: CreateSkinProfileInput): Promise<SkinProfile> {
+  async createSkinProfile(storeId: string, data: CreateSkinProfileInput): Promise<SkinProfile> {
+    const customer = await prisma.customer.findFirst({
+      where: { id: data.customerId, storeId },
+    });
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
     const profile = await prisma.skinProfile?.create({
       data: {
         customerId: data.customerId,
@@ -58,9 +70,17 @@ export class BeautyService {
   }
 
   async updateSkinProfile(
+    storeId: string,
     customerId: string,
     data: Partial<CreateSkinProfileInput>
   ): Promise<SkinProfile> {
+    const customer = await prisma.customer.findFirst({
+      where: { id: customerId, storeId },
+    });
+    if (!customer) {
+      throw new Error('Skin profile not found');
+    }
+
     const profile = await prisma.skinProfile?.update({
       where: { customerId },
       data: {
@@ -150,13 +170,15 @@ export class BeautyService {
   }
 
   async getRecommendedRoutines(
+    storeId: string,
     customerId: string
   ): Promise<RoutineBuilder[]> {
-    const profile = await this.getSkinProfile(customerId);
+    const profile = await this.getSkinProfile(storeId, customerId);
     if (!profile) return [];
 
     const routines = await prisma.routineBuilder?.findMany({
       where: {
+        storeId,
         isActive: true,
         targetSkinType: { has: profile.skinType },
       },
@@ -217,10 +239,16 @@ export class BeautyService {
   // ===== SHADE MATCHING =====
 
   async matchShade(
+    storeId: string,
     productId: string,
     customerId: string
   ): Promise<ProductShade | null> {
-    const profile = await this.getSkinProfile(customerId);
+    const product = await prisma.product.findFirst({
+      where: { id: productId, storeId },
+    });
+    if (!product) return null;
+
+    const profile = await this.getSkinProfile(storeId, customerId);
     if (!profile?.skinTone || !profile?.undertone) return null;
 
     const shades = await prisma.productShade?.findMany({

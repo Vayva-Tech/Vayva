@@ -146,7 +146,9 @@ async function handlePost(req: NextRequest, context: APIContext) {
 
     // Check if already active
     const existing = await prisma.storeAddOn.findUnique({
-      where: { storeId_addOnId: { storeId, addOnId: extensionId } },
+      where: {
+        storeId_extensionId: { storeId, extensionId },
+      },
     });
 
     if (existing?.status === "ACTIVE") {
@@ -157,15 +159,16 @@ async function handlePost(req: NextRequest, context: APIContext) {
     }
 
     const now = new Date();
-    const periodEnd = new Date(now);
-    periodEnd.setMonth(periodEnd.setMonth(now.getMonth() + 1));
+    const periodEnd = new Date(now.getTime());
+    periodEnd.setMonth(periodEnd.getMonth() + 1);
 
     // Upsert: create new or reactivate expired/cancelled
     const addOn = await prisma.storeAddOn.upsert({
-      where: { storeId_addOnId: { storeId, addOnId: extensionId } },
+      where: {
+        storeId_extensionId: { storeId, extensionId },
+      },
       create: {
         storeId,
-        addOnId: extensionId,
         extensionId,
         priceKobo: BigInt(ADD_ON_PRICE_KOBO),
         currency: ADD_ON_CURRENCY,

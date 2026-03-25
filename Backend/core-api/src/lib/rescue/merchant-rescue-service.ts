@@ -87,7 +87,7 @@ export class MerchantRescueService {
           "X-Title": "Vayva Rescue",
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
+          model: "google/gemini-2.0-flash-lite-001",
           messages: [
             {
               role: "system",

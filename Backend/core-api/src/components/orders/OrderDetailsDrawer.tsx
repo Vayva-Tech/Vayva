@@ -5,7 +5,7 @@ import {
   UnifiedOrderStatus,
   OrderType,
   logger,
-  formatCurrency,
+  formatCurrency
 } from "@vayva/shared";
 import { Drawer, Icon, cn, Button } from "@vayva/ui";
 

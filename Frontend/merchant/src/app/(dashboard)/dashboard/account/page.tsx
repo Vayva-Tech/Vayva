@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import {
@@ -136,10 +136,10 @@ export default function AccountPage() {
               </div>
             </div>
 
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors">
+            <Button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors">
               Upgrade Plan
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -225,10 +225,10 @@ export default function AccountPage() {
           Once you delete your account, there is no going back. All your data, products,
           and settings will be permanently removed.
         </p>
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-red-300 text-red-600 text-sm font-semibold rounded-xl hover:bg-red-50 transition-colors">
+        <Button className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-red-300 text-red-600 text-sm font-semibold rounded-xl hover:bg-red-50 transition-colors">
           <AlertTriangle className="w-4 h-4" />
           Delete Account
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -255,3 +255,4 @@ function InfoRow({
     </div>
   );
 }
+

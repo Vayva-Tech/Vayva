@@ -1,62 +1,93 @@
-// @ts-nocheck
-import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
+import { buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
-export async function POST(request: NextRequest) {
+function getXeroEventCategory(body: Record<string, unknown>): string {
+  const ev = body.event;
+  if (typeof ev !== "object" || ev === null) return "unknown";
+  const category = (ev as Record<string, unknown>).category;
+  return typeof category === "string" ? category : "unknown";
+}
+
+function verifyXeroWebhook(rawBody: string, request: NextRequest): boolean {
+  const secret = process.env.XERO_WEBHOOK_SECRET ?? "";
+  if (!secret) return false;
+  const signature = request.headers.get("x-xero-signature") ?? "";
+  if (!signature) return false;
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    // Verify webhook signature (Xero specific)
-    const isValid = verifyXeroWebhook(request);
-    
+    const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("base64");
+    const a = Buffer.from(signature.trim(), "utf8");
+    const b = Buffer.from(expected, "utf8");
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
+
+async function handleInvoiceEvent(_body: unknown): Promise<void> {
+  /* Forwarded to backend / reserved for merchant-side handling */
+}
+
+async function handlePaymentEvent(_body: unknown): Promise<void> {
+  /* Forwarded to backend / reserved for merchant-side handling */
+}
+
+async function handleContactEvent(_body: unknown): Promise<void> {
+  /* Forwarded to backend / reserved for merchant-side handling */
+}
+
+export async function POST(request: NextRequest): Promise<Response> {
+  try {
+    const storeId = request.headers.get("x-store-id") ?? "";
+    const rawBody = await request.text();
+    const isValid = verifyXeroWebhook(rawBody, request);
+
     if (!isValid) {
-      return NextResponse.json(
-        { error: 'Invalid webhook signature' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const eventType = body.event ? body.event.category : 'unknown';
+    let body: Record<string, unknown>;
+    try {
+      body = JSON.parse(rawBody) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
 
-    // Xero webhook received - eventType logged by backend
+    const eventType = getXeroEventCategory(body);
 
-    // Store webhook event for processing
     await apiJson<{
-        success: boolean;
-        data?: any;
-        error?: string;
-      }>(`${process.env.BACKEND_API_URL}/api/webhookevent`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-store-id": storeId,
-        },
-        body: JSON.stringify(body),
-      });
+      success: boolean;
+      data?: unknown;
+      error?: string;
+    }>(buildBackendUrl("/api/webhookevent"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-store-id": storeId,
+      },
+      body: JSON.stringify(body),
+    });
 
-    // Process different event types
     switch (eventType) {
-      case 'invoices':
+      case "invoices":
         await handleInvoiceEvent(body);
         break;
-      case 'payments':
+      case "payments":
         await handlePaymentEvent(body);
         break;
-      case 'contacts':
+      case "contacts":
         await handleContactEvent(body);
         break;
       default:
-        // Unhandled Xero event type
+        break;
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, { endpoint: "/api/webhooks/xero", operation: "POST" });
-    return NextResponse.json(
-      { error: "Failed to complete operation" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-legal - Type Definitions
  * 

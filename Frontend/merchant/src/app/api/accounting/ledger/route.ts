@@ -1,7 +1,9 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
 /**
  * GET /api/accounting/ledger
@@ -13,6 +15,11 @@ export async function GET(request: NextRequest) {
   const end = searchParams.get("end");
 
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const data = await apiJson<{
       success?: boolean;
       error?: string;
@@ -27,24 +34,24 @@ export async function GET(request: NextRequest) {
         reference: string;
         type: string;
       }>;
-    }>(`${process.env.BACKEND_API_URL}/api/accounting/ledger?start=${start}&end=${end}`);
+    }>(
+      `${backendBase()}/api/accounting/ledger?start=${encodeURIComponent(start ?? "")}&end=${encodeURIComponent(end ?? "")}`,
+      { headers: auth.headers },
+    );
 
     if (data.success === false) {
-      throw new Error(data.error || 'Failed to fetch ledger');
+      throw new Error(data.error || "Failed to fetch ledger");
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/accounting/ledger',
-        operation: 'GET_LEDGER',
-      }
-    );
+    handleApiError(error, {
+      endpoint: "/api/accounting/ledger",
+      operation: "GET_LEDGER",
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch ledger' },
-      { status: 500 }
+      { error: "Failed to fetch ledger" },
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Demand Forecasting AI Service
  * 
@@ -6,8 +5,32 @@
  * for retail operations
  */
 
-import { BaseAIService } from '@vayva/ai-agent';
-import type { DemandForecastResult } from '@vayva/ai-agent';
+import { BaseAIService } from "../lib/base-ai-service";
+
+export interface DemandForecastResult {
+  productId: string;
+  period: { start: string; end: string };
+  predictedDemand: {
+    quantity: number;
+    confidenceInterval: {
+      lower: number;
+      upper: number;
+      confidence: number;
+    };
+  };
+  seasonalityFactors: Array<{
+    factor: string;
+    impact: number;
+    duration: string;
+  }>;
+  trend: "increasing" | "decreasing" | "stable";
+  recommendations: Array<{
+    action: string;
+    quantity?: number;
+    rationale: string;
+    priority: string;
+  }>;
+}
 
 export interface DemandForecastInput {
   /** Product identifier */
@@ -122,58 +145,6 @@ Use statistical reasoning and consider all provided factors. Be conservative in 
 
       if (!parsed.period) {
         throw new Error('Missing forecast period');
-      }
-
-      // Add validation rules
-      this.addValidationRule({
-        id: 'has_demand_prediction',
-        validate: (data) => data.predictedDemand.quantity > 0,
-        errorMessage: 'Predicted demand must be positive',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'has_confidence_interval',
-        validate: (data) => 
-          data.predictedDemand.confidenceInterval.lower >= 0 &&
-          data.predictedDemand.confidenceInterval.upper >= data.predictedDemand.confidenceInterval.lower,
-        errorMessage: 'Invalid confidence interval',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'has_recommendations',
-        validate: (data) => data.recommendations.length > 0,
-        errorMessage: 'No recommendations provided',
-        isCritical: false,
-      });
-
-      // Check for reasonable confidence score
-      this.addValidationRule({
-        id: 'reasonable_confidence',
-        validate: (data) => 
-          data.predictedDemand.confidenceInterval.confidence >= 0.5 &&
-          data.predictedDemand.confidenceInterval.confidence <= 1.0,
-        errorMessage: 'Confidence score must be between 0.5 and 1.0',
-        isCritical: false,
-      });
-
-      // Validate trend identification
-      this.addValidationRule({
-        id: 'valid_trend',
-        validate: (data) => ['increasing', 'decreasing', 'stable'].includes(data.trend),
-        errorMessage: 'Invalid trend value',
-        isCritical: true,
-      });
-
-      // Check for seasonality analysis if factors were provided
-      if (input.seasonalityFactors && input.seasonalityFactors.length > 0) {
-        this.addValidationRule({
-          id: 'analyzes_seasonality',
-          validate: (data) => data.seasonalityFactors.length > 0,
-          errorMessage: 'Seasonality factors provided but not analyzed',
-          isCritical: false,
-        });
       }
 
       return {

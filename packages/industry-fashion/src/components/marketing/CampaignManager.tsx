@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 
 export interface Campaign {
   id: string;
@@ -61,12 +61,12 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Marketing Campaigns</h2>
         {onCreateCampaign && (
-          <button
+          <Button
             onClick={onCreateCampaign}
             className="px-4 py-2 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-lg transition-colors"
           >
             + New Campaign
-          </button>
+          </Button>
         )}
       </div>
 
@@ -115,25 +115,25 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
             </div>
 
             <div className="mt-3 pt-3 border-t border-white/10 flex gap-2">
-              <button className="flex-1 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
+              <Button className="flex-1 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
                 View Details
-              </button>
-              <button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
+              </Button>
+              <Button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
                 ✏️
-              </button>
+              </Button>
             </div>
           </div>
         ))}
 
         {/* Add Campaign Placeholder */}
         {onCreateCampaign && (
-          <button
+          <Button
             onClick={onCreateCampaign}
             className="bg-white/3 border-2 border-dashed border-white/20 hover:border-rose-400/50 rounded-xl p-4 flex flex-col items-center justify-center min-h-[200px] transition-colors group"
           >
             <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">➕</span>
             <span className="text-sm text-white/60 font-medium">Create Campaign</span>
-          </button>
+          </Button>
         )}
       </div>
     </GlassPanel>

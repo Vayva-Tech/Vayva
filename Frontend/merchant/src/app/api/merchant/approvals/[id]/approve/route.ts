@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -8,6 +9,11 @@ import { handleApiError } from "@/lib/api-error-handler";
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     
     if (!id) {
@@ -23,9 +29,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/merchant/approvals/${id}/approve`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
     });
 
     if (!result.success) {

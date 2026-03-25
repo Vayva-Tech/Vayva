@@ -35,11 +35,23 @@ export {
 // ADD-ON DEFINITIONS - Universal
 // ============================================================================
 
-export { default as NEWSLETTER_ADDON, NEWSLETTER_MODELS } from './addons/newsletter';
-export { default as REVIEWS_ADDON, REVIEWS_MODELS } from './addons/reviews';
-export { default as WHATSAPP_ADDON, WHATSAPP_MODELS } from './addons/whatsapp';
+export {
+  default as NEWSLETTER_ADDON,
+  NEWSLETTER_SUBSCRIBER_MODEL as NEWSLETTER_MODELS,
+} from './addons/newsletter';
+export {
+  default as REVIEWS_ADDON,
+  PRODUCT_REVIEW_MODEL as REVIEWS_MODELS,
+} from './addons/reviews';
+export {
+  default as WHATSAPP_ADDON,
+  WHATSAPP_ANALYTICS_MODEL as WHATSAPP_MODELS,
+} from './addons/whatsapp';
 export { default as COMPARISON_ADDON } from './addons/comparison';
-export { default as WISHLIST_ADDON, WISHLIST_MODELS } from './addons/wishlist';
+export {
+  default as WISHLIST_ADDON,
+  WISHLIST_MODEL as WISHLIST_MODELS,
+} from './addons/wishlist';
 export { default as SOCIAL_SHARING_ADDON } from './addons/social-share';
 export { default as SHOPPING_CART_ADDON, SHOPPING_CART_MODELS } from './addons/shopping-cart';
 export { default as CHECKOUT_FLOW_ADDON, CHECKOUT_FLOW_MODELS } from './addons/checkout-flow';

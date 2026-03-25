@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Warning as AlertTriangle } from "@phosphor-icons/react/dist/ssr/Warning";
 import { ArrowsClockwise as RefreshCcw } from "@phosphor-icons/react/dist/ssr/ArrowsClockwise";
 import { Button } from "./Button";

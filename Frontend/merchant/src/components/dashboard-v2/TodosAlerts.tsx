@@ -316,14 +316,14 @@ export function TodosAlerts() {
                 key={alert.id}
                 className={`p-4 border rounded-xl ${getAlertColor(alert.type)} relative group`}
               >
-                <button
+                <Button
                   onClick={() => handleDismissAlert(alert.id)}
                   disabled={dismissingAlerts.has(alert.id)}
                   className="absolute top-2 right-2 p-1 rounded-lg hover:bg-white-2/50 opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-label="Dismiss alert"
                 >
                   <Icon name="X" className="h-4 w-4" />
-                </button>
+                </Button>
                 <div className="flex items-start gap-3">
                   <Icon
                     name={getAlertIcon(alert.type)}

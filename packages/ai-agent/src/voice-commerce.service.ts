@@ -596,26 +596,61 @@ export class VoiceCommerceService {
   }
 
   private async trackOrder(orderId: string, session: VoiceSession): Promise<VoiceResponse> {
+    // orderId here is often an orderRef spoken by user (e.g. refCode / orderNumber).
+    const ref = String(orderId || "").trim();
+    if (!ref) {
+      return this.buildResponse("What’s your order number or reference?");
+    }
+
+    const maybeNumber = Number(ref);
     const order = await prisma.order.findFirst({
-      where: { id: orderId, storeId: session.storeId },
+      where: {
+        storeId: session.storeId,
+        OR: [
+          { refCode: ref },
+          ...(Number.isFinite(maybeNumber) ? [{ orderNumber: maybeNumber }] : []),
+        ],
+      },
+      select: { id: true, orderNumber: true, refCode: true, status: true },
     });
 
     if (!order) {
-      return this.buildResponse("I couldn't find that order. Please check the order number.");
+      return this.buildResponse(
+        "I couldn’t find that order. Please share your order number/reference exactly as shown on your receipt.",
+      );
     }
 
-    const status = order.status;
-    const tracking = null as { status: string; estimatedDelivery?: Date } | null;
+    // Use the same tracking tool as the customer SalesAgent.
+    const { MerchantBrainService } = await import("./lib/ai/merchant-brain.service");
+    const tracking = await MerchantBrainService.getTrackingInfo(session.storeId, {
+      orderRef: order.refCode || String(order.orderNumber),
+      phoneE164: session.phoneNumber,
+    });
 
-    let statusMessage = `Your order ${order.orderNumber} is currently ${status}. `;
-    if (tracking) {
-      statusMessage += `Delivery status: ${tracking.status}. `;
-      if (tracking.estimatedDelivery) {
-        statusMessage += `Estimated delivery: ${new Date(tracking.estimatedDelivery).toDateString()}.`;
-      }
+    if (!tracking?.ok || !tracking.tracking) {
+      return this.buildResponse(
+        `Your order ${order.refCode || order.orderNumber} is currently ${order.status}.`,
+      );
     }
 
-    return this.buildResponse(statusMessage);
+    const t = tracking.tracking;
+    const codAmount =
+      t.payment?.cod?.enabled && typeof t.payment.cod.amount === "number"
+        ? t.payment.cod.amount
+        : null;
+    const codNote =
+      t.payment?.cod?.enabled
+        ? `You’ll pay ${codAmount ? `₦${codAmount.toLocaleString()}` : "the COD amount"} on delivery${t.payment.cod.includesDelivery ? " (includes delivery fee)" : ""}. `
+        : "";
+    const linkNote = t.merchantTrackingUrl
+      ? `You can track it here: ${t.merchantTrackingUrl}. `
+      : t.externalTrackingUrl
+        ? `You can track it here: ${t.externalTrackingUrl}. `
+        : "";
+
+    return this.buildResponse(
+      `Order ${order.refCode || order.orderNumber} is ${t.status}. ${codNote}${linkNote}`.trim(),
+    );
   }
 
   private requiresConfirmation(intent: AgentIntent): boolean {

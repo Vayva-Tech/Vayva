@@ -5,16 +5,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { fraudDetectionService } from '@vayva/security';
-import { auth } from '@/lib/auth';
-import { prisma } from '@vayva/db';
+import { fraudDetectionService, type FraudRule } from '@vayva/security';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 /**
  * GET /api/security/fraud/rules
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'x-store-id header required' }, { status: 400 });
     }
 
-    const rules = await prisma.fraudRule.findMany({
-      where: { storeId },
-      orderBy: [{ isActive: 'desc' }, { priority: 'asc' }],
-    }).catch(() => []);
+    const rules = fraudDetectionService.getStoreRules(storeId);
 
     return NextResponse.json({ rules });
   } catch (error) {
@@ -41,7 +38,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -65,7 +62,13 @@ export async function POST(request: NextRequest) {
       priority?: number;
     };
 
-    const rule = await fraudDetectionService.createRule(storeId, body);
+    const rule = await fraudDetectionService.createRule(storeId, {
+      ...body,
+      condition: {
+        ...body.condition,
+        operator: body.condition.operator as FraudRule['condition']['operator'],
+      },
+    });
     return NextResponse.json({ rule }, { status: 201 });
   } catch (error) {
     console.error('[Fraud] Create rule failed:', error);

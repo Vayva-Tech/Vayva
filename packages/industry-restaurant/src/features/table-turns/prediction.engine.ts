@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Table Turn Prediction Engine
  * Predicts when tables will become available
@@ -9,12 +8,12 @@ import {
   type TurnPredictionFactors,
   type TableReservation,
   type PartyInfo,
-  type Table,
+  type TableTurnTable,
   type PredictionModel,
 } from '../../types/table.js';
 
 export interface PredictionInput {
-  table: Table;
+  table: TableTurnTable;
   reservation: TableReservation;
   historicalData?: number[]; // Previous turn times for this table
 }
@@ -35,6 +34,10 @@ export class TableTurnPredictionEngine {
 
   constructor(config: PredictionConfig) {
     this.config = config;
+  }
+
+  async initialize(): Promise<void> {
+    // Hook for engine orchestration.
   }
 
   /**
@@ -132,7 +135,7 @@ export class TableTurnPredictionEngine {
 
   private calculateFactors(
     reservation: TableReservation,
-    table: Table
+    table: TableTurnTable
   ): TurnPredictionFactors {
     const now = new Date();
     const seatedAt = reservation.seatedAt || now;

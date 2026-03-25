@@ -10,12 +10,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@vayva/schemas": "workspace:*",
-    "@vayva/db": "workspace:*",
-    "@vayva/shared": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
+    "@vayva/db": "workspace:*",
     "@vayva/industry-core": "workspace:*",
     "@vayva/realtime": "workspace:*",
+    "@vayva/schemas": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:^",
     "zod": "^3.25.76"
   },
   "devDependencies": {

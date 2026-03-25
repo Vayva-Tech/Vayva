@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Inventory Alerts Service
  * Monitors inventory levels and triggers alerts for low stock, overstock, and replenishment needs

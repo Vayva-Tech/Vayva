@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { prisma } from "@vayva/db";
 import { logger } from "@/lib/logger";
 /**
@@ -8,12 +7,11 @@ export class AiUsageService {
     /**
      * Record an AI message interaction
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static async logUsage(params: { storeId: string; model: string; inputTokens: number; outputTokens: number; channel?: string; requestId?: string }) {
         const { storeId, model, inputTokens, outputTokens, channel = "WHATSAPP", requestId } = params;
         try {
             // 1. Create ledger entry (Detailed audit)
-            await prisma.aiUsageEvent?.create({
+            await prisma.aiUsageEvent.create({
                 data: {
                     storeId,
                     channel,
@@ -25,7 +23,7 @@ export class AiUsageService {
                 },
             });
             // 2. Update Subscription Counters (Main billing source)
-            await prisma.merchantAiSubscription?.updateMany({
+            await prisma.merchantAiSubscription.updateMany({
                 where: {
                     storeId,
                     status: {
@@ -40,7 +38,7 @@ export class AiUsageService {
             // 3. Update Daily Aggregate (For Charts)
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            await prisma.aiUsageDaily?.upsert({
+            await prisma.aiUsageDaily.upsert({
                 where: { storeId_date: { storeId, date: today } },
                 update: {
                     requestsCount: { increment: 1 },
@@ -62,7 +60,7 @@ export class AiUsageService {
      * Check if a merchant is within their message limits (including add-ons)
      */
     static async checkLimits(storeId: string) {
-        const sub = await prisma.merchantAiSubscription?.findUnique({
+        const sub = await prisma.merchantAiSubscription.findUnique({
             where: { storeId },
             include: { plan: true, addonPurchases: true },
         });
@@ -74,28 +72,25 @@ export class AiUsageService {
                     messagesUsed: 0,
                     messageLimit: 0,
                     isOverLimit: true,
-                    status: "NONE",
+                    status: "NONE" as const,
                 },
             };
-        // 1. Hard closure (Abuse or explicit closure)
-        if ((sub as any).status === "SOFT_CLOSED" || (sub as any).status === "BLOCKED") {
-            const reason = (sub as any).status === "BLOCKED"
-                ? "Account blocked for abuse."
-                : "AI Agent Closed. Upgrade to reactivate.";
+        // 1. Hard closure (abuse or explicit closure)
+        if (sub.status === "SOFT_CLOSED") {
             return {
                 allowed: false,
-                reason,
+                reason: "AI Agent Closed. Upgrade to reactivate.",
                 usage: {
                     messagesUsed: sub.monthMessagesUsed,
                     messageLimit: 0,
                     isOverLimit: true,
-                    status: (sub as any).status,
+                    status: sub.status,
                 },
             };
         }
         // 2. Trial Expiry (Time-based or Grace-based)
         const now = new Date();
-        if ((sub as any).status === "TRIAL_EXPIRED_GRACE" ||
+        if (sub.status === "TRIAL_EXPIRED_GRACE" ||
             (sub.planKey === "STARTER" && sub.trialExpiresAt < now)) {
             return {
                 allowed: false,
@@ -104,21 +99,23 @@ export class AiUsageService {
                     messagesUsed: sub.monthMessagesUsed,
                     messageLimit: 0,
                     isOverLimit: true,
-                    status: (sub as any).status,
+                    status: sub.status,
                 },
             };
         }
-        // 3. Calculate dynamic limit: Plan Limit + All Addon Packs
-        const planLimit = sub.planKey === "STARTER" ? 20 : sub.plan?.monthlyRequestLimit;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const addonMessages = sub.addonPurchases?.reduce((sum: any, addon: { messagesAdded: number }) => sum + addon.messagesAdded, 0);
-        const totalLimit = planLimit + addonMessages;
+        // 3. Calculate dynamic limit: Plan Limit + add-on credits (packs extend capacity)
+        const planLimit = sub.planKey === "STARTER" ? 20 : sub.plan?.monthlyRequestLimit ?? 0;
+        const addonCredits = sub.addonPurchases.reduce(
+            (sum, addon) => sum + addon.creditsAdded,
+            0,
+        );
+        const totalLimit = planLimit + addonCredits;
         const isOverLimit = sub.monthMessagesUsed >= totalLimit;
         const usage = {
             messagesUsed: sub.monthMessagesUsed,
             messageLimit: totalLimit,
             isOverLimit,
-            status: (sub as any).status,
+            status: sub.status,
         };
         if (isOverLimit) {
             const reason = sub.planKey === "STARTER"
@@ -135,7 +132,7 @@ export class AiUsageService {
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - days);
         startDate.setHours(0, 0, 0, 0);
-        const dailyStats = await prisma.aiUsageDaily?.findMany({
+        const dailyStats = await prisma.aiUsageDaily.findMany({
             where: {
                 storeId,
                 date: { gte: startDate },
@@ -147,9 +144,8 @@ export class AiUsageService {
                 tokensCount: true,
             },
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return dailyStats.map((stat: { date: Date; requestsCount: number; tokensCount: number }) => ({
-            date: stat.date?.toISOString().split("T")[0],
+        return dailyStats.map((stat) => ({
+            date: stat.date.toISOString().split("T")[0],
             totalRequests: stat.requestsCount,
             totalTokens: stat.tokensCount,
             totalCost: Math.floor(stat.tokensCount * 0.005), // Estimate in kobo

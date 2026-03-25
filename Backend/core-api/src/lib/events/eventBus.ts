@@ -1,4 +1,4 @@
-import { prisma, Prisma, AuditTargetType, AuditSeverity } from "@vayva/db";
+import { prisma, Prisma, AuditTargetType, AuditSeverity as _AuditSeverity } from "@vayva/db";
 import { logger } from "@vayva/shared";
 import { EVENT_CATALOG } from "./catalog";
 

@@ -200,9 +200,7 @@ Yes. All Vayva storefronts are fully responsive and optimised for mobile devices
 
 ### Q35: How many products can I list?
 
-- Starter: up to 500 products
-- Pro: up to 1,000 products
-- Pro+: unlimited products
+- Starter: up to 100 products; Pro: up to 300; Pro+: up to 500
 
 ### Q36: Can I import products in bulk?
 

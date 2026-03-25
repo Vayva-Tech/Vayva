@@ -1,13 +1,16 @@
-// @ts-nocheck
 "use client";
-
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Globe, Plus, Trash, MapTrifold as Map, Package, Truck, CurrencyDollar as DollarSign, ClockCounterClockwise } from "@phosphor-icons/react";
 import { formatCurrency, logger } from "@vayva/shared";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button, Input } from "@vayva/ui";
+import { Label } from "@/components/ui/label";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+
+type DeliveryProvider = "CUSTOM" | "KWIK";
+type DeliveryFeePayer = "CUSTOMER" | "MERCHANT";
 
 interface ShippingRate {
   id: string;
@@ -28,6 +31,7 @@ export default function ShippingSettingsPage() {
   const [zones, setZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingDelivery, setSavingDelivery] = useState(false);
   const [activeZoneId, setActiveZoneId] = useState<string | null>(null);
   const [isAddRateOpen, setIsAddRateOpen] = useState(false);
   const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
@@ -37,12 +41,57 @@ export default function ShippingSettingsPage() {
     regions: [] as string[],
   });
 
+  const [deliverySettings, setDeliverySettings] = useState<{
+    isEnabled: boolean;
+    provider: DeliveryProvider;
+    pickupName: string;
+    pickupPhone: string;
+    pickupAddressLine1: string;
+    pickupCity: string;
+    pickupState: string;
+    codEnabledByDefault: boolean;
+    codIncludesDeliveryByDefault: boolean;
+    deliveryFeePayerDefault: DeliveryFeePayer;
+  }>({
+    isEnabled: false,
+    provider: "CUSTOM",
+    pickupName: "",
+    pickupPhone: "",
+    pickupAddressLine1: "",
+    pickupCity: "",
+    pickupState: "",
+    codEnabledByDefault: false,
+    codIncludesDeliveryByDefault: false,
+    deliveryFeePayerDefault: "CUSTOMER",
+  });
+
   useEffect(() => {
     const fetchZones = async () => {
       try {
         setLoading(true);
-        const data = await apiJson<ShippingZone[]>("/api/settings/shipping");
-        setZones(data || []);
+        const [zonesData, deliveryData] = await Promise.all([
+          apiJson<ShippingZone[]>("/api/settings/shipping"),
+          apiJson<any>("/api/settings/delivery"),
+        ]);
+
+        setZones(zonesData || []);
+        if (deliveryData) {
+          setDeliverySettings({
+            isEnabled: Boolean(deliveryData.isEnabled),
+            provider: (deliveryData.provider === "KWIK" ? "KWIK" : "CUSTOM") as DeliveryProvider,
+            pickupName: deliveryData.pickupName || "",
+            pickupPhone: deliveryData.pickupPhone || "",
+            pickupAddressLine1: deliveryData.pickupAddressLine1 || "",
+            pickupCity: deliveryData.pickupCity || "",
+            pickupState: deliveryData.pickupState || "",
+            codEnabledByDefault: Boolean(deliveryData.codEnabledByDefault),
+            codIncludesDeliveryByDefault: Boolean(deliveryData.codIncludesDeliveryByDefault),
+            deliveryFeePayerDefault:
+              deliveryData.deliveryFeePayerDefault === "MERCHANT"
+                ? "MERCHANT"
+                : "CUSTOMER",
+          });
+        }
       } catch (error: unknown) {
         const _errMsg = error instanceof Error ? error.message : String(error);
         logger.error("[FETCH_SHIPPING_ZONES_ERROR]", {
@@ -76,6 +125,26 @@ export default function ShippingSettingsPage() {
       toast.error("Failed to save settings");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveDelivery = async () => {
+    setSavingDelivery(true);
+    try {
+      await apiJson<{ success: boolean }>("/api/settings/delivery", {
+        method: "POST",
+        body: JSON.stringify(deliverySettings),
+      });
+      toast.success("Logistics settings saved successfully");
+    } catch (error: unknown) {
+      const _errMsg = error instanceof Error ? error.message : String(error);
+      logger.error("[SAVE_DELIVERY_SETTINGS_ERROR]", {
+        error: _errMsg,
+        app: "merchant",
+      });
+      toast.error("Failed to save logistics settings");
+    } finally {
+      setSavingDelivery(false);
     }
   };
 
@@ -163,16 +232,199 @@ export default function ShippingSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Shipping Zones</h1>
-          <p className="text-sm text-gray-500 mt-1">Configure delivery regions and rates</p>
+      <PageHeader
+        title="Shipping Zones"
+        subtitle="Configure delivery regions/rates and your logistics provider"
+        actions={
+          <Button onClick={() => setIsZoneModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
+            <Plus size={18} className="mr-2" />
+            New Zone
+          </Button>
+        }
+      />
+
+      {/* Logistics & Delivery Provider */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">
+              Logistics & Delivery
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Configure your delivery provider (Kwik) and payment policy (COD vs prepaid split).
+            </p>
+          </div>
+          <Button
+            onClick={handleSaveDelivery}
+            disabled={savingDelivery}
+            className="bg-vayva-green text-white hover:bg-vayva-green/90"
+          >
+            {savingDelivery ? "Saving..." : "Save logistics"}
+          </Button>
         </div>
-        <Button onClick={() => setIsZoneModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
-          <Plus size={18} className="mr-2" />
-          New Zone
-        </Button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div>
+                <div className="font-medium text-gray-900">Enable delivery</div>
+                <div className="text-xs text-gray-500">
+                  Turn on delivery dispatch from orders.
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                checked={deliverySettings.isEnabled}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({ ...s, isEnabled: e.target.checked }))
+                }
+                className="h-5 w-5"
+              />
+            </div>
+
+            <div>
+              <Label>Provider</Label>
+              <select
+                value={deliverySettings.provider}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({
+                    ...s,
+                    provider: (e.target.value as DeliveryProvider) || "CUSTOM",
+                  }))
+                }
+                className="mt-1 w-full border border-gray-200 rounded-lg p-3 bg-white"
+              >
+                <option value="CUSTOM">Custom / Manual</option>
+                <option value="KWIK">Kwik</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label>Pickup name</Label>
+              <Input
+                value={deliverySettings.pickupName}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({ ...s, pickupName: e.target.value }))
+                }
+                placeholder="e.g., Vayva Store"
+              />
+            </div>
+            <div>
+              <Label>Pickup phone</Label>
+              <Input
+                value={deliverySettings.pickupPhone}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({ ...s, pickupPhone: e.target.value }))
+                }
+                placeholder="+234..."
+              />
+            </div>
+            <div>
+              <Label>Pickup address</Label>
+              <Input
+                value={deliverySettings.pickupAddressLine1}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({
+                    ...s,
+                    pickupAddressLine1: e.target.value,
+                  }))
+                }
+                placeholder="Street address"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Pickup city</Label>
+                <Input
+                  value={deliverySettings.pickupCity}
+                  onChange={(e) =>
+                    setDeliverySettings((s) => ({ ...s, pickupCity: e.target.value }))
+                  }
+                  placeholder="City"
+                />
+              </div>
+              <div>
+                <Label>Pickup state</Label>
+                <Input
+                  value={deliverySettings.pickupState}
+                  onChange={(e) =>
+                    setDeliverySettings((s) => ({ ...s, pickupState: e.target.value }))
+                  }
+                  placeholder="State"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment policy */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="font-medium text-gray-900">COD default</div>
+            <div className="text-xs text-gray-500 mt-1">
+              Allow “Pay on delivery” by default at checkout.
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={deliverySettings.codEnabledByDefault}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({
+                    ...s,
+                    codEnabledByDefault: e.target.checked,
+                  }))
+                }
+                className="h-5 w-5"
+              />
+              <span className="text-sm text-gray-700">Enable COD</span>
+            </div>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="font-medium text-gray-900">COD includes delivery</div>
+            <div className="text-xs text-gray-500 mt-1">
+              If enabled, cash collection = product + delivery fee.
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={deliverySettings.codIncludesDeliveryByDefault}
+                onChange={(e) =>
+                  setDeliverySettings((s) => ({
+                    ...s,
+                    codIncludesDeliveryByDefault: e.target.checked,
+                  }))
+                }
+                className="h-5 w-5"
+                disabled={!deliverySettings.codEnabledByDefault}
+              />
+              <span className="text-sm text-gray-700">Collect delivery fee on drop-off</span>
+            </div>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="font-medium text-gray-900">Delivery fee payer</div>
+            <div className="text-xs text-gray-500 mt-1">
+              For prepaid delivery, choose who pays delivery by default.
+            </div>
+            <select
+              value={deliverySettings.deliveryFeePayerDefault}
+              onChange={(e) =>
+                setDeliverySettings((s) => ({
+                  ...s,
+                  deliveryFeePayerDefault:
+                    e.target.value === "MERCHANT" ? "MERCHANT" : "CUSTOMER",
+                }))
+              }
+              className="mt-3 w-full border border-gray-200 rounded-lg p-3 bg-white"
+            >
+              <option value="CUSTOMER">Customer pays delivery</option>
+              <option value="MERCHANT">Merchant pays delivery</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Summary Widgets */}
@@ -233,12 +485,12 @@ export default function ShippingSettingsPage() {
                     {zone.regions.join(', ')}
                   </p>
                 </div>
-                <button
+                <Button
                   onClick={() => handleOpenEditZone(zone)}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <Package size={16} />
-                </button>
+                </Button>
               </div>
 
               <div className="space-y-3">
@@ -253,12 +505,12 @@ export default function ShippingSettingsPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="font-semibold text-gray-900">{formatCurrency(rate.amount)}</div>
-                        <button
+                        <Button
                           onClick={() => deleteRate(zone.id, rate.id)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))
@@ -267,13 +519,13 @@ export default function ShippingSettingsPage() {
                 )}
               </div>
 
-              <button
+              <Button
                 onClick={() => { setActiveZoneId(zone.id); setIsAddRateOpen(true); }}
                 className="w-full mt-4 py-2.5 text-sm font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Plus size={16} />
                 Add Rate
-              </button>
+              </Button>
             </div>
           ))
         )}

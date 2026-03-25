@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Services Booking Management
  * Manages service appointments, bookings, and provider scheduling

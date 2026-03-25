@@ -4,14 +4,21 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Icon, cn } from "@vayva/ui";
 import { motion, AnimatePresence } from "framer-motion";
+import { VAYVA_CONSENT_CHANGED_EVENT } from "@/lib/analytics";
+
+function notifyConsentChanged(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(VAYVA_CONSENT_CHANGED_EVENT));
+  }
+}
 
 export const CookieBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState({
     necessary: true,
-    analytics: true,
-    marketing: true,
+    analytics: false,
+    marketing: false,
   });
 
   useEffect(() => {
@@ -29,6 +36,7 @@ export const CookieBanner: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
     localStorage.setItem("vayva_cookie_consent", JSON.stringify(consent));
+    notifyConsentChanged();
     setIsVisible(false);
   };
 
@@ -40,12 +48,14 @@ export const CookieBanner: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
     localStorage.setItem("vayva_cookie_consent", JSON.stringify(consent));
+    notifyConsentChanged();
     setIsVisible(false);
   };
 
   const handleSavePreferences = () => {
     const consent = { ...preferences, updatedAt: new Date().toISOString() };
     localStorage.setItem("vayva_cookie_consent", JSON.stringify(consent));
+    notifyConsentChanged();
     setIsVisible(false);
     setShowPreferences(false);
   };
@@ -84,6 +94,7 @@ export const CookieBanner: React.FC = () => {
                 </div>
                 <div className="flex flex-col gap-2 w-full md:w-auto shrink-0">
                   <Button
+                    type="button"
                     onClick={handleAcceptAll}
                     className="!bg-foreground !text-background !rounded-lg h-8 text-xs whitespace-nowrap px-4"
                   >
@@ -91,6 +102,7 @@ export const CookieBanner: React.FC = () => {
                   </Button>
                   <div className="flex gap-2">
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={handleRejectNonEssential}
@@ -99,6 +111,7 @@ export const CookieBanner: React.FC = () => {
                       Reject
                     </Button>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowPreferences(true)}
@@ -126,8 +139,10 @@ export const CookieBanner: React.FC = () => {
               <div className="p-6 border-b border-border/60 flex items-center justify-between">
                 <h3 className="font-bold text-lg">Cookie Preferences</h3>
                 <Button
+                  type="button"
                   onClick={() => setShowPreferences(false)}
                   className="p-2 hover:bg-muted rounded-lg transition-colors"
+                  aria-label="Close cookie preferences"
                 >
                   <Icon name="X" size={20} />
                 </Button>
@@ -152,6 +167,10 @@ export const CookieBanner: React.FC = () => {
                     </p>
                   </div>
                   <Button
+                    type="button"
+                    role="switch"
+                    aria-checked={preferences.analytics}
+                    aria-label="Analytics cookies"
                     onClick={() =>
                       setPreferences({
                         ...preferences,
@@ -179,6 +198,10 @@ export const CookieBanner: React.FC = () => {
                     </p>
                   </div>
                   <Button
+                    type="button"
+                    role="switch"
+                    aria-checked={preferences.marketing}
+                    aria-label="Marketing cookies"
                     onClick={() =>
                       setPreferences({
                         ...preferences,

@@ -6,6 +6,7 @@
  */
 
 import { prisma } from '@vayva/db';
+import { prismaDelegates } from '../prisma-delegates';
 import { logger } from '@vayva/shared';
 
 // ============================================================================
@@ -57,7 +58,7 @@ export class RoleMappingService {
     vayvaRole: VayvaRole;
     storeId?: string;
   }): Promise<RoleMapping> {
-    const mapping = await prisma.samlRoleMapping.create({
+    const mapping = await prismaDelegates.samlRoleMapping.create({
       data: {
         idpId: params.idpId,
         idpGroupName: params.idpGroupName,
@@ -79,7 +80,7 @@ export class RoleMappingService {
    * Get all mappings for an IdP
    */
   async getMappingsForIdp(idpId: string): Promise<RoleMapping[]> {
-    const mappings = await prisma.samlRoleMapping.findMany({
+    const mappings = await prismaDelegates.samlRoleMapping.findMany({
       where: { idpId, isActive: true },
       orderBy: { createdAt: 'asc' },
     });
@@ -97,16 +98,25 @@ export class RoleMappingService {
     idpGroups: string[]
   ): Promise<MappedRole> {
     // Get all active mappings for this IdP
-    const mappings = await prisma.samlRoleMapping.findMany({
+    const mappings = (await prismaDelegates.samlRoleMapping.findMany({
       where: {
         idpId,
         isActive: true,
         idpGroupName: { in: idpGroups },
       },
-    });
+    })) as Array<{
+      vayvaRole: string;
+      storeId?: string | null;
+    }>;
 
     const roles = [...new Set(mappings.map((m) => m.vayvaRole as VayvaRole))];
-    const storeIds = [...new Set(mappings.filter((m) => m.storeId).map((m) => m.storeId as string))];
+    const storeIds = [
+      ...new Set(
+        mappings
+          .filter((m): m is typeof m & { storeId: string } => Boolean(m.storeId))
+          .map((m) => m.storeId),
+      ),
+    ];
 
     // Apply roles to user in DB
     await this.applyRolesToUser(userId, mappings);
@@ -138,15 +148,14 @@ export class RoleMappingService {
     for (const mapping of mappings) {
       if (mapping.storeId) {
         // Store-scoped role
-        await prisma.storeUser.upsert({
-          where: { storeId_userId: { storeId: mapping.storeId, userId } },
+        await prisma.membership.upsert({
+          where: { userId_storeId: { storeId: mapping.storeId, userId } },
           create: {
             storeId: mapping.storeId,
             userId,
-            role: mapping.vayvaRole,
-            invitedAt: new Date(),
+            roleName: mapping.vayvaRole,
           },
-          update: { role: mapping.vayvaRole },
+          update: { roleName: mapping.vayvaRole },
         }).catch(() => {
           // Non-critical if table structure differs
         });
@@ -161,7 +170,7 @@ export class RoleMappingService {
     id: string,
     updates: Partial<Pick<RoleMapping, 'idpGroupName' | 'vayvaRole' | 'storeId' | 'isActive'>>
   ): Promise<RoleMapping> {
-    const updated = await prisma.samlRoleMapping.update({
+    const updated = await prismaDelegates.samlRoleMapping.update({
       where: { id },
       data: updates,
     });
@@ -173,7 +182,7 @@ export class RoleMappingService {
    * Delete a role mapping
    */
   async deleteMapping(id: string): Promise<void> {
-    await prisma.samlRoleMapping.delete({ where: { id } });
+    await prismaDelegates.samlRoleMapping.delete({ where: { id } });
     logger.info('[RoleMapping] Deleted mapping', { id });
   }
 

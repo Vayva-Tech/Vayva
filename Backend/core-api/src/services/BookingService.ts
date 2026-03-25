@@ -5,7 +5,7 @@ import {
   CreateServiceData,
   CreateBookingData,
   UpdateBookingData,
-  BookingWithDetails,
+  BookingWithDetails
 } from "@/types/bookings";
 
 export const BookingService = {

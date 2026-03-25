@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Restaurant Industry Dashboard Configuration
  * Implements the dashboard specification from VAYVA V2 Master Plan
@@ -8,6 +7,29 @@ import type { DashboardEngineConfig } from '@vayva/industry-core';
 
 export const RESTAURANT_DASHBOARD_CONFIG: DashboardEngineConfig = {
   industry: 'restaurant',
+  title: 'Restaurant operations',
+  subtitle: 'FOH, kitchen, labor, and margin health',
+  primaryObjectLabel: 'Service day',
+  defaultTimeHorizon: 'today',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
+  layouts: [
+    {
+      id: 'default',
+      name: 'Default',
+      breakpoints: { lg: [], md: [], sm: [], xs: [], xxs: [] },
+    },
+  ],
+  failureModes: [
+    'Kitchen display offline',
+    'POS sync delay',
+    'Staff clock data stale',
+  ],
 
   widgets: [
     // Kitchen Display System (KDS) Preview
@@ -464,9 +486,12 @@ export function getRestaurantDashboardConfig(
   return {
     ...RESTAURANT_DASHBOARD_CONFIG,
     ...overrides,
-    widgets: overrides?.widgets || RESTAURANT_DASHBOARD_CONFIG.widgets,
-    kpiCards: overrides?.kpiCards || RESTAURANT_DASHBOARD_CONFIG.kpiCards,
-    alertRules: overrides?.alertRules || RESTAURANT_DASHBOARD_CONFIG.alertRules,
-    actions: overrides?.actions || RESTAURANT_DASHBOARD_CONFIG.actions,
+    widgets: overrides?.widgets ?? RESTAURANT_DASHBOARD_CONFIG.widgets,
+    layouts: overrides?.layouts ?? RESTAURANT_DASHBOARD_CONFIG.layouts,
+    kpiCards: overrides?.kpiCards ?? RESTAURANT_DASHBOARD_CONFIG.kpiCards,
+    alertRules: overrides?.alertRules ?? RESTAURANT_DASHBOARD_CONFIG.alertRules,
+    actions: overrides?.actions ?? RESTAURANT_DASHBOARD_CONFIG.actions,
+    sections: overrides?.sections ?? RESTAURANT_DASHBOARD_CONFIG.sections,
+    failureModes: overrides?.failureModes ?? RESTAURANT_DASHBOARD_CONFIG.failureModes,
   };
 }

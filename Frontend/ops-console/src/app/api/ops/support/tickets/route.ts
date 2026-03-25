@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
+import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 
 export async function GET(req: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPS_SUPPORT");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const priority = searchParams.get("priority");
@@ -64,6 +75,8 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[SUPPORT_TICKETS_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to fetch support tickets" },
@@ -74,6 +87,15 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPS_SUPPORT");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const body = await req.json();
     const { ticketId, status, priority, assignedToId } = body;
 
@@ -101,6 +123,8 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true, ticket });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[SUPPORT_TICKET_UPDATE_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to update ticket" },

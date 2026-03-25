@@ -17,19 +17,20 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@vayva/industry-core": "workspace:*",
     "@vayva/ui": "workspace:*",
     "@vayva/db": "workspace:*",
-    "react": "^18.x",
-    "react-dom": "^18.x",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "date-fns": "^3.x",
     "zod": "^3.x"
   },
   "devDependencies": {
-    "@types/react": "^18.x",
+    "@types/react": "19.2.7",
     "typescript": "^5.x"
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Legal Research AI Service
  * 
@@ -145,10 +144,13 @@ Prioritize recent cases (last 10 years) unless historical precedent is particula
               c.court.toLowerCase().includes(j.toLowerCase()) ||
               c.citation.toLowerCase().includes(j.toLowerCase())
             )
-          ) || data.statutes.some(s =>
-            input.jurisdictions.some(j => 
-              s.jurisdiction.toLowerCase().includes(j.toLowerCase())
-            )
+          ) ||
+          (data.statutes as Array<{ jurisdiction?: string }>).some((s) =>
+            input.jurisdictions.some(
+              (j) =>
+                typeof s.jurisdiction === 'string' &&
+                s.jurisdiction.toLowerCase().includes(j.toLowerCase()),
+            ),
           );
         },
         errorMessage: 'Research does not address specified jurisdiction',
@@ -206,6 +208,16 @@ Prioritize recent cases (last 10 years) unless historical precedent is particula
       console.error('[LegalResearch] Failed to parse response:', error);
       throw new Error(`Failed to parse legal research: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  protected defaultOutput(input: LegalResearchInput): LegalResearchResult {
+    return {
+      query: input.researchQuestion,
+      cases: [],
+      statutes: [],
+      legalPrinciples: [],
+      suggestedArguments: [],
+    };
   }
 
   /**
@@ -308,11 +320,22 @@ Prioritize recent cases (last 10 years) unless historical precedent is particula
       depth: 'comprehensive',
     });
 
-    const counterarguments = result.suggestedArguments.map(arg => ({
-      argument: arg.argument,
-      strength: arg.strength as 'strong' | 'moderate' | 'weak',
-      authority: arg.supportingAuthority,
-    }));
+    const counterarguments = result.suggestedArguments.map((arg) => {
+      const raw = (arg as { supportingAuthority?: unknown }).supportingAuthority;
+      const authority = Array.isArray(raw)
+        ? (raw as string[])
+        : typeof raw === 'string'
+          ? [raw]
+          : [];
+      return {
+        argument: arg.argument,
+        strength: (arg as { strength?: string }).strength as
+          | 'strong'
+          | 'moderate'
+          | 'weak',
+        authority,
+      };
+    });
 
     // Identify potential weaknesses
     const weaknesses: string[] = [];

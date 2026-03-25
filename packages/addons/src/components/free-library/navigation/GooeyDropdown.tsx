@@ -1,6 +1,7 @@
 'use client';
+import { Button } from "@vayva/ui";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -26,7 +27,7 @@ export function GooeyDropdown({ trigger, items, className = '' }: GooeyDropdownP
 
   return (
     <div className={`relative ${className}`}>
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
       >
@@ -41,7 +42,7 @@ export function GooeyDropdown({ trigger, items, className = '' }: GooeyDropdownP
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </motion.svg>
-      </button>
+      </Button>
 
       <AnimatePresence>
         {isOpen && (
@@ -104,3 +105,4 @@ export function GooeyDropdown({ trigger, items, className = '' }: GooeyDropdownP
     </div>
   );
 }
+

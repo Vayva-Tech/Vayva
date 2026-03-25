@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMockRequest, getResponseJson } from "../helpers/api";
 
-// Mock dependencies
 vi.mock("@/lib/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
@@ -23,50 +22,30 @@ vi.mock("@/lib/env-validation", () => ({
   FEATURES: { EMAIL_ENABLED: false, INSTAGRAM_ENABLED: false },
 }));
 
-// Mock bcryptjs
 vi.mock("bcryptjs", () => ({
   compare: vi.fn(),
 }));
 
-// Mock fetch for backend API calls
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 import { POST } from "@/app/api/auth/merchant/login/route";
-import { compare } from "bcryptjs";
 
 describe("Auth Login - POST /api/auth/merchant/login", () => {
-  const mockBackendUser = {
-    id: "user_123",
-    email: "test@example.com",
-    firstName: "Test",
-    requiresOtp: true,
-    otp: "123456",
-    token: "mock-jwt-token",
-    user: {
-      id: "user_123",
-      email: "test@example.com",
-      firstName: "Test",
-      memberships: [
-        {
-          status: "active",
-          store: { id: "store_123", name: "Test Store" },
-          role: { name: "OWNER" },
-        },
-      ],
-    },
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.BACKEND_API_URL = "http://localhost:3001";
+    process.env.NODE_ENV = "development";
   });
 
   it("should return OTP_REQUIRED on valid credentials", async () => {
     mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ requiresOtp: true, email: "test@example.com" }),
+      ok: false,
+      status: 403,
+      json: async () => ({
+        error: { code: "OTP_REQUIRED", message: "OTP_REQUIRED" },
+        email: "test@example.com",
+      }),
     });
 
     const request = createMockRequest("POST", "/api/auth/merchant/login", {
@@ -75,28 +54,32 @@ describe("Auth Login - POST /api/auth/merchant/login", () => {
     const response = await POST(request);
     const data = await getResponseJson(response);
 
-    // Login returns response from backend (OTP_REQUIRED flow)
-    expect(response.status).toBe(200);
-    expect(data.requiresOtp).toBe(true);
+    expect(response.status).toBe(403);
+    expect(data.error?.message || data.message).toBeDefined();
     expect(data.email).toBe("test@example.com");
     expect(mockFetch).toHaveBeenCalledWith(
-      "http://localhost:3001/api/auth/login",
+      "http://localhost:3001/api/auth/merchant/login",
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: "test@example.com",
           password: "validpass123",
+          otpMethod: "EMAIL",
         }),
-      })
+      }),
     );
   });
 
   it("should expose OTP in dev mode when email is not enabled", async () => {
     mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ requiresOtp: true, email: "test@example.com", otp: "654321" }),
+      ok: false,
+      status: 403,
+      json: async () => ({
+        error: { code: "OTP_REQUIRED", message: "OTP_REQUIRED" },
+        email: "test@example.com",
+        otp: "654321",
+      }),
     });
 
     const request = createMockRequest("POST", "/api/auth/merchant/login", {
@@ -105,11 +88,8 @@ describe("Auth Login - POST /api/auth/merchant/login", () => {
     const response = await POST(request);
     const data = await getResponseJson(response);
 
-    // In dev/test mode with EMAIL_ENABLED=false, OTP may be exposed in response from backend
-    expect(response.status).toBe(200);
-    expect(data.otp).toBeDefined();
-    expect(typeof data.otp).toBe("string");
-    expect(data.otp.length).toBe(6);
+    expect(response.status).toBe(403);
+    expect(data.otp).toBe("654321");
   });
 
   it("should reject missing email or password", async () => {
@@ -125,7 +105,9 @@ describe("Auth Login - POST /api/auth/merchant/login", () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 401,
-      json: async () => ({ error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" } }),
+      json: async () => ({
+        error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" },
+      }),
     });
 
     const request = createMockRequest("POST", "/api/auth/merchant/login", {
@@ -140,7 +122,9 @@ describe("Auth Login - POST /api/auth/merchant/login", () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 401,
-      json: async () => ({ error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" } }),
+      json: async () => ({
+        error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" },
+      }),
     });
 
     const request = createMockRequest("POST", "/api/auth/merchant/login", {

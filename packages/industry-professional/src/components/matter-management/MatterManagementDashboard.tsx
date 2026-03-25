@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 
@@ -105,12 +105,12 @@ export function MatterManagementDashboard({
             <h2 className="text-2xl font-bold text-gray-900">Matter Management</h2>
             <p className="text-gray-600 mt-1">Track and manage all legal matters</p>
           </div>
-          <button
+          <Button
             onClick={onCreateMatter}
             className="px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             + New Matter
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -236,3 +236,4 @@ export function MatterManagementDashboard({
     </div>
   );
 }
+

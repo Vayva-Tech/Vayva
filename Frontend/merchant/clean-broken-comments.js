@@ -26,7 +26,7 @@ function cleanFile(file) {
 
   if (content !== orig) {
     fs.writeFileSync(file, content);
-    console.log(`Cleaned ${file}`);
+    console.warn(`Cleaned ${file}`);
   }
 }
 

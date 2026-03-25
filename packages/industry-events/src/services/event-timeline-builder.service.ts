@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Timeline Builder Service
  * Manages event planning timelines and milestone tracking
@@ -69,8 +68,8 @@ export class EventTimelineBuilderService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[EVENT_TIMELINE] Initializing service...');
-    console.log('[EVENT_TIMELINE] Service initialized');
+    console.warn('[EVENT_TIMELINE] Initializing service...');
+    console.warn('[EVENT_TIMELINE] Service initialized');
   }
 
   /**

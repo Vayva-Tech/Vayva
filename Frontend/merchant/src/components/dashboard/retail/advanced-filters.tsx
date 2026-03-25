@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -32,7 +31,7 @@ import { format } from 'date-fns';
 
 interface DateRange {
   from: Date | undefined;
-  to: Date | undefined;
+  to?: Date | undefined;
 }
 
 interface FilterOption {
@@ -245,8 +244,7 @@ export function AdvancedFilters({
                     {channels.map((channel) => (
                       <CommandItem
                         key={channel.value}
-                        value={channel.value}
-                        onSelect={() => toggleFilter('channels', channel.value)}
+                        onClick={() => toggleFilter('channels', channel.value)}
                         className="cursor-pointer"
                       >
                         <div
@@ -306,37 +304,43 @@ export function AdvancedFilters({
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap gap-1 ml-auto">
             {filters.categories.map((cat) => (
-              <Badge
+              <Button
+                type="button"
                 key={cat}
                 variant="secondary"
-                className="gap-1 cursor-pointer"
+                size="sm"
+                className="h-7 gap-1"
                 onClick={() => toggleFilter('categories', cat)}
               >
                 {categories.find(c => c.value === cat)?.label}
                 <X className="h-3 w-3" />
-              </Badge>
+              </Button>
             ))}
             {filters.statuses.map((status) => (
-              <Badge
+              <Button
+                type="button"
                 key={status}
                 variant="secondary"
-                className="gap-1 cursor-pointer"
+                size="sm"
+                className="h-7 gap-1"
                 onClick={() => toggleFilter('statuses', status)}
               >
                 {statuses.find(s => s.value === status)?.label}
                 <X className="h-3 w-3" />
-              </Badge>
+              </Button>
             ))}
             {filters.channels.map((channel) => (
-              <Badge
+              <Button
+                type="button"
                 key={channel}
                 variant="secondary"
-                className="gap-1 cursor-pointer"
+                size="sm"
+                className="h-7 gap-1"
                 onClick={() => toggleFilter('channels', channel)}
               >
                 {channels.find(c => c.value === channel)?.label}
                 <X className="h-3 w-3" />
-              </Badge>
+              </Button>
             ))}
           </div>
         )}

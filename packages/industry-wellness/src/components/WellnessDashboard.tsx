@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wellness Industry Dashboard Component
  * Health and wellness center management with appointment scheduling and client tracking
@@ -18,7 +17,7 @@ export function WellnessDashboard({
   return (
     <UniversalProDashboard
       industry="wellness"
-      variant="wellness-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

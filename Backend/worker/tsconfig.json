@@ -1,7 +1,10 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "outDir": "dist"
+        "outDir": "dist",
+        "paths": {
+            "@vayva/db": ["../../platform/infra/db/src/client.ts"]
+        }
     },
     "include": [
         "src"

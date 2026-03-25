@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI, APIContext } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { standardHeaders } from "@vayva/shared";
-import { 
+import {
   RetailApiService,
-  RETAIL_DASHBOARD_CONFIG 
+  RETAIL_DASHBOARD_CONFIG
 } from "@vayva/industry-retail";
 
 // GET /api/retail/dashboard - Get retail dashboard data

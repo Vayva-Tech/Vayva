@@ -1,25 +1,24 @@
-// @ts-nocheck
 /**
  * Unified Pro Dashboard Switcher
  * Allows seamless switching between different dashboard views with industry adaptation
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { 
-  LayoutDashboard,
-  Store,
+import {
+  SquaresFour,
+  Storefront,
   ChartLine,
   Megaphone,
   Wrench,
   Users,
-  ShoppingCart,
   Package,
   ArrowRight
 } from '@phosphor-icons/react';
+import type { IndustrySlug } from '@vayva/industry-core';
 import { useStore } from '@/providers/store-provider';
 import { getIndustryConfig } from '@/lib/utils/industry-adaptation';
 import { ThemedCard, getThemeColors } from '@/lib/design-system/theme-components';
@@ -36,8 +35,9 @@ interface DashboardOption {
 
 export function UnifiedDashboardSwitcher() {
   const { store } = useStore();
-  const industry = store?.industrySlug || 'retail';
+  const industry = (store?.industrySlug ?? 'retail') as IndustrySlug;
   const industryConfig = getIndustryConfig(industry);
+  const primaryObject = industryConfig.primaryObject ?? 'product';
   const colors = getThemeColors(industry);
   
   const [activeCategory, setActiveCategory] = useState('business');
@@ -54,7 +54,7 @@ export function UnifiedDashboardSwitcher() {
         id: 'overview',
         title: `${industryConfig.displayName} Dashboard`,
         description: 'Main business overview with key metrics',
-        icon: <LayoutDashboard className="h-6 w-6" />,
+        icon: <SquaresFour className="h-6 w-6" />,
         path: '/dashboard',
         isPro: false,
         industrySpecific: true
@@ -77,10 +77,10 @@ export function UnifiedDashboardSwitcher() {
       },
       {
         id: 'products',
-        title: `${industryConfig.primaryObject.replace(/_/g, " ")} Management`,
-        description: `Manage your ${industryConfig.primaryObject.replace(/_/g, " ").toLowerCase()} catalog`,
+        title: `${primaryObject.replace(/_/g, ' ')} Management`,
+        description: `Manage your ${primaryObject.replace(/_/g, ' ').toLowerCase()} catalog`,
         icon: <Package className="h-6 w-6" />,
-        path: `/dashboard/${industryConfig.primaryObject}s`,
+        path: `/dashboard/${primaryObject}s`,
         industrySpecific: true
       }
     ],
@@ -128,7 +128,7 @@ export function UnifiedDashboardSwitcher() {
         id: 'reports',
         title: 'Reports & Export',
         description: 'Generate reports and export data',
-        icon: <LayoutDashboard className="h-6 w-6" />,
+        icon: <SquaresFour className="h-6 w-6" />,
         path: '/dashboard/reports'
       },
       {
@@ -148,7 +148,7 @@ export function UnifiedDashboardSwitcher() {
         {/* Category Navigation */}
         <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
           {categories.map((category) => (
-            <button
+            <Button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
               className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -158,7 +158,7 @@ export function UnifiedDashboardSwitcher() {
               }`}
             >
               {category.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -213,7 +213,7 @@ export function UnifiedDashboardSwitcher() {
                     
                     {option.industrySpecific && (
                       <div className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs">
-                        <Store className="h-3 w-3" />
+                        <Storefront className="h-3 w-3" />
                         Industry-Specific
                       </div>
                     )}

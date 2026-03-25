@@ -121,12 +121,12 @@ export function CSVImportModal({ isOpen, onClose, onImport }: CSVImportModalProp
               Upload a CSV file with your product data
             </p>
           </div>
-          <button
+          <Button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-900 transition-colors"
           >
             <Icon name="X" size={20} />
-          </button>
+          </Button>
         </div>
 
         {/* Content */}

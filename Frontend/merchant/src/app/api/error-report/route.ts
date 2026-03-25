@@ -1,6 +1,7 @@
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 
 interface ErrorReport {
   error: string;
@@ -18,6 +19,10 @@ interface ErrorReport {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     
     // Forward error report to backend for centralized tracking
@@ -27,9 +32,7 @@ export async function POST(request: NextRequest) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/error-report`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(body),
     });
 

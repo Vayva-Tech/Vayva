@@ -25,8 +25,8 @@ export interface WidgetConfig {
     value: string | number;
     severity: 'critical' | 'warning' | 'info';
   }>;
-  condition?: (data: any) => boolean;
-  message?: (data: any) => string;
+  condition?: (data: unknown) => boolean;
+  message?: (data: unknown) => string;
   severity?: 'critical' | 'warning' | 'info';
   chartType?: string;
 }

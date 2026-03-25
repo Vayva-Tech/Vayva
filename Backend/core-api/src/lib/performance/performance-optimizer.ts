@@ -1,7 +1,7 @@
 import { logger } from "@vayva/shared";
-import { prisma } from "@vayva/db";
-import LRUCache from "lru-cache";
-import { promisify } from "util";
+import { prisma as _prisma } from "@vayva/db";
+import { LRUCache } from "lru-cache";
+import { promisify as _promisify } from "util";
 
 // Performance monitoring types
 export interface PerformanceMetrics {
@@ -34,13 +34,15 @@ export interface CacheStrategy {
  */
 export class PerformanceOptimizer {
   private static instance: PerformanceOptimizer;
-  private queryCache: LRUCache<string, any>;
+  private queryCache: LRUCache<string, object>;
+  private cacheHits = 0;
+  private cacheMisses = 0;
   private metricsHistory: Map<string, PerformanceMetrics[]>;
-  private optimizationRules: Map<string, Function>;
+  private optimizationRules: Map<string, () => void | Promise<void>>;
 
   private constructor() {
     // Initialize LRU cache with 1000 max items, 5 minute TTL
-    this.queryCache = new LRUCache<string, any>({
+    this.queryCache = new LRUCache<string, object>({
       max: 1000,
       ttl: 1000 * 60 * 5, // 5 minutes
       updateAgeOnGet: true
@@ -102,21 +104,22 @@ export class PerformanceOptimizer {
   /**
    * Batch optimize multiple related queries
    */
-  public async batchOptimize<T extends Record<string, any>>(
+  public async batchOptimize<T extends Record<string, unknown>>(
     queries: { [K in keyof T]: () => Promise<T[K]> }
   ): Promise<T> {
     const startTime = Date.now();
     const results = {} as T;
     const promises: Promise<void>[] = [];
 
-    // Execute all queries in parallel
-    Object.entries(queries).forEach(([key, queryFn]) => {
+    // Execute all queries in parallel (preserve key/value types)
+    for (const key of Object.keys(queries) as Array<keyof T>) {
+      const queryFn = queries[key];
       promises.push(
-        this.optimizeQuery(key, queryFn).then(result => {
-          results[key as keyof T] = result;
-        })
+        this.optimizeQuery(String(key), queryFn).then((result) => {
+          results[key] = result;
+        }),
       );
-    });
+    }
 
     await Promise.all(promises);
     
@@ -235,7 +238,7 @@ export class PerformanceOptimizer {
   /**
    * Get performance dashboard data
    */
-  public getPerformanceDashboard(storeId: string): any {
+  public getPerformanceDashboard(storeId: string): unknown {
     const endpoints = Array.from(this.metricsHistory.keys())
       .filter(key => key.startsWith(`/api/${storeId}`) || !key.includes('/'));
 
@@ -251,24 +254,29 @@ export class PerformanceOptimizer {
   }
 
   // Private helper methods
-  private getCachedResult(key: string): any {
-    return this.queryCache.get(key);
+  private getCachedResult(key: string): unknown {
+    const value = this.queryCache.get(key);
+    if (value === undefined) this.cacheMisses++;
+    else this.cacheHits++;
+    return value;
   }
 
-  private cacheResult(key: string, result: any, strategy?: CacheStrategy): void {
+  private cacheResult(key: string, result: unknown, strategy?: CacheStrategy): void {
     const ttl = strategy?.ttl ? strategy.ttl * 1000 : 1000 * 60 * 5; // Convert to ms
     const maxSize = strategy?.maxSize || 1000;
     
     // Update cache configuration if needed
     if (this.queryCache.max !== maxSize) {
-      this.queryCache = new LRUCache<string, any>({
+      this.queryCache = new LRUCache<string, object>({
         max: maxSize,
         ttl,
         updateAgeOnGet: true
       });
     }
     
-    this.queryCache.set(key, result, { ttl });
+    if (result && typeof result === "object") {
+      this.queryCache.set(key, result as object, { ttl });
+    }
   }
 
   private recordMetrics(
@@ -332,7 +340,7 @@ export class PerformanceOptimizer {
     };
   }
 
-  private async getSlowQueries(storeId: string): Promise<any[]> {
+  private async getSlowQueries(_storeId: string): Promise<unknown[]> {
     // Simulate getting slow queries from database logs
     return [
       { query: "SELECT * FROM orders WHERE store_id = ?", executionTime: 1200 },
@@ -340,13 +348,17 @@ export class PerformanceOptimizer {
     ];
   }
 
-  private analyzeQueryPatterns(queries: any[]): Record<string, string[]> {
+  private analyzeQueryPatterns(queries: unknown[]): Record<string, string[]> {
     const patterns: Record<string, string[]> = {};
     
-    queries.forEach(q => {
+    queries.forEach((q) => {
+      const qrec = q as Record<string, unknown>;
+      const query = typeof qrec.query === "string" ? qrec.query : "";
       // Simulate pattern extraction
-      const table = q.query.match(/FROM\s+(\w+)/i)?.[1] || 'unknown';
-      const columns = q.query.match(/WHERE\s+(\w+)/gi)?.map(c => c.split(' ')[1]) || [];
+      const table = query.match(/FROM\s+(\w+)/i)?.[1] || 'unknown';
+      const columns =
+        query.match(/WHERE\s+(\w+)/gi)?.map((c: string) => c.split(" ")[1]) ||
+        [];
       
       if (!patterns[table]) {
         patterns[table] = [];
@@ -387,12 +399,12 @@ export class PerformanceOptimizer {
     });
   }
 
-  private getOptimizationRules(endpoint: string): Function[] {
+  private getOptimizationRules(_endpoint: string): Array<() => void | Promise<void>> {
     // Return applicable optimization rules based on endpoint
     return Array.from(this.optimizationRules.values());
   }
 
-  private calculateOverallHealth(endpoints: string[]): any {
+  private calculateOverallHealth(endpoints: string[]): unknown {
     const metrics = endpoints.flatMap(endpoint => this.getRecentMetrics(endpoint, 10));
     
     if (metrics.length === 0) return { status: 'unknown', score: 0 };
@@ -416,7 +428,7 @@ export class PerformanceOptimizer {
     };
   }
 
-  private identifySlowEndpoints(endpoints: string[]): any[] {
+  private identifySlowEndpoints(endpoints: string[]): unknown[] {
     return endpoints
       .map(endpoint => {
         const recentMetrics = this.getRecentMetrics(endpoint, 5);
@@ -436,16 +448,16 @@ export class PerformanceOptimizer {
       }));
   }
 
-  private getCachePerformance(): any {
+  private getCachePerformance(): unknown {
     return {
-      hitRate: this.queryCache.hits / (this.queryCache.hits + this.queryCache.misses) || 0,
+      hitRate: this.cacheHits / (this.cacheHits + this.cacheMisses) || 0,
       itemCount: this.queryCache.size,
       maxSize: this.queryCache.max,
       ttl: this.queryCache.ttl
     };
   }
 
-  private getResourceUsage(): any {
+  private getResourceUsage(): unknown {
     const memory = process.memoryUsage();
     return {
       heapUsed: Math.round(memory.heapUsed / 1024 / 1024), // MB
@@ -455,8 +467,8 @@ export class PerformanceOptimizer {
     };
   }
 
-  private getOptimizationOpportunities(endpoints: string[]): any[] {
-    const opportunities: any[] = [];
+  private getOptimizationOpportunities(endpoints: string[]): unknown[] {
+    const opportunities: unknown[] = [];
     
     // Check for endpoints with poor cache hit rates
     endpoints.forEach(endpoint => {

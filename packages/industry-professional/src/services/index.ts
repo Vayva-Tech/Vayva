@@ -1,4 +1,3 @@
-// @ts-nocheck
 export { MatterService } from './matter-service';
 export { ClientService } from './client-service';
 export { BillingService } from './billing-service';

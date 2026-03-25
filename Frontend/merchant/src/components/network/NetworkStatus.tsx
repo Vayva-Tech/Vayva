@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import { useOffline } from "@/context/OfflineContext";
 import { WifiSlash, WifiHigh, Spinner } from "@phosphor-icons/react";
@@ -109,7 +110,7 @@ export function OfflineSyncButton() {
   if (queueCount === 0) return null;
 
   return (
-    <button
+    <Button
       onClick={handleSync}
       disabled={!isOnline || isSyncing}
       className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md bg-orange-100 text-amber-800 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -122,6 +123,7 @@ export function OfflineSyncButton() {
       )}
       <span>{queueCount} pending</span>
       {isOnline && !isSyncing && <span className="text-xs">(click to sync)</span>}
-    </button>
+    </Button>
   );
 }
+

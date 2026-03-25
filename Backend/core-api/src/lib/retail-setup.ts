@@ -17,7 +17,7 @@ let isInitialized = false;
  */
 export function setupRetailRealtime(server: Server) {
   if (isInitialized) {
-    console.log('[Retail Realtime] Already initialized');
+    console.warn('[Retail Realtime] Already initialized');
     return;
   }
 
@@ -30,16 +30,16 @@ export function setupRetailRealtime(server: Server) {
 
     isInitialized = true;
 
-    console.log('[Retail Realtime] ✅ Fully initialized');
+    console.warn('[Retail Realtime] ✅ Fully initialized');
     
     // Graceful shutdown
     process.on('SIGTERM', () => {
-      console.log('[Retail Realtime] Shutting down...');
+      console.warn('[Retail Realtime] Shutting down...');
       wss.shutdown();
     });
 
     process.on('SIGINT', () => {
-      console.log('[Retail Realtime] Shutting down...');
+      console.warn('[Retail Realtime] Shutting down...');
       wss.shutdown();
     });
 

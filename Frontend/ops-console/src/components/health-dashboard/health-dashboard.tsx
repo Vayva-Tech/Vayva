@@ -119,9 +119,9 @@ export function HealthDashboard() {
   };
 
   const getScoreBadge = (score: number) => {
-    if (score >= 70) return <Badge className="bg-green-500">Healthy</Badge>;
-    if (score >= 40) return <Badge className="bg-amber-500">At Risk</Badge>;
-    return <Badge className="bg-red-500">Critical</Badge>;
+    if (score >= 70) return <Badge variant="default">Healthy</Badge>;
+    if (score >= 40) return <Badge variant="warning">At Risk</Badge>;
+    return <Badge variant="destructive">Critical</Badge>;
   };
 
   const getTrendIcon = (trend: string) => {

@@ -142,7 +142,7 @@ export default function AgentProfilePage() {
     );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto p-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Agent Identity</h1>

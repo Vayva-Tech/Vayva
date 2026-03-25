@@ -30,7 +30,7 @@ This document catalogs every major feature in the Vayva platform, organized by d
 | Product Images | Upload multiple product images with drag-and-drop ordering (MinIO storage) | S, P, P+ | Merchant > Products > Edit Product > Images |
 | Bulk Product Import | Import products via CSV upload | S, P, P+ | Merchant > Products > Import |
 | Product Search and Filters | Search by name, filter by category, status, price range, stock level | S, P, P+ | Merchant > Products |
-| Product Limits | STARTER: 500 products, PRO: 1,000, PRO_PLUS: Unlimited | S, P, P+ | Enforced server-side |
+| Product Limits | STARTER: 100, PRO: 300, PRO_PLUS: 500 | S, P, P+ | Enforced server-side |
 | Inventory Tracking | Track stock levels per product/variant with low-stock alerts | S, P, P+ | Merchant > Products > Inventory |
 | Product Publishing | Publish/unpublish products to storefront | S, P, P+ | Merchant > Products > Edit Product |
 

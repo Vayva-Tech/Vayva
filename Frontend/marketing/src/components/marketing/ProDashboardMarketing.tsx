@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
+import { Button } from "@vayva/ui";
 import {
   TrendingUp,
   MoreHorizontal,
   Plus,
   Pencil,
   Maximize2,
-  Filter,
   LayoutGrid,
   LayoutDashboard,
   ShoppingBag,
@@ -15,14 +16,12 @@ import {
   Users,
   Tag,
   Megaphone,
-  PieChart,
   Settings,
   Bell,
   HelpCircle,
   ChevronDown,
   ChevronUp,
   ChevronRight,
-  Globe,
   Inbox,
   Zap,
   Calendar,
@@ -44,10 +43,12 @@ import {
   Truck,
   Star,
   Clock,
-  Layers,
   Sparkles,
   Sliders,
 } from "lucide-react";
+
+const MOCK_STORE_DISPLAY_NAME = "Luxe Fashion";
+const MOCK_STORE_HOST = "luxefashion.vayva.ng";
 
 // ============================================================================
 // Sub-Components — Matching Vayva Design System
@@ -55,15 +56,15 @@ import {
 
 const WidgetActions = () => (
   <div className="flex items-center gap-0.5">
-    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+    <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
       <Pencil size={13} className="text-gray-400" />
-    </button>
-    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+    </Button>
+    <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
       <Maximize2 size={13} className="text-gray-400" />
-    </button>
-    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+    </Button>
+    <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
       <MoreHorizontal size={13} className="text-gray-400" />
-    </button>
+    </Button>
   </div>
 );
 
@@ -143,7 +144,8 @@ export function ProDashboardMarketing() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   return (
-    <div className="flex min-h-[780px] bg-gray-50/80">
+    <div className="w-full min-w-0 max-sm:overflow-x-auto max-sm:rounded-2xl max-sm:border max-sm:border-gray-200/70 max-sm:shadow-sm [-webkit-overflow-scrolling:touch]">
+      <div className="flex min-h-[520px] sm:min-h-[780px] bg-gray-50/80 min-w-[900px] w-max sm:min-w-0 sm:w-full">
       {/* ============================================================== */}
       {/* SIDEBAR — Collapsed by default, expands on hover               */}
       {/* ============================================================== */}
@@ -154,21 +156,31 @@ export function ProDashboardMarketing() {
       >
         {/* Logo + Collapse */}
         <div className={`h-14 flex items-center ${sidebarExpanded ? "justify-between px-4" : "justify-center px-2"}`}>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-sm">V</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-white">
+              <Image
+                src="/vayva-logo-official.svg"
+                alt="Vayva"
+                width={28}
+                height={20}
+                className="h-5 w-auto object-contain"
+              />
             </div>
             {sidebarExpanded && (
-              <div className="leading-tight whitespace-nowrap">
-                <span className="text-sm font-bold text-gray-900">Merchant</span>
-                <p className="text-[10px] text-green-500 hover:text-green-600 cursor-pointer">luxefashion.vayva.ng</p>
+              <div className="leading-tight min-w-0">
+                <span className="text-sm font-bold text-gray-900 truncate block">
+                  {MOCK_STORE_DISPLAY_NAME}
+                </span>
+                <p className="text-[10px] text-green-500 hover:text-green-600 cursor-pointer truncate">
+                  {MOCK_STORE_HOST}
+                </p>
               </div>
             )}
           </div>
           {sidebarExpanded && (
-            <button className="text-gray-400 hover:text-gray-600 transition-colors">
+            <Button type="button" variant="ghost" className="text-gray-400 hover:text-gray-600 transition-colors h-auto p-1" aria-label="Collapse sidebar">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
-            </button>
+            </Button>
           )}
         </div>
 
@@ -340,10 +352,10 @@ export function ProDashboardMarketing() {
       {/* ============================================================== */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Breadcrumb / Top Bar — Vayva Style */}
-        <div className="h-12 bg-white border-b border-gray-200 px-5 flex items-center gap-3">
-          <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+        <div className="min-h-12 bg-white border-b border-gray-200 px-3 sm:px-5 py-2 flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors" aria-label="Back">
             <ArrowLeft size={16} className="text-gray-400" />
-          </button>
+          </Button>
           <div className="flex items-center gap-1.5 text-sm text-gray-500">
             <FolderClosed size={14} className="text-gray-400" />
             <span className="text-gray-700 font-medium">Dashboard</span>
@@ -353,24 +365,24 @@ export function ProDashboardMarketing() {
           </div>
 
           {/* Search */}
-          <div className="ml-auto flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-400 w-48">
+          <div className="w-full sm:w-auto sm:ml-auto flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-400 sm:w-48 min-w-0">
             <Search size={13} />
             <span>Search</span>
           </div>
 
           {/* Actions */}
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors">
+          <Button type="button" variant="outline" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors h-auto">
             <LayoutGrid size={13} />
             Manage
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors">
+          </Button>
+          <Button type="button" variant="outline" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors h-auto">
             <Share2 size={13} />
             Share
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 rounded-lg transition-colors shadow-sm">
+          </Button>
+          <Button type="button" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 rounded-lg transition-colors shadow-sm h-auto">
             <Plus size={13} />
             Add product
-          </button>
+          </Button>
         </div>
 
         {/* Dashboard Content */}
@@ -405,16 +417,16 @@ export function ProDashboardMarketing() {
                   </div>
                 ))}
               </div>
-              <button className="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors">
+              <Button type="button" variant="ghost" className="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors p-0" aria-label="Add team member">
                 <Plus size={12} className="text-gray-400" />
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* ============================================================ */}
           {/* 4 KPI CARDS — Revenue, Orders, Customers, Conversion         */}
           {/* ============================================================ */}
-          <div className="grid grid-cols-4 gap-4 mb-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
             <KPICard
               icon={DollarSign}
               label="Total Revenue"
@@ -452,7 +464,7 @@ export function ProDashboardMarketing() {
           {/* ============================================================ */}
           {/* ROW 2: Revenue Chart + Order Status + AI Insights             */}
           {/* ============================================================ */}
-          <div className="grid grid-cols-3 gap-4 mb-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
             {/* Revenue Trend Chart */}
             <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm col-span-1">
               <WidgetHeader icon={TrendingUp} title="Revenue trend" subtitle="(30d)" />
@@ -564,7 +576,7 @@ export function ProDashboardMarketing() {
           {/* ============================================================ */}
           {/* ROW 3: Top Products + Recent Orders                          */}
           {/* ============================================================ */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Top Products */}
             <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
               <WidgetHeader icon={ShoppingBag} title="Top products" subtitle="(this month)" />
@@ -608,12 +620,13 @@ export function ProDashboardMarketing() {
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-3 py-2 text-xs text-green-600 font-semibold hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center gap-1">
+              <Button type="button" variant="ghost" className="w-full mt-3 py-2 text-xs text-green-600 font-semibold hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center gap-1 h-auto">
                 View all orders <ArrowUpRight size={11} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
-// @ts-nocheck
 // Marketing Engine - Core business logic for marketing campaigns and promotions
 import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
+import { logEngineError } from "@/lib/engines/log-engine-error";
 
 export interface Campaign {
   id: string;
@@ -10,7 +9,7 @@ export interface Campaign {
   status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'cancelled';
   audience: {
     segmentId?: string;
-    filters?: Record<string, any>;
+    filters?: Record<string, unknown>;
     manualList?: string[];
   };
   content: {
@@ -77,8 +76,8 @@ export interface CustomerSegment {
     filters: Array<{
       field: string;
       operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'between';
-      value: any;
-      value2?: any;
+      value: unknown;
+      value2?: unknown;
     }>;
     combination: 'and' | 'or';
   };
@@ -106,7 +105,7 @@ export class MarketingEngine {
       
       return await apiJson<Campaign[]>(url);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_GET_CAMPAIGNS]', error);
+      logEngineError('[MARKETING_ENGINE_GET_CAMPAIGNS]', error);
       throw error;
     }
   }
@@ -115,7 +114,7 @@ export class MarketingEngine {
     try {
       return await apiJson<Campaign>(`/api/marketing/campaigns/${id}`);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_GET_CAMPAIGN]', error);
+      logEngineError('[MARKETING_ENGINE_GET_CAMPAIGN]', error);
       throw error;
     }
   }
@@ -127,7 +126,7 @@ export class MarketingEngine {
         body: JSON.stringify(campaign),
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_CREATE_CAMPAIGN]', error);
+      logEngineError('[MARKETING_ENGINE_CREATE_CAMPAIGN]', error);
       throw error;
     }
   }
@@ -139,7 +138,7 @@ export class MarketingEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_UPDATE_CAMPAIGN]', error);
+      logEngineError('[MARKETING_ENGINE_UPDATE_CAMPAIGN]', error);
       throw error;
     }
   }
@@ -150,7 +149,7 @@ export class MarketingEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_DELETE_CAMPAIGN]', error);
+      logEngineError('[MARKETING_ENGINE_DELETE_CAMPAIGN]', error);
       throw error;
     }
   }
@@ -161,7 +160,7 @@ export class MarketingEngine {
         method: 'POST',
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_SEND_CAMPAIGN]', error);
+      logEngineError('[MARKETING_ENGINE_SEND_CAMPAIGN]', error);
       throw error;
     }
   }
@@ -183,7 +182,7 @@ export class MarketingEngine {
       
       return await apiJson<Promotion[]>(url);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_GET_PROMOTIONS]', error);
+      logEngineError('[MARKETING_ENGINE_GET_PROMOTIONS]', error);
       throw error;
     }
   }
@@ -192,7 +191,7 @@ export class MarketingEngine {
     try {
       return await apiJson<Promotion>(`/api/marketing/promotions/${id}`);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_GET_PROMOTION]', error);
+      logEngineError('[MARKETING_ENGINE_GET_PROMOTION]', error);
       throw error;
     }
   }
@@ -209,7 +208,7 @@ export class MarketingEngine {
         }),
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_CREATE_PROMOTION]', error);
+      logEngineError('[MARKETING_ENGINE_CREATE_PROMOTION]', error);
       throw error;
     }
   }
@@ -221,7 +220,7 @@ export class MarketingEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_UPDATE_PROMOTION]', error);
+      logEngineError('[MARKETING_ENGINE_UPDATE_PROMOTION]', error);
       throw error;
     }
   }
@@ -232,7 +231,7 @@ export class MarketingEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_DELETE_PROMOTION]', error);
+      logEngineError('[MARKETING_ENGINE_DELETE_PROMOTION]', error);
       throw error;
     }
   }
@@ -242,7 +241,7 @@ export class MarketingEngine {
     try {
       return await apiJson<CustomerSegment[]>('/api/marketing/segments');
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_GET_SEGMENTS]', error);
+      logEngineError('[MARKETING_ENGINE_GET_SEGMENTS]', error);
       throw error;
     }
   }
@@ -251,7 +250,7 @@ export class MarketingEngine {
     try {
       return await apiJson<CustomerSegment>(`/api/marketing/segments/${id}`);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_GET_SEGMENT]', error);
+      logEngineError('[MARKETING_ENGINE_GET_SEGMENT]', error);
       throw error;
     }
   }
@@ -267,7 +266,7 @@ export class MarketingEngine {
         }),
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_CREATE_SEGMENT]', error);
+      logEngineError('[MARKETING_ENGINE_CREATE_SEGMENT]', error);
       throw error;
     }
   }
@@ -279,7 +278,7 @@ export class MarketingEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_UPDATE_SEGMENT]', error);
+      logEngineError('[MARKETING_ENGINE_UPDATE_SEGMENT]', error);
       throw error;
     }
   }
@@ -290,7 +289,7 @@ export class MarketingEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_DELETE_SEGMENT]', error);
+      logEngineError('[MARKETING_ENGINE_DELETE_SEGMENT]', error);
       throw error;
     }
   }
@@ -301,7 +300,7 @@ export class MarketingEngine {
         method: 'POST',
       });
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_CALCULATE_SEGMENT]', error);
+      logEngineError('[MARKETING_ENGINE_CALCULATE_SEGMENT]', error);
       throw error;
     }
   }
@@ -319,7 +318,7 @@ export class MarketingEngine {
     try {
       return await apiJson(`/api/marketing/campaigns/${campaignId}/analytics`);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_CAMPAIGN_ANALYTICS]', error);
+      logEngineError('[MARKETING_ENGINE_CAMPAIGN_ANALYTICS]', error);
       throw error;
     }
   }
@@ -333,7 +332,7 @@ export class MarketingEngine {
     try {
       return await apiJson(`/api/marketing/promotions/${promotionId}/analytics`);
     } catch (error) {
-      logger.error('[MARKETING_ENGINE_PROMOTION_ANALYTICS]', error);
+      logEngineError('[MARKETING_ENGINE_PROMOTION_ANALYTICS]', error);
       throw error;
     }
   }

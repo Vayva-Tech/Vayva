@@ -5,14 +5,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@vayva/ui";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   Spinner as Loader2,
-  ArrowSquareOut as ExternalLink,
+  ArrowSquareOut as ExternalLink
 } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
 

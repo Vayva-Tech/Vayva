@@ -2,22 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { searchParams } = new URL(request.url);
       const from = searchParams.get("from");
       const to = searchParams.get("to");
 
       const queryParams = new URLSearchParams();
       if (from) queryParams.set("from", from);
-      if (to) queryParams.set("to", to);// Call backend API
-      const result = await apiJson(`${process.env.BACKEND_API_URL}/api/endpoint`,
+      if (to) queryParams.set("to", to);
+      const result = await apiJson(`${buildBackendUrl("/api/dashboard/aggregate")}${queryParams.size ? `?${queryParams.toString()}` : ""}`,
       {
-          headers: {
-            "x-store-id": storeId,
-          },
+          headers: auth.headers,
         }
       );
       

@@ -1,4 +1,3 @@
-import Groq from "groq-sdk";
 import { SupportContextService } from "./support-context.service";
 import { EscalationService } from "./escalation.service";
 import { EscalationPolicy } from "./escalation-policy";
@@ -16,10 +15,6 @@ interface QueryResult {
     message: string;
     suggestedActions?: string[];
 }
-
-const groq = new Groq({
-    apiKey: process.env.GROQ_ADMIN_KEY || "",
-});
 
 export class MerchantSupportBot {
     static async handleQuery(storeId: string, query: string, history: ChatMessage[] = []): Promise<QueryResult> {
@@ -45,17 +40,39 @@ Support Guidelines:
 4. For billing or payment issues, always offer to escalate immediately.
 5. If they seem frustrated, skip the AI talk and offer a human handoff.`;
             
-            const response = await groq.chat.completions.create({
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    ...history,
-                    { role: "user", content: query },
-                ],
-                model: "llama-3.1-70b-versatile",
-                temperature: 0.2,
+            const apiKey = process.env.OPENROUTER_API_KEY;
+            if (!apiKey) {
+                return {
+                    message: "AI support bot is temporarily unavailable (not configured).",
+                };
+            }
+
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://vayva.tech",
+                    "X-Title": "Vayva Merchant Support Bot",
+                },
+                body: JSON.stringify({
+                    model: "google/gemini-2.5-flash",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        ...history,
+                        { role: "user", content: query },
+                    ],
+                    temperature: 0.2,
+                }),
+                signal: AbortSignal.timeout(20_000),
             });
-            
-            const reply = response.choices[0].message.content ||
+
+            if (!response.ok) {
+                throw new Error(`OpenRouter error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const reply = data.choices[0]?.message?.content ||
                 "I'm here to help. How can I assist you with your store today?";
             
             const decision = EscalationPolicy.evaluate(query, 0.95);

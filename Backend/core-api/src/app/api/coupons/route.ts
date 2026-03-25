@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest as _NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { z } from "zod";
@@ -78,7 +78,7 @@ export const POST = withVayvaAPI(
       );
     }
 
-    const { ruleId, code, generateCode, codePrefix, quantity } =
+    const { ruleId, code, generateCode: _generateCode, codePrefix, quantity } =
       validated.data;
 
     // Verify rule exists and belongs to store

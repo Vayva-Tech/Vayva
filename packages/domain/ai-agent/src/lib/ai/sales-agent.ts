@@ -1,8 +1,7 @@
-import { GroqClient } from "./groq-client";
+import { OpenRouterClient } from "./openrouter-client";
 import { MerchantBrainService } from "./merchant-brain.service";
 import { VisualSearchService } from "./visual-search.service";
 import { prisma, Prisma } from "@vayva/db";
-import { Chat } from "groq-sdk/resources/chat";
 import { AiUsageService } from "./ai-usage.service";
 import { DataGovernanceService } from "../governance/data-governance.service";
 import { EscalationService } from "../support/escalation.service";
@@ -11,7 +10,7 @@ import { reportError } from "../error";
 import { NotificationService } from "../../services/notifications";
 
 // Initialize centralised client
-const groqClient = new GroqClient("SUPPORT");
+const aiClient = new OpenRouterClient("SUPPORT");
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -243,8 +242,8 @@ export class SalesAgent {
           content: typeof m.content === "string" ? m.content : "",
         })),
       ];
-      const response = await groqClient.chatCompletion(llmMessages, {
-        model: "llama-3.1-70b-versatile",
+      const response = await aiClient.chatCompletion(llmMessages, {
+        model: "google/gemini-2.5-flash",
         temperature: 0.1,
         tools,
         tool_choice: "auto",
@@ -546,7 +545,7 @@ export class SalesAgent {
             });
           }
         }
-        const secondResponse = await groqClient.chatCompletion(
+        const secondResponse = await aiClient.chatCompletion(
           [
             { role: "system", content: systemPrompt },
             ...messages,
@@ -554,7 +553,7 @@ export class SalesAgent {
             ...toolResults,
           ],
           {
-            model: "llama-3.1-70b-versatile",
+            model: "google/gemini-2.5-flash",
             temperature: 0.1,
             storeId,
             requestId: options?.requestId,
@@ -571,7 +570,7 @@ export class SalesAgent {
       if (response && response.usage) {
         await AiUsageService.logUsage({
           storeId,
-          model: "llama-3.1-70b-versatile",
+          model: response.model || "google/gemini-2.5-flash",
           inputTokens: response.usage.prompt_tokens,
           outputTokens: response.usage.completion_tokens,
           requestId: options?.requestId,
@@ -581,7 +580,7 @@ export class SalesAgent {
           storeId,
           conversationId: conversationId,
           requestId: options?.requestId,
-          model: "llama-3.1-70b-versatile",
+          model: response.model || "google/gemini-2.5-flash",
           toolsUsed: (choice.tool_calls || []).map((t) => t.function.name),
           retrievedDocs: retrievedDocIds,
           inputSummary: lastMessage,
@@ -1181,7 +1180,7 @@ Remember: You're helping a real person. Be genuine, be helpful, be human.`;
   /**
    * Returns the appropriate tools based on store industry/category
    */
-  static getToolsForIndustry(category: string | null | undefined): Chat.ChatCompletionTool[] {
+  static getToolsForIndustry(category: string | null | undefined): any[] {
     // Base tools available to all industries
     const baseTools = [
       {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Universal Dashboard Components Index
 // Export all universal dashboard components for easy importing
 

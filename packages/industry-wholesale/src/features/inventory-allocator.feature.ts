@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Inventory Allocator Feature
  */

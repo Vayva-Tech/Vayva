@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Insurance Verification Feature Module
  */

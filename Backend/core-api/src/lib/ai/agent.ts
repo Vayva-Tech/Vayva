@@ -9,7 +9,7 @@
  */
 
 import { prisma } from "@vayva/db";
-import { logger } from "@vayva/shared";
+import { logger as _logger } from "@vayva/shared";
 
 interface PricingRecommendation {
   productId: string;
@@ -182,7 +182,7 @@ export async function predictStockLevels(
     // Calculate recommended reorder quantity
     // Formula: (lead time + safety stock) * avg daily sales - current stock
     const leadTimeDays = 7;
-    const safetyStock = avgDailySales * 14; // 2 weeks safety stock
+    const _safetyStock = avgDailySales * 14; // 2 weeks safety stock
     const recommendedReorder = Math.ceil(
       avgDailySales * (leadTimeDays + 14) - currentStock
     );

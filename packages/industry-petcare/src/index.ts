@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Pet Care Industry Package Index
  */

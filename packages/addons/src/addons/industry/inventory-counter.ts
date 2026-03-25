@@ -4,7 +4,7 @@
  * Real-time stock counter display for urgency
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const INVENTORY_COUNTER_ADDON: AddOnDefinition = {
   id: 'vayva.inventory-counter',

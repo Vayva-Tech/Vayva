@@ -20,7 +20,7 @@
 | `EVOLUTION_API_URL` | merchant | Yes | Evolution API URL for WhatsApp |
 | `EVOLUTION_API_KEY` | merchant | Yes | Evolution API authentication key |
 | `PAYSTACK_SECRET_KEY` | merchant, ops-console, storefront | Yes | Paystack secret key (test or live) |
-| `PAYSTACK_PUBLIC_KEY` | merchant, storefront | Yes | Paystack public key (client-side) |
+| `NEXT_PUBLIC_PAYSTACK_KEY` | merchant, storefront | Yes | Paystack public key (client-side) |
 | `PAYSTACK_LIVE_SECRET_KEY` | storefront | Prod | Paystack live secret key (production only) |
 | `RESEND_API_KEY` | merchant, ops-console | Yes | Resend email API key |
 | `NEXT_PUBLIC_ANALYTICS_ID` | merchant | No | Analytics tracking ID |
@@ -93,11 +93,6 @@
 - **Used by**: merchant (via backend)
 - **Notes**: Powers AI Autopilot, AI insights, product descriptions, and the AI agent. Usage is metered per tier (STARTER: 10K tokens, PRO: 100K, PRO_PLUS: 200K per month).
 
-### `GROQ_API_KEY_RESCUE`
-- **Format**: API key string
-- **Used by**: ops-console
-- **Notes**: Groq API key specifically for the merchant rescue feature (AI-assisted merchant intervention).
-
 ---
 
 ## WhatsApp Integration
@@ -114,15 +109,13 @@
 - **Used by**: merchant
 - **Notes**: Authentication key for the Evolution API instance.
 
-### `WHATSAPP_ACCESS_TOKEN`
-- **Format**: Token string
-- **Used by**: merchant
-- **Notes**: WhatsApp Cloud API access token (alternative to Evolution API for direct Meta integration).
+### Canonical vs legacy (important)
+- **Canonical (used today)**: `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`
+- **Legacy/Not used**: Meta WhatsApp Cloud API variables (kept only for backwards compatibility in some parts of the repo)
 
-### `WHATSAPP_PHONE_ID`
-- **Format**: Phone number ID string
-- **Used by**: merchant
-- **Notes**: WhatsApp Business phone number ID for the Cloud API.
+### `WHATSAPP_ACCESS_TOKEN` / `WHATSAPP_PHONE_ID` / `WHATSAPP_PHONE_NUMBER_ID` / `WHATSAPP_VERIFY_TOKEN`
+- **Used by**: Not used (Meta WhatsApp Cloud API)
+- **Notes**: Vayva uses **Evolution API** (self-hosted) and does not use Meta’s Cloud API today.
 
 ---
 
@@ -133,10 +126,14 @@
 - **Used by**: merchant, ops-console, storefront
 - **Notes**: Server-side key for Paystack API calls. The ops-console uses this for health checks. The storefront uses this for webhook signature verification.
 
-### `PAYSTACK_PUBLIC_KEY`
+### `NEXT_PUBLIC_PAYSTACK_KEY`
 - **Format**: `pk_test_*` (test) or `pk_live_*` (live)
 - **Used by**: merchant, storefront (client-side)
-- **Notes**: Client-side key for Paystack Inline.js checkout widget. Should be prefixed as `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` for client access.
+- **Notes**: Canonical client-side Paystack key used in the repo’s root `.env.example`.
+
+### `PAYSTACK_PUBLIC_KEY`
+- **Used by**: Legacy alias (some apps still reference this name)
+- **Notes**: Prefer `NEXT_PUBLIC_PAYSTACK_KEY` for client-side configuration unless/until the repo is fully normalized.
 
 ### `PAYSTACK_LIVE_SECRET_KEY`
 - **Format**: `sk_live_*`
@@ -285,7 +282,7 @@ For a new deployment, ensure these minimum variables are set:
 **Merchant**:
 - `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
 - `BACKEND_API_URL`
-- `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`
+- `PAYSTACK_SECRET_KEY`, `NEXT_PUBLIC_PAYSTACK_KEY` (legacy: `PAYSTACK_PUBLIC_KEY`)
 - `RESEND_API_KEY`
 - `OPENROUTER_API_KEY`
 - `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`

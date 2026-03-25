@@ -149,20 +149,20 @@ export default function SellerPage({ params }: { params: Promise<{ id: string }>
         {/* Category Filter */}
         {categories.length > 1 && (
           <div className="flex gap-2 overflow-x-auto mb-6">
-            <button
+            <Button
               onClick={() => setActiveCategory(null)}
               className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${!activeCategory ? "bg-green-500 text-white" : "bg-gray-100"}`}
             >
               All Products
-            </button>
+            </Button>
             {categories.map((cat) => (
-              <button
+              <Button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-full text-sm whitespace-nowrap capitalize ${activeCategory === cat ? "bg-green-500 text-white" : "bg-gray-100"}`}
               >
                 {cat}
-              </button>
+              </Button>
             ))}
           </div>
         )}

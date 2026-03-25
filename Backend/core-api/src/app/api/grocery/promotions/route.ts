@@ -243,7 +243,7 @@ export const POST = withVayvaAPI(
 );
 
 // Calculate promotion performance metrics
-async function calculatePromotionPerformance(promotionId: string, storeId: string) {
+async function _calculatePromotionPerformance(_promotionId: string, _storeId: string) {
   // Mock performance data - would integrate with actual sales data
   const mockPerformance = {
     totalRevenue: Math.floor(Math.random() * 50000) + 10000,

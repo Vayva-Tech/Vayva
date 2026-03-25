@@ -1,12 +1,15 @@
-// @ts-nocheck
 "use client";
-
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Wrench, Plus, Clock, PencilSimple as Edit, Trash, CurrencyDollar as DollarSign, CheckCircle, X, ClockCountdown } from "@phosphor-icons/react";
 import { logger, formatCurrency } from "@vayva/shared";
 import { Button, Input } from "@vayva/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface Service {
   id: string;
@@ -166,17 +169,59 @@ export default function ServicesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Services</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your service offerings and pricing</p>
-        </div>
-        <Button onClick={() => { setEditingService(null); resetForm(); setIsOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white">
-          <Plus size={18} className="mr-2" />
-          New Service
-        </Button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button
+                  onClick={() => { setEditingService(null); resetForm(); setIsOpen(true); }}
+                  className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-xl font-semibold justify-between"
+                >
+                  <span>New service</span>
+                  <Plus size={18} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Active</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {activeServices}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Inactive</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {inactiveServices}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Services"
+          subtitle="Manage your service offerings and pricing"
+          actions={
+            <Button
+              onClick={() => { setEditingService(null); resetForm(); setIsOpen(true); }}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Plus size={18} className="mr-2" />
+              New Service
+            </Button>
+          }
+        />
 
       {/* Summary Widgets */}
       {services.length > 0 && (
@@ -313,20 +358,20 @@ export default function ServicesPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
                           onClick={() => openEdit(service)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Edit size={16} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => setDeleteConfirm({ id: service.id, name: service.name })}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
                           <Trash size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -465,6 +510,7 @@ export default function ServicesPage() {
         cancelText="Cancel"
         variant="danger"
       />
+      </PageWithInsights>
     </div>
   );
 }

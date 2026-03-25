@@ -258,3 +258,22 @@ export async function sendRefundRequested(
     html,
   });
 }
+
+/** Generic HTML email (e.g. compliance SLA alerts). */
+export async function sendEmail(args: {
+  to: string | string[];
+  cc?: string[];
+  subject: string;
+  html: string;
+  tags?: string[];
+}) {
+  const to = Array.isArray(args.to) ? args.to : [args.to];
+  return getResend().emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    cc: args.cc,
+    subject: args.subject,
+    html: args.html,
+  });
+}

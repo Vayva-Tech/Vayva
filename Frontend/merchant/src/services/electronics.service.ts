@@ -90,13 +90,23 @@ export class ElectronicsService {
   }
 
   async updateWarrantyStatus(
+    storeId: string,
     id: string,
     status: WarrantyStatus
   ): Promise<WarrantyRecord> {
-    const warranty = await prisma.warrantyRecord?.update({
-      where: { id },
+    const updated = await prisma.warrantyRecord?.updateMany({
+      where: { id, storeId },
       data: { status },
     });
+    if (!updated || updated.count !== 1) {
+      throw new Error('Warranty not found');
+    }
+    const warranty = await prisma.warrantyRecord?.findFirst({
+      where: { id, storeId },
+    });
+    if (!warranty) {
+      throw new Error('Warranty not found');
+    }
 
     return {
       id: warranty.id,
@@ -247,11 +257,20 @@ export class ElectronicsService {
 
   // ===== RENEWAL OFFERS =====
 
-  async markRenewalOffered(id: string): Promise<WarrantyRecord> {
-    const warranty = await prisma.warrantyRecord?.update({
-      where: { id },
+  async markRenewalOffered(storeId: string, id: string): Promise<WarrantyRecord> {
+    const updated = await prisma.warrantyRecord?.updateMany({
+      where: { id, storeId },
       data: { renewalOffered: true },
     });
+    if (!updated || updated.count !== 1) {
+      throw new Error('Warranty not found');
+    }
+    const warranty = await prisma.warrantyRecord?.findFirst({
+      where: { id, storeId },
+    });
+    if (!warranty) {
+      throw new Error('Warranty not found');
+    }
 
     return {
       id: warranty.id,

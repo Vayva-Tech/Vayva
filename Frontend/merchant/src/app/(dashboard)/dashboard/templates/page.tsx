@@ -7,7 +7,6 @@ import { FilterBar } from "@/components/wix-style/FilterBar";
 import { EmptyState } from "@/components/wix-style/EmptyState";
 import { SkeletonGrid } from "@/components/wix-style/SkeletonCard";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHeader } from "@/components/wix-style/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button, Icon } from "@vayva/ui";
@@ -407,8 +406,7 @@ export default function TemplatesPage() {
   });
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-20">
-      <Breadcrumbs />
+    <div className="space-y-10 max-w-6xl pb-20">
       <BackButton href="/dashboard/control-center" label="Back to Control Center" className="mb-4" />
       <PageHeader
         title="Templates"

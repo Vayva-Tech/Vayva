@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -7,12 +7,21 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = await request.json().catch(() => ({}));
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
+    const body: unknown = await request.json().catch(() => ({}));
 
-    const { status, priority, metadata } = body;
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+
+    const { status, priority, metadata } = body as Record<string, unknown>;
 
     const allowed_statuses = ["open", "in_progress", "waiting", "resolved", "closed"];
     const allowed_priorities = ["low", "medium", "high", "urgent"];
@@ -38,21 +47,23 @@ export async function PATCH(
       return NextResponse.json({ error: "No updates provided" }, { status: 400 });
     }
 
-    const result = await apiJson<{ success: boolean; data?: any; error?: string }>(
-      `${process.env.BACKEND_API_URL}/api/merchant/support/tickets/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-store-id": storeId,
-        },
-        body: JSON.stringify(updatePayload),
-      }
-    );
+    const result = await apiJson<{
+      success: boolean;
+      data?: unknown;
+      error?: string;
+    }>(buildBackendUrl(`/api/merchant/support/tickets/${id}`), {
+      method: "PATCH",
+      headers: auth.headers,
+      body: JSON.stringify(updatePayload),
+    });
 
     return NextResponse.json(result);
-  } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/support/tickets/:id", operation: "PATCH" });
+  } catch (error: unknown) {
+    handleApiError(error, {
+      endpoint: "/api/merchant/support/tickets/[id]",
+      operation: "PATCH",
+      storeId,
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
@@ -97,12 +98,12 @@ export default function RealEstateDashboard() {
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="btn-gradient">
+              <Button className="btn-gradient">
                 + New Listing
-              </button>
-              <button className="glass-card px-4 py-2 text-[var(--re-text-secondary)] hover:text-white">
+              </Button>
+              <Button className="glass-card px-4 py-2 text-[var(--re-text-secondary)] hover:text-white">
                 📊 Generate CMA
-              </button>
+              </Button>
             </div>
           </div>
           
@@ -166,3 +167,4 @@ export default function RealEstateDashboard() {
     </motion.div>
   );
 }
+

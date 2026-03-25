@@ -1,5 +1,5 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -121,7 +121,7 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-5xl space-y-8">
       {/* Header */}
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
@@ -189,14 +189,15 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-500">
             No settings match &quot;{searchQuery}&quot;
           </p>
-          <button
+          <Button
             onClick={() => setSearchQuery("")}
             className="mt-2 text-sm text-green-600 hover:text-green-700 font-medium"
           >
             Clear search
-          </button>
+          </Button>
         </div>
       )}
     </div>
   );
 }
+

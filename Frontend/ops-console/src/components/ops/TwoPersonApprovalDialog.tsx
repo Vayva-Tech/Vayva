@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { cn } from "@vayva/ui";
+import { cn, Button } from "@vayva/ui";
 import { Shield, UserCheck, AlertTriangle, X, Check, Loader2 } from "lucide-react";
 
 interface TwoPersonApprovalDialogProps {
@@ -87,13 +87,13 @@ export function TwoPersonApprovalDialog({
                 2-Person Approval Required
               </p>
             </div>
-            <button
+            <Button
               onClick={onClose}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               disabled={isLoading}
             >
               <X className="w-5 h-5 text-white" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -123,7 +123,7 @@ export function TwoPersonApprovalDialog({
                   </div>
                 ) : (
                   filteredApprovers.map((approver) => (
-                    <button
+                    <Button
                       key={approver.id}
                       onClick={() => setSelectedApprover(approver.id)}
                       className={cn(
@@ -148,7 +148,7 @@ export function TwoPersonApprovalDialog({
                       {selectedApprover === approver.id && (
                         <Check className="w-5 h-5 text-red-500" />
                       )}
-                    </button>
+                    </Button>
                   ))
                 )}
               </div>
@@ -192,22 +192,22 @@ export function TwoPersonApprovalDialog({
           {/* Actions */}
           <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
             {step === 2 && (
-              <button
+              <Button
                 onClick={() => setStep(1)}
                 disabled={isLoading}
                 className="px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium"
               >
                 Back
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={onClose}
               disabled={isLoading}
               className="px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSubmit}
               disabled={isLoading || (step === 1 && !selectedApprover)}
               className={cn(
@@ -230,7 +230,7 @@ export function TwoPersonApprovalDialog({
                   Confirm 2-Person Approval
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

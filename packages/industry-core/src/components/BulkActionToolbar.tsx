@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 
@@ -39,7 +39,7 @@ export function BulkActionToolbar({
         
         <div className="flex items-center space-x-2">
           {actions.map((action) => (
-            <button
+            <Button
               key={action.key}
               type="button"
               onClick={() => onAction(action.key)}
@@ -52,16 +52,16 @@ export function BulkActionToolbar({
             >
               {action.icon && <span className="mr-1.5">{action.icon}</span>}
               {action.label}
-            </button>
+            </Button>
           ))}
           
-          <button
+          <Button
             type="button"
             onClick={onCancel}
             className="ml-3 inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     </div>

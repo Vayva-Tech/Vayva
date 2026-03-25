@@ -65,7 +65,7 @@ This document defines all deployment environments, their URLs, configuration dif
 | `PAYSTACK_SECRET_KEY` | `sk_test_*` | `sk_test_*` | `sk_live_*` |
 | `NEXT_PUBLIC_PAYSTACK_KEY` | `pk_test_*` | `pk_test_*` | `pk_live_*` |
 | `PAYSTACK_MOCK` | `true` | `false` | `false` |
-| `GROQ_API_KEY` | Dev API key | Staging API key | Production API key(s) |
+| `OPENROUTER_API_KEY` | Dev API key | Staging API key | Production API key |
 | `SENTRY_DSN` | Unset or dev project | Staging Sentry project | Production Sentry project |
 | `LOG_LEVEL` | `debug` | `info` | `info` |
 | `WORKER_CONCURRENCY` | `1` | `3` | `5` |

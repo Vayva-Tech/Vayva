@@ -11,10 +11,36 @@
  * RFC 7644: https://tools.ietf.org/html/rfc7644
  */
 
-import { randomBytes } from 'crypto';
-import { prisma } from '@vayva/db';
+import { createHash, randomBytes } from 'crypto';
+import { Prisma, prisma } from '@vayva/db';
+import { prismaDelegates } from '../prisma-delegates';
 import { logger } from '@vayva/shared';
 import { z } from 'zod';
+
+type PrismaDelegate = {
+  create: (args: unknown) => Promise<unknown>;
+  update: (args: unknown) => Promise<unknown>;
+  upsert: (args: unknown) => Promise<unknown>;
+  findUnique: (args: unknown) => Promise<unknown>;
+  findFirst: (args: unknown) => Promise<unknown>;
+  findMany: (args: unknown) => Promise<unknown[]>;
+  count: (args: unknown) => Promise<number>;
+};
+
+const delegates = prismaDelegates as unknown as Record<string, unknown>;
+const scimUserDelegate = delegates.scimUser as unknown as PrismaDelegate | undefined;
+const scimGroupDelegate = delegates.scimGroup as unknown as PrismaDelegate | undefined;
+const scimTokenDelegate = delegates.scimToken as unknown as PrismaDelegate | undefined;
+
+type ScimUserRow = Record<string, unknown> & {
+  userId: string;
+  tenantId?: string;
+  user: { email: string; firstName: string | null; lastName: string | null };
+};
+
+type ScimTokenRow = Record<string, unknown> & { tenantId: string };
+
+type ScimGroupRow = Record<string, unknown> & { id: string; members?: unknown };
 
 // ============================================================================
 // SCIM 2.0 Types (RFC 7643)
@@ -162,13 +188,16 @@ export class ScimService {
       logger.info('[SCIM] Linked existing user to SCIM provisioning', { userId, email });
     } else {
       // Create new user
+      const placeholderPassword = createHash('sha256')
+        .update(`scim|${email}|${tenantId}`)
+        .digest('hex');
       const newUser = await prisma.user.create({
         data: {
           email,
           firstName,
           lastName,
-          authProvider: 'SCIM',
-          emailVerified: true,
+          password: placeholderPassword,
+          isEmailVerified: true,
         },
       });
 
@@ -177,57 +206,77 @@ export class ScimService {
     }
 
     // Store SCIM record
-    const scimRecord = await prisma.scimUser.upsert({
-      where: { userId_tenantId: { userId, tenantId } },
-      create: {
-        id: `scim_usr_${randomBytes(8).toString('hex')}`,
-        userId,
-        tenantId,
-        externalId: validated.externalId,
-        userName: validated.userName,
-        active: validated.active,
-        title: validated.title,
-        department: validated.department,
-        rawData: scimData as Record<string, unknown>,
-      },
-      update: {
-        externalId: validated.externalId,
-        active: validated.active,
-        title: validated.title,
-        department: validated.department,
-        rawData: scimData as Record<string, unknown>,
-        updatedAt: new Date(),
-      },
-    }).catch(() => {
-      // Return a minimal record if SCIM table doesn't exist yet
-      return {
-        id: userId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-    });
+    const scimRecord = scimUserDelegate
+      ? await scimUserDelegate
+          .upsert({
+            where: { userId_tenantId: { userId, tenantId } },
+            create: {
+              id: `scim_usr_${randomBytes(8).toString('hex')}`,
+              userId,
+              tenantId,
+              externalId: validated.externalId,
+              userName: validated.userName,
+              active: validated.active,
+              title: validated.title,
+              department: validated.department,
+              rawData: scimData as unknown as Prisma.InputJsonValue,
+            },
+            update: {
+              externalId: validated.externalId,
+              active: validated.active,
+              title: validated.title,
+              department: validated.department,
+              rawData: scimData as unknown as Prisma.InputJsonValue,
+              updatedAt: new Date(),
+            },
+          })
+          .catch(() => {
+            // Return a minimal record if SCIM table doesn't exist yet
+            return {
+              id: userId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+          })
+      : {
+          id: userId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
 
-    return this.buildScimUserResponse(userId, scimRecord, email, firstName, lastName, validated);
+    return this.buildScimUserResponse(
+      userId,
+      scimRecord as Record<string, unknown>,
+      email,
+      firstName,
+      lastName,
+      validated,
+    );
   }
 
   /**
    * Get a SCIM user by ID
    */
   async getUser(tenantId: string, scimUserId: string): Promise<ScimUser | null> {
-    const scimRecord = await prisma.scimUser.findFirst({
-      where: { id: scimUserId, tenantId },
-      include: { user: true },
-    }).catch(() => null);
+    const scimRecord = scimUserDelegate
+      ? await scimUserDelegate
+          .findFirst({
+            where: { id: scimUserId, tenantId },
+            include: { user: true },
+          })
+          .catch(() => null)
+      : null;
 
     if (!scimRecord) return null;
 
+    const row = scimRecord as ScimUserRow;
     return this.buildScimUserResponse(
-      scimRecord.userId,
-      scimRecord,
-      scimRecord.user.email,
-      scimRecord.user.firstName ?? undefined,
-      scimRecord.user.lastName ?? undefined,
-      scimRecord
+      row.userId,
+      row,
+      row.user.email,
+      row.user.firstName ?? undefined,
+      row.user.lastName ?? undefined,
+      row,
     );
   }
 
@@ -241,15 +290,24 @@ export class ScimService {
     const startIndex = options.startIndex || 1;
     const count = options.count || 100;
 
-    const scimUsers = await prisma.scimUser.findMany({
-      where: { tenantId },
-      include: { user: true },
-      skip: startIndex - 1,
-      take: count,
-      orderBy: { createdAt: 'asc' },
-    }).catch(() => []);
+    const scimUsers = (await (scimUserDelegate
+      ? scimUserDelegate
+          .findMany({
+            where: { tenantId },
+            include: { user: true },
+            skip: startIndex - 1,
+            take: count,
+            orderBy: { createdAt: 'asc' },
+          })
+          .catch(() => [])
+      : [])) as Array<{
+      userId: string;
+      user: { email: string; firstName: string | null; lastName: string | null };
+    } & Record<string, unknown>>;
 
-    const total = await prisma.scimUser.count({ where: { tenantId } }).catch(() => 0);
+    const total = scimUserDelegate
+      ? await scimUserDelegate.count({ where: { tenantId } }).catch(() => 0)
+      : 0;
 
     const resources: ScimUser[] = scimUsers.map((su) =>
       this.buildScimUserResponse(
@@ -277,13 +335,18 @@ export class ScimService {
   async updateUser(tenantId: string, scimUserId: string, scimData: unknown): Promise<ScimUser> {
     const validated = ScimUserSchema.parse(scimData);
 
-    const scimRecord = await prisma.scimUser.findFirst({
-      where: { id: scimUserId, tenantId },
-    }).catch(() => null);
+    const scimRecord = scimUserDelegate
+      ? await scimUserDelegate
+          .findFirst({
+            where: { id: scimUserId, tenantId },
+          })
+          .catch(() => null)
+      : null;
 
     if (!scimRecord) {
       throw new Error(`SCIM user not found: ${scimUserId}`);
     }
+    const row = scimRecord as Record<string, unknown> & { userId: string };
 
     const email = validated.emails?.[0]?.value || validated.userName;
     const firstName = validated.name?.givenName;
@@ -291,27 +354,31 @@ export class ScimService {
 
     // Update user in DB
     await prisma.user.update({
-      where: { id: scimRecord.userId },
+      where: { id: row.userId },
       data: { firstName, lastName },
     }).catch(() => {});
 
     // Update SCIM record
-    await prisma.scimUser.update({
-      where: { id: scimUserId },
-      data: {
-        active: validated.active,
-        title: validated.title,
-        department: validated.department,
-        rawData: scimData as Record<string, unknown>,
-        updatedAt: new Date(),
-      },
-    }).catch(() => {});
+    if (scimUserDelegate) {
+      await scimUserDelegate
+        .update({
+          where: { id: scimUserId },
+          data: {
+            active: validated.active,
+            title: validated.title,
+            department: validated.department,
+            rawData: scimData as unknown as Prisma.InputJsonValue,
+            updatedAt: new Date(),
+          },
+        })
+        .catch(() => {});
+    }
 
-    logger.info('[SCIM] Updated user', { scimUserId, userId: scimRecord.userId });
+    logger.info('[SCIM] Updated user', { scimUserId, userId: row.userId });
 
     return this.buildScimUserResponse(
-      scimRecord.userId,
-      scimRecord,
+      row.userId,
+      row,
       email,
       firstName,
       lastName,
@@ -327,14 +394,19 @@ export class ScimService {
     scimUserId: string,
     operations: ScimPatchOperation[]
   ): Promise<ScimUser> {
-    const scimRecord = await prisma.scimUser.findFirst({
-      where: { id: scimUserId, tenantId },
-      include: { user: true },
-    }).catch(() => null);
+    const scimRecord = scimUserDelegate
+      ? await scimUserDelegate
+          .findFirst({
+            where: { id: scimUserId, tenantId },
+            include: { user: true },
+          })
+          .catch(() => null)
+      : null;
 
     if (!scimRecord) {
       throw new Error(`SCIM user not found: ${scimUserId}`);
     }
+    const row = scimRecord as ScimUserRow;
 
     // Process PATCH operations
     const updates: Record<string, unknown> = {};
@@ -350,7 +422,7 @@ export class ScimService {
           // Deactivate/reactivate the actual user
           if (op.value === false) {
             userUpdates.deactivatedAt = new Date();
-            logger.info('[SCIM] Deactivating user', { userId: scimRecord.userId });
+            logger.info('[SCIM] Deactivating user', { userId: row.userId });
           } else {
             userUpdates.deactivatedAt = null;
           }
@@ -370,25 +442,29 @@ export class ScimService {
 
     if (Object.keys(userUpdates).length > 0) {
       await prisma.user.update({
-        where: { id: scimRecord.userId },
+        where: { id: row.userId },
         data: userUpdates,
       }).catch(() => {});
     }
 
     if (Object.keys(updates).length > 0) {
-      await prisma.scimUser.update({
-        where: { id: scimUserId },
-        data: { ...updates, updatedAt: new Date() },
-      }).catch(() => {});
+      if (scimUserDelegate) {
+        await scimUserDelegate
+          .update({
+            where: { id: scimUserId },
+            data: { ...updates, updatedAt: new Date() },
+          })
+          .catch(() => {});
+      }
     }
 
     return this.buildScimUserResponse(
-      scimRecord.userId,
-      { ...scimRecord, ...updates },
-      scimRecord.user.email,
-      (userUpdates.firstName as string) ?? scimRecord.user.firstName ?? undefined,
-      (userUpdates.lastName as string) ?? scimRecord.user.lastName ?? undefined,
-      scimRecord
+      row.userId,
+      { ...row, ...updates },
+      row.user.email,
+      (userUpdates.firstName as string) ?? row.user.firstName ?? undefined,
+      (userUpdates.lastName as string) ?? row.user.lastName ?? undefined,
+      row
     );
   }
 
@@ -397,29 +473,38 @@ export class ScimService {
    * Per SCIM spec: users should be deactivated, not hard deleted
    */
   async deactivateUser(tenantId: string, scimUserId: string): Promise<ScimProvisionResult> {
-    const scimRecord = await prisma.scimUser.findFirst({
-      where: { id: scimUserId, tenantId },
-    }).catch(() => null);
+    const scimRecord = scimUserDelegate
+      ? await scimUserDelegate
+          .findFirst({
+            where: { id: scimUserId, tenantId },
+          })
+          .catch(() => null)
+      : null;
 
     if (!scimRecord) {
       return { success: false, action: 'deactivated', message: 'User not found' };
     }
+    const row = scimRecord as Record<string, unknown> & { userId: string };
 
-    await prisma.scimUser.update({
-      where: { id: scimUserId },
-      data: { active: false, updatedAt: new Date() },
-    }).catch(() => {});
+    if (scimUserDelegate) {
+      await scimUserDelegate
+        .update({
+          where: { id: scimUserId },
+          data: { active: false, updatedAt: new Date() },
+        })
+        .catch(() => {});
+    }
 
     // Revoke all sessions for the user
-    await prisma.session.deleteMany({
-      where: { userId: scimRecord.userId },
+    await prisma.userSession.deleteMany({
+      where: { userId: row.userId },
     }).catch(() => {});
 
-    logger.info('[SCIM] Deactivated user', { scimUserId, userId: scimRecord.userId });
+    logger.info('[SCIM] Deactivated user', { scimUserId, userId: row.userId });
 
     return {
       success: true,
-      userId: scimRecord.userId,
+      userId: row.userId,
       action: 'deactivated',
       message: 'User deactivated successfully',
     };
@@ -437,26 +522,40 @@ export class ScimService {
     externalId?: string;
     members?: Array<{ value: string; display?: string }>;
   }): Promise<ScimGroup> {
-    const group = await prisma.scimGroup.create({
-      data: {
-        id: `scim_grp_${randomBytes(8).toString('hex')}`,
-        tenantId,
-        displayName: scimData.displayName,
-        externalId: scimData.externalId,
-        members: (scimData.members || []) as unknown as Record<string, unknown>[],
-      },
-    }).catch(() => ({
-      id: `scim_grp_${randomBytes(8).toString('hex')}`,
-      displayName: scimData.displayName,
-      externalId: scimData.externalId,
-      members: scimData.members || [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }));
+    const group = scimGroupDelegate
+      ? await scimGroupDelegate
+          .create({
+            data: {
+              id: `scim_grp_${randomBytes(8).toString('hex')}`,
+              tenantId,
+              displayName: scimData.displayName,
+              externalId: scimData.externalId,
+              members: (scimData.members || []) as unknown as Prisma.InputJsonValue,
+            },
+          })
+          .catch(() => ({
+            id: `scim_grp_${randomBytes(8).toString('hex')}`,
+            displayName: scimData.displayName,
+            externalId: scimData.externalId,
+            members: scimData.members || [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }))
+      : {
+          id: `scim_grp_${randomBytes(8).toString('hex')}`,
+          displayName: scimData.displayName,
+          externalId: scimData.externalId,
+          members: scimData.members || [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
 
     logger.info('[SCIM] Created group', { displayName: scimData.displayName });
 
-    return this.buildScimGroupResponse(group, scimData.members || []);
+    return this.buildScimGroupResponse(
+      group as Record<string, unknown>,
+      scimData.members || [],
+    );
   }
 
   /**
@@ -469,13 +568,21 @@ export class ScimService {
     const startIndex = options.startIndex || 1;
     const count = options.count || 100;
 
-    const groups = await prisma.scimGroup.findMany({
-      where: { tenantId },
-      skip: startIndex - 1,
-      take: count,
-    }).catch(() => []);
+    const groups = (await (scimGroupDelegate
+      ? scimGroupDelegate
+          .findMany({
+            where: { tenantId },
+            skip: startIndex - 1,
+            take: count,
+          })
+          .catch(() => [])
+      : [])) as Array<
+      Record<string, unknown> & { members?: unknown }
+    >;
 
-    const total = await prisma.scimGroup.count({ where: { tenantId } }).catch(() => 0);
+    const total = scimGroupDelegate
+      ? await scimGroupDelegate.count({ where: { tenantId } }).catch(() => 0)
+      : 0;
 
     return {
       schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
@@ -485,7 +592,7 @@ export class ScimService {
       Resources: groups.map((g) =>
         this.buildScimGroupResponse(
           g,
-          (g.members as Array<{ value: string; display?: string }>) || []
+          ((g.members as Array<{ value: string; display?: string }>) || [])
         )
       ),
     };
@@ -499,15 +606,20 @@ export class ScimService {
     scimGroupId: string,
     operations: ScimPatchOperation[]
   ): Promise<ScimGroup> {
-    const group = await prisma.scimGroup.findFirst({
-      where: { id: scimGroupId, tenantId },
-    }).catch(() => null);
+    const group = scimGroupDelegate
+      ? await scimGroupDelegate
+          .findFirst({
+            where: { id: scimGroupId, tenantId },
+          })
+          .catch(() => null)
+      : null;
 
     if (!group) {
       throw new Error(`SCIM group not found: ${scimGroupId}`);
     }
+    const groupRow = group as ScimGroupRow;
 
-    let members = (group.members as Array<{ value: string; display?: string }>) || [];
+    let members = (groupRow.members as Array<{ value: string; display?: string }>) || [];
 
     for (const op of operations) {
       if (op.path === 'members') {
@@ -528,12 +640,16 @@ export class ScimService {
       }
     }
 
-    await prisma.scimGroup.update({
-      where: { id: scimGroupId },
-      data: { members: members as unknown as Record<string, unknown>[], updatedAt: new Date() },
-    }).catch(() => {});
+    if (scimGroupDelegate) {
+      await scimGroupDelegate
+        .update({
+          where: { id: scimGroupId },
+          data: { members: members as unknown as Prisma.InputJsonValue, updatedAt: new Date() },
+        })
+        .catch(() => {});
+    }
 
-    return this.buildScimGroupResponse({ ...group, members }, members);
+    return this.buildScimGroupResponse({ ...groupRow, members }, members);
   }
 
   // ============================================================================
@@ -547,13 +663,17 @@ export class ScimService {
     const token = randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
 
-    await prisma.scimToken.upsert({
-      where: { tenantId },
-      create: { tenantId, token, expiresAt },
-      update: { token, expiresAt },
-    }).catch(() => {
-      // Non-critical if table doesn't exist
-    });
+    if (scimTokenDelegate) {
+      await scimTokenDelegate
+        .upsert({
+          where: { tenantId },
+          create: { tenantId, token, expiresAt },
+          update: { token, expiresAt },
+        })
+        .catch(() => {
+          // Non-critical if table doesn't exist
+        });
+    }
 
     logger.info('[SCIM] Generated SCIM token', { tenantId });
 
@@ -564,13 +684,18 @@ export class ScimService {
    * Validate a SCIM Bearer token
    */
   async validateToken(token: string): Promise<{ valid: boolean; tenantId?: string }> {
-    const record = await prisma.scimToken.findFirst({
-      where: { token, expiresAt: { gt: new Date() } },
-    }).catch(() => null);
+    const record = scimTokenDelegate
+      ? await scimTokenDelegate
+          .findFirst({
+            where: { token, expiresAt: { gt: new Date() } },
+          })
+          .catch(() => null)
+      : null;
 
     if (!record) return { valid: false };
 
-    return { valid: true, tenantId: record.tenantId };
+    const row = record as ScimTokenRow;
+    return { valid: true, tenantId: row.tenantId };
   }
 
   // ============================================================================

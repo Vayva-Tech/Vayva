@@ -3,6 +3,7 @@
  * Integration with Paystack payment API
  */
 
+import { createHmac } from 'node:crypto';
 import type { ConnectorConfig, SyncResult } from '../../marketplace/types';
 
 export interface PaystackConfig extends ConnectorConfig {
@@ -220,9 +221,7 @@ export class PaystackConnector {
       return false;
     }
 
-    const crypto = require('crypto');
-    const hash = crypto
-      .createHmac('sha512', this.config.webhookSecret)
+    const hash = createHmac('sha512', this.config.webhookSecret)
       .update(body)
       .digest('hex');
 

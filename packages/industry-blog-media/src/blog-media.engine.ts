@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Blog/Media Industry Engine
  */
 
 import { DashboardEngine, type DashboardEngineConfig } from '@vayva/industry-core';
-import { BLOG_MEDIA_DASHBOARD_CONFIG } from './dashboard/index';
+import { BLOG_MEDIA_DASHBOARD_CONFIG } from './dashboard-config';
 
 export interface BlogMediaEngineConfig {
   contentManagement?: boolean;
@@ -13,17 +12,43 @@ export interface BlogMediaEngineConfig {
   socialDistribution?: boolean;
 }
 
-export type BlogMediaFeatureId = 'content-management' | 'audience-analytics' | 'monetization' | 'social-distribution';
+export type BlogMediaFeatureId =
+  | 'content-management'
+  | 'audience-analytics'
+  | 'monetization'
+  | 'social-distribution';
+
+export type BlogMediaEngineStatus = {
+  initialized: boolean;
+  activeFeatures: BlogMediaFeatureId[];
+  dashboardReady: boolean;
+  servicesReady: boolean;
+};
+
+const BLOG_MEDIA_ENGINE_DASHBOARD_CONFIG: DashboardEngineConfig = {
+  industry: BLOG_MEDIA_DASHBOARD_CONFIG.industry,
+  title: BLOG_MEDIA_DASHBOARD_CONFIG.title,
+  subtitle: BLOG_MEDIA_DASHBOARD_CONFIG.subtitle,
+  primaryObjectLabel: BLOG_MEDIA_DASHBOARD_CONFIG.primaryObjectLabel,
+  defaultTimeHorizon: BLOG_MEDIA_DASHBOARD_CONFIG.defaultTimeHorizon,
+  sections: BLOG_MEDIA_DASHBOARD_CONFIG.sections,
+  widgets: [],
+  layouts: [{ id: 'default', name: 'Default', breakpoints: { lg: [] } }],
+  kpiCards: [],
+  alertRules: [],
+  actions: [],
+  failureModes: BLOG_MEDIA_DASHBOARD_CONFIG.failureModes,
+};
 
 export class BlogMediaEngine {
   private dashboardEngine: DashboardEngine;
   private config: BlogMediaEngineConfig;
-  private status: { initialized: boolean; activeFeatures: BlogMediaFeatureId[]; dashboardReady: boolean; servicesReady: boolean };
+  private status: BlogMediaEngineStatus;
 
   constructor(config: BlogMediaEngineConfig = {}) {
     this.config = { contentManagement: true, audienceAnalytics: true, monetization: true, socialDistribution: true, ...config };
     this.dashboardEngine = new DashboardEngine();
-    this.dashboardEngine.setConfig(BLOG_MEDIA_DASHBOARD_CONFIG);
+    this.dashboardEngine.setConfig(BLOG_MEDIA_ENGINE_DASHBOARD_CONFIG);
     this.status = { initialized: false, activeFeatures: [], dashboardReady: false, servicesReady: false };
   }
 
@@ -35,7 +60,9 @@ export class BlogMediaEngine {
   }
 
   getDashboardEngine(): DashboardEngine { return this.dashboardEngine; }
-  getStatus() { return { ...this.status }; }
+  getStatus(): BlogMediaEngineStatus {
+    return { ...this.status };
+  }
   getActiveFeatures(): BlogMediaFeatureId[] { return [...this.status.activeFeatures]; }
   isFeatureAvailable(featureId: BlogMediaFeatureId): boolean { return this.status.activeFeatures.includes(featureId); }
   async dispose(): Promise<void> {}

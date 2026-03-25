@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Vendor Feature
  * High-level API for vendor management

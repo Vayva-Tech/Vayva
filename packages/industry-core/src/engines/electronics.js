@@ -10,7 +10,7 @@ class ElectronicsEngine {
   }
   
   async initialize() {
-    console.log('[ELECTRONICS_ENGINE] Initialized');
+    console.warn('[ELECTRONICS_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

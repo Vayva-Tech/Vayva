@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * GuestTimeline Widget
@@ -9,8 +9,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { BaseWidget } from '@vayva/industry-core';
-import type { WidgetDefinition } from '@vayva/industry-core';
+import { BaseWidget, type WidgetDefinition } from '@vayva/industry-core';
 
 export interface GuestStay {
   id: string;
@@ -129,7 +128,7 @@ export function GuestTimelineWidget({
   stays = [],
   viewMode = 'week',
   selectedDate,
-  showRoomNumbers = true,
+  showRoomNumbers: _showRoomNumbers = true,
   showGuestDetails = true,
   onStayClick,
   onCheckIn,
@@ -273,24 +272,24 @@ export function GuestTimelineWidget({
 
         {/* Navigation Controls */}
         <div className="flex justify-between items-center">
-          <button
+          <Button
             onClick={() => navigatePeriod('prev')}
             className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors font-medium"
           >
             ← Previous
-          </button>
+          </Button>
 
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-900">{getPeriodLabel()}</h3>
             <p className="text-sm text-gray-600 capitalize">{viewMode} view</p>
           </div>
 
-          <button
+          <Button
             onClick={() => navigatePeriod('next')}
             className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors font-medium"
           >
             Next →
-          </button>
+          </Button>
         </div>
 
         {/* Timeline Header */}
@@ -343,7 +342,7 @@ export function GuestTimelineWidget({
             <h4 className="font-semibold text-gray-900 mb-3">Quick Actions</h4>
             <div className="flex gap-3">
               {onCheckIn && (
-                <button
+                <Button
                   onClick={() => {
                     const todayCheckIns = stays.filter(
                       (s) =>
@@ -355,11 +354,11 @@ export function GuestTimelineWidget({
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                 >
                   Check In All Today ({stats.checkingInToday})
-                </button>
+                </Button>
               )}
               
               {onCheckOut && (
-                <button
+                <Button
                   onClick={() => {
                     const todayCheckOuts = stays.filter(
                       (s) =>
@@ -371,7 +370,7 @@ export function GuestTimelineWidget({
                   className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
                 >
                   Check Out All Today ({stats.checkingOutToday})
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -384,3 +383,4 @@ export function GuestTimelineWidget({
 GuestTimelineWidget.displayName = 'GuestTimelineWidget';
 
 export default GuestTimelineWidget;
+

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Travel Industry Package
  */
@@ -12,3 +11,5 @@ export { OccupancyHeatmapWidget } from './components/OccupancyHeatmap';
 export type { OccupancyHeatmapWidgetProps } from './components/OccupancyHeatmap';
 export { GuestTimelineWidget } from './components/GuestTimeline';
 export type { GuestTimelineWidgetProps } from './components/GuestTimeline';
+export { TravelDashboard } from './components/dashboard';
+export type { TravelDashboardProps } from './components/dashboard/types';

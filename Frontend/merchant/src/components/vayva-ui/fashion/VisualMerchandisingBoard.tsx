@@ -1,12 +1,11 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { VayvaCard, VayvaCardHeader, VayvaCardTitle, VayvaCardContent } from './VayvaCard';
-import { VayvaButton } from './VayvaButton';
+import { VayvaCard, VayvaCardHeader, VayvaCardTitle, VayvaCardContent } from '../VayvaCard';
+import { VayvaButton } from '../VayvaButton';
 import { cn } from '@/lib/utils';
 
-interface CollectionItem {
+export interface CollectionItem {
   id: string;
   name: string;
   image: string;

@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Performance Optimization Framework
  * System-wide speed and reliability enhancements
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState, useEffect, useCallback } from 'react';
 import { 
   Gauge,
@@ -100,7 +99,7 @@ export function usePerformanceMonitoring() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch performance metrics
-  const { data: metricsData } = useSWR<PerformanceMetrics>(
+  const { data: metricsData } = useSWR<PerformanceMetrics | null>(
     '/api/performance/metrics',
     async (url: string) => {
       try {
@@ -115,7 +114,7 @@ export function usePerformanceMonitoring() {
   );
 
   // Fetch performance health
-  const { data: healthData } = useSWR<PerformanceHealth>(
+  const { data: healthData } = useSWR<PerformanceHealth | null>(
     '/api/performance/health',
     async (url: string) => {
       try {
@@ -373,7 +372,7 @@ export default function PerformanceOptimizationDashboard() {
       <ThemedCard industry={industry}>
         <h3 className="font-semibold mb-4">Performance Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-left">
+          <Button className="p-4 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-left">
             <div className="flex items-center gap-3 mb-2">
               <BatteryCharging className="h-5 w-5 text-green-600" />
               <span className="font-medium">Enable Caching</span>
@@ -381,9 +380,9 @@ export default function PerformanceOptimizationDashboard() {
             <p className="text-sm text-gray-500">
               Activate CDN and memory caching for faster loads
             </p>
-          </button>
+          </Button>
           
-          <button className="p-4 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-left">
+          <Button className="p-4 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-left">
             <div className="flex items-center gap-3 mb-2">
               <Cloud className="h-5 w-5 text-blue-600" />
               <span className="font-medium">Optimize Images</span>
@@ -391,9 +390,9 @@ export default function PerformanceOptimizationDashboard() {
             <p className="text-sm text-gray-500">
               Compress and lazy-load images for better performance
             </p>
-          </button>
+          </Button>
           
-          <button className="p-4 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-left">
+          <Button className="p-4 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-left">
             <div className="flex items-center gap-3 mb-2">
               <Rocket className="h-5 w-5 text-purple-600" />
               <span className="font-medium">Run Diagnostics</span>
@@ -401,7 +400,7 @@ export default function PerformanceOptimizationDashboard() {
             <p className="text-sm text-gray-500">
               Perform comprehensive performance analysis
             </p>
-          </button>
+          </Button>
         </div>
       </ThemedCard>
     </div>

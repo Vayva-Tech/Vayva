@@ -1,6 +1,7 @@
-// @ts-nocheck
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
+import { Prisma } from "@vayva/db";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 
@@ -47,21 +48,22 @@ function generateRFQNumber(storeId: string): string {
  */
 export async function GET(request: Request): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request as NextRequest);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const customerId = searchParams.get("customerId");
     const limit = parseInt(searchParams.get("limit") || "50", 10);
     const offset = parseInt(searchParams.get("offset") || "0", 10);
-    const storeId = searchParams.get("storeId");
 
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
-    }
-
-    const where: Record<string, unknown> = { storeId };
+    const where: Prisma.RFQRequestWhereInput = { storeId };
     if (status) where.status = status;
     if (customerId) where.customerId = customerId;
 
@@ -100,33 +102,44 @@ export async function GET(request: Request): Promise<Response> {
  */
 export async function POST(request: Request): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request as NextRequest);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const validated = createRFQSchema.parse(body);
 
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
-    }
-
     const rfqNumber = generateRFQNumber(storeId);
 
-    const rfq = await apiJson<{
-        success: boolean;
-        data?: any;
-        error?: string;
-      }>(`${process.env.BACKEND_API_URL}/api/rfqrequest`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-store-id": storeId,
+    const rfq = await prisma.rFQRequest.create({
+      data: {
+        storeId,
+        customerId: validated.customerId,
+        rfqNumber,
+        dueDate: validated.dueDate ? new Date(validated.dueDate) : undefined,
+        deliveryDate: validated.deliveryDate ? new Date(validated.deliveryDate) : undefined,
+        deliveryLocation: validated.deliveryLocation,
+        paymentTerms: validated.paymentTerms,
+        notes: validated.notes,
+        attachments: validated.attachments ?? [],
+        items: {
+          create: validated.items.map((item) => ({
+            productId: item.productId,
+            description: item.description,
+            quantity: item.quantity,
+            targetPrice:
+              item.targetPrice != null ? new Prisma.Decimal(item.targetPrice) : undefined,
+            specifications: item.specifications,
+          })),
         },
-        body: JSON.stringify(body),
-      });
+      },
+      include: { items: true },
+    });
 
     logger.info("[RFQ_POST] RFQ created", {
       rfqId: rfq.id,
@@ -139,7 +152,7 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
+        { error: "Invalid input", details: error.issues },
         { status: 400 }
       );
     }
@@ -157,6 +170,15 @@ export async function POST(request: Request): Promise<Response> {
  */
 export async function PATCH(request: Request): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request as NextRequest);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Store ID required" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -170,12 +192,20 @@ export async function PATCH(request: Request): Promise<Response> {
     const body = await request.json();
     const validated = updateStatusSchema.parse(body);
 
-    const rfq = await prisma.rFQRequest.update({
-      where: { id },
+    const updated = await prisma.rFQRequest.updateMany({
+      where: { id, storeId },
       data: {
         status: validated.status,
         updatedAt: new Date(),
       },
+    });
+
+    if (updated.count === 0) {
+      return NextResponse.json({ error: "RFQ not found" }, { status: 404 });
+    }
+
+    const rfq = await prisma.rFQRequest.findFirst({
+      where: { id, storeId },
       include: { items: true },
     });
 
@@ -188,7 +218,7 @@ export async function PATCH(request: Request): Promise<Response> {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
+        { error: "Invalid input", details: error.issues },
         { status: 400 }
       );
     }
@@ -206,20 +236,24 @@ export async function PATCH(request: Request): Promise<Response> {
  */
 export async function PUT(request: Request): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request as NextRequest);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Store ID required" }, { status: 401 });
+    }
+
     const body = await request.json();
     const validated = quoteSchema.parse(body);
 
-    const rfq = await apiJson<{
-        success: boolean;
-        data?: any;
-        error?: string;
-      }>(`${process.env.BACKEND_API_URL}/api/rfqrequest/id`, {
-        headers: {
-          "x-store-id": storeId,
-        },
-      });
+    const rfqExists = await prisma.rFQRequest.findFirst({
+      where: { id: validated.rfqId, storeId },
+      select: { id: true },
+    });
 
-    if (!rfq) {
+    if (!rfqExists) {
       return NextResponse.json(
         { error: "RFQ not found" },
         { status: 404 }
@@ -228,11 +262,15 @@ export async function PUT(request: Request): Promise<Response> {
 
     // Update item quotes
     for (const quote of validated.itemQuotes) {
-      await prisma.rFQItem.update({
-        where: { id: quote.itemId },
+      await prisma.rFQItem.updateMany({
+        where: {
+          id: quote.itemId,
+          rfqId: validated.rfqId,
+          rfq: { storeId },
+        },
         data: {
           quotedPrice: quote.quotedPrice,
-          quotedQuantity: quote.quotedQuantity,
+          quotedQuantity: quote.quotedQuantity ?? undefined,
           status: "quoted",
           notes: quote.notes || undefined,
         },
@@ -240,17 +278,28 @@ export async function PUT(request: Request): Promise<Response> {
     }
 
     // Update RFQ status and total
-    const totalValue = validated.itemQuotes.reduce((sum: number, q) => sum + q.quotedPrice, 0);
+    const totalValue = validated.itemQuotes.reduce(
+      (sum, q: (typeof validated.itemQuotes)[number]) => sum + q.quotedPrice,
+      0
+    );
     
-    const updatedRFQ = await prisma.rFQRequest.update({
-      where: { id: validated.rfqId },
+    await prisma.rFQRequest.updateMany({
+      where: { id: validated.rfqId, storeId },
       data: {
         status: "quoted",
         totalValue,
         updatedAt: new Date(),
       },
+    });
+
+    const updatedRFQ = await prisma.rFQRequest.findFirst({
+      where: { id: validated.rfqId, storeId },
       include: { items: true },
     });
+
+    if (!updatedRFQ) {
+      return NextResponse.json({ error: "RFQ not found after update" }, { status: 404 });
+    }
 
     logger.info("[RFQ_QUOTE] Quote submitted", {
       rfqId: validated.rfqId,
@@ -266,7 +315,7 @@ export async function PUT(request: Request): Promise<Response> {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
+        { error: "Invalid input", details: error.issues },
         { status: 400 }
       );
     }

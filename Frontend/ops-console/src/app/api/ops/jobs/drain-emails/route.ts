@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 import {
   sendMerchantInvite,
   sendPasswordReset,
@@ -113,9 +114,10 @@ function isInternalJob(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // Auth bypass for cron if job token is valid
+    // Auth bypass for cron if job token is valid; manual runs need elevated ops role
     if (!isInternalJob(req)) {
-      await OpsAuthService.requireSession();
+      const { user } = await OpsAuthService.requireSession();
+      OpsAuthService.requireRole(user, "SUPERVISOR");
     }
 
     const body = await req.json().catch(() => ({}));
@@ -124,8 +126,10 @@ export async function POST(req: Request) {
     const result = await drainEmailOutbox(batchSize);
 
     return NextResponse.json({ success: true, ...result });
-  } catch (err: any) {
-    const msg = err instanceof Error ? err.message : "Unauthorized";
-    return NextResponse.json({ error: msg }, { status: 401 });
+  } catch (err: unknown) {
+    const authRes = opsApiAuthErrorResponse(err);
+    if (authRes) return authRes;
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

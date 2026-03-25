@@ -3,13 +3,19 @@
 **Document Classification:** Confidential -- Financial Planning
 **Last Updated:** March 2026
 **Version:** 1.0
-**Exchange Rate Assumption:** $1 = ₦1,550 (March 2026)
+**Exchange Rate Assumption:** $1 = ₦1,600 (March 2026 default for repo docs)
 
 ---
 
 ## 1. Executive Summary
 
-This document provides a comprehensive breakdown of Vayva's operational expenses across infrastructure, third-party services, and development tools. Total baseline monthly costs at launch are approximately **₦155,000--₦220,000 ($100--$142)**, scaling to an estimated **₦5.1M--₦8.2M** at 1,000 merchants and **₦33M--₦51M** at 10,000 merchants. The cost structure is heavily weighted toward variable costs (AI compute), giving Vayva strong operating leverage at scale.
+This document provides a comprehensive breakdown of Vayva's operational expenses across infrastructure, third-party services, and development tools. We split costs into:
+
+- **Fixed monthly** (baseline infrastructure + core tooling)
+- **Variable** (AI usage, payment fees, delivery costs, WhatsApp costs if applicable)
+- **Prepaid deposits** (cash-flow items that are not recurring “monthly bills”)
+
+Baseline launch costs (fixed monthly) are intentionally lean, while the biggest scaling driver is variable AI + delivery/payment volume.
 
 ---
 
@@ -19,13 +25,9 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 
 | Item | Plan | Monthly Cost (USD) | Monthly Cost (₦) |
 |---|---|---|---|
-| Storefront App | Pro | $20 | ₦31,000 |
-| Merchant Dashboard | Pro | $20 | ₦31,000 |
-| Admin Dashboard | Pro | $20 | ₦31,000 |
-| Landing/Marketing Site | Pro | $20 | ₦31,000 |
-| **Total Vercel** | | **$80** | **₦124,000** |
+| Vercel (all projects) | Pro | **$20** | **₦32,000** |
 
-**Alternative:** Vercel Team plan at $20/user/mo (shared across projects). At 1--2 developers, this may be more economical ($20--40/mo total). Evaluate when team size changes.
+**Note:** This reflects the current baseline you provided (**$20/mo total**). If you later decide to split projects or add seats, update this line accordingly.
 
 **Scaling notes:**
 - Vercel Pro includes 1TB bandwidth, 100GB-hours serverless function execution
@@ -34,16 +36,16 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 
 ### 2.2 VPS (Backend Servers)
 
-| Server | Provider | Role | Specs (Estimated) | Monthly Cost (USD) | Monthly Cost (₦) |
-|---|---|---|---|---|---|
-| Appserver (163.245.209.202) | DigitalOcean/Contabo | API, Evolution API, application services | 4 vCPU, 8GB RAM, 200GB SSD | $30--50 | ₦46,500--₦77,500 |
-| Dbserver (163.245.209.203) | DigitalOcean/Contabo | PostgreSQL, Redis | 4 vCPU, 16GB RAM, 400GB SSD | $40--60 | ₦62,000--₦93,000 |
-| **Total VPS** | | | | **$70--110** | **₦108,500--₦170,500** |
+| Server | Provider | Role | Monthly Cost (USD) | Monthly Cost (₦) |
+|---|---|---|---:|---:|
+| VPS (database) | **InterServer** | PostgreSQL (primary DB) | **$35** | **₦56,000** |
+| VPS (app/services) | **InterServer** | Core API + self-hosted services | **$35** | **₦56,000** |
 
 **Self-hosted services on VPS (no additional cost):**
-- PostgreSQL (database)
+- PostgreSQL (database) *(on the DB VPS)*
 - Redis (caching, session management, queues)
 - Evolution API (WhatsApp Business integration)
+- MinIO (S3-compatible file storage) *hosted on this VPS*
 
 **Scaling triggers:**
 - **100 merchants:** Current infrastructure sufficient
@@ -55,30 +57,43 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 
 | Item | Provider | Annual Cost | Monthly Equivalent |
 |---|---|---|---|
-| vayva.ng domain | NiRA-accredited registrar | $15--30/year | ₦1,900--₦3,875 |
+| vayva.ng domain | **hosting.com** | **₦20,000/year** | **₦1,667** |
 | DNS | Vercel/Cloudflare (free) | $0 | ₦0 |
-| SSL certificates | Let's Encrypt / Vercel (free) | $0 | ₦0 |
-| **Total Domain** | | **$15--30/year** | **₦1,900--₦3,875/mo** |
+| Wildcard SSL (storefront subdomains) | PositiveSSL Wildcard (DV) | **$90/year** | **₦12,000** |
+| **Total Domain** | | **₦164,000/year** | **₦13,667/mo** |
+
+### 2.4 Business Email (hosting.com)
+
+| Item | Provider | Monthly Cost (USD) | Monthly Cost (₦) |
+|---|---|---:|---:|
+| `@vayva.ng` business inboxes | **hosting.com** | **$5** | **₦8,000** |
+
+**Important:** This is the mailbox provider for staff inboxes. Transactional emails are sent via **Resend**.
 
 ### 2.4 Infrastructure Cost Summary
 
 | Category | Monthly (USD) | Monthly (₦) | Annual (₦) |
 |---|---|---|---|
-| Vercel | $80 | ₦124,000 | ₦1,488,000 |
-| VPS (2 servers) | $70--110 | ₦108,500--₦170,500 | ₦1,302,000--₦2,046,000 |
-| Domain & DNS | $2 | ₦2,900 | ₦34,800 |
-| **Total Infrastructure** | **$152--192** | **₦235,400--₦297,400** | **₦2,824,800--₦3,568,800** |
+| Vercel | **$20** | **₦32,000** | **₦384,000** |
+| VPS | **$70** | **₦112,000** | **₦1,344,000** |
+| Business email | **$5** | **₦8,000** | **₦96,000** |
+| Domain & SSL | $8.5 | ₦13,667 | ₦164,000 |
+| **Total Infrastructure (baseline)** | **$103.5** | **₦165,667** | **₦1,988,000** |
 
 ---
 
 ## 3. Third-Party Service Costs
 
+### 3.0 OpenRouter launch deposit (prepaid)
+
+| Item | Type | Cost (USD) | Cost (₦) | Notes |
+|---|---|---:|---:|---|
+| OpenRouter initial deposit | **Prepaid deposit (cash-flow)** | **$50** | **₦80,000** | We re-deposit from merchant revenue once subscriptions start. Not a “monthly bill”. |
+
 ### 3.1 OpenRouter (AI Models)
 
-| Model | Use Case | Input Cost | Output Cost | Blended Cost/1M Tokens |
-|---|---|---|---|---|
-| GPT-4o Mini | Primary AI agent | $0.15/1M tokens | $0.60/1M tokens | ~$0.375/1M |
-| Llama 3.3 70B Instruct | Autopilot/routing | $0.21/1M tokens | $0.21/1M tokens | $0.21/1M |
+Model pricing varies by model/provider. For Vayva’s current baseline assumptions and NGN conversions, see:
+- `docs/08_reference/ai-pricing-and-credits.md`
 
 **Per-merchant AI cost estimation:**
 
@@ -139,43 +154,19 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 
 **Current:** Free tier sufficient during early growth. Upgrade to Team at ~200+ merchants when error volume exceeds free limits.
 
-### 3.5 Cloudinary (Image/Media Management)
+### 3.5 Storage (MinIO / S3-compatible)
 
-| Plan | Storage | Transformations | Monthly Cost (USD) | Monthly Cost (₦) |
-|---|---|---|---|---|
-| Free | 25GB | 25,000/mo | $0 | ₦0 |
-| Plus | 100GB | 75,000/mo | $89 | ₦137,950 |
-| Advanced | 300GB | 225,000/mo | $224 | ₦347,200 |
-
-**Image volume estimates:**
-- Per merchant: ~50--500 product images, ~5--20 uploads/mo
-- 100 merchants: ~10GB storage, Free tier sufficient
-- 1,000 merchants: ~80--100GB storage, Plus plan required
-- 10,000 merchants: ~500GB+ storage, Advanced or Enterprise plan
+Vayva does **not** use Cloudinary. Uploads are stored in **MinIO / S3-compatible storage** (often self-hosted).\n
+If MinIO is self-hosted on the VPS, the main cost drivers are **disk + bandwidth** and are captured under VPS.
 
 ### 3.6 Evolution API (WhatsApp)
 
 | Component | Cost |
 |---|---|
 | Evolution API (self-hosted) | ₦0 (runs on VPS) |
-| WhatsApp Business API (Meta) | Variable -- per-conversation pricing |
+| WhatsApp Business API (Meta) | **Not used** (we use Evolution API) |
 
-**WhatsApp Business API conversation costs (Meta pricing for Nigeria):**
-
-| Category | Per Conversation (24h window) |
-|---|---|
-| Marketing | ~$0.049 (~₦76) |
-| Utility | ~$0.018 (~₦28) |
-| Authentication | ~$0.027 (~₦42) |
-| Service (user-initiated) | Free (first 1,000/mo) |
-
-**Estimated WhatsApp costs:**
-
-| Merchants | Est. Conversations/Mo | Est. Cost/Mo (₦) |
-|---|---|---|
-| 100 | 5,000--10,000 | ₦140K--₦280K |
-| 1,000 | 50,000--100,000 | ₦1.4M--₦2.8M |
-| 10,000 | 500,000--1,000,000 | ₦14M--₦28M |
+**Note:** Vayva does **not** use Meta’s official WhatsApp Cloud API today. WhatsApp messaging cost is captured as VPS cost + operational overhead, not per-conversation fees.
 
 ### 3.7 Third-Party Services Cost Summary
 
@@ -185,8 +176,8 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 | Paystack (sub billing) | ₦385K | ₦3.85M | ₦38.5M |
 | Resend (email) | ₦31K | ₦124K | ₦500K+ |
 | Sentry | ₦0 | ₦40K | ₦124K |
-| Cloudinary | ₦0 | ₦138K | ₦347K |
-| WhatsApp (Meta) | ₦210K | ₦2.1M | ₦21M |
+| Storage (MinIO self-hosted) | ₦0 | ₦0 | ₦0 |
+| WhatsApp (Evolution API) | ₦0 | ₦0 | ₦0 |
 | **Total** | **₦1.83M** | **₦16.75M** | **₦145.5M** |
 
 ---
@@ -228,10 +219,11 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 
 | Category | Monthly (₦) | Annual (₦) |
 |---|---|---|
-| Infrastructure (Vercel + VPS + Domain) | ₦266,400 | ₦3,196,800 |
-| Third-party services (minimal) | ₦31,000 | ₦372,000 |
+| Infrastructure (Vercel + VPS + email + domain) | **₦165,667** | **₦1,988,000** |
+| Third-party services (variable usage) | **₦0+** | **₦0+** |
+| OpenRouter initial deposit (prepaid) | **₦80,000** | **₦80,000** |
 | Development tools | ₦0 | ₦0 |
-| **Total Baseline** | **₦297,400** | **₦3,568,800** |
+| **Total Baseline (launch month cash)** | **₦245,667** | **₦2,068,000** |
 
 ### 5.2 Scaling Cost Projections
 
@@ -239,7 +231,7 @@ This document provides a comprehensive breakdown of Vayva's operational expenses
 |---|---|---|---|
 | Infrastructure | ₦300K | ₦620K | ₦2.5M |
 | AI Compute (OpenRouter) | ₦1.2M | ₦10.5M | ₦85M |
-| WhatsApp (Meta) | ₦210K | ₦2.1M | ₦21M |
+| WhatsApp (Evolution API) | ₦0 | ₦0 | ₦0 |
 | Paystack (billing fees) | ₦385K | ₦3.85M | ₦38.5M |
 | Email (Resend) | ₦31K | ₦124K | ₦500K |
 | Monitoring & media | ₦0 | ₦178K | ₦471K |
@@ -269,8 +261,8 @@ The per-merchant cost decreases at scale due to fixed infrastructure costs being
 |---|---|---|
 | Vercel Team plan consolidation | Up to ₦62K/mo | Switch from 4x Pro to Team plan if 1--2 developers |
 | AI response caching (Redis) | 10--20% AI cost reduction | Cache common product queries, FAQ responses |
-| Image compression before Cloudinary | Delay paid plan by 6+ months | Client-side compression in merchant dashboard |
-| Batch WhatsApp messages | 5--10% WhatsApp cost reduction | Group notification messages within 24h windows |
+| Image compression before storage | Reduce bandwidth + disk usage | Client-side compression in merchant dashboard |
+| Batch WhatsApp messages | Reduce WhatsApp ops overhead | Group notification messages + rate-limit to avoid spam |
 
 ### 6.2 Medium-Term Optimizations (3--12 Months)
 
@@ -294,7 +286,7 @@ The per-merchant cost decreases at scale due to fixed infrastructure costs being
 
 All major service providers bill in USD. With Naira volatility, the following strategies reduce currency exposure:
 
-1. **Pre-pay annual plans** when Naira is strong (Vercel, Cloudinary, GitHub)
+1. **Pre-pay annual plans** when Naira is strong (Vercel, domain, GitHub)
 2. **Maintain USD reserves** for operational expenses (3-month buffer recommended)
 3. **Shift to local/self-hosted alternatives** where quality is equivalent
 4. **Price services in Naira** with quarterly review clauses tied to exchange rate bands

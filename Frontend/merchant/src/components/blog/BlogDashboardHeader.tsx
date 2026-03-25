@@ -1,6 +1,4 @@
-// @ts-nocheck
 'use client';
-
 import React from 'react';
 import { Icon } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
@@ -30,7 +28,7 @@ export function BlogDashboardHeader({
             {/* Time Range Selector */}
             <div className="flex bg-white-tertiary rounded-lg p-1">
               {(['today', 'week', 'month'] as const).map((range) => (
-                <button
+                <Button
                   key={range}
                   onClick={() => onTimeRangeChange(range)}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
@@ -40,7 +38,7 @@ export function BlogDashboardHeader({
                   }`}
                 >
                   {range.charAt(0).toUpperCase() + range.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -81,7 +79,7 @@ export function BlogDashboardHeader({
             { label: 'Newsletter', icon: 'Mail' },
             { label: 'Analytics', icon: 'BarChart3' },
           ].map((item) => (
-            <button
+            <Button
               key={item.label}
               className={`flex items-center gap-2 text-sm font-medium transition-colors ${
                 item.active
@@ -91,10 +89,11 @@ export function BlogDashboardHeader({
             >
               <Icon name={item.icon as any} size={16} />
               {item.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
     </div>
   );
 }
+

@@ -1,7 +1,14 @@
-// @ts-nocheck
 'use client';
 
-import { createContext, useContext, useEffect, useRef, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 
 interface WebSocketMessage {
   type: 'metrics_update' | 'churn_alert' | 'feature_release' | 'usage_spike';

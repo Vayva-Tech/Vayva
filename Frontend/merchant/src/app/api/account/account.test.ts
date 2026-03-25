@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { GET as getOverview } from "./overview/route";
-import { GET as getDomains, } from "./domains/route";
+import { GET as getDomains } from "./domains/route";
 import { POST as verifyDomain } from "./domains/verify/route";
 import { POST as changePassword } from "./security/change-password/route";
 import { requireAuth } from "@/lib/auth/session";

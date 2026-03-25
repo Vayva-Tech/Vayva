@@ -19,6 +19,7 @@ export interface BankAccount {
   accountNumber: string;
   accountName: string;
   isDefault?: boolean;
+  recipientCode?: string;
 }
 
 export interface PayoutResponse {

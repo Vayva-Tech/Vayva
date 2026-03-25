@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import {
   CheckCircle,
   Clock,
-  Spinner as Loader2,
+  Spinner as Loader2
 } from "@phosphor-icons/react/ssr";
 import { logger } from "@vayva/shared";
 import { useState } from "react";

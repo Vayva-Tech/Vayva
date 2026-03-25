@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * CRM Integration Component
  * Displays CRM dashboard and customer management interface
@@ -163,12 +163,12 @@ export const CRMIntegration: React.FC<CRMIntegrationProps> = ({
                   </span>
                 </td>
                 <td className="px-4 py-2 whitespace-nowrap">
-                  <button
+                  <Button
                     onClick={() => onCustomerSelect?.(customer)}
                     className="text-blue-600 hover:text-blue-800"
                   >
                     View
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -208,3 +208,4 @@ export const CRMIntegration: React.FC<CRMIntegrationProps> = ({
     </div>
   );
 };
+

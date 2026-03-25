@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { monitoringService } from '@/lib/monitoring';
+import { OpsAuthService } from '@/lib/ops-auth';
+import { opsApiAuthErrorResponse } from '@/lib/ops-api-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +16,15 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, 'OPERATOR');
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const metricName = searchParams.get('metric');
 
@@ -45,6 +56,8 @@ export async function GET(request: NextRequest) {
       timestamp: new Date(),
     });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error('Error fetching metrics:', error);
     return NextResponse.json(
       { error: 'Failed to fetch metrics' },

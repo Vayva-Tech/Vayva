@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Expiration Alerts Widget
@@ -53,7 +53,7 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
       productId: 'prod-1',
       productName: 'Fresh Milk',
       batchNumber: 'BATCH-101',
-      expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+      expirationDate: new Date('2030-01-02T12:00:00Z'),
       daysUntilExpiry: 1,
       quantity: 24,
       severity: 'critical',
@@ -65,7 +65,7 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
       productId: 'prod-2',
       productName: 'Yogurt Pack',
       batchNumber: 'BATCH-102',
-      expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      expirationDate: new Date('2030-01-03T12:00:00Z'),
       daysUntilExpiry: 2,
       quantity: 12,
       severity: 'critical',
@@ -77,7 +77,7 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
       productId: 'prod-3',
       productName: 'Cheese Blocks',
       batchNumber: 'BATCH-103',
-      expirationDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      expirationDate: new Date('2030-01-07T12:00:00Z'),
       daysUntilExpiry: 5,
       quantity: 8,
       severity: 'high',
@@ -89,7 +89,7 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
       productId: 'prod-4',
       productName: 'Orange Juice',
       batchNumber: 'BATCH-104',
-      expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expirationDate: new Date('2030-01-08T12:00:00Z'),
       daysUntilExpiry: 7,
       quantity: 36,
       severity: 'medium',
@@ -196,18 +196,18 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
               <span className="text-sm text-gray-600 self-center">
                 {selectedAlerts.size} selected
               </span>
-              <button
+              <Button
                 onClick={() => handleBulkAction('acknowledge')}
                 className="px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
               >
                 Acknowledge Selected
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleBulkAction('discount')}
                 className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
               >
                 Apply Discount
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -276,24 +276,24 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
 
                 {!alert.acknowledged && onAcknowledge && (
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => onAcknowledge(alert.id, 'discount-applied')}
                       className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                     >
                       Apply Discount
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onAcknowledge(alert.id, 'removed')}
                       className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
                     >
                       Remove from Shelf
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onAcknowledge(alert.id, 'donated')}
                       className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                     >
                       Mark as Donated
-                    </button>
+                    </Button>
                   </div>
                 )}
 
@@ -314,3 +314,4 @@ export const ExpirationAlerts: React.FC<ExpirationAlertsProps> = ({
     </div>
   );
 };
+

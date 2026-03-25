@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Booking Add-On Components
@@ -11,7 +12,7 @@
  * - BookingConfirmation: Success state display
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
@@ -20,14 +21,12 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  MapPin,
   Phone,
   Mail,
   CreditCard,
   Star,
   Clock3,
   Users,
-  AlertCircle,
   CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -112,22 +111,22 @@ export function BookingCalendar({
     <div className={cn('bg-card rounded-xl border p-4', className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <button
+        <Button
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
           className="p-2 hover:bg-accent rounded-lg transition-colors"
           disabled={isSameMonth(currentMonth, new Date())}
         >
           <ChevronLeft className="w-5 h-5" />
-        </button>
+        </Button>
         <h3 className="font-semibold">
           {format(currentMonth, 'MMMM yyyy')}
         </h3>
-        <button
+        <Button
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
           className="p-2 hover:bg-accent rounded-lg transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
-        </button>
+        </Button>
       </div>
 
       {/* Weekday Headers */}
@@ -152,7 +151,7 @@ export function BookingCalendar({
           const isTodayDate = isToday(day);
 
           return (
-            <button
+            <Button
               key={day.toISOString()}
               onClick={() => !disabled && onSelect(day)}
               disabled={disabled}
@@ -168,7 +167,7 @@ export function BookingCalendar({
               )}
             >
               {format(day, 'd')}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -187,6 +186,45 @@ interface TimeSlotSelectorProps {
   className?: string;
 }
 
+interface TimeSlotGroupProps {
+  title: string;
+  icon: React.ElementType;
+  groupSlots: TimeSlot[];
+  selected: string | null;
+  onSelect: (slotId: string) => void;
+}
+
+function TimeSlotGroup({ title, icon: Icon, groupSlots, selected, onSelect }: TimeSlotGroupProps) {
+  if (groupSlots.length === 0) return null;
+  return (
+    <div className="space-y-2">
+      <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        <Icon className="w-4 h-4" />
+        {title}
+      </h4>
+      <div className="flex flex-wrap gap-2">
+        {groupSlots.map(slot => (
+          <Button
+            key={slot.id}
+            onClick={() => slot.available && onSelect(slot.id)}
+            disabled={!slot.available}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              selected === slot.id
+                ? 'bg-primary text-primary-foreground'
+                : !slot.available
+                ? 'bg-muted text-muted-foreground/50 cursor-not-allowed'
+                : 'border hover:bg-accent'
+            )}
+          >
+            {slot.time}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function TimeSlotSelector({ slots, selected, onSelect, className }: TimeSlotSelectorProps) {
   const morning = slots.filter(s => {
     const hour = parseInt(s.time.split(':')[0]);
@@ -201,40 +239,6 @@ export function TimeSlotSelector({ slots, selected, onSelect, className }: TimeS
     return hour >= 17;
   });
 
-  const SlotGroup = ({ title, icon: Icon, slots: groupSlots }: { 
-    title: string; 
-    icon: React.ElementType;
-    slots: TimeSlot[];
-  }) => (
-    groupSlots.length > 0 && (
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <Icon className="w-4 h-4" />
-          {title}
-        </h4>
-        <div className="flex flex-wrap gap-2">
-          {groupSlots.map(slot => (
-            <button
-              key={slot.id}
-              onClick={() => slot.available && onSelect(slot.id)}
-              disabled={!slot.available}
-              className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                selected === slot.id
-                  ? 'bg-primary text-primary-foreground'
-                  : !slot.available
-                  ? 'bg-muted text-muted-foreground/50 cursor-not-allowed'
-                  : 'border hover:bg-accent'
-              )}
-            >
-              {slot.time}
-            </button>
-          ))}
-        </div>
-      </div>
-    )
-  );
-
   if (slots.length === 0) {
     return (
       <div className={cn('text-center py-8 bg-muted/50 rounded-xl', className)}>
@@ -247,9 +251,9 @@ export function TimeSlotSelector({ slots, selected, onSelect, className }: TimeS
 
   return (
     <div className={cn('space-y-4', className)}>
-      <SlotGroup title="Morning" icon={Clock} slots={morning} />
-      <SlotGroup title="Afternoon" icon={Clock} slots={afternoon} />
-      <SlotGroup title="Evening" icon={Clock} slots={evening} />
+      <TimeSlotGroup title="Morning" icon={Clock} groupSlots={morning} selected={selected} onSelect={onSelect} />
+      <TimeSlotGroup title="Afternoon" icon={Clock} groupSlots={afternoon} selected={selected} onSelect={onSelect} />
+      <TimeSlotGroup title="Evening" icon={Clock} groupSlots={evening} selected={selected} onSelect={onSelect} />
     </div>
   );
 }
@@ -347,7 +351,7 @@ interface BookingFormProps {
   className?: string;
 }
 
-export function BookingForm({ service, onSubmit, initialData, className }: BookingFormProps) {
+export function BookingForm({ service: _service, onSubmit, initialData, className }: BookingFormProps) {
   const [formData, setFormData] = useState<BookingData['customer']>({
     firstName: initialData?.firstName || '',
     lastName: initialData?.lastName || '',
@@ -446,12 +450,12 @@ export function BookingForm({ service, onSubmit, initialData, className }: Booki
         />
       </div>
 
-      <button
+      <Button
         type="submit"
         className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
       >
         Continue to Payment
-      </button>
+      </Button>
     </form>
   );
 }
@@ -554,7 +558,7 @@ export function BookingConfirmation({
   date,
   time,
   onAddToCalendar,
-  onShare,
+  onShare: _onShare,
   className
 }: BookingConfirmationProps) {
   return (
@@ -596,13 +600,13 @@ export function BookingConfirmation({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <button
+        <Button
           onClick={onAddToCalendar}
           className="px-6 py-3 border rounded-lg font-medium hover:bg-accent transition-colors flex items-center justify-center gap-2"
         >
           <Calendar className="w-4 h-4" />
           Add to Calendar
-        </button>
+        </Button>
         <a
           href="/"
           className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
@@ -741,7 +745,7 @@ export function BookingStepper({ services, onComplete, className }: BookingStepp
                 <h2 className="text-xl font-semibold mb-4">Select Date</h2>
                 <BookingCalendar
                   selectedDate={bookingData.date || null}
-                  onSelect={(date) => {
+                  onSelect={(_date) => {
                     // In real implementation, fetch available slots for this date
                   }}
                 />
@@ -779,13 +783,13 @@ export function BookingStepper({ services, onComplete, className }: BookingStepp
                   <p className="text-center text-muted-foreground mb-4">
                     Payment integration would go here
                   </p>
-                  <button
+                  <Button
                     onClick={handlePaymentComplete}
                     className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
                     <CreditCard className="w-5 h-5" />
                     Complete Payment
-                  </button>
+                  </Button>
                 </div>
               </div>
               <BookingSummary
@@ -810,3 +814,4 @@ export function BookingStepper({ services, onComplete, className }: BookingStepp
     </div>
   );
 }
+

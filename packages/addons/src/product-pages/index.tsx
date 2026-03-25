@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Product Pages Add-On Components
@@ -11,7 +12,7 @@
  * - ProductSpecifications: Tabbed product details
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ZoomIn,
@@ -23,7 +24,6 @@ import {
   Maximize2,
   Heart,
   Share2,
-  AlertCircle,
   Package,
   Truck,
   Shield,
@@ -156,20 +156,20 @@ export function ProductGallery({
         {/* Navigation Arrows */}
         {images.length > 1 && (
           <>
-            <button
+            <Button
               onClick={handlePrev}
               className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleNext}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5" />
-            </button>
+            </Button>
           </>
         )}
 
@@ -182,13 +182,13 @@ export function ProductGallery({
 
         {/* Lightbox Toggle */}
         {enableLightbox && (
-          <button
+          <Button
             onClick={() => setIsLightboxOpen(true)}
             className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="View full screen"
           >
             <Maximize2 className="w-4 h-4" />
-          </button>
+          </Button>
         )}
 
         {/* Image Counter */}
@@ -203,7 +203,7 @@ export function ProductGallery({
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-2">
           {images.map((image, index) => (
-            <button
+            <Button
               key={image.id}
               onClick={() => setCurrentIndex(index)}
               className={cn(
@@ -216,7 +216,7 @@ export function ProductGallery({
                 alt={image.alt}
                 className="w-full h-full object-cover"
               />
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -268,12 +268,12 @@ function Lightbox({
       onClick={onClose}
     >
       {/* Close Button */}
-      <button
+      <Button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors z-10"
       >
         <X className="w-6 h-6" />
-      </button>
+      </Button>
 
       {/* Main Image */}
       <div className="relative w-full h-full flex items-center justify-center p-4">
@@ -291,18 +291,18 @@ function Lightbox({
         {/* Navigation */}
         {images.length > 1 && (
           <>
-            <button
+            <Button
               onClick={(e) => { e.stopPropagation(); handlePrev(); }}
               className="absolute left-4 p-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors"
             >
               <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={(e) => { e.stopPropagation(); handleNext(); }}
               className="absolute right-4 p-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors"
             >
               <ChevronRight className="w-6 h-6" />
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -311,7 +311,7 @@ function Lightbox({
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
           {images.map((image, index) => (
-            <button
+            <Button
               key={image.id}
               onClick={(e) => { e.stopPropagation(); onNavigate(index); }}
               className={cn(
@@ -320,7 +320,7 @@ function Lightbox({
               )}
             >
               <img src={image.thumbnail || image.url} alt="" className="w-full h-full object-cover" />
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -369,7 +369,7 @@ export function ProductVariants({
               // Color variant - show color swatch
               if (variant.name.toLowerCase().includes('color')) {
                 return (
-                  <button
+                  <Button
                     key={option.id}
                     onClick={() => isAvailable && onChange(variant.id, option.id)}
                     disabled={!isAvailable}
@@ -382,13 +382,13 @@ export function ProductVariants({
                     title={option.value}
                   >
                     {isSelected && <Check className="w-4 h-4 text-white m-auto" />}
-                  </button>
+                  </Button>
                 );
               }
 
               // Size or other variants - show button
               return (
-                <button
+                <Button
                   key={option.id}
                   onClick={() => isAvailable && onChange(variant.id, option.id)}
                   disabled={!isAvailable}
@@ -401,7 +401,7 @@ export function ProductVariants({
                   )}
                 >
                   {option.value}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -458,12 +458,12 @@ export function ProductReviews({
             <span className="text-muted-foreground">Based on {totalReviews} reviews</span>
           </div>
         </div>
-        <button
+        <Button
           onClick={() => setShowReviewForm(true)}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
         >
           Write a Review
-        </button>
+        </Button>
       </div>
 
       {/* Rating Distribution */}
@@ -490,7 +490,7 @@ export function ProductReviews({
             { id: 'verified', label: `Verified (${reviews.filter(r => r.verified).length})` },
             { id: 'images', label: `With Images (${reviews.filter(r => r.images?.length).length})` },
           ].map(({ id, label }) => (
-            <button
+            <Button
               key={id}
               onClick={() => setFilter(id as typeof filter)}
               className={cn(
@@ -501,7 +501,7 @@ export function ProductReviews({
               )}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -586,12 +586,12 @@ function ReviewCard({ review }: { review: ProductReview }) {
         <span className="text-sm text-muted-foreground">
           {review.helpful} people found this helpful
         </span>
-        <button className="text-sm text-primary hover:underline">
+        <Button className="text-sm text-primary hover:underline">
           Helpful
-        </button>
-        <button className="text-sm text-muted-foreground hover:underline">
+        </Button>
+        <Button className="text-sm text-muted-foreground hover:underline">
           Report
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -625,9 +625,9 @@ function ReviewFormModal({ onClose }: { onClose: () => void }) {
         <div className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Write a Review</h3>
-            <button onClick={onClose} className="p-1 hover:bg-accent rounded-full">
+            <Button onClick={onClose} className="p-1 hover:bg-accent rounded-full">
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {/* Rating */}
@@ -635,7 +635,7 @@ function ReviewFormModal({ onClose }: { onClose: () => void }) {
             <label className="block text-sm font-medium mb-2">Your Rating</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button
+                <Button
                   key={star}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
@@ -650,7 +650,7 @@ function ReviewFormModal({ onClose }: { onClose: () => void }) {
                         : 'text-muted-foreground'
                     )}
                   />
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -679,12 +679,12 @@ function ReviewFormModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          <button
+          <Button
             onClick={onClose}
             className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
           >
             Submit Review
-          </button>
+          </Button>
         </div>
       </motion.div>
     </motion.div>
@@ -706,7 +706,7 @@ export function ProductRecommendations({
   title = "You May Also Like",
   className 
 }: ProductRecommendationsProps) {
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -725,18 +725,18 @@ export function ProductRecommendations({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{title}</h3>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => scroll('left')}
             className="p-2 border rounded-full hover:bg-accent transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => scroll('right')}
             className="p-2 border rounded-full hover:bg-accent transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -810,7 +810,7 @@ export function ProductSpecifications({
           { id: 'specs', label: 'Specifications' },
           { id: 'shipping', label: 'Shipping & Returns' },
         ].map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as typeof activeTab)}
             className={cn(
@@ -821,7 +821,7 @@ export function ProductSpecifications({
             )}
           >
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -934,7 +934,7 @@ export function ProductActionsBar({
 }: ProductActionsBarProps) {
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <button
+      <Button
         onClick={onWishlist}
         className={cn(
           'p-2 border rounded-lg transition-colors',
@@ -943,14 +943,15 @@ export function ProductActionsBar({
         aria-label="Add to wishlist"
       >
         <Heart className={cn('w-5 h-5', isWishlisted && 'fill-current')} />
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={onShare}
         className="p-2 border rounded-lg hover:bg-accent transition-colors"
         aria-label="Share product"
       >
         <Share2 className="w-5 h-5" />
-      </button>
+      </Button>
     </div>
   );
 }
+

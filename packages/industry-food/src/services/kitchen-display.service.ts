@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Kitchen Display Service
  * Kitchen display system (KDS) integration and order management
@@ -18,6 +17,14 @@ export interface KDSOrder {
   createdAt: Date;
   targetTime: Date;
   status: 'pending' | 'in-progress' | 'completed';
+}
+
+function toKdsOrderStatus(raw: string): KDSOrder['status'] {
+  if (raw === 'completed') return 'completed';
+  if (raw === 'preparing' || raw === 'confirmed' || raw === 'in-progress') {
+    return 'in-progress';
+  }
+  return 'pending';
 }
 
 export class KitchenDisplayService {
@@ -43,18 +50,18 @@ export class KitchenDisplayService {
       },
     });
 
-    return orders.map(order => ({
+    return orders.map((order) => ({
       id: order.id,
       orderNumber: order.orderNumber,
-      items: order.items.map(item => ({
+      items: order.items.map((item) => ({
         name: item.menuItem?.name || 'Unknown Item',
         quantity: item.quantity,
-        status: 'pending',
-        notes: item.notes,
+        status: 'pending' as const,
+        notes: item.notes ?? undefined,
       })),
       createdAt: order.createdAt,
       targetTime: order.estimatedReadyTime || order.createdAt,
-      status: order.status as any,
+      status: toKdsOrderStatus(order.status),
     }));
   }
 

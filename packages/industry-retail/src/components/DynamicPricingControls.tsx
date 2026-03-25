@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { Card, Button } from "@vayva/ui";
 
 interface PricingRule {
   id: string;
@@ -88,29 +87,29 @@ export const DynamicPricingControls: React.FC<DynamicPricingControlsProps> = ({
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassPanel variant="bordered" className="p-4">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Products Tracked</div>
           <div className="text-2xl font-bold text-white">{products.length}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Active Rules</div>
           <div className="text-2xl font-bold text-white">{activeRulesCount}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Avg Margin</div>
           <div className="text-2xl font-bold text-white">{avgMargin.toFixed(1)}%</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-4">
           <div className="text-sm text-white/60 mb-2">Potential Revenue</div>
           <div className="text-2xl font-bold text-green-400">
             {formatCurrency(products.reduce((sum, p) => sum + (p.suggestedPrice - p.currentPrice) * 10, 0))}
           </div>
-        </GlassPanel>
+        </Card>
       </div>
 
       {/* Products Tab */}
       {activeTab === 'products' && (
-        <GlassPanel variant="elevated" className="p-6">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Pricing Recommendations</h3>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -174,12 +173,12 @@ export const DynamicPricingControls: React.FC<DynamicPricingControlsProps> = ({
               </tbody>
             </table>
           </div>
-        </GlassPanel>
+        </Card>
       )}
 
       {/* Rules Tab */}
       {activeTab === 'rules' && (
-        <GlassPanel variant="elevated" className="p-6">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Pricing Rules</h3>
             <Button variant="primary" onClick={() => onCreateRule?.({
@@ -225,7 +224,7 @@ export const DynamicPricingControls: React.FC<DynamicPricingControlsProps> = ({
                     </div>
                   )}
                   <Button
-                    variant={rule.active ? 'success' : 'ghost'}
+                    variant={rule.active ? 'primary' : 'ghost'}
                     size="sm"
                     onClick={() => onToggleRule?.(rule.id)}
                   >
@@ -235,12 +234,12 @@ export const DynamicPricingControls: React.FC<DynamicPricingControlsProps> = ({
               </div>
             ))}
           </div>
-        </GlassPanel>
+        </Card>
       )}
 
       {/* Analytics Tab */}
       {activeTab === 'analytics' && (
-        <GlassPanel variant="elevated" className="p-6">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Pricing Analytics</h3>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -285,7 +284,7 @@ export const DynamicPricingControls: React.FC<DynamicPricingControlsProps> = ({
               </div>
             </div>
           </div>
-        </GlassPanel>
+        </Card>
       )}
     </div>
   );

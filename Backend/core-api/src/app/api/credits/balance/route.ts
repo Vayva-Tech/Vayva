@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { prisma as _prisma } from "@vayva/db";
 import { CreditManager } from "@/lib/credits/credit-manager";
 
 export async function GET(req: NextRequest) {

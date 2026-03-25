@@ -2,9 +2,9 @@
  * Grocery Settings Page
  * Configure grocery-specific settings
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React, { useState } from 'react';
 import { Save, AlertTriangle, Truck, Tag, Users, Clock } from 'lucide-react';
 
@@ -67,22 +67,21 @@ export default function GrocerySettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-6 max-w-6xl">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Grocery Settings</h1>
             <p className="text-sm text-gray-600">Configure your grocery store operations</p>
           </div>
-          <button
+          <Button
             onClick={handleSave}
             disabled={isLoading}
             className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
           >
             <Save className="w-4 h-4 mr-2" />
             {isLoading ? 'Saving...' : 'Save Settings'}
-          </button>
+          </Button>
         </div>
 
         {/* Department Configuration */}
@@ -101,9 +100,9 @@ export default function GrocerySettingsPage() {
                   </span>
                 ))}
               </div>
-              <button className="mt-2 text-sm text-green-600 hover:text-green-700">
+              <Button className="mt-2 text-sm text-green-600 hover:text-green-700">
                 + Add Department
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -344,7 +343,6 @@ export default function GrocerySettingsPage() {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }

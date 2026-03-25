@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       }
       
       default:
-        console.log(`[STRIPE WEBHOOK] Unhandled event type: ${event.type}`);
+        console.warn(`[STRIPE WEBHOOK] Unhandled event type: ${event.type}`);
     }
     
     return new Response(JSON.stringify({ received: true }));

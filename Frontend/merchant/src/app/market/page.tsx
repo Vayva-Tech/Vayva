@@ -112,16 +112,16 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-lg font-semibold mb-4">Browse Categories</h2>
           <div className="flex gap-3 overflow-x-auto pb-2">
-            <button
+            <Button
               onClick={() => setSelectedCategory(null)}
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
                 !selectedCategory ? "bg-green-500 text-white" : "bg-gray-100 hover:bg-gray-100"
               }`}
             >
               All
-            </button>
+            </Button>
             {categories.map((cat) => (
-              <button
+              <Button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.slug)}
                 className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
@@ -129,7 +129,7 @@ export default function MarketplacePage() {
                 }`}
               >
                 {cat.name} ({cat.productCount})
-              </button>
+              </Button>
             ))}
           </div>
         </div>

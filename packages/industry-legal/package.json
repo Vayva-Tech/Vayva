@@ -10,16 +10,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@vayva/schemas": "workspace:*",
-    "@vayva/db": "workspace:*",
-    "@vayva/shared": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
+    "@vayva/db": "workspace:*",
     "@vayva/industry-core": "workspace:*",
     "@vayva/realtime": "workspace:*",
+    "@vayva/schemas": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:^",
+    "react": "19.2.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
+    "@types/react": "19.2.7",
     "typescript": "^5.9.3"
   },
   "exports": {

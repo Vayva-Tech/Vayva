@@ -30,7 +30,8 @@ export async function apiJson<T>(
       correlationId?: string | null;
     };
     error.status = res.status;
-    error.correlationId = res.headers.get("x-correlation-id");
+    error.correlationId =
+      res.headers?.get?.("x-correlation-id") ?? null;
     throw error;
   }
 

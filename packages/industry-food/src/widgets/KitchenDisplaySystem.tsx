@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Kitchen Display System (KDS) Component
 // ============================================================================
@@ -6,8 +5,11 @@
 // ============================================================================
 
 import React from "react";
-import { Card, CardContent, CardHeader } from "@vayva/ui/components/card";
-import { cn } from "@vayva/ui/lib/utils";
+import { Card, CardContent, CardHeader } from "@vayva/ui";
+
+function joinClasses(...parts: Array<string | undefined>): string {
+  return parts.filter(Boolean).join(" ");
+}
 
 export interface KDSOrderItem {
   name: string;
@@ -62,7 +64,7 @@ export function KitchenDisplaySystem({
   };
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={joinClasses("space-y-4", className)}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Pending Orders Column */}
         <OrderColumn
@@ -124,7 +126,7 @@ function OrderColumn({ title, orders, color, designCategory }: OrderColumnProps)
   };
 
   return (
-    <Card className={cn("bg-gradient-to-br", getGradientClass(), "border-2")}>
+    <Card className={joinClasses("bg-gradient-to-br", getGradientClass(), "border-2")}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">{title}</h3>
@@ -188,7 +190,7 @@ function OrderCard({ order }: OrderCardProps) {
 
   return (
     <div
-      className={cn(
+      className={joinClasses(
         "p-3 rounded-lg border shadow-sm bg-background border-l-4",
         getPriorityColor()
       )}

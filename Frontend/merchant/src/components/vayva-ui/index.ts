@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * VAYVA UI - Industry-Specific Design System
  * 
@@ -28,7 +27,8 @@ export { FashionKPICard, GradientOrbs } from './fashion/KPICards';
 export { default as FashionDashboardPage } from './fashion/FashionDashboardPage';
 
 // Fashion types
-export type { SizeCurveData, CollectionItem } from './fashion/SizeCurveChart';
+export type { SizeCurveData } from './fashion/SizeCurveChart';
+export type { CollectionItem } from './fashion/VisualMerchandisingBoard';
 
 // ============================================
 // COMING SOON - Other Industries

@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { apiError, ApiErrorCode } from "@vayva/shared";
-import { logger } from "@/lib/logger";
 import { checkRateLimitCustom, RateLimitError } from "@/lib/ratelimit";
 import { createSession } from "@/lib/session.server";
 import { apiJson } from "@/lib/api-client-shared";
@@ -38,6 +36,7 @@ export async function POST(request: NextRequest) {
     }
     const email = getString(body.email);
     const code = getString(body.code) || getString(body.otp);
+    const rememberMe = body.rememberMe === true;
     // Validation
     if (!email || !code) {
       return NextResponse.json(
@@ -66,14 +65,14 @@ export async function POST(request: NextRequest) {
     
     if (result.error || !result.success) {
       return NextResponse.json(
-        apiError(ApiErrorCode.INVALID_CREDENTIALS, result.error || "Invalid OTP"),
+        apiError(ApiErrorCode.UNAUTHORIZED, result.error || "Invalid OTP"),
         { status: 401 },
       );
     }
 
-    // Create session if user and storeId provided
-    if (result.user && result.storeId) {
-      await createSession(result.user, result.storeId, request);
+    // Persist JWT session cookie when backend returns a token.
+    if (result.token) {
+      await createSession({ token: result.token, rememberMe });
     }
 
     return NextResponse.json(result);

@@ -1,10 +1,8 @@
-// @ts-nocheck
-import { BlogForm } from "../blog-form";
+import { BlogForm, type BlogFormInitialData } from "../blog-form";
 import { getBlogPost, getBlogPosts, updateBlogPost } from "../actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
-import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function generateStaticParams() {
   try {
     // Get all blog posts to generate paths for
-    const posts = await getBlogPosts("");
+    const posts = (await getBlogPosts("")) as { id: string }[];
     return posts.map((post) => ({
       id: post.id,
     }));
@@ -32,8 +30,10 @@ export default async function EditBlogPage(props: Props) {
   if (!session?.user) redirect("/signin");
   if (!session.user?.storeId) redirect("/onboarding");
 
-  const post = await getBlogPost(session.user?.storeId, params.id);
-  if (!post) notFound();
+  const postRaw = await getBlogPost(session.user?.storeId, params.id);
+  if (!postRaw || typeof postRaw !== "object") notFound();
+
+  const post = postRaw as BlogFormInitialData;
 
   const updateAction = updateBlogPost.bind(
     null,

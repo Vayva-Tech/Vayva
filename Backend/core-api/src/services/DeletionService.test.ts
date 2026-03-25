@@ -53,7 +53,8 @@ describe("DeletionService.confirmDeletion", () => {
       confirmationMeta: {
         tokenId: "req-2",
         tokenSecret: "secret-ok",
-        expiresAt: new Date("2026-03-20T00:00:00.000Z"),
+        // Future expiry so the test does not fail when run after this date.
+        expiresAt: new Date("2099-01-01T00:00:00.000Z"),
       },
     });
 

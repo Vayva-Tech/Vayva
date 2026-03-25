@@ -15,3 +15,14 @@ export const AnalyticsProvider = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   identify: (userId: string, traits?: any) => {},
 };
+
+export {
+  BatchEventsSchema,
+  CollectedEventSchema,
+  EventCollector,
+  collectBatchFromRequest,
+  collectEvent,
+  persistStampedCollectedEvents,
+  type AnalyticsEventWriter,
+  type CollectedEvent,
+} from "./event-collector";

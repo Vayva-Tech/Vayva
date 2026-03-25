@@ -1,10 +1,10 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { apiError, ApiErrorCode } from "@vayva/shared";
-import { logger } from "@/lib/logger";
 import { checkRateLimitCustom, RateLimitError } from "@/lib/ratelimit";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -47,34 +47,34 @@ export async function POST(request: NextRequest) {
       success: boolean;
       message?: string;
       error?: string;
-    }>(
-      `${process.env.BACKEND_API_URL}/api/auth/merchant/resend-otp`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: normalizedEmail }),
-      }
-    );
-    
+    }>(`${backendBase()}/api/auth/merchant/resend-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: normalizedEmail }),
+    });
+
     if (result.error || !result.success) {
       return NextResponse.json(
-        apiError(ApiErrorCode.INVALID_CREDENTIALS, result.error || "Failed to resend OTP"),
+        apiError(
+          ApiErrorCode.UNAUTHENTICATED,
+          result.error || "Failed to resend OTP",
+        ),
         { status: 400 },
       );
     }
 
     return NextResponse.json(result);
   } catch (error: unknown) {
-    handleApiError(
-      error,
-      {
-        endpoint: "/api/auth/merchant/resend-otp",
-        operation: "RESEND_OTP",
-        storeId: undefined,
-      }
+    handleApiError(error, {
+      endpoint: "/api/auth/merchant/resend-otp",
+      operation: "RESEND_OTP",
+      storeId: undefined,
+    });
+    return NextResponse.json(
+      apiError(ApiErrorCode.INTERNAL_SERVER_ERROR, "Failed to resend OTP"),
+      { status: 500 },
     );
-    throw error;
   }
 }

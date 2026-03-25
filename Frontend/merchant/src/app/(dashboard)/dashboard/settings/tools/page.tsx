@@ -40,7 +40,10 @@ interface ToolsResponse {
   enabled: number;
 }
 
-const iconMap: Record<string, ComponentType<{ size?: number; className?: string }>> = {
+const iconMap: Record<
+  string,
+  ComponentType<{ size?: number | string; className?: string }>
+> = {
   Package,
   ShoppingCart,
   Calendar,

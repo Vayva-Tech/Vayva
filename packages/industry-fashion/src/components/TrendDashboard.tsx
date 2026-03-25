@@ -1,8 +1,8 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
+import { Button } from '@vayva/ui';
 
 interface TrendData {
   trendId: string;
@@ -156,11 +156,19 @@ export const TrendDashboard: React.FC<TrendDashboardProps> = ({
       {activeView === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedTrends.map((trend) => (
-            <GlassPanel
+            <div
               key={trend.trendId}
-              variant="elevated"
-              className="p-6 cursor-pointer transition-transform hover:scale-[1.02]"
+              role="button"
+              tabIndex={0}
               onClick={() => onTrendSelect?.(trend)}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === "Enter" || e.key === " ") onTrendSelect?.(trend);
+              }}
+              className="cursor-pointer transition-transform hover:scale-[1.02]"
+            >
+            <GlassPanel
+              variant="elevated"
+              className="p-6"
             >
               {trend.imageUrl && (
                 <div className="aspect-video rounded-lg overflow-hidden mb-4 bg-white/10">
@@ -209,7 +217,7 @@ export const TrendDashboard: React.FC<TrendDashboardProps> = ({
               <div className="mt-4 pt-4 border-t border-white/10">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-white/40">{trend.category}</span>
-                  <Button size="sm" variant="secondary" onClick={(e) => {
+                  <Button size="sm" variant="secondary" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     onSaveTrend?.(trend);
                   }}>
@@ -218,6 +226,7 @@ export const TrendDashboard: React.FC<TrendDashboardProps> = ({
                 </div>
               </div>
             </GlassPanel>
+            </div>
           ))}
         </div>
       ) : (
@@ -280,17 +289,17 @@ export const TrendDashboard: React.FC<TrendDashboardProps> = ({
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassPanel variant="bordered" className="p-4">
+        <GlassPanel variant="default" className="p-4">
           <div className="text-sm text-white/60 mb-2">Total Trends Tracked</div>
           <div className="text-2xl font-bold text-white">{trends.length}</div>
         </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        <GlassPanel variant="default" className="p-4">
           <div className="text-sm text-white/60 mb-2">Emerging Trends</div>
           <div className="text-2xl font-bold text-white">
             {trends.filter(t => t.status === 'emerging').length}
           </div>
         </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        <GlassPanel variant="default" className="p-4">
           <div className="text-sm text-white/60 mb-2">Avg Confidence</div>
           <div className="text-2xl font-bold text-white">
             {trends.length > 0
@@ -298,7 +307,7 @@ export const TrendDashboard: React.FC<TrendDashboardProps> = ({
               : 0}%
           </div>
         </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        <GlassPanel variant="default" className="p-4">
           <div className="text-sm text-white/60 mb-2">High Growth (&gt;50%)</div>
           <div className="text-2xl font-bold text-white">
             {trends.filter(t => t.growthRate > 50).length}

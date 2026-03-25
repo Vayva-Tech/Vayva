@@ -1,5 +1,4 @@
-// @ts-nocheck
-import type { PaymentMethod, NotificationPayload } from '../types';
+import type { PaymentMethod as _PaymentMethod, NotificationPayload as _NotificationPayload } from '../types';
 
 export interface PaystackConfig {
   secretKey: string;
@@ -225,7 +224,7 @@ export class TravelPaymentService {
           break;
           
         default:
-          console.log(`Unhandled Paystack webhook event: ${event}`);
+          console.warn(`Unhandled Paystack webhook event: ${event}`);
       }
 
     } catch (error) {
@@ -295,7 +294,7 @@ export class TravelPaymentService {
     }
 
     // This would trigger the booking confirmation process
-    console.log(`Payment successful for booking: ${bookingId}`);
+    console.warn(`Payment successful for booking: ${bookingId}`);
     // In a real implementation, this would call the booking service to confirm the booking
   }
 
@@ -307,7 +306,7 @@ export class TravelPaymentService {
     const bookingId = metadata?.bookingId as string;
     
     if (bookingId) {
-      console.log(`Payment failed for booking: ${bookingId}`);
+      console.warn(`Payment failed for booking: ${bookingId}`);
       // This would trigger the booking cancellation process
     }
   }
@@ -317,7 +316,7 @@ export class TravelPaymentService {
    */
   private async handleRefundCreated(data: Record<string, unknown>): Promise<void> {
     const transactionId = data.transaction as string;
-    console.log(`Refund created for transaction: ${transactionId}`);
+    console.warn(`Refund created for transaction: ${transactionId}`);
     // Handle refund notification
   }
 
@@ -325,7 +324,7 @@ export class TravelPaymentService {
    * Handle transfer success webhook
    */
   private async handleTransferSuccess(data: Record<string, unknown>): Promise<void> {
-    console.log('Transfer successful:', data);
+    console.warn('Transfer successful:', data);
     // Handle payout/transfer success
   }
 
@@ -333,7 +332,7 @@ export class TravelPaymentService {
    * Handle transfer failed webhook
    */
   private async handleTransferFailed(data: Record<string, unknown>): Promise<void> {
-    console.log('Transfer failed:', data);
+    console.warn('Transfer failed:', data);
     // Handle payout/transfer failure
   }
 
@@ -343,7 +342,7 @@ export class TravelPaymentService {
   private async getTransactionIdForBooking(bookingId: string): Promise<string | null> {
     // This would query your database to find the Paystack transaction reference
     // for the given booking ID
-    console.log(`Looking up transaction for booking: ${bookingId}`);
+    console.warn(`Looking up transaction for booking: ${bookingId}`);
     return null; // Placeholder
   }
 
@@ -359,7 +358,7 @@ export class TravelPaymentService {
    */
   private async makeRequest(
     endpoint: string,
-    options: RequestInit = {}
+    options: NonNullable<Parameters<typeof fetch>[1]> = {}
   ): Promise<Response> {
     const url = `${this.baseUrl}${endpoint}`;
     
@@ -378,7 +377,7 @@ export class TravelPaymentService {
   /**
    * Verify webhook signature (implement in production)
    */
-  private verifyWebhookSignature(payload: WebhookPayload): boolean {
+  private verifyWebhookSignature(_payload: WebhookPayload): boolean {
     // In production, verify the signature using Paystack's webhook secret
     // This is a simplified placeholder
     return true;

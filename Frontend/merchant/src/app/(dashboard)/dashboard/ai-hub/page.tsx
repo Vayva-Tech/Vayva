@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import useSWR from "swr";
@@ -59,8 +59,8 @@ const fetcher = (url: string) => fetch(url).then((res) => {
 
 function AIHubSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="bg-gray-50">
+      <div className="max-w-7xl space-y-8">
         {/* Header skeleton */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-pulse">
           <div className="flex items-center gap-3">
@@ -291,20 +291,20 @@ export default function AIHubPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-gray-50 flex items-center justify-center py-16">
         <div className="bg-white rounded-2xl border border-red-100 p-8 text-center max-w-md">
           <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load AI Hub</h3>
           <p className="text-sm text-gray-500 mb-4">There was a problem fetching your AI usage data. Please try again.</p>
-          <button
+          <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -318,8 +318,8 @@ export default function AIHubPage() {
   // Empty state
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+      <div className="bg-gray-50">
+        <div className="max-w-7xl space-y-8">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/25">
               <Brain size={24} className="text-white" />
@@ -350,8 +350,8 @@ export default function AIHubPage() {
   const features = data.features;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="bg-gray-50">
+      <div className="max-w-7xl space-y-8">
         {/* ================================================================ */}
         {/* HEADER                                                           */}
         {/* ================================================================ */}
@@ -366,13 +366,13 @@ export default function AIHubPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            <Button
               onClick={() => mutate()}
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
             >
               <RefreshCw size={16} />
               Refresh
-            </button>
+            </Button>
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               {WHATSAPP_MESSAGES.plan} Plan
@@ -394,10 +394,10 @@ export default function AIHubPage() {
                   this cycle
                 </p>
               </div>
-              <button className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/25 transition-all">
+              <Button className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/25 transition-all">
                 <CreditCard size={16} />
                 Buy more credits
-              </button>
+              </Button>
             </div>
 
             <div className="flex flex-col lg:flex-row items-center gap-10">
@@ -463,7 +463,7 @@ export default function AIHubPage() {
                 <Phone size={22} className="text-green-600" />
               </div>
               {/* Toggle */}
-              <button
+              <Button
                 onClick={() => setWhatsappEnabled(!whatsappEnabled)}
                 className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${
                   whatsappEnabled ? "bg-green-500" : "bg-gray-300"
@@ -474,7 +474,7 @@ export default function AIHubPage() {
                     whatsappEnabled ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
-              </button>
+              </Button>
             </div>
             <h3 className="text-base font-bold text-gray-900 mb-1">WhatsApp AI Agent</h3>
             <p className="text-sm text-gray-500 mb-4 leading-relaxed">
@@ -509,10 +509,10 @@ export default function AIHubPage() {
                 <span className="text-xs text-gray-500">Products enhanced</span>
                 <span className="text-sm font-extrabold text-gray-900">{features?.productWriter?.productsEnhanced ?? 0}</span>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 transition-all">
+              <Button className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 transition-all">
                 <Sparkles size={16} />
                 Generate Descriptions
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -647,9 +647,9 @@ export default function AIHubPage() {
               <Activity size={16} className="text-green-500" />
               <h2 className="text-base font-bold text-gray-900">Recent AI Activity</h2>
             </div>
-            <button className="text-xs font-semibold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
+            <Button className="text-xs font-semibold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
               View all <ChevronRight size={14} />
-            </button>
+            </Button>
           </div>
           <div className="divide-y divide-gray-50">
             {RECENT_ACTIVITY.map((item, idx) => (
@@ -688,3 +688,4 @@ export default function AIHubPage() {
     </div>
   );
 }
+

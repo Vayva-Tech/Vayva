@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useVayvaTheme } from '@/components/vayva-ui/VayvaThemeProvider';
 import type { DesignCategory } from '@/components/vayva-ui/VayvaThemeProvider';
 
-interface UniversalChartContainerProps {
+export interface UniversalChartContainerProps {
   title?: string;
   subtitle?: string;
   children: React.ReactNode;
@@ -169,7 +170,7 @@ export function UniversalChartContainer({
               {error}
             </p>
           </div>
-          <button
+          <Button
             onClick={() => window.location.reload()}
             className={cn(
               "px-4 py-2 rounded-lg font-medium transition-colors",
@@ -181,7 +182,7 @@ export function UniversalChartContainer({
             )}
           >
             Try Again
-          </button>
+          </Button>
         </CardContent>
       </Card>
     );

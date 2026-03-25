@@ -13,9 +13,37 @@ import { createHash, randomBytes } from 'crypto';
 import { addMinutes } from 'date-fns';
 import { logger } from '@vayva/shared';
 import { prisma } from '@vayva/db';
+import { prismaDelegates } from "../prisma-delegates";
 
 // SAML library - using @node-saml/node-saml
 import { SAML, SamlConfig } from '@node-saml/node-saml';
+
+type PrismaDelegate = {
+  create: (args: unknown) => Promise<unknown>;
+  update: (args: unknown) => Promise<unknown>;
+  upsert: (args: unknown) => Promise<unknown>;
+  findUnique: (args: unknown) => Promise<unknown>;
+  findFirst: (args: unknown) => Promise<unknown>;
+  findMany: (args: unknown) => Promise<unknown[]>;
+  count: (args: unknown) => Promise<number>;
+};
+
+type SamlIdentityProviderRow = {
+  id: string;
+  name: string;
+  entityId: string;
+  ssoUrl: string;
+  sloUrl: string | null;
+  certificate: string;
+  metadataUrl: string | null;
+  isActive: boolean;
+};
+
+const delegates = prismaDelegates as unknown as Record<string, unknown>;
+const samlIdentityProviderDelegate =
+  delegates.samlIdentityProvider as unknown as PrismaDelegate | undefined;
+const samlAuthRequestDelegate =
+  delegates.samlAuthRequest as unknown as PrismaDelegate | undefined;
 
 // ============================================================================
 // Types
@@ -72,6 +100,28 @@ export interface SsoSession {
   expiresAt: Date;
 }
 
+function toSamlIdentityProvider(row: {
+  id: string;
+  name: string;
+  entityId: string;
+  ssoUrl: string;
+  sloUrl: string | null;
+  certificate: string;
+  metadataUrl: string | null;
+  isActive: boolean;
+}): SamlIdentityProvider {
+  return {
+    id: row.id,
+    name: row.name,
+    entityId: row.entityId,
+    ssoUrl: row.ssoUrl,
+    sloUrl: row.sloUrl ?? undefined,
+    certificate: row.certificate,
+    metadataUrl: row.metadataUrl ?? undefined,
+    isActive: row.isActive,
+  };
+}
+
 // ============================================================================
 // SAML SSO Provider
 // ============================================================================
@@ -90,7 +140,11 @@ export class SamlSsoProvider {
     certificate: string;
     metadataUrl?: string;
   }): Promise<SamlIdentityProvider> {
-    const idp = await prisma.samlIdentityProvider.create({
+    if (!samlIdentityProviderDelegate) {
+      throw new Error('SAML Identity Provider persistence is not available in this Prisma schema');
+    }
+
+    const idp = (await samlIdentityProviderDelegate.create({
       data: {
         id: `idp_${randomBytes(8).toString('hex')}`,
         name: params.name,
@@ -101,14 +155,14 @@ export class SamlSsoProvider {
         metadataUrl: params.metadataUrl,
         isActive: true,
       },
-    });
+    })) as SamlIdentityProviderRow;
 
     // Initialize SAML instance for this IdP
-    await this.initializeSamlInstance(idp);
+    await this.initializeSamlInstance(toSamlIdentityProvider(idp));
 
     logger.info('[SAML] Identity Provider registered', { idpId: idp.id, name: params.name });
 
-    return idp;
+    return toSamlIdentityProvider(idp);
   }
 
   /**
@@ -142,9 +196,13 @@ export class SamlSsoProvider {
    * Create authentication request
    */
   async createAuthRequest(idpId: string, relayState?: string): Promise<SamlAuthRequest> {
-    const idp = await prisma.samlIdentityProvider.findUnique({
+    if (!samlIdentityProviderDelegate) {
+      throw new Error('SAML Identity Provider persistence is not available in this Prisma schema');
+    }
+
+    const idp = (await samlIdentityProviderDelegate.findUnique({
       where: { id: idpId },
-    });
+    })) as SamlIdentityProviderRow | null;
 
     if (!idp || !idp.isActive) {
       throw new Error('Identity Provider not found or inactive');
@@ -165,15 +223,17 @@ export class SamlSsoProvider {
     const requestId = `saml_req_${randomBytes(16).toString('hex')}`;
 
     // Store request
-    await prisma.samlAuthRequest.create({
-      data: {
-        id: requestId,
-        idpId,
-        samlRequest: authRequest,
-        relayState,
-        expiresAt: addMinutes(new Date(), 10),
-      },
-    });
+    if (samlAuthRequestDelegate) {
+      await samlAuthRequestDelegate.create({
+        data: {
+          id: requestId,
+          idpId,
+          samlRequest: authRequest,
+          relayState,
+          expiresAt: addMinutes(new Date(), 10),
+        },
+      });
+    }
 
     return {
       id: requestId,
@@ -201,9 +261,13 @@ export class SamlSsoProvider {
       const issuerMatch = decoded.match(/<(?:[^:>]+:)?Issuer[^>]*>([^<]+)<\/(?:[^:>]+:)?Issuer>/);
       if (issuerMatch) {
         const entityId = issuerMatch[1].trim();
-        const idp = await prisma.samlIdentityProvider.findFirst({
+        if (!samlIdentityProviderDelegate) {
+          throw new Error('SAML Identity Provider persistence is not available in this Prisma schema');
+        }
+
+        const idp = (await samlIdentityProviderDelegate.findFirst({
           where: { entityId, isActive: true },
-        });
+        })) as SamlIdentityProviderRow | null;
         idpId = idp?.id;
       }
     } catch {
@@ -217,9 +281,15 @@ export class SamlSsoProvider {
     const saml = this.samlInstances.get(idpId);
     if (!saml) {
       // Try to reinitialize from DB
-      const idp = await prisma.samlIdentityProvider.findUnique({ where: { id: idpId } });
+      if (!samlIdentityProviderDelegate) {
+        throw new Error('SAML Identity Provider persistence is not available in this Prisma schema');
+      }
+
+      const idp = (await samlIdentityProviderDelegate.findUnique({
+        where: { id: idpId },
+      })) as SamlIdentityProviderRow | null;
       if (!idp) throw new Error('SAML instance not initialized for IdP');
-      await this.initializeSamlInstance(idp);
+      await this.initializeSamlInstance(toSamlIdentityProvider(idp));
     }
 
     const samlInstance = this.samlInstances.get(idpId);
@@ -274,17 +344,17 @@ export class SamlSsoProvider {
     const sessionToken = randomBytes(32).toString('hex');
     const hashedToken = createHash('sha256').update(sessionToken).digest('hex');
 
-    await prisma.session.create({
-      data: {
-        id: `sess_${randomBytes(16).toString('hex')}`,
-        userId: user.id,
-        token: hashedToken,
-        provider: 'SAML',
-        expiresAt: addMinutes(new Date(), 480), // 8 hours
-      },
-    }).catch(() => {
-      // Session table may not exist in all schemas; safe to skip
-    });
+    await prisma.userSession
+      .create({
+        data: {
+          userId: user.id,
+          sessionTokenHash: hashedToken,
+          userAgent: 'SAML',
+        },
+      })
+      .catch(() => {
+        // Optional: user_session table may be absent in some deployments
+      });
 
     logger.info('[SAML] User authenticated via SSO', { userId: user.id, email, idpId });
 
@@ -310,13 +380,16 @@ export class SamlSsoProvider {
 
     if (!user) {
       // Create new user from SAML attributes
+      const placeholderPassword = createHash('sha256')
+        .update(`saml-sso|${samlUser.email}|${idpId}`)
+        .digest('hex');
       user = await prisma.user.create({
         data: {
           email: samlUser.email,
           firstName: samlUser.firstName,
           lastName: samlUser.lastName,
-          authProvider: 'SAML',
-          emailVerified: true,
+          password: placeholderPassword,
+          isEmailVerified: true,
         },
       });
 
@@ -335,9 +408,9 @@ export class SamlSsoProvider {
     }
 
     // Link user to IdP if not already linked
-    await prisma.samlUserLink.upsert({
+    await prismaDelegates.samlUserLink.upsert({
       where: { userId_idpId: { userId: user.id, idpId } },
-      create: { userId: user.id, idpId, linkedAt: new Date() },
+      create: { userId: user.id, idpId },
       update: { lastLoginAt: new Date() },
     }).catch(() => {
       // Table may not exist yet; non-critical
@@ -354,9 +427,8 @@ export class SamlSsoProvider {
     idpId: string,
     sessionIndex: string
   ): Promise<SsoSession> {
-    const session = await prisma.samlSession.create({
+    const session = await prismaDelegates.samlSession.create({
       data: {
-        id: `saml_session_${randomBytes(16).toString('hex')}`,
         userId,
         idpId,
         sessionIndex,
@@ -379,7 +451,7 @@ export class SamlSsoProvider {
    */
   async initiateLogout(userId: string): Promise<string | null> {
     // Find active SSO session
-    const session = await prisma.samlSession.findFirst({
+    const session = await prismaDelegates.samlSession.findFirst({
       where: {
         userId,
         expiresAt: { gt: new Date() },
@@ -404,7 +476,7 @@ export class SamlSsoProvider {
   /**
    * Process Single Logout response
    */
-  async processLogoutResponse(samlResponse: string): Promise<void> {
+  async processLogoutResponse(_samlResponse: string): Promise<void> {
     // Parse and validate logout response
     // Invalidate session
   }
@@ -437,11 +509,13 @@ export class SamlSsoProvider {
    * List configured Identity Providers
    */
   async listIdentityProviders(): Promise<SamlIdentityProvider[]> {
-    const idps = await prisma.samlIdentityProvider.findMany({
-      where: { isActive: true },
-    });
+    if (!samlIdentityProviderDelegate) return [];
 
-    return idps;
+    const idps = (await samlIdentityProviderDelegate.findMany({
+      where: { isActive: true },
+    })) as SamlIdentityProviderRow[];
+
+    return idps.map(toSamlIdentityProvider);
   }
 
   /**
@@ -451,22 +525,28 @@ export class SamlSsoProvider {
     id: string,
     updates: Partial<SamlIdentityProvider>
   ): Promise<SamlIdentityProvider> {
-    const idp = await prisma.samlIdentityProvider.update({
+    if (!samlIdentityProviderDelegate) {
+      throw new Error('SAML Identity Provider persistence is not available in this Prisma schema');
+    }
+
+    const idp = (await samlIdentityProviderDelegate.update({
       where: { id },
       data: updates,
-    });
+    })) as SamlIdentityProviderRow;
 
     // Re-initialize SAML instance
-    await this.initializeSamlInstance(idp);
+    await this.initializeSamlInstance(toSamlIdentityProvider(idp));
 
-    return idp;
+    return toSamlIdentityProvider(idp);
   }
 
   /**
    * Deactivate Identity Provider
    */
   async deactivateIdentityProvider(id: string): Promise<void> {
-    await prisma.samlIdentityProvider.update({
+    if (!samlIdentityProviderDelegate) return;
+
+    await samlIdentityProviderDelegate.update({
       where: { id },
       data: { isActive: false },
     });

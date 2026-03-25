@@ -9,6 +9,7 @@
  * - Timer synchronization
  */
 
+import { useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 type KDSUpdateType = 
@@ -69,7 +70,7 @@ class KDSRealTimeService {
           console.log('[KDS_WS] Disconnected from real-time server');
         });
 
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect_error', (error: Error) => {
           console.error('[KDS_WS] Connection error:', error);
           reject(error);
         });

@@ -45,9 +45,18 @@ describe('PlatformOverview', () => {
 
   it('displays current month and year', () => {
     render(<PlatformOverview {...defaultProps} />);
-    
-    const currentDate = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
-    expect(screen.getByText(currentDate)).toBeInTheDocument();
+    // Subtitle is the small paragraph only; ancestors would also match a naive textContent check
+    expect(
+      screen.getByText((_, el) => {
+        if (!el || el.tagName.toLowerCase() !== 'p') return false;
+        const t = el.textContent ?? '';
+        return (
+          t.includes(defaultProps.platformName) &&
+          t.includes('|') &&
+          /\d{4}/.test(t)
+        );
+      }),
+    ).toBeInTheDocument();
   });
 
   it('uses default values when props not provided', () => {

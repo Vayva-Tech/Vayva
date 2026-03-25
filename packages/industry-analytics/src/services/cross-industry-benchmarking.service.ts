@@ -1,11 +1,11 @@
-// @ts-nocheck
 /**
  * Cross-Industry Benchmarking Service
  * 
  * Provides anonymized cross-industry benchmarking and percentile analysis
  */
 
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
+import { analyticsPrisma } from './analytics-prisma';
 import { z } from 'zod';
 
 const benchmarkRequestSchema = z.object({
@@ -21,7 +21,7 @@ interface BenchmarkPercentile {
   interpretation: string;
 }
 
-interface BenchmarkReport {
+export interface BenchmarkReport {
   businessId: string;
   industry: string;
   generatedAt: string;
@@ -157,7 +157,7 @@ export class CrossIndustryBenchmarkingService {
     for (const metric of metrics) {
       try {
         // Query analytics data for this business
-        const analyticsData = await prisma.analyticsSnapshot.findFirst({
+        const analyticsData = await analyticsPrisma.analyticsSnapshot.findFirst({
           where: {
             businessId,
             metricType: metric,
@@ -227,14 +227,33 @@ export class CrossIndustryBenchmarkingService {
             AND a.timestamp > NOW() - INTERVAL '30 days'
         `;
 
-        const data = aggregatedData[0] as any;
+        const rows = aggregatedData as Array<{
+          average: unknown;
+          median: unknown;
+          top_quartile: unknown;
+          bottom_quartile: unknown;
+          distribution: unknown;
+        }>;
+        const data = rows[0];
+        if (!data) {
+          result[metric] = {
+            average: 0,
+            median: 0,
+            topQuartile: 0,
+            bottomQuartile: 0,
+            distribution: [],
+          };
+          continue;
+        }
 
         result[metric] = {
-          average: parseFloat(data.average) || 0,
-          median: parseFloat(data.median) || 0,
-          topQuartile: parseFloat(data.top_quartile) || 0,
-          bottomQuartile: parseFloat(data.bottom_quartile) || 0,
-          distribution: data.distribution || [],
+          average: parseFloat(String(data.average)) || 0,
+          median: parseFloat(String(data.median)) || 0,
+          topQuartile: parseFloat(String(data.top_quartile)) || 0,
+          bottomQuartile: parseFloat(String(data.bottom_quartile)) || 0,
+          distribution: Array.isArray(data.distribution)
+            ? (data.distribution as number[])
+            : [],
         };
       } catch (error) {
         console.error(`Error calculating benchmark for ${metric}:`, error);
@@ -332,7 +351,7 @@ export class CrossIndustryBenchmarkingService {
   }
 }
 
-interface ComparisonReport {
+export interface ComparisonReport {
   businesses: Array<{
     businessId: string;
     metrics: Record<string, number>;

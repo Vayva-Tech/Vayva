@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Workflow Automation Dashboard
  * Visual workflow builder, template library, and execution monitoring
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -151,7 +150,7 @@ export default function WorkflowAutomationDashboard({ planTier = 'pro' }: { plan
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -162,7 +161,7 @@ export default function WorkflowAutomationDashboard({ planTier = 'pro' }: { plan
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -221,9 +220,9 @@ function WorkflowBuilder({
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Workflows</h3>
-            <button className="p-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+            <Button className="p-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
               <Plus className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
           
           <div className="space-y-2">
@@ -263,22 +262,22 @@ function WorkflowBuilder({
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-3">Quick Actions</h3>
           <div className="space-y-2">
-            <button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors">
+            <Button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors">
               <Play className="h-4 w-4 text-green-600" />
               Start Selected
-            </button>
-            <button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors">
               <Pause className="h-4 w-4 text-yellow-600" />
               Pause Selected
-            </button>
-            <button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors">
               <Copy className="h-4 w-4 text-blue-600" />
               Duplicate
-            </button>
-            <button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors text-red-600">
+            </Button>
+            <Button className="w-full flex items-center gap-2 p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors text-red-600">
               <Trash className="h-4 w-4" />
               Delete
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>
@@ -300,13 +299,13 @@ function WorkflowBuilder({
             
             {selectedWorkflow && (
               <div className="flex gap-2">
-                <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+                <Button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
                   <Play className="h-4 w-4" />
                   Run Workflow
-                </button>
-                <button className="px-4 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+                </Button>
+                <Button className="px-4 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                   Save
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -432,9 +431,9 @@ function TemplateLibrary({ templates, loading }: { templates: WorkflowTemplate[]
               <span>Preview: {template.preview}</span>
             </div>
             
-            <button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
+            <Button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
               Use Template
-            </button>
+            </Button>
           </ThemedCard>
         </motion.div>
       ))}

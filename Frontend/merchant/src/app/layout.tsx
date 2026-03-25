@@ -30,6 +30,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: true,
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { Toaster } from "sonner";
+import { ResponsiveToaster } from "@/components/layout/ResponsiveToaster";
 
 export default function RootLayout({
   children,
@@ -77,7 +78,7 @@ export default function RootLayout({
           <AuthProvider>
             <IncidentBanner />
             {children}
-            <Toaster richColors position="top-right" />
+            <ResponsiveToaster richColors />
             <ConsentBanner />
           </AuthProvider>
         </ThemeProvider>

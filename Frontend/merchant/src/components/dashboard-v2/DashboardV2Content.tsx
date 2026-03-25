@@ -263,8 +263,8 @@ export function DashboardV2Content(props: DashboardV2ContentProps) {
               </div>
               
               <div className="flex gap-2 mb-3">
-                <button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-full">Today</button>
-                <button className="px-3 py-1 text-gray-500 text-xs font-medium hover:bg-gray-100 rounded-full transition-colors">Tomorrow</button>
+                <Button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-full">Today</Button>
+                <Button className="px-3 py-1 text-gray-500 text-xs font-medium hover:bg-gray-100 rounded-full transition-colors">Tomorrow</Button>
               </div>
 
               <div className="space-y-1">
@@ -311,10 +311,10 @@ export function DashboardV2Content(props: DashboardV2ContentProps) {
                   <h1 className="text-xl font-semibold text-gray-900">Store Dashboard</h1>
                 </div>
                 <Link href={ctaLink}>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-xl transition-colors">
+                  <Button className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-xl transition-colors">
                     <Icon name="Plus" className="w-4 h-4" />
                     Add Product
-                  </button>
+                  </Button>
                 </Link>
               </div>
 
@@ -646,9 +646,9 @@ export function DashboardV2Content(props: DashboardV2ContentProps) {
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-gray-900">{pipelineTitle}</h3>
-                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <Button className="text-gray-400 hover:text-gray-600 transition-colors">
                     <Icon name="ArrowRight" size={16} />
-                  </button>
+                  </Button>
                 </div>
                 <DonutChart data={donutData} legendStyle={pipelineLegend} />
               </div>
@@ -660,9 +660,9 @@ export function DashboardV2Content(props: DashboardV2ContentProps) {
                     <h3 className="text-sm font-semibold text-gray-900">Performance</h3>
                     <p className="text-xs text-gray-500 mt-0.5">{incomeVsExpenseDefinition}</p>
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <Button className="text-gray-400 hover:text-gray-600 transition-colors">
                     <Icon name="ArrowRight" size={16} />
-                  </button>
+                  </Button>
                 </div>
                 <IncomeExpenseChart
                   data={incomeVsExpense}
@@ -677,9 +677,9 @@ export function DashboardV2Content(props: DashboardV2ContentProps) {
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-gray-900">{pipelineTitle}</h3>
-                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <Button className="text-gray-400 hover:text-gray-600 transition-colors">
                     <Icon name="ArrowRight" size={16} />
-                  </button>
+                  </Button>
                 </div>
                 <DonutChart data={donutData} legendStyle={pipelineLegend} />
               </div>

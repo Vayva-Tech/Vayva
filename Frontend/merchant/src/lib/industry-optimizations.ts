@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Industry-Specific Optimization Engine
  * Enhanced configurations and personalized experiences for each vertical
@@ -22,8 +21,10 @@ export interface EnhancedIndustryConfig {
   successIndicators: string[];
 }
 
-// Industry Optimization Profiles
-export const INDUSTRY_OPTIMIZATIONS: Record<IndustrySlug, EnhancedIndustryConfig> = {
+// Industry Optimization Profiles (partial map; unknown slugs fall back to retail)
+export const INDUSTRY_OPTIMIZATIONS: Partial<Record<IndustrySlug, EnhancedIndustryConfig>> & {
+  retail: EnhancedIndustryConfig;
+} = {
   // Commerce & Retail
   retail: {
     slug: 'retail',

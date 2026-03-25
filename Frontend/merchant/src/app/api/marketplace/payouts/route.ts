@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -15,22 +16,19 @@ const payoutStatusSchema = z.object({
 });
 
 /**
- * GET /api/marketplace/payouts?storeId=xxx&vendorId=xxx&status=xxx
- * List vendor payouts
+ * GET /api/marketplace/payouts?vendorId=xxx&status=xxx — store from session only
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
     const vendorId = searchParams.get("vendorId");
     const status = searchParams.get("status");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
-    }
 
     // Fetch payouts via backend API
     const queryParams = new URLSearchParams({ storeId });
@@ -41,7 +39,9 @@ export async function GET(request: Request): Promise<Response> {
       success: boolean;
       data?: { payouts?: any[]; stats?: any };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/marketplace/payouts?${queryParams.toString()}`);
+    }>(`${process.env.BACKEND_API_URL}/api/marketplace/payouts?${queryParams.toString()}`, {
+      headers: auth.headers,
+    });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch payouts');
@@ -70,20 +70,15 @@ export async function GET(request: Request): Promise<Response> {
  * POST /api/marketplace/payouts/calculate
  * Calculate payout for a vendor period
  */
-export async function POST(request: Request): Promise<Response> {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const validated = payoutCalculationSchema.parse(body);
-
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
-    }
 
     // Calculate payout via backend API
     const result = await apiJson<{
@@ -92,10 +87,7 @@ export async function POST(request: Request): Promise<Response> {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/marketplace/payouts/calculate`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(validated),
     });
 
@@ -132,8 +124,13 @@ export async function POST(request: Request): Promise<Response> {
  * PATCH /api/marketplace/payouts?id=xxx
  * Update payout status
  */
-export async function PATCH(request: Request): Promise<Response> {
+export async function PATCH(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -154,9 +151,7 @@ export async function PATCH(request: Request): Promise<Response> {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/marketplace/payouts?id=${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(validated),
     });
 
@@ -190,24 +185,23 @@ export async function PATCH(request: Request): Promise<Response> {
  * GET /api/marketplace/payouts/summary?storeId=xxx
  * Get payout summary/dashboard data
  */
-export async function PUT(request: Request): Promise<Response> {
+export async function PUT(request: NextRequest): Promise<Response> {
   try {
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const storeId = auth.user.storeId;
 
     // Fetch payout summary via backend API
     const result = await apiJson<{
       success: boolean;
       data?: { summary?: any };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/marketplace/payouts/summary?storeId=${storeId}`);
+    }>(`${process.env.BACKEND_API_URL}/api/marketplace/payouts/summary?storeId=${encodeURIComponent(storeId)}`, {
+      headers: auth.headers,
+    });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to get payout summary');

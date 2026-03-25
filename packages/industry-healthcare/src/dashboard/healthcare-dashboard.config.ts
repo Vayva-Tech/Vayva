@@ -1,5 +1,7 @@
-// @ts-nocheck
-import type { DashboardEngineConfig, WidgetDefinition } from '../types';
+import type {
+  DashboardEngineConfig,
+  WidgetDefinition,
+} from '@vayva/industry-core';
 
 const APPOINTMENTS_TODAY_WIDGET: WidgetDefinition = {
   id: 'appointments-today',
@@ -114,6 +116,18 @@ const TELEMEDICINE_UTILIZATION_WIDGET: WidgetDefinition = {
 
 export const HEALTHCARE_DASHBOARD_CONFIG: DashboardEngineConfig = {
   industry: 'healthcare',
+  title: 'Healthcare Operations',
+  subtitle: 'Appointments, patients, and clinical workflow',
+  primaryObjectLabel: 'Appointments',
+  defaultTimeHorizon: 'today',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
+  failureModes: [],
   widgets: [
     APPOINTMENTS_TODAY_WIDGET,
     TOTAL_PATIENTS_WIDGET,
@@ -151,21 +165,23 @@ export const HEALTHCARE_DASHBOARD_CONFIG: DashboardEngineConfig = {
   alertRules: [
     {
       id: 'low-fulfillment',
-      condition: 'appointments.fulfillmentRate < threshold',
-      threshold: 70,
-      action: 'notify:operations',
+      name: 'Low appointment fulfillment',
+      condition: { metric: 'appointments.fulfillmentRate', operator: 'lt', value: 70 },
+      severity: 'warning',
+      message: 'Appointment fulfillment is below {value}%',
     },
     {
       id: 'high-wait-time',
-      condition: 'appointments.averageWaitTime > threshold',
-      threshold: 30,
-      action: 'notify:operations',
+      name: 'High average wait time',
+      condition: { metric: 'appointments.averageWaitTime', operator: 'gt', value: 30 },
+      severity: 'warning',
+      message: 'Average wait time exceeds {value} minutes',
     },
   ],
   actions: [
-    { id: 'new-appointment', label: 'New Appointment', icon: 'calendar-plus', action: 'navigate:/appointments/new' },
-    { id: 'add-patient', label: 'Add Patient', icon: 'user-plus', action: 'navigate:/patients/new' },
-    { id: 'view-today', label: "Today's Schedule", icon: 'calendar', action: 'navigate:/appointments/today' },
+    { id: 'new-appointment', label: 'New Appointment', icon: 'calendar-plus', href: '/appointments/new' },
+    { id: 'add-patient', label: 'Add Patient', icon: 'user-plus', href: '/patients/new' },
+    { id: 'view-today', label: "Today's Schedule", icon: 'calendar', href: '/appointments/today' },
   ],
 };
 

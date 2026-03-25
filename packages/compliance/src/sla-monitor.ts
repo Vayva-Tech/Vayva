@@ -6,7 +6,7 @@
  * WCAG 2.1 AA + GDPR accountability
  */
 
-import { prisma } from '@vayva/prisma/client';
+import { prisma } from '@vayva/db';
 import { sendEmail } from '@vayva/emails';
 
 // ============================================================================
@@ -67,7 +67,7 @@ export async function checkSLABreaches() {
       },
       include: {
         updates: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { date: 'desc' },
           take: 1,
         },
       },

@@ -88,9 +88,10 @@ Industry-specific dashboards (PRO_PLUS):
 - `professional/`, `services/` — Professional services
 
 Beta features:
-- `beta/desktop-app/` — Desktop app preview
-- `beta/industry-dashboards/` — Industry dashboard previews
-- `beta/meal-kit/` — Meal kit management
+- `beta/desktop-app/` — Native apps waitlist (beta, coming soon)
+- `dashboard/meal-kit/` — Meal kit management
+
+Merchant **beta cleanup, strict typing phases, and route QA** (including removal of the old industry-dashboard waitlist) are documented in [Merchant pages: type safety and route QA — phased plan](../08_reference/merchant-pages-type-safety-and-route-qa-phases.md).
 
 ### Component Organization (`src/components/`)
 
@@ -306,20 +307,20 @@ WebSocket connections for live dashboard updates use `NEXT_PUBLIC_WS_URL` (defau
 Feature access is controlled through `src/lib/access-control/tier-limits.ts`. Three tiers exist:
 
 ### STARTER
-- 500 products, 500 orders/month, 1,000 customers
+- 100 products, 500 orders/month, 1,000 customers
 - 1 team member, 10K AI tokens, 500 WhatsApp messages
 - 3 automation rules, 5 campaigns, 90-day analytics
 - No AI Autopilot, no custom domains, no API access, no industry dashboards
 
 ### PRO
-- 1,000 products, 10K orders/month, unlimited customers
+- 300 products, 10K orders/month, unlimited customers
 - 3 team members, 100K AI tokens, 5K WhatsApp messages
 - 20 automation rules, unlimited campaigns, 365-day analytics
 - AI Autopilot enabled, custom domains, API access, multi-store
 - No industry dashboards, no visual workflow builder
 
 ### PRO_PLUS
-- Unlimited products, orders, customers
+- 500 products, unlimited orders, unlimited customers
 - 5 team members, 200K AI tokens, 10K WhatsApp messages
 - Unlimited automation rules, unlimited dashboard widgets
 - All PRO features plus: industry dashboards, merged industry dashboard, visual workflow builder

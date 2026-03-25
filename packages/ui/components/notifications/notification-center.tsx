@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState } from 'react';
 import { cn } from '../../utils';
 import { Button } from '../button';
@@ -125,7 +124,7 @@ export const NotificationCenter = ({
         
         {/* Filters */}
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => handleFilterChange('all')}
             className={cn(
               "px-3 py-1 text-xs rounded-full transition-colors",
@@ -135,8 +134,8 @@ export const NotificationCenter = ({
             )}
           >
             All
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleFilterChange('unread')}
             className={cn(
               "px-3 py-1 text-xs rounded-full transition-colors",
@@ -146,8 +145,8 @@ export const NotificationCenter = ({
             )}
           >
             Unread
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleFilterChange('critical')}
             className={cn(
               "px-3 py-1 text-xs rounded-full transition-colors",
@@ -157,7 +156,7 @@ export const NotificationCenter = ({
             )}
           >
             Critical
-          </button>
+          </Button>
         </div>
       </div>
 

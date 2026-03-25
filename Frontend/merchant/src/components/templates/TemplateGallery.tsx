@@ -1,12 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  ALL_TEMPLATES, 
-  TEMPLATE_CATEGORIES,
-  type TemplateGalleryItem,
-} from "@/template-gallery";
 import { Button } from "@vayva/ui";
 import { apiJson } from "@/lib/api-client-shared";
 import { toast } from "sonner";
@@ -26,49 +21,89 @@ import { cn } from "@/lib/utils";
 
 interface TemplateGalleryProps {
   currentTemplateId?: string;
-  onSelect?: (template: TemplateGalleryItem) => void;
 }
 
-export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGalleryProps) {
+type BackendTemplate = {
+  id: string;
+  name: string;
+  description?: string;
+  previewImageUrl?: string;
+  requiredPlan?: string;
+  isLocked?: boolean;
+  industrySlugs?: string[];
+  isRecommended?: boolean;
+};
+
+export function TemplateGallery({ currentTemplateId }: TemplateGalleryProps) {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateGalleryItem | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<BackendTemplate | null>(null);
+  const [templates, setTemplates] = useState<BackendTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        const data = await apiJson<BackendTemplate[]>("/api/templates");
+        setTemplates(Array.isArray(data) ? data : []);
+      } catch (e: unknown) {
+        toast.error("Failed to load templates");
+        setTemplates([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    void load();
+  }, []);
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of templates) set.add("Storefront");
+    return Array.from(set);
+  }, [templates]);
 
   // Filter templates
-  const filteredTemplates = ALL_TEMPLATES.filter((template: TemplateGalleryItem) => {
-    const matchesCategory = selectedCategory ? 
-      template.category.toLowerCase() === selectedCategory.toLowerCase() ||
-      template.industry === selectedCategory
-      : true;
-    const matchesSearch = searchQuery ?
-      template.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.compare.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.primaryUseCase.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-    const matchesPlan = selectedPlan ? template.requiredPlan === selectedPlan : true;
-    return matchesCategory && matchesSearch && matchesPlan && template.status === "active";
-  });
+  const filteredTemplates = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return templates.filter((template) => {
+      const matchesCategory = selectedCategory ? selectedCategory === "Storefront" : true;
+      const matchesSearch = q
+        ? String(template.name || "").toLowerCase().includes(q) ||
+          String(template.description || "").toLowerCase().includes(q)
+        : true;
+      const matchesPlan = selectedPlan
+        ? String(template.requiredPlan || "").toLowerCase() === selectedPlan
+        : true;
+      return matchesCategory && matchesSearch && matchesPlan;
+    });
+  }, [templates, selectedCategory, searchQuery, selectedPlan]);
 
-  const handleApplyTemplate = async (template: TemplateGalleryItem) => {
+  const handleApplyTemplate = async (template: BackendTemplate) => {
+    if (template.isLocked) {
+      toast.error("This template is locked on your current plan.");
+      return;
+    }
     setIsApplying(template.id);
     try {
-      const result = await apiJson<{ success: boolean }>("/api/storefront/template", {
-        method: "POST",
-        body: JSON.stringify({ templateId: template.id }),
-      });
-      
-      if (result.success) {
-        toast.success(`Template "${template.displayName}" applied successfully!`);
-        if (onSelect) {
-          onSelect(template);
-        } else {
-          router.push("/dashboard/control-center/customize");
-        }
+      // Create/update draft so Customize can load immediately
+      const result = await apiJson<{ success: boolean; draft?: unknown }>(
+        "/api/storefront/draft",
+        {
+          method: "POST",
+          body: JSON.stringify({ activeTemplateId: template.id }),
+        },
+      );
+      if (!result?.success) {
+        throw new Error("Failed to apply template");
       }
+
+      toast.success(`Template "${template.name}" selected. Redirecting…`);
+      router.push("/dashboard/control-center/customize");
     } catch (error) {
       toast.error("Failed to apply template. Please try again.");
     } finally {
@@ -118,7 +153,7 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
         <div>
           <h2 className="text-2xl font-bold">Template Gallery</h2>
           <p className="text-gray-600">
-            {ALL_TEMPLATES.length} professional templates available
+            {templates.length} templates available
           </p>
         </div>
         
@@ -137,7 +172,7 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
 
       {/* Category Filter */}
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           onClick={() => setSelectedCategory(null)}
           className={cn(
             "px-4 py-2 rounded-full text-sm font-medium transition-colors",
@@ -147,20 +182,20 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
           )}
         >
           All Templates
-        </button>
-        {TEMPLATE_CATEGORIES.map((cat: { slug: string; displayName: string }) => (
-          <button
-            key={cat.slug}
-            onClick={() => setSelectedCategory(cat.slug)}
+        </Button>
+        {categories.map((cat) => (
+          <Button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-              selectedCategory === cat.slug
+              selectedCategory === cat
                 ? "bg-green-500 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             )}
           >
-            {cat.displayName}
-          </button>
+            {cat}
+          </Button>
         ))}
       </div>
 
@@ -169,7 +204,7 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
         <Filter className="w-4 h-4 text-gray-400" />
         <span className="text-sm text-gray-600">Plan:</span>
         {["free", "starter", "growth", "enterprise"].map((plan) => (
-          <button
+          <Button
             key={plan}
             onClick={() => setSelectedPlan(selectedPlan === plan ? null : plan)}
             className={cn(
@@ -180,13 +215,16 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
             )}
           >
             {plan}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Template Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredTemplates.map((template: TemplateGalleryItem) => (
+        {loading ? (
+          <p className="text-sm text-gray-500">Loading templates…</p>
+        ) : null}
+        {filteredTemplates.map((template) => (
           <div
             key={template.id}
             className={cn(
@@ -199,25 +237,17 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
             {/* Preview Image */}
             <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-50">
-                {template.preview.thumbnailUrl.includes("/") ? "🖼️" : template.displayName.charAt(0)}
+                {template.previewImageUrl ? "🖼️" : String(template.name || "T").charAt(0)}
               </div>
               
               {/* Overlay Actions */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <button
+                <Button
                   onClick={() => setSelectedTemplate(template)}
                   className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium text-sm hover:bg-gray-100"
                 >
                   Preview
-                </button>
-                <a
-                  href={template.source.demoUrl || `#demo-${template.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium text-sm hover:bg-green-500"
-                >
-                  Live Demo
-                </a>
+                </Button>
               </div>
 
               {/* Current Badge */}
@@ -235,27 +265,29 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
             <div className="p-4 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900">{template.displayName}</h3>
-                  <p className="text-sm text-gray-500">{template.primaryUseCase}</p>
+                  <h3 className="font-semibold text-gray-900">{template.name}</h3>
+                  <p className="text-sm text-gray-500">{template.description || "—"}</p>
                 </div>
-                {getPlanBadge(template.requiredPlan)}
+                {template.requiredPlan ? getPlanBadge(template.requiredPlan) : null}
               </div>
 
               <p className="text-sm text-gray-600 line-clamp-2">
-                {template.compare.headline}
+                {template.description || ""}
               </p>
 
               {/* Key Modules */}
-              <div className="flex flex-wrap gap-1">
-                {template.compare.keyModules.slice(0, 3).map((module: string) => (
-                  <span
-                    key={module}
-                    className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                  >
-                    {module}
-                  </span>
-                ))}
-              </div>
+              {Array.isArray(template.industrySlugs) && template.industrySlugs.length > 0 ? (
+                <div className="flex flex-wrap gap-1">
+                  {template.industrySlugs.slice(0, 3).map((slug) => (
+                    <span
+                      key={slug}
+                      className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
+                    >
+                      {slug}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
               {/* Actions */}
               <div className="pt-3 border-t">
@@ -311,15 +343,15 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div>
-                <h3 className="text-xl font-bold">{selectedTemplate.displayName}</h3>
-                <p className="text-gray-600">{selectedTemplate.compare.headline}</p>
+                <h3 className="text-xl font-bold">{selectedTemplate.name}</h3>
+                <p className="text-gray-600">{selectedTemplate.description || "—"}</p>
               </div>
-              <button
+              <Button
                 onClick={() => setSelectedTemplate(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
                 ✕
-              </button>
+              </Button>
             </div>
 
             {/* Modal Body */}
@@ -327,7 +359,7 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
               {/* Preview Toggle */}
               <div className="flex justify-center">
                 <div className="flex bg-gray-100 p-1 rounded-lg">
-                  <button
+                  <Button
                     onClick={() => setPreviewMode("desktop")}
                     className={cn(
                       "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
@@ -336,8 +368,8 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
                   >
                     <Monitor className="w-4 h-4" />
                     Desktop
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setPreviewMode("mobile")}
                     className={cn(
                       "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
@@ -346,7 +378,7 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
                   >
                     <Smartphone className="w-4 h-4" />
                     Mobile
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -359,7 +391,7 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
                   <div className="text-center">
                     <div className="text-6xl mb-4">🖼️</div>
                     <p>Template Preview</p>
-                    <p className="text-sm">{selectedTemplate.displayName}</p>
+                    <p className="text-sm">{selectedTemplate.name}</p>
                   </div>
                 </div>
               </div>
@@ -369,18 +401,16 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
                 <div>
                   <h4 className="font-semibold mb-3">Features</h4>
                   <ul className="space-y-2">
-                    {selectedTemplate.compare.bullets.map((bullet: string, i: number) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                        {bullet}
-                      </li>
-                    ))}
+                    <li className="flex items-start gap-2 text-sm text-gray-600">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Theme customization and publishing supported.
+                    </li>
                   </ul>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-3">Best For</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedTemplate.compare.bestFor.map((item: string) => (
+                    {(selectedTemplate.industrySlugs || []).map((item: string) => (
                       <span
                         key={item}
                         className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
@@ -392,14 +422,9 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
                   
                   <h4 className="font-semibold mb-3 mt-6">Key Modules</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedTemplate.compare.keyModules.map((module: string) => (
-                      <span
-                        key={module}
-                        className="px-3 py-1 bg-green-500/10 text-green-500 text-sm rounded-full"
-                      >
-                        {module}
-                      </span>
-                    ))}
+                    <span className="px-3 py-1 bg-green-500/10 text-green-500 text-sm rounded-full">
+                      Storefront
+                    </span>
                   </div>
                 </div>
               </div>
@@ -408,9 +433,9 @@ export function TemplateGallery({ currentTemplateId, onSelect }: TemplateGallery
             {/* Modal Footer */}
             <div className="flex items-center justify-between p-6 border-t bg-gray-50">
               <div className="flex items-center gap-4">
-                {getPlanBadge(selectedTemplate.requiredPlan)}
+                {selectedTemplate.requiredPlan ? getPlanBadge(selectedTemplate.requiredPlan) : null}
                 <span className="text-sm text-gray-500">
-                  {selectedTemplate.routes.length} pages
+                  Template
                 </span>
               </div>
               <div className="flex gap-3">

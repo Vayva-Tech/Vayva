@@ -14,14 +14,14 @@
 type AnalyticsProvider = 'mixpanel' | 'amplitude';
 
 interface EventProperties {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface UserProfile {
   $email?: string;
   $name?: string;
   $userId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class AnalyticsTracker {
@@ -46,7 +46,7 @@ class AnalyticsTracker {
     properties?: EventProperties
   ): Promise<{ success: boolean; error?: string }> {
     if (!this.enabled) {
-      console.log(`[ANALYTICS] ${eventName}`, { userId, properties });
+      console.warn(`[ANALYTICS] ${eventName}`, { userId, properties });
       return { success: true };
     }
 
@@ -64,7 +64,7 @@ class AnalyticsTracker {
    */
   async identify(userId: string, profile?: UserProfile): Promise<{ success: boolean; error?: string }> {
     if (!this.enabled) {
-      console.log(`[ANALYTICS] Identify user: ${userId}`, profile);
+      console.warn(`[ANALYTICS] Identify user: ${userId}`, profile);
       return { success: true };
     }
 
@@ -274,8 +274,11 @@ export const trackEvents = {
     analytics.track('Dashboard Viewed', userId, { dashboardType }),
   
   // Feature usage
-  featureUsed: (userId: string, featureName: string, metadata?: any) =>
-    analytics.track('Feature Used', userId, { featureName, ...metadata }),
+  featureUsed: (userId: string, featureName: string, metadata?: unknown) =>
+    analytics.track('Feature Used', userId, {
+      featureName,
+      ...(metadata && typeof metadata === "object" ? (metadata as Record<string, unknown>) : {}),
+    }),
   
   // E-signature
   contractSent: (userId: string, contractId: string) =>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -28,7 +27,7 @@ export function IndustryGuard({ children }: IndustryGuardProps) {
   const settings = store?.settings as Record<string, unknown> | undefined;
   const enabledTools = settings?.enabledTools as string[] | undefined;
 
-  const allowed = isRouteAllowed(pathname, industrySlug, enabledTools);
+  const allowed = isRouteAllowed(pathname ?? "", industrySlug, enabledTools);
 
   if (!allowed) {
     return (

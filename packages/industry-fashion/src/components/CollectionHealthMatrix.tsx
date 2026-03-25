@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React from 'react';
-import { GlassPanel , ProgressBar } from '@vayva/ui/components/fashion';
+import { GlassPanel , ProgressBar } from '@vayva/ui/fashion';
 import type { CollectionHealth } from '../types';
 
 export interface CollectionHealthMatrixProps {

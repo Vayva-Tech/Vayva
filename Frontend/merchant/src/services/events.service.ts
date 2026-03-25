@@ -43,8 +43,8 @@ export class EventsService {
     }));
   }
 
-  async getEventById(id: string): Promise<Event | null> {
-    const e = await prisma.event.findUnique({ where: { id } });
+  async getEventById(storeId: string, id: string): Promise<Event | null> {
+    const e = await prisma.event.findFirst({ where: { id, storeId } });
     if (!e) return null;
 
     return {
@@ -112,11 +112,16 @@ export class EventsService {
     };
   }
 
-  async publishEvent(id: string): Promise<Event> {
-    const e = await prisma.event.update({
-      where: { id },
+  async publishEvent(storeId: string, id: string): Promise<Event> {
+    const updated = await prisma.event.updateMany({
+      where: { id, storeId },
       data: { status: 'published' },
     });
+    if (updated.count !== 1) {
+      throw new Error('Event not found');
+    }
+    const e = await prisma.event.findFirst({ where: { id, storeId } });
+    if (!e) throw new Error('Event not found');
 
     return {
       id: e.id,
@@ -166,7 +171,14 @@ export class EventsService {
     }));
   }
 
-  async createTicketTier(data: CreateTicketTierInput): Promise<TicketTier> {
+  async createTicketTier(storeId: string, data: CreateTicketTierInput): Promise<TicketTier> {
+    const event = await prisma.event.findFirst({
+      where: { id: data.eventId, storeId },
+    });
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
     const t = await prisma.ticketTier.create({
       data: {
         eventId: data.eventId,
@@ -347,7 +359,14 @@ export class EventsService {
     }));
   }
 
-  async addAttendee(data: CreateEventAttendeeInput): Promise<EventAttendee> {
+  async addAttendee(storeId: string, data: CreateEventAttendeeInput): Promise<EventAttendee> {
+    const event = await prisma.event.findFirst({
+      where: { id: data.eventId, storeId },
+    });
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
     const a = await prisma.eventAttendee.create({
       data: {
         eventId: data.eventId,

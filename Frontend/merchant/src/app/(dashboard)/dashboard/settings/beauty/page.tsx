@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { useState } from "react";
 import { Card, Button, Input, Label, Switch, Select, Badge, cn } from "@vayva/ui";
 import { motion } from "framer-motion";
@@ -54,7 +52,7 @@ export default function BeautySettingsPage() {
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
@@ -66,7 +64,7 @@ export default function BeautySettingsPage() {
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -720,7 +718,7 @@ function PackagesSettings() {
                 <Label className="mt-2">Denominations:</Label>
                 <div className="flex gap-2 mt-2">
                   {["$50", "$100", "$200", "Custom"].map((amount) => (
-                    <Badge key={amount} variant="secondary" className="cursor-pointer">
+                    <Badge key={amount} variant="outline" className="cursor-pointer">
                       {amount}
                     </Badge>
                   ))}

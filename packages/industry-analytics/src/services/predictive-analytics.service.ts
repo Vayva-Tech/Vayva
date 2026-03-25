@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Predictive Analytics Service
  * ML-powered forecasting, trend predictions, and pattern recognition

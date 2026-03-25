@@ -38,8 +38,8 @@ export class NonprofitService {
     }));
   }
 
-  async getCampaignById(id: string): Promise<DonationCampaign | null> {
-    const c = await prisma.donationCampaign.findUnique({ where: { id } });
+  async getCampaignById(storeId: string, id: string): Promise<DonationCampaign | null> {
+    const c = await prisma.donationCampaign.findFirst({ where: { id, storeId } });
     if (!c) return null;
 
     return {
@@ -98,13 +98,20 @@ export class NonprofitService {
     };
   }
 
-  async updateCampaignRaised(id: string, amount: number): Promise<DonationCampaign> {
-    const c = await prisma.donationCampaign.update({
-      where: { id },
+  async updateCampaignRaised(storeId: string, campaignId: string, amount: number): Promise<DonationCampaign> {
+    const updated = await prisma.donationCampaign.updateMany({
+      where: { id: campaignId, storeId },
       data: {
         raised: { increment: amount },
       },
     });
+    if (updated.count === 0) {
+      throw new Error('Campaign not found');
+    }
+    const c = await prisma.donationCampaign.findFirst({
+      where: { id: campaignId, storeId },
+    });
+    if (!c) throw new Error('Campaign not found');
 
     return {
       id: c.id,
@@ -187,7 +194,7 @@ export class NonprofitService {
 
     // Update campaign raised amount if campaignId provided
     if (data.campaignId) {
-      await this.updateCampaignRaised(data.campaignId, data.amount);
+      await this.updateCampaignRaised(data.storeId, data.campaignId, data.amount);
     }
 
     return {
@@ -303,13 +310,18 @@ export class NonprofitService {
     };
   }
 
-  async updateVolunteerHours(id: string, hours: number): Promise<Volunteer> {
-    const v = await prisma.volunteer.update({
-      where: { id },
+  async updateVolunteerHours(storeId: string, id: string, hours: number): Promise<Volunteer> {
+    const updated = await prisma.volunteer.updateMany({
+      where: { id, storeId },
       data: {
         hoursVolunteered: { increment: hours },
       },
     });
+    if (updated.count === 0) {
+      throw new Error('Volunteer not found');
+    }
+    const v = await prisma.volunteer.findFirst({ where: { id, storeId } });
+    if (!v) throw new Error('Volunteer not found');
 
     return {
       id: v.id,
@@ -393,29 +405,38 @@ export class NonprofitService {
     };
   }
 
-  async assignVolunteerToShift(shiftId: string, volunteerId: string): Promise<VolunteerShift> {
-    const shift = await prisma.volunteerShift.findUnique({ where: { id: shiftId } });
+  async assignVolunteerToShift(storeId: string, shiftId: string, volunteerId: string): Promise<VolunteerShift> {
+    const shift = await prisma.volunteerShift.findFirst({ where: { id: shiftId, storeId } });
     if (!shift) throw new Error('Shift not found');
+
+    const volunteer = await prisma.volunteer.findFirst({ where: { id: volunteerId, storeId } });
+    if (!volunteer) throw new Error('Volunteer not found');
 
     const assigned = [...shift.volunteersAssigned, volunteerId];
     const status = assigned.length >= shift.volunteersNeeded ? 'filled' : 'open';
 
-    const [updatedShift] = await prisma.$transaction([
-      prisma.volunteerShift.update({
-        where: { id: shiftId },
+    const updatedShift = await prisma.$transaction(async (tx) => {
+      const u = await tx.volunteerShift.updateMany({
+        where: { id: shiftId, storeId },
         data: {
           volunteersAssigned: assigned,
           status,
         },
-      }),
-      prisma.volunteerAssignment.create({
+      });
+      if (u.count === 0) throw new Error('Shift not found');
+
+      await tx.volunteerAssignment.create({
         data: {
           volunteerId,
           shiftId,
           status: 'confirmed',
         },
-      }),
-    ]);
+      });
+
+      const s = await tx.volunteerShift.findFirst({ where: { id: shiftId, storeId } });
+      if (!s) throw new Error('Shift not found');
+      return s;
+    });
 
     return {
       id: updatedShift.id,
@@ -504,11 +525,17 @@ export class NonprofitService {
     };
   }
 
-  async approveGrant(id: string): Promise<Grant> {
-    const g = await prisma.grant.update({
-      where: { id },
+  async approveGrant(id: string, storeId: string): Promise<Grant> {
+    const upd = await prisma.grant.updateMany({
+      where: { id, storeId },
       data: { status: 'approved' },
     });
+    if (upd.count === 0) {
+      throw new Error('Grant not found');
+    }
+
+    const g = await prisma.grant.findFirst({ where: { id, storeId } });
+    if (!g) throw new Error('Grant not found');
 
     return {
       id: g.id,
@@ -533,7 +560,15 @@ export class NonprofitService {
 
   // ===== GRANT EXPENSES =====
 
-  async getGrantExpenses(grantId: string): Promise<GrantExpense[]> {
+  async getGrantExpenses(storeId: string, grantId: string): Promise<GrantExpense[]> {
+    const grant = await prisma.grant.findFirst({
+      where: { id: grantId, storeId },
+      select: { id: true },
+    });
+    if (!grant) {
+      throw new Error('Grant not found');
+    }
+
     const expenses = await prisma.grantExpense.findMany({
       where: { grantId },
       orderBy: { date: 'desc' },
@@ -553,25 +588,39 @@ export class NonprofitService {
     }));
   }
 
-  async createGrantExpense(data: CreateGrantExpenseInput): Promise<GrantExpense> {
-    const e = await prisma.grantExpense.create({
-      data: {
-        grantId: data.grantId,
-        category: data.category,
-        description: data.description,
-        amount: data.amount,
-        date: data.date,
-        receiptUrl: data.receiptUrl,
-        status: 'pending',
-      },
-    });
+  async createGrantExpense(storeId: string, data: CreateGrantExpenseInput): Promise<GrantExpense> {
+    const e = await prisma.$transaction(async (tx) => {
+      const grantOk = await tx.grant.findFirst({
+        where: { id: data.grantId, storeId },
+        select: { id: true },
+      });
+      if (!grantOk) {
+        throw new Error('Grant not found');
+      }
 
-    // Update grant funds spent
-    await prisma.grant.update({
-      where: { id: data.grantId },
-      data: {
-        fundsSpent: { increment: data.amount },
-      },
+      const created = await tx.grantExpense.create({
+        data: {
+          grantId: data.grantId,
+          category: data.category,
+          description: data.description,
+          amount: data.amount,
+          date: data.date,
+          receiptUrl: data.receiptUrl,
+          status: 'pending',
+        },
+      });
+
+      const spentUpd = await tx.grant.updateMany({
+        where: { id: data.grantId, storeId },
+        data: {
+          fundsSpent: { increment: data.amount },
+        },
+      });
+      if (spentUpd.count === 0) {
+        throw new Error('Grant not found');
+      }
+
+      return created;
     });
 
     return {
@@ -588,14 +637,36 @@ export class NonprofitService {
     };
   }
 
-  async approveExpense(id: string, approvedBy: string): Promise<GrantExpense> {
-    const e = await prisma.grantExpense.update({
+  async approveExpense(storeId: string, id: string, approvedBy: string): Promise<GrantExpense> {
+    const expense = await prisma.grantExpense.findFirst({
       where: { id },
+      select: { grantId: true },
+    });
+    if (!expense) {
+      throw new Error('Expense not found');
+    }
+
+    const grant = await prisma.grant.findFirst({
+      where: { id: expense.grantId, storeId },
+      select: { id: true },
+    });
+    if (!grant) {
+      throw new Error('Expense not found');
+    }
+
+    const upd = await prisma.grantExpense.updateMany({
+      where: { id, grantId: expense.grantId },
       data: {
         status: 'approved',
         approvedBy,
       },
     });
+    if (upd.count === 0) {
+      throw new Error('Expense not found');
+    }
+
+    const e = await prisma.grantExpense.findFirst({ where: { id } });
+    if (!e) throw new Error('Expense not found');
 
     return {
       id: e.id,

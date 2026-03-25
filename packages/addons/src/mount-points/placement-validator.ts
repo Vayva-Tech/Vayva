@@ -2,8 +2,8 @@
  * Placement Validator - Validates add-on compatibility with mount points
  */
 
-import type { MountPointId } from '../../types';
-import { MOUNT_POINTS } from '../../types';
+import type { MountPointId } from '../types';
+import { MOUNT_POINTS } from '../types';
 
 export interface PlacementValidationResult {
   valid: boolean;

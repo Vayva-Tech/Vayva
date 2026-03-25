@@ -1,5 +1,5 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -162,14 +162,14 @@ function formatSegment(segment: string): string {
 interface DropdownProps {
   label: string;
   href: string;
-  children: { label: string; href: string }[];
+  items: { label: string; href: string }[];
   currentPath: string;
 }
 
 function BreadcrumbDropdown({
   label,
   href,
-  children,
+  items,
   currentPath,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
@@ -211,7 +211,7 @@ function BreadcrumbDropdown({
         <FolderSimple weight="duotone" className="h-3.5 w-3.5 shrink-0 text-amber-500/80" />
         <span>{label}</span>
       </Link>
-      <button
+      <Button
         type="button"
         aria-label={`Show ${label} sub-pages`}
         aria-expanded={open}
@@ -228,11 +228,11 @@ function BreadcrumbDropdown({
             open && "rotate-180",
           )}
         />
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute left-0 top-full mt-1.5 z-50 min-w-[180px] rounded-lg border border-gray-200 bg-white shadow-lg py-1 animate-in fade-in slide-in-from-top-1 duration-150">
-          {children.map((child) => {
+          {items.map((child) => {
             const isActive =
               currentPath === child.href ||
               currentPath.startsWith(child.href + "/");
@@ -287,7 +287,7 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   // If explicit items are provided, render them with folder/file icons (no dropdown)
   if (items) {
@@ -391,7 +391,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
               <BreadcrumbDropdown
                 label={crumb.label}
                 href={crumb.href}
-                children={crumb.hierarchy.children}
+                items={crumb.hierarchy.children}
                 currentPath={pathname}
               />
             ) : !crumb.isLast ? (
@@ -417,3 +417,4 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
     </nav>
   );
 }
+

@@ -17,7 +17,7 @@ import {
   MagnifyingGlass as Search,
   CaretDown as ChevronDown,
   SignOut as LogOut,
-  List as Menu,
+  List as Menu
 } from "@phosphor-icons/react/ssr";
 import { useAuth } from "@/context/AuthContext";
 import { StoreProvider } from "@/context/StoreContext";
@@ -811,7 +811,7 @@ export const AdminShell = ({
               </div>
             </div>
 
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border px-6 py-3 pb-safe z-40 flex justify-between items-center shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.06)]">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border px-6 py-3 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] z-40 flex justify-between items-center shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.06)]">
               {bottomNavItems.map((item) => {
                 const isActive =
                   normalizeSidebarHref(pathname) ===

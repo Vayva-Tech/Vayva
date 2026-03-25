@@ -1,7 +1,6 @@
-// @ts-nocheck
 // Product Engine - Core business logic for product management
 import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
+import { logEngineError } from "@/lib/engines/log-engine-error";
 
 export interface Product {
   id: string;
@@ -63,7 +62,7 @@ export class ProductEngine {
       
       return await apiJson<Product[]>(url);
     } catch (error) {
-      logger.error('[PRODUCT_ENGINE_GET_ALL]', error);
+      logEngineError('[PRODUCT_ENGINE_GET_ALL]', error);
       throw error;
     }
   }
@@ -72,7 +71,7 @@ export class ProductEngine {
     try {
       return await apiJson<Product>(`/api/products/${id}`);
     } catch (error) {
-      logger.error('[PRODUCT_ENGINE_GET_BY_ID]', error);
+      logEngineError('[PRODUCT_ENGINE_GET_BY_ID]', error);
       throw error;
     }
   }
@@ -84,7 +83,7 @@ export class ProductEngine {
         body: JSON.stringify(product),
       });
     } catch (error) {
-      logger.error('[PRODUCT_ENGINE_CREATE]', error);
+      logEngineError('[PRODUCT_ENGINE_CREATE]', error);
       throw error;
     }
   }
@@ -96,7 +95,7 @@ export class ProductEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[PRODUCT_ENGINE_UPDATE]', error);
+      logEngineError('[PRODUCT_ENGINE_UPDATE]', error);
       throw error;
     }
   }
@@ -107,7 +106,7 @@ export class ProductEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[PRODUCT_ENGINE_DELETE]', error);
+      logEngineError('[PRODUCT_ENGINE_DELETE]', error);
       throw error;
     }
   }
@@ -119,7 +118,7 @@ export class ProductEngine {
         body: JSON.stringify({ quantity }),
       });
     } catch (error) {
-      logger.error('[PRODUCT_ENGINE_UPDATE_INVENTORY]', error);
+      logEngineError('[PRODUCT_ENGINE_UPDATE_INVENTORY]', error);
       throw error;
     }
   }

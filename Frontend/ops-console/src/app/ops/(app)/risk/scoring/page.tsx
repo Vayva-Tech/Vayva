@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState } from "react";
 import { useOpsQuery } from "@/hooks/useOpsQuery";
@@ -133,12 +134,12 @@ export default function RiskScoringPage(): React.JSX.Element {
       title="Risk Scoring Engine"
       description="Automated risk assessment and merchant monitoring"
       headerActions={
-        <button
+        <Button
           onClick={() => refetch()}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowsClockwise className={`h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
-        </button>
+        </Button>
       }
     >
       {/* Overview Stats */}
@@ -382,3 +383,4 @@ export default function RiskScoringPage(): React.JSX.Element {
     </OpsPageShell>
   );
 }
+

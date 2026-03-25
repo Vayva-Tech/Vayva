@@ -4,10 +4,9 @@
  * GDPR-compliant cookie consent banner with granular controls
  * Zero external dependencies - fully self-built
  */
-
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { X, Settings, Check, Info } from 'lucide-react';
 import {
   getConsentState,
@@ -20,23 +19,47 @@ import {
   CookieConsentState,
 } from './cookie-consent';
 
+type CookieButtonProps = {
+  onClick?: () => void;
+  className?: string;
+  "aria-label"?: string;
+  children: ReactNode;
+};
+
+function CookieButton(props: CookieButtonProps) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={props.onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") props.onClick?.();
+      }}
+      className={props.className}
+      aria-label={props["aria-label"]}
+    >
+      {props.children}
+    </div>
+  );
+}
+
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [consent, setConsent] = useState<CookieConsentState | null>(null);
 
   useEffect(() => {
-    // Only show on client side
-    const storedConsent = getConsentState();
-    setConsent(storedConsent);
-
-    // Check if user has already made a choice
-    const hasMadeChoice = localStorage.getItem('vayva_cookie_consent');
-    if (!hasMadeChoice) {
-      // Show banner after 2 seconds
-      const timer = setTimeout(() => setIsVisible(true), 2000);
-      return () => clearTimeout(timer);
-    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    queueMicrotask(() => {
+      setConsent(getConsentState());
+      const hasMadeChoice = localStorage.getItem('vayva_cookie_consent');
+      if (!hasMadeChoice) {
+        timer = setTimeout(() => setIsVisible(true), 2000);
+      }
+    });
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const handleAcceptAll = () => {
@@ -182,13 +205,13 @@ export default function CookieBanner() {
                 </p>
               </div>
             </div>
-            <button
+            <CookieButton
               onClick={() => setIsVisible(false)}
               className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Close banner"
             >
               <X className="w-5 h-5" />
-            </button>
+            </CookieButton>
           </div>
 
           {/* Description */}
@@ -203,26 +226,26 @@ export default function CookieBanner() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
-            <button
+            <CookieButton
               onClick={handleAcceptAll}
               className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
             >
               <Check className="w-5 h-5" />
               Accept All
-            </button>
-            <button
+            </CookieButton>
+            <CookieButton
               onClick={handleRejectAll}
               className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
             >
               Reject Non-Essential
-            </button>
-            <button
+            </CookieButton>
+            <CookieButton
               onClick={() => setShowSettings(!showSettings)}
               className="flex-1 px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border-2 border-gray-200 hover:border-gray-300 transition-colors flex items-center justify-center gap-2"
             >
               <Settings className="w-5 h-5" />
               Customize
-            </button>
+            </CookieButton>
           </div>
 
           {/* Privacy Notice */}
@@ -337,18 +360,18 @@ export default function CookieBanner() {
 
             {/* Save Button */}
             <div className="mt-6 flex justify-end gap-3">
-              <button
+              <CookieButton
                 onClick={() => setShowSettings(false)}
                 className="px-6 py-2 text-gray-700 font-medium hover:text-gray-900 transition-colors"
               >
                 Cancel
-              </button>
-              <button
+              </CookieButton>
+              <CookieButton
                 onClick={handleSaveSettings}
                 className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Save Preferences
-              </button>
+              </CookieButton>
             </div>
           </div>
         )}

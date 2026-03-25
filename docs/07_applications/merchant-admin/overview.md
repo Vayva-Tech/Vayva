@@ -1,7 +1,7 @@
 # Merchant Admin Dashboard
 
 > **Application:** `apps/merchant`
-> **URL:** `https://app.vayva.ng`
+> **URL:** `https://merchant.vayva.ng`
 > **Framework:** Next.js 16, React 19, TypeScript
 
 ## Purpose

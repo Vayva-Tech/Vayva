@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Industry Settings Management UI
 // ============================================================================
@@ -47,7 +46,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -56,7 +55,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { apiJson } from '@/lib/api-client-shared';
-import type { IndustrySlug, IndustryConfig } from '@/types/industry';
+import type { IndustryConfig } from '@/types/industry';
+import type { IndustrySlug } from '@/lib/templates/types';
 
 // ============================================================================
 // Industry Icon Mapping
@@ -107,6 +107,11 @@ const industrySettingsSchema = z.object({
 
 type IndustrySettingsForm = z.infer<typeof industrySettingsSchema>;
 
+type IndustrySettingsApiResponse = {
+  industrySlug?: string;
+  config?: IndustryConfig;
+};
+
 // ============================================================================
 // Main Component
 // ============================================================================
@@ -146,22 +151,30 @@ export function IndustrySettingsManager({
   useEffect(() => {
     async function loadIndustrySettings() {
       try {
-        const data = await apiJson('/api/settings/industry');
+        const data = await apiJson<IndustrySettingsApiResponse>('/api/settings/industry');
 
         if (data.industrySlug) {
+          const cfg = data.config;
+          const aiInsights =
+            cfg?.features &&
+            typeof cfg.features === 'object' &&
+            !Array.isArray(cfg.features) &&
+            'aiInsights' in cfg.features
+              ? Boolean((cfg.features as Record<string, boolean>).aiInsights)
+              : true;
           form.reset({
             industrySlug: data.industrySlug,
-            displayName: data.config?.displayName || '',
-            enabledModules: data.config?.modules || [],
-            primaryObjectLabel: data.config?.primaryObject || '',
+            displayName: cfg?.displayName || '',
+            enabledModules: [...(cfg?.modules ?? [])],
+            primaryObjectLabel: cfg?.primaryObject || '',
             features: {
               enableAnalytics: true,
-              enableAIInsights: data.config?.features?.aiInsights || true,
+              enableAIInsights: aiInsights,
               enableRealTimeUpdates: true,
               enableCustomWidgets: false,
             },
           });
-          setIndustryConfig(data.config);
+          setIndustryConfig(cfg ?? null);
         }
       } catch (error) {
         console.error('Failed to load industry settings:', error);
@@ -181,12 +194,12 @@ export function IndustrySettingsManager({
     // Update config preview
     try {
       const response = await fetch(`/api/settings/industry?preview=${value}`);
-      const data = await response.json();
-      setIndustryConfig(data.config);
+      const data = (await response.json()) as { config?: IndustryConfig };
+      setIndustryConfig(data.config ?? null);
       
       form.setValue('displayName', data.config?.displayName || '');
       form.setValue('primaryObjectLabel', data.config?.primaryObject || '');
-      form.setValue('enabledModules', data.config?.modules || []);
+      form.setValue('enabledModules', [...(data.config?.modules ?? [])]);
     } catch (error) {
       console.error('Failed to load industry preview:', error);
     }
@@ -271,7 +284,8 @@ export function IndustrySettingsManager({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectGroup label="Commerce & Retail">
+                            <SelectGroup>
+                              <SelectLabel>Commerce & Retail</SelectLabel>
                               <SelectItem value="retail">Retail Store</SelectItem>
                               <SelectItem value="fashion">Fashion & Apparel</SelectItem>
                               <SelectItem value="electronics">Electronics</SelectItem>
@@ -279,17 +293,20 @@ export function IndustrySettingsManager({
                               <SelectItem value="grocery">Grocery & Food Market</SelectItem>
                               <SelectItem value="one_product">Single Product</SelectItem>
                             </SelectGroup>
-                            <SelectGroup label="Food & Services">
+                            <SelectGroup>
+                              <SelectLabel>Food & Services</SelectLabel>
                               <SelectItem value="food">Restaurant & Food</SelectItem>
                               <SelectItem value="services">Professional Services</SelectItem>
                               <SelectItem value="real_estate">Real Estate</SelectItem>
                             </SelectGroup>
-                            <SelectGroup label="Events & Hospitality">
+                            <SelectGroup>
+                              <SelectLabel>Events & Hospitality</SelectLabel>
                               <SelectItem value="events">Events & Experiences</SelectItem>
                               <SelectItem value="travel_hospitality">Travel & Hospitality</SelectItem>
                               <SelectItem value="nightlife">Nightlife & Entertainment</SelectItem>
                             </SelectGroup>
-                            <SelectGroup label="Specialized">
+                            <SelectGroup>
+                              <SelectLabel>Specialized</SelectLabel>
                               <SelectItem value="education">Education</SelectItem>
                               <SelectItem value="nonprofit">Nonprofit</SelectItem>
                               <SelectItem value="saas">SaaS</SelectItem>

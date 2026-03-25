@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from "react";
-import { cn } from "@vayva/ui";
+import { cn, Button } from "@vayva/ui";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // ============================================================================
@@ -200,20 +200,20 @@ export function GanttChart({ rows, startDate: propStart, endDate: propEnd }: Gan
       {/* Toolbar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => handleScroll("left")}
             className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Scroll left"
           >
             <ChevronLeft size={16} className="text-gray-500" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleScroll("right")}
             className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Scroll right"
           >
             <ChevronRight size={16} className="text-gray-500" />
-          </button>
+          </Button>
           <span className="text-xs text-gray-400 ml-2">
             {formatShortDate(timelineStart)} — {formatShortDate(timelineEnd)}
           </span>
@@ -222,7 +222,7 @@ export function GanttChart({ rows, startDate: propStart, endDate: propEnd }: Gan
         {/* View toggle */}
         <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
           {viewModes.map((vm) => (
-            <button
+            <Button
               key={vm.key}
               onClick={() => setViewMode(vm.key)}
               className={cn(
@@ -233,7 +233,7 @@ export function GanttChart({ rows, startDate: propStart, endDate: propEnd }: Gan
               )}
             >
               {vm.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

@@ -166,18 +166,25 @@ export class AutomotiveService {
   }
 
   async updateTradeInOffer(
+    storeId: string,
     id: string,
     offerPrice: number,
     notes?: string
   ): Promise<TradeInValuation> {
-    const valuation = await prisma.tradeInValuation?.update({
-      where: { id },
+    await prisma.tradeInValuation?.updateMany({
+      where: { id, storeId },
       data: {
         offerPrice,
         status: 'reviewed',
         notes,
       },
     });
+    const valuation = await prisma.tradeInValuation?.findFirst({
+      where: { id, storeId },
+    });
+    if (!valuation) {
+      throw new Error('Trade-in valuation not found');
+    }
 
     return {
       id: valuation.id,
@@ -199,11 +206,17 @@ export class AutomotiveService {
     };
   }
 
-  async acceptTradeInOffer(id: string): Promise<TradeInValuation> {
-    const valuation = await prisma.tradeInValuation?.update({
-      where: { id },
+  async acceptTradeInOffer(storeId: string, id: string): Promise<TradeInValuation> {
+    await prisma.tradeInValuation?.updateMany({
+      where: { id, storeId },
       data: { status: 'accepted' },
     });
+    const valuation = await prisma.tradeInValuation?.findFirst({
+      where: { id, storeId },
+    });
+    if (!valuation) {
+      throw new Error('Trade-in valuation not found');
+    }
 
     return {
       id: valuation.id,

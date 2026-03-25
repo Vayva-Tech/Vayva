@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Events Industry Features
  */

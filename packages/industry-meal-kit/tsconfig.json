@@ -1,13 +1,15 @@
 {
-  "extends": "@vayva/tsconfig/library.json",
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "__tests__"],
+  "extends": "../tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "jsx": "react-jsx"
-  }
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@vayva/db": ["../../infra/db/src/client.ts"],
+      "@vayva/ui": ["../ui/src/index.ts"],
+      "@vayva/ui/*": ["../ui/src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "__tests__"]
 }

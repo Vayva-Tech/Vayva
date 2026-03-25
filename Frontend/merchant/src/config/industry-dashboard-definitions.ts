@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { IndustrySlug } from "@/lib/templates/types";
 
 // ---------------------------------------------------------------------------
@@ -1439,7 +1438,8 @@ const MARKETPLACE_DASHBOARD: IndustryDashboardDefinition = {
 // Meal Kit Dashboard
 // ---------------------------------------------------------------------------
 
-const MEAL_KIT_DASHBOARD: IndustryDashboardDefinition = {
+/** Exported for meal-kit verticals; merged into `food` routing where applicable. */
+export const MEAL_KIT_DASHBOARD: IndustryDashboardDefinition = {
   industry: "meal-kit",
   title: "Meal Kit Command Center",
   subtitle: "Fresh ingredients, zero waste, happy subscribers",
@@ -1571,11 +1571,459 @@ const MEAL_KIT_DASHBOARD: IndustryDashboardDefinition = {
 };
 
 // ---------------------------------------------------------------------------
+// Phase 4+ Definitions: SaaS, Legal, Healthcare, Fitness/Wellness, Jobs, etc.
+// ---------------------------------------------------------------------------
+
+const ANALYTICS_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "analytics",
+  title: "Analytics & Reporting",
+  subtitle: "Turn metrics into decisions",
+  primaryObjectLabel: "Report",
+  defaultTimeHorizon: "week",
+  sections: [
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+    "primary_object_health",
+    "live_operations",
+  ],
+  primaryObjectHealth: [
+    { key: "activeReports", label: "Active Reports", format: "number", icon: "FileText" },
+    { key: "connectedSources", label: "Connected Sources", format: "number", icon: "Database" },
+  ],
+  liveOps: [
+    { key: "queriesToday", label: "Queries Today", format: "number", icon: "Activity", emptyText: "—" },
+    { key: "dataFreshness", label: "Data Freshness", format: "duration", icon: "Clock", emptyText: "—" },
+  ],
+  alertThresholds: [
+    {
+      key: "dataFreshnessMinutes",
+      label: "Stale Data",
+      operator: "gte",
+      value: 180,
+      severity: "warning",
+      message: "Data is stale ({value}min) — check connectors",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "view_analytics",
+      title: "Review analytics",
+      reason: "Spot trends and anomalies early",
+      conditionKey: "hasMetrics",
+      severity: "info",
+      href: "/dashboard/analytics",
+      icon: "BarChart3",
+    },
+    {
+      id: "export_report",
+      title: "Export a report",
+      reason: "Share performance with your team",
+      conditionKey: "hasReports",
+      severity: "info",
+      href: "/dashboard/reports",
+      icon: "Download",
+    },
+  ],
+  failureModes: ["Metric blindness", "Stale data", "Delayed decisions"],
+};
+
+const SAAS_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "saas",
+  title: "SaaS Control Center",
+  subtitle: "Reduce churn and grow MRR",
+  primaryObjectLabel: "Tenant",
+  defaultTimeHorizon: "week",
+  sections: [
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+    "live_operations",
+    "primary_object_health",
+  ],
+  primaryObjectHealth: [
+    { key: "activeTenants", label: "Active Tenants", format: "number", icon: "Building2" },
+    { key: "trialsEnding", label: "Trials Ending Soon", format: "number", icon: "Hourglass" },
+  ],
+  liveOps: [
+    { key: "mrr", label: "MRR", format: "currency", icon: "DollarSign", emptyText: "—" },
+    { key: "apiCallsToday", label: "API Calls Today", format: "number", icon: "Activity", emptyText: "—" },
+    { key: "incidentsOpen", label: "Open Incidents", format: "number", icon: "AlertTriangle", emptyText: "None" },
+  ],
+  alertThresholds: [
+    {
+      key: "churnRate",
+      label: "Churn Risk",
+      operator: "gte",
+      value: 5,
+      severity: "warning",
+      message: "Churn at {value}% — investigate top churn drivers",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "review_subscriptions",
+      title: "Review subscriptions",
+      reason: "Identify failed renewals and upgrades",
+      conditionKey: "hasSubscriptions",
+      severity: "info",
+      href: "/dashboard/subscriptions",
+      icon: "CreditCard",
+    },
+    {
+      id: "manage_feature_flags",
+      title: "Audit feature flags",
+      reason: "Avoid unintended rollouts",
+      conditionKey: "hasFeatureFlags",
+      severity: "warning",
+      href: "/dashboard/feature-flags",
+      icon: "ToggleRight",
+    },
+    {
+      id: "rotate_api_keys",
+      title: "Rotate API keys",
+      reason: "Maintain security hygiene",
+      conditionKey: "hasApiKeys",
+      severity: "info",
+      href: "/dashboard/api-keys",
+      icon: "Key",
+    },
+  ],
+  failureModes: ["Churn spikes", "Usage outages", "Revenue leakage"],
+};
+
+const LEGAL_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "legal",
+  title: "Legal Practice Dashboard",
+  subtitle: "Stay on top of cases, deadlines, and billing",
+  primaryObjectLabel: "Case",
+  defaultTimeHorizon: "week",
+  sections: [
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+    "primary_object_health",
+  ],
+  primaryObjectHealth: [
+    { key: "activeCases", label: "Active Cases", format: "number", icon: "Briefcase" },
+    { key: "overdueTasks", label: "Overdue Tasks", format: "number", icon: "AlertTriangle" },
+  ],
+  liveOps: [
+    { key: "billableHoursWeek", label: "Billable Hours (WTD)", format: "number", icon: "Clock", emptyText: "—" },
+    { key: "invoicesOutstanding", label: "Outstanding Invoices", format: "currency", icon: "Receipt", emptyText: "—" },
+  ],
+  alertThresholds: [
+    {
+      key: "overdueTasks",
+      label: "Overdue Tasks",
+      operator: "gte",
+      value: 1,
+      severity: "critical",
+      message: "{count} overdue tasks — review deadlines",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "review_cases",
+      title: "Review active cases",
+      reason: "Prevent deadline slips",
+      conditionKey: "hasActiveCases",
+      severity: "info",
+      href: "/dashboard/legal-services",
+      icon: "Scale",
+    },
+    {
+      id: "send_invoices",
+      title: "Send invoices",
+      reason: "Improve cash flow",
+      conditionKey: "hasOutstandingInvoices",
+      severity: "warning",
+      href: "/dashboard/invoices",
+      icon: "Send",
+    },
+  ],
+  failureModes: ["Missed deadlines", "Unbilled work", "Cash flow gaps"],
+};
+
+const HEALTHCARE_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "healthcare",
+  title: "Clinic Operations",
+  subtitle: "Keep schedules full and patients cared for",
+  primaryObjectLabel: "Appointment",
+  defaultTimeHorizon: "today",
+  sections: [
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+    "primary_object_health",
+  ],
+  primaryObjectHealth: [
+    { key: "appointmentsToday", label: "Appointments Today", format: "number", icon: "Calendar" },
+    { key: "noShowRisk", label: "No-Show Risk", format: "percent", icon: "UserX" },
+  ],
+  liveOps: [
+    { key: "waitingRoom", label: "Waiting Room", format: "number", icon: "Users", emptyText: "Empty" },
+    { key: "avgWaitTime", label: "Avg Wait Time", format: "duration", icon: "Clock", emptyText: "—" },
+  ],
+  alertThresholds: [
+    {
+      key: "avgWaitTimeMinutes",
+      label: "Wait Time Spike",
+      operator: "gte",
+      value: 30,
+      severity: "warning",
+      message: "Average wait time is {value}min",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "review_schedule",
+      title: "Review today's schedule",
+      reason: "Reduce wait times and gaps",
+      conditionKey: "hasSchedule",
+      severity: "info",
+      href: "/dashboard/appointments",
+      icon: "CalendarCheck",
+    },
+    {
+      id: "bill_patients",
+      title: "Review billing",
+      reason: "Ensure claims/invoices are up to date",
+      conditionKey: "hasBilling",
+      severity: "info",
+      href: "/dashboard/billing",
+      icon: "Receipt",
+    },
+  ],
+  failureModes: ["Long waits", "No-shows", "Billing backlog"],
+};
+
+const FITNESS_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "fitness",
+  title: "Gym Performance",
+  subtitle: "Grow memberships and keep classes full",
+  primaryObjectLabel: "Membership",
+  defaultTimeHorizon: "week",
+  sections: [
+    "decision_kpis",
+    "live_operations",
+    "bottlenecks_alerts",
+    "suggested_actions",
+    "primary_object_health",
+  ],
+  primaryObjectHealth: [
+    { key: "activeMembers", label: "Active Members", format: "number", icon: "Users" },
+    { key: "classesToday", label: "Classes Today", format: "number", icon: "Dumbbell" },
+  ],
+  liveOps: [
+    { key: "checkinsToday", label: "Check-ins Today", format: "number", icon: "UserCheck", emptyText: "—" },
+    { key: "classFillRate", label: "Class Fill Rate", format: "number", icon: "Percent", emptyText: "—" },
+  ],
+  alertThresholds: [
+    {
+      key: "classFillRate",
+      label: "Low Class Fill",
+      operator: "lte",
+      value: 40,
+      severity: "info",
+      message: "Class fill rate at {value}% — consider promotions",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "manage_memberships",
+      title: "Manage memberships",
+      reason: "Track renewals and churn",
+      conditionKey: "hasMemberships",
+      severity: "info",
+      href: "/dashboard/memberships",
+      icon: "CreditCard",
+    },
+    {
+      id: "review_schedule",
+      title: "Review class schedule",
+      reason: "Optimize attendance",
+      conditionKey: "hasClasses",
+      severity: "info",
+      href: "/dashboard/classes",
+      icon: "Calendar",
+    },
+  ],
+  failureModes: ["Member churn", "Empty classes", "Low retention"],
+};
+
+const WELLNESS_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "wellness",
+  title: "Wellness Operations",
+  subtitle: "Deliver great sessions and retain clients",
+  primaryObjectLabel: "Session",
+  defaultTimeHorizon: "week",
+  sections: [
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+    "primary_object_health",
+  ],
+  primaryObjectHealth: [
+    { key: "activePrograms", label: "Active Programs", format: "number", icon: "Sparkles" },
+    { key: "clientsActive", label: "Active Clients", format: "number", icon: "Users" },
+  ],
+  liveOps: [
+    { key: "sessionsToday", label: "Sessions Today", format: "number", icon: "Calendar", emptyText: "—" },
+    { key: "cancellations", label: "Cancellations", format: "number", icon: "XCircle", emptyText: "None" },
+  ],
+  alertThresholds: [
+    {
+      key: "cancellations",
+      label: "Cancellations",
+      operator: "gte",
+      value: 5,
+      severity: "warning",
+      message: "{count} cancellations — check reminder flow",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "review_bookings",
+      title: "Review bookings",
+      reason: "Reduce idle time",
+      conditionKey: "hasBookings",
+      severity: "info",
+      href: "/dashboard/bookings",
+      icon: "CalendarCheck",
+    },
+  ],
+  failureModes: ["Idle calendar", "High cancellations", "Low retention"],
+};
+
+const PETCARE_DASHBOARD: IndustryDashboardDefinition = {
+  ...SERVICES_DASHBOARD,
+  industry: "petcare",
+  title: "Pet Care Operations",
+  subtitle: "Appointments, follow-ups, and client retention",
+  primaryObjectLabel: "Appointment",
+};
+
+const SALON_DASHBOARD: IndustryDashboardDefinition = {
+  ...SERVICES_DASHBOARD,
+  industry: "salon",
+  title: "Salon Bookings",
+  subtitle: "Fill chairs and reduce no-shows",
+  primaryObjectLabel: "Appointment",
+};
+
+const SPA_DASHBOARD: IndustryDashboardDefinition = {
+  ...SERVICES_DASHBOARD,
+  industry: "spa",
+  title: "Spa Appointments",
+  subtitle: "Maximize utilization and guest satisfaction",
+  primaryObjectLabel: "Appointment",
+};
+
+const HOTEL_DASHBOARD: IndustryDashboardDefinition = {
+  ...TRAVEL_DASHBOARD,
+  industry: "hotel",
+  title: "Hotel Operations",
+  subtitle: "Maximize occupancy and streamline check-ins",
+  primaryObjectLabel: "Room",
+};
+
+const RESTAURANT_DASHBOARD: IndustryDashboardDefinition = {
+  ...FOOD_DASHBOARD,
+  industry: "restaurant",
+  title: "Restaurant Operations",
+  subtitle: "Keep prep time low and tables turning",
+  primaryObjectLabel: "Order",
+};
+
+const CATERING_DASHBOARD: IndustryDashboardDefinition = {
+  ...FOOD_DASHBOARD,
+  industry: "catering",
+  title: "Catering Operations",
+  subtitle: "Deliver events on time and on budget",
+  primaryObjectLabel: "Order",
+};
+
+const WHOLESALE_DASHBOARD: IndustryDashboardDefinition = {
+  ...B2B_DASHBOARD,
+  industry: "wholesale",
+  title: "Wholesale Operations",
+  subtitle: "Convert bulk orders and keep accounts happy",
+  primaryObjectLabel: "Order",
+};
+
+const JOBS_DASHBOARD: IndustryDashboardDefinition = {
+  industry: "jobs",
+  title: "Hiring Pipeline",
+  subtitle: "Publish roles and move candidates through stages",
+  primaryObjectLabel: "Job",
+  defaultTimeHorizon: "week",
+  sections: [
+    "primary_object_health",
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+  ],
+  primaryObjectHealth: [
+    { key: "activeJobs", label: "Active Jobs", format: "number", icon: "Briefcase" },
+    { key: "applicationsOpen", label: "Open Applications", format: "number", icon: "Users" },
+  ],
+  liveOps: [
+    { key: "newApplicationsToday", label: "New Applications", format: "number", icon: "UserPlus", emptyText: "—" },
+    { key: "interviewsScheduled", label: "Interviews Scheduled", format: "number", icon: "Calendar", emptyText: "—" },
+  ],
+  alertThresholds: [
+    {
+      key: "staleJobsCount",
+      label: "Stale Postings",
+      operator: "gte",
+      value: 5,
+      severity: "info",
+      message: "{count} postings have low application flow — refresh listings",
+    },
+  ],
+  suggestedActionRules: [
+    {
+      id: "post_job",
+      title: "Post a new role",
+      reason: "Keep the pipeline active",
+      conditionKey: "hasNoJobs",
+      severity: "info",
+      href: "/dashboard/jobs/new",
+      icon: "Plus",
+    },
+    {
+      id: "review_applications",
+      title: "Review applications",
+      reason: "Fast responses improve conversion",
+      conditionKey: "hasApplications",
+      severity: "warning",
+      href: "/dashboard/applications",
+      icon: "Inbox",
+    },
+  ],
+  failureModes: ["Slow hiring", "Candidate drop-off", "Unfilled roles"],
+};
+
+const SPECIALIZED_DASHBOARD: IndustryDashboardDefinition = {
+  ...RETAIL_DASHBOARD,
+  industry: "specialized",
+  title: "Specialized Operations",
+  subtitle: "A flexible dashboard for niche workflows",
+  primaryObjectLabel: "Product",
+};
+
+// ---------------------------------------------------------------------------
 // Registry — maps industry slugs to their native dashboard definition.
 // Industries without a specific definition fall back to the closest match.
 // ---------------------------------------------------------------------------
 
 const DEFINITIONS: Record<string, IndustryDashboardDefinition> = {
+  analytics: ANALYTICS_DASHBOARD,
   retail: RETAIL_DASHBOARD,
   fashion: {
     ...RETAIL_DASHBOARD,
@@ -1605,12 +2053,23 @@ const DEFINITIONS: Record<string, IndustryDashboardDefinition> = {
     primaryObjectLabel: "Product",
   },
   food: FOOD_DASHBOARD,
+  restaurant: RESTAURANT_DASHBOARD,
+  catering: CATERING_DASHBOARD,
+  "meal-kit": MEAL_KIT_DASHBOARD,
   services: SERVICES_DASHBOARD,
+  salon: SALON_DASHBOARD,
+  spa: SPA_DASHBOARD,
+  wellness: WELLNESS_DASHBOARD,
+  petcare: PETCARE_DASHBOARD,
+  fitness: FITNESS_DASHBOARD,
+  healthcare: HEALTHCARE_DASHBOARD,
   b2b: B2B_DASHBOARD,
+  wholesale: WHOLESALE_DASHBOARD,
   events: EVENTS_DASHBOARD,
   nightlife: NIGHTLIFE_DASHBOARD,
   automotive: AUTOMOTIVE_DASHBOARD,
   travel_hospitality: TRAVEL_DASHBOARD,
+  hotel: HOTEL_DASHBOARD,
   real_estate: {
     ...SERVICES_DASHBOARD,
     industry: "real_estate",
@@ -1624,7 +2083,10 @@ const DEFINITIONS: Record<string, IndustryDashboardDefinition> = {
   blog_media: BLOG_MEDIA_DASHBOARD,
   creative_portfolio: CREATIVE_PORTFOLIO_DASHBOARD,
   marketplace: MARKETPLACE_DASHBOARD,
-  "meal-kit": MEAL_KIT_DASHBOARD,
+  saas: SAAS_DASHBOARD,
+  legal: LEGAL_DASHBOARD,
+  jobs: JOBS_DASHBOARD,
+  specialized: SPECIALIZED_DASHBOARD,
 };
 
 export function getIndustryDashboardDefinition(

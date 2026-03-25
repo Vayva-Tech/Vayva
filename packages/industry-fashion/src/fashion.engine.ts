@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Fashion Industry Engine
  * Main orchestrator for all fashion-specific features
@@ -105,49 +104,41 @@ export class FashionEngine {
     // Initialize Auto-Replenishment if enabled
     if (this.fashionConfig.autoReplenishment) {
       this.replenishmentService = new AutoReplenishmentService();
-      await this.replenishmentService.initialize?.();
     }
 
     // Initialize Demand Forecast if enabled
     if (this.fashionConfig.demandForecast) {
       this.forecastService = new DemandForecastService();
-      await this.forecastService.initialize?.();
     }
 
     // Initialize Size Curve Optimizer if enabled
     if (this.fashionConfig.sizeOptimization) {
       this.sizeOptimizer = new SizeCurveOptimizer();
-      await this.sizeOptimizer.initialize?.();
     }
 
     // Initialize Wholesale Service if enabled
     if (this.fashionConfig.wholesale) {
       this.wholesaleService = new WholesaleService();
-      await this.wholesaleService.initialize?.();
     }
 
     // Initialize Inventory Alerts if enabled
     if (this.fashionConfig.inventoryAlerts) {
       this.alertsService = new InventoryAlertService();
-      await this.alertsService.initialize?.();
     }
 
     // Initialize Trend Analysis if enabled
     if (this.fashionConfig.trendAnalysis) {
       this.trendService = new TrendAnalysisService();
-      await this.trendService.initialize?.();
     }
 
     // Initialize Wholesale Customer Service if enabled
     if (this.fashionConfig.wholesaleCustomer) {
       this.wholesaleCustomerService = new WholesaleCustomerService();
-      await this.wholesaleCustomerService.initialize?.();
     }
 
     // Initialize Collection Analytics if enabled
     if (this.fashionConfig.collectionAnalytics) {
       this.collectionAnalyticsService = new CollectionAnalyticsService();
-      await this.collectionAnalyticsService.initialize?.();
     }
 
     // Register data resolvers
@@ -280,31 +271,14 @@ export class FashionEngine {
    * Cleanup and dispose of all resources
    */
   async dispose(): Promise<void> {
-    // Cleanup services if needed
-    if (this.replenishmentService?.dispose) {
-      await this.replenishmentService.dispose();
-    }
-    if (this.forecastService?.dispose) {
-      await this.forecastService.dispose();
-    }
-    if (this.sizeOptimizer?.dispose) {
-      await this.sizeOptimizer.dispose();
-    }
-    if (this.wholesaleService?.dispose) {
-      await this.wholesaleService.dispose();
-    }
-    if (this.alertsService?.dispose) {
-      await this.alertsService.dispose();
-    }
-    if (this.trendService?.dispose) {
-      await this.trendService.dispose();
-    }
-    if (this.wholesaleCustomerService?.dispose) {
-      await this.wholesaleCustomerService.dispose();
-    }
-    if (this.collectionAnalyticsService?.dispose) {
-      await this.collectionAnalyticsService.dispose();
-    }
+    this.replenishmentService = undefined;
+    this.forecastService = undefined;
+    this.sizeOptimizer = undefined;
+    this.wholesaleService = undefined;
+    this.alertsService = undefined;
+    this.trendService = undefined;
+    this.wholesaleCustomerService = undefined;
+    this.collectionAnalyticsService = undefined;
   }
 
   /**

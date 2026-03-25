@@ -3,6 +3,7 @@
  * Executes playbook actions and manages playbook runs
  */
 
+import { Prisma, AppRole } from '@vayva/db';
 import { prisma } from '../lib/prisma';
 import {
   Playbook,
@@ -73,12 +74,20 @@ export class PlaybookExecutor {
     // Get store data for templating
     const store = await prisma.store.findUnique({
       where: { id: storeId },
-      include: { owner: true },
+      include: {
+        memberships: {
+          where: { role_enum: AppRole.OWNER, status: 'ACTIVE' },
+          take: 1,
+          include: { user: true },
+        },
+      },
     });
 
     if (!store) {
       throw new Error(`Store not found: ${storeId}`);
     }
+
+    const storeContext = this.toStoreContext(store);
 
     // Create execution record
     const execution: PlaybookExecution = {
@@ -108,10 +117,10 @@ export class PlaybookExecutor {
         actionExecution.status = 'running';
 
         // Process template variables
-        const processedAction = this.processTemplates(action, store, triggerData);
+        const processedAction = this.processTemplates(action, storeContext, triggerData);
 
         // Execute the action
-        const result = await this.executeAction(processedAction, store);
+        const result = await this.executeAction(processedAction, storeContext);
 
         actionExecution.status = 'completed';
         actionExecution.executedAt = new Date();
@@ -270,6 +279,29 @@ export class PlaybookExecutor {
     });
   }
 
+  private toStoreContext(store: {
+    id: string;
+    name: string;
+    memberships: Array<{
+      user: { firstName: string | null; phone: string | null; email: string | null };
+    }>;
+  }): {
+    id: string;
+    name: string;
+    owner: { firstName?: string | null; phone: string | null; email: string | null };
+  } {
+    const user = store.memberships[0]?.user;
+    return {
+      id: store.id,
+      name: store.name,
+      owner: {
+        firstName: user?.firstName,
+        phone: user?.phone ?? null,
+        email: user?.email ?? null,
+      },
+    };
+  }
+
   /**
    * Check if action is critical (failure should stop playbook)
    */
@@ -308,9 +340,12 @@ export class PlaybookExecutor {
           playbookId: execution.playbookId,
           storeId: execution.storeId,
           status: execution.status,
+          triggerType: 'manual',
+          triggerData: {},
+          metadata: {},
           startedAt: execution.startedAt,
           completedAt: execution.completedAt,
-          actionsExecuted: execution.actionsExecuted,
+          result: { actionsExecuted: execution.actionsExecuted } as unknown as Prisma.InputJsonValue,
           error: execution.error,
         },
       });
@@ -346,16 +381,19 @@ export class PlaybookExecutor {
       take: limit,
     });
 
-    return records.map(r => ({
-      id: r.id,
-      playbookId: r.playbookId,
-      storeId: r.storeId,
-      status: r.status as PlaybookExecution['status'],
-      startedAt: r.startedAt,
-      completedAt: r.completedAt ?? undefined,
-      actionsExecuted: r.actionsExecuted as PlaybookActionExecution[],
-      error: r.error ?? undefined,
-    }));
+    return records.map(r => {
+      const resultPayload = r.result as { actionsExecuted?: PlaybookActionExecution[] } | null;
+      return {
+        id: r.id,
+        playbookId: r.playbookId,
+        storeId: r.storeId,
+        status: r.status as PlaybookExecution['status'],
+        startedAt: r.startedAt,
+        completedAt: r.completedAt ?? undefined,
+        actionsExecuted: resultPayload?.actionsExecuted ?? [],
+        error: r.error ?? undefined,
+      };
+    });
   }
 
   /**
@@ -375,7 +413,8 @@ export class PlaybookExecutor {
     const failed = executions.filter(e => e.status === 'failed').length;
 
     const totalActions = executions.reduce((sum, e) => {
-      const actions = e.actionsExecuted as PlaybookActionExecution[];
+      const payload = e.result as { actionsExecuted?: PlaybookActionExecution[] } | null;
+      const actions = payload?.actionsExecuted ?? [];
       return sum + actions.filter(a => a.status === 'completed').length;
     }, 0);
 

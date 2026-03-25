@@ -8,8 +8,8 @@
  * - Installation order calculation
  */
 
-import { AddOnDefinition } from '../../types';
-import { satisfies, parseVersion } from './versioning';
+import type { AddOnDefinition } from '../types';
+import { satisfies } from './versioning';
 
 // ============================================================================
 // Types
@@ -105,7 +105,7 @@ export class CompatibilityEngine {
   /**
    * Register known conflicts between add-ons
    */
-  registerConflict(addOnId1: string, addOnId2: string, reason: string): void {
+  registerConflict(addOnId1: string, addOnId2: string, _reason: string): void {
     const c1 = this.conflicts.get(addOnId1) || [];
     const c2 = this.conflicts.get(addOnId2) || [];
     

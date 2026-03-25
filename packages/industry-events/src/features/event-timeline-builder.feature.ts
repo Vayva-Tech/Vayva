@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Timeline Builder Feature
  */

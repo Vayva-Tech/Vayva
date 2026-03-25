@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { useForm, UseFormReturn } from 'react-hook-form';
@@ -436,34 +436,35 @@ export function PatientIntakeForms({
         {/* Navigation Buttons */}
         <div className="mt-8 flex justify-between border-t pt-6">
           {step > 1 && (
-            <button
+            <Button
               type="button"
               onClick={handleBack}
               className="px-6 py-2.5 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               ← Back
-            </button>
+            </Button>
           )}
           
           {step < 4 ? (
-            <button
+            <Button
               type="button"
               onClick={handleNext}
               className="ml-auto px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Next →
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
               className="ml-auto px-6 py-2.5 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Forms'}
-            </button>
+            </Button>
           )}
         </div>
       </form>
     </div>
   );
 }
+

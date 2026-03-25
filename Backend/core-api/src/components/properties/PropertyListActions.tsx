@@ -6,7 +6,7 @@ import { Button, Modal } from "@vayva/ui";
 import {
   PencilSimple as Pencil,
   Trash as Trash2,
-  Spinner as Loader2,
+  Spinner as Loader2
 } from "@phosphor-icons/react/ssr";
 import { RealEstateForm } from "./RealEstateForm";
 import { toast } from "sonner";

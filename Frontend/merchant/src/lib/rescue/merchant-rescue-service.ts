@@ -1,6 +1,5 @@
 import { prisma, type RescueIncident } from "@vayva/db";
 import { logger } from "@vayva/shared";
-import Groq from "groq-sdk";
 
 interface IncidentReport {
     errorMessage: string;
@@ -16,10 +15,6 @@ interface AiAnalysis {
     USER_FACING_ACTION?: string;
     remediation?: string;
 }
-
-const groq = new Groq({
-    apiKey: process.env?.GROQ_API_KEY_RESCUE || process.env?.GROQ_API_KEY || "",
-});
 
 export class MerchantRescueService {
     static async reportIncident(data: IncidentReport): Promise<RescueIncident> {
@@ -63,11 +58,24 @@ export class MerchantRescueService {
         if (!incident)
             return;
         try {
-            const completion = await groq.chat?.completions.create({
-                messages: [
-                    {
-                        role: "system",
-                        content: `
+            const apiKey = process.env.OPENROUTER_API_KEY || "";
+            if (!apiKey) return;
+
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://vayva.tech",
+                    "X-Title": "Vayva Merchant Rescue",
+                },
+                body: JSON.stringify({
+                    model: "google/gemini-2.5-flash",
+                    response_format: { type: "json_object" },
+                    messages: [
+                        {
+                            role: "system",
+                            content: `
               You are Vayva Rescue AI.
               Classify the error: AUTH, DATABASE, NETWORK, UI_RENDER, UNKNOWN.
               Suggest a USER-FACING-ACTION: "REFRESH", "RELOGIN", "WAIT", "CONTACT_SUPPORT".
@@ -79,13 +87,15 @@ export class MerchantRescueService {
               - App: Merchant Admin
               - Error: ${incident.errorMessage}
             `,
-                    },
-                    { role: "user", content: "Analyze this incident." },
-                ],
-                model: "llama-3.1-70b-versatile",
-                response_format: { type: "json_object" },
+                        },
+                        { role: "user", content: "Analyze this incident." },
+                    ],
+                }),
+                signal: AbortSignal.timeout(25_000),
             });
             
+            if (!response.ok) return;
+            const completion = await response.json();
             const analysis = JSON.parse(completion.choices[0]?.message?.content || "{}") as AiAnalysis;
             let nextStatus = "NEEDS_ENGINEERING";
             if (analysis.USER_FACING_ACTION === "REFRESH") {

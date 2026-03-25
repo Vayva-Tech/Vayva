@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Universal AI Insights Panel
 // ============================================================================
@@ -91,11 +90,15 @@ export function AIInsightsPanel({
   // Load insights
   const loadInsights = async () => {
     try {
-      const data = await apiJson(`/api/ai/insights?storeId=${storeId}&industry=${industry}`);
+      const data = await apiJson<{
+        success?: boolean;
+        insights?: AIInsight[];
+        forecasts?: PredictiveForecast[];
+      }>(`/api/ai/insights?storeId=${storeId}&industry=${industry}`);
 
       if (data.success) {
-        setInsights(data.insights || []);
-        setForecasts(data.forecasts || []);
+        setInsights(data.insights ?? []);
+        setForecasts(data.forecasts ?? []);
       }
     } catch (error) {
       console.error('Failed to load AI insights:', error);
@@ -174,7 +177,7 @@ export function AIInsightsPanel({
               anomaly detection, and automated recommendations.
             </AlertDescription>
           </Alert>
-          <Button variant="primary" className="w-full" onClick={() => window.location.href = '/dashboard/settings/subscription'}>
+          <Button variant="default" className="w-full" onClick={() => window.location.href = '/dashboard/settings/subscription'}>
             Upgrade to Pro Plan
           </Button>
         </CardContent>

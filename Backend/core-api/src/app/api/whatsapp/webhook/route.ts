@@ -5,8 +5,7 @@ import { QUEUES } from "@vayva/shared";
 import { getRedis } from "@vayva/redis";
 
 // Evolution API message types that we handle
-const SUPPORTED_MEDIA_TYPES = ["audio", "voice", "image", "video", "document"] as const;
-type MediaType = (typeof SUPPORTED_MEDIA_TYPES)[number];
+type MediaType = "audio" | "voice" | "image" | "video" | "document";
 
 interface MediaInfo {
   type: MediaType | "text";

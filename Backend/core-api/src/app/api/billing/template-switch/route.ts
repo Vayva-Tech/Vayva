@@ -5,7 +5,7 @@ import { PERMISSIONS } from "@/lib/team/permissions";
 import {
   calculateTemplateSwitchPrice,
   formatPrice,
-  normalizePlan,
+  normalizePlan
 } from "@/lib/templates/pricing";
 import { randomUUID } from "crypto";
 import { Paystack } from "@vayva/payments";

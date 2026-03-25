@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Collection Analytics Service
  * Track and analyze fashion collection performance, seasonality, and trends

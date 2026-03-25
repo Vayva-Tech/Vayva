@@ -10,7 +10,7 @@ class FashionEngine {
   }
   
   async initialize() {
-    console.log('[FASHION_ENGINE] Initialized');
+    console.warn('[FASHION_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

@@ -1,30 +1,36 @@
-// @ts-nocheck
 /**
  * Referral Analytics API Route
  * GET /api/merchant/referrals/analytics - Get referral program analytics
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
+  let storeId: string | undefined;
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
 
     const result = await apiJson<{
       success: boolean;
-      analytics?: any;
+      analytics?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/referrals/analytics`, {
-      headers: { "x-store-id": storeId },
+    }>(buildBackendUrl("/api/merchant/referrals/analytics"), {
+      headers: auth.headers,
     });
 
     return NextResponse.json({ analytics: result.analytics ?? result });
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, {
       endpoint: "/api/merchant/referrals/analytics",
       operation: "GET_REFERRALS",
+      storeId,
     });
     return NextResponse.json(
       { error: "Failed to fetch referral analytics" },

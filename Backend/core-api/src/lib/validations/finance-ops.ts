@@ -10,11 +10,16 @@ export const ShipmentQuerySchema = z.object({
 });
 
 export const PayoutCreateSchema = z.object({
+  // Amount in NGN (not kobo)
   amount: z.number().positive("Amount must be positive"),
   currency: z.string().default("NGN"),
+  // Affiliate payouts are typically instant; allow manual as a fallback.
+  instant: z.boolean().optional().default(true),
   bankDetails: z.object({
     accountNumber: z.string().min(10),
     bankCode: z.string(),
     accountName: z.string(),
+    // Optional optimization: if already created and stored client-side.
+    recipientCode: z.string().optional(),
   }),
 });

@@ -1,17 +1,17 @@
-// @ts-nocheck
-import type {
-  Vehicle,
-  VehicleStatus,
-  VehicleCondition,
-  TestDrive,
-  TestDriveStatus,
-  FinancingApplication,
-  FinancingStatus,
-  ServiceAppointment,
-  ServiceType,
-  AutomotiveAnalytics,
-  TradeInEvaluation,
-  AcquisitionType,
+import {
+  VehicleSchema,
+  type Vehicle,
+  type VehicleStatus,
+  type VehicleCondition,
+  type TestDrive,
+  type TestDriveStatus,
+  type FinancingApplication,
+  type FinancingStatus,
+  type ServiceAppointment,
+  type ServiceType,
+  type AutomotiveAnalytics,
+  type TradeInEvaluation,
+  type AcquisitionType,
 } from '../types';
 import { TradeInEvaluationSchema } from '../types/acquisition.types';
 
@@ -79,14 +79,39 @@ export class VehicleAcquisitionService {
       tradeInId?: string;
     }
   ): Promise<Vehicle> {
-    const vehicle: Vehicle = {
-      ...acquisitionData.vehicleData,
+    const partial = acquisitionData.vehicleData;
+    const vehicle = VehicleSchema.parse({
       id: `veh_${Date.now()}`,
-      tenantId: acquisitionData.vehicleData.tenantId!,
+      tenantId: partial.tenantId!,
+      vin:
+        partial.vin && partial.vin.length === 17
+          ? partial.vin
+          : '0'.repeat(17),
+      make: partial.make ?? 'Unknown',
+      model: partial.model ?? 'Unknown',
+      year: partial.year ?? new Date().getFullYear(),
+      trim: partial.trim,
+      color: partial.color ?? 'unspecified',
+      interiorColor: partial.interiorColor,
+      condition: partial.condition ?? 'used',
       status: 'available',
+      mileage: partial.mileage ?? 0,
+      fuelType: partial.fuelType ?? 'petrol',
+      transmission: partial.transmission ?? 'automatic',
+      engineSize: partial.engineSize,
+      horsepower: partial.horsepower,
+      bodyType: partial.bodyType,
+      price: partial.price ?? 0,
+      negotiable: partial.negotiable ?? true,
+      features: partial.features ?? [],
+      imageUrls: partial.imageUrls ?? [],
+      description: partial.description,
+      warrantyMonths: partial.warrantyMonths ?? 0,
+      inspectionReport: partial.inspectionReport,
+      locationId: partial.locationId,
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
+    });
 
     await this.db.vehicle.create({ data: vehicle });
 
@@ -130,24 +155,31 @@ export class VehicleAcquisitionService {
   }> {
     const startDate = this.getPeriodStartDate(period);
     
-    const acquisitions = await this.db.vehicleAcquisition.findMany({
+    const acquisitions = (await this.db.vehicleAcquisition.findMany({
       where: {
         tenantId,
         date: { gte: startDate },
       },
       include: { tradeInEvaluation: true },
-    });
+    })) as Array<{
+      type: AcquisitionType;
+      cost: number;
+      tradeInEvaluation?: { tradeInValue: number } | null;
+    }>;
 
-    const byType = {
-      purchase: acquisitions.filter(a => a.type === 'purchase').length,
-      trade_in: acquisitions.filter(a => a.type === 'trade_in').length,
-      consignment: acquisitions.filter(a => a.type === 'consignment').length,
+    const byType: Record<AcquisitionType, number> = {
+      purchase: acquisitions.filter((a) => a.type === 'purchase').length,
+      trade_in: acquisitions.filter((a) => a.type === 'trade_in').length,
+      consignment: acquisitions.filter((a) => a.type === 'consignment').length,
     };
 
-    const totalCost = acquisitions.reduce((sum, acq) => sum + acq.cost, 0);
+    const totalCost = acquisitions.reduce((sum: number, acq) => sum + acq.cost, 0);
     const tradeInValues = acquisitions
-      .filter(a => a.tradeInEvaluation)
-      .reduce((sum, acq) => sum + (acq.tradeInEvaluation?.tradeInValue || 0), 0);
+      .filter((a) => a.tradeInEvaluation)
+      .reduce(
+        (sum: number, acq) => sum + (acq.tradeInEvaluation?.tradeInValue ?? 0),
+        0
+      );
 
     return {
       totalAcquired: acquisitions.length,

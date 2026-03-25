@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 86 Manager Service
  * Manages sold-out items across all channels
@@ -6,7 +5,7 @@
 
 import {
   type EightySixConfig,
-  type EightySixItem,
+  type PosEightySixItem,
   type EightySixReason,
   type EightySixChannel,
   type EightySixEvent,
@@ -34,7 +33,7 @@ export interface RestockAction {
 
 export class EightySixService {
   private config: EightySixConfig;
-  private active86s: Map<string, EightySixItem> = new Map();
+  private active86s: Map<string, PosEightySixItem> = new Map();
   private history: EightySixEvent[] = [];
   private autoRules: Map<string, Auto86Rule> = new Map();
   private listeners: Set<(event: EightySixEvent) => void> = new Set();
@@ -55,7 +54,7 @@ export class EightySixService {
   /**
    * 86 an item (mark as sold out)
    */
-  async eightySixItem(action: EightySixAction): Promise<EightySixItem> {
+  async eightySixItem(action: EightySixAction): Promise<PosEightySixItem> {
     const id = this.generateId();
     const now = new Date();
 
@@ -73,7 +72,7 @@ export class EightySixService {
       ? action.channels
       : this.config.channelSync;
 
-    const eightySixItem: EightySixItem = {
+    const eightySixItem: PosEightySixItem = {
       id,
       menuItemId: action.menuItemId,
       name: action.name,
@@ -116,7 +115,7 @@ export class EightySixService {
   /**
    * Restock an item (remove 86)
    */
-  async restockItem(action: RestockAction): Promise<EightySixItem | undefined> {
+  async restockItem(action: RestockAction): Promise<PosEightySixItem | undefined> {
     const item = this.active86s.get(action.eightySixId);
     if (!item) return undefined;
 
@@ -155,7 +154,7 @@ export class EightySixService {
   /**
    * Get active 86s
    */
-  getActive86s(): EightySixItem[] {
+  getActive86s(): PosEightySixItem[] {
     return Array.from(this.active86s.values())
       .filter(item => item.isActive)
       .sort((a, b) => b.eightySixedAt.getTime() - a.eightySixedAt.getTime());
@@ -164,7 +163,7 @@ export class EightySixService {
   /**
    * Get 86 by ID
    */
-  getEightySix(id: string): EightySixItem | undefined {
+  getEightySix(id: string): PosEightySixItem | undefined {
     return this.active86s.get(id);
   }
 
@@ -270,11 +269,11 @@ export class EightySixService {
     currentQuantity: number,
     userId: string,
     userName: string
-  ): Promise<EightySixItem[]> {
+  ): Promise<PosEightySixItem[]> {
     if (!this.config.auto86) return [];
 
     const affectedMenuItems = this.ingredientToItems.get(ingredientId) || [];
-    const eightySixedItems: EightySixItem[] = [];
+    const eightySixedItems: PosEightySixItem[] = [];
 
     // Check if below threshold
     if (currentQuantity <= this.config.thresholdQuantity) {
@@ -328,7 +327,7 @@ export class EightySixService {
     newEstimatedRestock: Date,
     userId: string,
     userName: string
-  ): Promise<EightySixItem | undefined> {
+  ): Promise<PosEightySixItem | undefined> {
     const item = this.active86s.get(eightySixId);
     if (!item) return undefined;
 
@@ -372,7 +371,7 @@ export class EightySixService {
   /**
    * Get items that will be restocked soon
    */
-  getUpcomingRestocks(withinMinutes: number = 30): EightySixItem[] {
+  getUpcomingRestocks(withinMinutes: number = 30): PosEightySixItem[] {
     const cutoff = new Date(Date.now() + withinMinutes * 60000);
     return this.getActive86s().filter(
       item => item.estimatedRestock && item.estimatedRestock <= cutoff
@@ -380,7 +379,7 @@ export class EightySixService {
   }
 
   private async syncToChannels(
-    item: EightySixItem,
+    item: PosEightySixItem,
     action: 'disable' | 'enable'
   ): Promise<void> {
     // This would integrate with:
@@ -402,7 +401,7 @@ export class EightySixService {
 
   private async syncToChannel(
     channel: EightySixChannel,
-    item: EightySixItem,
+    item: PosEightySixItem,
     action: 'disable' | 'enable'
   ): Promise<void> {
     // Implementation would depend on channel-specific APIs
@@ -411,7 +410,7 @@ export class EightySixService {
   }
 
   private async notifyStaff(
-    item: EightySixItem,
+    item: PosEightySixItem,
     type: 'new_86' | 'restocked' | 'low_inventory_warning'
   ): Promise<void> {
     const notification: EightySixNotification = {
@@ -460,7 +459,7 @@ export class EightySixService {
     return affected;
   }
 
-  private findInHistory(itemId: string): EightySixItem | undefined {
+  private findInHistory(itemId: string): PosEightySixItem | undefined {
     // Search through history to find item details
     const event = this.history.find(e => e.itemId === itemId);
     if (!event) return undefined;

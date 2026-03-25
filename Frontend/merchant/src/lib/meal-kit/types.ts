@@ -1,18 +1,16 @@
-// @ts-nocheck
 // ============================================================================
 // Meal Kit API Type Definitions
 // Centralized TypeScript types for all meal kit API operations
 // ============================================================================
 
 import { z } from 'zod';
-import type { 
-  MealKitSubscription, 
-  WeeklyMenu, 
-  MealKitRecipe, 
-  CustomerMealPreference, 
+import type {
+  MealKitSubscription,
+  WeeklyMenu,
+  MealKitRecipe,
+  CustomerMealPreference,
   DeliverySlot,
-  MealKitPlanType as PrismaMealKitPlanType 
-} from '@prisma/client';
+} from '../../../../../infra/db/src/generated/client';
 
 // ============================================================================
 // Plan Types

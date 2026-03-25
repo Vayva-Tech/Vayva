@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
+/**
+ * Proxies marketing checkout initialization to the core backend.
+ *
+ * **Contract (backend `POST .../api/public/checkout/init`, outside this repo):**
+ * - Request body must include `billingCycle` (`"monthly"` | `"quarterly"`) when the UI sends it.
+ * - Charged amount must match `getPlanPriceForCycle(monthlyAmount, billingCycle)` (same rules as
+ *   marketing `pricing.ts` / merchant `verify` route).
+ * - Paystack initialization metadata must include `billingCycle` (and plan identifiers) so
+ *   `POST .../api/public/checkout/verify` can recompute the expected amount and reject mismatches.
+ */
 export async function POST(request: NextRequest) {
   try {
     const storeId = request.headers.get("x-store-id") || "";

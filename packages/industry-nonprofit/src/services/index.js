@@ -9,7 +9,7 @@ export class DonorManagementService {
   }
   
   async initialize() {
-    console.log('[DONOR_MANAGEMENT_SERVICE] Initialized');
+    console.warn('[DONOR_MANAGEMENT_SERVICE] Initialized');
   }
   
   async addDonor(donorData) {
@@ -56,7 +56,7 @@ export class CampaignManagerService {
   }
   
   async initialize() {
-    console.log('[CAMPAIGN_MANAGER_SERVICE] Initialized');
+    console.warn('[CAMPAIGN_MANAGER_SERVICE] Initialized');
   }
   
   async createCampaign(campaignData) {
@@ -93,7 +93,7 @@ export class GrantTrackerService {
   }
   
   async initialize() {
-    console.log('[GRANT_TRACKER_SERVICE] Initialized');
+    console.warn('[GRANT_TRACKER_SERVICE] Initialized');
   }
   
   async addGrant(grantData) {

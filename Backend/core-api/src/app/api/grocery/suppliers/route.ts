@@ -71,7 +71,7 @@ export const GET = withVayvaAPI(
         ];
       }
 
-      const [suppliers, total] = await Promise.all([
+      const [suppliers, _total] = await Promise.all([
         prisma.grocerySupplier.findMany({
           where,
           include: {

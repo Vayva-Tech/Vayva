@@ -1,8 +1,7 @@
-// @ts-nocheck
 "use client";
 
 import { logger } from "@vayva/shared";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Avatar, Button, Icon, IconName, cn } from "@vayva/ui";
@@ -19,6 +18,8 @@ import {
   ChevronDown,
   LogOut,
   Menu,
+  Globe,
+  Plus,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { StoreProvider } from "@/context/StoreContext";
@@ -79,6 +80,7 @@ interface BootstrapResponse {
       enabledExtensionIds?: string[];
       externalManifests?: Record<string, unknown>[];
       logoUrl?: string;
+      businessName?: string;
       features?: {
         socials?: { enabled: boolean };
         transactions?: { enabled: boolean };
@@ -101,6 +103,7 @@ interface BootstrapResponse {
     enabledExtensionIds?: string[];
     externalManifests?: Record<string, unknown>[];
     logoUrl?: string;
+    businessName?: string;
     features?: {
       socials?: { enabled: boolean };
       transactions?: { enabled: boolean };
@@ -124,6 +127,17 @@ interface StorefrontUrlResponse {
 
 interface StorefrontStatusResponse {
   status: "live" | "draft";
+}
+
+/** Title-case a storefront subdomain (e.g. luxe-fashion → Luxe Fashion) for sidebar fallback. */
+function storeTitleFromSubdomain(storeLink: string): string {
+  const host =
+    storeLink.replace(/^https?:\/\//, "").split("/")[0]?.split(":")[0] ?? "";
+  const sub = host.split(".")[0]?.trim() ?? "";
+  if (!sub || sub === "www") return "";
+  return sub
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export const AdminShell = ({
@@ -151,6 +165,7 @@ export const AdminShell = ({
     );
   })();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [isSidebarPinned, setIsSidebarPinned] = useState(false);
 
@@ -165,6 +180,23 @@ export const AdminShell = ({
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!showUserMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowUserMenu(false);
+    };
+    const onDown = (e: MouseEvent) => {
+      const el = userMenuRef.current;
+      if (el && !el.contains(e.target as Node)) setShowUserMenu(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [showUserMenu]);
 
   const toggleSidebar = () => {
     const nextPinned = !isSidebarPinned;
@@ -183,6 +215,7 @@ export const AdminShell = ({
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [mobileStoreSheetOpen, setMobileStoreSheetOpen] = useState(false);
   const [savedMobileNavConfig] = useLocalStorage<MobileNavConfig>(
     "vayva_mobile_nav_config",
     DEFAULT_MOBILE_NAV_CONFIG,
@@ -203,6 +236,20 @@ export const AdminShell = ({
   const [storeDisplayName, setStoreDisplayName] = useState<string>(
     merchant?.store?.name || merchant?.businessName || "My Store",
   );
+
+  useEffect(() => {
+    if (!merchant) return;
+    const m = merchant as {
+      store?: { name?: string };
+      businessName?: string;
+    };
+    const fromStore =
+      typeof m.store?.name === "string" ? m.store.name.trim() : "";
+    const fromBusiness =
+      typeof m.businessName === "string" ? m.businessName.trim() : "";
+    const next = fromStore || fromBusiness;
+    if (next) setStoreDisplayName(next);
+  }, [merchant]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -230,6 +277,11 @@ export const AdminShell = ({
 
         if (typeof storeData?.name === "string" && storeData.name.trim()) {
           setStoreDisplayName(storeData.name.trim());
+        } else if (
+          typeof merchantData.businessName === "string" &&
+          merchantData.businessName.trim()
+        ) {
+          setStoreDisplayName(merchantData.businessName.trim());
         }
 
         setIsSocialsEnabled(
@@ -320,6 +372,7 @@ export const AdminShell = ({
     if (
       !industrySlug &&
       !merchant?.onboardingCompleted &&
+      pathname &&
       !pathname.startsWith("/onboarding")
     ) {
       router.push("/onboarding");
@@ -329,6 +382,7 @@ export const AdminShell = ({
   useEffect(() => {
     setMobileMenuOpen(false);
     setMobileMoreOpen(false);
+    setMobileStoreSheetOpen(false);
   }, [pathname]);
 
   const handleVisitStore = (e: React.MouseEvent) => {
@@ -369,10 +423,19 @@ export const AdminShell = ({
     }
   };
 
+  const canAddProduct =
+    normalizeSidebarHref(pathname) === "/dashboard/products" ||
+    normalizeSidebarHref(pathname).startsWith("/dashboard/products/");
+
   const initials = user
     ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`
     : "FD";
   const merchantName = merchant?.firstName || user?.firstName || "Merchant";
+
+  const sidebarStoreTitle =
+    storeDisplayName.trim() ||
+    storeTitleFromSubdomain(storeLink) ||
+    "My Store";
 
   const baseGroups = _isLoadingIndustry
     ? [
@@ -493,7 +556,7 @@ export const AdminShell = ({
             />
           )}
 
-          {/* Clean white sidebar - permanently expanded on desktop */}
+          {/* Clean white sidebar */}
           <aside
             className={cn(
               "fixed md:relative h-full z-50 flex flex-col text-gray-900 overflow-hidden bg-white border-r border-gray-100",
@@ -501,15 +564,15 @@ export const AdminShell = ({
             )}
           >
             {/* Top branding block */}
-            <div className="h-14 flex items-center justify-start px-3 shrink-0 border-b border-gray-50">
-              <div className="flex items-center gap-2 flex-1">
-                <div className="w-8 h-8 rounded-xl bg-green-500 flex items-center justify-center">
+            <div className="px-3 py-2 shrink-0 border-b border-gray-50">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-white">
                   <Logo href="/dashboard" size="sm" showText={false} />
                 </div>
                 {(isMobile || isSidebarExpanded) && (
-                  <div className="flex flex-col">
+                  <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-sm font-semibold text-gray-900 truncate">
-                      {storeDisplayName || merchantName || "Merchant"}
+                      {sidebarStoreTitle}
                     </span>
                     {storeLink && (
                       <a
@@ -523,37 +586,44 @@ export const AdminShell = ({
                     )}
                     {!storeLink && (
                       <span className="text-xs text-gray-400 truncate">
-                        {storeDisplayName}
+                        {sidebarStoreTitle}
                       </span>
                     )}
+                    <Breadcrumbs className="mt-1 text-[11px] text-gray-400" />
                   </div>
                 )}
+                {!(isMobile || isSidebarExpanded) && (
+                  <span className="sr-only">{sidebarStoreTitle}</span>
+                )}
               </div>
-              {isMobile ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-xl hover:bg-gray-100 text-gray-500 ml-auto"
-                >
-                  <X size={20} />
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleSidebar}
-                  className="rounded-xl hover:bg-gray-100 text-gray-400 ml-auto"
-                  title={isSidebarPinned ? "Collapse sidebar" : "Pin sidebar"}
-                  aria-label={isSidebarPinned ? "Collapse sidebar" : "Pin sidebar"}
-                >
-                  {isSidebarPinned ? (
-                    <PanelLeftClose size={16} />
-                  ) : (
-                    <PanelLeftOpen size={16} />
-                  )}
-                </Button>
-              )}
+              <div className="mt-2 flex items-center justify-end">
+                {isMobile ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-xl hover:bg-gray-100 text-gray-500"
+                    aria-label="Close navigation"
+                  >
+                    <X size={20} />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleSidebar}
+                    className="rounded-xl hover:bg-gray-100 text-gray-400"
+                    title={isSidebarPinned ? "Collapse sidebar" : "Pin sidebar"}
+                    aria-label={isSidebarPinned ? "Collapse sidebar" : "Pin sidebar"}
+                  >
+                    {isSidebarPinned ? (
+                      <PanelLeftClose size={16} />
+                    ) : (
+                      <PanelLeftOpen size={16} />
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
 
             {/* Navigation groups with collapsible sections */}
@@ -663,13 +733,13 @@ export const AdminShell = ({
                   <Icon name="Settings" size={20} className={cn(normalizeSidebarHref(pathname).startsWith("/dashboard/settings") ? "text-green-600" : "text-gray-400")} />
                   {(isMobile || isSidebarExpanded) && <span className="truncate">Settings</span>}
                 </Link>
-                <button
+                <Button
                   onClick={() => router.push('/dashboard/settings/team?invite=true')}
                   className="flex items-center gap-3 px-2 py-2 rounded-xl text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors w-full"
                 >
                   <Icon name="UsersThree" size={20} className="text-gray-400" />
                   {(isMobile || isSidebarExpanded) && <span className="truncate">Invite Team</span>}
-                </button>
+                </Button>
               </div>
               
               {/* User profile section */}
@@ -696,13 +766,13 @@ export const AdminShell = ({
                   )}
                 </Link>
                 {(isMobile || isSidebarExpanded) && (
-                  <button
+                  <Button
                     onClick={() => logout()}
                     className="flex items-center gap-3 px-2 py-2 mt-1 rounded-xl text-sm text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors w-full"
                   >
                     <LogOut size={18} className="text-red-400" />
-                    <span className="truncate">Sign Out</span>
-                  </button>
+                    <span className="truncate">Sign out</span>
+                  </Button>
                 )}
               </div>
             </div>
@@ -712,23 +782,32 @@ export const AdminShell = ({
           <main className="flex-1 h-full flex flex-col relative overflow-hidden bg-white">
             <TrialBanner />
             <GlobalBanner />
-            {/* Clean white header - h-14 (56px) */}
-            <header className="h-14 w-full px-6 shrink-0 relative z-30 bg-white border-b border-gray-100">
-              <div className="h-full flex items-center justify-between gap-4">
-                {/* Left: Back button + Breadcrumbs */}
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {/* Back button - shows on sub-pages only */}
-                  {pathname !== '/dashboard' && (
-                    <button
+            {/* Header: safe-area inset above the bar; frosted glass on small screens */}
+            <header className="w-full shrink-0 relative z-30 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
+              <div className="pt-safe-top md:pt-0">
+                <div className="h-14 w-full px-4 md:px-6 flex items-center justify-between gap-2 md:gap-4">
+                {/* Left: Menu + Back */}
+                <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+                  {isMobile && (
+                    <Button
+                      type="button"
+                      onClick={() => setMobileMenuOpen(true)}
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
+                      aria-label="Open navigation menu"
+                    >
+                      <PanelLeftOpen size={22} strokeWidth={2} />
+                    </Button>
+                  )}
+                  {pathname !== "/dashboard" && (
+                    <Button
+                      type="button"
                       onClick={() => router.back()}
-                      className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500"
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
                       aria-label="Go back"
                     >
-                      <Icon name="ArrowLeft" size={18} />
-                    </button>
+                      <Icon name="ArrowLeft" size={20} />
+                    </Button>
                   )}
-                  {/* Breadcrumb trail */}
-                  <Breadcrumbs className="flex items-center gap-2 text-sm text-gray-400" />
                 </div>
 
                 {/* Center: Search bar */}
@@ -752,15 +831,87 @@ export const AdminShell = ({
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
-                    onClick={() => typeof window !== 'undefined' && (window as any).triggerCommandPalette?.()}
+                <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+                  <Button
+                    type="button"
+                    className="md:hidden min-w-[44px] min-h-[44px] rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center"
+                    onClick={() =>
+                      typeof window !== "undefined" &&
+                      (window as Window & { triggerCommandPalette?: () => void }).triggerCommandPalette?.()
+                    }
                     aria-label="Search"
                   >
                     <Search size={20} className="text-gray-600" />
-                  </button>
-                  <Button variant="outline" size="sm" onClick={handlePreview} className="rounded-xl h-9 px-3 gap-2">
+                  </Button>
+                  {storeLink ? (
+                    <a
+                      href={
+                        storeLink.startsWith("http")
+                          ? storeLink
+                          : `https://${storeLink}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleVisitStore}
+                      className="md:hidden inline-flex items-center gap-1.5 rounded-xl h-9 px-3 border border-gray-200 bg-white text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                      aria-label="Open merchant website"
+                    >
+                      <Globe size={16} className="text-gray-500" />
+                      <span>Website</span>
+                    </a>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setMobileStoreSheetOpen(true)}
+                      className="md:hidden rounded-xl h-9 px-3 gap-1.5 border-gray-200"
+                      aria-label="Store and publishing"
+                    >
+                      <ExternalLink size={16} className="text-gray-500" />
+                      <span className="text-sm font-medium text-gray-800">
+                        Store
+                      </span>
+                    </Button>
+                  )}
+
+                  {canAddProduct && (
+                    <Link
+                      href="/dashboard/products/new"
+                      className="hidden md:inline-flex items-center gap-2 rounded-xl bg-green-500 px-4 h-9 text-sm font-medium text-white shadow-sm hover:bg-green-600 transition-colors"
+                      aria-label="Add product"
+                    >
+                      <Plus size={16} />
+                      Add Product
+                    </Link>
+                  )}
+
+                  {storeLink ? (
+                    <a
+                      href={
+                        storeLink.startsWith("http")
+                          ? storeLink
+                          : `https://${storeLink}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleVisitStore}
+                      className="hidden md:inline-flex items-center gap-2 rounded-xl h-9 px-3 border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      aria-label="Open merchant website"
+                      title="Open website"
+                    >
+                      <Globe size={16} className="text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Website
+                      </span>
+                    </a>
+                  ) : null}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePreview}
+                    className="hidden md:inline-flex rounded-xl h-9 px-3 gap-2"
+                  >
                     <Eye size={16} className="text-gray-400" />
                     <span className="text-sm font-medium text-gray-700">Preview</span>
                   </Button>
@@ -768,7 +919,7 @@ export const AdminShell = ({
                     size="sm"
                     onClick={handlePublish}
                     disabled={isPublishing}
-                    className="rounded-full h-9 px-4 gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium"
+                    className="hidden md:inline-flex rounded-full h-9 px-4 gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium"
                   >
                     {isPublishing ? (
                       <Loader2 size={16} className="animate-spin" />
@@ -777,9 +928,10 @@ export const AdminShell = ({
                     )}
                     <span>Publish</span>
                   </Button>
-                  {/* Credit Balance Widget */}
-                  <CreditBalanceWidget />
-                  
+                  <div className="hidden md:block">
+                    <CreditBalanceWidget />
+                  </div>
+
                   <div className="h-4 w-px bg-gray-200 mx-1 hidden sm:block" />
                   <NotificationBell
                     isOpen={isNotifOpen}
@@ -789,12 +941,14 @@ export const AdminShell = ({
                     isOpen={isNotifOpen}
                     onClose={() => setIsNotifOpen(false)}
                   />
-                  <div className="relative">
-                    <button
+                  <div className="relative" ref={userMenuRef}>
+                    <Button
+                      type="button"
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-2 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 p-1 rounded-xl hover:bg-gray-100 transition-colors"
                       id="user-menu-button"
                       aria-label="User menu"
+                      aria-expanded={showUserMenu}
                     >
                       <Avatar
                         src={storeLogo || undefined}
@@ -802,7 +956,7 @@ export const AdminShell = ({
                         className="w-8 h-8 rounded-full bg-green-500 text-white"
                       />
                       <ChevronDown size={16} className="text-gray-400 hidden sm:block" />
-                    </button>
+                    </Button>
                     {showUserMenu && (
                       <div
                         className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden z-50 py-1"
@@ -830,7 +984,7 @@ export const AdminShell = ({
                             </Link>
                           ))}
                           <div className="h-px bg-gray-100 my-1" />
-                          <button
+                          <Button
                             onClick={() => {
                               logout();
                               setShowUserMenu(false);
@@ -841,24 +995,25 @@ export const AdminShell = ({
                           >
                             <LogOut size={16} />
                             Sign out
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+              </div>
             </header>
 
-            {/* Content area with proper padding */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 pb-24 md:pb-8">
-              <div className="min-h-full w-full">
-                {children}
+            {/* Content: tinted canvas on mobile, extra bottom padding for tab bar */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-5 md:px-6 md:py-6 pb-28 md:pb-8 bg-gray-50 md:bg-white">
+              <div className="min-h-full w-full dashboard-page">
+                <div className="mx-auto w-full max-w-[1600px]">{children}</div>
               </div>
             </div>
 
             {/* Mobile bottom navigation */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-5 pt-2 pb-safe z-40 flex justify-between items-center">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-between items-center border-t border-gray-100/90 bg-white/95 backdrop-blur-lg px-4 pt-2 pb-safe-bottom shadow-[0_-8px_30px_-12px_rgba(15,23,42,0.12)]">
               {bottomNavItems.map((item) => {
                 const isActive =
                   normalizeSidebarHref(pathname) ===
@@ -867,7 +1022,7 @@ export const AdminShell = ({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex flex-col items-center justify-center gap-0.5 min-w-[58px] min-h-[52px] relative"
+                    className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[48px] max-h-[52px] relative touch-manipulation active:opacity-80"
                     aria-label={item.name}
                     aria-current={isActive ? "page" : undefined}
                   >
@@ -895,7 +1050,7 @@ export const AdminShell = ({
               <Button
                 variant="ghost"
                 onClick={() => setMobileMoreOpen(true)}
-                className="flex flex-col items-center justify-center gap-0.5 min-w-[58px] min-h-[52px] h-auto p-0 hover:bg-transparent"
+                className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] !min-h-[48px] max-h-[52px] h-auto p-0 hover:bg-transparent touch-manipulation"
                 aria-expanded={mobileMoreOpen}
                 aria-controls="mobile-more-sheet"
                 aria-label="Open more navigation"
@@ -953,7 +1108,7 @@ export const AdminShell = ({
                       </div>
                     </div>
 
-                    <div className="px-3 pb-safe pb-4 max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
+                    <div className="px-3 pb-safe-bottom pb-4 max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
                       {moreSheetGroups.map((group: any, idx: number) => (
                         <div key={group.name || idx} className="mb-4">
                           {group.name && (
@@ -984,6 +1139,89 @@ export const AdminShell = ({
                         </div>
                       ))}
                     </div>
+                </div>
+              </>
+            )}
+
+            {/* Mobile storefront: preview, publish, credits */}
+            {isMobile && mobileStoreSheetOpen && (
+              <>
+                <div
+                  className="fixed inset-0 bg-black/50 z-50"
+                  onClick={() => setMobileStoreSheetOpen(false)}
+                  aria-hidden
+                />
+                <div
+                  className="fixed left-0 right-0 bottom-0 z-[60] bg-white border-t border-gray-100 rounded-t-2xl shadow-[0_-12px_40px_-16px_rgba(15,23,42,0.18)]"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Store and publishing"
+                >
+                  <div className="px-5 pt-3 pb-2">
+                    <div className="mx-auto h-1.5 w-12 rounded-full bg-gray-200" />
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="text-sm font-semibold text-gray-900">
+                        Storefront
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setMobileStoreSheetOpen(false)}
+                        className="rounded-xl"
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="px-4 pb-safe-bottom pb-6 space-y-3">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      className="w-full rounded-xl h-11 justify-center gap-2"
+                      onClick={() => {
+                        handlePreview();
+                        setMobileStoreSheetOpen(false);
+                      }}
+                    >
+                      <Eye size={18} />
+                      Preview site
+                    </Button>
+                    <Button
+                      type="button"
+                      className="w-full rounded-xl h-11 justify-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+                      onClick={() => {
+                        void handlePublish();
+                        setMobileStoreSheetOpen(false);
+                      }}
+                      disabled={isPublishing}
+                    >
+                      {isPublishing ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Upload size={18} />
+                      )}
+                      Publish changes
+                    </Button>
+                    {storeLink ? (
+                      <a
+                        href={
+                          storeLink.startsWith("http")
+                            ? storeLink
+                            : `https://${storeLink}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleVisitStore}
+                        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-green-600 hover:bg-green-50 transition-colors"
+                      >
+                        <ExternalLink size={16} />
+                        Open live store
+                      </a>
+                    ) : null}
+                    <div className="pt-3 border-t border-gray-100 w-full min-w-0">
+                      <CreditBalanceWidget />
+                    </div>
+                  </div>
                 </div>
               </>
             )}

@@ -4,11 +4,16 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@vayva/ui";
-import { CheckCircle2, ArrowRight, MessageCircle, CreditCard, Package, Truck, BarChart3, Users } from "lucide-react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import { APP_URL } from "@/lib/constants";
 import { landingContent } from "@/data/marketing-content";
+import { getLandingHeroTrustChips } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 
 export function HeroSection(): React.JSX.Element {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const heroStats = getLandingHeroTrustChips(starterFirstMonthFree);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center px-6 py-20 overflow-hidden">
       {/* Background Gradients */}
@@ -80,7 +85,7 @@ export function HeroSection(): React.JSX.Element {
           transition={{ delay: 0.4 }}
           className="flex flex-wrap items-center justify-center gap-8 text-sm font-semibold text-slate-600"
         >
-          {landingContent.heroStats.map((stat, i) => (
+          {heroStats.map((stat, i) => (
             <div key={i} className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               {stat}

@@ -4,7 +4,7 @@
  * Student assignment submission and grading system
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const ASSIGNMENTS_ADDON: AddOnDefinition = {
   id: 'vayva.assignments',

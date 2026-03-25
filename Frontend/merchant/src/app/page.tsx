@@ -1,39 +1,25 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { getAuthRedirect } from "@/lib/session";
-// import { LoadingSpinner } from "@vayva/ui";
+async function hasAnySessionCookie(): Promise<boolean> {
+  const store = await cookies();
+  const cookieNames = [
+    "vayva_session",
+    "session",
+    "__Secure-vayva-merchant-session",
+    "next-auth.merchant-session",
+    "__Secure-next-auth.session-token",
+    "next-auth.session-token",
+  ];
+  return cookieNames.some((name) => !!store.get(name)?.value);
+}
 
-export default function RootPage() {
-  const router = useRouter();
-  const { user, merchant, isLoading } = useAuth();
+export default async function RootPage() {
+  // Server-side redirect avoids "infinite spinner" when auth bootstrap hangs.
+  if (!(await hasAnySessionCookie())) {
+    redirect("/signin");
+  }
 
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (!user) {
-      router.replace("/signin");
-      return;
-    }
-
-    const destination = getAuthRedirect(
-      user,
-      merchant
-        ? {
-            onboardingStatus: merchant.onboardingStatus,
-            onboardingCompleted: merchant.onboardingCompleted,
-          }
-        : null,
-    );
-    router.replace(destination);
-  }, [user, merchant, isLoading, router]);
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-transparent">
-      {/* Use simple spinner if component not verified, or simple SVG */}
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-    </div>
-  );
+  // If a session cookie exists, let protected routes/server layout validate it.
+  redirect("/dashboard");
 }

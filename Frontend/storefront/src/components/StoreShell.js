@@ -5,7 +5,7 @@ import { Button } from "@vayva/ui";
 import NextLink from "next/link";
 const Link = NextLink;
 import { useStore } from "@/context/StoreContext";
-import { ShoppingBag as ShoppingBagIcon, Menu as MenuIcon, X as XIcon, Search as SearchIcon, ChevronRight as ChevronRightIcon, User as UserIcon, } from "lucide-react";
+import { ShoppingBag as ShoppingBagIcon, Menu as MenuIcon, X as XIcon, Search as SearchIcon, ChevronRight as ChevronRightIcon, User as UserIcon } from "lucide-react";
 const ShoppingBag = ShoppingBagIcon;
 const Menu = MenuIcon;
 const X = XIcon;

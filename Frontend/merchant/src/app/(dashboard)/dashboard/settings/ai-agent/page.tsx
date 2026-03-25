@@ -17,7 +17,8 @@ import {
   Info,
 } from "@phosphor-icons/react/ssr";
 import { Button, Card, Input, Label, Select, Switch, Textarea } from "@vayva/ui";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface AiAgentSettings {
   enabled: boolean;
@@ -30,6 +31,10 @@ interface AiAgentSettings {
   persuasionLevel: number;
   allowImageUnderstanding: boolean;
   allowVoiceNotes: boolean;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  oneQuestionRule?: boolean;
   lastUpdated?: string;
 }
 
@@ -196,18 +201,51 @@ export default function AiAgentSettingsPage() {
   }
 
   return (
-    <div className="max-w-4xl space-y-8 pb-12">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-          AI Agent Settings
-        </h1>
-        <p className="text-gray-500">
-          Customize your AI's personality, tone, and behavior across all social
-          channels.
-        </p>
-      </div>
+    <div className="max-w-6xl space-y-6 pb-12">
+      <PageWithInsights
+        insights={
+          <>
+            <Card className="p-6 bg-white rounded-2xl border border-gray-100">
+              <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                Agent Stats
+              </h4>
+              <div className="space-y-4">
+                <div className="bg-white  p-3 rounded-lg border border-gray-100 flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Last Synced</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {settings?.lastUpdated
+                      ? new Date(settings.lastUpdated).toLocaleDateString()
+                      : "Never"}
+                  </span>
+                </div>
+                <div className="bg-white  p-3 rounded-lg border border-gray-100 flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Automation</span>
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${settings?.enabled ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}
+                  >
+                    {settings?.enabled ? "ACTIVE" : "INACTIVE"}
+                  </span>
+                </div>
+              </div>
+            </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <Card className="p-6 bg-white rounded-2xl border border-gray-100">
+              <h4 className="font-semibold text-gray-900 mb-2">Pro Tip</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Be specific in your instructions. Mention your return policy,
+                shipping times, and top-selling products for the best results.
+              </p>
+            </Card>
+          </>
+        }
+      >
+        <PageHeader
+          title="AI Agent Settings"
+          subtitle="Customize your AI's personality, tone, and behavior across all social channels."
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-6">
@@ -395,6 +433,30 @@ export default function AiAgentSettingsPage() {
                 </div>
 
                 <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label
+                        htmlFor="oneQuestionRule"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        One-question follow-ups
+                      </Label>
+                      <p className="text-xs text-gray-400">
+                        Keep the conversation flowing by asking only one question
+                        at a time.
+                      </p>
+                    </div>
+                    <Switch
+                      id="oneQuestionRule"
+                      checked={settings?.oneQuestionRule ?? true}
+                      onCheckedChange={(checked) =>
+                        setSettings((s) =>
+                          s ? { ...s, oneQuestionRule: checked } : null,
+                        )
+                      }
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="brevityMode">Response Brevity</Label>
                     <Select
@@ -432,6 +494,107 @@ export default function AiAgentSettingsPage() {
                       <option value={2}>Sales-Focused</option>
                       <option value={3}>Highly Persuasive</option>
                     </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advanced Model Settings */}
+              <div className="pt-6 border-t border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-1.5 bg-gray-50 rounded-md text-gray-700">
+                    <Bot className="h-4 w-4" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900">Advanced</h4>
+                </div>
+                <p className="text-xs text-gray-400 mb-4">
+                  Optional. Tune model behavior for your store.
+                </p>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="model">Model</Label>
+                    <Select
+                      id="model"
+                      title="Select AI Model"
+                      className="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white "
+                      value={settings?.model || ""}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setSettings((s) =>
+                          s ? { ...s, model: e.target?.value || undefined } : null,
+                        )
+                      }
+                    >
+                      <option value="">Auto (recommended)</option>
+                      <option value="google/gemini-2.5-flash">
+                        Gemini 2.5 Flash (fast)
+                      </option>
+                      <option value="openai/gpt-4o-mini">
+                        GPT-4o mini (balanced)
+                      </option>
+                    </Select>
+                    <p className="text-xs text-gray-400">
+                      If unsure, keep Auto.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="temperature">Temperature</Label>
+                      <Input
+                        id="temperature"
+                        type="number"
+                        min={0}
+                        max={2}
+                        step={0.1}
+                        value={settings?.temperature ?? ""}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setSettings((s) =>
+                            s
+                              ? {
+                                  ...s,
+                                  temperature:
+                                    e.target.value === ""
+                                      ? undefined
+                                      : Number(e.target.value),
+                                }
+                              : null,
+                          )
+                        }
+                        placeholder="e.g. 0.1"
+                      />
+                      <p className="text-xs text-gray-400">
+                        Lower = more consistent. Higher = more creative.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="maxTokens">Max tokens</Label>
+                      <Input
+                        id="maxTokens"
+                        type="number"
+                        min={100}
+                        max={4096}
+                        step={50}
+                        value={settings?.maxTokens ?? ""}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setSettings((s) =>
+                            s
+                              ? {
+                                  ...s,
+                                  maxTokens:
+                                    e.target.value === ""
+                                      ? undefined
+                                      : Number(e.target.value),
+                                }
+                              : null,
+                          )
+                        }
+                        placeholder="e.g. 1024"
+                      />
+                      <p className="text-xs text-gray-400">
+                        Hard cap for response length (cost control).
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -690,42 +853,8 @@ Pricing Strategy: ${merchantContext.pricingStrategy}
             )}
           </Card>
         </div>
-
-        <div className="space-y-6">
-          <Card className="p-6 bg-white rounded-2xl border border-gray-100">
-            <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-500" />
-              Agent Stats
-            </h4>
-            <div className="space-y-4">
-              <div className="bg-white  p-3 rounded-lg border border-gray-100 flex items-center justify-between">
-                <span className="text-sm text-gray-500">Last Synced</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {settings?.lastUpdated
-                    ? new Date(settings.lastUpdated).toLocaleDateString()
-                    : "Never"}
-                </span>
-              </div>
-              <div className="bg-white  p-3 rounded-lg border border-gray-100 flex items-center justify-between">
-                <span className="text-sm text-gray-500">Automation</span>
-                <span
-                  className={`text-xs font-bold px-2 py-0.5 rounded-full ${settings?.enabled ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}
-                >
-                  {settings?.enabled ? "ACTIVE" : "INACTIVE"}
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-white rounded-2xl border border-gray-100">
-            <h4 className="font-semibold text-gray-900 mb-2">Pro Tip</h4>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Be specific in your instructions. Mention your return policy,
-              shipping times, and top-selling products for the best results.
-            </p>
-          </Card>
-        </div>
       </div>
+      </PageWithInsights>
     </div>
   );
 }

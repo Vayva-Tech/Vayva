@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Restaurant Industry Types
  * 
@@ -591,7 +590,8 @@ export type KPIMetric = z.infer<typeof KPIMetricSchema>;
 
 export type KitchenStation = z.infer<typeof KitchenStationSchema>;
 export type PrepItem = z.infer<typeof PrepItemSchema>;
-export type Recipe = z.infer<typeof RecipeSchema>;
+/** Menu / kitchen recipe record (Zod); distinct from costing `Recipe` in `./recipe`. */
+export type MenuRecipe = z.infer<typeof RecipeSchema>;
 
 export type AIInsight = z.infer<typeof AIInsightSchema>;
 export type DemandPrediction = z.infer<typeof DemandPredictionSchema>;

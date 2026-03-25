@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 import type { Lookbook } from '../types';
 
 export interface VisualMerchandisingBoardProps {
@@ -20,20 +20,20 @@ export const VisualMerchandisingBoard: React.FC<VisualMerchandisingBoardProps> =
         <h2 className="text-xl font-semibold text-white">Visual Merchandising</h2>
         <div className="flex gap-2">
           {onCreateLookbook && (
-            <button
+            <Button
               onClick={onCreateLookbook}
               className="px-3 py-1.5 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-lg transition-colors"
             >
               + Create Lookbook
-            </button>
+            </Button>
           )}
           {onManageAssets && (
-            <button
+            <Button
               onClick={onManageAssets}
               className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-colors"
             >
               📷 Manage Assets
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -89,13 +89,13 @@ export const VisualMerchandisingBoard: React.FC<VisualMerchandisingBoardProps> =
 
         {/* Add New Placeholder */}
         {onCreateLookbook && (
-          <button
+          <Button
             onClick={onCreateLookbook}
             className="bg-white/3 border-2 border-dashed border-white/20 hover:border-rose-400/50 rounded-xl flex flex-col items-center justify-center aspect-[3/4] transition-colors group"
           >
             <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">+</span>
             <span className="text-sm text-white/60 font-medium">New Lookbook</span>
-          </button>
+          </Button>
         )}
       </div>
 

@@ -46,7 +46,7 @@ export const GET = withVayvaAPI(
       });
 
       // Transform to required format
-      const topCustomersFormatted = topCustomers.map((customer, index) => ({
+      const topCustomersFormatted = topCustomers.map((customer, _index) => ({
         id: customer.id,
         name: customer.companyName,
         revenue: customer.orders.reduce((sum, order) => sum + order.totalAmount, 0),

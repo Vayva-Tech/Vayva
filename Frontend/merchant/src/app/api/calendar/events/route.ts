@@ -1,17 +1,21 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/calendar/events - Get all calendar events
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const dateFrom = searchParams.get("dateFrom");
     const dateTo = searchParams.get("dateTo");
-    const limit = parseInt(searchParams.get("limit") || "100");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    const limit = Number.parseInt(searchParams.get("limit") || "100", 10);
+    const offset = Number.parseInt(searchParams.get("offset") || "0", 10);
 
     const queryParams = new URLSearchParams();
     if (dateFrom) queryParams.set("dateFrom", dateFrom);
@@ -26,12 +30,10 @@ export async function GET(request: NextRequest) {
     }>(
       `${process.env.BACKEND_API_URL}/api/calendar/events?${queryParams.toString()}`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
-      }
+        headers: auth.headers,
+      },
     );
-    
+
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(
       { error: "Failed to fetch calendar events" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

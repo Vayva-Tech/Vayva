@@ -4,9 +4,9 @@
  * Manage accessibility complaints, track WCAG 2.1 AA progress
  * Monitor response times and resolution rates
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { Plus, AlertCircle, CheckCircle, Clock, TrendingUp, Download } from 'lucide-react';
 
@@ -116,17 +116,17 @@ export default function AccessibilityIssuesTracker() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+          <Button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             Export Report
-          </button>
-          <button 
+          </Button>
+          <Button 
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Log Issue
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -258,9 +258,9 @@ export default function AccessibilityIssuesTracker() {
                 </div>
               </div>
               
-              <button className="text-blue-600 hover:text-blue-900 font-medium text-sm">
+              <Button className="text-blue-600 hover:text-blue-900 font-medium text-sm">
                 View Details →
-              </button>
+              </Button>
             </div>
             
             {/* Recent Updates */}
@@ -285,12 +285,12 @@ export default function AccessibilityIssuesTracker() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Log Accessibility Issue</h2>
-                <button
+                <Button
                   onClick={() => setShowAddModal(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ✕
-                </button>
+                </Button>
               </div>
 
               <form className="space-y-6">
@@ -415,19 +415,19 @@ export default function AccessibilityIssuesTracker() {
                 </div>
 
                 <div className="flex gap-4 pt-6">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowAddModal(false)}
                     className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Create Issue
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">

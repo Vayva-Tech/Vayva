@@ -15,15 +15,15 @@ function safeSentryCaptureException(
   error: unknown,
   extra?: Record<string, unknown>
 ): void {
-  try {
-    // Dynamic import to avoid crash if @sentry/nextjs is not initialized
-    const Sentry = require("@sentry/nextjs");
-    if (typeof Sentry?.captureException === "function") {
-      Sentry.captureException(error, { extra });
-    }
-  } catch {
-    // Sentry not available or not initialized — silently ignore
-  }
+  void import("@sentry/nextjs")
+    .then((Sentry) => {
+      if (typeof Sentry?.captureException === "function") {
+        Sentry.captureException(error, { extra });
+      }
+    })
+    .catch(() => {
+      /* Sentry not available or not initialized */
+    });
 }
 
 /**

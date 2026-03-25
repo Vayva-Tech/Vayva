@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nightlife Industry Engine
  * Main orchestrator for nightlife features

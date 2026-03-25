@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
               "X-Title": "Vayva Trial Reminders",
             },
             body: JSON.stringify({
-              model: "openai/gpt-4o-mini",
+              model: "google/gemini-2.0-flash-lite-001",
               messages: [{ role: "user", content: prompt }],
             }),
           });
@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
             const data = await response.json();
             messageText = data.choices[0]?.message?.content || messageText;
           }
-        } catch (error) {
+        } catch {
           logger.warn("[TRIAL_REMINDERS] AI generation failed, using fallback");
         }
       }

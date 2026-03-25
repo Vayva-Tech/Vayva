@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
@@ -42,12 +41,12 @@ export function AffiliateWidget({
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
                 <Gift className="w-6 h-6 text-white" />
               </div>
-              <button 
+              <Button 
                 onClick={() => setIsExpanded(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
             <h3 className="font-bold text-lg mb-1">Earn with {store?.name}</h3>
             <p className="text-sm text-gray-600 mb-4">
@@ -67,22 +66,22 @@ export function AffiliateWidget({
                 </Button>
               </Link>
             </div>
-            <button 
+            <Button 
               onClick={() => setIsDismissed(true)}
               className="w-full text-center text-xs text-gray-400 mt-3 hover:text-gray-600"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <Button
             onClick={() => setIsExpanded(true)}
             className="group flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
           >
             <Gift className="w-5 h-5" />
             <span className="font-medium">Earn Money</span>
             <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -183,7 +182,7 @@ interface ShareAndEarnButtonProps {
 }
 
 export function ShareAndEarnButton({ 
-  productId, 
+  productId: _productId, 
   productName,
   className = "" 
 }: ShareAndEarnButtonProps) {
@@ -200,9 +199,9 @@ export function ShareAndEarnButton({
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-      } catch (err) {
+      } catch {
         // User cancelled or share failed
-        console.log("Share cancelled");
+        console.warn("Share cancelled");
       }
     } else {
       // Fallback - copy to clipboard
@@ -214,13 +213,13 @@ export function ShareAndEarnButton({
 
   return (
     <>
-      <button
+      <Button
         onClick={handleShare}
         className={`inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors ${className}`}
       >
         <Gift className="w-4 h-4" />
         <span>Share & Earn</span>
-      </button>
+      </Button>
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
@@ -232,3 +231,4 @@ export function ShareAndEarnButton({
     </>
   );
 }
+

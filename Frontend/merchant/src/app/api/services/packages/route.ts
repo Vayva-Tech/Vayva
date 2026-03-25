@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { apiJson } from "@/lib/api-client-shared";
@@ -21,18 +22,20 @@ const servicePackageSchema = z.object({
  * GET /api/services/packages?storeId=xxx&isActive=xxx
  * List service packages for a store
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-    const isActive = searchParams.get("isActive");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const isActive = searchParams.get("isActive");
 
     // Call backend API to fetch service packages
     const result = await apiJson<{
@@ -53,10 +56,10 @@ export async function GET(request: Request): Promise<Response> {
         inactive: number;
       };
     }>(
-      `${process.env.BACKEND_API_URL}/api/services/packages?storeId=${storeId}&isActive=${isActive || ''}`,
+      `${process.env.BACKEND_API_URL}/api/services/packages?storeId=${encodeURIComponent(storeId)}&isActive=${isActive || ''}`,
       {
-        headers: {},
-      }
+        headers: auth.headers,
+      },
     );
     
     return NextResponse.json(result);

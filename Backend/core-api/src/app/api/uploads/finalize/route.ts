@@ -9,12 +9,12 @@ import {
   NotFoundError,
   ForbiddenError,
   InternalError,
-  logger,
+  logger
 } from "@vayva/shared";
 import {
   S3Client,
   HeadObjectCommand,
-  DeleteObjectCommand,
+  DeleteObjectCommand
 } from "@aws-sdk/client-s3";
 
 function getS3Config() {

@@ -37,10 +37,12 @@
     --warning-foreground: 0 0% 98%;
   }
 
-  /* FLUID TYPOGRAPHY: Scale down UI on mobile */
+  /* Fluid type: comfortable minimum on phones (avoid “zoomed out” feel) */
   html {
-    font-size: 14px;
+    font-size: 15px;
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   @media (min-width: 768px) {
@@ -101,6 +103,8 @@
     background: #ffffff;
     background-attachment: fixed;
     min-height: 100vh;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   h1,
@@ -240,6 +244,11 @@
   
   .container-wide {
     @apply max-w-6xl mx-auto px-6;
+  }
+
+  /* Primary marketing content width (aligned with homepage / pricing). */
+  .marketing-container {
+    @apply max-w-[1400px] mx-auto px-4 sm:px-6;
   }
   
   /* Typography scale - clean hierarchy */

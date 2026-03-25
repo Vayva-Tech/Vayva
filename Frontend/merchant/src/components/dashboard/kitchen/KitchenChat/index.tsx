@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRealTimeKDS } from '@/hooks/useRealTimeKDS';
@@ -91,12 +91,11 @@ export function KitchenChat({ storeId, stationId, userId, userName }: KitchenCha
     }
 
     // Emit typing event
-    window.dispatchEvent(new CustomEvent('kds:typing', {
-      storeId,
-      stationId,
-      userId,
-      userName,
-    }));
+    window.dispatchEvent(
+      new CustomEvent('kds:typing', {
+        detail: { storeId, stationId, userId, userName },
+      }),
+    );
 
     typingTimeoutRef.current = setTimeout(() => {
       // Stop typing indicator after 2 seconds
@@ -146,7 +145,7 @@ export function KitchenChat({ storeId, stationId, userId, userName }: KitchenCha
     <div className="fixed bottom-4 right-4 z-50">
       {/* Chat Toggle Button */}
       {!isOpen ? (
-        <button
+        <Button
           onClick={() => setIsOpen(true)}
           className="p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
         >
@@ -156,7 +155,7 @@ export function KitchenChat({ storeId, stationId, userId, userName }: KitchenCha
               {messages.length}
             </span>
           )}
-        </button>
+        </Button>
       ) : (
         /* Chat Window */
         <div className="w-80 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
@@ -171,12 +170,12 @@ export function KitchenChat({ storeId, stationId, userId, userName }: KitchenCha
                 </span>
               )}
             </div>
-            <button
+            <Button
               onClick={() => setIsOpen(false)}
               className="text-blue-200 hover:text-white"
             >
               ✕
-            </button>
+            </Button>
           </div>
 
           {/* Messages */}
@@ -224,13 +223,13 @@ export function KitchenChat({ storeId, stationId, userId, userName }: KitchenCha
           <div className="p-2 bg-gray-100 border-t border-gray-200">
             <div className="flex flex-wrap gap-1 mb-2">
               {quickMessages.map((quickMsg) => (
-                <button
+                <Button
                   key={quickMsg}
                   onClick={() => sendMessage(quickMsg)}
                   className="px-2 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                 >
                   {quickMsg}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -252,16 +251,17 @@ export function KitchenChat({ storeId, stationId, userId, userName }: KitchenCha
               placeholder="Type a message..."
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button
+            <Button
               onClick={() => sendMessage(message)}
               disabled={!message.trim()}
               className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Send className="h-5 w-5" />
-            </button>
+            </Button>
           </div>
         </div>
       )}
     </div>
   );
 }
+

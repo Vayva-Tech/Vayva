@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useVayvaTheme } from '@/components/vayva-ui/VayvaThemeProvider';
 import type { DesignCategory } from '@/components/vayva-ui/VayvaThemeProvider';
 
-interface UniversalTaskItemProps {
+export interface UniversalTaskItemProps {
   id: string;
   title: string;
   subtitle?: string;

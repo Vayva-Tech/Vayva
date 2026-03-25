@@ -10,7 +10,7 @@ export const ParticleBackground: React.FC = () => {
 
   // Exclusion list
   const isExcluded = pathname?.match(
-    /\/(terms|privacy|legal|policy|security|cookies|legal-hub)/i,
+    /\/(terms|privacy|legal|policy|security|cookies|legal-hub|pricing|checkout)/i,
   );
 
   // Use ref to access current pathname in animation loop without restarting effect

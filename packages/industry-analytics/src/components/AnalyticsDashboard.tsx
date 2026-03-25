@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Analytics Industry Dashboard Component
  * Data-driven decision making dashboard with KPIs, trends, and predictive insights
@@ -18,7 +17,7 @@ export function AnalyticsDashboard({
   return (
     <UniversalProDashboard
       industry="analytics"
-      variant="analytics-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

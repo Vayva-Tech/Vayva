@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Symptom Checker AI Service
  * 
@@ -6,11 +5,7 @@
  * with clinical decision support capabilities
  */
 
-import { BaseAIService } from '@vayva/ai-agent';
-import type { 
-  ClinicalInsight, 
-  getClinicalAIConfig 
-} from '@vayva/ai-agent';
+import { BaseAIService, type ClinicalInsight } from '@vayva/ai-agent';
 
 export interface SymptomCheckInput {
   /** Patient age */
@@ -151,6 +146,21 @@ IMPORTANT: This is a clinical decision support tool only. Always recommend appro
       console.error('[SymptomChecker] Failed to parse response:', error);
       throw new Error(`Failed to parse clinical insight: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  protected defaultOutput(_input: SymptomCheckInput): ClinicalInsight {
+    return {
+      possibleConditions: [],
+      recommendedSteps: [
+        {
+          action: 'Consult a licensed healthcare provider for evaluation',
+          urgency: 'routine',
+          rationale: 'Configure a clinical AI provider to enable automated triage output',
+        },
+      ],
+      redFlags: [],
+      confidence: 0,
+    };
   }
 
   /**

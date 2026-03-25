@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "@vayva/ui";
+import { cn, Button } from "@vayva/ui";
 import {
   MagnifyingGlass as Search,
   Package,
@@ -101,12 +101,12 @@ export function DataTableEmpty({
       }
       action={
         hasFilters && onClearFilters ? (
-          <button
+          <Button
             onClick={onClearFilters}
             className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
           >
             Clear all filters
-          </button>
+          </Button>
         ) : undefined
       }
       className={className}

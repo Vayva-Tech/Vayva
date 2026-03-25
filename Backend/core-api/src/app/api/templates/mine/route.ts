@@ -6,7 +6,7 @@ import {
   logger,
   standardHeaders,
   VAYVA_DESIGN_TOKENS,
-  TEMPLATE_PACKS,
+  TEMPLATE_PACKS
 } from "@vayva/shared";
 
 function isRecord(value: unknown): value is Record<string, unknown> {

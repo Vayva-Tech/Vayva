@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as _uuidv4 } from 'uuid';
 
 export async function POST(request: Request) {
   try {
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     if (sendEmail && recipientEmail) {
       try {
         // In real implementation, integrate with email service
-        console.log(`Would send gift card email to ${recipientEmail}`);
+        console.warn(`Would send gift card email to ${recipientEmail}`);
         // await sendGiftCardEmail(giftCard);
       } catch (emailError) {
         console.error('Failed to send gift card email:', emailError);

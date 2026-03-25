@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, ReturnStatus } from "@vayva/db";
+import { prismaDelegates, ReturnStatus } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
 import { logger } from "@vayva/shared";
 
@@ -19,7 +19,7 @@ export async function POST(
 
     const newStatus = action === "approve" ? "APPROVED" : "REJECTED";
 
-    await prisma.returnRequest.update({
+    await prismaDelegates.returnRequest.update({
       where: { id },
       data: { status: newStatus as ReturnStatus },
     });

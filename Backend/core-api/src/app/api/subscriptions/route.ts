@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest as _NextRequest, NextResponse } from "next/server";
 import { prisma, type Prisma } from "@vayva/db";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { z } from "zod";
@@ -195,13 +195,22 @@ export const PATCH = withVayvaAPI(
           );
         }
 
-        const updatedSubscription = await prisma.subscription.update({
-          where: { id },
+        const planWrite = await prisma.subscription.updateMany({
+          where: { id, storeId },
           data: {
             planKey,
             updatedAt: new Date(),
           },
         });
+        if (planWrite.count === 0) {
+          return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        }
+        const updatedSubscription = await prisma.subscription.findFirst({
+          where: { id, storeId },
+        });
+        if (!updatedSubscription) {
+          return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        }
 
         // Create prorated invoice if needed
         const daysRemaining = Math.ceil(
@@ -245,13 +254,20 @@ export const PATCH = withVayvaAPI(
         }
 
         if (cancelAtPeriodEnd) {
-          const canceled = await prisma.subscription.update({
-            where: { id },
+          const w = await prisma.subscription.updateMany({
+            where: { id, storeId },
             data: {
               cancelAtPeriodEnd: true,
               updatedAt: new Date(),
             },
           });
+          if (w.count === 0) {
+            return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+          }
+          const canceled = await prisma.subscription.findFirst({ where: { id, storeId } });
+          if (!canceled) {
+            return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+          }
 
           return NextResponse.json({
             success: true,
@@ -259,13 +275,20 @@ export const PATCH = withVayvaAPI(
             message: "Subscription will cancel at period end",
           });
         } else {
-          const canceled = await prisma.subscription.update({
-            where: { id },
+          const w = await prisma.subscription.updateMany({
+            where: { id, storeId },
             data: {
               status: "CANCELED",
               updatedAt: new Date(),
             },
           });
+          if (w.count === 0) {
+            return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+          }
+          const canceled = await prisma.subscription.findFirst({ where: { id, storeId } });
+          if (!canceled) {
+            return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+          }
 
           return NextResponse.json({
             success: true,
@@ -278,8 +301,8 @@ export const PATCH = withVayvaAPI(
       case "reactivate": {
         if (subscription.status === "CANCELED") {
           const now = new Date();
-          const reactivated = await prisma.subscription.update({
-            where: { id },
+          const rw = await prisma.subscription.updateMany({
+            where: { id, storeId },
             data: {
               status: "ACTIVE",
               currentPeriodStart: now,
@@ -288,6 +311,13 @@ export const PATCH = withVayvaAPI(
               updatedAt: new Date(),
             },
           });
+          if (rw.count === 0) {
+            return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+          }
+          const reactivated = await prisma.subscription.findFirst({ where: { id, storeId } });
+          if (!reactivated) {
+            return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+          }
 
           // Create new invoice
           await prisma.invoiceV2.create({
@@ -316,14 +346,21 @@ export const PATCH = withVayvaAPI(
       case "pause": {
         // Pause subscription (set grace period)
         const gracePeriodDays = 7;
-        const paused = await prisma.subscription.update({
-          where: { id },
+        const pw = await prisma.subscription.updateMany({
+          where: { id, storeId },
           data: {
             status: "PAST_DUE",
             gracePeriodEndsAt: new Date(Date.now() + gracePeriodDays * 24 * 60 * 60 * 1000),
             updatedAt: new Date(),
           },
         });
+        if (pw.count === 0) {
+          return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        }
+        const paused = await prisma.subscription.findFirst({ where: { id, storeId } });
+        if (!paused) {
+          return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        }
 
         return NextResponse.json({
           success: true,
@@ -340,14 +377,21 @@ export const PATCH = withVayvaAPI(
           );
         }
 
-        const resumed = await prisma.subscription.update({
-          where: { id },
+        const resW = await prisma.subscription.updateMany({
+          where: { id, storeId },
           data: {
             status: "ACTIVE",
             gracePeriodEndsAt: null,
             updatedAt: new Date(),
           },
         });
+        if (resW.count === 0) {
+          return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        }
+        const resumed = await prisma.subscription.findFirst({ where: { id, storeId } });
+        if (!resumed) {
+          return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+        }
 
         return NextResponse.json({
           success: true,
@@ -383,14 +427,17 @@ export const DELETE = withVayvaAPI(
       return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
     }
 
-    await prisma.subscription.update({
-      where: { id },
+    const delW = await prisma.subscription.updateMany({
+      where: { id, storeId },
       data: {
         status: "CANCELED",
         cancelAtPeriodEnd: false,
         updatedAt: new Date(),
       },
     });
+    if (delW.count === 0) {
+      return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+    }
 
     return NextResponse.json({
       success: true,

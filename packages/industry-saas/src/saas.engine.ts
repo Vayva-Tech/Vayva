@@ -1,14 +1,13 @@
-// @ts-nocheck
 /**
  * SaaS Industry Engine
  */
 
 import { IndustryEngine, Feature } from '@vayva/industry-core';
-import type { SaaSConfig } from './types';
+import type { SaaSEngineConfig } from './types';
 import { SaaSSubscriptionService } from './services/saas-subscription.service';
 import { SaaSSubscriptionFeature } from './features/saas-subscription.feature';
 
-export class SaaSEngine extends IndustryEngine<SaaSConfig> {
+export class SaaSEngine extends IndustryEngine<SaaSEngineConfig> {
   private subscriptionService?: SaaSSubscriptionService;
   private subscriptionFeature?: SaaSSubscriptionFeature;
 

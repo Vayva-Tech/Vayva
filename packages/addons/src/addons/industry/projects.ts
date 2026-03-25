@@ -4,7 +4,7 @@
  * Portfolio project showcase with case studies
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PROJECTS_ADDON: AddOnDefinition = {
   id: 'vayva.projects',

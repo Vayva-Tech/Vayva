@@ -3,7 +3,7 @@
  */
 
 import { Model } from '@nozbe/watermelondb';
-import { field, relation } from '@nozbe/watermelondb/decorators';
+import { field } from '@nozbe/watermelondb/decorators';
 
 export class MatterModel extends Model {
   static table = 'matters';
@@ -15,6 +15,4 @@ export class MatterModel extends Model {
   @field('practice_area') practiceArea!: string;
   @field('description') description?: string;
   @field('assigned_attorney_id') assignedAttorneyId?: string;
-
-  @relation('clients', 'client_id') client!: any;
 }

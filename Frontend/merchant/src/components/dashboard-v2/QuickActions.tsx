@@ -18,11 +18,42 @@ interface QuickAction {
 // Type guard for IndustrySlug
 const isValidIndustrySlug = (slug: string): slug is IndustrySlug => {
   return [
-    "food", "real_estate", "automotive", "education", "events",
-    "travel_hospitality", "marketplace", "retail", "fashion", "beauty",
-    "services", "digital", "electronics", "grocery", "nonprofit",
-    "b2b", "one_product", "nightlife", "blog_media", "creative_portfolio",
-    "saas", "fitness", "healthcare", "legal", "jobs"
+    "analytics",
+    "food",
+    "meal-kit",
+    "restaurant",
+    "catering",
+    "wholesale",
+    "hotel",
+    "salon",
+    "spa",
+    "real_estate",
+    "automotive",
+    "education",
+    "events",
+    "travel_hospitality",
+    "marketplace",
+    "retail",
+    "fashion",
+    "beauty",
+    "services",
+    "digital",
+    "electronics",
+    "grocery",
+    "nonprofit",
+    "b2b",
+    "one_product",
+    "nightlife",
+    "blog_media",
+    "creative_portfolio",
+    "saas",
+    "fitness",
+    "healthcare",
+    "legal",
+    "jobs",
+    "petcare",
+    "specialized",
+    "wellness",
   ].includes(slug);
 };
 
@@ -64,6 +95,14 @@ const getIndustryActions = (industrySlug: IndustrySlug): QuickAction[] => {
 
   // Industry-specific primary actions
   const industryPrimary: Record<IndustrySlug, QuickAction> = {
+    analytics: {
+      id: "analytics",
+      title: "Analytics",
+      description: "View dashboards and reports",
+      icon: "BarChart3",
+      iconBg: "bg-status-info/10 text-status-info",
+      href: "/dashboard/analytics",
+    },
     food: {
       id: "kitchen",
       title: "Kitchen",
@@ -71,6 +110,14 @@ const getIndustryActions = (industrySlug: IndustrySlug): QuickAction[] => {
       icon: "ChefHat",
       iconBg: "bg-status-success/10 text-status-success",
       href: "/dashboard/kitchen",
+    },
+    "meal-kit": {
+      id: "meal-kit",
+      title: "Meal kit",
+      description: "Menus, subscriptions, and delivery",
+      icon: "ChefHat",
+      iconBg: "bg-status-success/10 text-status-success",
+      href: "/dashboard/meal-kit",
     },
     restaurant: {
       id: "kitchen",
@@ -311,6 +358,30 @@ const getIndustryActions = (industrySlug: IndustrySlug): QuickAction[] => {
       icon: "Briefcase",
       iconBg: "bg-status-info/10 text-status-info",
       href: "/dashboard/listings",
+    },
+    petcare: {
+      id: "appointments",
+      title: "Appointments",
+      description: "Manage pet care appointments",
+      icon: "HeartPulse",
+      iconBg: "bg-status-success/10 text-status-success",
+      href: "/dashboard/appointments",
+    },
+    specialized: {
+      id: "catalog",
+      title: "Catalog",
+      description: "Manage your offerings",
+      icon: "Layers",
+      iconBg: "bg-status-info/10 text-status-info",
+      href: "/dashboard/catalog",
+    },
+    wellness: {
+      id: "bookings",
+      title: "Bookings",
+      description: "Manage wellness appointments",
+      icon: "Sparkles",
+      iconBg: "bg-status-success/10 text-status-success",
+      href: "/dashboard/bookings",
     },
   };
 

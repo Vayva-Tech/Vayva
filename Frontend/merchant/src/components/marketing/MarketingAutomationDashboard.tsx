@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Marketing Automation Dashboard (Industry-Adaptive)
  * Campaign workflows, personalization, and A/B testing with industry-specific metrics
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -31,6 +30,7 @@ import { GradientHeader, ThemedCard, getThemeColors } from '@/lib/design-system/
 import { useStore } from '@/providers/store-provider';
 import { toast } from 'sonner';
 import { getIndustryConfig } from '@/lib/utils/industry-adaptation';
+import type { IndustrySlug } from '@/lib/templates/types';
 
 // Types
 interface MarketingWorkflow {
@@ -90,7 +90,7 @@ interface MarketingOverview {
 // Main Marketing Automation Dashboard
 export default function MarketingAutomationDashboard() {
   const { store } = useStore();
-  const industry = store?.industrySlug || 'retail';
+  const industry = (store?.industrySlug || 'retail') as IndustrySlug;
   const industryConfig = getIndustryConfig(industry);
   const colors = getThemeColors(industry);
   const [activeTab, setActiveTab] = useState<'workflows' | 'ab-tests' | 'personalization'>('workflows');
@@ -110,7 +110,9 @@ export default function MarketingAutomationDashboard() {
           totalWorkflows: 12,
           activeWorkflows: 8,
           totalCampaigns: 24,
-          avgConversionRate: industryConfig.metrics.conversionRate || 3.2,
+          avgConversionRate:
+            (industryConfig as { metrics?: { conversionRate?: number } }).metrics
+              ?.conversionRate ?? 3.2,
           totalRevenue: 245680,
           roi: 4.2
         };
@@ -178,7 +180,7 @@ export default function MarketingAutomationDashboard() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -189,7 +191,7 @@ export default function MarketingAutomationDashboard() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -233,7 +235,11 @@ export default function MarketingAutomationDashboard() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Avg. Conversion</p>
                 <p className="text-2xl font-bold" style={{ color: colors.accent }}>
-                  {overview.avgConversionRate || industryConfig.metrics.conversionRate || 0}%
+                  {(overview.avgConversionRate ||
+                    (industryConfig as { metrics?: { conversionRate?: number } }).metrics
+                      ?.conversionRate ||
+                    0)}
+                  %
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ backgroundColor: `${colors.accent}15` }}>
@@ -291,7 +297,7 @@ export default function MarketingAutomationDashboard() {
 // Workflow Management Component
 function WorkflowManagement({ workflows, loading }: { workflows: MarketingWorkflow[]; loading: boolean }) {
   const { store } = useStore();
-  const industry = store?.industrySlug || 'retail';
+  const industry = (store?.industrySlug || 'retail') as IndustrySlug;
   const industryConfig = getIndustryConfig(industry);
 
   if (loading) {
@@ -334,9 +340,9 @@ function WorkflowManagement({ workflows, loading }: { workflows: MarketingWorkfl
             <Lightning className="h-5 w-5" />
             Active Workflows
           </h3>
-          <button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+          <Button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
             Create Workflow
-          </button>
+          </Button>
         </div>
         
         <div className="space-y-4">
@@ -603,18 +609,18 @@ function PersonalizationManagement({ rules, loading }: { rules: PersonalizationR
       <ThemedCard industry={industry}>
         <h3 className="font-semibold mb-6">Quick Actions</h3>
         <div className="space-y-3">
-          <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+          <Button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
             <Target className="h-5 w-5 text-green-500" />
             <span className="font-medium">Create New Rule</span>
-          </button>
-          <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+          </Button>
+          <Button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
             <Funnel className="h-5 w-5 text-green-500" />
             <span className="font-medium">Setup A/B Test</span>
-          </button>
-          <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+          </Button>
+          <Button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
             <Lightning className="h-5 w-5 text-green-500" />
             <span className="font-medium">New Automation</span>
-          </button>
+          </Button>
         </div>
       </ThemedCard>
     </div>

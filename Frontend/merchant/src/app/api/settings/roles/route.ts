@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -8,8 +9,12 @@ import { handleApiError } from "@/lib/api-error-handler";
  * List custom roles for the current store.
  */
 export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     // Call backend API to fetch roles
     const roles = await apiJson<Array<{
         id: string;
@@ -27,9 +32,7 @@ export async function GET(request: NextRequest) {
     }>>(
         `${process.env.BACKEND_API_URL}/api/settings/roles`,
         {
-            headers: {
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
         }
     );
 
@@ -56,8 +59,12 @@ export async function GET(request: NextRequest) {
  * Create or update a custom role.
  */
 export async function POST(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json().catch(() => ({}));
     const { id, name, description, permissionIds } = body;
 
@@ -74,10 +81,7 @@ export async function POST(request: NextRequest) {
         `${process.env.BACKEND_API_URL}/api/settings/roles`,
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
             body: JSON.stringify({
                 id,
                 name,

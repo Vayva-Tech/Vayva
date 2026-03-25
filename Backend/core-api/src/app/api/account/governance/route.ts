@@ -494,7 +494,7 @@ export const GET = withVayvaAPI(
     try {
       const { searchParams } = new URL(req.url);
       const requestType = searchParams.get("requestType");
-      const status = searchParams.get("status");
+      const _status = searchParams.get("status");
       const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
       const offset = parseInt(searchParams.get("offset") || "0");
 

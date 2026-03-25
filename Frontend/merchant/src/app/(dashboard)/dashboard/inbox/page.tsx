@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { logger, WhatsAppMessage, WhatsAppConversation } from "@vayva/shared";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -94,7 +92,7 @@ export default function InboxPage() {
   }, []);
 
   useEffect(() => {
-    const id = searchParams.get("conversationId");
+    const id = searchParams?.get("conversationId");
     if (id) {
       setSelectedId(id);
       void fetchMessages(id);

@@ -155,7 +155,7 @@ export default function AppealsPage() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl space-y-8">
       <div className="flex items-center gap-4">
         <FileText className="h-8 w-8 text-gray-700" />
         <div>

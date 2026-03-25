@@ -4,7 +4,7 @@
  * Real-time customer support chat widget
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const LIVE_CHAT_ADDON: AddOnDefinition = {
   id: 'vayva.live-chat',

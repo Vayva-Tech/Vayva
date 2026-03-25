@@ -1,6 +1,7 @@
 import { GET, POST } from '../route';
 import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
 
 // Mock the dependencies
 jest.mock('next-auth', () => ({
@@ -20,6 +21,10 @@ jest.mock('@/lib/prisma', () => ({
 describe('Restaurant Menu Categories API', () => {
   const mockSession = {
     user: { id: 'user-123' },
+  };
+
+  const mockedPrisma = prisma as jest.Mocked<typeof prisma> & {
+    menuCategory: { findMany: jest.Mock; create: jest.Mock; findFirst: jest.Mock };
   };
 
   beforeEach(() => {
@@ -50,8 +55,7 @@ describe('Restaurant Menu Categories API', () => {
         { id: 'cat-2', name: 'Main Course', sortOrder: 2 },
       ];
       
-      const prisma = require('@/lib/prisma').prisma;
-      prisma.menuCategory.findMany.mockResolvedValue(mockCategories);
+      mockedPrisma.menuCategory.findMany.mockResolvedValue(mockCategories);
       
       const request = new NextRequest('http://localhost/api/restaurant/menu/categories?businessId=biz-123');
       const response = await GET(request);
@@ -89,9 +93,8 @@ describe('Restaurant Menu Categories API', () => {
     it('should create menu category successfully', async () => {
       const mockCategory = { id: 'cat-1', name: 'Desserts' };
       
-      const prisma = require('@/lib/prisma').prisma;
-      prisma.menuCategory.findFirst.mockResolvedValue(null);
-      prisma.menuCategory.create.mockResolvedValue(mockCategory);
+      mockedPrisma.menuCategory.findFirst.mockResolvedValue(null);
+      mockedPrisma.menuCategory.create.mockResolvedValue(mockCategory);
       
       const requestBody = {
         businessId: 'biz-123',
@@ -112,8 +115,7 @@ describe('Restaurant Menu Categories API', () => {
     });
 
     it('should return 409 if category name already exists', async () => {
-      const prisma = require('@/lib/prisma').prisma;
-      prisma.menuCategory.findFirst.mockResolvedValue({ id: 'cat-1' });
+      mockedPrisma.menuCategory.findFirst.mockResolvedValue({ id: 'cat-1' });
       
       const requestBody = {
         businessId: 'biz-123',

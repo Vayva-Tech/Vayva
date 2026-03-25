@@ -1,12 +1,14 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 import type { InventoryVariant } from '../types';
+
+export type HeatmapColor = string | { name: string; code: string };
 
 export interface InventoryVariantHeatmapProps {
   variants: InventoryVariant[];
   sizes?: string[];
-  colors?: string[];
+  colors?: HeatmapColor[];
 }
 
 export const InventoryVariantHeatmap: React.FC<InventoryVariantHeatmapProps> = ({
@@ -19,6 +21,10 @@ export const InventoryVariantHeatmap: React.FC<InventoryVariantHeatmapProps> = (
     { name: 'White', code: '⚪' },
   ],
 }) => {
+  const normalizedColors = colors.map((c) =>
+    typeof c === "string" ? { name: c, code: c } : c,
+  );
+
   const getStockStatus = (quantity: number) => {
     if (quantity <= 5) return 'critical';
     if (quantity <= 15) return 'low';
@@ -37,11 +43,11 @@ export const InventoryVariantHeatmap: React.FC<InventoryVariantHeatmapProps> = (
   };
 
   // Group variants by color
-  const variantsByColor = colors.map((color) => ({
+  const variantsByColor = normalizedColors.map((color) => ({
     color,
     data: sizes.map((size) => {
       const variant = variants.find(
-        (v) => v.size === size && v.color === color.name
+        (v) => v.size === size && v.color === color.name,
       );
       return {
         size,
@@ -55,9 +61,9 @@ export const InventoryVariantHeatmap: React.FC<InventoryVariantHeatmapProps> = (
     <GlassPanel variant="elevated" className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Inventory by Variant</h2>
-        <button className="text-xs text-rose-400 hover:text-rose-300 transition-colors">
+        <Button className="text-xs text-rose-400 hover:text-rose-300 transition-colors">
           View Full Inventory →
-        </button>
+        </Button>
       </div>
 
       {/* Heatmap Grid */}

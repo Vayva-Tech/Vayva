@@ -1,13 +1,11 @@
-// @ts-nocheck
 "use client";
-
 import { useEffect, useState } from "react";
 import { logger } from "@vayva/shared";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button, Icon } from "@vayva/ui";
 import { toast } from "sonner";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function SubscriptionCallbackPage() {
   const searchParams = useSearchParams();
@@ -16,8 +14,8 @@ export default function SubscriptionCallbackPage() {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const paymentStatus = searchParams.get("payment");
-  const reference = searchParams.get("reference");
+  const paymentStatus = searchParams?.get("payment");
+  const reference = searchParams?.get("reference");
 
   useEffect(() => {
     if (paymentStatus === "success" && reference && !verified && !verifying) {
@@ -55,8 +53,12 @@ export default function SubscriptionCallbackPage() {
 
   if (paymentStatus !== "success") {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-6">
-        <Breadcrumbs />
+      <div className="max-w-2xl py-8">
+        <PageHeader
+          title="Billing"
+          subtitle="We couldn't determine the status of your payment."
+          className="mb-4"
+        />
         <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6 mt-4">
           <div className="flex items-start gap-4">
             <Icon name="AlertTriangle" className="text-yellow-600" size={24} />
@@ -80,8 +82,12 @@ export default function SubscriptionCallbackPage() {
 
   if (error) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-6">
-        <Breadcrumbs />
+      <div className="max-w-2xl py-8">
+        <PageHeader
+          title="Billing"
+          subtitle="Payment verification failed."
+          className="mb-4"
+        />
         <div className="bg-red-50 border border-red-100 rounded-xl p-6 mt-4">
           <div className="flex items-start gap-4">
             <Icon name="XCircle" className="text-red-600" size={24} />
@@ -110,8 +116,12 @@ export default function SubscriptionCallbackPage() {
 
   if (verified) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-6">
-        <Breadcrumbs />
+      <div className="max-w-2xl py-8">
+        <PageHeader
+          title="Billing"
+          subtitle="Payment verified."
+          className="mb-4"
+        />
         <div className="bg-green-50 border border-green-100 rounded-xl p-6 mt-4">
           <div className="flex items-start gap-4">
             <Icon name="CheckCircle" className="text-green-600" size={24} />
@@ -131,8 +141,8 @@ export default function SubscriptionCallbackPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-6">
-      <Breadcrumbs />
+    <div className="max-w-2xl py-8">
+      <PageHeader title="Billing" subtitle="Verifying payment…" className="mb-4" />
       <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mt-4">
         <div className="flex items-start gap-4">
           <div className="animate-spin">

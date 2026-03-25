@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Users } from "lucide-react";
+import type { TabletKdsViewProps } from './ActiveTicketsByStation';
 
-export function StationWorkload() {
+export function StationWorkload(_props: TabletKdsViewProps) {
   return (
     <Card>
       <CardHeader>

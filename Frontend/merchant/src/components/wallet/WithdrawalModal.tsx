@@ -251,6 +251,7 @@ export const WithdrawalModal = ({
                 variant="link"
                 className="text-xs font-bold text-black underline pl-1 pt-1 h-auto p-0 hover:no-underline"
                 disabled={loading}
+                onClick={() => window.location.assign("/dashboard/finance/accounts")}
               >
                 + Add another account
               </Button>

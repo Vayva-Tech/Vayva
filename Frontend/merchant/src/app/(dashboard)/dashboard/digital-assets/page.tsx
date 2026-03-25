@@ -1,11 +1,12 @@
-// @ts-nocheck
 "use client";
-
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { DownloadSimple, Plus, PencilSimple as Edit, Trash, Image as ImageIcon, FilePdf, FileZip, File, HardDrives } from "@phosphor-icons/react";
 import { logger } from "@vayva/shared";
 import { Button, Input } from "@vayva/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiJson } from "@/lib/api-client-shared";
 
 interface DigitalAsset {
@@ -316,20 +317,20 @@ export default function DigitalAssetsPage() {
                           >
                             <DownloadSimple size={16} />
                           </a>
-                          <button
+                          <Button
                             onClick={() => openEdit(asset)}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <Edit size={16} />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => setDeleteConfirm({ id: asset.id, name: asset.name })}
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete"
                           >
                             <Trash size={16} />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

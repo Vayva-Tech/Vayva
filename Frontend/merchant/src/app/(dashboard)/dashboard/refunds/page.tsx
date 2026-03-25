@@ -192,20 +192,20 @@ export default function RefundsPage() {
                     <td className="px-6 py-4 text-right">
                       {refund.status === 'pending' && (
                         <div className="flex items-center justify-end gap-2">
-                          <button
+                          <Button
                             onClick={() => { setSelectedRefund(refund); setActionType('approve'); }}
                             className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                             title="Approve"
                           >
                             <Check size={16} />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => { setSelectedRefund(refund); setActionType('reject'); }}
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Reject"
                           >
                             <X size={16} />
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </td>

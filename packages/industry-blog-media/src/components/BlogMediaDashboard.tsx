@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Blog/Media Industry Dashboard Component
  * Content publishing, audience analytics, and monetization dashboard
@@ -18,7 +17,7 @@ export function BlogMediaDashboard({
   return (
     <UniversalProDashboard
       industry="blog_media"
-      variant="blog-media-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

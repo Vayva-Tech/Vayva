@@ -1,9 +1,8 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
-import { VirtualTable } from './VirtualScroll';
-import { Image, Avatar } from './Image';
+import Image from 'next/image';
 import { useMetricsWorker, calculateMetricsAsync } from '@/hooks/use-metrics-worker';
 import { useServiceWorker, useOnlineStatus, useServiceWorkerUpdate } from '@/hooks/use-service-worker';
 import { SkipLink } from '@/lib/accessibility';
@@ -52,7 +51,13 @@ export function EnhancedSaasDashboard() {
       label: 'User',
       width: '80px',
       render: (tenant: TenantData) => (
-        <Avatar src={tenant.avatar} alt={tenant.name} size="sm" />
+        <Image
+          src={tenant.avatar}
+          alt=""
+          width={32}
+          height={32}
+          className="h-8 w-8 rounded-full object-cover"
+        />
       ),
     },
     {
@@ -127,12 +132,12 @@ export function EnhancedSaasDashboard() {
           <p className="text-sm text-gray-500">
             🎉 New version available! Refresh to update.
           </p>
-          <button
+          <Button
             onClick={updateServiceWorker}
             className="px-4 py-2 bg-green-50-primary text-white rounded-md text-sm font-medium hover:bg-green-50-primary/90 transition-colors"
           >
             Refresh
-          </button>
+          </Button>
         </div>
       )}
 
@@ -164,17 +169,37 @@ export function EnhancedSaasDashboard() {
         </div>
       </div>
 
-      {/* Virtual Table with 1000 rows - only renders visible rows */}
+      {/* Tenant table (scrollable; visible subset for performance demo) */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Tenants (Virtual Scrolling - 1000 rows)
+          Tenants (showing first 100 of {tenants.length})
         </h2>
-        <VirtualTable<TenantData>
-          data={tenants}
-          columns={columns}
-          containerHeight={500}
-          rowHeight={64}
-        />
+        <div className="max-h-[500px] overflow-auto rounded-lg border border-gray-200">
+          <table className="w-full text-sm">
+            <thead className="sticky top-0 bg-gray-50 border-b">
+              <tr>
+                {columns.map((col) => (
+                  <th key={col.key} className="px-3 py-2 text-left font-medium text-gray-700" style={{ width: col.width }}>
+                    {col.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {tenants.slice(0, 100).map((tenant) => (
+                <tr key={tenant.id} className="border-b border-gray-100 hover:bg-gray-50/80">
+                  {columns.map((col) => (
+                    <td key={col.key} className="px-3 py-2 align-middle">
+                      {'render' in col && col.render
+                        ? col.render(tenant)
+                        : String((tenant as unknown as Record<string, unknown>)[col.key] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Optimized Images */}
@@ -187,27 +212,27 @@ export function EnhancedSaasDashboard() {
             width={300}
             height={200}
             quality={80}
-            placeholder="blur"
+            className="rounded-lg object-cover"
           />
         ))}
       </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={handleCalculateMetrics}
           disabled={workerLoading}
           className="px-6 py-3 bg-green-50-primary text-white rounded-lg font-medium hover:bg-green-50-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {workerLoading ? 'Calculating...' : 'Calculate Metrics (Web Worker)'}
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={() => send({ type: 'ANALYZE_TRENDS', payload: { data: [10, 20, 30, 40, 50], periods: 3 } })}
           className="px-6 py-3 bg-white-tertiary text-gray-900 rounded-lg font-medium hover:bg-border/20 transition-colors"
         >
           Analyze Trends
-        </button>
+        </Button>
       </div>
 
       {/* Error Display */}
@@ -219,3 +244,4 @@ export function EnhancedSaasDashboard() {
     </div>
   );
 }
+

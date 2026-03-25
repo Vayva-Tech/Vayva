@@ -4,98 +4,100 @@
   "description": "Vayva Add-On System - Types, Registry, Components, and Mount Points",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
     "./types": {
-      "types": "./dist/types.d.ts",
+      "types": "./src/types.ts",
       "import": "./dist/types.mjs",
       "require": "./dist/types.js"
     },
     "./registry": {
-      "types": "./dist/registry.d.ts",
+      "types": "./src/registry.ts",
       "import": "./dist/registry.mjs",
       "require": "./dist/registry.js"
     },
     "./mount-points": {
-      "types": "./dist/mount-points.d.ts",
+      "types": "./src/mount-points/index.ts",
       "import": "./dist/mount-points.mjs",
       "require": "./dist/mount-points.js"
     },
     "./storefront": {
-      "types": "./dist/components/storefront.d.ts",
+      "types": "./src/components/storefront.tsx",
       "import": "./dist/components/storefront.mjs",
       "require": "./dist/components/storefront.js"
     },
     "./settings": {
-      "types": "./dist/components/settings.d.ts",
+      "types": "./src/components/settings.tsx",
       "import": "./dist/components/settings.mjs",
       "require": "./dist/components/settings.js"
     },
     "./shopping-cart": {
-      "types": "./dist/shopping-cart/index.d.ts",
+      "types": "./src/shopping-cart/index.tsx",
       "import": "./dist/shopping-cart/index.mjs",
       "require": "./dist/shopping-cart/index.js"
     },
     "./checkout-flow": {
-      "types": "./dist/checkout-flow/index.d.ts",
+      "types": "./src/checkout-flow/index.tsx",
       "import": "./dist/checkout-flow/index.mjs",
       "require": "./dist/checkout-flow/index.js"
     },
     "./product-pages": {
-      "types": "./dist/product-pages/index.d.ts",
+      "types": "./src/product-pages/index.tsx",
       "import": "./dist/product-pages/index.mjs",
       "require": "./dist/product-pages/index.js"
     },
     "./wishlist": {
-      "types": "./dist/wishlist/index.d.ts",
+      "types": "./src/wishlist/index.tsx",
       "import": "./dist/wishlist/index.mjs",
       "require": "./dist/wishlist/index.js"
     },
     "./reviews": {
-      "types": "./dist/reviews/index.d.ts",
+      "types": "./src/reviews/index.tsx",
       "import": "./dist/reviews/index.mjs",
       "require": "./dist/reviews/index.js"
     },
     "./booking": {
-      "types": "./dist/booking/index.d.ts",
+      "types": "./src/booking/index.tsx",
       "import": "./dist/booking/index.mjs",
       "require": "./dist/booking/index.js"
     },
     "./newsletter": {
-      "types": "./dist/newsletter/index.d.ts",
+      "types": "./src/newsletter/index.tsx",
       "import": "./dist/newsletter/index.mjs",
       "require": "./dist/newsletter/index.js"
     },
     "./api": {
-      "types": "./dist/api/routes.d.ts",
+      "types": "./src/api/routes.ts",
       "import": "./dist/api/routes.mjs",
       "require": "./dist/api/routes.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/types.ts src/registry.ts src/mount-points.tsx src/components/storefront.tsx src/components/settings.tsx src/api/routes.ts --format cjs,esm --dts --clean --external react --external next --external framer-motion --external lucide-react --external date-fns",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react --external next",
+    "build": "tsup --config tsup.config.ts",
+    "dev": "tsup --config tsup.config.ts --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ --ext .ts,.tsx"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/utilities": "^3.2.2",
+    "@vayva/ui": "workspace:^",
     "date-fns": "^3.0.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.400.0",
-    "react": "^18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "eslint": "^8.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.3.0"

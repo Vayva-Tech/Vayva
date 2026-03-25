@@ -3,8 +3,12 @@
  * Handles workflow triggers (webhooks, events, schedules)
  */
 
-import type { WorkflowExecution, TriggerType } from '@vayva/workflow-engine';
-import { TRIGGER_DEFINITIONS, getDefaultTriggerRegistry } from '@vayva/workflow-engine';
+import {
+  type WorkflowExecution,
+  type TriggerType,
+  TRIGGER_DEFINITIONS,
+  getDefaultTriggerRegistry,
+} from '@vayva/workflow-engine';
 import { WorkflowService } from './workflow-service.js';
 import { ExecutionService } from './execution-service.js';
 

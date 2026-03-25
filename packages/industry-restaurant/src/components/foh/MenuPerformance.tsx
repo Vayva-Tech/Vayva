@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { RestaurantDashboardService } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from "@vayva/ui";
+import { CardTitle } from '../restaurant-ui';
 import { 
   BarChart3,
   TrendingUp,
@@ -161,7 +161,7 @@ export function MenuPerformance({ dashboardService }: MenuPerformanceProps) {
         
         {/* Time Range Selector */}
         <div className="flex gap-2 mt-3">
-          <button
+          <Button
             onClick={() => setTimeRange('day')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               timeRange === 'day'
@@ -170,8 +170,8 @@ export function MenuPerformance({ dashboardService }: MenuPerformanceProps) {
             }`}
           >
             Today
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setTimeRange('week')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               timeRange === 'week'
@@ -180,8 +180,8 @@ export function MenuPerformance({ dashboardService }: MenuPerformanceProps) {
             }`}
           >
             This Week
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setTimeRange('month')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               timeRange === 'month'
@@ -190,7 +190,7 @@ export function MenuPerformance({ dashboardService }: MenuPerformanceProps) {
             }`}
           >
             This Month
-          </button>
+          </Button>
         </div>
       </CardHeader>
       
@@ -235,7 +235,7 @@ export function MenuPerformance({ dashboardService }: MenuPerformanceProps) {
                   <h3 className="font-semibold text-orange-900 truncate">
                     {item.name}
                   </h3>
-                  <Badge variant="secondary" className="text-xs bg-white/70">
+                  <Badge variant="outline" className="text-xs bg-white/70">
                     {item.category}
                   </Badge>
                 </div>

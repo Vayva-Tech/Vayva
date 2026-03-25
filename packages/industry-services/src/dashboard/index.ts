@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Services Industry Dashboard Index
  * Export dashboard configuration

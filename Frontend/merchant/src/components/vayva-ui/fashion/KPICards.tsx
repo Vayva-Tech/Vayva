@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
-import { VayvaCard } from './VayvaCard';
+import { VayvaCard } from '../VayvaCard';
 import { cn } from '@/lib/utils';
 
 interface KPICardProps {

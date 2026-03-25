@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Recipe Costing exports
  */

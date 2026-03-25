@@ -72,7 +72,7 @@ export default function ExtensionsPage() {
   }, []);
 
   return (
-    <div className="relative space-y-8 max-w-6xl mx-auto pb-20">
+    <div className="relative space-y-8 max-w-6xl pb-20">
       {/* Green gradient blur background */}
       {isPaidPlan && (
         <div className="fixed inset-0 pointer-events-none -z-10">

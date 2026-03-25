@@ -11,7 +11,7 @@ export const GET = withVayvaAPI(
     try {
       const { searchParams } = new URL(req.url);
       const period = searchParams.get('period') || 'month'; // day, week, month, quarter, year
-      const comparePeriod = searchParams.get('compare') === 'true';
+      const _comparePeriod = searchParams.get('compare') === 'true';
       
       // Calculate date ranges
       const now = new Date();
@@ -115,7 +115,7 @@ export const GET = withVayvaAPI(
 );
 
 // Sales analytics
-async function getSalesAnalytics(storeId: string, startDate: Date, endDate: Date, compStart: Date, compEnd: Date) {
+async function _getSalesAnalytics(storeId: string, startDate: Date, endDate: Date, compStart: Date, compEnd: Date) {
   const [currentSales, previousSales] = await Promise.all([
     prisma.groceryOrder.aggregate({
       where: {
@@ -144,7 +144,7 @@ async function getSalesAnalytics(storeId: string, startDate: Date, endDate: Date
 }
 
 // Inventory analytics
-async function getInventoryAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getInventoryAnalytics(storeId: string, _startDate: Date, _endDate: Date) {
   const products = await prisma.groceryProduct.findMany({
     where: { storeId },
   });
@@ -170,7 +170,7 @@ async function getInventoryAnalytics(storeId: string, startDate: Date, endDate: 
 }
 
 // Order analytics
-async function getOrderAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getOrderAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const [orders, fulfilledOrders] = await Promise.all([
     prisma.groceryOrder.findMany({
       where: {
@@ -205,7 +205,7 @@ async function getOrderAnalytics(storeId: string, startDate: Date, endDate: Date
 }
 
 // Customer analytics
-async function getCustomerAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getCustomerAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const [customers, newCustomers, orders] = await Promise.all([
     prisma.user.count({ where: { storeId } }),
     prisma.user.count({
@@ -233,7 +233,7 @@ async function getCustomerAnalytics(storeId: string, startDate: Date, endDate: D
 }
 
 // Category analytics
-async function getCategoryAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getCategoryAnalytics(storeId: string, _startDate: Date, _endDate: Date) {
   const categories = await prisma.groceryCategory.findMany({
     where: { storeId, status: "active" },
     include: {
@@ -256,7 +256,7 @@ async function getCategoryAnalytics(storeId: string, startDate: Date, endDate: D
 }
 
 // Supplier analytics
-async function getSupplierAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getSupplierAnalytics(storeId: string, _startDate: Date, _endDate: Date) {
   const suppliers = await prisma.grocerySupplier.findMany({
     where: { storeId, status: "active" },
   });
@@ -272,7 +272,7 @@ async function getSupplierAnalytics(storeId: string, startDate: Date, endDate: D
 }
 
 // Generate trends data
-async function generateTrends(storeId: string, period: string) {
+async function _generateTrends(_storeId: string, _period: string) {
   // Mock trend data - would connect to actual time-series data
   return {
     revenue: [45000, 48000, 52000, 49000, 55000],
@@ -283,7 +283,7 @@ async function generateTrends(storeId: string, period: string) {
 }
 
 // Generate business insights
-function generateInsights(sales: any, inventory: any, orders: any, customers: any): string[] {
+function _generateInsights(sales: any, inventory: any, orders: any, customers: any): string[] {
   const insights: string[] = [];
   
   if (sales.changePercent > 10) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 // ============================================================================
@@ -49,7 +48,7 @@ export function DashboardGrid({
 
   const handleRefresh = useCallback((widgetId: string) => {
     // This would trigger a data refresh for the specific widget
-    console.log("Refreshing widget:", widgetId);
+    console.warn("Refreshing widget:", widgetId);
   }, []);
 
   // Create a map of widget definitions by ID for quick lookup

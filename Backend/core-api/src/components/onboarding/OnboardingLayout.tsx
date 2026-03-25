@@ -17,7 +17,7 @@ import {
   CheckCircle,
   Question as HelpCircle,
   List as Menu,
-  X,
+  X
 } from "@phosphor-icons/react/ssr";
 
 interface StepConfig {

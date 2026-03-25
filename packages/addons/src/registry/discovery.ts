@@ -9,7 +9,7 @@
  * - Featured and recommended add-ons
  */
 
-import { AddOnDefinition, AddOnCategory } from '../../types';
+import type { AddOnDefinition, AddOnCategory } from '../types';
 
 // ============================================================================
 // Types
@@ -99,9 +99,12 @@ export class DiscoveryEngine {
       addOn.name,
       addOn.description,
       addOn.tagline,
-      ...addOn.tags,
-      addOn.author.name,
-    ].join(' ').toLowerCase();
+      ...(addOn.tags ?? []),
+      addOn.author?.name,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
 
     // Tokenize
     const words = searchableText
@@ -171,26 +174,39 @@ export class DiscoveryEngine {
    */
   getFeatured(
     templateId?: string,
-    userAddOns?: string[]
+    _userAddOns?: string[]
   ): FeaturedAddOns {
     const all = Array.from(this.registry.values());
 
     // Featured: official, highly rated, popular
     const featured = all
-      .filter((a) => a.author.isOfficial && a.stats.rating >= 4)
-      .sort((a, b) => b.stats.installCount - a.stats.installCount)
+      .filter((a) => a.author?.isOfficial && (a.stats?.rating ?? 0) >= 4)
+      .sort(
+        (a, b) =>
+          (b.stats?.installCount ?? 0) - (a.stats?.installCount ?? 0),
+      )
       .slice(0, 6);
 
     // New arrivals: recently added
     const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const newArrivals = all
-      .filter((a) => new Date(a.stats.createdAt).getTime() > oneWeekAgo)
-      .sort((a, b) => new Date(b.stats.createdAt).getTime() - new Date(a.stats.createdAt).getTime())
+      .filter((a) => {
+        const created = a.stats?.createdAt;
+        return created ? new Date(created).getTime() > oneWeekAgo : false;
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.stats?.createdAt ?? 0).getTime() -
+          new Date(a.stats?.createdAt ?? 0).getTime(),
+      )
       .slice(0, 6);
 
     // Trending: rapid install growth (simulate with install count for now)
     const trending = all
-      .sort((a, b) => b.stats.installCount - a.stats.installCount)
+      .sort(
+        (a, b) =>
+          (b.stats?.installCount ?? 0) - (a.stats?.installCount ?? 0),
+      )
       .slice(0, 8);
 
     // Recommended: compatible with user's template
@@ -201,7 +217,9 @@ export class DiscoveryEngine {
           a.compatibleTemplates.includes(templateId) ||
           a.compatibleTemplates.includes('*')
         )
-        .sort((a, b) => b.stats.rating - a.stats.rating)
+        .sort(
+          (a, b) => (b.stats?.rating ?? 0) - (a.stats?.rating ?? 0),
+        )
         .slice(0, 6);
     }
 
@@ -225,11 +243,13 @@ export class DiscoveryEngine {
       if (a.category === addOn.category) score += 3;
       
       // Shared tags: +1 each
-      const sharedTags = a.tags.filter((t) => addOn.tags.includes(t));
+      const sharedTags = (a.tags ?? []).filter((t) =>
+        (addOn.tags ?? []).includes(t),
+      );
       score += sharedTags.length;
       
       // Same developer: +2
-      if (a.author.name === addOn.author.name) score += 2;
+      if (a.author?.name === addOn.author?.name) score += 2;
       
       return { addOn: a, score };
     });
@@ -250,7 +270,7 @@ export class DiscoveryEngine {
       counts.set(addOn.category, (counts.get(addOn.category) || 0) + 1);
     });
 
-    const categoryLabels: Record<AddOnCategory, string> = {
+    const categoryLabels: Partial<Record<AddOnCategory, string>> = {
       ecommerce: 'E-Commerce',
       booking: 'Booking & Scheduling',
       content: 'Content & Media',
@@ -258,13 +278,21 @@ export class DiscoveryEngine {
       operations: 'Business Operations',
       integration: 'Integrations',
       'industry-specific': 'Industry Specific',
+      analytics: 'Analytics',
+      shipping: 'Shipping',
+      payment: 'Payment',
+      communication: 'Communication',
+      automation: 'Automation',
+      inventory: 'Inventory',
+      'customer-service': 'Customer Service',
+      storefront: 'Storefront',
     };
 
     return Array.from(counts.entries())
       .map(([category, count]) => ({
         category,
         count,
-        label: categoryLabels[category] || category,
+        label: categoryLabels[category] ?? category,
       }))
       .sort((a, b) => b.count - a.count);
   }
@@ -276,7 +304,7 @@ export class DiscoveryEngine {
     const counts = new Map<string, number>();
     
     this.registry.forEach((addOn) => {
-      addOn.tags.forEach((tag) => {
+      (addOn.tags ?? []).forEach((tag) => {
         counts.set(tag, (counts.get(tag) || 0) + 1);
       });
     });
@@ -324,7 +352,8 @@ export class DiscoveryEngine {
 
       // Tags filter (any match)
       if (filter.tags && filter.tags.length > 0) {
-        const hasTag = filter.tags.some((t) => addOn.tags.includes(t));
+        const tags = addOn.tags ?? [];
+        const hasTag = filter.tags.some((t) => tags.includes(t));
         if (!hasTag) return false;
       }
 
@@ -337,17 +366,20 @@ export class DiscoveryEngine {
       }
 
       // Developer filter
-      if (filter.developer && addOn.author.name !== filter.developer) {
+      if (filter.developer && addOn.author?.name !== filter.developer) {
         return false;
       }
 
       // Official/verified only
-      if (filter.officialOnly && !addOn.author.isOfficial) {
+      if (filter.officialOnly && !addOn.author?.isOfficial) {
         return false;
       }
 
       // Minimum rating
-      if (filter.minRating && addOn.stats.rating < filter.minRating) {
+      if (
+        filter.minRating != null &&
+        (addOn.stats?.rating ?? 0) < filter.minRating
+      ) {
         return false;
       }
 
@@ -403,21 +435,27 @@ export class DiscoveryEngine {
           comparison = a.name.localeCompare(b.name);
           break;
         case 'installCount':
-          comparison = a.stats.installCount - b.stats.installCount;
+          comparison =
+            (a.stats?.installCount ?? 0) - (b.stats?.installCount ?? 0);
           break;
         case 'rating':
-          comparison = a.stats.rating - b.stats.rating;
+          comparison = (a.stats?.rating ?? 0) - (b.stats?.rating ?? 0);
           break;
         case 'createdAt':
-          comparison = new Date(a.stats.createdAt).getTime() - new Date(b.stats.createdAt).getTime();
+          comparison =
+            new Date(a.stats?.createdAt ?? 0).getTime() -
+            new Date(b.stats?.createdAt ?? 0).getTime();
           break;
         case 'updatedAt':
-          comparison = new Date(a.stats.lastUpdated).getTime() - new Date(b.stats.lastUpdated).getTime();
+          comparison =
+            new Date(a.stats?.lastUpdated ?? 0).getTime() -
+            new Date(b.stats?.lastUpdated ?? 0).getTime();
           break;
         case 'relevance':
         default:
           // Default sort by install count
-          comparison = a.stats.installCount - b.stats.installCount;
+          comparison =
+            (a.stats?.installCount ?? 0) - (b.stats?.installCount ?? 0);
       }
 
       return sort.direction === 'desc' ? -comparison : comparison;
@@ -431,12 +469,16 @@ export class DiscoveryEngine {
     // Keep required fields but minimize data transfer
     return {
       ...addOn,
-      description: addOn.tagline, // Truncate description
-      previewImages: { 
-        thumbnail: addOn.previewImages.thumbnail, 
-        screenshots: [],
-        demoVideo: addOn.previewImages.demoVideo,
-      },
+      description: addOn.tagline ?? addOn.description,
+      previewImages: addOn.previewImages
+        ? {
+            thumbnail: addOn.previewImages.thumbnail,
+            screenshots: [] as string[],
+            ...(addOn.previewImages.demoVideo != null
+              ? { demoVideo: addOn.previewImages.demoVideo }
+              : {}),
+          }
+        : undefined,
       // Keep required fields to satisfy type
       provides: addOn.provides,
       configSchema: addOn.configSchema,
@@ -463,11 +505,16 @@ export function filterByCompatibility(
 }
 
 export function sortByPopularity(addOns: AddOnDefinition[]): AddOnDefinition[] {
-  return [...addOns].sort((a, b) => b.stats.installCount - a.stats.installCount);
+  return [...addOns].sort(
+    (a, b) =>
+      (b.stats?.installCount ?? 0) - (a.stats?.installCount ?? 0),
+  );
 }
 
 export function sortByRating(addOns: AddOnDefinition[]): AddOnDefinition[] {
-  return [...addOns].sort((a, b) => b.stats.rating - a.stats.rating);
+  return [...addOns].sort(
+    (a, b) => (b.stats?.rating ?? 0) - (a.stats?.rating ?? 0),
+  );
 }
 
 export default DiscoveryEngine;

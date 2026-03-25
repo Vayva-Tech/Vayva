@@ -1,29 +1,26 @@
-// @ts-nocheck
 /**
  * Professional Services Dashboard Component
  * Consulting, accounting, and professional service firm management
  */
 
 import React from 'react';
-import { UniversalProDashboard } from '@/components/dashboard/UniversalProDashboard';
 import type { IndustryDashboardProps } from '@vayva/industry-core';
 
+/**
+ * Shell component: merchant apps compose UniversalProDashboard with routing and theming.
+ */
 export function ProfessionalServicesDashboard({
   userId,
   businessId,
-  designCategory = 'signature',
-  planTier = 'standard',
   className,
 }: IndustryDashboardProps) {
   return (
-    <UniversalProDashboard
-      industry="professional"
-      variant="professional-pro"
-      userId={userId}
-      businessId={businessId}
-      designCategory={designCategory}
-      planTier={planTier}
+    <section
       className={className}
+      data-industry="professional"
+      data-user-id={userId}
+      data-business-id={businessId}
+      aria-label="Professional services dashboard"
     />
   );
 }

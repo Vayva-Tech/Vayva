@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Specialized Industry Dashboard Component
  * Custom and niche business solutions dashboard
@@ -18,7 +17,7 @@ export function SpecializedDashboard({
   return (
     <UniversalProDashboard
       industry="specialized"
-      variant="specialized-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

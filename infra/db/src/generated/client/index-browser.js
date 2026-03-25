@@ -1715,6 +1715,24 @@ exports.Prisma.StoreScalarFieldEnum = {
   ownedTemplates: 'ownedTemplates'
 };
 
+exports.Prisma.MerchantWorkflowScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  name: 'name',
+  description: 'description',
+  industry: 'industry',
+  trigger: 'trigger',
+  nodes: 'nodes',
+  edges: 'edges',
+  status: 'status',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  executionCount: 'executionCount',
+  lastExecutedAt: 'lastExecutedAt'
+};
+
 exports.Prisma.FlashSaleScalarFieldEnum = {
   id: 'id',
   storeId: 'storeId',
@@ -7094,6 +7112,13 @@ exports.StoreAiAgencyStatus = exports.$Enums.StoreAiAgencyStatus = {
   EXPIRED: 'EXPIRED'
 };
 
+exports.MerchantWorkflowStatus = exports.$Enums.MerchantWorkflowStatus = {
+  draft: 'draft',
+  active: 'active',
+  paused: 'paused',
+  archived: 'archived'
+};
+
 exports.DeliveryEventStatus = exports.$Enums.DeliveryEventStatus = {
   PENDING: 'PENDING',
   IN_TRANSIT: 'IN_TRANSIT',
@@ -7942,6 +7967,7 @@ exports.Prisma.ModelName = {
   PlatformKillSwitch: 'PlatformKillSwitch',
   Product: 'Product',
   Store: 'Store',
+  MerchantWorkflow: 'MerchantWorkflow',
   FlashSale: 'FlashSale',
   StoreDeliverySettings: 'StoreDeliverySettings',
   Shipment: 'Shipment',

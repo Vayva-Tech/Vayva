@@ -6,7 +6,7 @@ import { logAuditEvent, AuditEventType } from "@/lib/audit";
 import {
   sanitizeText,
   sanitizeHtml,
-  sanitizeUrl,
+  sanitizeUrl
 } from "@/lib/input-sanitization";
 import { logger } from "@/lib/logger";
 import { ProductCreateSchema } from "@/lib/product-schemas";

@@ -1,8 +1,4 @@
 import { logger } from "../logger";
-import { Groq } from "groq-sdk";
-import { writeFile, unlink } from "fs/promises";
-import { tmpdir } from "os";
-import { join } from "path";
 
 export interface VoiceTranscriptionResult {
   text: string;
@@ -17,27 +13,43 @@ export interface VoiceProcessingError {
 }
 
 /**
- * VoiceProcessor - Handles audio transcription using Groq Whisper API
+ * VoiceProcessor - Voice transcription is currently disabled
  *
  * Features:
  * - Downloads audio from URLs (MinIO, WhatsApp, etc.)
- * - Transcribes to text using Groq Whisper (fast, cost-effective)
- * - Supports multiple audio formats (ogg, mp3, wav, m4a)
- * - Returns language detection and confidence scores
- * - Cleans up temporary files after processing
  */
 export class VoiceProcessor {
-  private groq: Groq;
+  constructor() {}
 
-  constructor() {
-    const apiKey = process.env.GROQ_API_KEY_MERCHANT || process.env.GROQ_API_KEY_SUPPORT;
-    if (!apiKey) {
-      logger.warn("[VoiceProcessor] No Groq API key found. Voice transcription will fail.");
-    }
-    this.groq = new Groq({
-      apiKey: apiKey || "placeholder-key",
-      dangerouslyAllowBrowser: false,
-    });
+  private async downloadAudio(audioUrl: string): Promise<{
+    base64: string;
+    format: "wav" | "mp3" | "ogg" | "m4a" | "aac" | "flac" | "aiff";
+  } | null> {
+    const res = await fetch(audioUrl, { signal: AbortSignal.timeout(30_000) });
+    if (!res.ok) return null;
+
+    const contentType = (res.headers.get("content-type") || "").toLowerCase();
+    const u = audioUrl.toLowerCase();
+
+    const format: "wav" | "mp3" | "ogg" | "m4a" | "aac" | "flac" | "aiff" =
+      contentType.includes("audio/wav") || u.endsWith(".wav")
+        ? "wav"
+        : contentType.includes("audio/mpeg") || u.endsWith(".mp3")
+          ? "mp3"
+          : contentType.includes("audio/ogg") || u.endsWith(".ogg") || u.endsWith(".oga")
+            ? "ogg"
+            : contentType.includes("audio/mp4") || u.endsWith(".m4a")
+              ? "m4a"
+              : contentType.includes("audio/aac") || u.endsWith(".aac")
+                ? "aac"
+                : contentType.includes("audio/flac") || u.endsWith(".flac")
+                  ? "flac"
+                  : contentType.includes("audio/aiff") || u.endsWith(".aiff") || u.endsWith(".aif")
+                    ? "aiff"
+                    : "ogg";
+
+    const buf = Buffer.from(await res.arrayBuffer());
+    return { base64: buf.toString("base64"), format };
   }
 
   /**
@@ -51,154 +63,77 @@ export class VoiceProcessor {
     audioUrl: string,
     storeId: string,
   ): Promise<VoiceTranscriptionResult | VoiceProcessingError> {
-    const startTime = Date.now();
-    let tempFilePath: string | null = null;
+    const apiKey = process.env.OPENROUTER_API_KEY || "";
+    if (!apiKey) {
+      return { error: "OPENROUTER_API_KEY not configured", code: "NO_API_KEY" };
+    }
+
+    const audio = await this.downloadAudio(audioUrl);
+    if (!audio) {
+      return { error: "Failed to download audio", code: "DOWNLOAD_FAILED" };
+    }
 
     try {
-      // Validate URL
-      if (!audioUrl || typeof audioUrl !== "string") {
-        return { error: "Invalid audio URL provided", code: "INVALID_URL" };
-      }
-
-      if (!audioUrl.startsWith("http://") && !audioUrl.startsWith("https://")) {
-        return { error: "Audio URL must be HTTP/HTTPS", code: "INVALID_URL" };
-      }
-
-      logger.info("[VOICE_TRANSCRIPTION_START]", {
-        storeId,
-        audioUrl: audioUrl.substring(0, 100) + "...",
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+          "HTTP-Referer": "https://vayva.tech",
+          "X-Title": "Vayva Voice",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          temperature: 0,
+          max_tokens: 512,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: "Transcribe this audio. Return only the transcript text." },
+                {
+                  type: "input_audio",
+                  inputAudio: { data: audio.base64, format: audio.format },
+                },
+              ],
+            },
+          ],
+        }),
+        signal: AbortSignal.timeout(45_000),
       });
 
-      // Download audio file
-      const audioBuffer = await this.downloadAudio(audioUrl);
-      if (!audioBuffer) {
-        return { error: "Failed to download audio file", code: "DOWNLOAD_FAILED" };
+      if (!res.ok) {
+        const detail = await res.text().catch(() => "");
+        logger.warn("[VOICE_TRANSCRIPTION_FAILED]", undefined, {
+          storeId,
+          status: res.status,
+          detail: detail.slice(0, 200),
+        });
+        return { error: "Transcription failed", code: "TRANSCRIPTION_FAILED" };
       }
 
-      // Save to temporary file (Groq SDK requires file path)
-      tempFilePath = join(tmpdir(), `voice-${storeId}-${Date.now()}.ogg`);
-      await writeFile(tempFilePath, audioBuffer);
-
-      // Transcribe using Groq Whisper
-      const transcription = await this.groq.audio.transcriptions.create({
-        file: await this.createFileFromPath(tempFilePath),
-        model: "whisper-large-v3",
-        response_format: "verbose_json",
-        language: "en", // Auto-detect if not specified, but we can set default
-      });
-
-      const duration = Date.now() - startTime;
-
-      logger.info("[VOICE_TRANSCRIPTION_SUCCESS]", {
-        storeId,
-        duration,
-        textLength: transcription.text?.length || 0,
-        language: (transcription as { language?: string }).language,
-      });
+      const data = (await res.json()) as any;
+      const text = String(data?.choices?.[0]?.message?.content || "").trim();
+      if (!text) {
+        return { error: "Empty transcription", code: "EMPTY_TRANSCRIPT" };
+      }
 
       return {
-        text: transcription.text || "",
-        language: (transcription as { language?: string }).language || "unknown",
-        confidence: this.calculateConfidence(transcription),
-        duration: (transcription as { duration?: number }).duration,
+        text,
+        language: "unknown",
+        confidence: 0.8,
       };
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error("[VOICE_TRANSCRIPTION_ERROR]", {
-        storeId,
-        error: errorMessage,
-        audioUrl: audioUrl?.substring(0, 100),
-      });
-      return { error: errorMessage, code: "TRANSCRIPTION_FAILED" };
-    } finally {
-      // Cleanup temporary file
-      if (tempFilePath) {
-        try {
-          await unlink(tempFilePath);
-        } catch {
-          // Ignore cleanup errors
-        }
-      }
+    } catch (e: unknown) {
+      logger.warn("[VOICE_TRANSCRIPTION_ERROR]", undefined, { storeId, error: String(e) });
+      return { error: "Transcription error", code: "TRANSCRIPTION_ERROR" };
     }
-  }
-
-  /**
-   * Download audio from URL
-   */
-  private async downloadAudio(url: string): Promise<Buffer | null> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-      
-      const response = await fetch(url, {
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        logger.error("[AUDIO_DOWNLOAD_FAILED]", {
-          url: url.substring(0, 100),
-          status: response.status,
-          statusText: response.statusText,
-        });
-        return null;
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
-      return Buffer.from(arrayBuffer);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error("[AUDIO_DOWNLOAD_ERROR]", {
-        url: url.substring(0, 100),
-        error: errorMessage,
-      });
-      return null;
-    }
-  }
-
-  /**
-   * Create a File object from file path for Groq SDK
-   */
-  private async createFileFromPath(filePath: string): Promise<File> {
-    // Node.js 18+ has native File support, but we need to handle older versions
-    const fs = await import("fs");
-    const buffer = fs.readFileSync(filePath);
-
-    // Create a File-like object that Groq SDK accepts
-    return new File([buffer], "audio.ogg", { type: "audio/ogg" });
-  }
-
-  /**
-   * Calculate confidence score from transcription segments
-   */
-  private calculateConfidence(
-    transcription: {
-      text?: string;
-      segments?: Array<{ avg_logprob?: number; no_speech_prob?: number }>;
-    },
-  ): number {
-    if (!transcription.segments || transcription.segments.length === 0) {
-      return 0.8; // Default confidence if no segments
-    }
-
-    // Average the log probabilities across segments
-    const avgLogProb =
-      transcription.segments.reduce((sum, seg) => sum + (seg.avg_logprob || 0), 0) /
-      transcription.segments.length;
-
-    // Convert log probability to approximate confidence (0-1)
-    // Whisper logprobs are typically negative, closer to 0 is better
-    const confidence = Math.min(Math.max((avgLogProb + 1) * 0.5, 0), 1);
-
-    return Math.round(confidence * 100) / 100;
   }
 
   /**
    * Check if voice processing is available (API key configured)
    */
   static isAvailable(): boolean {
-    const apiKey = process.env.GROQ_API_KEY_MERCHANT || process.env.GROQ_API_KEY_SUPPORT;
-    return !!apiKey && apiKey !== "placeholder-key";
+    return Boolean(process.env.OPENROUTER_API_KEY);
   }
 }
 

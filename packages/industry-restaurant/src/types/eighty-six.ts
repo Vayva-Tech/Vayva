@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 86 Manager types
  * Sold-out item management across channels
@@ -18,7 +17,8 @@ export interface EightySixConfig {
   restockLeadTimeMinutes: number;
 }
 
-export interface EightySixItem {
+/** POS / channel 86 listing; distinct from dashboard `EightySixItem` in `kitchen-types`. */
+export interface PosEightySixItem {
   id: string;
   menuItemId: string;
   name: string;

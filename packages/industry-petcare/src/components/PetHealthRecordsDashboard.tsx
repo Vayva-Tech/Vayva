@@ -1,9 +1,8 @@
-// @ts-nocheck
 /**
  * Pet Health Records Dashboard Component
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PetRecord, Vaccination } from '../services/pet-health-records.service';
 
 export interface PetHealthRecordsDashboardProps {
@@ -19,6 +18,12 @@ export const PetHealthRecordsDashboard: React.FC<PetHealthRecordsDashboardProps>
   onCreateRecord,
   onAddVaccination,
 }) => {
+  const vaccinationSoonThreshold = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d;
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="mb-6">
@@ -111,7 +116,7 @@ export const PetHealthRecordsDashboard: React.FC<PetHealthRecordsDashboardProps>
                   </div>
                   {vaccination.nextDueDate && (
                     <div className={`text-xs font-medium px-2 py-1 rounded ${
-                      new Date(vaccination.nextDueDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                      new Date(vaccination.nextDueDate) < vaccinationSoonThreshold
                         ? 'bg-red-100 text-red-700'
                         : 'bg-yellow-100 text-yellow-700'
                     }`}>

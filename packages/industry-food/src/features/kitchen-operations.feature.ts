@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Kitchen Operations Feature
  * Manage kitchen workflow and order preparation
@@ -14,12 +13,12 @@ export const kitchenOrderSchema = z.object({
       name: z.string(),
       quantity: z.number(),
       specialInstructions: z.string().optional(),
-      status: 'pending' | 'preparing' | 'ready' | 'served',
+      status: z.enum(['pending', 'preparing', 'ready', 'served']),
     })
   ),
-  priority: 'normal' | 'rush' | 'vip',
+  priority: z.enum(['normal', 'rush', 'vip']),
   estimatedPrepTime: z.number(),
-  station: 'hot' | 'cold' | 'grill' | 'fry' | 'pastry',
+  station: z.enum(['hot', 'cold', 'grill', 'fry', 'pastry']),
 });
 
 export type KitchenOrder = z.infer<typeof kitchenOrderSchema>;
@@ -38,7 +37,11 @@ export class KitchenOperationsFeature {
     this.orderQueue.push(order);
     // Sort by priority and time
     this.orderQueue.sort((a, b) => {
-      const priorityOrder = { rush: 0, vip: 1, normal: 2 };
+      const priorityOrder: Record<KitchenOrder['priority'], number> = {
+        rush: 0,
+        vip: 1,
+        normal: 2,
+      };
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
   }
@@ -46,7 +49,7 @@ export class KitchenOperationsFeature {
   async updateOrderStatus(orderId: string, status: KitchenOrder['items'][0]['status']): Promise<void> {
     const order = this.orderQueue.find(o => o.orderId === orderId);
     if (order) {
-      order.items.forEach(item => {
+      order.items.forEach((item: KitchenOrder['items'][number]) => {
         if (item.status === 'pending') {
           item.status = status;
         }

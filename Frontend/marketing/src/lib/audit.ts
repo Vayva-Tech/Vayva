@@ -7,7 +7,10 @@ export interface AuditLog {
 }
 
 export async function logAudit(data: Omit<AuditLog, 'id' | 'createdAt'>) {
-  console.log('Audit log:', data);
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console -- stub audit sink; replace with persistence
+    console.log("Audit log:", data);
+  }
 }
 
 export const audit = {

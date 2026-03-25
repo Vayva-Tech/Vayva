@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest as _NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma, type Prisma } from "@vayva/db";
@@ -117,7 +117,14 @@ export const POST = withVayvaAPI(
       );
     }
 
-    const { subscriptionId, amount, currency, dueDate, items, metadata } = validated.data;
+    const {
+      subscriptionId,
+      amount,
+      currency: _currency,
+      dueDate,
+      items,
+      metadata: _metadata,
+    } = validated.data;
 
     // Calculate total from items
     const itemTotal = items.reduce((sum, item) => sum + item.amount * item.quantity, 0);
@@ -198,7 +205,13 @@ export const PATCH = withVayvaAPI(
       );
     }
 
-    const { id, action, paymentMethod, providerRef, refundReason } = validated.data;
+    const {
+      id,
+      action,
+      paymentMethod: _paymentMethod,
+      providerRef: _providerRef,
+      refundReason: _refundReason,
+    } = validated.data;
 
     // Find invoice
     const invoice = await prisma.invoiceV2.findFirst({

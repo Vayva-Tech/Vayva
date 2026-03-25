@@ -1,7 +1,8 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   TrendingUp,
   TrendingDown,
@@ -18,6 +19,8 @@ import {
   FileText,
   Eye,
 } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 /* ------------------------------------------------------------------ */
 /*  Format helpers                                                     */
@@ -493,38 +496,85 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6 pb-10">
-      {/* ---- Header ---- */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Analytics</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Track performance, identify trends, and make data-driven decisions.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Date range picker */}
-          <div className="inline-flex items-center rounded-xl bg-gray-100 p-1">
-            {ranges.map((r) => (
-              <button
-                key={r.key}
-                onClick={() => setActiveRange(r.key)}
-                className={`px-3.5 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  activeRange === r.key
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-          {/* Export button */}
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
-        </div>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/products/new"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Add product</span>
+                  <ArrowUpRight className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/orders"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>View orders</span>
+                  <ArrowUpRight className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/customers"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Customers</span>
+                  <ArrowUpRight className="w-4 h-4 text-gray-400" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Insight
+              </div>
+              <div className="mt-2 text-sm font-semibold text-gray-900">
+                AI suggestions
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                We’ll surface anomalies, trends, and recommended actions here.
+              </p>
+              <div className="mt-4 rounded-xl bg-green-50 border border-green-100 p-4">
+                <div className="text-sm font-semibold text-green-900">Tip</div>
+                <p className="text-sm text-green-800 mt-1">
+                  Focus on conversion rate + AOV to compound revenue growth.
+                </p>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Analytics"
+          subtitle="Track performance, identify trends, and make data-driven decisions."
+          actions={
+            <>
+              <div className="inline-flex items-center rounded-xl bg-gray-100 p-1">
+                {ranges.map((r) => (
+                  <Button
+                    key={r.key}
+                    onClick={() => setActiveRange(r.key)}
+                    className={`px-3.5 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                      activeRange === r.key
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {r.label}
+                  </Button>
+                ))}
+              </div>
+              <Button className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+                <Download className="w-4 h-4" />
+                Export
+              </Button>
+            </>
+          }
+        />
 
       {/* ---- 4 Summary Cards ---- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -678,6 +728,8 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
+      </PageWithInsights>
     </div>
   );
 }
+

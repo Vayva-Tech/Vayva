@@ -57,12 +57,12 @@ export function ActionRequired({ items, onRefresh }: ActionRequiredProps) {
                   key={item.id}
                   className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg"
                 >
-                  <button
+                  <Button
                     onClick={() => toggleComplete(item.id)}
                     className="mt-0.5 text-red-600 hover:text-red-800"
                   >
                     <Square size={20} />
-                  </button>
+                  </Button>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">{item.title}</div>
                     <div className="text-sm text-gray-500 mt-1">{item.description}</div>
@@ -87,12 +87,12 @@ export function ActionRequired({ items, onRefresh }: ActionRequiredProps) {
                   key={item.id}
                   className="flex items-start gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg"
                 >
-                  <button
+                  <Button
                     onClick={() => toggleComplete(item.id)}
                     className="mt-0.5 text-gray-600 hover:text-gray-800"
                   >
                     <Square size={20} />
-                  </button>
+                  </Button>
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">{item.title}</div>
                     <div className="text-sm text-gray-500 mt-1">{item.description}</div>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { DashboardEngineConfig, WidgetDefinition } from '../types';
 
 const UPCOMING_EVENTS_WIDGET: WidgetDefinition = {

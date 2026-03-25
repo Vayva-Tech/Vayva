@@ -47,14 +47,8 @@ export const GET = withVayvaAPI(
     let status: CustomerStatus = CustomerStatus.NEW;
     if (totalOrders > 5) status = CustomerStatus.VIP;
     else if (totalOrders > 1) status = CustomerStatus.RETURNING;
-    
-    // Update status in database if changed
-    if (customer.status !== status) {
-      await prisma.customer.update({
-        where: { id: customer.id },
-        data: { status },
-      });
-    }
+
+    // Customer.status is not persisted on platform schema; derived status is response-only.
     const mappedProfile = {
       id: customer.id,
       merchantId: storeId,

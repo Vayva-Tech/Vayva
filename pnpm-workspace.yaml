@@ -16,3 +16,5 @@ packages:
   - "packages/industry-*"
   - "packages/tsconfig"
   - "packages/realtime"
+  - "packages/security"
+  - "packages/addons"

@@ -56,7 +56,14 @@ export class FashionService {
     return mapSizeProfile(profile);
   }
 
-  async createSizeProfile(data: CreateSizeProfileInput): Promise<SizeProfile> {
+  async createSizeProfile(storeId: string, data: CreateSizeProfileInput): Promise<SizeProfile> {
+    const customer = await prisma.customer.findFirst({
+      where: { id: data.customerId, storeId },
+    });
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+
     const profile = await prisma.sizeProfile.create({
       data: {
         customerId: data.customerId,
@@ -69,9 +76,21 @@ export class FashionService {
   }
 
   async updateSizeProfile(
+    storeId: string,
     id: string,
     data: Partial<CreateSizeProfileInput>
   ): Promise<SizeProfile> {
+    const existing = await prisma.sizeProfile.findFirst({ where: { id } });
+    if (!existing) {
+      throw new Error('Size profile not found');
+    }
+    const customer = await prisma.customer.findFirst({
+      where: { id: existing.customerId, storeId },
+    });
+    if (!customer) {
+      throw new Error('Size profile not found');
+    }
+
     const profile = await prisma.sizeProfile.update({
       where: { id },
       data: {
@@ -118,10 +137,13 @@ export class FashionService {
     return mapSizeChart(chart);
   }
 
-  async deleteSizeChart(id: string): Promise<void> {
-    await prisma.sizeChart.delete({
-      where: { id },
+  async deleteSizeChart(storeId: string, id: string): Promise<void> {
+    const deleted = await prisma.sizeChart.deleteMany({
+      where: { id, storeId },
     });
+    if (deleted.count !== 1) {
+      throw new Error('Size chart not found');
+    }
   }
 
   // ===== STYLE QUIZZES =====
@@ -155,11 +177,12 @@ export class FashionService {
   }
 
   async updateStyleQuiz(
+    storeId: string,
     id: string,
     data: Partial<Omit<StyleQuiz, 'id' | 'storeId' | 'createdAt' | 'updatedAt'>>
   ): Promise<StyleQuiz> {
-    const quiz = await prisma.styleQuiz.update({
-      where: { id },
+    const updated = await prisma.styleQuiz.updateMany({
+      where: { id, storeId },
       data: {
         ...(data.title !== undefined && { title: data.title }),
         ...(data.questions !== undefined &&
@@ -169,6 +192,13 @@ export class FashionService {
         ...(data.isActive !== undefined && { isActive: data.isActive }),
       },
     });
+    if (updated.count !== 1) {
+      throw new Error('Style quiz not found');
+    }
+    const quiz = await prisma.styleQuiz.findFirst({ where: { id, storeId } });
+    if (!quiz) {
+      throw new Error('Style quiz not found');
+    }
 
     return mapStyleQuiz(quiz);
   }

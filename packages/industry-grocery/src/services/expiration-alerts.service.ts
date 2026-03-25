@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Expiration Alerts Service
  * Monitors and alerts about products nearing expiration

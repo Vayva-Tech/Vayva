@@ -1,11 +1,10 @@
-// @ts-nocheck
 // ============================================================================
 // Widgets
 // ============================================================================
 // Widget components and registry for the dashboard engine
 // ============================================================================
 
-export { WidgetRegistry } from "./registry";
+export { WidgetRegistry, getWidgetRegistry } from "./registry";
 export { BaseWidget } from "./base-widget";
 export { KPICardWidget } from "./kpi-card";
 export { ChartWidget } from "./chart-widget";

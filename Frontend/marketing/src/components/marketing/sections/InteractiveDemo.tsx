@@ -7,12 +7,12 @@ import {
   IconShoppingBag as ShoppingBag,
   IconSparkles as Sparkles,
   IconLayoutDashboard as LayoutDashboard,
-  IconDeviceMobile as Smartphone,
   IconChevronRight as ChevronRight,
   IconCircleCheck as CheckCircle2,
   IconClock as Clock,
   IconTruck as Truck,
 } from "@tabler/icons-react";
+import { Button } from "@vayva/ui";
 
 const tabs = [
   { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -86,12 +86,15 @@ function WhatsAppDemo() {
       {/* Step indicator */}
       <div className="flex justify-center gap-2 mt-4">
         {messages.map((_, i) => (
-          <button
+          <Button
+            type="button"
+            variant="ghost"
             key={i}
             onClick={() => setStep(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i <= step ? "bg-emerald-500 w-4" : "bg-slate-300"
+            className={`w-2 h-2 min-h-0 min-w-0 p-0 rounded-full transition-all ${
+              i <= step ? "bg-emerald-500 w-4 hover:bg-emerald-500" : "bg-slate-300 hover:bg-slate-400"
             }`}
+            aria-label={`Step ${i + 1}`}
           />
         ))}
       </div>
@@ -132,9 +135,9 @@ function StoreDemo() {
           <div className="bg-emerald-100 rounded-xl p-4 mb-4">
             <p className="text-xs text-emerald-600 font-medium mb-1">NEW COLLECTION</p>
             <h4 className="text-lg font-bold text-slate-900 mb-2">Autumn Ankara</h4>
-            <button className="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-full">
+            <Button type="button" className="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-full h-auto hover:bg-emerald-700 hover:text-white">
               Shop Now
-            </button>
+            </Button>
           </div>
 
           {/* Products */}
@@ -371,18 +374,20 @@ export function InteractiveDemo(): React.JSX.Element {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all h-auto ${
                     isActive
-                      ? "bg-white text-emerald-700 shadow-sm"
+                      ? "bg-white text-emerald-700 shadow-sm hover:bg-white hover:text-emerald-700"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? "text-emerald-600" : "text-slate-500"}`} />
                   {tab.label}
-                </button>
+                </Button>
               );
             })}
           </div>

@@ -37,8 +37,8 @@ export const termsOfService: LegalDocument = {
       heading: "4. Verification, KYC and Compliance Obligations",
       content: [
         "To maintain platform security, prevent fraud, and comply with legal obligations including anti-money laundering (AML) and counter-terrorism financing (CTF) regulations, Vayva requires identity and business verification (Know Your Customer - KYC).",
-        "Verification Requirements May Include: National Identity Number (NIN) verified through YouVerify or equivalent government-issued identification; Bank Verification Number (BVN) validated through Paystack or Central Bank of Nigeria database; Corporate Affairs Commission (CAC) documentation for registered businesses including certificate of incorporation, memorandum and articles of association; Proof of address such as utility bills or bank statements issued within the last 90 days; Tax identification numbers and relevant tax clearance certificates; Additional documentation as required based on transaction volume, risk profile, or regulatory requirements.",
-        "Verification Process: We may use third-party verification services including YouVerify for NIN checks, Paystack for BVN validation, and manual review for CAC documents through our Operations Console. You authorize Vayva and our service providers to verify your identity using available databases and records.",
+        "Verification Requirements May Include: National Identity Number (NIN) or equivalent government-issued identification; Bank Verification Number (BVN) validated through Paystack or bank/CBN-linked checks; Corporate Affairs Commission (CAC) documentation for registered businesses including certificate of incorporation, memorandum and articles of association; Proof of address such as utility bills or bank statements issued within the last 90 days; Tax identification numbers and relevant tax clearance certificates; Additional documentation as required based on transaction volume, risk profile, or regulatory requirements.",
+        "Verification Process: We may use third-party verification services (including Paystack for BVN validation) and manual review for CAC documents through our Operations Console. You authorize Vayva and our service providers to verify your identity using available databases and records.",
         "You agree to provide accurate, complete documentation and promptly update any changes to verification information. Failure to complete verification may result in restricted account functionality including inability to withdraw funds, receive payments, or access certain features.",
       ],
     },
@@ -108,13 +108,15 @@ export const termsOfService: LegalDocument = {
     {
       heading: "12. Indemnification and Hold Harmless",
       content: [
-        "You agree to indemnify, defend, and hold harmless Vayva, its parent company, affiliates, subsidiaries, officers, directors, employees, agents, licensors, suppliers, and partners from and against any and all claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees and court costs) arising out of or relating to:
-        - Your use of the Service in violation of these Terms;
-        - Your content, product listings, or intellectual property infringement;
-        - Your goods, services, or business practices including product liability, consumer protection violations, or misrepresentation;
-        - Your violation of any law, regulation, or third-party rights;
-        - Claims by your customers, employees, or other third parties related to your business;
-        - Your breach of any representation, warranty, or covenant in these Terms.",
+        [
+          "You agree to indemnify, defend, and hold harmless Vayva, its parent company, affiliates, subsidiaries, officers, directors, employees, agents, licensors, suppliers, and partners from and against any and all claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees and court costs) arising out of or relating to:",
+          "- Your use of the Service in violation of these Terms;",
+          "- Your content, product listings, or intellectual property infringement;",
+          "- Your goods, services, or business practices including product liability, consumer protection violations, or misrepresentation;",
+          "- Your violation of any law, regulation, or third-party rights;",
+          "- Claims by your customers, employees, or other third parties related to your business;",
+          "- Your breach of any representation, warranty, or covenant in these Terms.",
+        ].join(" "),
         "Vayva reserves the right to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you shall cooperate with Vayva in asserting any available defenses. You may not settle any claim on Vayva's behalf without our prior written consent.",
       ],
     },
@@ -132,7 +134,7 @@ export const termsOfService: LegalDocument = {
         "Governing Law: These Terms and your use of the Service are governed by and construed in accordance with the laws of the Federal Republic of Nigeria, without regard to its conflict of law provisions. The United Nations Convention on Contracts for the International Sale of Goods (CISG) does not apply.",
         "Mandatory Arbitration: Except as provided below, any dispute, controversy, or claim arising out of or relating to these Terms or the Service shall be finally resolved by binding arbitration administered by the Lagos Court of Arbitration (LCA) in accordance with its Arbitration Rules. The arbitration shall be conducted by a single arbitrator appointed in accordance with the Rules. The place of arbitration shall be Lagos, Nigeria. The language of arbitration shall be English. Judgment on the award may be entered in any court having jurisdiction.",
         "Class Action Waiver: YOU AND VAYVA AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING. UNLESS BOTH YOU AND VAYVA AGREE OTHERWISE, THE ARBITRATOR MAY NOT CONSOLIDATE MORE THAN ONE PERSON'S CLAIMS AND MAY NOT OTHERWISE PRESIDE OVER ANY FORM OF A REPRESENTATIVE OR CLASS PROCEEDING.",
-        "Small Claims Exception: Notwithstanding the foregoing, either party may bring an individual action in small claims court if the claim qualifies for small claims court jurisdiction and the party provides 30 days' prior written notice. This exception does not permit class actions or representative proceedings in small claims court.
+        "Small Claims Exception: Notwithstanding the foregoing, either party may bring an individual action in small claims court if the claim qualifies for small claims court jurisdiction and the party provides 30 days' prior written notice. This exception does not permit class actions or representative proceedings in small claims court.",
         "Court Jurisdiction: If the arbitration agreement is found unenforceable or does not apply to a particular claim, you and Vayva agree that any legal proceeding must be brought in the Federal High Court of Nigeria, Lagos Division. Both parties consent to venue and personal jurisdiction there.",
       ],
     },
@@ -148,9 +150,6 @@ export const termsOfService: LegalDocument = {
         "Survival: Provisions that by their nature should survive termination shall survive termination including but not limited to: Ownership of data; Intellectual property rights; Payment obligations; Disclaimers; Limitations of liability; Indemnification; Governing law; Dispute resolution.",
       ],
     },
-  ],
-};
-
     {
       heading: "16. Contact Information and Customer Support",
       content: [

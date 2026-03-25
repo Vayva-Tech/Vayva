@@ -76,18 +76,27 @@ class TicketDetailController extends BaseIndustryController {
           throw new Error("Ticket not found");
         }
 
-        // Update ticket
-        const updatedTicket = await prisma.kitchenTicket.update({
-          where: { id: ticketId },
+        const updated = await prisma.kitchenTicket.updateMany({
+          where: { id: ticketId, storeId: context.storeId },
           data: {
             ...body,
             updatedAt: new Date(),
           },
+        });
+        if (updated.count === 0) {
+          throw new Error("Ticket not found");
+        }
+
+        const updatedTicket = await prisma.kitchenTicket.findUnique({
+          where: { id: ticketId, storeId: context.storeId },
           include: {
             station: true,
             items: true,
           },
         });
+        if (!updatedTicket) {
+          throw new Error("Ticket not found");
+        }
 
         // Send real-time update notification
         await this.notifyKDSUpdate(context.storeId, updatedTicket.stationId);
@@ -122,14 +131,16 @@ class TicketDetailController extends BaseIndustryController {
           throw new Error("Ticket not found");
         }
 
-        // Soft delete by updating status
-        await prisma.kitchenTicket.update({
-          where: { id: ticketId },
+        const cancelled = await prisma.kitchenTicket.updateMany({
+          where: { id: ticketId, storeId: context.storeId },
           data: {
             status: "cancelled",
             updatedAt: new Date(),
           },
         });
+        if (cancelled.count === 0) {
+          throw new Error("Ticket not found");
+        }
 
         return {
           success: true,
@@ -169,7 +180,7 @@ class TicketDetailController extends BaseIndustryController {
         },
       });
       
-      console.log(`[KDS_WS] Notified subscribers - Store: ${storeId}, Station: ${stationId || 'all'}`);
+      console.warn(`[KDS_WS] Notified subscribers - Store: ${storeId}, Station: ${stationId || 'all'}`);
     } catch (error) {
       console.error('[KDS_WS] Failed to emit WebSocket event:', error);
     }

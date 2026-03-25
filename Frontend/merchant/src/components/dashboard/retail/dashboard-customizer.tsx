@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -266,8 +265,8 @@ export function DashboardCustomizer({
                 <div className="flex items-center gap-4">
                   <Select
                     value={widget.size}
-                    onValueChange={(value: 'small' | 'medium' | 'large') =>
-                      updateWidgetSize(widget.id, value)
+                    onValueChange={(value) =>
+                      updateWidgetSize(widget.id, value as 'small' | 'medium' | 'large')
                     }
                   >
                     <SelectTrigger className="w-[120px]">

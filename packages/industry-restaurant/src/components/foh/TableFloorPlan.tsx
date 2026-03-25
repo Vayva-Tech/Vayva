@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { TableManagementService, type Table } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from "@vayva/ui";
+import { CardTitle } from '../restaurant-ui';
 import { 
   Grid3X3,
   Users,
@@ -25,7 +25,7 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
   useEffect(() => {
     const fetchTables = async () => {
       try {
-        const tableData = await tableService.getAllTables();
+        const tableData = tableService.getAllTables();
         setTables(tableData);
         setLoading(false);
       } catch (error) {
@@ -45,6 +45,9 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
       case 'available':
         return 'bg-green-100 text-green-800 border-green-300';
       case 'occupied':
+      case 'seated':
+      case 'ordering':
+      case 'cooking':
         return 'bg-red-100 text-red-800 border-red-300';
       case 'reserved':
         return 'bg-blue-100 text-blue-800 border-blue-300';
@@ -62,6 +65,9 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
       case 'available':
         return <CheckCircle className="h-4 w-4" />;
       case 'occupied':
+      case 'seated':
+      case 'ordering':
+      case 'cooking':
         return <Users className="h-4 w-4" />;
       case 'reserved':
         return <Clock className="h-4 w-4" />;
@@ -74,11 +80,12 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
     }
   };
 
-  const filteredTables = selectedZone === 'all' 
-    ? tables 
-    : tables.filter(table => table.zone === selectedZone);
+  const filteredTables =
+    selectedZone === 'all'
+      ? tables
+      : tables.filter((table) => table.section === selectedZone);
 
-  const zones = [...new Set(tables.map(table => table.zone))].filter(Boolean);
+  const zones = [...new Set(tables.map((table) => table.section))].filter(Boolean);
 
   const getStatusCounts = () => {
     const counts = {
@@ -89,11 +96,14 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
       maintenance: 0
     };
     
-    tables.forEach(table => {
+    tables.forEach((table) => {
       const status = table.status.toLowerCase();
-      if (status in counts) {
-        counts[status as keyof typeof counts]++;
-      }
+      if (status === 'available') counts.available++;
+      else if (status === 'seated' || status === 'ordering' || status === 'cooking' || status === 'occupied')
+        counts.occupied++;
+      else if (status === 'reserved') counts.reserved++;
+      else if (status === 'cleaning' || status === 'paid') counts.cleaning++;
+      else if (status === 'offline') counts.maintenance++;
     });
     
     return counts;
@@ -137,7 +147,7 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
         {/* Zone Filter */}
         {zones.length > 1 && (
           <div className="flex flex-wrap gap-2 mt-3">
-            <button
+            <Button
               onClick={() => setSelectedZone('all')}
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
                 selectedZone === 'all'
@@ -146,9 +156,9 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
               }`}
             >
               All Zones
-            </button>
+            </Button>
             {zones.map(zone => (
-              <button
+              <Button
                 key={zone}
                 onClick={() => setSelectedZone(zone)}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
@@ -158,7 +168,7 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
                 }`}
               >
                 {zone}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -197,7 +207,7 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
               className={`
                 aspect-square flex flex-col items-center justify-center p-2 rounded-xl border-2 cursor-pointer transition-all hover:scale-105
                 ${getTableStatusColor(table.status)}
-                ${table.status.toLowerCase() === 'occupied' ? 'hover:border-red-500' : ''}
+                ${['occupied', 'seated', 'ordering', 'cooking'].includes(table.status.toLowerCase()) ? 'hover:border-red-500' : ''}
                 ${table.status.toLowerCase() === 'available' ? 'hover:border-green-500' : ''}
               `}
               onClick={() => console.log('Table clicked:', table)}
@@ -218,16 +228,17 @@ export function TableFloorPlan({ tableService }: TableFloorPlanProps) {
               </div>
               
               {/* Occupancy Indicator */}
-              {table.status.toLowerCase() === 'occupied' && table.currentOccupancy && (
+              {['occupied', 'seated', 'ordering', 'cooking'].includes(table.status.toLowerCase()) &&
+                table.currentParty?.size != null && (
                 <div className="text-xs text-current mt-1">
-                  {table.currentOccupancy}/{table.capacity}
+                  {table.currentParty.size}/{table.capacity}
                 </div>
               )}
               
-              {/* Zone Badge */}
-              {table.zone && (
-                <Badge variant="secondary" className="mt-1 text-[8px] px-1 py-0 bg-white/50">
-                  {table.zone}
+              {/* Section badge */}
+              {table.section && (
+                <Badge variant="outline" className="mt-1 text-[8px] px-1 py-0 bg-white/50">
+                  {table.section}
                 </Badge>
               )}
             </div>

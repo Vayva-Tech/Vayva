@@ -12,7 +12,7 @@ export function useDashboardConfig() {
   };
 }
 
-export function useWidgetData(widgetId, dataSource) {
+export function useWidgetData(_widgetId, _dataSource) {
   return {
     data: null,
     loading: false,

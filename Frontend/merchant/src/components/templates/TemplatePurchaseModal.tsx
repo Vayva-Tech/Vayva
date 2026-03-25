@@ -1,15 +1,22 @@
-// @ts-nocheck
 /**
  * Template Purchase Modal
  * Shows confirmation dialog for purchasing additional templates
  */
 
-'use client';
+"use client";
 
-import React from 'react';
-import { Button, Dialog } from '@vayva/ui';
-import { Lightning as Zap, Warning as AlertTriangle, Info } from '@phosphor-icons/react';
-import { useTemplatePurchase } from '@/hooks/useTemplatePurchase';
+import Link from "next/link";
+import React from "react";
+import {
+  Lightning as Zap,
+  Warning as AlertTriangle,
+  Info,
+  Spinner as Loader2,
+} from "@phosphor-icons/react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Button } from "@vayva/ui";
+import { useTemplatePurchase } from "@/hooks/useTemplatePurchase";
+import { cn } from "@/lib/utils";
 
 interface TemplatePurchaseModalProps {
   open: boolean;
@@ -177,8 +184,3 @@ export function TemplatePurchaseModal({
     </Dialog.Root>
   );
 }
-
-// Helper imports
-import Link from 'next/link';
-import { Spinner as Loader2 } from '@phosphor-icons/react';
-import { cn } from '@/lib/utils';

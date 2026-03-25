@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React from 'react';
-import { GlassPanel , SparklineChart , TrendIndicator } from '@vayva/ui/components/fashion';
+import { GlassPanel , SparklineChart , TrendIndicator } from '@vayva/ui/fashion';
 
 export interface KPICardProps {
   id: string;

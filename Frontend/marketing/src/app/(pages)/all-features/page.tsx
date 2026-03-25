@@ -1,6 +1,8 @@
 import React from "react";
 import { SchemaOrg } from "@/components/seo/SchemaOrg";
 import { MerchantFeaturesSection } from "@/components/marketing/MerchantFeaturesSection";
+import { readStarterFirstMonthFreeEnabled } from "@/lib/read-starter-first-month-free";
+import { getSchemaOfferLine } from "@/config/pricing";
 
 export const metadata = {
   title: "Platform Features | Vayva",
@@ -25,35 +27,40 @@ export const metadata = {
   },
 };
 
-const featurePageSchema = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Vayva Platform Features",
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "NGN",
-    description: "7-day trial on Starter",
-  },
-  featureList: [
-    "AI Order Capture",
-    "Unified Order Inbox",
-    "Real-Time Inventory",
-    "Paystack Integration",
-    "Kwik Delivery",
-    "Customer CRM",
-    "Flash Sales",
-    "Analytics Dashboard",
-    "Templates",
-    "Visual Editor",
-  ],
-};
+function buildFeaturePageSchema(offerDescription: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Vayva Platform Features",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "NGN",
+      description: offerDescription,
+    },
+    featureList: [
+      "AI Order Capture",
+      "Unified Order Inbox",
+      "Real-Time Inventory",
+      "Paystack Integration",
+      "Kwik Delivery",
+      "Customer CRM",
+      "Flash Sales",
+      "Analytics Dashboard",
+      "Templates",
+      "Visual Editor",
+    ],
+  };
+}
 
-export default function AllFeaturesPage(): React.JSX.Element {
+export default async function AllFeaturesPage(): Promise<React.JSX.Element> {
+  const starterFirstMonthFree = await readStarterFirstMonthFreeEnabled();
+  const featurePageSchema = buildFeaturePageSchema(getSchemaOfferLine(starterFirstMonthFree));
+
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative w-full min-w-0 overflow-x-hidden">
       <SchemaOrg type="SoftwareApplication" />
       <script
         type="application/ld+json"

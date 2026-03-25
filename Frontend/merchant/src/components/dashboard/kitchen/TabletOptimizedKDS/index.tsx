@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { useRealTimeKDS } from '@/hooks/useRealTimeKDS';
@@ -76,7 +76,7 @@ export function TabletOptimizedKDS() {
               </select>
 
               {/* Fullscreen Toggle */}
-              <button
+              <Button
                 onClick={toggleFullscreen}
                 className="p-2 text-kds-text-secondary hover:text-kds-text-green-500 transition-colors"
                 title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
@@ -86,7 +86,7 @@ export function TabletOptimizedKDS() {
                 ) : (
                   <Maximize2 className="h-6 w-6" />
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@ export function TabletOptimizedKDS() {
       {/* Bottom Navigation - Tablet Optimized */}
       <nav className="fixed bottom-0 left-0 right-0 bg-kds-card-bg border-t border-kds-card-border safe-area-inset-bottom z-40">
         <div className="grid grid-cols-4 gap-2 px-4 py-2">
-          <button
+          <Button
             onClick={() => setActiveView('tickets')}
             className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
               activeView === 'tickets'
@@ -107,9 +107,9 @@ export function TabletOptimizedKDS() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <span className="text-xs font-medium">Tickets</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => setActiveView('status')}
             className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
               activeView === 'status'
@@ -121,9 +121,9 @@ export function TabletOptimizedKDS() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             <span className="text-xs font-medium">Status</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => setActiveView('stations')}
             className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
               activeView === 'stations'
@@ -135,9 +135,9 @@ export function TabletOptimizedKDS() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
             </svg>
             <span className="text-xs font-medium">Stations</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={() => setActiveView('86')}
             className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
               activeView === '86'
@@ -149,7 +149,7 @@ export function TabletOptimizedKDS() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span className="text-xs font-medium">86 Board</span>
-          </button>
+          </Button>
         </div>
       </nav>
 
@@ -217,3 +217,4 @@ export function TabletOptimizedKDS() {
     </div>
   );
 }
+

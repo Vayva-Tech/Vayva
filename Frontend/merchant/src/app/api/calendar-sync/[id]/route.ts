@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@vayva/db";
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { id } = await params;
 
     const products = await prisma.product?.findMany({
@@ -29,7 +34,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const next = existing.filter((s: any) => s?.id !== id);
 
     await prisma.product?.update({
-      where: { id: target.id },
+      where: { id: target.id, storeId },
       data: {
         metadata: {
           ...metadata,

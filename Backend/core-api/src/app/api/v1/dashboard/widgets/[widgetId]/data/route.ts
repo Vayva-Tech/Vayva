@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db/prisma";
+import { prisma as _prisma } from "@/lib/db/prisma";
 import { getServerSession } from "@/lib/auth/session";
 import type { DataSourceConfig } from "@vayva/industry-core";
 

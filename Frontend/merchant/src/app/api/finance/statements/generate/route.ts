@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@vayva/db";
@@ -25,7 +26,11 @@ function parseMonthYear(input: { month: unknown; year: unknown }): { monthIndex:
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const parsed = parseMonthYear({
       month: searchParams.get("month"),

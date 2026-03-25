@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Instructor Performance Feature
  * 
@@ -31,7 +30,7 @@ export async function getInstructorPerformance(
     where.id = instructorId;
   }
 
-  const instructors = await prisma.user.findMany({
+  const instructors = await (prisma as any).user.findMany({
     where: {
       ...where,
       role: 'instructor',
@@ -158,7 +157,7 @@ export async function createInstructor(
     avatarUrl?: string;
   }
 ): Promise<Instructor> {
-  const instructor = await prisma.user.create({
+  const instructor = await (prisma as any).user.create({
     data: {
       storeId,
       email: data.email,
@@ -204,7 +203,7 @@ export async function updateInstructor(
     responseTime?: number;
   }>
 ): Promise<Instructor> {
-  const instructor = await prisma.user.update({
+  const instructor = await (prisma as any).user.update({
     where: { id: instructorId, role: 'instructor' },
     data,
   });
@@ -220,7 +219,7 @@ export async function getInstructorCourses(
   prisma: PrismaClient,
   instructorId: string
 ): Promise<any[]> {
-  const courses = await prisma.course.findMany({
+  const courses = await (prisma as any).course.findMany({
     where: { instructorId },
     include: {
       _count: {
@@ -290,7 +289,7 @@ async function getInstructorById(
   prisma: PrismaClient,
   instructorId: string
 ): Promise<Instructor> {
-  const instructor = await prisma.user.findUnique({
+  const instructor = await (prisma as any).user.findUnique({
     where: { id: instructorId },
     include: {
       courses: {
@@ -308,11 +307,13 @@ async function getInstructorById(
 
   const courses = instructor.courses || [];
   const totalStudents = courses.reduce(
-    (sum, c) => sum + (c._count?.enrollments || 0),
+    (sum: number, c: { _count?: { enrollments?: number }; revenue?: number }) =>
+      sum + (c._count?.enrollments || 0),
     0
   );
   const totalRevenue = courses.reduce(
-    (sum, c) => sum + (c.revenue || 0),
+    (sum: number, c: { _count?: { enrollments?: number }; revenue?: number }) =>
+      sum + (c.revenue || 0),
     0
   );
   const averageRating = calculateAverageRating(instructor.reviews || []);

@@ -10,7 +10,7 @@ class CreativePortfolioEngine {
   }
   
   async initialize() {
-    console.log('[CREATIVE_PORTFOLIO_ENGINE] Initialized');
+    console.warn('[CREATIVE_PORTFOLIO_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

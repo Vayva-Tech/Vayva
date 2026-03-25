@@ -203,7 +203,7 @@ describe('Travel Dashboard Integration Tests', () => {
     expect(headings.length).toBeGreaterThan(0);
     
     // Check for landmark regions
-    const regions = screen.queryAllByRole('region');
+    const _regions = screen.queryAllByRole('region');
     // Should have multiple sections
     
     // Check for proper contrast and readable text

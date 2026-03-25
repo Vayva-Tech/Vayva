@@ -1,17 +1,29 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 /**
  * GET /api/collections/[id] - Get collection details
  */
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> },
+) {
   try {
     const { id: collectionId } = await params;
-    
-    // Call backend API to fetch collection
+    if (!collectionId) {
+      return NextResponse.json(
+        { error: "Collection id required" },
+        { status: 400 },
+      );
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await apiJson<{
       success: boolean;
       data?: {
@@ -22,17 +34,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         imageUrl: string | null;
         productCount: number;
         isAutomated: boolean;
-        conditions: any;
+        conditions: unknown;
       };
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/collections/${collectionId}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch collection');
+      throw new Error(result.error || "Failed to fetch collection");
     }
 
     return NextResponse.json({
@@ -41,12 +51,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/collections/[id]',
-      operation: 'GET_COLLECTION',
+      endpoint: "/api/collections/[id]",
+      operation: "GET_COLLECTION",
     });
     return NextResponse.json(
-      { error: 'Failed to fetch collection' },
-      { status: 500 }
+      { error: "Failed to fetch collection" },
+      { status: 500 },
     );
   }
 }
@@ -54,26 +64,38 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 /**
  * PUT /api/collections/[id] - Update collection
  */
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> },
+) {
   try {
     const { id: collectionId } = await params;
-    const body = await request.json();
-    
+    if (!collectionId) {
+      return NextResponse.json(
+        { error: "Collection id required" },
+        { status: 400 },
+      );
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body: unknown = await request.json();
+
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/collections/${collectionId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-store-id': storeId,
-      },
+      method: "PUT",
+      headers: auth.headers,
       body: JSON.stringify(body),
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to update collection');
+      throw new Error(result.error || "Failed to update collection");
     }
 
     return NextResponse.json({
@@ -82,12 +104,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/collections/[id]',
-      operation: 'UPDATE_COLLECTION',
+      endpoint: "/api/collections/[id]",
+      operation: "UPDATE_COLLECTION",
     });
     return NextResponse.json(
-      { error: 'Failed to update collection' },
-      { status: 500 }
+      { error: "Failed to update collection" },
+      { status: 500 },
     );
   }
 }
@@ -95,36 +117,48 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 /**
  * DELETE /api/collections/[id] - Delete collection
  */
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> },
+) {
   try {
     const { id: collectionId } = await params;
-    
+    if (!collectionId) {
+      return NextResponse.json(
+        { error: "Collection id required" },
+        { status: 400 },
+      );
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await apiJson<{
       success: boolean;
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/collections/${collectionId}`, {
-      method: 'DELETE',
-      headers: {
-        'x-store-id': storeId,
-      },
+      method: "DELETE",
+      headers: auth.headers,
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to delete collection');
+      throw new Error(result.error || "Failed to delete collection");
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Collection deleted successfully',
+      message: "Collection deleted successfully",
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/collections/[id]',
-      operation: 'DELETE_COLLECTION',
+      endpoint: "/api/collections/[id]",
+      operation: "DELETE_COLLECTION",
     });
     return NextResponse.json(
-      { error: 'Failed to delete collection' },
-      { status: 500 }
+      { error: "Failed to delete collection" },
+      { status: 500 },
     );
   }
 }

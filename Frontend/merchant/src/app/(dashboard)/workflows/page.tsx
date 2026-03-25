@@ -1,25 +1,24 @@
-// @ts-nocheck
 /**
  * Workflows List Page
  * Displays all workflows for the merchant
  */
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { Button } from "@vayva/ui";
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { 
-  Plus, 
-  Play, 
-  Pause, 
-  Edit3, 
-  Trash2, 
+import { toast } from 'sonner';
+import { apiJson } from '@/lib/api-client-shared';
+import {
+  Plus,
+  Play,
+  Pause,
+  Edit3,
+  Trash2,
   Copy,
-  Workflow,
+  Workflow as WorkflowIcon,
   Search,
   Filter,
-  MoreVertical,
 } from 'lucide-react';
 import type { Workflow, WorkflowStatus } from '@vayva/workflow-engine';
 
@@ -28,73 +27,41 @@ interface WorkflowListItem extends Workflow {
   lastExecutedAt?: Date;
 }
 
+function parseWorkflowListItem(raw: unknown): WorkflowListItem {
+  const o = raw as Record<string, unknown>;
+  return {
+    ...(o as unknown as WorkflowListItem),
+    createdAt: new Date(String(o.createdAt ?? Date.now())),
+    updatedAt: new Date(String(o.updatedAt ?? Date.now())),
+    lastExecutedAt: o.lastExecutedAt
+      ? new Date(String(o.lastExecutedAt))
+      : undefined,
+  };
+}
+
 export default function WorkflowsPage() {
-  const router = useRouter();
   const [workflows, setWorkflows] = useState<WorkflowListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>('all');
 
-  // Mock data - replace with actual API call
-  useEffect(() => {
-    const mockWorkflows: WorkflowListItem[] = [
-      {
-        id: 'wf_1',
-        name: 'Auto-Reorder Low Sizes',
-        description: 'Automatically create PO when size stock drops below threshold',
-        industry: 'fashion',
-        merchantId: 'merchant_1',
-        trigger: { type: 'inventory_low', config: {} },
-        nodes: [],
-        edges: [],
-        status: 'active',
-        version: 1,
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date('2024-01-20'),
-        createdBy: 'user_1',
-        executionCount: 45,
-        lastExecutedAt: new Date('2024-03-10'),
-      },
-      {
-        id: 'wf_2',
-        name: 'VIP Early Access',
-        description: 'Give VIP customers 24hr early access to new drops',
-        industry: 'fashion',
-        merchantId: 'merchant_1',
-        trigger: { type: 'schedule', config: { cron: '0 9 * * 1' } },
-        nodes: [],
-        edges: [],
-        status: 'active',
-        version: 2,
-        createdAt: new Date('2024-02-01'),
-        updatedAt: new Date('2024-02-15'),
-        createdBy: 'user_1',
-        executionCount: 12,
-        lastExecutedAt: new Date('2024-03-11'),
-      },
-      {
-        id: 'wf_3',
-        name: 'Auto-86 Low Inventory',
-        description: 'Automatically mark items as sold out when ingredients run low',
-        industry: 'restaurant',
-        merchantId: 'merchant_1',
-        trigger: { type: 'inventory_low', config: {} },
-        nodes: [],
-        edges: [],
-        status: 'draft',
-        version: 1,
-        createdAt: new Date('2024-03-01'),
-        updatedAt: new Date('2024-03-05'),
-        createdBy: 'user_1',
-        executionCount: 0,
-      },
-    ];
-
-    setTimeout(() => {
-      setWorkflows(mockWorkflows);
+  const loadWorkflows = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await apiJson<{ workflows?: unknown[] }>('/api/workflows');
+      const list = res.workflows ?? [];
+      setWorkflows(list.map(parseWorkflowListItem));
+    } catch {
+      toast.error('Failed to load workflows');
+      setWorkflows([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   }, []);
+
+  useEffect(() => {
+    void loadWorkflows();
+  }, [loadWorkflows]);
 
   const filteredWorkflows = workflows.filter((workflow) => {
     const matchesSearch = workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -115,13 +82,14 @@ export default function WorkflowsPage() {
       });
       
       if (response.ok) {
-        setWorkflows(workflows.filter((w) => w.id !== id));
+        setWorkflows((prev) => prev.filter((w) => w.id !== id));
+        toast.success('Workflow deleted');
       } else {
         throw new Error('Failed to delete workflow');
       }
     } catch (error) {
       console.error('Error deleting workflow:', error);
-      // Show error message to user
+      toast.error('Could not delete workflow');
       alert('Failed to delete workflow. Please try again.');
     }
   };
@@ -214,7 +182,7 @@ export default function WorkflowsPage() {
         </div>
       ) : filteredWorkflows.length === 0 ? (
         <div className="text-center py-16">
-          <Workflow className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <WorkflowIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No workflows found</h3>
           <p className="text-gray-600 mb-4">Get started by creating your first workflow</p>
           <Link
@@ -281,7 +249,7 @@ export default function WorkflowsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      <button
+                      <Button
                         onClick={() => handleToggleStatus(workflow.id, workflow.status)}
                         className="p-1 text-gray-400 hover:text-gray-600"
                         title={workflow.status === 'active' ? 'Pause' : 'Activate'}
@@ -291,7 +259,7 @@ export default function WorkflowsPage() {
                         ) : (
                           <Play className="w-4 h-4" />
                         )}
-                      </button>
+                      </Button>
                       <Link
                         href={`/workflows/${workflow.id}`}
                         className="p-1 text-gray-400 hover:text-blue-600"
@@ -299,20 +267,20 @@ export default function WorkflowsPage() {
                       >
                         <Edit3 className="w-4 h-4" />
                       </Link>
-                      <button
+                      <Button
                         onClick={() => handleDuplicate(workflow)}
                         className="p-1 text-gray-400 hover:text-gray-600"
                         title="Duplicate"
                       >
                         <Copy className="w-4 h-4" />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => handleDelete(workflow.id)}
                         className="p-1 text-gray-400 hover:text-red-600"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

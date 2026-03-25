@@ -1,7 +1,7 @@
 import {
   Paystack,
   PaystackInitArgs,
-  PaystackApiResponse,
+  PaystackApiResponse
 } from "@vayva/payments";
 import { urls } from "@vayva/shared";
 
@@ -60,6 +60,7 @@ export class PaystackService {
       FREE: 0,
       STARTER: 25000 * 100, // ₦25,000
       PRO: 35000 * 100, // ₦35,000
+      PRO_PLUS: 50000 * 100, // ₦50,000
     } as const;
     const baseAmount =
       (planPrices as Record<string, number | undefined>)[newPlan] || 0;

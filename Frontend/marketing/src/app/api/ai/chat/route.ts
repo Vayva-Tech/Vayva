@@ -1,13 +1,33 @@
 import { urls } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import { getRedis } from "@vayva/redis";
+import { openRouterChatCompletion } from "@/lib/openrouter";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY_MARKETING || process.env.GROQ_API_KEY || "",
-});
+/** Shared budget with `public/ai/chat` so callers cannot bypass limits by path. */
+const RATE_LIMIT = 10;
+const WINDOW_MS = 60_000;
+
+async function checkIpRateLimit(ip: string): Promise<boolean> {
+  const redis = await getRedis();
+  const key = `rate_limit:marketing_ai:${ip}`;
+  const current = await redis.incr(key);
+  if (current === 1) {
+    await redis.pexpire(key, WINDOW_MS);
+  }
+  return current <= RATE_LIMIT;
+}
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (!(await checkIpRateLimit(ip))) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429 },
+      );
+    }
+
     const { message } = await req.json();
 
     if (!message) {
@@ -20,7 +40,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Basic prompt injection guard & safety
     const safeMessage = message.slice(0, 500); // Limit length
 
-    const completion = await groq.chat.completions.create({
+    const reply = await openRouterChatCompletion({
       messages: [
         {
           role: "system",
@@ -41,14 +61,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         },
         { role: "user", content: safeMessage },
       ],
-      model: "llama-3.1-70b-versatile",
+      model: "openai/gpt-4o-mini",
       temperature: 0.7,
-      max_tokens: 1024,
+      maxTokens: 1024,
     });
-
-    const reply =
-      completion.choices[0]?.message?.content ||
-      "I apologize, but I couldn't process that request.";
 
     // Simple logging (no PII)
 

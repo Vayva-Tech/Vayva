@@ -1,3 +1,4 @@
+import { Button } from "@vayva/ui";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -73,7 +74,7 @@ describe("OpsFilters", () => {
   it("renders filter panel with clear button", () => {
     const { getByText } = render(
       <div>
-        <button>Clear All</button>
+        <Button>Clear All</Button>
         <select><option>Filter 1</option></select>
       </div>
     );

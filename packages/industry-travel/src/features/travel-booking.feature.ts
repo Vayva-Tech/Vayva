@@ -1,9 +1,8 @@
-// @ts-nocheck
 /**
  * Travel Booking Feature
  */
 
-import { TravelBookingService, TravelBooking, Itinerary, TravelConfig } from '../services/travel-booking.service';
+import { TravelBookingService, TravelBooking, Itinerary, TravelConfig as _TravelConfig } from '../services/travel-booking.service';
 
 export class TravelBookingFeature {
   constructor(private service: TravelBookingService) {}

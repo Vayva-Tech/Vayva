@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Globe, Check } from "lucide-react";
@@ -75,7 +76,7 @@ export function CurrencySelector({
 
   if (variant === "minimal") {
     return (
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center gap-1 text-sm hover:opacity-80 transition-opacity",
@@ -85,26 +86,26 @@ export function CurrencySelector({
         <span>{selected.flag}</span>
         <span className="font-medium">{selected.code}</span>
         <ChevronDown className="w-3 h-3" />
-      </button>
+      </Button>
     );
   }
 
   if (variant === "compact") {
     return (
       <div ref={dropdownRef} className={cn("relative", className)}>
-        <button
+        <Button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 px-3 py-1.5 bg-white border rounded-full hover:border-gray-400 transition-colors"
         >
           <span className="text-lg">{selected.flag}</span>
           <span className="font-medium text-sm">{selected.code}</span>
           <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen && "rotate-180")} />
-        </button>
+        </Button>
 
         {isOpen && (
           <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
             {currencies.map((currency) => (
-              <button
+              <Button
                 key={currency.code}
                 onClick={() => handleSelect(currency)}
                 className={cn(
@@ -120,7 +121,7 @@ export function CurrencySelector({
                 {selected.code === currency.code && (
                   <Check className="w-4 h-4 text-emerald-600" />
                 )}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -137,7 +138,7 @@ export function CurrencySelector({
         </label>
       )}
 
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "w-full flex items-center gap-3 px-4 py-3 bg-white border rounded-lg",
@@ -152,12 +153,12 @@ export function CurrencySelector({
           <p className="text-sm text-gray-500">{selected.name}</p>
         </div>
         <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform", isOpen && "rotate-180")} />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border py-2 z-50 max-h-72 overflow-auto">
           {currencies.map((currency) => (
-            <button
+            <Button
               key={currency.code}
               onClick={() => handleSelect(currency)}
               className={cn(
@@ -176,7 +177,7 @@ export function CurrencySelector({
               {selected.code === currency.code && (
                 <Check className="w-5 h-5 text-emerald-600" />
               )}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -244,3 +245,4 @@ export function PriceDisplay({
 }
 
 export default CurrencySelector;
+

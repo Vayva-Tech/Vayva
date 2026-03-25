@@ -1,4 +1,4 @@
-import type { Inventory } from '../../services/inventory-service';
+import type { Inventory as _Inventory } from '../../services/inventory-service';
 
 export interface WidgetConfig {
   id: string;
@@ -27,8 +27,8 @@ export interface WidgetConfig {
     value: string | number;
     severity: 'critical' | 'warning' | 'info';
   }>;
-  condition?: (data: any) => boolean;
-  message?: (data: any) => string;
+  condition?: (data: unknown) => boolean;
+  message?: (data: unknown) => string;
   severity?: 'critical' | 'warning' | 'info';
   chartType?: string;
 }
@@ -140,8 +140,8 @@ export const LOW_STOCK_ALERTS_WIDGET: WidgetConfig = {
     type: 'service',
     service: 'InventoryService.getReorderItems'
   },
-  condition: (data: any[]) => data.length > 0,
-  message: (data: any[]) => `${data.length} items below reorder point`
+  condition: (data: unknown[]) => data.length > 0,
+  message: (data: unknown[]) => `${data.length} items below reorder point`
 };
 
 // Inventory Turnover Widget

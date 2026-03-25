@@ -1,9 +1,11 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@vayva/db";
+import type { Prisma } from "@vayva/db";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 const stylistSchema = z.object({
   firstName: z.string(),
@@ -14,7 +16,7 @@ const stylistSchema = z.object({
   specialty: z.string().optional(),
   commissionRate: z.number().optional(),
   maxAppointmentsPerDay: z.number().optional(),
-  metadata: z.any().optional(),
+  metadata: z.record(z.unknown()).optional(),
 });
 
 /**
@@ -23,67 +25,57 @@ const stylistSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const limit = parseInt(searchParams.get("limit") || "50", 10);
 
-    const where: any = {
+    const where: Prisma.MembershipWhereInput = {
       storeId,
-      role: {
-        in: ["STYLIST", "SENIOR_STYLIST", "JUNIOR_STYLIST", "NAIL_TECH"],
-      },
+      status: "ACTIVE",
     };
 
     if (role) {
-      where.role = role;
+      where.roleName = role;
     }
 
-    const stylists = await prisma.user?.findMany({
+    const memberships = await prisma.membership.findMany({
       where,
       include: {
-        bookings: {
-          where: {
-            startsAt: {
-              gte: new Date(),
-            },
-          },
-          orderBy: {
-            startsAt: "asc",
-          },
-          take: 5,
-          include: {
-            service: {
-              select: {
-                title: true,
-                duration: true,
-              },
-            },
-            customer: {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            },
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            createdAt: true,
           },
         },
       },
       orderBy: {
-        firstName: "asc",
+        createdAt: "desc",
       },
       take: limit,
-    }) || [];
+    });
 
-    // Calculate availability and performance metrics
-    const stylistsWithMetrics = stylists.map((stylist) => {
-      const nextAppointment = stylist.bookings?.[0];
-      const isAvailable = !nextAppointment || new Date(nextAppointment.startsAt).getTime() > Date.now() + 30 * 60 * 1000;
-
+    const stylistsWithMetrics = memberships.map((m) => {
+      const stylist = m.user;
       return {
         ...stylist,
-        isAvailable,
-        nextAppointment,
-        totalBookings: stylist.bookings?.length || 0,
+        role: m.roleName,
+        role_enum: m.role_enum,
+        isAvailable: true,
+        nextAppointment: null,
+        totalBookings: 0,
       };
     });
 
@@ -93,13 +85,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/beauty/stylists',
-      operation: 'GET_STYLISTS',
+      endpoint: "/api/beauty/stylists",
+      operation: "GET_STYLISTS",
     });
-    return NextResponse.json(
-      { error: 'Failed to fetch stylists' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch stylists" }, { status: 500 });
   }
 }
 
@@ -109,45 +98,77 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = await request.json();
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body: unknown = await request.json();
     const validatedData = stylistSchema.parse(body);
 
-    // Check if email already exists in store
-    const existingUser = await prisma.user?.findFirst({
+    const existingUser = await prisma.user.findFirst({
       where: {
         email: validatedData.email,
-        storeId,
       },
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 400 }
-      );
+      const existingMembership = await prisma.membership.findUnique({
+        where: {
+          userId_storeId: { userId: existingUser.id, storeId },
+        },
+      });
+      if (existingMembership) {
+        return NextResponse.json({ error: "Email already registered" }, { status: 400 });
+      }
     }
 
-    const stylist = await prisma.user?.create({
-      data: {
-        ...validatedData,
-        storeId,
-        password: "", // Will need to set password separately
-      },
-      include: {
-        bookings: {
-          select: {
-            id: true,
-            startsAt: true,
-            status: true,
+    const passwordHash = await bcrypt.hash(
+      `invite-${validatedData.email}-${Date.now()}`,
+      10
+    );
+
+    const stylist = await prisma.$transaction(async (tx) => {
+      const user =
+        existingUser ??
+        (await tx.user.create({
+          data: {
+            email: validatedData.email,
+            password: passwordHash,
+            firstName: validatedData.firstName,
+            lastName: validatedData.lastName,
+            phone: validatedData.phone,
+          },
+        }));
+
+      return tx.membership.create({
+        data: {
+          userId: user.id,
+          storeId,
+          roleName: validatedData.role,
+          status: "ACTIVE",
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phone: true,
+            },
           },
         },
-      },
+      });
     });
 
     logger.info("[BEAUTY_STYLISTS_POST] Stylist created", {
-      stylistId: stylist?.id,
-      storeId
+      stylistId: stylist.user.id,
+      storeId,
     });
 
     return NextResponse.json({
@@ -156,12 +177,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/beauty/stylists',
-      operation: 'CREATE_STYLIST',
+      endpoint: "/api/beauty/stylists",
+      operation: "CREATE_STYLIST",
     });
-    return NextResponse.json(
-      { error: 'Failed to create stylist' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create stylist" }, { status: 500 });
   }
 }

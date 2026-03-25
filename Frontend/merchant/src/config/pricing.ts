@@ -5,12 +5,19 @@
  * This file is the single source of truth for all pricing, plans, and fees
  * across the Vayva platform (marketing, dashboard, and legal).
  */
-export const PRICING_VERSION = "2025-12-26_v2";
+export const PRICING_VERSION = "2026-03-25_v5";
 export const CURRENCY = "NGN";
 // Transaction Fees
 export const FEES = {
   WITHDRAWAL_PERCENTAGE: 3, // 3% fee on every withdrawal
 };
+
+/** Discount on the 3-month bundle vs paying monthly × 3 (matches marketing checkout). */
+export const QUARTERLY_DISCOUNT_PERCENT = 20;
+
+export function getQuarterlyTotalNgn(monthlyNgn: number): number {
+  return Math.round(monthlyNgn * 3 * (1 - QUARTERLY_DISCOUNT_PERCENT / 100));
+}
 export const PLANS = [
   {
     key: "FREE",
@@ -34,9 +41,9 @@ export const PLANS = [
     tagline: "Grow without the busywork. AI handles your orders 24/7.",
     bullets: [
       "1 Staff Seat",
-      "Up to 500 Products",
+      "Up to 100 Products",
       "WhatsApp & Instagram Automation",
-      "Remove Branding & Custom Domain",
+      "Remove Vayva Branding (Custom Domain from Pro)",
     ],
     ctaLabel: "Upgrade to Starter",
     featured: true,
@@ -44,17 +51,34 @@ export const PLANS = [
   {
     key: "PRO",
     name: "Pro",
-    monthlyAmount: 40000,
-    baseAmount: 40000,
+    monthlyAmount: 35000,
+    baseAmount: 35000,
     trialDays: 7,
     tagline: "Scale with AI doing the heavy lifting. Your team, unlimited growth.",
     bullets: [
       "3 Staff Seats",
+      "Up to 300 Products",
       "Multi-Location & API Access",
       "Dedicated Account Manager",
       "Custom Integrations",
     ],
     ctaLabel: "Upgrade to Pro",
+  },
+  {
+    key: "PRO_PLUS",
+    name: "Pro+",
+    monthlyAmount: 50000,
+    baseAmount: 50000,
+    trialDays: 0,
+    tagline: "Everything unlocked. Maximum power for serious businesses.",
+    bullets: [
+      "5 Staff Seats",
+      "Up to 500 Products",
+      "Visual Workflow Builder",
+      "Merged Industry View",
+      "Priority Support & AI Autopilot",
+    ],
+    ctaLabel: "Upgrade to Pro+",
   },
 ];
 export function formatNGN(amount: number) {

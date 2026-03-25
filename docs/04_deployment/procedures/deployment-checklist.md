@@ -109,7 +109,7 @@ Vayva deploys four frontend applications via Vercel and background workers on a 
 
 1. **Pre-deploy:**
    - Note: TypeScript errors are currently ignored (`ignoreBuildErrors: true`)
-   - Verify `PAYSTACK_PUBLIC_KEY` and `PAYSTACK_LIVE_SECRET_KEY` are set for production
+   - Verify `NEXT_PUBLIC_PAYSTACK_KEY` (or legacy `PAYSTACK_PUBLIC_KEY`) and `PAYSTACK_LIVE_SECRET_KEY` are set for production
 
 2. **Deploy:**
    - Push to `Vayva` branch

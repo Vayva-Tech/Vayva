@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GET /api/merchant/billing/invoices
  *
@@ -6,12 +5,42 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
+import { logger, ErrorCategory } from "@/lib/logger";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
+
+type UsageInvoiceRow = {
+  id: string;
+  invoiceNumber?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  baseAmount: unknown;
+  overageAmount: unknown;
+  totalAmount: unknown;
+  status?: string;
+  paidAt?: string | null;
+  lineItems?: unknown;
+  createdAt?: string | Date;
+};
+
+function isUsageInvoiceRow(v: unknown): v is UsageInvoiceRow {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    "id" in v &&
+    typeof (v as { id: unknown }).id === "string"
+  );
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    if (!storeId) {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,19 +50,19 @@ export async function GET(request: NextRequest) {
     const queryParams = new URLSearchParams();
     if (status) queryParams.set("status", status.toUpperCase());
 
-    const invoices = await apiJson<Array<any>>(
-      `${process.env.BACKEND_API_URL}/api/usageinvoice?${queryParams.toString()}`,
+    const invoices = await apiJson<unknown>(
+      `${backendBase()}/api/usageinvoice?${queryParams.toString()}`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
+        headers: auth.headers,
       }
     );
 
-    const list = Array.isArray(invoices) ? invoices : [];
+    const list: UsageInvoiceRow[] = Array.isArray(invoices)
+      ? invoices.filter(isUsageInvoiceRow)
+      : [];
 
     return NextResponse.json({
-      invoices: list.map((inv: any) => ({
+      invoices: list.map((inv) => ({
         id: inv.id,
         invoiceNumber: inv.invoiceNumber,
         periodStart: inv.periodStart,
@@ -44,14 +73,12 @@ export async function GET(request: NextRequest) {
         status: inv.status,
         paidAt: inv.paidAt,
         lineItems: inv.lineItems,
-        createdAt: inv.createdAt,
+        createdAt:
+          inv.createdAt instanceof Date ? inv.createdAt.toISOString() : inv.createdAt,
       })),
     });
   } catch (error) {
-    console.error("[BILLING_INVOICES_API_ERROR]", error);
-    return NextResponse.json(
-      { error: "Failed to fetch invoices" },
-      { status: 500 }
-    );
+    logger.error("[BILLING_INVOICES_API_ERROR]", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to fetch invoices" }, { status: 500 });
   }
 }

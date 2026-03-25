@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 /**
  * GET /api/storefront/draft
@@ -8,18 +9,27 @@ import { handleApiError } from "@/lib/api-error-handler";
  */
 export async function GET(request: NextRequest) {
   try {
-    // Call backend API using apiJson
-    const result = await apiJson<{
-      success: boolean;
-      data?: { draft?: any };
-      error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/storefront/draft`);
-
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch draft');
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json(result);
+    const result = await apiJson<{ found: boolean; draft?: unknown }>(
+      buildBackendUrl("/api/storefront/draft"),
+      { headers: auth.headers, cache: "no-store" },
+    );
+
+    if (!result?.found) {
+      return NextResponse.json(
+        { draft: null },
+        { status: 404, headers: { "Cache-Control": "no-store" } },
+      );
+    }
+
+    return NextResponse.json(
+      { draft: result.draft ?? null },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     handleApiError(error, {
       endpoint: '/api/storefront/draft',
@@ -38,25 +48,22 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     
-    const result = await apiJson<{
-      success: boolean;
-      data?: { versionId?: string };
-      error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/storefront/draft`, {
+    const result = await apiJson<{ success: boolean; draft?: unknown }>(buildBackendUrl("/api/storefront/draft"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...auth.headers,
       },
       body: JSON.stringify(body),
     });
 
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to save draft');
-    }
-
-    return NextResponse.json(result);
+    return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(error, {
       endpoint: '/api/storefront/draft',
@@ -65,6 +72,43 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Failed to save draft' },
       { status: 500 }
+    );
+  }
+}
+
+/**
+ * PATCH /api/storefront/draft
+ * Partial update for autosave (theme editor)
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body = await request.json();
+
+    const result = await apiJson<{ success: boolean; draft?: unknown }>(
+      buildBackendUrl("/api/storefront/draft"),
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...auth.headers,
+        },
+        body: JSON.stringify(body),
+      },
+    );
+
+    return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    handleApiError(error, {
+      endpoint: "/api/storefront/draft",
+      operation: "PATCH_DRAFT",
+    });
+    return NextResponse.json(
+      { error: "Failed to update draft" },
+      { status: 500 },
     );
   }
 }

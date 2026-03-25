@@ -62,6 +62,12 @@
             "@/template-gallery": [
                 "../../template-gallery/index.ts"
             ],
+            "@vayva/analytics": [
+                "../../packages/domain/analytics/src/index.ts"
+            ],
+            "@vayva/analytics/*": [
+                "../../packages/domain/analytics/src/*"
+            ],
             "@vayva/addons": [
                 "../../packages/addons/src/index.ts"
             ],
@@ -73,6 +79,12 @@
             ],
             "@vayva/shared/content": [
                 "../../packages/shared/content/src/index.ts"
+            ],
+            "@vayva/workflow-engine": [
+                "../../packages/infra/workflow-engine/src/index.ts"
+            ],
+            "@vayva/realtime": [
+                "../../packages/realtime/src/index.ts"
             ]
         }
     },

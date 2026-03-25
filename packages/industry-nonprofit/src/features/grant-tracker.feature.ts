@@ -1,9 +1,9 @@
-// @ts-nocheck
 /**
  * Grant Tracker Feature
  */
 
-import { GrantTrackerService } from '../services/grant-tracker.service.js';
+import type { Grant } from '../services/grant-tracker.service';
+import { GrantTrackerService } from '../services/grant-tracker.service';
 
 export class GrantTrackerFeature {
   constructor(private service: GrantTrackerService) {}
@@ -16,7 +16,7 @@ export class GrantTrackerFeature {
     return this.service.createGrant(data);
   }
 
-  updateGrantStatus(grantId: string, status: string) {
+  updateGrantStatus(grantId: string, status: Grant['status']) {
     return this.service.updateGrantStatus(grantId, status);
   }
 

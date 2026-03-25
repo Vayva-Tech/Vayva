@@ -7,14 +7,14 @@ import {
   Shield,
   Prohibit as Ban,
   Clock,
-  Warning as AlertTriangle,
+  Warning as AlertTriangle
 } from "@phosphor-icons/react/ssr";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button, Input, Switch } from "@vayva/ui";
@@ -23,7 +23,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 

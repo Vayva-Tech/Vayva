@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Insurance Verification Service
  * 
@@ -6,10 +5,7 @@
  * and authorization workflows for healthcare services.
  */
 
-import { PrismaClient } from '@vayva/prisma';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Schema definitions
 export const InsuranceVerificationSchema = z.object({
@@ -47,28 +43,39 @@ export interface EligibilityResponse {
   notes?: string;
 }
 
+interface VerificationRecord extends InsuranceVerificationData {
+  id: string;
+  status: 'pending' | 'verified' | 'denied' | 'expired';
+  verifiedAt: Date;
+  updatedAt?: Date;
+}
+
+interface PriorAuthRecord {
+  id: string;
+  storeId: string;
+  patientId: string;
+  procedureCode: string;
+  diagnosisCode: string;
+  providerNPI: string;
+  facilityNPI: string;
+  requestedDate: Date;
+  status: string;
+  approvedDate?: Date;
+}
+
 export class InsuranceVerificationService {
+  private readonly verifications: VerificationRecord[] = [];
+  private readonly authorizations: PriorAuthRecord[] = [];
+
   /**
    * Verify insurance eligibility
    */
   async verifyEligibility(data: InsuranceVerificationData): Promise<EligibilityResponse> {
-    // In a real implementation, this would call external insurance APIs
-    // For now, we'll create a verification record
-    
-    const verification = await prisma.insuranceVerification.create({
-      data: {
-        patientId: data.patientId,
-        storeId: data.storeId,
-        insuranceProvider: data.insuranceProvider,
-        policyNumber: data.policyNumber,
-        groupNumber: data.groupNumber,
-        memberName: data.memberName,
-        dateOfBirth: data.dateOfBirth,
-        serviceDate: data.serviceDate,
-        verifiedBy: data.verifiedBy,
-        status: 'verified',
-        verifiedAt: new Date(),
-      },
+    this.verifications.push({
+      ...data,
+      id: `iv_${Date.now()}`,
+      status: 'verified',
+      verifiedAt: new Date(),
     });
 
     // Mock eligibility response
@@ -111,26 +118,27 @@ export class InsuranceVerificationService {
    */
   async submitPriorAuthRequest(data: {
     patientId: string;
+    storeId?: string;
     procedureCode: string;
     diagnosisCode: string;
     providerNPI: string;
     facilityNPI: string;
     requestedDate: Date;
   }): Promise<string> {
-    const authRequest = await prisma.priorAuthorization.create({
-      data: {
-        patientId: data.patientId,
-        procedureCode: data.procedureCode,
-        diagnosisCode: data.diagnosisCode,
-        providerNPI: data.providerNPI,
-        facilityNPI: data.facilityNPI,
-        requestedDate: data.requestedDate,
-        status: 'pending',
-      },
-    });
+    const authRequest: PriorAuthRecord = {
+      id: `pa_${Date.now()}`,
+      storeId: data.storeId ?? '',
+      patientId: data.patientId,
+      procedureCode: data.procedureCode,
+      diagnosisCode: data.diagnosisCode,
+      providerNPI: data.providerNPI,
+      facilityNPI: data.facilityNPI,
+      requestedDate: data.requestedDate,
+      status: 'pending',
+    };
+    this.authorizations.push(authRequest);
 
-    // Simulate approval (in production, this would be async)
-    await this.processAuthRequest(authRequest.id);
+    void this.processAuthRequest(authRequest.id);
 
     return authRequest.id;
   }
@@ -138,11 +146,10 @@ export class InsuranceVerificationService {
   /**
    * Get insurance verification history
    */
-  async getVerificationHistory(patientId: string): Promise<any[]> {
-    return prisma.insuranceVerification.findMany({
-      where: { patientId },
-      orderBy: { verifiedAt: 'desc' },
-    });
+  async getVerificationHistory(patientId: string): Promise<VerificationRecord[]> {
+    return this.verifications
+      .filter((v) => v.patientId === patientId)
+      .sort((a, b) => b.verifiedAt.getTime() - a.verifiedAt.getTime());
   }
 
   /**
@@ -152,35 +159,27 @@ export class InsuranceVerificationService {
     verificationId: string,
     status: 'pending' | 'verified' | 'denied' | 'expired'
   ): Promise<void> {
-    await prisma.insuranceVerification.update({
-      where: { id: verificationId },
-      data: {
-        status,
-        updatedAt: new Date(),
-      },
-    });
+    const v = this.verifications.find((x) => x.id === verificationId);
+    if (v) {
+      v.status = status;
+      v.updatedAt = new Date();
+    }
   }
 
   /**
    * Track authorization status
    */
-  async trackAuthorization(authId: string): Promise<any> {
-    return prisma.priorAuthorization.findUnique({
-      where: { id: authId },
-    });
+  async trackAuthorization(authId: string): Promise<PriorAuthRecord | undefined> {
+    return this.authorizations.find((a) => a.id === authId);
   }
 
   /**
    * Get pending authorizations
    */
-  async getPendingAuthorizations(storeId: string): Promise<any[]> {
-    return prisma.priorAuthorization.findMany({
-      where: {
-        storeId,
-        status: 'pending',
-      },
-      orderBy: { requestedDate: 'asc' },
-    });
+  async getPendingAuthorizations(storeId: string): Promise<PriorAuthRecord[]> {
+    return this.authorizations
+      .filter((a) => a.storeId === storeId && a.status === 'pending')
+      .sort((a, b) => a.requestedDate.getTime() - b.requestedDate.getTime());
   }
 
   /**
@@ -218,16 +217,13 @@ export class InsuranceVerificationService {
     return requiresAuthCodes.includes(procedureCode);
   }
 
-  private async processAuthRequest(authId: string): Promise<void> {
-    // Simulate processing time
-    setTimeout(async () => {
-      await prisma.priorAuthorization.update({
-        where: { id: authId },
-        data: {
-          status: 'approved',
-          approvedDate: new Date(),
-        },
-      });
+  private processAuthRequest(authId: string): void {
+    setTimeout(() => {
+      const a = this.authorizations.find((x) => x.id === authId);
+      if (a) {
+        a.status = 'approved';
+        a.approvedDate = new Date();
+      }
     }, 1000);
   }
 

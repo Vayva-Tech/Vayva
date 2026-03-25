@@ -237,11 +237,11 @@ crontab -e
 
 #### If using Kubernetes CronJob:
 
-Create `k8s/cronjobs/sla-monitor.yaml`:
+Apply a `CronJob` in your cluster config repo (example manifest shape):
 
 ```yaml
 apiVersion: batch/v1
-kind CronJob
+kind: CronJob
 metadata:
   name: sla-monitor
 spec:
@@ -263,11 +263,7 @@ spec:
           restartPolicy: OnFailure
 ```
 
-Apply:
-
-```bash
-kubectl apply -f k8s/cronjobs/sla-monitor.yaml
-```
+Then `kubectl apply -f` that manifest from your deployment checkout.
 
 ### Verify Cron Job Execution
 
@@ -277,8 +273,9 @@ Check logs after first run:
 # For Vercel
 vercel logs --follow | grep "SLA Monitor"
 
-# For Kubernetes
-kubectl logs cronjob/sla-monitor
+# For Kubernetes (CronJob → Job → Pod; use your CronJob name / labels)
+kubectl get pods -l cronjob.kubernetes.io/name=sla-monitor
+kubectl logs <pod-name>
 
 # For traditional cron
 tail -f /var/log/sla-monitor.log

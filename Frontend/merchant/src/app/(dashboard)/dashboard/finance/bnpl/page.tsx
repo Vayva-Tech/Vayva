@@ -37,6 +37,7 @@ interface BNPLAgreement {
   orderId: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
   provider: string;
   totalAmount: number;
   upfrontAmount: number;
@@ -256,7 +257,17 @@ export default function BNPLDashboardPage() {
                     <td className="px-4 py-3">
                       <div>
                         <p className="font-medium">{agreement.customerName}</p>
-                        <p className="text-sm text-gray-500">{agreement.customerPhone}</p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {agreement.customerPhone}
+                          {agreement.customerEmail ? (
+                            <span className="hidden sm:inline"> • {agreement.customerEmail}</span>
+                          ) : null}
+                        </p>
+                        {agreement.customerEmail ? (
+                          <p className="text-xs text-gray-500 truncate sm:hidden">
+                            {agreement.customerEmail}
+                          </p>
+                        ) : null}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -337,6 +348,9 @@ export default function BNPLDashboardPage() {
                   <p className="text-sm text-gray-500">Customer</p>
                   <p className="font-medium">{selectedAgreement.customerName}</p>
                   <p className="text-sm">{selectedAgreement.customerPhone}</p>
+                  {selectedAgreement.customerEmail ? (
+                    <p className="text-sm text-gray-600">{selectedAgreement.customerEmail}</p>
+                  ) : null}
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500">Order</p>

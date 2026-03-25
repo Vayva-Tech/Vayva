@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { TrustTransaction, TrustTransactionType } from '../types';
 
 export class TrustAccountingService {

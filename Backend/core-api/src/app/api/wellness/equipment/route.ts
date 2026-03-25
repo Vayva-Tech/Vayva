@@ -215,7 +215,7 @@ export const POST = withVayvaAPI(
 );
 
 // Calculate next maintenance date based on schedule
-function calculateNextMaintenance(lastMaintenance: Date | null, schedule: string): Date | null {
+function _calculateNextMaintenance(lastMaintenance: Date | null, schedule: string): Date | null {
   if (!lastMaintenance) return null;
   
   const nextDate = new Date(lastMaintenance);

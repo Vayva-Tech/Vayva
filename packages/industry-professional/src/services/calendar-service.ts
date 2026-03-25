@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { CalendarEvent, DeadlineType } from '../types';
 
 export class CalendarService {

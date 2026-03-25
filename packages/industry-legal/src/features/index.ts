@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Legal Features
  * Business logic and practice management modules

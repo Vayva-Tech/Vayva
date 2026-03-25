@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real Estate Industry Package Index
  */

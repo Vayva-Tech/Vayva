@@ -104,7 +104,7 @@ export function TierComparisonTable({ currentTier }: TierComparisonTableProps) {
     },
     {
       name: "Starter",
-      price: "₦5,000",
+      price: "₦25,000",
       period: "/month",
       features: [
         "Up to 100 products",
@@ -118,15 +118,29 @@ export function TierComparisonTable({ currentTier }: TierComparisonTableProps) {
     },
     {
       name: "Pro",
-      price: "₦15,000",
+      price: "₦35,000",
       period: "/month",
       features: [
-        "Up to 1,000 products",
+        "Up to 300 products",
         "10,000 orders/month",
         "Advanced analytics",
         "Multi-store support",
         "Accounting features",
         "API access",
+        "AI Autopilot",
+      ],
+      cta: "Upgrade",
+    },
+    {
+      name: "Pro+",
+      price: "₦50,000",
+      period: "/month",
+      features: [
+        "Up to 500 products",
+        "Unlimited orders/month",
+        "Everything in Pro",
+        "Visual workflow builder",
+        "Merged industry view",
         "Priority support",
       ],
       cta: "Upgrade",
@@ -136,8 +150,7 @@ export function TierComparisonTable({ currentTier }: TierComparisonTableProps) {
       price: "Custom",
       period: "",
       features: [
-        "Unlimited products",
-        "Unlimited orders",
+        "Custom product and order limits",
         "Custom integrations",
         "Dedicated support",
         "SLA guarantee",
@@ -147,7 +160,7 @@ export function TierComparisonTable({ currentTier }: TierComparisonTableProps) {
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       {tiers.map((tier) => (
         <Card
           key={tier.name}

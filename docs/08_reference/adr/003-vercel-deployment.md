@@ -53,6 +53,20 @@ All projects use:
 
 Pushing to `main` triggers production deployments across all four projects simultaneously. Pushing to `Vayva` or opening a PR creates a preview deployment accessible via a generated URL.
 
+### Backend `core-api` on Vercel (when used)
+
+The Next.js app in [`Backend/core-api`](../../Backend/core-api) may be deployed as its own Vercel project for App Router API routes and **Cron Jobs** (see `Backend/core-api/vercel.json`). Scheduled handlers expect:
+
+| Variable | Purpose |
+|----------|---------|
+| `CRON_SECRET` | Sent as `Authorization: Bearer <value>` on cron invocations |
+| `OPENROUTER_API_KEY` | Autopilot LLM calls via OpenRouter (when Autopilot is enabled) |
+| `AUTOPILOT_CRON_MAX_STORES` | Store batch size per Autopilot cron loop (default 40) |
+| `AUTOPILOT_CRON_MAX_BATCHES` | Max batches per cron HTTP invocation (default 5) |
+| `AUTOPILOT_INBOUND_SECRET` | Optional; auth for `POST /api/internal/autopilot/context` |
+
+Autopilot cron responses may include `nextCursor` and `hasMore`; a follow-up request can use `GET .../autopilot-evaluate?cursor=<storeId>` with the same bearer token to drain remaining stores without raising `maxDuration` on a single run.
+
 ---
 
 ## Alternatives Considered
@@ -85,7 +99,7 @@ Cloudflare Pages supports Next.js via the `@cloudflare/next-on-pages` adapter. R
 
 ### Docker containers on Kubernetes (k8s)
 
-The repository includes a `k8s/` directory with Kubernetes manifests, indicating that a K8s-based deployment was explored. For frontends specifically, K8s was rejected as the primary target because the operational overhead exceeds the benefit for stateless Next.js applications. K8s remains available for backend services if needed in the future.
+Kubernetes was evaluated for hosting. For frontends specifically, K8s was rejected as the primary target because the operational overhead exceeds the benefit for stateless Next.js applications. Backend APIs today ship as containers or Node services on the team’s chosen host (VPS, PaaS, or managed Kubernetes elsewhere); the monorepo does not ship in-repo K8s manifests so deployment config stays with the environment that actually runs the cluster.
 
 ---
 
@@ -105,7 +119,7 @@ The repository includes a `k8s/` directory with Kubernetes manifests, indicating
 - **Vendor lock-in.** Some Next.js features (Partial Prerendering, Vercel Edge Middleware behaviour, ISR revalidation via Vercel's CDN) are optimised for or specific to Vercel. Migrating to another platform would require testing and potentially rewriting some edge cases.
 - **Cost at scale.** Vercel's pricing scales with bandwidth, function invocations, and build minutes. At high traffic volumes, the cost may justify moving to self-hosted infrastructure. This should be revisited when monthly Vercel costs exceed a self-managed VPS + ops overhead.
 - **Build minutes are shared.** All four projects share the team's Vercel build quota. If multiple branches are pushed simultaneously, builds may queue.
-- **Backend services are not on Vercel.** The NestJS core API (`Backend/core-api`) and worker (`Backend/worker`) are not deployed to Vercel. They run on the VPS or in Docker. This means the frontend and backend deployment pipelines are separate and must be kept in sync during breaking API changes.
+- **Backend workloads split.** The worker (`Backend/worker`) and database are not on Vercel. The Next.js merchant API (`Backend/core-api`) may run on Vercel (API routes + crons) **or** on VPS/Docker depending on environment—deployment pipelines must stay aligned when URLs or secrets change.
 - **`next build --webpack` requirement.** Turbopack is the Vercel-preferred bundler for Next.js 16, but it has module resolution issues with this monorepo's workspace packages. All projects currently build with `--webpack`. This will be revisited as Turbopack stabilises (see ADR 002).
 
 ---

@@ -11,7 +11,7 @@ import { SafetyFilters } from "@/components/whatsapp/settings/SafetyFilters";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { WarningOctagon as ShieldAlert } from "@phosphor-icons/react/ssr";
 import { apiJson } from "@/lib/api-client-shared";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface WhatsAppSettingsResponse {
   channel?: Record<string, unknown>;
@@ -75,15 +75,10 @@ export default function WhatsAppSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs />
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">WhatsApp Agent</h2>
-          <p className="text-gray-500">
-            Configure your AI agent, message templates, and connection settings.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="WhatsApp Agent"
+        subtitle="Configure your AI agent, message templates, and connection settings."
+      />
 
       <Tabs defaultValue="connection" className="space-y-4">
         <TabsList>

@@ -7,11 +7,11 @@ import { beforeAll, afterAll } from 'vitest';
 
 // Increase timeout for database operations
 beforeAll(() => {
-  console.log('🧪 Starting API test suite...');
+  console.warn('🧪 Starting API test suite...');
 }, 30000);
 
 afterAll(() => {
-  console.log('✅ API test suite completed');
+  console.warn('✅ API test suite completed');
 });
 
 // Global test utilities
@@ -43,6 +43,3 @@ export const testUtils = {
    */
   randomId: () => `test-${Math.random().toString(36).substr(2, 9)}`,
 };
-
-// Export for use in tests
-export { testUtils };

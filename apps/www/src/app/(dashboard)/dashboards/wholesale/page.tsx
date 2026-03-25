@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,16 +6,16 @@ import { Button } from '@/components/ui/button';
 import { 
   Package, 
   TrendingUp, 
-  Users, 
-  Truck, 
+  _Users, 
+  _Truck, 
   DollarSign, 
   AlertTriangle,
   CheckCircle,
   Clock,
   ShoppingCart,
   BarChart3,
-  Warehouse,
-  FileText,
+  _Warehouse,
+  _FileText,
   Bell
 } from 'lucide-react';
 import { wholesaleService } from '@vayva/industry-wholesale';
@@ -258,7 +257,7 @@ const WholesaleDashboard = () => {
         {/* Navigation */}
         <div className="flex space-x-1 mt-6 border-b">
           {['Dashboard', 'Orders', 'Inventory', 'Customers', 'Suppliers', 'Warehouse', 'Finance', 'Settings'].map((item) => (
-            <button
+            <Button
               key={item}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 item === 'Dashboard'
@@ -267,7 +266,7 @@ const WholesaleDashboard = () => {
               }`}
             >
               {item}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

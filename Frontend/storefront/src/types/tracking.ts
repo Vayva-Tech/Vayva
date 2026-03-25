@@ -18,6 +18,9 @@ export interface TrackingInfo {
   order: {
     refCode: string;
     total: number;
+    subtotal: number;
+    shippingTotal: number;
+    paymentStatus: string;
     createdAt: string;
   };
   store: {
@@ -25,6 +28,17 @@ export interface TrackingInfo {
     slug: string;
   };
   externalTrackingUrl: string | null;
+  payment?: {
+    cod: { amount: number | null; includesDelivery: boolean } | null;
+  };
+  live?: {
+    provider: string;
+    rider: { name: string | null; phone: string | null; location: LatLng | null } | null;
+    pickup: { location: LatLng | null } | null;
+    delivery: { location: LatLng | null } | null;
+    rawStatus: string | number | null;
+    lastSyncAt: string;
+  } | null;
   lastUpdated: string;
 }
 
@@ -33,4 +47,9 @@ export interface TrackingEvent {
   location: string | null;
   note: string | null;
   timestamp: string;
+}
+
+export interface LatLng {
+  lat: number;
+  lng: number;
 }

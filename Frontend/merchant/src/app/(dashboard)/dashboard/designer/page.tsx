@@ -217,7 +217,7 @@ export default function DesignerPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto p-6">
+    <div className="space-y-6 max-w-5xl">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-to-br from-pink-500 to-red-500 rounded-lg">

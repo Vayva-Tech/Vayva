@@ -1,7 +1,13 @@
-// @ts-nocheck
 /**
  * Shared types for specialized industries
  */
+
+import type { SpecializedConfig as SpecializedServiceModuleConfig } from '../services/specialized-service-management.service';
+
+/** Engine wiring for optional service-management feature module. */
+export interface SpecializedEngineConfig {
+  serviceManagement?: false | SpecializedServiceModuleConfig;
+}
 
 // Agriculture types
 export interface Farm {

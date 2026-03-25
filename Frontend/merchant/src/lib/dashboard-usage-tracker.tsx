@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Dashboard Usage Analytics Tracker
 // ============================================================================
@@ -8,9 +7,8 @@
 
 'use client';
 
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-const useUser = () => { const { merchant } = useAuth(); return { user: merchant ? { id: (merchant as any)?.id, fullName: (merchant as any)?.name } : null }; };
 import { logger } from '@/lib/logger';
 import { trackEvents } from '@/lib/analytics';
 
@@ -57,12 +55,18 @@ export interface DashboardUsageMetrics {
 // Analytics Service
 // ============================================================================
 
+export interface DashboardTrackerUser {
+  id: string;
+  fullName?: string;
+  storeId: string;
+}
+
 class DashboardUsageTracker {
   private static instance: DashboardUsageTracker;
   private sessionStartTime: Date | null = null;
   private interactions: DashboardInteraction[] = [];
   private widgetEngagement: Map<string, WidgetEngagement> = new Map();
-  private user: any = null;
+  private user: DashboardTrackerUser | null = null;
   private storeId: string | null = null;
   private flushInterval: ReturnType<typeof setTimeout> | null = null;
   private readonly FLUSH_INTERVAL_MS = 30000; // 30 seconds
@@ -77,7 +81,7 @@ class DashboardUsageTracker {
   }
 
   // Initialize tracker with user context
-  initialize(user: any, storeId: string): void {
+  initialize(user: DashboardTrackerUser, storeId: string): void {
     this.user = user;
     this.storeId = storeId;
     this.sessionStartTime = new Date();
@@ -88,7 +92,7 @@ class DashboardUsageTracker {
     }
     this.flushInterval = setInterval(() => this.flush(), this.FLUSH_INTERVAL_MS);
     
-    logger.info('[DASHBOARD_ANALYTICS] Initialized', { userId: user?.id, storeId });
+    logger.info('[DASHBOARD_ANALYTICS] Initialized', { userId: user.id, storeId });
   }
 
   // Track dashboard view
@@ -329,19 +333,29 @@ class DashboardUsageTracker {
 // React Hook for Dashboard Tracking
 // ============================================================================
 
+function useTrackerUser(): DashboardTrackerUser | null {
+  const { user, merchant } = useAuth();
+  return useMemo(() => {
+    if (!user?.id) return null;
+    const storeId = merchant?.storeId ?? user.storeId ?? '';
+    const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || undefined;
+    return { id: user.id, fullName, storeId };
+  }, [user, merchant]);
+}
+
 export function useDashboardTracking(
   industry: string,
   dashboardType: string,
   enabled = true
 ) {
-  const { user } = useUser();
+  const trackerUser = useTrackerUser();
   const trackerRef = useRef<DashboardUsageTracker | null>(null);
 
   useEffect(() => {
-    if (!enabled || !user) return;
+    if (!enabled || !trackerUser) return;
 
     const tracker = DashboardUsageTracker.getInstance();
-    tracker.initialize(user, user.publicMetadata?.storeId as string || '');
+    tracker.initialize(trackerUser, trackerUser.storeId);
     trackerRef.current = tracker;
 
     // Track initial view
@@ -352,7 +366,7 @@ export function useDashboardTracking(
       tracker.destroy();
       trackerRef.current = null;
     };
-  }, [enabled, industry, dashboardType, user]);
+  }, [enabled, industry, dashboardType, trackerUser]);
 
   // Return tracking functions
   return {
@@ -401,12 +415,12 @@ export function useDashboardTracking(
 // Higher-Order Component for Auto-Tracking
 // ============================================================================
 
-export function withDashboardTracking<P extends object>(
+export function withDashboardTracking<P extends object & { industry?: string }>(
   WrappedComponent: React.ComponentType<P>,
   dashboardType: string
 ) {
   return function TrackedDashboard(props: P) {
-    const { industry } = props as any;
+    const industry = props.industry ?? 'retail';
     const tracking = useDashboardTracking(industry, dashboardType);
 
     // Auto-track render

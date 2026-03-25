@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 import { VayvaThemeProvider, useVayvaTheme } from '@/components/vayva-ui/VayvaThemeProvider';
@@ -90,7 +91,7 @@ function FashionDashboardContent() {
               {/* Theme Preset Selector */}
               <div className="flex items-center gap-2 bg-white/50  rounded-xl p-2 border border-white/40">
                 {['default', 'rose-gold', 'ocean-breeze', 'forest-mist', 'midnight-luxe', 'sunset-vibes'].map((preset) => (
-                  <button
+                  <Button
                     key={preset}
                     onClick={() => setThemePreset(preset as any)}
                     className={cn(
@@ -101,7 +102,7 @@ function FashionDashboardContent() {
                     )}
                   >
                     {preset.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                  </button>
+                  </Button>
                 ))}
               </div>
               
@@ -311,3 +312,4 @@ export default function FashionDashboardPage() {
     </VayvaThemeProvider>
   );
 }
+

@@ -4,7 +4,7 @@
  * Universal shopping cart functionality for all templates
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const SHOPPING_CART_ADDON: AddOnDefinition = {
   id: 'vayva.shopping-cart',

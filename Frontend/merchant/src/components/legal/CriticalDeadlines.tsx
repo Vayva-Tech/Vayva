@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
@@ -41,7 +40,7 @@ export function CriticalDeadlines({ data }: CriticalDeadlinesProps) {
               >
                 <div className="text-sm font-medium text-gray-900">{deadline.title}</div>
                 <div className="text-xs text-gray-500 mt-1">
-                  {deadline.case.caseNumber} • {deadline.responsibleAttorneyName}
+                  {deadline.caseId} • {deadline.responsibleAttorneyName}
                 </div>
               </div>
             ))}

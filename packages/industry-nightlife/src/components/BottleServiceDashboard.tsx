@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Bottle Service Dashboard Component
  * Advanced bottle service management with inventory tracking
@@ -20,7 +20,7 @@ interface BottleOrder {
   status: 'pending' | 'preparing' | 'served';
 }
 
-interface BottleServiceDashboardProps {
+export interface BottleServiceDashboardProps {
   orders?: BottleOrder[];
   inventory?: Array<{
     brand: string;
@@ -28,7 +28,7 @@ interface BottleServiceDashboardProps {
     stock: number;
     reorderLevel: number;
   }>;
-  onCreateOrder?: (order: any) => void;
+  onCreateOrder?: (order: unknown) => void;
   onUpdateStatus?: (orderId: string, status: string) => void;
 }
 
@@ -87,9 +87,9 @@ export const BottleServiceDashboard: React.FC<BottleServiceDashboardProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">🍾 Bottle Service Dashboard</h3>
         {onCreateOrder && (
-          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+          <Button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
             + New Order
-          </button>
+          </Button>
         )}
       </div>
 
@@ -139,12 +139,12 @@ export const BottleServiceDashboard: React.FC<BottleServiceDashboardProps> = ({
                 <div className="flex justify-between items-center">
                   <p className="font-bold text-lg">${order.total}</p>
                   {onUpdateStatus && order.status === 'pending' && (
-                    <button
+                    <Button
                       onClick={() => onUpdateStatus(order.id, 'preparing')}
                       className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                     >
                       Start Preparing
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

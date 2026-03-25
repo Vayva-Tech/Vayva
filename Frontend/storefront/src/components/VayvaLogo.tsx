@@ -8,7 +8,7 @@ interface VayvaLogoProps {
 }
 
 export const VayvaLogo = ({
-  variant = "official",
+  variant: _variant = "official",
   width = 100,
   height = 32,
   className = "",

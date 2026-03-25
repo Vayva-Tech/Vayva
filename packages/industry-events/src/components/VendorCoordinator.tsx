@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Vendor Coordinator Component
  */
@@ -54,9 +54,9 @@ export const VendorCoordinator: React.FC<VendorCoordinatorProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Vendor Management</h3>
         {onAddVendor && (
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             + Add Vendor
-          </button>
+          </Button>
         )}
       </div>
 

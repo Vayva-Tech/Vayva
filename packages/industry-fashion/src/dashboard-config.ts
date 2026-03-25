@@ -1,8 +1,19 @@
-// @ts-nocheck
-import { DashboardEngineConfig } from './types';
+import type { DashboardEngineConfig } from "@vayva/industry-core";
 
 export const FASHION_DASHBOARD_CONFIG: DashboardEngineConfig = {
-  industry: 'fashion',
+  industry: "fashion",
+  title: "Fashion operations",
+  subtitle: "Collections, size curves, and wholesale in one view",
+  primaryObjectLabel: "SKU",
+  defaultTimeHorizon: "week",
+  sections: [
+    "primary_object_health",
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+  ],
+  failureModes: ["wholesale_sync_stale", "inventory_feed_delayed", "returns_pipeline_blocked"],
 
   widgets: [
     {
@@ -167,26 +178,44 @@ export const FASHION_DASHBOARD_CONFIG: DashboardEngineConfig = {
 
   alertRules: [
     {
-      id: 'low-sell-through',
-      condition: 'sell-through-rate < 0.3',
-      threshold: 0.3,
-      action: 'notify-merchant',
+      id: "low-sell-through",
+      name: "Low sell-through",
+      condition: { metric: "sell_through_rate", operator: "lt", value: 0.3 },
+      severity: "warning",
+      message: "Sell-through dropped below target",
+      enabled: true,
     },
     {
-      id: 'high-return-rate',
-      condition: 'return-rate > 0.15',
-      threshold: 0.15,
-      action: 'flag-products',
+      id: "high-return-rate",
+      name: "High return rate",
+      condition: { metric: "return_rate", operator: "gt", value: 0.15 },
+      severity: "warning",
+      message: "Return rate elevated — review assortment",
+      enabled: true,
     },
   ],
 
   actions: [
-    { id: 'create-lookbook', label: 'Create Lookbook', icon: 'images', action: 'open-lookbook-creator' },
-    { id: 'manage-wholesale', label: 'Wholesale Portal', icon: 'users', action: 'open-wholesale-dashboard' },
-    { id: 'size-analysis', label: 'Size Analysis', icon: 'barChart', action: 'open-size-analytics' },
-    // Phase 4: Demand forecasting actions
-    { id: 'run-forecast', label: 'Run Forecast', icon: 'trendingUp', action: 'trigger-demand-forecast' },
-    { id: 'optimize-size-curve', label: 'Optimize Sizes', icon: 'sliders', action: 'open-size-optimizer' },
-    { id: 'manage-replenishment', label: 'Auto-Replenishment', icon: 'refreshCw', action: 'open-replenishment-rules' },
+    { id: "create-lookbook", label: "Create Lookbook", icon: "images", href: "/merchandising/lookbooks/new" },
+    { id: "manage-wholesale", label: "Wholesale Portal", icon: "users", href: "/wholesale" },
+    { id: "size-analysis", label: "Size Analysis", icon: "barChart", href: "/analytics/sizes" },
+    {
+      id: "run-forecast",
+      label: "Run Forecast",
+      icon: "trendingUp",
+      href: "/analytics/demand-forecast",
+    },
+    {
+      id: "optimize-size-curve",
+      label: "Optimize Sizes",
+      icon: "sliders",
+      href: "/inventory/size-curve",
+    },
+    {
+      id: "manage-replenishment",
+      label: "Auto-Replenishment",
+      icon: "refreshCw",
+      href: "/inventory/replenishment",
+    },
   ],
 };

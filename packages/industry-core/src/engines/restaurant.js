@@ -10,7 +10,7 @@ class RestaurantEngine {
   }
   
   async initialize() {
-    console.log('[RESTAURANT_ENGINE] Initialized');
+    console.warn('[RESTAURANT_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

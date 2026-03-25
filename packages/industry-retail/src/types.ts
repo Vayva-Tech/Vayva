@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Retail Industry Types
 
 export type IndustrySlug = 'retail';

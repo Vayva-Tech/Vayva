@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { useRealTimeKDS } from '@/hooks/useRealTimeKDS';
@@ -94,12 +95,12 @@ export function EightySixBoard({
           <h3 className="text-lg font-semibold">86 Board</h3>
         </div>
         
-        <button
+        <Button
           onClick={() => setShowAddModal(true)}
           className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
         >
           Add Item
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,9 +128,9 @@ export function EightySixBoard({
                       </p>
                     </div>
                   </div>
-                  <button className="text-red-600 hover:text-red-800">
+                  <Button className="text-red-600 hover:text-red-800">
                     <CheckCircle className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               ))}
             
@@ -165,9 +166,9 @@ export function EightySixBoard({
                       </p>
                     </div>
                   </div>
-                  <button className="text-yellow-600 hover:text-yellow-800">
+                  <Button className="text-yellow-600 hover:text-yellow-800">
                     <CheckCircle className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               ))}
             
@@ -204,3 +205,4 @@ export function EightySixBoard({
     </div>
   );
 }
+

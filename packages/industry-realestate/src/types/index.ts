@@ -1,8 +1,14 @@
-// @ts-nocheck
 /**
  * Real Estate Industry Types
  * Export all type definitions for the real estate industry engine
  */
+
+import type { PropertyConfig } from '../services/property-management.service';
+
+/** Engine bootstrap options: `false` disables property management. */
+export type RealEstateConfig = {
+  propertyManagement?: false | PropertyConfig;
+};
 
 // Property types
 export * from './property';

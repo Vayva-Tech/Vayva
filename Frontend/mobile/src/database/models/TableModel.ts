@@ -13,5 +13,5 @@ export class TableModel extends Model {
   @field('status') status!: 'available' | 'occupied' | 'reserved' | 'maintenance';
   @field('location') location?: string;
 
-  @children('orders') orders!: any;
+  @children('orders') orders!: unknown;
 }

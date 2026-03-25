@@ -5,7 +5,7 @@
  * Public transparency document listing all third-party data processors
  */
 
-import { LegalDocument } from "../types";
+import type { LegalDocument } from "../types";
 
 export const subprocessors: LegalDocument = {
   slug: "subprocessors",

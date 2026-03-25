@@ -93,11 +93,11 @@ export default function StorefrontSettingsPage() {
   };
 
   if (loading || !settings) {
-    return <div className="p-6">Loading...</div>;
+    return <div className="py-8">Loading...</div>;
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

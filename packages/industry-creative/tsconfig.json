@@ -1,9 +1,39 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "composite": true
+    "noEmit": true,
+    "composite": false,
+    "baseUrl": "../..",
+    "paths": {
+      "@vayva/db": ["infra/db/src/client.ts"],
+      "@vayva/industry-core": ["packages/industry-core/src/index.ts"],
+      "@vayva/schemas": ["packages/schemas/src/index.ts"],
+      "@vayva/shared": ["packages/shared/utils/src/index.ts"],
+      "@vayva/ai-agent": ["packages/ai-agent/src/index.ts"],
+      "@vayva/realtime": ["packages/realtime/src/index.ts"],
+      "@/components/*": [
+        "Frontend/merchant/src/components/*",
+        "Frontend/ops-console/src/components/*"
+      ],
+      "@/lib/*": [
+        "Frontend/merchant/src/lib/*",
+        "Frontend/marketing/src/lib/*"
+      ],
+      "@/hooks/*": [
+        "Frontend/merchant/src/hooks/*",
+        "Frontend/ops-console/src/hooks/*"
+      ],
+      "@/context/*": [
+        "Frontend/merchant/src/context/*",
+        "Frontend/marketing/src/context/*"
+      ],
+      "@/config/*": ["Frontend/merchant/src/config/*"],
+      "@/services/*": [
+        "Frontend/merchant/src/services/*",
+        "Frontend/storefront/src/services/*"
+      ],
+      "@/types/*": ["Frontend/merchant/src/types/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

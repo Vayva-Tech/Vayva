@@ -1,11 +1,38 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
-import { Ticket } from '@/types/kitchen';
+import type { Ticket } from '@/types/kitchen';
 import { TimerDisplay } from '../shared/TimerDisplay';
 import { StatusBadge } from '../shared/StatusBadge';
-import { CheckCircle, Clock, AlertTriangle, ChefHat } from 'lucide-react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
+
+type BadgeTicketStatus = 'fresh' | 'cooking' | 'ready' | 'urgent' | 'overdue';
+
+function mapKdsOrderToBadgeStatus(ticket: Ticket): BadgeTicketStatus {
+  if (ticket.priority === 'rush') return 'urgent';
+  const now = Date.now();
+  if (
+    ticket.promisedTime &&
+    new Date(ticket.promisedTime).getTime() < now &&
+    ticket.status !== 'ready' &&
+    ticket.status !== 'served'
+  ) {
+    return 'overdue';
+  }
+  switch (ticket.status) {
+    case 'pending':
+      return 'fresh';
+    case 'preparing':
+      return 'cooking';
+    case 'ready':
+    case 'served':
+    case 'bumped':
+      return 'ready';
+    default:
+      return 'cooking';
+  }
+}
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -18,7 +45,7 @@ interface TicketCardProps {
 
 /**
  * TicketCard Component
- * 
+ *
  * Displays individual kitchen ticket with timer and actions
  */
 export function TicketCard({
@@ -29,8 +56,14 @@ export function TicketCard({
   onComplete,
   onVoid,
 }: TicketCardProps) {
-  const isUrgent = ticket.priority === 'urgent' || ticket.status === 'overdue';
+  const badgeStatus = mapKdsOrderToBadgeStatus(ticket);
+  const isUrgent = badgeStatus === 'urgent' || badgeStatus === 'overdue';
   const isCompact = variant === 'compact';
+
+  const startTime = new Date(ticket.receivedAt);
+  const targetTime = ticket.promisedTime
+    ? new Date(ticket.promisedTime)
+    : new Date(startTime.getTime() + 30 * 60 * 1000);
 
   return (
     <div
@@ -44,25 +77,21 @@ export function TicketCard({
       <div className={`flex items-start justify-between ${isCompact ? 'p-3' : 'p-4'} border-b`}>
         <div>
           <div className="flex items-center gap-2">
-            <h4 className="font-bold text-lg">#{ticket.ticketNumber}</h4>
-            <StatusBadge status={ticket.status} />
+            <h4 className="font-bold text-lg">#{ticket.orderNumber}</h4>
+            <StatusBadge status={badgeStatus} />
           </div>
           <p className="text-sm text-gray-500 mt-1">
-            {ticket.type} • Table {ticket.tableNumber || 'N/A'}
+            {ticket.course} • Table {ticket.tableNumber || 'N/A'}
           </p>
         </div>
-        
-        <TimerDisplay
-          startTime={new Date(ticket.createdAt)}
-          targetTime={new Date(ticket.targetTime)}
-          size={isCompact ? 'small' : 'medium'}
-        />
+
+        <TimerDisplay startTime={startTime} targetTime={targetTime} size={isCompact ? 'small' : 'medium'} />
       </div>
 
       {/* Items List */}
       <div className={`${isCompact ? 'p-3' : 'p-4'}`}>
         <ul className="space-y-2">
-          {ticket.items.map((item, index) => (
+          {ticket.items.map((item) => (
             <li key={item.id} className="flex items-start gap-2">
               <span className="font-semibold text-gray-700 min-w-[24px]">
                 {item.quantity}x
@@ -71,17 +100,17 @@ export function TicketCard({
                 <p className="text-gray-900">{item.name}</p>
                 {item.modifiers && item.modifiers.length > 0 && (
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {item.modifiers.map(m => m.value).join(', ')}
+                    {item.modifiers.map((m) => m.name).join(', ')}
                   </p>
                 )}
-                {item.specialInstructions && (
+                {item.notes && (
                   <p className="text-xs text-red-600 font-medium mt-1 flex items-center gap-1">
                     <AlertTriangle className="h-3 w-3" />
-                    {item.specialInstructions}
+                    {item.notes}
                   </p>
                 )}
               </div>
-              {item.status === 'completed' && (
+              {item.status === 'served' && (
                 <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
               )}
             </li>
@@ -93,28 +122,32 @@ export function TicketCard({
       {!isCompact && (
         <div className="flex items-center justify-between gap-2 px-4 py-3 bg-gray-50 border-t rounded-b-lg">
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              type="button"
               onClick={() => onBump?.(ticket.id)}
               className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             >
               Bump
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
               onClick={() => onComplete?.(ticket.id)}
               className="px-3 py-1.5 text-sm font-medium bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
             >
               Complete
-            </button>
+            </Button>
           </div>
-          
-          <button
+
+          <Button
+            type="button"
             onClick={() => onVoid?.(ticket.id, 'Other')}
             className="px-3 py-1.5 text-sm font-medium text-red-600 border border-red-200 rounded hover:bg-red-50 transition-colors"
           >
             Void
-          </button>
+          </Button>
         </div>
       )}
     </div>
   );
 }
+

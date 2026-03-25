@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CMA Adjustment Engine
  * Calculates adjustments for comparable properties

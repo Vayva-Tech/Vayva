@@ -1,9 +1,9 @@
-// @ts-nocheck
 /**
  * Table Reservation Feature
  */
 
 import { TableReservationManagerService } from '../services/table-reservation-manager.service.js';
+import type { TableReservation } from '../services/table-reservation-manager.service.js';
 
 export class TableReservationFeature {
   constructor(private service: TableReservationManagerService) {}
@@ -16,7 +16,7 @@ export class TableReservationFeature {
     return this.service.createReservation(eventId, data);
   }
 
-  updateReservationStatus(id: string, status: string) {
+  updateReservationStatus(id: string, status: TableReservation['status']) {
     return this.service.updateReservationStatus(id, status);
   }
 

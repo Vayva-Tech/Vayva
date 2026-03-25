@@ -5,18 +5,20 @@ import { INDUSTRY_CONFIG } from "@/config/industry";
 import { IndustrySlug } from "@/lib/templates/types";
 import { logger } from "@vayva/shared";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Button, Icon } from "@vayva/ui";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 const INDUSTRY_ICON: Record<IndustrySlug, string> = {
+  analytics: "ChartLine",
   retail: "Store",
   fashion: "Shirt",
   electronics: "Laptop",
   beauty: "Sparkles",
   grocery: "ShoppingCart",
   food: "UtensilsCrossed",
+  "meal-kit": "Package",
   restaurant: "Utensils",
   catering: "Truck",
   services: "Scissors",
@@ -42,6 +44,9 @@ const INDUSTRY_ICON: Record<IndustrySlug, string> = {
   healthcare: "HeartPulse",
   legal: "Scale",
   jobs: "Briefcase",
+  petcare: "HeartPulse",
+  specialized: "Layers",
+  wellness: "Sparkles",
 };
 
 // Groupings for UI
@@ -56,7 +61,7 @@ const INDUSTRY_GROUPS = {
     "b2b",
     "marketplace",
   ],
-  "Food & Services": ["food", "services"],
+  "Food & Services": ["food", "meal-kit", "services"],
   "Education & Digital": ["education", "events", "digital"],
   "Entertainment & Hospitality": ["nightlife", "travel_hospitality"],
   Specialized: [
@@ -65,6 +70,9 @@ const INDUSTRY_GROUPS = {
     "blog_media",
     "creative_portfolio",
     "nonprofit",
+    "petcare",
+    "specialized",
+    "wellness",
   ],
 };
 
@@ -106,25 +114,20 @@ export default function IndustrySettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 md:p-8">
-      <Breadcrumbs />
       <div className="flex items-center gap-4 mb-6">
         <BackButton
           href="/dashboard/settings/overview"
           label="Back to Settings"
         />
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Industry
-          </h1>
-          <p className="text-gray-500">
-            Select your business industry for tailored features.
-          </p>
-        </div>
+        <PageHeader
+          title="Industry"
+          subtitle="Select your business industry for tailored features."
+        />
       </div>
 
       <div className="mb-8 flex items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Select Your Industry</h1>
+          <h2 className="text-2xl font-bold mb-2">Select Your Industry</h2>
           <p className="text-gray-500">
             This will customize your dashboard, sidebar, and product forms to
             match your business needs.

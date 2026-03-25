@@ -13,117 +13,124 @@ const HoursLogSchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const { searchParams } = new URL(req.url);
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.VOLUNTEERS_VIEW,
+  async (req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    let volunteerIdForLog = "";
+    try {
+      const { id } = await params;
+      volunteerIdForLog = id;
+      const { searchParams } = new URL(req.url);
 
-    // Verify volunteer exists
-    const volunteer = await prisma.nonprofitVolunteer.findFirst({
-      where: { id, storeId },
-    });
+      const volunteer = await prisma.nonprofitVolunteer.findFirst({
+        where: { id, storeId },
+      });
 
-    if (!volunteer) {
-      return NextResponse.json(
-        { error: "Volunteer not found" },
-        { status: 404, headers: standardHeaders(requestId) }
-      );
-    }
+      if (!volunteer) {
+        return NextResponse.json(
+          { error: "Volunteer not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
 
-    // Parse date filters
-    const startDateParam = searchParams.get('startDate');
-    const endDateParam = searchParams.get('endDate');
-    const activityFilter = searchParams.get('activity');
+      const startDateParam = searchParams.get("startDate");
+      const endDateParam = searchParams.get("endDate");
+      const activityFilter = searchParams.get("activity");
 
-    const where: any = { volunteerId: id };
-    
-    if (startDateParam) where.date = { ...where.date, gte: new Date(startDateParam) };
-    if (endDateParam) where.date = { ...where.date, lte: new Date(endDateParam) };
-    if (activityFilter) where.activity = { contains: activityFilter, mode: "insensitive" };
+      let dateRange: { gte?: Date; lte?: Date } | undefined;
+      if (startDateParam) dateRange = { ...dateRange, gte: new Date(startDateParam) };
+      if (endDateParam) dateRange = { ...dateRange, lte: new Date(endDateParam) };
 
-    const [hours, total] = await Promise.all([
-      prisma.nonprofitVolunteerHour.findMany({
-        where,
-        include: {
-          project: {
-            select: {
-              name: true,
-              description: true,
+      const where = {
+        volunteerId: id,
+        storeId,
+        ...(dateRange ? { date: dateRange } : {}),
+        ...(activityFilter
+          ? { activity: { contains: activityFilter, mode: "insensitive" as const } }
+          : {}),
+      };
+
+      const [hours, total] = await Promise.all([
+        prisma.nonprofitVolunteerHour.findMany({
+          where,
+          include: {
+            project: {
+              select: {
+                name: true,
+                description: true,
+              },
             },
           },
-        },
-        orderBy: { date: "desc" },
-        take: 100,
-      }),
-      prisma.nonprofitVolunteerHour.count({ where }),
-    ]);
+          orderBy: { date: "desc" },
+          take: 100,
+        }),
+        prisma.nonprofitVolunteerHour.count({ where }),
+      ]);
 
-    // Calculate summary statistics
-    const totalHours = hours.reduce((sum, h) => sum + h.hours, 0);
-    const averageHours = hours.length > 0 ? totalHours / hours.length : 0;
+      const totalHours = hours.reduce((sum, h) => sum + h.hours, 0);
+      const averageHours = hours.length > 0 ? totalHours / hours.length : 0;
 
-    // Group by activity type
-    const activitySummary: Record<string, { count: number; hours: number }> = {};
-    hours.forEach(hour => {
-      if (!activitySummary[hour.activity]) {
-        activitySummary[hour.activity] = { count: 0, hours: 0 };
-      }
-      activitySummary[hour.activity].count += 1;
-      activitySummary[hour.activity].hours += hour.hours;
-    });
+      const activitySummary: Record<string, { count: number; hours: number }> =
+        {};
+      hours.forEach((hour) => {
+        if (!activitySummary[hour.activity]) {
+          activitySummary[hour.activity] = { count: 0, hours: 0 };
+        }
+        activitySummary[hour.activity].count += 1;
+        activitySummary[hour.activity].hours += hour.hours;
+      });
 
-    // Monthly breakdown for the past 12 months
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-    
-    const monthlyBreakdown = hours
-      .filter(h => h.date >= twelveMonthsAgo)
-      .reduce((acc: Record<string, number>, hour) => {
-        const monthKey = hour.date.toISOString().slice(0, 7); // YYYY-MM
-        acc[monthKey] = (acc[monthKey] || 0) + hour.hours;
-        return acc;
-      }, {});
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
 
-    return NextResponse.json(
-      {
-        data: {
-          volunteerId: id,
-          volunteerName: `${volunteer.firstName} ${volunteer.lastName}`,
-          hours,
-          summary: {
-            totalRecords: total,
-            totalHours: Math.round(totalHours * 100) / 100,
-            averageHoursPerSession: Math.round(averageHours * 100) / 100,
-            activityTypes: Object.keys(activitySummary).length,
+      const monthlyBreakdown = hours
+        .filter((h) => h.date >= twelveMonthsAgo)
+        .reduce((acc: Record<string, number>, hour) => {
+          const monthKey = hour.date.toISOString().slice(0, 7);
+          acc[monthKey] = (acc[monthKey] || 0) + hour.hours;
+          return acc;
+        }, {});
+
+      return NextResponse.json(
+        {
+          data: {
+            volunteerId: id,
+            volunteerName: `${volunteer.firstName} ${volunteer.lastName}`,
+            hours,
+            summary: {
+              totalRecords: total,
+              totalHours: Math.round(totalHours * 100) / 100,
+              averageHoursPerSession: Math.round(averageHours * 100) / 100,
+              activityTypes: Object.keys(activitySummary).length,
+            },
+            activityBreakdown: activitySummary,
+            monthlyBreakdown,
           },
-          activityBreakdown: activitySummary,
-          monthlyBreakdown,
         },
-      },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[NONPROFIT_VOLUNTEER_HOURS_GET]", { error, volunteerId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch volunteer hours" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      logger.error("[NONPROFIT_VOLUNTEER_HOURS_GET]", {
+        error,
+        volunteerId: volunteerIdForLog,
+      });
+      return NextResponse.json(
+        { error: "Failed to fetch volunteer hours" },
+        { status: 500, headers: standardHeaders(requestId) },
+      );
+    }
+  },
+);
 
 export const POST = withVayvaAPI(
   PERMISSIONS.VOLUNTEERS_MANAGE,
-  async (req: NextRequest, { params, storeId, user, correlationId }: APIContext & { params: { id: string } }) => {
+  async (req: NextRequest, { params, storeId, user, correlationId }: APIContext) => {
     const requestId = correlationId;
+    let volunteerIdForLog = "";
     try {
-      const { id } = params;
+      const { id } = await params;
+      volunteerIdForLog = id;
       const json = await req.json().catch(() => ({}));
       const parseResult = HoursLogSchema.safeParse(json);
 
@@ -133,13 +140,12 @@ export const POST = withVayvaAPI(
             error: "Invalid hours data",
             details: parseResult.error.flatten(),
           },
-          { status: 400, headers: standardHeaders(requestId) }
+          { status: 400, headers: standardHeaders(requestId) },
         );
       }
 
       const body = parseResult.data;
 
-      // Verify volunteer exists
       const volunteer = await prisma.nonprofitVolunteer.findFirst({
         where: { id, storeId },
       });
@@ -147,20 +153,19 @@ export const POST = withVayvaAPI(
       if (!volunteer) {
         return NextResponse.json(
           { error: "Volunteer not found" },
-          { status: 404, headers: standardHeaders(requestId) }
+          { status: 404, headers: standardHeaders(requestId) },
         );
       }
 
-      // Verify project exists if provided
       if (body.projectId) {
         const project = await prisma.nonprofitProject.findFirst({
           where: { id: body.projectId, storeId },
         });
-        
+
         if (!project) {
           return NextResponse.json(
             { error: "Project not found" },
-            { status: 404, headers: standardHeaders(requestId) }
+            { status: 404, headers: standardHeaders(requestId) },
           );
         }
       }
@@ -189,11 +194,16 @@ export const POST = withVayvaAPI(
         headers: standardHeaders(requestId),
       });
     } catch (error: unknown) {
-      logger.error("[NONPROFIT_VOLUNTEER_HOURS_POST]", { error, volunteerId: params.id, storeId, userId: user?.id });
+      logger.error("[NONPROFIT_VOLUNTEER_HOURS_POST]", {
+        error,
+        volunteerId: volunteerIdForLog,
+        storeId,
+        userId: user?.id,
+      });
       return NextResponse.json(
         { error: "Failed to log volunteer hours" },
-        { status: 500, headers: standardHeaders(requestId) }
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-  }
+  },
 );

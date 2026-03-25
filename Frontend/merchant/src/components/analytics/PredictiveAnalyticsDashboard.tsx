@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Predictive Analytics Dashboard
  * 
@@ -68,10 +67,46 @@ import {
   Settings as _Settings,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AnalyticsService } from "@/services/analytics.service";
-import { OrderService } from "@/services/order.service";
-import { ProductService as _ProductService } from "@/services/product.service";
 import { logger } from "@vayva/shared";
+
+/** Demo analytics payload until merchant analytics services are wired to this UI. */
+interface SalesAnalyticsShape {
+  totalRevenue: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  revenueByDay?: Array<{ revenue?: number }>;
+}
+
+interface ProductPerfRow {
+  quantitySold: number;
+  product?: { name?: string };
+}
+
+async function loadPredictiveDataset(): Promise<{
+  analytics: SalesAnalyticsShape;
+  productPerformance: ProductPerfRow[];
+}> {
+  return {
+    analytics: {
+      totalRevenue: 125000,
+      totalOrders: 420,
+      averageOrderValue: 297,
+      revenueByDay: Array.from({ length: 30 }, (_, i) => ({ revenue: 2800 + i * 95 })),
+    },
+    productPerformance: [
+      { quantitySold: 120, product: { name: "Widget A" } },
+      { quantitySold: 98, product: { name: "Widget B" } },
+      { quantitySold: 76, product: { name: "Widget C" } },
+      { quantitySold: 64, product: { name: "Widget D" } },
+      { quantitySold: 55, product: { name: "Widget E" } },
+      { quantitySold: 44, product: { name: "Widget F" } },
+      { quantitySold: 40, product: { name: "Widget G" } },
+      { quantitySold: 38, product: { name: "Widget H" } },
+      { quantitySold: 32, product: { name: "Widget I" } },
+      { quantitySold: 28, product: { name: "Widget J" } },
+    ],
+  };
+}
 
 // Types
 interface ForecastDataPoint {
@@ -100,10 +135,17 @@ interface SeasonalInsight {
 
 interface ScenarioResult {
   name: string;
-  assumptions: Record<string, number>;
+  assumptions: Record<string, number | string>;
   projectedRevenue: number;
   projectedOrders: number;
   growth: number;
+}
+
+interface DemandForecastRow {
+  name: string;
+  current: number;
+  predicted: number;
+  change: number;
 }
 
 export function PredictiveAnalyticsDashboard() {
@@ -117,7 +159,7 @@ export function PredictiveAnalyticsDashboard() {
   
   // Data states
   const [salesForecast, setSalesForecast] = useState<ForecastDataPoint[]>([]);
-  const [demandForecast, setDemandForecast] = useState<unknown[]>([]);
+  const [demandForecast, setDemandForecast] = useState<DemandForecastRow[]>([]);
   const [revenueProjection, setRevenueProjection] = useState<number>(0);
   const [trends, setTrends] = useState<TrendInsight[]>([]);
   const [seasonalInsights, setSeasonalInsights] = useState<SeasonalInsight[]>([]);
@@ -138,11 +180,7 @@ export function PredictiveAnalyticsDashboard() {
       setRefreshing(true);
       
       // Get historical data
-      const [analytics, productPerformance, orderSummary] = await Promise.all([ // eslint-disable-line @typescript-eslint/no-unused-vars
-        AnalyticsService.getSalesAnalytics("current-store-id", { period: "last_90_days" }),
-        AnalyticsService.getProductPerformance("current-store-id", { period: "last_90_days" }),
-        OrderService.getOrderSummary("current-store-id"),
-      ]);
+      const { analytics, productPerformance } = await loadPredictiveDataset();
 
       // Generate forecast (simulated ML predictions)
       const forecast = generateSalesForecast(analytics.revenueByDay || [], forecastPeriod);
@@ -168,7 +206,9 @@ export function PredictiveAnalyticsDashboard() {
       });
 
     } catch (error) {
-      logger.error("Failed to fetch predictive data:", error);
+      logger.error("Failed to fetch predictive data", {
+        message: error instanceof Error ? error.message : String(error),
+      });
       toast({
         title: "Error",
         description: "Failed to load predictive analytics",
@@ -185,7 +225,10 @@ export function PredictiveAnalyticsDashboard() {
   }, [timeRange, forecastPeriod]);
 
   // Generate sales forecast using simple linear regression (simulated ML)
-  const generateSalesForecast = (historicalData: unknown[], period: string): ForecastDataPoint[] => {
+  const generateSalesForecast = (
+    historicalData: Array<{ revenue?: number }>,
+    period: string
+  ): ForecastDataPoint[] => {
     if (!historicalData || historicalData.length === 0) return [];
 
     const days = period === "7d" ? 7 : period === "30d" ? 30 : 90;
@@ -194,7 +237,8 @@ export function PredictiveAnalyticsDashboard() {
     // Calculate trend from historical data
     const recentData = historicalData.slice(-30);
     const avgGrowth = calculateAverageGrowth(recentData);
-    const lastValue = recentData[recentData.length - 1]?.revenue || 0;
+    const lastPoint = recentData[recentData.length - 1];
+    const lastValue = (lastPoint && typeof lastPoint.revenue === "number" ? lastPoint.revenue : 0) || 0;
 
     // Generate forecast with confidence intervals
     for (let i = 1; i <= days; i++) {
@@ -216,10 +260,10 @@ export function PredictiveAnalyticsDashboard() {
   };
 
   // Generate demand forecast by product
-  const generateDemandForecast = (productPerformance: unknown[]): unknown[] => {
+  const generateDemandForecast = (productPerformance: ProductPerfRow[]): DemandForecastRow[] => {
     if (!productPerformance || productPerformance.length === 0) return [];
 
-    return productPerformance.slice(0, 10).map(product => {
+    return productPerformance.slice(0, 10).map((product) => {
       const growthRate = (Math.random() * 0.4) - 0.1; // -10% to +30%
       const predictedDemand = Math.round(product.quantitySold * (1 + growthRate));
       
@@ -322,7 +366,7 @@ export function PredictiveAnalyticsDashboard() {
       },
       {
         name: "Marketing Push",
-        assumptions: { adSpend: 50000, roas: 4, newCustomers: 200 },
+        assumptions: { adSpend: "₦50,000", roas: "4x", newCustomers: 200 },
         projectedRevenue: Math.round(baseRevenue * 1.4),
         projectedOrders: Math.round(((analytics?.totalOrders as number) || 0) * 1.35),
         growth: 40,
@@ -331,14 +375,14 @@ export function PredictiveAnalyticsDashboard() {
   };
 
   // Helper calculations
-  const calculateAverageGrowth = (data: unknown[]): number => {
+  const calculateAverageGrowth = (data: Array<{ revenue?: number }>): number => {
     if (data.length < 2) return 0.05; // Default 5% growth
     
     const firstHalf = data.slice(0, Math.floor(data.length / 2));
     const secondHalf = data.slice(Math.floor(data.length / 2));
     
-    const firstAvg = firstHalf.reduce((sum, d) => sum + (d.revenue || 0), 0) / firstHalf.length;
-    const secondAvg = secondHalf.reduce((sum, d) => sum + (d.revenue || 0), 0) / secondHalf.length;
+    const firstAvg = firstHalf.reduce((sum, d) => sum + (d.revenue ?? 0), 0) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((sum, d) => sum + (d.revenue ?? 0), 0) / secondHalf.length;
     
     return firstAvg > 0 ? (secondAvg - firstAvg) / firstAvg : 0.05;
   };
@@ -385,7 +429,10 @@ export function PredictiveAnalyticsDashboard() {
           <div className="flex gap-4 flex-wrap">
             <div className="space-y-2">
               <Label>Historical Period</Label>
-              <Select value={timeRange} onValueChange={(v: unknown) => setTimeRange(v)}>
+              <Select
+                value={timeRange}
+                onValueChange={(v) => setTimeRange(v as "30d" | "90d" | "180d" | "365d")}
+              >
                 <SelectTrigger className="w-[150px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -399,7 +446,10 @@ export function PredictiveAnalyticsDashboard() {
             </div>
             <div className="space-y-2">
               <Label>Forecast Period</Label>
-              <Select value={forecastPeriod} onValueChange={(v: unknown) => setForecastPeriod(v)}>
+              <Select
+                value={forecastPeriod}
+                onValueChange={(v) => setForecastPeriod(v as "7d" | "30d" | "90d")}
+              >
                 <SelectTrigger className="w-[150px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -635,7 +685,7 @@ export function PredictiveAnalyticsDashboard() {
                                   {key.replace(/([A-Z])/g, ' $1').trim()}
                                 </span>
                                 <span className="font-medium">
-                                  {typeof value === 'number' ? `${value}%` : value.toLocaleString()}
+                                  {typeof value === "number" ? `${value}%` : String(value)}
                                 </span>
                               </div>
                             ))}

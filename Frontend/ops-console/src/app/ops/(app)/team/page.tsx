@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState } from "react";
 import { useOpsQuery } from "@/hooks/useOpsQuery";
@@ -210,20 +211,20 @@ function InviteModal({
           </div>
           
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
               onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
             >
               {isSubmitting ? "Inviting..." : "Send Invite"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -283,7 +284,7 @@ function UserRow({
       <td className="px-6 py-4">
         {canManageUser && (
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => onToggleStatus(user.id)}
               className={`p-2 rounded-lg ${user.isActive 
                 ? "text-yellow-600 hover:bg-yellow-50" 
@@ -292,14 +293,14 @@ function UserRow({
               title={user.isActive ? "Deactivate" : "Activate"}
             >
               {user.isActive ? <XCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => onDelete(user.id)}
               className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
               title="Delete"
             >
               <Trash className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         )}
       </td>
@@ -415,13 +416,13 @@ export default function TeamManagementPage(): React.JSX.Element {
       description="Manage your ops team members and their roles"
       headerActions={
         canInvite && (
-          <button
+          <Button
             onClick={() => setIsInviteOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Invite Member
-          </button>
+          </Button>
         )
       }
     >
@@ -472,12 +473,12 @@ export default function TeamManagementPage(): React.JSX.Element {
                       {new Date(inv.expiresAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-3">
-                      <button
+                      <Button
                         onClick={() => handleCancelInvitation(inv.id)}
                         className="text-red-600 hover:text-red-800 text-sm font-medium"
                       >
                         Cancel
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -559,3 +560,4 @@ export default function TeamManagementPage(): React.JSX.Element {
     </OpsPageShell>
   );
 }
+

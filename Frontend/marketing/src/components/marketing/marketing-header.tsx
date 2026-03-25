@@ -12,29 +12,11 @@ import {
   IconMenu2 as Menu,
   IconX as X,
   IconSparkles as Sparkles,
-  IconBuildingStore as Store,
   IconRocket as Rocket,
-  IconBed as Bed,
-  IconCar as Car,
-  IconSchool as GraduationCap,
-  IconHome as Home,
-  IconNews as Newspaper,
-  IconPackage as Package,
-  IconPackage as Warehouse,
-  IconPalette as Palette,
-  IconConfetti as PartyPopper,
-  IconTicket as Ticket,
   IconBuilding as Building2,
-  IconBriefcase as Briefcase,
   IconLifebuoy as LifeBuoy,
   IconFileText as FileText,
-  IconShoppingBag as ShoppingBag,
-  IconHanger as Shirt,
-  IconToolsKitchen2 as UtensilsCrossed,
-  IconHeart as Heart,
   IconDeviceMobile as Smartphone,
-  IconShoppingCart as ShoppingCart,
-  IconCoffee as Coffee
 } from "@tabler/icons-react";
 
 // Navigation structure with dropdowns
@@ -58,6 +40,11 @@ const NAV_ITEMS = [
     // Simple link - no dropdown
   },
   {
+    label: "Help",
+    href: "/help",
+    // Simple link — always reachable (no dropdown hover gap)
+  },
+  {
     label: "Company",
     href: "/about",
     items: [
@@ -68,18 +55,15 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: "Resources",
-    href: "/help",
+    label: "Legal",
+    href: "/legal",
     items: [
-      { href: "/help", label: "Help Center", icon: LifeBuoy, description: "Guides & tutorials" },
-      { href: "/legal", label: "Legal", icon: FileText, description: "Terms & policies" },
+      { href: "/legal", label: "Legal hub", icon: FileText, description: "All policies in one place" },
+      { href: "/legal/terms", label: "Terms of Service", icon: FileText, description: "Platform terms of use" },
+      { href: "/legal/privacy", label: "Privacy Policy", icon: FileText, description: "How we handle your data" },
+      { href: "/legal/cookies", label: "Cookie Policy", icon: FileText, description: "Cookies & preferences" },
     ]
   },
-];
-
-const NAV_LINKS = [
-  { href: "/pricing", label: "Pricing" },
-  { href: "/help", label: "Help" },
 ];
 
 export function MarketingHeader(): React.JSX.Element {
@@ -88,7 +72,7 @@ export function MarketingHeader(): React.JSX.Element {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/40 bg-white/30 backdrop-blur-xl">
-      <div className="max-w-[1600px] mx-auto h-16 md:h-[72px] flex items-center justify-between px-6">
+      <div className="max-w-[1400px] mx-auto h-16 md:h-[72px] flex items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Logo href="/" size="sm" showText={true} />
 
@@ -124,35 +108,37 @@ export function MarketingHeader(): React.JSX.Element {
 
               {/* Dropdown Menu - only render if items exist */}
               {item.items && activeDropdown === item.label && (
-                <div className="absolute top-full left-0 w-72 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl py-3 border border-slate-200/50 animate-in fade-in slide-in-from-top-1 duration-200 z-50">
-                  <div className="px-4 py-2 border-b border-slate-200/40 mb-2">
-                    <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
-                      {item.label}
-                    </span>
+                <div className="absolute left-0 top-full z-50 pt-2 -mt-2 min-w-[288px]">
+                  <div className="w-72 rounded-2xl border border-slate-200/50 bg-white/90 py-3 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="mb-2 border-b border-slate-200/40 px-4 py-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+                        {item.label}
+                      </span>
+                    </div>
+                    {item.items.map((subItem) => {
+                      const Icon = subItem.icon;
+                      return (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-emerald-50/60"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          <div className="rounded-xl bg-emerald-100/80 p-2 transition-colors group-hover:bg-emerald-200/80">
+                            <Icon size={18} className="text-emerald-600" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-foreground transition-colors group-hover:text-emerald-700">
+                              {subItem.label}
+                            </div>
+                            <div className="mt-0.5 text-xs text-muted-foreground">
+                              {subItem.description}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
-                  {item.items.map((subItem) => {
-                    const Icon = subItem.icon;
-                    return (
-                      <Link
-                        key={subItem.href}
-                        href={subItem.href}
-                        className="flex items-start gap-3 px-4 py-3 hover:bg-emerald-50/60 transition-colors group"
-                        onClick={() => setActiveDropdown(null)}
-                      >
-                        <div className="p-2 bg-emerald-100/80 rounded-xl group-hover:bg-emerald-200/80 transition-colors">
-                          <Icon size={18} className="text-emerald-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm text-foreground group-hover:text-emerald-700 transition-colors">
-                            {subItem.label}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            {subItem.description}
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
                 </div>
               )}
             </div>
@@ -171,6 +157,7 @@ export function MarketingHeader(): React.JSX.Element {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
+            aria-controls="marketing-mobile-nav"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </Button>
@@ -179,7 +166,12 @@ export function MarketingHeader(): React.JSX.Element {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-4 right-4 mt-2 bg-white/80 backdrop-blur-xl shadow-2xl py-6 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200 rounded-2xl border border-slate-200/50 max-h-[80vh] overflow-y-auto">
+        <div
+          id="marketing-mobile-nav"
+          className="lg:hidden absolute top-full left-3 right-3 sm:left-4 sm:right-4 mt-2 bg-white/80 backdrop-blur-xl shadow-2xl py-6 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200 rounded-2xl border border-slate-200/50 max-h-[80vh] overflow-y-auto"
+          role="navigation"
+          aria-label="Mobile navigation"
+        >
           {NAV_ITEMS.map((section) => (
             <div key={section.label} className="flex flex-col gap-2">
               {section.items ? (
@@ -189,6 +181,13 @@ export function MarketingHeader(): React.JSX.Element {
                       {section.label}
                     </span>
                   </div>
+                  <Link
+                    href={section.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-2 text-sm font-semibold text-emerald-800 hover:text-emerald-900"
+                  >
+                    {section.label} overview →
+                  </Link>
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     return (

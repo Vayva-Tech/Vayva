@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
@@ -71,10 +70,13 @@ export function CustomerInsightsChart({
               <XAxis type="number" />
               <YAxis dataKey="name" type="category" width={80} />
               <Tooltip 
-                formatter={(value: number, name: string, props: any) => [
-                  `${value.toLocaleString()} (${props.payload.percentage.toFixed(1)}%)`,
-                  'Customers'
-                ]}
+                formatter={(value, _name, item) => {
+                  const pct =
+                    item && typeof item === 'object' && 'payload' in item
+                      ? Number((item as { payload?: { percentage?: number } }).payload?.percentage ?? 0)
+                      : 0;
+                  return [`${Number(value ?? 0).toLocaleString()} (${pct.toFixed(1)}%)`, 'Customers'];
+                }}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                 {data.map((entry, index) => (

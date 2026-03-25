@@ -1,9 +1,4 @@
 import { urls, logger } from "@vayva/shared";
-import Groq from "groq-sdk";
-
-const groq = new Groq({
-    apiKey: process.env.GROQ_MARKETING_KEY || "",
-});
 
 export class MarketingAIService {
     static SYSTEM_PROMPT = `You are Vayva AI, a friendly and polished assistant for Vayva. 
@@ -25,19 +20,43 @@ If they seem ready, kindly invite them to click "Start selling for free." If you
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static async getResponse(messages: any[]) {
         try {
-            const completion = await groq.chat.completions.create({
-                messages: [
-                    { role: "system", content: this.SYSTEM_PROMPT },
-                    ...messages,
-                ],
-                model: process.env.AI_MODEL || "llama-3.1-70b-versatile",
-                temperature: 0.7,
-                max_tokens: 1024,
+            const apiKey = process.env.OPENROUTER_API_KEY;
+            if (!apiKey) {
+                return {
+                    success: false,
+                    message: "AI service temporarily unavailable (not configured).",
+                };
+            }
+
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://vayva.tech",
+                    "X-Title": "Vayva Merchant Marketing",
+                },
+                body: JSON.stringify({
+                    model: process.env.AI_MODEL || "google/gemini-2.5-flash",
+                    messages: [
+                        { role: "system", content: this.SYSTEM_PROMPT },
+                        ...messages,
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 1024,
+                }),
+                signal: AbortSignal.timeout(20_000),
             });
+
+            if (!response.ok) {
+                throw new Error(`OpenRouter error: ${response.status}`);
+            }
+
+            const data = await response.json();
 
             return {
                 success: true,
-                message: completion.choices[0]?.message?.content ||
+                message: data.choices[0]?.message?.content ||
                     "I'm sorry, I couldn't process that right now. Please try again or contact our support team.",
             };
         }

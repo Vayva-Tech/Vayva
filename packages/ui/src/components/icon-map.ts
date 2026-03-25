@@ -1,6 +1,4 @@
-// @ts-nocheck
-// Pre-existing dependency issue: @phosphor-icons/react subpath imports don't have type declarations
-// This file uses SSR subpath imports for proper Next.js tree-shaking
+// SSR subpath imports for Next.js tree-shaking; types ship with @phosphor-icons/react per icon.
 import * as React from "react";
 import { Pulse as Activity } from "@phosphor-icons/react/dist/ssr/Pulse";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr/ArrowLeft";
@@ -416,7 +414,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
   stethoscope: Activity,
   health: Activity,
   medical: Activity,
-  briefcase: Buildings,
   case: Buildings,
   legal: Buildings,
   jobs: Buildings,
@@ -435,9 +432,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
   whatsapp: WhatsappLogo,
   "whatsapp-logo": WhatsappLogo,
   wa: WhatsappLogo,
-  envelope: EnvelopeSimple,
-  mail: EnvelopeSimple,
-  email: EnvelopeSimple,
   // Industry dashboard icon aliases
   trendingup: TrendUp,
   "trending-up": TrendUp,
@@ -467,9 +461,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
   chefhat: HardHat,
   "chef-hat": HardHat,
   kitchen: HardHat,
-  star: Star,
-  favorite: Star,
-  bookmark: Star,
   xcricle: XCircle,
   error: XCircle,
   userx: UserMinus,
@@ -500,7 +491,6 @@ export const ICON_MAP: Record<string, React.ElementType> = {
   student: Student,
   penline: PencilSimple,
   "pen-line": PencilSimple,
-  send: PaperPlaneRight,
   paperplane: PaperPlaneRight,
   "paper-plane": PaperPlaneRight,
 };

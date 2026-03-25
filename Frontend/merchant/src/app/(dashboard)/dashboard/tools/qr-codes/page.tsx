@@ -384,7 +384,7 @@ function CreateQRModal({
             {QR_TYPES.map((type) => {
               const Icon = type.icon;
               return (
-                <button
+                <Button
                   key={type.id}
                   onClick={() => setSelectedType(type.id)}
                   className={`p-4 rounded-lg border text-left transition-all ${
@@ -396,7 +396,7 @@ function CreateQRModal({
                   <Icon className="w-6 h-6 mb-2" />
                   <p className="font-medium">{type.label}</p>
                   <p className="text-xs text-gray-500">{type.description}</p>
-                </button>
+                </Button>
               );
             })}
           </div>

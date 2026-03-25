@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client';
 
-import React from 'react';
+import React, { type ComponentType } from 'react';
 import * as PhosphorIcons from '@phosphor-icons/react';
 
 interface IconProps {
@@ -12,11 +11,21 @@ interface IconProps {
   color?: string;
 }
 
+type PhosphorIconComponent = ComponentType<{
+  size?: number;
+  weight?: IconProps['weight'];
+  className?: string;
+  color?: string;
+}>;
+
 /**
  * Generic Icon component that renders Phosphor icons by name.
  */
 export function Icon({ name, size = 24, weight = 'regular', className, color }: IconProps) {
-  const IconComponent = (PhosphorIcons as any)[name];
+  const IconComponent = (PhosphorIcons as unknown as Record<
+    string,
+    PhosphorIconComponent | undefined
+  >)[name];
 
   if (!IconComponent) {
     return <span className={className} style={{ width: size, height: size, display: 'inline-block' }} />;

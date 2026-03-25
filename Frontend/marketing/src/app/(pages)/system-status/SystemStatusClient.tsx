@@ -83,48 +83,41 @@ export function SystemStatusClient(): React.JSX.Element {
   };
 
   return (
-    <div className="relative pt-32 pb-24 px-4">
-      <div className="max-w-[1600px] mx-auto px-6">
+    <div className="relative w-full min-w-0 overflow-x-hidden pt-24 sm:pt-32 pb-20 sm:pb-24 px-4">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 min-w-0">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="relative inline-flex mb-6">
-            <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-full border-2 border-emerald-200/60" />
-            <div className="relative inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-slate-900/10 bg-white/90 text-primary text-xs font-bold uppercase tracking-wider shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
-              <CheckCircle className="w-4 h-4" />
-              All Systems Operational
-            </div>
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex mb-6 items-center gap-2 px-4 py-2 rounded-full border border-slate-200/80 bg-white text-primary text-xs font-bold uppercase tracking-wider shadow-sm">
+            <CheckCircle className="w-4 h-4" />
+            All Systems Operational
           </div>
-          <h1 className="text-5xl font-bold text-foreground mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 sm:mb-6">
             System Status
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto px-1">
             Real-time status of Vayva platform services and infrastructure.
           </p>
         </div>
 
         {/* Services Status */}
-        <div className="space-y-4 mb-16">
+        <div className="space-y-4 mb-12 sm:mb-16">
           {services.map((service) => (
-            <div key={service.name} className="relative">
-              <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[22px] border-2 border-emerald-200/60" />
-              <div className="relative bg-white/90 border-2 border-slate-900/10 rounded-2xl p-6 shadow-[0_16px_40px_rgba(15,23,42,0.1)] hover:-translate-y-1 transition-all">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4 flex-1">
-                    {getStatusIcon(service.status)}
-                    <div className="flex-1">
-                      <h3 className="font-bold text-foreground mb-1">
-                        {service.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {service.description}
-                      </p>
-                    </div>
+            <div
+              key={service.name}
+              className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all min-w-0"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between min-w-0">
+                <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                  <span className="shrink-0 mt-0.5">{getStatusIcon(service.status)}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-foreground mb-1">{service.name}</h3>
+                    <p className="text-sm text-muted-foreground">{service.description}</p>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-bold ${getStatusColor(service.status)}`}>
-                      {getStatusText(service.status)}
-                    </p>
-                  </div>
+                </div>
+                <div className="shrink-0 sm:text-right pl-8 sm:pl-0">
+                  <p className={`text-sm font-bold ${getStatusColor(service.status)}`}>
+                    {getStatusText(service.status)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -132,9 +125,7 @@ export function SystemStatusClient(): React.JSX.Element {
         </div>
 
         {/* Incident History */}
-        <div className="relative">
-          <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[26px] border-2 border-emerald-200/60" />
-          <div className="relative bg-white/90 rounded-2xl p-8 border-2 border-slate-900/10 shadow-[0_18px_45px_rgba(15,23,42,0.1)]">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm min-w-0">
             <h2 className="text-2xl font-bold text-foreground mb-4">
               Recent Incidents
             </h2>
@@ -145,18 +136,15 @@ export function SystemStatusClient(): React.JSX.Element {
               <CheckCircle className="w-4 h-4" />
               No incidents reported this month
             </div>
-          </div>
         </div>
 
         {/* Support CTA */}
-        <div className="mt-16 text-center">
-          <div className="relative inline-block">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[30px] border-2 border-emerald-200/60" />
-            <div className="relative rounded-[28px] border-2 border-slate-900/10 bg-white/90 backdrop-blur px-10 py-8 shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
-              <p className="text-muted-foreground mb-4">
+        <div className="mt-12 sm:mt-16 text-center px-1">
+          <div className="inline-block rounded-[28px] border border-slate-200/80 bg-white px-6 sm:px-10 py-6 sm:py-8 shadow-sm max-w-full min-w-0">
+              <p className="text-muted-foreground mb-4 text-sm sm:text-base">
                 Experiencing issues? Contact our support team.
               </p>
-              <div className="flex justify-center gap-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
                 <Link href="/help">
                   <Button className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-colors">
                     Visit Help Center
@@ -168,7 +156,6 @@ export function SystemStatusClient(): React.JSX.Element {
                   </Button>
                 </a>
               </div>
-            </div>
           </div>
         </div>
       </div>

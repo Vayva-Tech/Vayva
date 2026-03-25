@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { Card, Badge, Button, cn } from "@vayva/ui";
@@ -76,7 +75,7 @@ export function StylistAvailability({
         );
       default:
         return (
-          <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30">
+          <Badge variant="outline" className="bg-gray-500/20 text-gray-300 border-gray-500/30">
             Off Duty
           </Badge>
         );

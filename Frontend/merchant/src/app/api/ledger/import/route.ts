@@ -1,12 +1,13 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const body = await request.json();
       const { entries, format = "json" } = body;
 
@@ -27,19 +28,18 @@ export async function POST(request: NextRequest) {
       }
 
       // Call backend API
-      const result = await apiJson(`${process.env.BACKEND_API_URL}/api/endpoint`,
+      const result = await apiJson(`${buildBackendUrl("/api/ledger/import")}`,
       {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "x-store-id": storeId,
-            "x-user-id": user.id,
+            ...auth.headers,
+            "x-user-id": auth.user.id,
           },
           body: JSON.stringify({
             entries,
             format,
-            importedBy: user.id,
-            importedByEmail: user.email,
+            importedBy: auth.user.id,
+            importedByEmail: auth.user.email,
           }),
         }
       );

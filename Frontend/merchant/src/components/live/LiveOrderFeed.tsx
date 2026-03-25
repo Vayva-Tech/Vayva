@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Live Order Feed Component
  * Displays real-time order notifications with "new" highlighting
@@ -9,7 +8,7 @@
 import React, { useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ShoppingBag, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { useLiveOrders , OrderEventData } from '@vayva/realtime';
+import { useLiveOrders, type OrderEventData } from '@vayva/realtime';
 import { cn } from '@/lib/utils';
 
 interface LiveOrderFeedProps {
@@ -92,8 +91,10 @@ function OrderNotification({ order, isNew, receivedAt }: OrderNotificationProps)
 export function LiveOrderFeed({ storeId, maxItems = 10, className }: LiveOrderFeedProps) {
     const { orders, newOrderIds, isConnected, error } = useLiveOrders(storeId);
 
-    const displayOrders = useMemo(() => {
-        return orders.slice(0, maxItems).map((order) => ({
+    type OrderRow = OrderEventData & { receivedAt: number };
+
+    const displayOrders = useMemo((): OrderRow[] => {
+        return orders.slice(0, maxItems).map((order: OrderEventData) => ({
             ...order,
             receivedAt: Date.now(),
         }));

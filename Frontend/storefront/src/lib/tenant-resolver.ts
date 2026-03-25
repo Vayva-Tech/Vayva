@@ -113,8 +113,8 @@ export function isValidCustomDomain(domain: string): boolean {
  * In production, this would verify CNAME/A records point to Vayva
  */
 export async function validateDomainOwnership(
-  domain: string,
-  expectedStoreId: string
+  _domain: string,
+  _expectedStoreId: string
 ): Promise<{ valid: boolean; message?: string }> {
   // Mock validation - in production, check DNS records
   return { valid: true };

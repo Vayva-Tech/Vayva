@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real-Time Inventory Tracking Dashboard
  * 
@@ -61,10 +60,18 @@ import {
   XCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { InventoryService } from "@/services/inventory.service";
-import { ProductService as _ProductService } from "@/services/product.service";
-import type { StockAlert } from "@/services/inventory.service";
+import { apiJson } from "@/lib/api-client-shared";
 import { logger } from "@vayva/shared";
+
+type StockAlertSeverity = "out_of_stock" | "critical" | "low";
+
+interface StockAlert {
+  id: string;
+  name?: string;
+  sku?: string;
+  severity: StockAlertSeverity;
+  quantity?: number;
+}
 
 interface InventoryItem {
   id: string;
@@ -111,30 +118,31 @@ export function InventoryDashboard() {
   const fetchInventory = async () => {
     try {
       setRefreshing(true);
-      const [inventoryData, valuation, alertsSummary] = await Promise.all([
-        InventoryService.getInventoryLevels("current-store-id"),
-        InventoryService.getInventoryValuation("current-store-id"),
-        InventoryService.getStockAlertsSummary("current-store-id"),
-      ]);
+      const storeId = "current-store-id";
+      const data = await apiJson<{
+        items?: InventoryItem[];
+        stats?: InventoryStats;
+        alerts?: StockAlert[];
+      }>(`/api/merchant/inventory/dashboard?storeId=${encodeURIComponent(storeId)}`);
 
-      setInventory(inventoryData);
-      setStats({
-        totalProducts: valuation.totalProducts,
-        totalQuantity: valuation.totalQuantity,
-        totalValue: valuation.totalValue,
-        averagePrice: valuation.averagePrice,
-        lowStockCount: alertsSummary.criticalStock + alertsSummary.outOfStock,
-        outOfStockCount: alertsSummary.outOfStock,
+      setInventory(data.items ?? []);
+      if (data.stats) {
+        setStats(data.stats);
+      } else {
+        setStats({
+          totalProducts: 0,
+          totalQuantity: 0,
+          totalValue: 0,
+          averagePrice: 0,
+          lowStockCount: 0,
+          outOfStockCount: 0,
+        });
+      }
+      setAlerts(data.alerts ?? []);
+    } catch (error: unknown) {
+      logger.error("Failed to fetch inventory:", {
+        error: error instanceof Error ? error.message : String(error),
       });
-
-      // Get low stock alerts
-      const lowStock = await InventoryService.getLowStockProducts(
-        "current-store-id",
-        10
-      );
-      setAlerts(lowStock);
-    } catch (error) {
-      logger.error("Failed to fetch inventory:", error);
       toast({
         title: "Error",
         description: "Failed to load inventory data",
@@ -169,11 +177,15 @@ export function InventoryDashboard() {
     }
 
     try {
-      await InventoryService.adjustInventory("current-store-id", {
-        productId: selectedProduct.id,
-        change: adjustmentData.change,
-        reason: adjustmentData.reason || "Manual adjustment",
-        reference: adjustmentData.reference || undefined,
+      await apiJson("/api/merchant/inventory/adjust", {
+        method: "POST",
+        body: JSON.stringify({
+          storeId: "current-store-id",
+          productId: selectedProduct.id,
+          change: adjustmentData.change,
+          reason: adjustmentData.reason || "Manual adjustment",
+          reference: adjustmentData.reference || undefined,
+        }),
       });
 
       toast({
@@ -390,7 +402,9 @@ export function InventoryDashboard() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((cat) => (
+                {categories
+                  .filter((cat): cat is string => Boolean(cat))
+                  .map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
                   </SelectItem>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wholesale Industry UI Components
  */

@@ -13,14 +13,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const storeId = session.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
-    const storeId = searchParams.get('storeId');
     const status = searchParams.get('status');
     const featured = searchParams.get('featured') === 'true' ? true : undefined;
-
-    if (!storeId) {
-      return NextResponse.json({ error: 'Missing storeId' }, { status: 400 });
-    }
 
     // Fetch campaigns via API instead of direct service call
     const queryParams = new URLSearchParams({ storeId });
@@ -61,9 +61,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const storeId = session.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const {
-      storeId,
       title,
       description,
       goal,
@@ -74,7 +78,7 @@ export async function POST(req: Request) {
       impactMetrics,
     } = body;
 
-    if (!storeId || !title || !goal || !startDate) {
+    if (!title || !goal || !startDate) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -90,6 +94,7 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-store-id': storeId,
       },
       body: JSON.stringify({
         storeId,

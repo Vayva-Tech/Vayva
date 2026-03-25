@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { CalendarCheck, Plus, Clock, PencilSimple as Edit, Trash, CheckCircle, XCircle, CalendarBlank, User, MagnifyingGlass } from "@phosphor-icons/react";
@@ -8,8 +6,11 @@ import { logger, formatCurrency } from "@vayva/shared";
 import { Button, Input } from "@vayva/ui";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiJson } from "@/lib/api-client-shared";
 import { format, parseISO, isAfter, isBefore, addDays, startOfDay, endOfDay } from "date-fns";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface Appointment {
   id: string;
@@ -232,17 +233,59 @@ export default function AppointmentsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Appointments</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage bookings and schedule</p>
-        </div>
-        <Button onClick={() => { setEditingAppointment(null); setIsOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
-          <Plus size={18} className="mr-2" />
-          New Appointment
-        </Button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button
+                  onClick={() => { setEditingAppointment(null); setIsOpen(true); }}
+                  className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-xl font-semibold justify-between"
+                >
+                  <span>New appointment</span>
+                  <Plus size={18} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Scheduled</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {scheduled}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Upcoming (7d)</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {upcomingWeek}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Appointments"
+          subtitle="Manage bookings and schedule"
+          actions={
+            <Button
+              onClick={() => { setEditingAppointment(null); setIsOpen(true); }}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold"
+            >
+              <Plus size={18} className="mr-2" />
+              New Appointment
+            </Button>
+          }
+        />
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
@@ -389,20 +432,20 @@ export default function AppointmentsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
                           onClick={() => { setEditingAppointment(appointment); setIsOpen(true); }}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Edit size={16} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => setDeleteConfirm({ id: appointment.id, name: appointment.customerName })}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Cancel"
                         >
                           <Trash size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -511,6 +554,7 @@ export default function AppointmentsPage() {
         cancelText="Keep Appointment"
         variant="warning"
       />
+      </PageWithInsights>
     </div>
   );
 }

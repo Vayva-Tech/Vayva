@@ -1,24 +1,18 @@
-// @ts-nocheck
 /**
  * Legal Industry Engine
  * Main orchestrator for all legal-specific features
  */
 
-import {
-  DashboardEngine,
-  type DashboardEngineConfig,
-  type DataResolver,
-} from '@vayva/industry-core';
+import { DashboardEngine, type DashboardEngineConfig } from '@vayva/industry-core';
 
 import {
-  MatterService,
+  MatterManagementService as MatterService,
   ClientService,
-  BillingService,
-  DocumentService,
-  CalendarService,
+  BillingInvoicingService as BillingService,
+  DocumentAutomationService as DocumentService,
+  DeadlineCalendarService as CalendarService,
   TrustAccountingService,
   ConflictCheckService,
-  // Phase 4: AI Services
   ContractAnalysisService,
   LegalResearchService,
   AIDocumentAutomationService,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@/lib/prisma";
@@ -6,7 +7,11 @@ import { prisma } from "@/lib/prisma";
 // GET /api/education/progress?courseId=xxx - Get student progress for a course
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
     const studentId = searchParams.get("studentId");
@@ -64,7 +69,11 @@ export async function GET(request: NextRequest) {
 // POST /api/education/progress - Update progress
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json();
 
     const result = await apiJson<{
@@ -73,10 +82,7 @@ export async function POST(request: NextRequest) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/education/progress`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-store-id': storeId,
-      },
+      headers: auth.headers,
       body: JSON.stringify(body),
     });
 

@@ -4,7 +4,7 @@
  * 3D property tours for real estate
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const VIRTUAL_TOUR_ADDON: AddOnDefinition = {
   id: 'vayva.virtual-tour',

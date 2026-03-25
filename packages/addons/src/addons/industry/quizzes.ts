@@ -4,7 +4,7 @@
  * Interactive quiz and assessment system
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const QUIZZES_ADDON: AddOnDefinition = {
   id: 'vayva.quizzes',

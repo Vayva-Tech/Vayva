@@ -10,7 +10,7 @@
  * - Performance optimization
  */
 
-import { device, element, by, expect } from 'detox';
+import { device, element, by, expect, waitFor } from 'detox';
 
 describe('Vayva Mobile App - Phase 4 E2E Tests', () => {
   beforeAll(async () => {
@@ -399,6 +399,10 @@ describe('Vayva Mobile App - Phase 4 E2E Tests', () => {
     await element(by.text('Patients')).tap();
   }
 
+  async function navigateToAppointments() {
+    await element(by.text('Appointments')).tap();
+  }
+
   async function navigateToPOS() {
     await element(by.text('POS')).tap();
   }
@@ -440,26 +444,26 @@ describe('Vayva Mobile App - Phase 4 E2E Tests', () => {
     await element(by.id('save-patient-button')).tap();
   }
 
-  async function getRecordCount(table: string): Promise<number> {
+  async function getRecordCount(_table: string): Promise<number> {
     // This would require native module access
     // Placeholder for actual implementation
     return 0;
   }
 
-  async function findPatientByName(name: string): Promise<any> {
+  async function findPatientByName(_name: string): Promise<unknown> {
     // Placeholder for database query
     return { id: '123', phone: '555-0123' };
   }
 
-  async function updatePatient(id: string, data: any): Promise<void> {
+  async function updatePatient(_id: string, _data: unknown): Promise<void> {
     // Placeholder for database update
   }
 
-  async function deletePatient(id: string): Promise<void> {
+  async function deletePatient(_id: string): Promise<void> {
     // Placeholder for database deletion
   }
 
-  async function queryPatients(filters: any): Promise<any[]> {
+  async function queryPatients(_filters: unknown): Promise<unknown[]> {
     // Placeholder for database query
     return [{ id: '1', firstName: 'John' }];
   }

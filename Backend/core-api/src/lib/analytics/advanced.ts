@@ -115,7 +115,7 @@ function linearRegression(data: number[]): { slope: number; intercept: number; r
   const sumY = data.reduce((a, b) => a + b, 0);
   const sumXY = x.reduce((total, xi, i) => total + xi * data[i], 0);
   const sumXX = x.reduce((total, xi) => total + xi * xi, 0);
-  const sumYY = data.reduce((total, yi) => total + yi * yi, 0);
+  const _sumYY = data.reduce((total, yi) => total + yi * yi, 0);
 
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;

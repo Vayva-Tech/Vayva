@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
@@ -48,10 +47,13 @@ export function UsageByEndpointChart({ data, className = '' }: UsageByEndpointCh
               borderRadius: '8px',
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
-            formatter={(value: number, name: string, props: any) => [
-              `${props.payload.percentage}%`,
-              'Usage'
-            ]}
+            formatter={(value, _name, item) => {
+              const pct =
+                item && typeof item === 'object' && 'payload' in item
+                  ? Number((item as { payload?: { percentage?: number } }).payload?.percentage ?? 0)
+                  : 0;
+              return [`${Number(value ?? 0).toLocaleString()} (${pct}%)`, 'Usage'];
+            }}
           />
           <Bar 
             dataKey="percentage" 

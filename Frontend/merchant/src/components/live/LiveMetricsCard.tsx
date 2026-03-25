@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Live Metrics Card Component
  * Displays real-time business metrics with trend indicators
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus, DollarSign, ShoppingCart, MessageCircle, Users } from 'lucide-react';
 import { useLiveMetrics } from '@vayva/realtime';
@@ -59,12 +58,12 @@ export function LiveMetricsCard({ storeId, className }: LiveMetricsCardProps) {
                 <p className="text-sm text-red-500 mb-2">
                     Failed to load metrics
                 </p>
-                <button
+                <Button
                     onClick={reconnect}
                     className="text-xs text-green-500 hover:underline"
                 >
                     Try again
-                </button>
+                </Button>
             </div>
         );
     }

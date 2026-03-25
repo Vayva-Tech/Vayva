@@ -1,10 +1,10 @@
-// @ts-nocheck
 // ============================================================================
 // Widget Renderer
 // ============================================================================
 // Renders widgets based on their type using the widget registry
 // ============================================================================
 
+import { createElement } from "react";
 import { getWidgetRegistry } from "../widgets/registry";
 import type { WidgetDefinition, WidgetData } from "../types";
 
@@ -50,15 +50,13 @@ export function WidgetRenderer({
     );
   }
 
-  return (
-    <WidgetComponent
-      widget={widget}
-      data={data}
-      isLoading={isLoading}
-      error={error}
-      onRefresh={onRefresh}
-    />
-  );
+  return createElement(WidgetComponent, {
+    widget,
+    data,
+    isLoading,
+    error,
+    onRefresh,
+  });
 }
 
 WidgetRenderer.displayName = "WidgetRenderer";

@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import {
@@ -151,10 +151,10 @@ export default function PickupsPage() {
             Manage customer pickup orders and scheduling
           </p>
         </div>
-        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
+        <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
           <Plus className="w-4 h-4" />
           Schedule Pickup
-        </button>
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -180,7 +180,7 @@ export default function PickupsPage() {
       {/* Filter Tabs */}
       <div className="flex items-center gap-1 p-1 bg-gray-50 rounded-xl border border-gray-100 w-fit">
         {filters.map((tab) => (
-          <button
+          <Button
             key={tab}
             onClick={() => setActiveFilter(tab)}
             className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
@@ -190,7 +190,7 @@ export default function PickupsPage() {
             }`}
           >
             {tab}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -271,18 +271,18 @@ export default function PickupsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button
+                        <Button
                           className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
                           title="View details"
                         >
                           <Eye className="w-4 h-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
                           title="Contact customer"
                         >
                           <Phone className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -304,3 +304,4 @@ export default function PickupsPage() {
     </div>
   );
 }
+

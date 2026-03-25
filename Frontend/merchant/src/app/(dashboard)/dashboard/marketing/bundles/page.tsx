@@ -1,8 +1,6 @@
-// @ts-nocheck
 "use client";
-
 import { useState, useEffect } from "react";
-import { PencilSimple as Edit, Trash, Plus, Package, Tag, TrendUp, Users } from "@phosphor-icons/react";
+import { PencilSimple as Edit, Trash, Plus, Package, Tag, TrendUp, Users, Spinner as Loader2 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { logger, formatCurrency } from "@vayva/shared";
 import { Button, Input } from "@vayva/ui";

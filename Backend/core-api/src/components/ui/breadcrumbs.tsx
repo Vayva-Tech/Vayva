@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CaretRight as ChevronRight,
-  House as Home,
+  House as Home
 } from "@phosphor-icons/react/ssr";
 import { cn } from "@vayva/ui";
 

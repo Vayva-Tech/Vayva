@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { apiJson } from "@/lib/api-client-shared";
@@ -19,8 +20,13 @@ const availabilitySchema = z.object({
  * GET /api/services/availability?serviceId=xxx&staffId=xxx
  * Get staff availability schedules
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const serviceId = searchParams.get("serviceId");
     const staffId = searchParams.get("staffId");
@@ -43,8 +49,8 @@ export async function GET(request: Request): Promise<Response> {
     }>(
       `${process.env.BACKEND_API_URL}/api/services/availability?serviceId=${serviceId || ''}&staffId=${staffId || ''}&dayOfWeek=${dayOfWeek || ''}`,
       {
-        headers: {},
-      }
+        headers: auth.headers,
+      },
     );
     
     return NextResponse.json(result);

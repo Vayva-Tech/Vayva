@@ -1,10 +1,7 @@
-// @ts-nocheck
 /**
  * Quotes Feature Module
  * Dedicated module for quote functionality
  */
-
-export * from '../../services/quote-service';
 
 export interface QuoteFeatureConfig {
   defaultValidityDays: number;

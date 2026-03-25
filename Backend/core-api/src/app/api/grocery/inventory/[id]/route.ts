@@ -12,11 +12,13 @@ const ProductUpdateSchema = z.object({
   cost: z.number().nonnegative().optional(),
   unit: z.string().optional(),
   weight: z.number().optional(),
-  dimensions: z.object({
-    length: z.number().optional(),
-    width: z.number().optional(),
-    height: z.number().optional(),
-  }).optional(),
+  dimensions: z
+    .object({
+      length: z.number().optional(),
+      width: z.number().optional(),
+      height: z.number().optional(),
+    })
+    .optional(),
   perishable: z.boolean().optional(),
   expirationDays: z.number().int().positive().optional(),
   featured: z.boolean().optional(),
@@ -25,153 +27,147 @@ const ProductUpdateSchema = z.object({
   seoDescription: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.INVENTORY_VIEW,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    const product = await prisma.groceryProduct.findFirst({
-      where: { id, storeId },
-      include: {
-        category: {
-          select: {
-            id: true,
-            name: true,
-            parentId: true,
+      const product = await prisma.groceryProduct.findFirst({
+        where: { id, storeId },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              parentId: true,
+            },
+          },
+          supplier: {
+            select: {
+              id: true,
+              name: true,
+              contactName: true,
+              rating: true,
+            },
+          },
+          _count: {
+            select: {
+              sales: true,
+              reviews: true,
+            },
           },
         },
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            contactName: true,
-            rating: true,
-          },
-        },
-        _count: {
-          select: {
-            sales: true,
-            reviews: true,
-          },
-        },
-      },
-    });
+      });
 
-    if (!product) {
+      if (!product) {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
       return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404, headers: standardHeaders(requestId) }
+        { data: product },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: productId } = await params;
+      logger.error("[GROCERY_PRODUCT_GET]", { error, productId });
+      return NextResponse.json(
+        { error: "Failed to fetch product" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
+  },
+);
 
-    return NextResponse.json(
-      { data: product },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[GROCERY_PRODUCT_GET]", { error, productId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch product" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+export const PATCH = withVayvaAPI(
+  PERMISSIONS.INVENTORY_MANAGE,
+  async (req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
+      const json = await req.json().catch(() => ({}));
+      const parseResult = ProductUpdateSchema.safeParse(json);
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const json = await req.json().catch(() => ({}));
-    const parseResult = ProductUpdateSchema.safeParse(json);
+      if (!parseResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid product data",
+            details: parseResult.error.flatten(),
+          },
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
 
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid product data",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400, headers: standardHeaders(requestId) }
-      );
-    }
+      const updatedProduct = await prisma.groceryProduct.update({
+        where: { id_storeId: { id, storeId } },
+        data: parseResult.data,
+      });
 
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
-
-    const updatedProduct = await prisma.groceryProduct.update({
-      where: { id_storeId: { id, storeId } },
-      data: parseResult.data,
-    });
-
-    logger.info("[GROCERY_PRODUCT_UPDATE]", {
-      productId: id,
-      updatedFields: Object.keys(parseResult.data),
-    });
-
-    return NextResponse.json(
-      { data: updatedProduct },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[GROCERY_PRODUCT_UPDATE]", { error, productId: params.id });
-    return NextResponse.json(
-      { error: "Failed to update product" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
-
-    // Check if product has active orders
-    const activeOrders = await prisma.groceryOrderItem.count({
-      where: {
+      logger.info("[GROCERY_PRODUCT_UPDATE]", {
         productId: id,
-        order: {
-          status: { in: ["pending", "processing", "shipped"] },
-        },
-      },
-    });
+        updatedFields: Object.keys(parseResult.data),
+      });
 
-    if (activeOrders > 0) {
       return NextResponse.json(
-        { error: "Cannot delete product with active orders" },
-        { status: 400, headers: standardHeaders(requestId) }
+        { data: updatedProduct },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: productId } = await params;
+      logger.error("[GROCERY_PRODUCT_UPDATE]", { error, productId });
+      return NextResponse.json(
+        { error: "Failed to update product" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
+  },
+);
 
-    await prisma.groceryProduct.delete({
-      where: { id_storeId: { id, storeId } },
-    });
+export const DELETE = withVayvaAPI(
+  PERMISSIONS.INVENTORY_MANAGE,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    logger.info("[GROCERY_PRODUCT_DELETE]", { productId: id });
+      const activeOrders = await prisma.groceryOrderItem.count({
+        where: {
+          productId: id,
+          order: {
+            storeId,
+            status: { in: ["pending", "processing", "shipped"] },
+          },
+        },
+      });
 
-    return NextResponse.json(
-      { message: "Product deleted successfully" },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[GROCERY_PRODUCT_DELETE]", { error, productId: params.id });
-    return NextResponse.json(
-      { error: "Failed to delete product" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+      if (activeOrders > 0) {
+        return NextResponse.json(
+          { error: "Cannot delete product with active orders" },
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
+
+      await prisma.groceryProduct.delete({
+        where: { id_storeId: { id, storeId } },
+      });
+
+      logger.info("[GROCERY_PRODUCT_DELETE]", { productId: id });
+
+      return NextResponse.json(
+        { message: "Product deleted successfully" },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: productId } = await params;
+      logger.error("[GROCERY_PRODUCT_DELETE]", { error, productId });
+      return NextResponse.json(
+        { error: "Failed to delete product" },
+        { status: 500, headers: standardHeaders(requestId) },
+      );
+    }
+  },
+);

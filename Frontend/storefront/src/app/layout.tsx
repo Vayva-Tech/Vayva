@@ -12,6 +12,7 @@ import { getSlugFromHeaders } from "./utils";
 import Script from "next/script";
 
 import { reportError } from "@/lib/error";
+import { StorefrontAddOnMounts } from "@/components/addons/StorefrontAddOnMounts";
 
 function sanitizeCssColor(input: unknown): string | null {
   const value = String(input ?? "").trim();
@@ -135,6 +136,10 @@ export default async function RootLayout({
         include: {
           storefrontPublished: true,
           merchantPolicies: true,
+          addOns: {
+            where: { status: "ACTIVE" },
+            select: { extensionId: true },
+          },
           // contacts is a JSON field, no include
         },
       });
@@ -227,7 +232,10 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
-          <StoreProvider initialStore={store}>{children}</StoreProvider>
+          <StoreProvider initialStore={store}>
+            <StorefrontAddOnMounts />
+            {children}
+          </StoreProvider>
         </Suspense>
 
         {/* Boot Vayva Commerce Blocks */}

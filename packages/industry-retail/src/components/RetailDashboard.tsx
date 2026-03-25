@@ -1,14 +1,7 @@
-// @ts-nocheck
-'use client';
-// ============================================================================
-// Retail Dashboard Component
-// ============================================================================
-// Main dashboard component for retail industry
-// ============================================================================
+"use client";
 
-import React, { useEffect } from "react";
-import { useDashboardEngine } from "@vayva/industry-core";
-import { UniversalProDashboard } from "@/components/dashboard/UniversalProDashboard";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Card } from "@vayva/ui";
 import { retailDashboardConfig } from "../dashboard/config";
 import { registerRetailWidgets } from "../widgets/registry";
 
@@ -21,43 +14,70 @@ export interface RetailDashboardProps {
   planTier?: "basic" | "standard" | "advanced" | "pro";
 }
 
+interface DashboardShellState {
+  businessId: string;
+  userId: string;
+  lastRefreshed: string;
+  widgetsLoaded: number;
+}
+
+/**
+ * Package-local retail dashboard shell. Host apps can wrap this with their own
+ * universal layout and data hooks; this component stays free of app-only imports.
+ */
 export function RetailDashboard({
-  industry,
-  variant = "default",
+  industry: _industry,
+  variant: _variant = "default",
   userId,
   businessId,
-  designCategory = "signature",
-  planTier = "standard",
+  designCategory: _designCategory = "signature",
+  planTier: _planTier = "standard",
 }: RetailDashboardProps) {
-  // Register retail-specific widgets on mount
+  const [state, setState] = useState<DashboardShellState | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
   useEffect(() => {
     registerRetailWidgets();
   }, []);
 
-  const {
-    state,
-    loading,
-    error,
-    refreshMetrics,
-    subscribeToUpdates,
-  } = useDashboardEngine({
-    industry: "retail",
-    config: retailDashboardConfig,
-    userId,
-    businessId,
-  });
+  const refreshMetrics = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setState({
+        businessId,
+        userId,
+        lastRefreshed: new Date().toISOString(),
+        widgetsLoaded: retailDashboardConfig.widgets.length,
+      });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e : new Error(String(e)));
+    } finally {
+      setLoading(false);
+    }
+  }, [businessId, userId]);
 
-  // Subscribe to real-time updates
+  useEffect(() => {
+    void refreshMetrics();
+  }, [refreshMetrics]);
+
+  const subscribeToUpdates = useCallback(() => {
+    return () => {};
+  }, []);
+
   useEffect(() => {
     const unsubscribe = subscribeToUpdates();
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, [subscribeToUpdates]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+          <div className="border-primary mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2" />
           <p className="text-muted-foreground">Loading retail dashboard...</p>
         </div>
       </div>
@@ -66,29 +86,33 @@ export function RetailDashboard({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center max-w-md">
-          <h3 className="text-lg font-semibold mb-2">Error Loading Dashboard</h3>
+      <div className="flex h-full items-center justify-center">
+        <div className="max-w-md text-center">
+          <h3 className="mb-2 text-lg font-semibold">Error Loading Dashboard</h3>
           <p className="text-muted-foreground mb-4">{error.message}</p>
-          <button
-            onClick={refreshMetrics}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-          >
+          <Button variant="primary" onClick={() => void refreshMetrics()}>
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <UniversalProDashboard
-      industry="retail"
-      variant={variant}
-      config={retailDashboardConfig}
-      state={state}
-      designCategory={designCategory}
-      planTier={planTier}
-    />
+    <div className="space-y-6 p-6">
+      <div>
+        <h1 className="text-2xl font-semibold">{retailDashboardConfig.title}</h1>
+        <p className="text-muted-foreground mt-1">{retailDashboardConfig.subtitle}</p>
+      </div>
+      <Card className="p-6">
+        <p className="text-sm text-muted-foreground">
+          {retailDashboardConfig.primaryObjectLabel}: {state?.widgetsLoaded ?? 0} widgets in config
+          {state?.lastRefreshed ? ` · last refresh ${state.lastRefreshed}` : ""}
+        </p>
+        <Button variant="secondary" className="mt-4" onClick={() => void refreshMetrics()}>
+          Refresh
+        </Button>
+      </Card>
+    </div>
   );
 }

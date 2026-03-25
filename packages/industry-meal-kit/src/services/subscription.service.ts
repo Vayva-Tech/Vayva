@@ -1,10 +1,10 @@
-// @ts-nocheck
 // ============================================================================
 // Subscription Service
 // ============================================================================
 
-import { PrismaClient, MealKitSubscription } from '@prisma/client';
-import { MealKitSubscriptionSchema, MealKitPlanType } from '../types/index.js';
+import type { MealKitSubscription } from '../../../../infra/db/src/generated/client';
+import { PrismaClient } from '@vayva/db';
+import { MealKitSubscriptionSchema, MealKitPlanType } from '../types';
 
 export class SubscriptionService {
   private prisma: PrismaClient;

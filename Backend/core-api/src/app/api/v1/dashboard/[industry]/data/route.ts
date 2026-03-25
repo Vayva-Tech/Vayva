@@ -30,7 +30,7 @@ export async function GET(
     const { industry } = await params;
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get("storeId");
-    const timeHorizon = searchParams.get("timeHorizon") || "month";
+    const _timeHorizon = searchParams.get("timeHorizon") || "month";
 
     if (!storeId) {
       return NextResponse.json(

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /// <reference lib="webworker" />
 
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-core';
@@ -7,8 +6,19 @@ import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from 'workbox-strategi
 import { ExpirationPlugin } from 'workbox-expiration';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
-// Declare service worker self type
-declare const self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope & {
+  __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
+};
+
+interface PushPayload {
+  title?: string;
+  body?: string;
+  tag?: string;
+}
+
+function isPushPayload(value: unknown): value is PushPayload {
+  return typeof value === 'object' && value !== null;
+}
 
 // Clean up old caches
 cleanupOutdatedCaches();
@@ -18,7 +28,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 // Cache strategy for API requests - Network First with fallback
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }: { url: URL }) => url.pathname.startsWith('/api/'),
   new NetworkFirst({
     cacheName: 'api-cache',
     plugins: [
@@ -32,7 +42,7 @@ registerRoute(
 
 // Cache strategy for images - Cache First
 registerRoute(
-  ({ request, url }) => 
+  ({ request, url }: { request: Request; url: URL }) =>
     request.destination === 'image' || 
     url.pathname.endsWith('.png') ||
     url.pathname.endsWith('.jpg') ||
@@ -51,7 +61,7 @@ registerRoute(
 
 // Cache strategy for fonts - Cache First
 registerRoute(
-  ({ request, url }) => 
+  ({ request, url }: { request: Request; url: URL }) =>
     request.destination === 'font' ||
     url.pathname.includes('fonts'),
   new CacheFirst({
@@ -67,7 +77,7 @@ registerRoute(
 
 // Cache strategy for static assets (CSS, JS) - Stale While Revalidate
 registerRoute(
-  ({ request, url }) => 
+  ({ request, url }: { request: Request; url: URL }) =>
     request.destination === 'style' ||
     request.destination === 'script',
   new StaleWhileRevalidate({
@@ -87,7 +97,7 @@ const bgSyncPlugin = new BackgroundSyncPlugin('saas-api-queue', {
 });
 
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/saas/'),
+  ({ url }: { url: URL }) => url.pathname.startsWith('/api/saas/'),
   new NetworkFirst({
     cacheName: 'saas-api-cache',
     plugins: [bgSyncPlugin],
@@ -104,13 +114,19 @@ self.addEventListener('message', (event) => {
 
 // Push notification handling (for future real-time alerts)
 self.addEventListener('push', (event) => {
-  const data = event.data?.json() ?? {};
-  const title = data.title || 'SaaS Dashboard Update';
+  let data: unknown = {};
+  try {
+    data = event.data?.json() ?? {};
+  } catch {
+    data = {};
+  }
+  const payload = isPushPayload(data) ? data : {};
+  const title = payload.title || 'SaaS Dashboard Update';
   const options = {
-    body: data.body || 'New metrics available',
+    body: payload.body || 'New metrics available',
     icon: '/icon-192x192.png',
     badge: '/badge-72x72.png',
-    tag: data.tag || 'saas-metrics',
+    tag: payload.tag || 'saas-metrics',
   };
 
   event.waitUntil(

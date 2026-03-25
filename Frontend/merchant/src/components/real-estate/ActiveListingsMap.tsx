@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState, useEffect } from "react";
 
@@ -64,18 +65,18 @@ export const ActiveListingsMap: React.FC = () => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold">Active Listings Map</h3>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => setViewMode('map')}
             className={`px-3 py-1 text-sm rounded ${viewMode === 'map' ? 'btn-gradient' : 'glass-card'}`}
           >
             Map
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setViewMode('list')}
             className={`px-3 py-1 text-sm rounded ${viewMode === 'list' ? 'btn-gradient' : 'glass-card'}`}
           >
             List
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -200,13 +201,14 @@ export const ActiveListingsMap: React.FC = () => {
       </div>
 
       <div className="flex justify-between items-center mt-4">
-        <button className="glass-card px-4 py-2 text-sm hover:text-white transition-colors">
+        <Button className="glass-card px-4 py-2 text-sm hover:text-white transition-colors">
           View Full Map
-        </button>
-        <button className="btn-gradient text-sm">
+        </Button>
+        <Button className="btn-gradient text-sm">
           Add Listing
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
+

@@ -9,7 +9,7 @@
  * - Audio alert triggers
  */
 
-import { Server } from 'socket.io';
+import { Server, type Socket } from 'socket.io';
 import { createServer } from 'http';
 
 const PORT = process.env.KDS_WS_PORT || 3001;
@@ -34,7 +34,7 @@ export class KDSSocketServer {
   }
 
   private setupEventHandlers() {
-    this.io.on('connection', (socket) => {
+    this.io.on('connection', (socket: Socket) => {
       console.log(`[KDS_WS] Client connected: ${socket.id}`);
 
       // Subscribe to store channel

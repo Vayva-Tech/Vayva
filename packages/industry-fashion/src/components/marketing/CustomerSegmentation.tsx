@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 
 export interface CustomerSegment {
   id: string;
@@ -46,12 +46,12 @@ export const CustomerSegmentation: React.FC<CustomerSegmentationProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Customer Segmentation</h2>
         {onCreateSegment && (
-          <button
+          <Button
             onClick={onCreateSegment}
             className="px-4 py-2 bg-purple-400 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors"
           >
             + Create Segment
-          </button>
+          </Button>
         )}
       </div>
 
@@ -137,25 +137,25 @@ export const CustomerSegmentation: React.FC<CustomerSegmentationProps> = ({
 
             {/* Actions */}
             <div className="mt-4 flex gap-2">
-              <button className="flex-1 px-3 py-1.5 bg-purple-400/20 hover:bg-purple-400/30 text-purple-400 text-xs rounded transition-colors">
+              <Button className="flex-1 px-3 py-1.5 bg-purple-400/20 hover:bg-purple-400/30 text-purple-400 text-xs rounded transition-colors">
                 View Details
-              </button>
-              <button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
+              </Button>
+              <Button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
                 ✏️
-              </button>
+              </Button>
             </div>
           </div>
         ))}
 
         {/* Add Segment Placeholder */}
         {onCreateSegment && (
-          <button
+          <Button
             onClick={onCreateSegment}
             className="bg-white/3 border-2 border-dashed border-white/20 hover:border-purple-400/50 rounded-xl p-5 flex flex-col items-center justify-center transition-colors group"
           >
             <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">➕</span>
             <span className="text-sm text-white/60 font-medium">Create Segment</span>
-          </button>
+          </Button>
         )}
       </div>
 

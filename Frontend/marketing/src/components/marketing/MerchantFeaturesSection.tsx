@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@vayva/ui";
 import { APP_URL } from "@/lib/constants";
+import { getOfferCopy } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 import {
   ShoppingCart,
   Package,
@@ -16,20 +19,14 @@ import {
   Sparkles,
   Calendar,
   FileText,
-  Settings,
-  Shield,
   Zap,
   Clock,
-  Bell,
   Search,
-  Filter,
   Download,
   Upload,
   Share2,
-  MessageSquare,
   Star,
   Gift,
-  Tag,
   Percent,
   TrendingUp,
   Eye,
@@ -40,20 +37,11 @@ import {
   Receipt,
   Wallet,
   Banknote,
-  QrCode,
   Smartphone,
   Globe,
   Layers,
-  Puzzle,
   Palette,
   Type,
-  Image,
-  Video,
-  Headphones,
-  LifeBuoy,
-  BookOpen,
-  GraduationCap,
-  Heart,
   Target,
   Mail,
   Send,
@@ -61,7 +49,6 @@ import {
   CheckSquare,
   List,
   Grid,
-  Table,
   LayoutGrid,
 } from "lucide-react";
 
@@ -480,14 +467,16 @@ function LinkIcon({ className }: { className?: string }) {
 
 export function MerchantFeaturesSection(): React.JSX.Element {
   const [activeCategory, setActiveCategory] = React.useState("orders");
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const offerCopy = getOfferCopy(starterFirstMonthFree);
 
   const activeData = MERCHANT_FEATURE_CATEGORIES.find(c => c.id === activeCategory);
 
   return (
-    <div className="relative">
+    <div className="relative w-full min-w-0 overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-slate-200/70">
-        <div className="relative max-w-[1600px] mx-auto px-6 py-20 lg:py-28 text-center">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-16 sm:py-20 lg:py-28 text-center min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -501,7 +490,7 @@ export function MerchantFeaturesSection(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 max-w-4xl mx-auto"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 max-w-4xl mx-auto px-1"
           >
             Everything you need to
             <br />
@@ -512,31 +501,36 @@ export function MerchantFeaturesSection(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto"
+            className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto px-1"
           >
-            From order capture to delivery tracking, payments to marketing—every tool 
-            you need is built-in and works seamlessly together.
+            <span className="md:hidden">Orders, stock, payments, and growth tools in one connected stack.</span>
+            <span className="hidden md:inline">
+              From order capture to delivery tracking, payments to marketing—every tool you need is built-in and
+              works seamlessly together.
+            </span>
           </motion.p>
         </div>
       </section>
 
       {/* Category Navigation */}
       <section className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/70">
-        <div className="max-w-[1600px] mx-auto px-6 py-4">
+        <div className="max-w-[1400px] mx-auto px-6 py-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {MERCHANT_FEATURE_CATEGORIES.map((category) => (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all h-auto ${
                   activeCategory === category.id
-                    ? "bg-slate-900 text-white shadow-lg"
+                    ? "bg-slate-900 text-white shadow-lg hover:bg-slate-900 hover:text-white"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
                 <category.icon className="w-4 h-4" />
                 {category.name}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -544,7 +538,7 @@ export function MerchantFeaturesSection(): React.JSX.Element {
 
       {/* Active Category Features */}
       <section className="py-16 bg-slate-50 min-h-[600px]">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           {activeData && (
             <motion.div
               key={activeData.id}
@@ -561,8 +555,8 @@ export function MerchantFeaturesSection(): React.JSX.Element {
                 <p className="text-slate-600 mt-2 text-lg">{activeData.description}</p>
               </div>
 
-              {/* Features Grid */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <p className="text-sm text-slate-500 md:hidden mb-4">Swipe through features in this category.</p>
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {activeData.features.map((feature, i) => (
                   <motion.div
                     key={i}
@@ -582,7 +576,7 @@ export function MerchantFeaturesSection(): React.JSX.Element {
                     }`}>
                       <feature.icon className="w-5 h-5" />
                     </div>
-                    <h3 className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
+                    <h3 className="font-semibold text-slate-900 mb-1 flex items-center gap-2 flex-wrap">
                       {feature.title}
                       {feature.highlight && (
                         <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase">
@@ -596,6 +590,45 @@ export function MerchantFeaturesSection(): React.JSX.Element {
                   </motion.div>
                 ))}
               </div>
+              <div className="md:hidden -mx-1">
+                <MarketingSnapRow
+                  ariaLabel={`${activeData.name} features`}
+                  hint="Swipe for more in this category"
+                  showDots={activeData.features.length <= 8}
+                  dotCount={activeData.features.length <= 8 ? activeData.features.length : undefined}
+                >
+                  {activeData.features.map((feature, i) => (
+                    <MarketingSnapItem key={`${feature.title}-${i}`}>
+                      <div
+                        className={`bg-white rounded-2xl border p-5 h-full ${
+                          feature.highlight
+                            ? "border-emerald-200 shadow-md ring-1 ring-emerald-100"
+                            : "border-slate-200"
+                        }`}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
+                            feature.highlight
+                              ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          <feature.icon className="w-5 h-5" />
+                        </div>
+                        <h3 className="font-semibold text-slate-900 mb-1 flex items-center gap-2 flex-wrap">
+                          {feature.title}
+                          {feature.highlight && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase">
+                              Popular
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+                      </div>
+                    </MarketingSnapItem>
+                  ))}
+                </MarketingSnapRow>
+              </div>
             </motion.div>
           )}
         </div>
@@ -603,7 +636,7 @@ export function MerchantFeaturesSection(): React.JSX.Element {
 
       {/* Feature Count Summary */}
       <section className="py-16 bg-white border-t border-slate-200/70">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-center mb-10">
             <h3 className="text-2xl font-bold text-slate-900">
               One platform. Every feature connected.
@@ -627,19 +660,18 @@ export function MerchantFeaturesSection(): React.JSX.Element {
 
       {/* CTA Section */}
       <section className="py-20">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-12 lg:p-16 text-center text-white">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               See all these features in action
             </h2>
             <p className="text-emerald-100 text-lg max-w-2xl mx-auto mb-8">
-              Start your free 7-day trial and explore the full merchant dashboard. 
-              No credit card required.
+              {offerCopy.primaryCta}. Explore the full merchant dashboard. {offerCopy.noCard}.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href={`${APP_URL}/signup`}>
                 <Button className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 py-6 rounded-xl text-base font-semibold h-auto">
-                  Start Free Trial
+                  {offerCopy.primaryCta}
                 </Button>
               </Link>
               <Link href="/pricing">

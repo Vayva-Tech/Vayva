@@ -5,7 +5,23 @@
  * Implements triggers, actions, and authentication.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { logger } from '@vayva/shared';
+
+const integrationsPackageJsonPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+  'package.json',
+);
+const integrationsVersion = (
+  JSON.parse(readFileSync(integrationsPackageJsonPath, 'utf8')) as { version: string }
+).version;
+
+/** Zapier Platform CLI major version this manifest targets (see Zapier Platform changelog). */
+const ZAPIER_PLATFORM_VERSION = '15.0.0';
 // Note: prisma models would be defined in schema when needed
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const prisma: any = {
@@ -656,8 +672,8 @@ export const zapierActions: Record<string, ZapierAction> = {
 // ============================================================================
 
 export const zapierApp = {
-  version: require('../package.json').version,
-  platformVersion: require('zapier-platform-core').version,
+  version: integrationsVersion,
+  platformVersion: ZAPIER_PLATFORM_VERSION,
 
   authentication: zapierAuth,
 

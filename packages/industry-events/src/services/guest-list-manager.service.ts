@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Guest List Manager Service
  * Manages event guest lists, invitations, and RSVP tracking
@@ -74,8 +73,8 @@ export class GuestListManagerService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[GUEST_LIST] Initializing service...');
-    console.log('[GUEST_LIST] Service initialized');
+    console.warn('[GUEST_LIST] Initializing service...');
+    console.warn('[GUEST_LIST] Service initialized');
   }
 
   /**

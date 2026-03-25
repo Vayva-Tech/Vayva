@@ -13,20 +13,10 @@ import { HELP_ARTICLES, HELP_CATEGORIES, type HelpArticle } from "@/lib/help";
 import { HelpAIChat } from "@/components/marketing/HelpAIChat";
 import { helpContent } from "@/data/marketing-content";
 
-function stripMarkdown(text: string): string {
-  return text
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/\*\*/g, "")
-    .replace(/ {2,}$/gm, "");
-}
-
 export function HelpCenterClient(): React.JSX.Element {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [selectedArticle, setSelectedArticle] = useState<HelpArticle | null>(
-    null,
-  );
 
   const filteredArticles = searchQuery.trim()
     ? HELP_ARTICLES.filter(
@@ -40,32 +30,30 @@ export function HelpCenterClient(): React.JSX.Element {
       : HELP_ARTICLES;
 
   return (
-    <div className="relative overflow-hidden text-slate-900">
+    <div className="relative w-full min-w-0 overflow-x-hidden text-slate-900">
       {/* Hero — left-aligned, editorial */}
       <section className="pt-16 pb-6 px-4">
-        <div className="max-w-[1600px] mx-auto px-6">
-          <h1 className="text-4xl md:text-6xl font-semibold text-slate-900 tracking-tight leading-[1.1] mb-4">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 min-w-0">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold text-slate-900 tracking-tight leading-[1.1] mb-4">
             {helpContent.heroTitle}
           </h1>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
-            <p className="text-slate-600 text-lg max-w-lg shrink-0">
-              {helpContent.heroDescription}
+            <p className="text-slate-600 text-base sm:text-lg max-w-lg shrink-0">
+              <span className="md:hidden">Search or pick a topic—articles update as you type.</span>
+              <span className="hidden md:inline">{helpContent.heroDescription}</span>
             </p>
             <div className="relative w-full md:w-[320px] shrink-0">
-              <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl border-2 border-emerald-200/60" />
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder={helpContent.searchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setSearchQuery(e.target?.value);
-                    if (e.target?.value.trim()) setActiveCategory(null);
-                  }}
-                  className="w-full pl-12 pr-5 py-3 rounded-xl border-2 border-slate-900/10 bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-emerald-500/30 outline-none text-[15px] transition-all text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.08)]"
-                />
-              </div>
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400 pointer-events-none z-10" />
+              <input
+                type="text"
+                placeholder={helpContent.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setSearchQuery(e.target?.value);
+                  if (e.target?.value.trim()) setActiveCategory(null);
+                }}
+                className="w-full pl-12 pr-5 py-3 rounded-xl border border-slate-200/80 bg-white focus:ring-2 focus:ring-emerald-500/30 outline-none text-[15px] transition-all text-slate-700 shadow-sm"
+              />
             </div>
           </div>
         </div>
@@ -73,14 +61,15 @@ export function HelpCenterClient(): React.JSX.Element {
 
       {/* Main: Sidebar + Content */}
       <section className="px-4 pb-28">
-        <div className="max-w-[1600px] mx-auto px-6">
-          <div className="grid lg:grid-cols-[220px_1fr_340px] gap-8 items-start">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 min-w-0">
+          <div className="grid lg:grid-cols-[220px_1fr_340px] gap-8 items-start min-w-0">
             {/* Left: Category Nav */}
             <nav className="hidden lg:block sticky top-28">
               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">Topics</p>
               <ul className="space-y-1">
                 <li>
                   <Button
+                    type="button"
                     variant="ghost"
                     onClick={() => {
                       setActiveCategory(null);
@@ -98,6 +87,7 @@ export function HelpCenterClient(): React.JSX.Element {
                 {HELP_CATEGORIES.map((cat: { name: string; icon: string }) => (
                   <li key={cat.name}>
                     <Button
+                      type="button"
                       variant="ghost"
                       onClick={() => {
                         setActiveCategory(cat.name);
@@ -162,6 +152,7 @@ export function HelpCenterClient(): React.JSX.Element {
                     {helpContent.emptySearchDescription} &ldquo;{searchQuery}&rdquo;
                   </p>
                   <Button
+                    type="button"
                     variant="link"
                     onClick={() => {
                       setSearchQuery("");
@@ -175,14 +166,12 @@ export function HelpCenterClient(): React.JSX.Element {
               ) : (
                 <div className="space-y-3">
                   {filteredArticles.map((article: HelpArticle) => (
-                    <div key={article.id} className="relative">
-                      <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl border-2 border-emerald-200/60" />
-                      <Button
-                        variant="ghost"
-                        onClick={() => setSelectedArticle(article)}
-                        className="relative group flex items-start gap-4 p-5 rounded-2xl border-2 border-slate-900/10 bg-white/90 hover:bg-white w-full text-left h-auto shadow-[0_14px_32px_rgba(15,23,42,0.08)]"
+                      <Link
+                        key={article.id}
+                        href={`/help/${article.slug}`}
+                        className="group flex w-full items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 text-left shadow-sm transition-colors hover:border-slate-300 hover:shadow-md"
                       >
-                        <div className="mt-0.5 p-2 rounded-lg bg-white/70 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-700 transition-colors shrink-0">
+                        <div className="mt-0.5 shrink-0 rounded-lg bg-white/70 p-2 text-slate-500 transition-colors group-hover:bg-emerald-100 group-hover:text-emerald-700">
                           <Icon
                             name={
                               (HELP_CATEGORIES.find(
@@ -192,22 +181,22 @@ export function HelpCenterClient(): React.JSX.Element {
                             size={16}
                           />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors text-[15px]">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center gap-3">
+                            <h3 className="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-emerald-700">
                               {article.title}
                             </h3>
                           </div>
-                          <p className="text-sm text-slate-500 line-clamp-1">
+                          <p className="line-clamp-1 text-sm text-slate-500">
                             {article.summary}
                           </p>
                         </div>
                         <ArrowRight
                           size={16}
-                          className="text-slate-300 group-hover:text-emerald-600 transition-colors mt-1.5 shrink-0"
+                          className="mt-1.5 shrink-0 text-slate-300 transition-colors group-hover:text-emerald-600"
+                          aria-hidden="true"
                         />
-                      </Button>
-                    </div>
+                      </Link>
                   ))}
                 </div>
               )}
@@ -223,71 +212,10 @@ export function HelpCenterClient(): React.JSX.Element {
         </div>
       </section>
 
-      {/* Article Popup Modal */}
-      {selectedArticle && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-          onClick={() => setSelectedArticle(null)}
-        >
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          <div className="relative" onClick={(e: unknown) => (e as React.MouseEvent).stopPropagation()}>
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[28px] border-2 border-emerald-200/60" />
-            <div className="relative bg-white rounded-2xl border-2 border-slate-900/10 shadow-[0_24px_60px_rgba(15,23,42,0.12)] max-w-lg w-full max-h-[80vh] overflow-y-auto p-8">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSelectedArticle(null)}
-              className="absolute top-4 right-4 h-9 w-9 rounded-lg text-slate-500 hover:text-slate-900"
-              aria-label="Close article"
-            >
-              <X size={18} />
-            </Button>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-600">
-                <Icon
-                  name={
-                    (HELP_CATEGORIES.find(
-                      (c: { name: string; icon: string }) => c.name === selectedArticle.category,
-                    )?.icon || "HelpCircle") as IconName
-                  }
-                  size={18}
-                />
-              </div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                {selectedArticle.category}
-              </span>
-            </div>
-
-            <h2 className="text-2xl font-semibold text-slate-900 mb-3 leading-tight">
-              {selectedArticle.title}
-            </h2>
-
-            <p className="text-slate-500 text-sm mb-6">
-              {selectedArticle.summary}
-            </p>
-
-            <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed whitespace-pre-line">
-              {stripMarkdown(selectedArticle.content)}
-            </div>
-
-            {selectedArticle.lastUpdated && (
-              <p className="mt-8 pt-4 border-t border-slate-200 text-xs text-slate-500">
-                Last updated:{" "}
-                {new Date(selectedArticle.lastUpdated).toLocaleDateString(
-                  "en-NG",
-                  { year: "numeric", month: "long", day: "numeric" },
-                )}
-              </p>
-            )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Mobile AI Chat FAB */}
       <div className="lg:hidden fixed bottom-6 right-6 z-50">
         <Button
+          type="button"
           onClick={() => setIsAiOpen(!isAiOpen)}
           className="w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform"
           aria-label="Toggle AI support chat"
@@ -307,6 +235,7 @@ export function HelpCenterClient(): React.JSX.Element {
           <div className="max-w-md mx-auto h-[85vh]">
             <HelpAIChat />
             <Button
+              type="button"
               variant="ghost"
               onClick={() => setIsAiOpen(false)}
               className="w-full mt-3 py-3 text-slate-500 font-semibold text-sm rounded-xl h-auto"

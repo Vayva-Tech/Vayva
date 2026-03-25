@@ -3,7 +3,7 @@ import { withStorefrontAPI } from "@/lib/api-handler";
 import { reportError } from "@/lib/error";
 import { logger } from "@vayva/shared";
 
-const confirmConversionSchema = {
+const _confirmConversionSchema = {
   referralCode: "string",
   orderId: "string",
 };

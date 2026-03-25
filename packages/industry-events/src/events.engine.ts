@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Events Industry Engine
  * Main orchestrator for all event management features
@@ -84,7 +83,7 @@ export class EventsEngine {
       }
 
       this.registerDataResolvers();
-      console.log('[EVENTS_ENGINE] Initialized successfully');
+      console.warn('[EVENTS_ENGINE] Initialized successfully');
     } catch (error) {
       console.error('[EVENTS_ENGINE] Initialization failed:', error);
       throw error;

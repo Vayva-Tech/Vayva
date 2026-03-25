@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userId = session.user.id;
+    const _userId = session.user.id;
     
     // Get store ID from request or user's default store
     const body = await request.json().catch(() => ({}));
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
  * GET /api/compliance/gdpr/export
  * Check status of a pending export
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {

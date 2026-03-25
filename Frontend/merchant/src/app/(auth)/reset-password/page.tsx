@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import React, { useState, Suspense } from "react";
 import { logger } from "@vayva/shared";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,7 +11,7 @@ import { SplitAuthLayout } from "@/components/auth/SplitAuthLayout";
 const ResetPasswordContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token") || "";
+  const token = searchParams?.get("token") ?? "";
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

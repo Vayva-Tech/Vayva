@@ -4,7 +4,7 @@
  * Certificate generation and verification system
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const CERTIFICATES_ADDON: AddOnDefinition = {
   id: 'vayva.certificates',

@@ -1,8 +1,22 @@
 'use client';
 
 import React from 'react';
+import type { Ticket } from '@/types/kitchen';
 import { useRealTimeKDS } from '@/hooks/useRealTimeKDS';
 import { TrendingUp, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+
+function isUrgentTicket(ticket: Ticket): boolean {
+  if (ticket.priority === 'rush') return true;
+  if (
+    ticket.promisedTime &&
+    new Date(ticket.promisedTime) < new Date() &&
+    ticket.status !== 'ready' &&
+    ticket.status !== 'served'
+  ) {
+    return true;
+  }
+  return false;
+}
 
 interface KitchenStatusProps {
   designCategory?: string;
@@ -23,14 +37,19 @@ export function KitchenStatus({
   const { tickets } = useRealTimeKDS();
 
   // Calculate metrics
-  const activeTickets = tickets.filter(t => t.status === 'cooking' || t.status === 'fresh').length;
-  const readyTickets = tickets.filter(t => t.status === 'ready').length;
-  const urgentTickets = tickets.filter(t => t.priority === 'urgent' || t.status === 'overdue').length;
-  
-  // Calculate average cook time
-  const avgCookTime = tickets.length > 0
-    ? Math.round(tickets.reduce((acc, t) => acc + t.timerSeconds, 0) / tickets.length / 60)
-    : 0;
+  const activeTickets = tickets.filter(
+    (t) => t.status === 'pending' || t.status === 'preparing',
+  ).length;
+  const readyTickets = tickets.filter((t) => t.status === 'ready').length;
+  const urgentTickets = tickets.filter(isUrgentTicket).length;
+
+  const withPrep = tickets.filter((t) => t.prepTimeMinutes != null);
+  const avgCookTime =
+    withPrep.length > 0
+      ? Math.round(
+          withPrep.reduce((acc, t) => acc + (t.prepTimeMinutes ?? 0), 0) / withPrep.length,
+        )
+      : 0;
 
   const stats = [
     {

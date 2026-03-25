@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Seasonal Pricing Service
  * Manages dynamic pricing based on seasons, demand, and inventory levels

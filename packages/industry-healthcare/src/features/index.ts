@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Healthcare Features
  * Feature flags and HIPAA-compliant functionality

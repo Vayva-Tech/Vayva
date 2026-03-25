@@ -13,7 +13,7 @@ import {
   OpsUserListItem,
   UserCreateResult,
   OpsLoginResponseData,
-  logger,
+  logger
 } from "@vayva/shared";
 
 function isRecord(value: unknown): value is Record<string, unknown> {

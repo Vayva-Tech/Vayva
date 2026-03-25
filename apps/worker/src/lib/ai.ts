@@ -1,9 +1,4 @@
-import Groq from "groq-sdk";
 import { logger } from "@vayva/shared";
-
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY || "",
-});
 
 export interface AIMessage {
     role: "system" | "user" | "assistant";
@@ -39,12 +34,27 @@ ${context.products ? `Available Products:\n${context.products.map(p => `- ${p.na
 `;
 
         try {
-            const completion = await groq.chat.completions.create({
-                messages: [{ role: "system", content: systemPrompt }, ...messages],
-                model: "llama-3.1-70b-versatile",
-                temperature: 0.7,
+            const apiKey = process.env.OPENROUTER_API_KEY || "";
+            if (!apiKey) throw new Error("OPENROUTER_API_KEY not configured");
+
+            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://vayva.tech",
+                    "X-Title": "Vayva Apps Worker",
+                },
+                body: JSON.stringify({
+                    messages: [{ role: "system", content: systemPrompt }, ...messages],
+                    model: "google/gemini-2.5-flash",
+                    temperature: 0.7,
+                }),
+                signal: AbortSignal.timeout(25_000),
             });
 
+            if (!res.ok) throw new Error(`OpenRouter error: ${res.status}`);
+            const completion = await res.json();
             return completion.choices[0]?.message?.content || "I apologize, I'm currently unable to assist. Please wait for a human agent.";
         } catch (error: any) {
             logger.error("[AI_PROVIDER] Error", { error: error.message, stack: error.stack, app: "worker" });

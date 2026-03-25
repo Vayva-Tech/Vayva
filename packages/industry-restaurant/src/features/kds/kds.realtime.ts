@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * KDS Real-time Integration
  * WebSocket and pub/sub integration for live kitchen updates

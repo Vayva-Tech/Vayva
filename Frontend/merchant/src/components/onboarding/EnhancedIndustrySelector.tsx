@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Enhanced Industry Selector Component
  * Simplified, categorized industry selection with smart suggestions
@@ -15,7 +15,7 @@ import {
   ForkKnife,
   Wrench,
   Laptop,
-  Scale,
+  Scales as Scale,
   Flask
 } from "@phosphor-icons/react/ssr";
 
@@ -119,26 +119,29 @@ export function EnhancedIndustrySelector({
   const filteredCategories = useMemo(() => {
     if (!searchTerm) return INDUSTRY_CATEGORIES;
     
-    const filtered: typeof INDUSTRY_CATEGORIES = {};
+    const filtered: Partial<typeof INDUSTRY_CATEGORIES> = {};
     const lowerSearch = searchTerm.toLowerCase();
     
-    Object.entries(INDUSTRY_CATEGORIES).forEach(([category, config]) => {
-      const matchingIndustries = config.industries.filter(slug => {
-        const industry = INDUSTRY_CONFIG[slug as IndustrySlug];
-        return (
-          industry?.displayName.toLowerCase().includes(lowerSearch) ||
-          slug.toLowerCase().includes(lowerSearch) ||
-          industry?.description?.toLowerCase().includes(lowerSearch)
-        );
-      });
-      
-      if (matchingIndustries.length > 0) {
-        filtered[category] = {
-          ...config,
-          industries: matchingIndustries
-        };
-      }
-    });
+    (Object.keys(INDUSTRY_CATEGORIES) as (keyof typeof INDUSTRY_CATEGORIES)[]).forEach(
+      (category) => {
+        const config = INDUSTRY_CATEGORIES[category];
+        const matchingIndustries = config.industries.filter((slug) => {
+          const industry = INDUSTRY_CONFIG[slug as IndustrySlug];
+          return (
+            industry?.displayName.toLowerCase().includes(lowerSearch) ||
+            slug.toLowerCase().includes(lowerSearch) ||
+            industry?.description?.toLowerCase().includes(lowerSearch)
+          );
+        });
+
+        if (matchingIndustries.length > 0) {
+          filtered[category] = {
+            ...config,
+            industries: matchingIndustries,
+          };
+        }
+      },
+    );
     
     return filtered;
   }, [searchTerm]);
@@ -209,7 +212,7 @@ export function EnhancedIndustrySelector({
                     if (!industry) return null;
                     
                     return (
-                      <button
+                      <Button
                         key={slug}
                         type="button"
                         onClick={() => {
@@ -237,7 +240,7 @@ export function EnhancedIndustrySelector({
                           </div>
                         </div>
                         <Check className="w-4 h-4 text-vayva-green opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -267,7 +270,7 @@ export function EnhancedIndustrySelector({
                     const isSelected = value === slug;
                     
                     return (
-                      <button
+                      <Button
                         key={slug}
                         type="button"
                         onClick={() => {
@@ -311,7 +314,7 @@ export function EnhancedIndustrySelector({
                             </p>
                           </div>
                         </div>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>

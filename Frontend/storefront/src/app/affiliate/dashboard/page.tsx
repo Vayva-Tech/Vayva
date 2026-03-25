@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams as _useSearchParams } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,16 +15,16 @@ import {
   Users,
   TrendingUp,
   DollarSign,
-  Link,
+  Link as _Link,
   Copy,
   Check,
   BarChart3,
-  Calendar,
-  AlertCircle,
+  Calendar as _Calendar,
+  AlertCircle as _AlertCircle,
   ArrowRight,
   Wallet,
   Share2,
-  RefreshCw,
+  RefreshCw
 } from "lucide-react";
 
 interface AffiliateStats {
@@ -89,6 +89,26 @@ export default function AffiliateDashboardPage() {
       loadData();
     }
   }, [store?.id]);
+
+  const affiliateAddonEnabled =
+    Array.isArray((store as any)?.enabledAddOns) &&
+    (store as any).enabledAddOns.includes("vayva.affiliate");
+
+  if (store && !affiliateAddonEnabled) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-3">Affiliate Program not enabled</h1>
+          <p className="text-gray-600 mb-6">
+            This store has not enabled the Affiliate Program add-on.
+          </p>
+          <Button variant="outline" onClick={() => router.push("/")}>
+            Back to Store
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const loadData = async () => {
     try {

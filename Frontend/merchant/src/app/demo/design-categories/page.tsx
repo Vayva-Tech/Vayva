@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState } from 'react';
 import { VayvaThemeProvider } from '@/components/vayva-ui/VayvaThemeProvider';
 import { UniversalProDashboard } from '@/components/dashboard/UniversalProDashboard';
@@ -44,7 +43,7 @@ export default function DesignCategoriesDemo() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {INDUSTRY_EXAMPLES.map((industry) => (
-                <button
+                <Button
                   key={industry.slug}
                   onClick={() => setSelectedIndustry(industry)}
                   className={cn(
@@ -68,7 +67,7 @@ export default function DesignCategoriesDemo() {
                       <p className="text-gray-600 text-sm mt-1">{industry.description}</p>
                     </div>
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
             
@@ -112,7 +111,7 @@ export default function DesignCategoriesDemo() {
             >
               <div className={isFullscreen ? "" : "max-h-[70vh] overflow-y-auto"}>
                 <UniversalProDashboard
-                  industry={selectedIndustry.slug}
+                  industry={selectedIndustry.slug as any}
                   variant="pro"
                   userId="demo-user"
                   businessId="demo-business"

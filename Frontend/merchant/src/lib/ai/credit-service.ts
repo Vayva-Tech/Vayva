@@ -1,11 +1,11 @@
-// @ts-nocheck
 /**
  * AI Credit Service Stub
  * Placeholder implementation for AI credit management
  */
 
 export class AICreditService {
-  static async getCreditSummary(storeId: string) {
+  static async getCreditSummary(_storeId: string) {
+    void _storeId;
     return {
       totalCredits: 0,
       usedCredits: 0,
@@ -15,7 +15,8 @@ export class AICreditService {
     };
   }
 
-  static async checkLowCreditAlert(storeId: string) {
+  static async checkLowCreditAlert(_storeId: string) {
+    void _storeId;
     return {
       isLow: false,
       threshold: 100,
@@ -23,7 +24,9 @@ export class AICreditService {
     };
   }
 
-  static async addCredits(storeId: string, amount: number, reason: string) {
+  static async addCredits(_storeId: string, amount: number, _reason: string) {
+    void _storeId;
+    void _reason;
     return {
       success: true,
       newBalance: amount,

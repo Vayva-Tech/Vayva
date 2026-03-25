@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-healthcare - Unified Healthcare Industry Package
  * 

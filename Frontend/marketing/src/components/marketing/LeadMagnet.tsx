@@ -6,7 +6,6 @@ import {
   IconX as X,
   IconDownload as Download,
   IconBrandWhatsapp as WhatsappLogo,
-  IconMail as Mail,
   IconCircleCheck as CheckCircle,
 } from "@tabler/icons-react";
 import { Button } from "@vayva/ui";
@@ -132,13 +131,15 @@ export function LeadMagnetPopup({ isOpen: controlledOpen, onClose, triggerOnExit
         className="relative bg-background rounded-[40px] shadow-2xl max-w-lg w-full overflow-hidden"
       >
         {/* Close button */}
-        <button
+        <Button
+          type="button"
+          variant="ghost"
           onClick={handleClose}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors z-10"
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors z-10 p-0"
           aria-label="Close popup"
         >
           <X className="w-5 h-5" />
-        </button>
+        </Button>
 
         {!isSubmitted ? (
           <div className="p-8">

@@ -1,10 +1,9 @@
-// @ts-nocheck
 // ============================================================================
 // Recipe Service
 // ============================================================================
 
-import { PrismaClient } from '@prisma/client';
-import { MealKitRecipeSchema, MealKitRecipeInput } from '../types/index.js';
+import { PrismaClient } from '@vayva/db';
+import { MealKitRecipeSchema, MealKitRecipeInput } from '../types';
 
 export class RecipeService {
   private prisma: PrismaClient;

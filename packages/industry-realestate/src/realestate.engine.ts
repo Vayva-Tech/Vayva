@@ -1,28 +1,34 @@
-// @ts-nocheck
 /**
  * Real Estate Industry Engine
  */
 
-import { IndustryEngine, Feature } from '@vayva/industry-core';
 import type { RealEstateConfig } from './types';
 import { PropertyManagementService } from './services/property-management.service';
 import { PropertyManagementFeature } from './features/property-management.feature';
 
-export class RealEstateEngine extends IndustryEngine<RealEstateConfig> {
+export class RealEstateEngine {
+  private readonly config: RealEstateConfig;
   private propertyService?: PropertyManagementService;
   private propertyFeature?: PropertyManagementFeature;
 
+  constructor(config: RealEstateConfig = {}) {
+    this.config = config;
+  }
+
   async initialize(): Promise<void> {
     console.log('[REALESTATE] Initializing engine...');
-    
-    // Initialize property management service
+
     if (this.config.propertyManagement !== false) {
-      this.propertyService = new PropertyManagementService(this.config.propertyManagement);
+      const pmConfig =
+        this.config.propertyManagement &&
+        typeof this.config.propertyManagement === 'object'
+          ? this.config.propertyManagement
+          : {};
+      this.propertyService = new PropertyManagementService(pmConfig);
       await this.propertyService.initialize();
       this.propertyFeature = new PropertyManagementFeature(this.propertyService);
-      this.features.set('property-management', this.propertyFeature as unknown as Feature);
     }
-    
+
     console.log('[REALESTATE] Engine initialized');
   }
 

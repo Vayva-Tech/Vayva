@@ -27,7 +27,11 @@ const envSchema = z.object({
   NEXTAUTH_SECRET: z.string().min(1),
   NEXTAUTH_URL: z.string().url().optional(), // In Vercel usage often optional, but good to validate if local
   // WhatsApp
-  WHATSAPP_ACCESS_TOKEN: z.string().min(1).optional(), // Optional for now if not strictly integrated yet
+  // Canonical (Evolution API - self-hosted)
+  EVOLUTION_API_URL: z.string().url().optional(),
+  EVOLUTION_API_KEY: z.string().min(1).optional(),
+  // Legacy / not used (Meta WhatsApp Cloud API)
+  WHATSAPP_ACCESS_TOKEN: z.string().min(1).optional(),
   WHATSAPP_VERIFY_TOKEN: z.string().min(1).optional(),
   WHATSAPP_PHONE_NUMBER_ID: z.string().min(1).optional(),
   // Payment (Nigeria First)
@@ -52,10 +56,8 @@ const envSchema = z.object({
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   // Monitoring (Sentry)
   SENTRY_DSN: z.string().url().optional(),
-  // AI (Groq)
-  GROQ_ADMIN_KEY: z.string().optional(),
-  GROQ_MARKETING_KEY: z.string().optional(),
-  GROQ_WHATSAPP_KEY: z.string().optional(),
+  // AI (OpenRouter)
+  OPENROUTER_API_KEY: z.string().optional(),
 });
 const _env = envSchema.safeParse(process.env);
 if (!_env.success) {

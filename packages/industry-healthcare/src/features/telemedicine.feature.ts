@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Telemedicine Feature Module
  */

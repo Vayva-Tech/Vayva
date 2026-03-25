@@ -1,8 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prismaDelegates } from '@vayva/db';
 
 interface Client extends WebSocket {
   userId?: string;
@@ -11,7 +9,7 @@ interface Client extends WebSocket {
 
 interface Message {
   type: 'message' | 'typing' | 'presence' | 'channel_update';
-  payload: any;
+  payload: unknown;
 }
 
 // Store active connections
@@ -40,7 +38,7 @@ export function initializeWebSocketServer(wss: WebSocketServer) {
     }
     clients.get(key)!.push(client);
 
-    console.log(`User ${userId} connected to store ${storeId}`);
+    console.warn(`User ${userId} connected to store ${storeId}`);
 
     // Send welcome message
     sendToClient(client, {
@@ -82,7 +80,7 @@ export function initializeWebSocketServer(wss: WebSocketServer) {
         }
       }
 
-      console.log(`User ${userId} disconnected from store ${storeId}`);
+      console.warn(`User ${userId} disconnected from store ${storeId}`);
 
       // Broadcast presence update
       broadcastToStore(storeId, {
@@ -113,8 +111,11 @@ async function handleMessage(client: Client, message: Message) {
   }
 }
 
-async function handleChatMessage(client: Client, payload: any) {
-  const { channelId, text, attachments } = payload;
+async function handleChatMessage(client: Client, payload: unknown) {
+  const p = payload as Record<string, unknown>;
+  const channelId = p.channelId as string | undefined;
+  const text = p.text as string | undefined;
+  const attachments = p.attachments as unknown[] | undefined;
 
   if (!channelId || !text) {
     sendToClient(client, {
@@ -125,7 +126,7 @@ async function handleChatMessage(client: Client, payload: any) {
   }
 
   // Save message to database
-  const savedMessage = await prisma.chatMessage.create({
+  const savedMessage = await prismaDelegates.chatMessage.create({
     data: {
       channelId,
       senderId: client.userId!,
@@ -145,14 +146,15 @@ async function handleChatMessage(client: Client, payload: any) {
   });
 
   // Broadcast message to all channel members
-  const channel = await prisma.chatChannel.findUnique({
+  const channel = await prismaDelegates.chatChannel.findUnique({
     where: { id: channelId },
     include: { members: true },
   });
 
   if (channel) {
-    channel.members.forEach((member) => {
-      const key = `${client.storeId}-${member.userId}`;
+    channel.members.forEach((member: unknown) => {
+      const m = member as { userId: string };
+      const key = `${client.storeId}-${m.userId}`;
       const memberClients = clients.get(key);
       if (memberClients) {
         memberClients.forEach((mc) => {
@@ -175,8 +177,10 @@ async function handleChatMessage(client: Client, payload: any) {
   }
 }
 
-function handleTypingIndicator(client: Client, payload: any) {
-  const { channelId, isTyping } = payload;
+function handleTypingIndicator(client: Client, payload: unknown) {
+  const p = payload as Record<string, unknown>;
+  const channelId = p.channelId as string;
+  const isTyping = Boolean(p.isTyping);
 
   // Broadcast typing indicator to channel members
   broadcastToChannel(client.storeId!, channelId, {
@@ -207,14 +211,15 @@ function broadcastToStore(storeId: string, message: Message) {
 
 function broadcastToChannel(storeId: string, channelId: string, message: Message) {
   // Get all users in the channel and broadcast to them
-  prisma.channelMember
+  prismaDelegates.channelMember
     .findMany({
       where: { channelId },
       include: { user: true },
     })
-    .then((members) => {
-      members.forEach((member) => {
-        const key = `${storeId}-${member.userId}`;
+    .then((members: unknown[]) => {
+      members.forEach((member: unknown) => {
+        const m = member as { userId: string };
+        const key = `${storeId}-${m.userId}`;
         const memberClients = clients.get(key);
         if (memberClients) {
           memberClients.forEach((client) => {
@@ -223,7 +228,7 @@ function broadcastToChannel(storeId: string, channelId: string, message: Message
         }
       });
     })
-    .catch((error) => {
+    .catch((error: unknown) => {
       console.error('Error broadcasting to channel:', error);
     });
 }

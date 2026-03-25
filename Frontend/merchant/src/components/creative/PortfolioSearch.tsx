@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -116,12 +115,12 @@ export function PortfolioSearch() {
           className="pl-10 pr-10"
         />
         {searchState.query && (
-          <button
+          <Button
             onClick={() => setSearchState(prev => ({ ...prev, query: '' }))}
             className="absolute right-3 top-3 text-gray-500 hover:text-gray-900"
           >
             <X className="h-5 w-5" />
-          </button>
+          </Button>
         )}
       </div>
 
@@ -246,3 +245,4 @@ export function useAlgoliaSearch(indexName: string) {
 
   return { results, loading, error, search };
 }
+

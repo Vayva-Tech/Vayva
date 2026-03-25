@@ -8,8 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { BackButton } from "@/components/ui/BackButton";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 type PolicyType =
   | "terms"
@@ -207,6 +207,17 @@ export default function StorePoliciesPage() {
             : "It will be visible on your storefront."
         }
       />
+
+      <div className="flex items-center gap-4 mb-6">
+        <BackButton
+          href="/dashboard/settings/overview"
+          label="Back to Settings"
+        />
+        <PageHeader
+          title="Store Policies"
+          subtitle="Review, edit, and publish policies shown on your storefront."
+        />
+      </div>
 
       {/* Warning Card */}
       <Card className="bg-orange-50 border-amber-200 p-4 mb-6">

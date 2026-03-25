@@ -1,45 +1,43 @@
-// @ts-nocheck
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import type { WorkerMessage, WorkerResponse } from '@/workers/metrics.worker';
 
-interface UseWorkerResult<T> {
-  data: T | null;
+type WorkerSuccessPayload = Exclude<WorkerResponse, { type: 'ERROR' }>['payload'];
+
+interface UseWorkerResult {
+  data: WorkerSuccessPayload | null;
   loading: boolean;
   error: string | null;
-  send: (message: Omit<WorkerMessage, any>) => void;
+  send: (message: WorkerMessage) => void;
 }
 
 /**
  * Hook to interact with Web Workers for off-main-thread calculations
  */
-export function useMetricsWorker(): UseWorkerResult<any> {
+export function useMetricsWorker(): UseWorkerResult {
   const workerRef = useRef<Worker | null>(null);
-  const callbacksRef = useRef<Map<string, (data: any) => void>>(new Map());
-  
-  const [data, setData] = useState<any>(null);
+  const callbacksRef = useRef<Map<string, (data: unknown) => void>>(new Map());
+
+  const [data, setData] = useState<WorkerSuccessPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initialize worker
     workerRef.current = new Worker(
       new URL('@/workers/metrics.worker.ts', import.meta.url)
     );
 
-    // Handle messages from worker
     workerRef.current.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const { type, payload } = event.data;
-      
+
       if (type === 'ERROR') {
         setError(payload);
         setLoading(false);
       } else {
         setData(payload);
         setLoading(false);
-        
-        // Call specific callback if registered
+
         const callback = callbacksRef.current.get(type);
         if (callback) {
           callback(payload);
@@ -47,8 +45,7 @@ export function useMetricsWorker(): UseWorkerResult<any> {
       }
     };
 
-    // Handle worker errors
-    workerRef.current.onerror = (err) => {
+    workerRef.current.onerror = (err: ErrorEvent) => {
       setError(err.message);
       setLoading(false);
     };
@@ -58,7 +55,7 @@ export function useMetricsWorker(): UseWorkerResult<any> {
     };
   }, []);
 
-  const send = useCallback((message: Omit<WorkerMessage, any>) => {
+  const send = useCallback((message: WorkerMessage) => {
     if (workerRef.current) {
       setLoading(true);
       setError(null);
@@ -79,7 +76,7 @@ export async function calculateMetricsAsync(
 ): Promise<{ growth: number; arr: number; churnRate: number; ltv: number }> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('@/workers/metrics.worker.ts', import.meta.url));
-    
+
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       if (event.data.type === 'METRICS_CALCULATED') {
         resolve(event.data.payload);
@@ -89,12 +86,12 @@ export async function calculateMetricsAsync(
         worker.terminate();
       }
     };
-    
-    worker.onerror = (err) => {
+
+    worker.onerror = (err: ErrorEvent) => {
       reject(err);
       worker.terminate();
     };
-    
+
     worker.postMessage({
       type: 'CALCULATE_METRICS',
       payload: { mrr, previousMonth, subscriptions },
@@ -111,7 +108,7 @@ export async function analyzeTrendsAsync(
 ): Promise<{ trend: 'up' | 'down' | 'neutral'; percentage: number; forecast: number[] }> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('@/workers/metrics.worker.ts', import.meta.url));
-    
+
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       if (event.data.type === 'TRENDS_ANALYZED') {
         resolve(event.data.payload);
@@ -121,12 +118,12 @@ export async function analyzeTrendsAsync(
         worker.terminate();
       }
     };
-    
-    worker.onerror = (err) => {
+
+    worker.onerror = (err: ErrorEvent) => {
       reject(err);
       worker.terminate();
     };
-    
+
     worker.postMessage({
       type: 'ANALYZE_TRENDS',
       payload: { data, periods },

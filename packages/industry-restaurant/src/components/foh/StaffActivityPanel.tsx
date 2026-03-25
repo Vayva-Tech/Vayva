@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { RestaurantDashboardService } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from "@vayva/ui";
+import { CardTitle } from '../restaurant-ui';
 import { 
   Users,
   Clock,
@@ -174,7 +174,7 @@ export function StaffActivityPanel({ dashboardService }: StaffActivityPanelProps
         <CardTitle className="flex items-center gap-2 text-orange-800">
           <Users className="h-5 w-5" />
           Staff Activity
-          <Badge variant="secondary" className="ml-auto bg-orange-100 text-orange-700">
+          <Badge variant="outline" className="ml-auto bg-orange-100 text-orange-700">
             {activeStaff} active
           </Badge>
         </CardTitle>
@@ -259,13 +259,13 @@ export function StaffActivityPanel({ dashboardService }: StaffActivityPanelProps
               
               {/* Quick Actions */}
               <div className="flex flex-col gap-1">
-                <button className="px-2 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 transition-colors">
+                <Button className="px-2 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 transition-colors">
                   Message
-                </button>
+                </Button>
                 {staff.status === 'active' && (
-                  <button className="px-2 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600 transition-colors">
+                  <Button className="px-2 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600 transition-colors">
                     Break
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

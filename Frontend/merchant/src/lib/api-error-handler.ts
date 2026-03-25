@@ -27,7 +27,7 @@ export interface ErrorResponse {
  * @param error - The caught error
  * @param context - Context information for logging
  * @param fallbackData - Optional fallback data to return instead of throwing
- * @returns Never throws if fallbackData is provided, otherwise rethrows
+ * @returns Fallback data when provided; otherwise logs only (callers return their own error responses)
  */
 export function handleApiError<T>(
   error: unknown,
@@ -39,7 +39,7 @@ export function handleApiError<T>(
     additionalInfo?: Record<string, unknown>;
   },
   fallbackData?: T
-): T {
+): T | undefined {
   const apiError = normalizeError(error);
   
   // Log the error with full context
@@ -68,9 +68,6 @@ export function handleApiError<T>(
     });
     return fallbackData;
   }
-
-  // Otherwise, rethrow the error
-  throw apiError;
 }
 
 /**

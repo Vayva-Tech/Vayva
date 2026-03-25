@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useCallback, useMemo, useRef } from "react";
@@ -52,8 +51,8 @@ export function useUrlFilters<
   } = config;
 
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = usePathname() ?? "";
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const isNavigating = useRef(false);
 
   // Parse current filters from URL, merging with defaults

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -66,7 +65,7 @@ export function EnhancedDashboardSwitcher({
     const stored = localStorage.getItem('preferredDashboardType');
     if (stored === 'universal-pro' || stored === 'industry-native') {
       setStoredDashboardType(stored);
-      onSwitchDashboardType(stored);
+      onSwitchDashboardType(stored === 'universal-pro' ? 'universal' : 'industry-native');
     }
   }, [onSwitchDashboardType]);
 
@@ -151,7 +150,9 @@ export function EnhancedDashboardSwitcher({
             <Button
               key={option.id}
               variant="ghost"
-              onClick={() => onSwitchDashboardType(option.id as 'universal-pro' | 'industry-native')}
+              onClick={() =>
+                onSwitchDashboardType(option.id === 'universal-pro' ? 'universal' : 'industry-native')
+              }
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap h-auto",
                 isActive

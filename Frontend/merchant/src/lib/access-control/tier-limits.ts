@@ -63,7 +63,7 @@ export const TIER_TRIAL_PERIODS: Record<PlanTier, number> = {
 
 export const TIER_LIMITS: Record<PlanTier, TierLimits> = {
   STARTER: {
-    products: { maxItems: 500, enabled: true },
+    products: { maxItems: 100, enabled: true },
     orders: { maxItems: 500, enabled: true, quota: 500 },
     customers: { maxItems: 1000, enabled: true },
     teamMembers: { maxItems: 1, enabled: true },
@@ -91,7 +91,7 @@ export const TIER_LIMITS: Record<PlanTier, TierLimits> = {
   },
 
   PRO: {
-    products: { maxItems: 1000, enabled: true },
+    products: { maxItems: 300, enabled: true },
     orders: { maxItems: 10000, enabled: true, quota: 10000 },
     customers: { maxItems: 'unlimited', enabled: true },
     teamMembers: { maxItems: 3, enabled: true },
@@ -119,7 +119,7 @@ export const TIER_LIMITS: Record<PlanTier, TierLimits> = {
   },
 
   PRO_PLUS: {
-    products: { maxItems: 'unlimited', enabled: true },
+    products: { maxItems: 500, enabled: true },
     orders: { maxItems: 'unlimited', enabled: true },
     customers: { maxItems: 'unlimited', enabled: true },
     teamMembers: { maxItems: 5, enabled: true },

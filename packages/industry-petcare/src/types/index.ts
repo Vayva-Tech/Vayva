@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Petcare Industry Types
  * Core types for the petcare industry engine
@@ -306,6 +305,13 @@ export interface PetBehaviorLog {
   recordedBy: string;
   incidentType?: string;
   createdAt: Date;
+}
+
+import type { HealthConfig } from '../services/pet-health-records.service';
+
+/** Engine wiring for optional pet-health feature module. */
+export interface PetCareConfig {
+  healthRecords?: false | HealthConfig;
 }
 
 // Configuration Types

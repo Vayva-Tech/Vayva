@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Wishlist Add-On Components
@@ -84,19 +85,21 @@ interface WishlistProviderProps {
 export function WishlistProvider({ children, storeId, maxItems = 100 }: WishlistProviderProps) {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   // Load wishlist from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem(`wishlist_${storeId}`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setItems(parsed.items || []);
-      } catch {
-        // Invalid data
+    queueMicrotask(() => {
+      const saved = localStorage.getItem(`wishlist_${storeId}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setItems(parsed.items || []);
+        } catch {
+          // Invalid data
+        }
       }
-    }
+    });
   }, [storeId]);
 
   // Save to localStorage
@@ -234,7 +237,7 @@ export function WishlistButton({
 
   if (variant === 'icon') {
     return (
-      <button
+      <Button
         onClick={handleToggle}
         className={cn(
           'p-2 rounded-lg transition-all',
@@ -246,13 +249,13 @@ export function WishlistButton({
         aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
       >
         <Heart className={cn('w-5 h-5', isWishlisted && 'fill-current')} />
-      </button>
+      </Button>
     );
   }
 
   if (variant === 'floating') {
     return (
-      <button
+      <Button
         onClick={isWishlisted ? openWishlist : handleToggle}
         className={cn(
           'fixed bottom-20 right-4 z-40 p-3 rounded-full shadow-lg transition-colors',
@@ -269,12 +272,12 @@ export function WishlistButton({
             </span>
           )}
         </div>
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
+    <Button
       onClick={handleToggle}
       className={cn(
         'flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors',
@@ -286,7 +289,7 @@ export function WishlistButton({
     >
       <Heart className={cn('w-4 h-4', isWishlisted && 'fill-current')} />
       {isWishlisted ? 'In Wishlist' : 'Add to Wishlist'}
-    </button>
+    </Button>
   );
 }
 
@@ -302,7 +305,7 @@ export function WishlistIcon({ className }: WishlistIconProps) {
   const { itemCount, toggleWishlist } = useWishlist();
 
   return (
-    <button
+    <Button
       onClick={toggleWishlist}
       className={cn(
         'relative p-2 rounded-lg hover:bg-accent transition-colors',
@@ -321,7 +324,7 @@ export function WishlistIcon({ className }: WishlistIconProps) {
           {itemCount > 99 ? '99+' : itemCount}
         </motion.span>
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -367,12 +370,12 @@ export function WishlistDrawer({ className }: WishlistDrawerProps) {
                   <Heart className="w-5 h-5" />
                   <h2 className="font-semibold">My Wishlist ({items.length})</h2>
                 </div>
-                <button 
+                <Button 
                   onClick={closeWishlist}
                   className="p-2 hover:bg-accent rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
               {/* Items */}
@@ -404,13 +407,13 @@ export function WishlistDrawer({ className }: WishlistDrawerProps) {
                     </span>
                   </div>
                   
-                  <button
+                  <Button
                     onClick={closeWishlist}
                     className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
                     Continue Shopping
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -481,7 +484,7 @@ function WishlistItemRow({
               <AlertCircle className="w-3 h-3" />
               Out of Stock
             </span>
-            <button
+            <Button
               onClick={onToggleNotify}
               className={cn(
                 'mt-1 text-xs flex items-center gap-1 transition-colors',
@@ -490,27 +493,27 @@ function WishlistItemRow({
             >
               <Bell className="w-3 h-3" />
               {item.notifyOnRestock ? 'You\'ll be notified' : 'Notify when available'}
-            </button>
+            </Button>
           </div>
         )}
 
         {/* Actions */}
         <div className="flex items-center gap-2 mt-3">
-          <button
+          <Button
             onClick={onMoveToCart}
             disabled={!item.inStock}
             className="flex-1 py-2 px-3 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
           >
             <ShoppingCart className="w-4 h-4" />
             Add to Cart
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onRemove}
             className="p-2 text-muted-foreground hover:text-destructive transition-colors"
             aria-label="Remove from wishlist"
           >
             <Trash2 className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -531,12 +534,12 @@ function EmptyWishlist({ onClose }: { onClose: () => void }) {
       <p className="text-muted-foreground text-center mb-6">
         Save items you love to your wishlist and buy them later.
       </p>
-      <button
+      <Button
         onClick={onClose}
         className="py-2 px-6 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
       >
         Start Shopping
-      </button>
+      </Button>
     </div>
   );
 }
@@ -550,7 +553,7 @@ interface WishlistPageProps {
 }
 
 export function WishlistPage({ className }: WishlistPageProps) {
-  const { items, removeItem, moveToCart, clearWishlist, isInWishlist } = useWishlist();
+  const { items, removeItem, moveToCart, clearWishlist } = useWishlist();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const toggleSelect = (id: string) => {
@@ -586,12 +589,12 @@ export function WishlistPage({ className }: WishlistPageProps) {
           <p className="text-muted-foreground">{items.length} items saved</p>
         </div>
         {items.length > 0 && (
-          <button
+          <Button
             onClick={clearWishlist}
             className="text-sm text-destructive hover:underline"
           >
             Clear All
-          </button>
+          </Button>
         )}
       </div>
 
@@ -618,18 +621,18 @@ export function WishlistPage({ className }: WishlistPageProps) {
                 {selectedItems.length} items selected
               </span>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={handleBulkMoveToCart}
                   className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg"
                 >
                   Add to Cart
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleBulkRemove}
                   className="px-3 py-1.5 text-sm border rounded-lg hover:bg-accent"
                 >
                   Remove
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -686,19 +689,19 @@ export function WishlistPage({ className }: WishlistPageProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     onClick={() => moveToCart(item.id)}
                     disabled={!item.inStock}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
                   >
                     Add to Cart
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => removeItem(item.id)}
                     className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -736,7 +739,7 @@ export function ShareWishlist({ className }: ShareWishlistProps) {
   if (items.length === 0) return null;
 
   return (
-    <button
+    <Button
       onClick={handleShare}
       className={cn(
         'flex items-center gap-2 px-4 py-2 border rounded-lg font-medium transition-colors',
@@ -746,6 +749,7 @@ export function ShareWishlist({ className }: ShareWishlistProps) {
     >
       <Share2 className="w-4 h-4" />
       {copied ? 'Copied!' : 'Share Wishlist'}
-    </button>
+    </Button>
   );
 }
+

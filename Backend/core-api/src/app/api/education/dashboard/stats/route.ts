@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
+import { prisma as _prisma } from "@vayva/db";
 import { logger } from "@vayva/shared";
 import { getEducationDashboardData } from "@vayva/industry-education/services";
 import { withDashboardCache } from "@/lib/dashboard-cache";

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -11,6 +12,10 @@ interface OTPVerifyBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json().catch(() => ({})) as OTPVerifyBody;
     const { field, newValue, otp } = body;
 
@@ -30,9 +35,7 @@ export async function POST(request: NextRequest) {
     // Call backend API to verify OTP and update field
     const result = await apiJson<{ success: boolean }>(`${process.env.BACKEND_API_URL}/api/account/otp/verify`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify({ field, newValue, otp }),
     });
     

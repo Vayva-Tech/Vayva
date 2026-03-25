@@ -4,18 +4,16 @@ import { legalContent } from "@/data/marketing-content";
 
 export default function LegalHubPage(): React.JSX.Element {
   return (
-    <div className="relative text-slate-900">
-      <div className="max-w-[1600px] mx-auto px-6 py-16">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          <aside className="w-full lg:w-64 flex-shrink-0">
+    <div className="relative w-full min-w-0 overflow-x-hidden text-slate-900">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12 sm:py-16 min-w-0">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 min-w-0">
+          <aside className="w-full lg:w-64 shrink-0 min-w-0">
             <nav className="sticky top-24">
-              <div className="relative">
-                <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[24px] border-2 border-emerald-200/60" />
-                <div className="relative rounded-[22px] border-2 border-slate-900/10 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.1)]">
+              <div className="rounded-[22px] border border-slate-200/80 bg-white p-5 shadow-sm">
                   <h3 className="text-sm font-semibold text-slate-900 mb-4">Legal Documents</h3>
                   <ul className="space-y-2">
                     {legalContent.nav.map((doc, index) => (
-                      <li key={doc.href}>
+                      <li key={`${doc.href}-${doc.title}`}>
                         <Link
                           href={doc.href}
                           className={`block px-3 py-2 text-sm rounded-lg ${
@@ -29,7 +27,6 @@ export default function LegalHubPage(): React.JSX.Element {
                       </li>
                     ))}
                   </ul>
-                </div>
               </div>
             </nav>
           </aside>
@@ -51,16 +48,16 @@ export default function LegalHubPage(): React.JSX.Element {
                 </h2>
                 <div className="space-y-6">
                   {section.items.map((item) => (
-                    <div key={item.href} className="relative">
-                      <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[22px] border-2 border-emerald-200/60" />
-                      <div className="relative rounded-2xl border-2 border-slate-900/10 bg-white/90 p-6 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
+                    <div
+                      key={item.href}
+                      className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"
+                    >
                         <h3 className="text-lg font-semibold text-slate-900 mb-2">
                           <Link href={item.href} className="hover:underline">
                             {item.title}
                           </Link>
                         </h3>
                         <p className="text-slate-600">{item.description}</p>
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -68,19 +65,14 @@ export default function LegalHubPage(): React.JSX.Element {
             ))}
 
             <div className="mt-10">
-              <div className="relative">
-                <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[22px] border-2 border-emerald-200/60" />
-                <div className="relative rounded-2xl border-2 border-slate-900/10 bg-white/90 p-6 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
-                  <p className="text-sm text-slate-500">{legalContent.disclaimer}</p>
-                </div>
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                <p className="text-sm text-slate-500">{legalContent.disclaimer}</p>
               </div>
             </div>
 
             <div className="mt-8">
-              <div className="relative">
-                <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-[22px] border-2 border-emerald-200/60" />
-                <div className="relative rounded-2xl border-2 border-slate-900/10 bg-white/90 p-6 shadow-[0_14px_32px_rgba(15,23,42,0.08)]">
-                  <dl className="grid grid-cols-2 gap-4 text-sm">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm min-w-0">
                     {legalContent.meta.map((item) => (
                       <div key={item.label}>
                         <dt className="font-semibold text-slate-900">{item.label}</dt>
@@ -88,7 +80,6 @@ export default function LegalHubPage(): React.JSX.Element {
                       </div>
                     ))}
                   </dl>
-                </div>
               </div>
             </div>
           </main>

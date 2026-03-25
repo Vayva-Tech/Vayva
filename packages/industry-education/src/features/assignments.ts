@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Assignments & Assessments Feature
  * 
@@ -38,7 +37,7 @@ export async function getAssignments(
   }
 
   // Fetch assignments with submission data
-  const assignments = await prisma.assignment.findMany({
+  const assignments = await (prisma as any).assignment.findMany({
     where,
     include: {
       course: {
@@ -138,7 +137,7 @@ export async function createAssignment(
     description?: string;
   }
 ): Promise<Assignment> {
-  const assignment = await prisma.assignment.create({
+  const assignment = await (prisma as any).assignment.create({
     data: {
       storeId,
       courseId,
@@ -176,7 +175,7 @@ export async function submitAssignment(
   const now = new Date();
   
   // Get assignment to check due date
-  const assignment = await prisma.assignment.findUnique({
+  const assignment = await (prisma as any).assignment.findUnique({
     where: { id: assignmentId },
     select: { dueDate: true },
   });
@@ -187,7 +186,7 @@ export async function submitAssignment(
 
   const isLate = now > assignment.dueDate;
 
-  const submission = await prisma.assignmentSubmission.create({
+  const submission = await (prisma as any).assignmentSubmission.create({
     data: {
       assignmentId,
       studentId,
@@ -220,7 +219,7 @@ export async function gradeSubmission(
     feedback?: string;
   }
 ): Promise<AssignmentSubmission> {
-  const submission = await prisma.assignmentSubmission.update({
+  const submission = await (prisma as any).assignmentSubmission.update({
     where: { id: submissionId },
     data: {
       grade: data.grade,
@@ -249,7 +248,7 @@ export async function getPendingGradingQueue(
   storeId: string,
   limit: number = 50
 ): Promise<AssignmentSubmission[]> {
-  const submissions = await prisma.assignmentSubmission.findMany({
+  const submissions = await (prisma as any).assignmentSubmission.findMany({
     where: {
       assignment: {
         storeId,

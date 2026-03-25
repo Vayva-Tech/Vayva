@@ -1,7 +1,6 @@
-// @ts-nocheck
 // Customer Engine - Core business logic for customer management
 import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
+import { logEngineError } from "@/lib/engines/log-engine-error";
 
 export interface Customer {
   id: string;
@@ -24,6 +23,14 @@ export interface Customer {
   lastOrderAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CustomerOrderSummary {
+  id: string;
+  orderNumber?: string;
+  total?: number;
+  status?: string;
+  createdAt?: string;
 }
 
 export interface CustomerFilters {
@@ -55,7 +62,7 @@ export class CustomerEngine {
       
       return await apiJson<Customer[]>(url);
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_GET_ALL]', error);
+      logEngineError('[CUSTOMER_ENGINE_GET_ALL]', error);
       throw error;
     }
   }
@@ -64,7 +71,7 @@ export class CustomerEngine {
     try {
       return await apiJson<Customer>(`/api/customers/${id}`);
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_GET_BY_ID]', error);
+      logEngineError('[CUSTOMER_ENGINE_GET_BY_ID]', error);
       throw error;
     }
   }
@@ -80,7 +87,7 @@ export class CustomerEngine {
         }),
       });
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_CREATE]', error);
+      logEngineError('[CUSTOMER_ENGINE_CREATE]', error);
       throw error;
     }
   }
@@ -92,7 +99,7 @@ export class CustomerEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_UPDATE]', error);
+      logEngineError('[CUSTOMER_ENGINE_UPDATE]', error);
       throw error;
     }
   }
@@ -103,7 +110,7 @@ export class CustomerEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_DELETE]', error);
+      logEngineError('[CUSTOMER_ENGINE_DELETE]', error);
       throw error;
     }
   }
@@ -115,7 +122,7 @@ export class CustomerEngine {
         body: JSON.stringify({ tag }),
       });
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_ADD_TAG]', error);
+      logEngineError('[CUSTOMER_ENGINE_ADD_TAG]', error);
       throw error;
     }
   }
@@ -126,7 +133,7 @@ export class CustomerEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_REMOVE_TAG]', error);
+      logEngineError('[CUSTOMER_ENGINE_REMOVE_TAG]', error);
       throw error;
     }
   }
@@ -138,16 +145,16 @@ export class CustomerEngine {
         body: JSON.stringify({ note }),
       });
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_ADD_NOTE]', error);
+      logEngineError('[CUSTOMER_ENGINE_ADD_NOTE]', error);
       throw error;
     }
   }
 
-  static async getOrderHistory(customerId: string): Promise<any[]> {
+  static async getOrderHistory(customerId: string): Promise<CustomerOrderSummary[]> {
     try {
-      return await apiJson<any[]>(`/api/customers/${customerId}/orders`);
+      return await apiJson<CustomerOrderSummary[]>(`/api/customers/${customerId}/orders`);
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_GET_ORDER_HISTORY]', error);
+      logEngineError('[CUSTOMER_ENGINE_GET_ORDER_HISTORY]', error);
       throw error;
     }
   }
@@ -161,7 +168,7 @@ export class CustomerEngine {
     try {
       return await apiJson(`/api/customers/${customerId}/stats`);
     } catch (error) {
-      logger.error('[CUSTOMER_ENGINE_GET_LIFETIME_STATS]', error);
+      logEngineError('[CUSTOMER_ENGINE_GET_LIFETIME_STATS]', error);
       throw error;
     }
   }

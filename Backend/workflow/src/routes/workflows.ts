@@ -3,7 +3,7 @@
  * CRUD operations for workflows
  */
 
-import { Router, type Request, type Response } from 'express';
+import { Router } from "express";
 import { z } from 'zod';
 import { type Workflow, type WorkflowStatus, type TriggerType, type IndustrySlug, type NodeType, type WorkflowNode, getDefaultValidator } from '@vayva/workflow-engine';
 import { WorkflowService } from '../services/workflow-service.js';

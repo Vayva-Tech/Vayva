@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Education Industry Engine
  */
 
-import { DashboardEngine, type DashboardEngineConfig } from '@vayva/industry-core';
-import { EDUCATION_DASHBOARD_CONFIG } from './dashboard/index';
+import { DashboardEngine } from '@vayva/industry-core';
+import { EDUCATION_ENGINE_DASHBOARD_CONFIG } from './education-engine-dashboard.config';
 
 export interface EducationEngineConfig {
   courseManagement?: boolean;
@@ -31,7 +30,7 @@ export class EducationEngine {
   constructor(config: EducationEngineConfig = {}) {
     this.config = { courseManagement: true, studentTracking: true, gradebook: true, attendance: true, scheduling: true, ...config };
     this.dashboardEngine = new DashboardEngine();
-    this.dashboardEngine.setConfig(EDUCATION_DASHBOARD_CONFIG);
+    this.dashboardEngine.setConfig(EDUCATION_ENGINE_DASHBOARD_CONFIG);
     this.status = { initialized: false, activeFeatures: [], dashboardReady: false, servicesReady: false };
   }
 

@@ -1,11 +1,9 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * Event Vendor Dashboard Component
  * Comprehensive vendor management interface
  */
-
-'use client';
 
 import React, { useState, useEffect } from 'react';
 import { EventVendorFeature } from '../features/event-vendor.feature';
@@ -103,9 +101,9 @@ export const EventVendorDashboard: React.FC<EventVendorDashboardProps> = ({
                 These vendors haven't signed their contracts yet
               </p>
             </div>
-            <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            <Button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
               Review Contracts
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -159,13 +157,13 @@ export const EventVendorDashboard: React.FC<EventVendorDashboardProps> = ({
               </div>
               
               <div className="mt-3 flex gap-2">
-                <button className="flex-1 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded hover:bg-blue-100">
+                <Button className="flex-1 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded hover:bg-blue-100">
                   Contact
-                </button>
+                </Button>
                 {!vendor.contractSigned && (
-                  <button className="flex-1 px-3 py-1.5 text-xs bg-green-50 text-green-700 rounded hover:bg-green-100">
+                  <Button className="flex-1 px-3 py-1.5 text-xs bg-green-50 text-green-700 rounded hover:bg-green-100">
                     Sign Contract
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -175,3 +173,4 @@ export const EventVendorDashboard: React.FC<EventVendorDashboardProps> = ({
     </div>
   );
 };
+

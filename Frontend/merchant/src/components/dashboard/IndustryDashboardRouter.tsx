@@ -1,102 +1,109 @@
-// @ts-nocheck
 // ============================================================================
 // Industry Dashboard Router
 // ============================================================================
 // Dynamically loads the correct industry dashboard component
-// Phase 5: All 13 industries now have production-ready dashboards ✅
-// Fallback to UniversalProDashboard for unsupported industries
+// Falls back to UniversalProDashboard when no dedicated package UI exists
 // ============================================================================
 
 'use client';
 
 import React, { Suspense, lazy } from 'react';
 import type { IndustrySlug } from '@vayva/industry-core';
+import type { PlanTier } from '@/lib/access-control/tier-limits';
+import type { DashboardVariant } from '@/config/dashboard-universal-types';
 import { UniversalProDashboard } from '@/components/dashboard/UniversalProDashboard';
 import { IndustryDashboardPaywall } from '@/components/billing/IndustryDashboardPaywall';
 import { useAccessControl } from '@/hooks/use-access-control';
 import { canAccessIndustryDashboards } from '@/lib/access-control/tier-limits';
 
-// Tier 1 Industry Dashboards (Lazy loaded for performance)
-const RetailDashboard = lazy(() => import('@vayva/industry-retail').then(module => ({
-  default: module.RetailDashboard
-})));
+function normalizePlanTier(raw: string | undefined): PlanTier {
+  const u = (raw ?? 'STARTER').toUpperCase();
+  if (u === 'PRO_PLUS' || u === 'PRO+') return 'PRO_PLUS';
+  if (u === 'PRO') return 'PRO';
+  return 'STARTER';
+}
 
-const FoodDashboard = lazy(() => import('@vayva/industry-food').then(module => ({
-  default: module.FoodDashboard
-})));
+function toDashboardVariant(v: string | undefined): DashboardVariant {
+  const x = (v ?? 'pro').toLowerCase();
+  if (x === 'basic' || x === 'standard' || x === 'advanced' || x === 'pro' || x === 'legacy') {
+    return x;
+  }
+  return 'pro';
+}
 
-const ServicesDashboard = lazy(() => import('@vayva/industry-services').then(module => ({
-  default: module.ServicesDashboard
-})));
+const RetailDashboard = lazy(() =>
+  import('@vayva/industry-retail').then((m) => ({ default: m.RetailDashboard }))
+);
 
-// Phase 5 Industries - Production Ready ✅
-const AutomotiveDashboard = lazy(() => import('@vayva/industry-automotive').then(module => ({
-  default: module.AutomotiveDashboard
-})));
+const FoodDashboard = lazy(() =>
+  import('@vayva/industry-food').then((m) => ({ default: m.FoodDashboard }))
+);
 
-const GroceryDashboard = lazy(() => import('@vayva/industry-grocery').then(module => ({
-  default: module.GroceryDashboard
-})));
+const ServicesDashboard = lazy(() =>
+  import('@vayva/industry-services').then((m) => ({ default: m.ServicesDashboard }))
+);
 
-const EventsDashboard = lazy(() => import('@vayva/industry-events').then(module => ({
-  default: module.EventsDashboard
-})));
+const GroceryDashboard = lazy(() =>
+  import('@vayva/industry-grocery').then((m) => ({ default: m.GroceryDashboard }))
+);
 
-const WholesaleDashboard = lazy(() => import('@vayva/industry-wholesale').then(module => ({
-  default: module.WholesaleDashboard
-})));
+const WholesaleDashboard = lazy(() =>
+  import('@vayva/industry-wholesale').then((m) => ({ default: m.WholesaleDashboard }))
+);
 
-const NightlifeDashboard = lazy(() => import('@vayva/industry-nightlife').then(module => ({
-  default: module.NightlifeDashboard
-})));
+const NightlifeDashboard = lazy(() =>
+  import('@vayva/industry-nightlife').then((m) => ({ default: m.NightlifeDashboard }))
+);
 
-const NonprofitDashboard = lazy(() => import('@vayva/industry-nonprofit').then(module => ({
-  default: module.NonprofitDashboard
-})));
+const NonprofitDashboard = lazy(() =>
+  import('@vayva/industry-nonprofit').then((m) => ({ default: m.NonprofitDashboard }))
+);
 
-const PetCareDashboard = lazy(() => import('@vayva/industry-petcare').then(module => ({
-  default: module.PetCareDashboard
-})));
+const PetCareDashboard = lazy(() =>
+  import('@vayva/industry-petcare').then((m) => ({ default: m.PetCareDashboard }))
+);
 
-const RealEstateDashboard = lazy(() => import('@vayva/industry-realestate').then(module => ({
-  default: module.RealEstateDashboard
-})));
+const RealEstateDashboard = lazy(() =>
+  import('@vayva/industry-realestate').then((m) => ({ default: m.RealEstateDashboard }))
+);
 
-const TravelDashboard = lazy(() => import('@vayva/industry-travel').then(module => ({
-  default: module.TravelDashboard
-})));
+const TravelDashboard = lazy(() =>
+  import('@vayva/industry-travel').then((m) => ({ default: m.TravelDashboard }))
+);
 
-const SaaSDashboard = lazy(() => import('@vayva/industry-saas').then(module => ({
-  default: module.SaaSDashboard
-})));
+const SaaSDashboard = lazy(() =>
+  import('@vayva/industry-saas').then((m) => ({ default: m.SaaSDashboard }))
+);
 
-const BlogMediaDashboard = lazy(() => import('@vayva/industry-blog-media').then(module => ({
-  default: module.BlogMediaDashboard
-})));
+const BlogMediaDashboard = lazy(() =>
+  import('@vayva/industry-blog-media').then((m) => ({ default: m.BlogMediaDashboard }))
+);
 
-const AnalyticsDashboard = lazy(() => import('@vayva/industry-analytics').then(module => ({
-  default: module.AnalyticsDashboard
-})));
+const AnalyticsDashboard = lazy(() =>
+  import('@vayva/industry-analytics').then((m) => ({ default: m.AnalyticsDashboard }))
+);
 
-const LegalDashboard = lazy(() => import('@vayva/industry-legal').then(module => ({
-  default: module.LegalDashboard
-})));
+const LegalDashboard = lazy(() =>
+  import('@vayva/industry-legal').then((m) => ({ default: m.LegalDashboard }))
+);
 
-const WellnessDashboard = lazy(() => import('@vayva/industry-wellness').then(module => ({
-  default: module.WellnessDashboard
-})));
+const WellnessDashboard = lazy(() =>
+  import('@vayva/industry-wellness').then((m) => ({ default: m.WellnessDashboard }))
+);
 
-const ProfessionalServicesDashboard = lazy(() => import('@vayva/industry-professional').then(module => ({
-  default: module.ProfessionalServicesDashboard
-})));
+const ProfessionalServicesDashboard = lazy(() =>
+  import('@vayva/industry-professional').then((m) => ({
+    default: m.ProfessionalServicesDashboard,
+  }))
+);
 
-const CreativeDashboard = lazy(() => import('@vayva/industry-creative').then(module => ({
-  default: module.CreativeDashboard
-})));
+const CreativeDashboard = lazy(() =>
+  import('@vayva/industry-creative').then((m) => ({ default: m.CreativeDashboard }))
+);
 
-const SpecializedDashboard = lazy(() => import('@vayva/industry-specialized').then(module => ({
-  default: module.SpecializedDashboard
-})));
+const SpecializedDashboard = lazy(() =>
+  import('@vayva/industry-specialized').then((m) => ({ default: m.SpecializedDashboard }))
+);
 
 export interface IndustryDashboardRouterProps {
   industry: IndustrySlug;
@@ -106,16 +113,9 @@ export interface IndustryDashboardRouterProps {
   designCategory?: 'signature' | 'glass' | 'bold' | 'dark' | 'natural';
   planTier?: 'basic' | 'standard' | 'advanced' | 'pro';
   className?: string;
-  currentTier?: string; // Add current tier prop
+  currentTier?: string;
 }
 
-/**
- * Industry Dashboard Router
- * 
- * Automatically selects the correct dashboard component based on industry slug.
- * Falls back to UniversalProDashboard for unsupported industries.
- * Falls back to ProDashboardV2 for legacy/unknown industries.
- */
 export function IndustryDashboardRouter({
   industry,
   variant = 'default',
@@ -126,17 +126,13 @@ export function IndustryDashboardRouter({
   className,
   currentTier: propTier,
 }: IndustryDashboardRouterProps) {
-  // Get current tier from access control hook if not provided
   const { currentTier: hookTier } = useAccessControl();
-  const currentTier = (propTier?.toUpperCase() as 'FREE' | 'STARTER' | 'PRO') || hookTier;
+  const billingTier = normalizePlanTier(propTier ?? hookTier);
+  const hasAccess = canAccessIndustryDashboards(billingTier);
 
-  // Check if user can access industry dashboards
-  const hasAccess = canAccessIndustryDashboards(currentTier);
+  const dv = toDashboardVariant(variant);
 
-  // Common props for all dashboards
-  const commonProps = {
-    industry,
-    variant,
+  const shellProps = {
     userId,
     businessId,
     designCategory,
@@ -144,17 +140,18 @@ export function IndustryDashboardRouter({
     className,
   };
 
-  // If user doesn't have access to industry dashboards, show paywall
+  const engineProps = {
+    ...shellProps,
+    industry,
+    variant: dv,
+  };
+
   if (!hasAccess) {
     return (
-      <IndustryDashboardPaywall 
-        currentTier={currentTier}
-        industry={industry}
-      />
+      <IndustryDashboardPaywall currentTier={billingTier} industry={industry} />
     );
   }
 
-  // Loading fallback component
   const LoadingFallback = () => (
     <div className="flex items-center justify-center h-full min-h-[400px]">
       <div className="text-center">
@@ -164,45 +161,25 @@ export function IndustryDashboardRouter({
     </div>
   );
 
-  // Error fallback component
-  const ErrorFallback = ({ error }: { error: Error }) => (
-    <div className="flex items-center justify-center h-full min-h-[400px]">
-      <div className="text-center max-w-md">
-        <h3 className="text-lg font-semibold mb-2">Error Loading Dashboard</h3>
-        <p className="text-gray-500 mb-4">{error.message}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-500"
-        >
-          Retry
-        </button>
-      </div>
-    </div>
-  );
+  const routeKey = industry as string;
 
-  // Route to appropriate dashboard based on industry
-  switch (industry) {
-    // ========================================================================
-    // Tier 1: Core Business Models (Fully Implemented)
-    // ========================================================================
-    
+  switch (routeKey) {
     case 'retail':
     case 'fashion':
     case 'electronics':
-    case 'grocery':
     case 'one_product':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <RetailDashboard {...commonProps} />
+          <RetailDashboard {...engineProps} />
         </Suspense>
       );
 
     case 'food':
     case 'restaurant':
-    case 'meal-kit':  // Temporary: uses Food dashboard until dedicated meal kit package is built
+    case 'meal-kit':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <FoodDashboard {...commonProps} />
+          <FoodDashboard {...engineProps} />
         </Suspense>
       );
 
@@ -210,130 +187,51 @@ export function IndustryDashboardRouter({
     case 'real_estate':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <ServicesDashboard {...commonProps} />
+          <ServicesDashboard {...engineProps} />
         </Suspense>
       );
 
-    // ========================================================================
-    // Phase 5 Industries - Production Ready ✅
-    // ========================================================================
-    
     case 'events':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <EventsDashboard {...commonProps} />
+          <UniversalProDashboard
+            industry="events"
+            variant={dv}
+            userId={userId}
+            businessId={businessId}
+            designCategory={designCategory}
+            planTier={planTier}
+            className={className}
+          />
         </Suspense>
       );
 
     case 'automotive':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <AutomotiveDashboard {...commonProps} />
+          <UniversalProDashboard
+            industry="automotive"
+            variant={dv}
+            userId={userId}
+            businessId={businessId}
+            designCategory={designCategory}
+            planTier={planTier}
+            className={className}
+          />
         </Suspense>
       );
 
     case 'grocery':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <GroceryDashboard {...commonProps} />
+          <GroceryDashboard {...shellProps} />
         </Suspense>
       );
 
     case 'wholesale':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <WholesaleDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'nightlife':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <NightlifeDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'nonprofit':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <NonprofitDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'petcare':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <PetCareDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'realestate':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <RealEstateDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'travel':
-    case 'travel_hospitality':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <TravelDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'saas':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <SaaSDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'blogmedia':
-    case 'blog_media':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogMediaDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'analytics':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <AnalyticsDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'legal':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <LegalDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'wellness':
-    case 'spa':
-    case 'fitness':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <WellnessDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'professional':
-    case 'consulting':
-    case 'accounting':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <ProfessionalServicesDashboard {...commonProps} />
-        </Suspense>
-      );
-
-    case 'realestate':
-    case 'property_management':
-      return (
-        <Suspense fallback={<LoadingFallback />}>
-          <RealEstateDashboard {...commonProps} />
+          <WholesaleDashboard {...shellProps} />
         </Suspense>
       );
 
@@ -342,7 +240,90 @@ export function IndustryDashboardRouter({
     case 'club':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <NightlifeDashboard {...commonProps} />
+          <NightlifeDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'nonprofit':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <NonprofitDashboard
+            industry={industry}
+            variant={dv}
+            userId={userId}
+            businessId={businessId}
+            className={className}
+          />
+        </Suspense>
+      );
+
+    case 'petcare':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <PetCareDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'realestate':
+    case 'property_management':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <RealEstateDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'travel':
+    case 'travel_hospitality':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <TravelDashboard className={className} />
+        </Suspense>
+      );
+
+    case 'saas':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <SaaSDashboard {...engineProps} />
+        </Suspense>
+      );
+
+    case 'blogmedia':
+    case 'blog_media':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <BlogMediaDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'analytics':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <AnalyticsDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'legal':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <LegalDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'wellness':
+    case 'spa':
+    case 'fitness':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <WellnessDashboard {...shellProps} />
+        </Suspense>
+      );
+
+    case 'professional':
+    case 'consulting':
+    case 'accounting':
+      return (
+        <Suspense fallback={<LoadingFallback />}>
+          <ProfessionalServicesDashboard {...shellProps} />
         </Suspense>
       );
 
@@ -350,7 +331,7 @@ export function IndustryDashboardRouter({
     case 'design_studio':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <CreativeDashboard {...commonProps} />
+          <CreativeDashboard {...shellProps} />
         </Suspense>
       );
 
@@ -358,21 +339,16 @@ export function IndustryDashboardRouter({
     case 'custom_solutions':
       return (
         <Suspense fallback={<LoadingFallback />}>
-          <SpecializedDashboard {...commonProps} />
+          <SpecializedDashboard {...shellProps} />
         </Suspense>
       );
 
-    // ========================================================================
-    // Fallback: Use UniversalProDashboard for other industries
-    // ========================================================================
-    
     default:
-      // For any industry without a dedicated dashboard, use the universal one
       return (
         <Suspense fallback={<LoadingFallback />}>
           <UniversalProDashboard
             industry={industry}
-            variant={variant}
+            variant={dv}
             userId={userId}
             businessId={businessId}
             designCategory={designCategory}
@@ -384,10 +360,6 @@ export function IndustryDashboardRouter({
   }
 }
 
-/**
- * Legacy Fallback Router
- * Used when industry is unknown or merchant has no industry set
- */
 export function LegacyDashboardFallback({
   userId,
   businessId,
@@ -395,7 +367,6 @@ export function LegacyDashboardFallback({
   userId: string;
   businessId: string;
 }) {
-  // Fallback to UniversalProDashboard for legacy cases
   return (
     <UniversalProDashboard
       industry="retail"

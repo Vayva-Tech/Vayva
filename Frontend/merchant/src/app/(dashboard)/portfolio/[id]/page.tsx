@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { Button, Input, Label, Switch, Textarea } from "@vayva/ui";
 import {
   FloppyDisk as Save,
@@ -41,7 +39,10 @@ import { apiJson } from "@/lib/api-client-shared";
 export default function ProjectEditorPage() {
   const params = useParams();
   const router = useRouter();
-  const [_project, setProject] = useState<PortfolioProject | null>(null);
+  const rawId = params?.id;
+  const projectId =
+    typeof rawId === "string" ? rawId : Array.isArray(rawId) ? rawId[0] : "";
+  const [, setProject] = useState<PortfolioProject | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -59,7 +60,7 @@ export default function ProjectEditorPage() {
       try {
         setIsLoading(true);
         const data = await apiJson<PortfolioResponse>(
-          `/api/portfolio/${params.id}`,
+          `/api/portfolio/${projectId}`,
         );
         if (data?.project) {
           const p = data.project;
@@ -70,11 +71,11 @@ export default function ProjectEditorPage() {
           setPassword(p.password || "");
           setImages(Array.isArray(p.images) ? p.images : []);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         const _errMsg = e instanceof Error ? e.message : String(e);
         logger.error("[FETCH_PROJECT_ERROR]", {
           error: _errMsg,
-          projectId: params.id,
+          projectId,
           app: "merchant",
         });
         toast.error("Failed to load project");
@@ -83,14 +84,14 @@ export default function ProjectEditorPage() {
         setIsLoading(false);
       }
     };
-    if (params.id) void fetchProject();
-  }, [params.id, router]);
+    if (projectId) void fetchProject();
+  }, [projectId, router]);
 
   const handleSave = async () => {
-    if (isSaving) return;
+    if (!projectId || isSaving) return;
     setIsSaving(true);
     try {
-      await apiJson<{ success: boolean }>(`/api/portfolio/${params.id}`, {
+      await apiJson<{ success: boolean }>(`/api/portfolio/${projectId}`, {
         method: "PATCH",
         body: JSON.stringify({
           title,
@@ -101,11 +102,11 @@ export default function ProjectEditorPage() {
         }),
       });
       toast.success("Project saved successfully");
-    } catch (e: any) {
+    } catch (e: unknown) {
       const _errMsg = e instanceof Error ? e.message : String(e);
       logger.error("[SAVE_PROJECT_ERROR]", {
         error: _errMsg,
-        projectId: params.id,
+        projectId,
         app: "merchant",
       });
       toast.error("Failed to save project");

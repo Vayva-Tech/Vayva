@@ -63,7 +63,7 @@ const TEMPLATE_REGISTRY: Record<string, () => Promise<{ default: TemplateCompone
 };
 
 // Default fallback template
-const DefaultTemplate: TemplateComponent = ({ store, products }) => (
+const DefaultTemplate: TemplateComponent = ({ store, products: _products }) => (
   <StoreShell>
     <div className="max-w-7xl mx-auto px-4 py-20">
       <h1 className="text-4xl font-bold mb-4">{store?.name || 'Welcome'}</h1>

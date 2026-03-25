@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDashboardSettings } from '@vayva/settings';
@@ -234,12 +235,12 @@ export function DashboardEngine({
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-2xl mx-auto">
           <h3 className="text-lg font-semibold text-red-800 mb-2">Dashboard Error</h3>
           <p className="text-red-600 mb-4">{externalError}</p>
-          <button
+          <Button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Reload Dashboard
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -255,7 +256,7 @@ export function DashboardEngine({
           <p className="text-gray-600 mb-6">
             Your dashboard is empty. Add some widgets to get started.
           </p>
-          <button
+          <Button
             onClick={() => {
               // This would typically open the widget selector
               console.log('Open widget selector');
@@ -263,7 +264,7 @@ export function DashboardEngine({
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Add Widgets
-          </button>
+          </Button>
         </div>
       </div>
     );

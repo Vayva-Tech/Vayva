@@ -198,7 +198,7 @@ Vayva serves Nigerian merchants across 20+ industry verticals. These personas re
 
 ### Recommended Tier
 
-**PRO_PLUS** (NGN 50,000/month) -- Tunde needs unlimited products, unlimited orders, 5 staff seats, API access for custom integrations, visual workflow builder for complex business rules, and maximum AI credits for high inquiry volume.
+**PRO_PLUS** (NGN 50,000/month) -- Tunde needs up to 500 products, unlimited orders, 5 staff seats, API access for custom integrations, visual workflow builder for complex business rules, and maximum AI credits for high inquiry volume.
 
 ---
 

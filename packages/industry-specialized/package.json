@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@vayva/industry-core": "workspace:*",
     "@vayva/schemas": "workspace:*",
     "@vayva/db": "workspace:*",
     "@vayva/shared": "workspace:*",
@@ -17,6 +18,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
+    "@types/react": "19.2.7",
+    "react": "19.2.3",
     "typescript": "^5.9.3"
   },
   "exports": {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Inventory Prediction AI Service
  * 
@@ -7,6 +6,26 @@
  */
 
 import { BaseAIService } from '@vayva/ai-agent';
+
+export type InventoryPredictionOutput = {
+  ingredientId: string;
+  predictedUsage: {
+    totalQuantity: number;
+    dailyBreakdown: Array<{ date: string; quantity: number }>;
+    confidence: number;
+  };
+  reorderRecommendation: {
+    shouldReorder: boolean;
+    recommendedQuantity: number;
+    orderDate: string;
+    urgency: 'immediate' | 'soon' | 'routine';
+  };
+  wasteRisk: {
+    atRisk: boolean;
+    potentialWasteQuantity: number;
+    mitigationStrategy: string;
+  };
+};
 
 export interface InventoryPredictionInput {
   /** Ingredient identifier */
@@ -35,25 +54,10 @@ export interface InventoryPredictionInput {
   forecastDays: number;
 }
 
-export class InventoryPredictionService extends BaseAIService<InventoryPredictionInput, {
-  ingredientId: string;
-  predictedUsage: {
-    totalQuantity: number;
-    dailyBreakdown: Array<{ date: string; quantity: number }>;
-    confidence: number;
-  };
-  reorderRecommendation: {
-    shouldReorder: boolean;
-    recommendedQuantity: number;
-    orderDate: string;
-    urgency: 'immediate' | 'soon' | 'routine';
-  };
-  wasteRisk: {
-    atRisk: boolean;
-    potentialWasteQuantity: number;
-    mitigationStrategy: string;
-  };
-}> {
+export class InventoryPredictionService extends BaseAIService<
+  InventoryPredictionInput,
+  InventoryPredictionOutput
+> {
   constructor() {
     super({
       model: 'culinary-analyst',
@@ -61,6 +65,32 @@ export class InventoryPredictionService extends BaseAIService<InventoryPredictio
       requireHumanValidation: false, // Predictions are advisory
       confidenceThreshold: 0.75,
     });
+  }
+
+  async initialize(): Promise<void> {
+    // Hook for engine orchestration
+  }
+
+  protected defaultOutput(input: InventoryPredictionInput): InventoryPredictionOutput {
+    return {
+      ingredientId: input.ingredientId,
+      predictedUsage: {
+        totalQuantity: 0,
+        dailyBreakdown: [],
+        confidence: 0,
+      },
+      reorderRecommendation: {
+        shouldReorder: false,
+        recommendedQuantity: 0,
+        orderDate: new Date().toISOString().slice(0, 10),
+        urgency: 'routine',
+      },
+      wasteRisk: {
+        atRisk: false,
+        potentialWasteQuantity: 0,
+        mitigationStrategy: '',
+      },
+    };
   }
 
   protected async buildPrompt(input: InventoryPredictionInput): Promise<string> {
@@ -123,7 +153,10 @@ Balance avoiding stockouts with minimizing waste.`;
     return prompt;
   }
 
-  protected async parseResponse(rawResponse: string, input: InventoryPredictionInput): Promise<any> {
+  protected async parseResponse(
+    rawResponse: string,
+    input: InventoryPredictionInput
+  ): Promise<InventoryPredictionOutput> {
     try {
       const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
@@ -144,14 +177,14 @@ Balance avoiding stockouts with minimizing waste.`;
       // Add validation rules
       this.addValidationRule({
         id: 'has_usage_prediction',
-        validate: (data) => data.predictedUsage.totalQuantity > 0,
+        validate: (data: InventoryPredictionOutput) => data.predictedUsage.totalQuantity > 0,
         errorMessage: 'Predicted usage must be positive',
         isCritical: true,
       });
 
       this.addValidationRule({
         id: 'realistic_reorder_quantity',
-        validate: (data) => 
+        validate: (data: InventoryPredictionOutput) =>
           data.reorderRecommendation.recommendedQuantity >= 0 &&
           data.reorderRecommendation.recommendedQuantity <= input.currentStock * 3,
         errorMessage: 'Reorder quantity unrealistic',
@@ -160,7 +193,8 @@ Balance avoiding stockouts with minimizing waste.`;
 
       this.addValidationRule({
         id: 'valid_urgency',
-        validate: (data) => ['immediate', 'soon', 'routine'].includes(data.reorderRecommendation.urgency),
+        validate: (data: InventoryPredictionOutput) =>
+          ['immediate', 'soon', 'routine'].includes(data.reorderRecommendation.urgency),
         errorMessage: 'Invalid urgency level',
         isCritical: true,
       });
@@ -170,7 +204,7 @@ Balance avoiding stockouts with minimizing waste.`;
         predictedUsage: parsed.predictedUsage,
         reorderRecommendation: parsed.reorderRecommendation,
         wasteRisk: parsed.wasteRisk || { atRisk: false, potentialWasteQuantity: 0, mitigationStrategy: '' },
-      };
+      } as InventoryPredictionOutput;
     } catch (error) {
       console.error('[InventoryPrediction] Failed to parse response:', error);
       throw error;

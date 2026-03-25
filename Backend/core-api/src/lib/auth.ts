@@ -1,9 +1,11 @@
 import { NextAuthOptions } from "next-auth";
+import { getServerSession as getServerSessionNext } from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@vayva/db";
 import bcrypt from "bcryptjs";
 import { Adapter } from "next-auth/adapters";
+import type { NextRequest } from "next/server";
 
 function requireAuthEnv(app: "merchant") {
   const url = process.env.NEXTAUTH_URL;
@@ -212,3 +214,10 @@ export const authOptions: NextAuthOptions = {
 };
 // Export getServerSession for compatibility
 export { getServerSession } from "next-auth";
+
+/** Resolve store id from NextAuth session (BFF / route handlers). */
+export async function getAuthStoreId(_req: NextRequest): Promise<string | null> {
+  const session = await getServerSessionNext(authOptions);
+  const user = session?.user as { storeId?: string } | undefined;
+  return user?.storeId ?? null;
+}

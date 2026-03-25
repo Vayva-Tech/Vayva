@@ -1,8 +1,8 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
+import { Button } from '@vayva/ui';
 
 interface WholesaleCustomer {
   customerId: string;
@@ -139,14 +139,14 @@ export const WholesalePortal: React.FC<WholesalePortalProps> = ({
               {['platinum', 'gold', 'silver', 'bronze'].map((tier) => {
                 const count = customers.filter(c => c.tier === tier).length;
                 return (
-                  <button
+                  <Button
                     key={tier}
                     onClick={() => setSelectedTier(tier)}
                     className={`p-4 rounded-lg bg-gradient-to-br ${getTierColor(tier)} transition-transform hover:scale-105`}
                   >
                     <div className="text-white/80 text-xs uppercase tracking-wider mb-1">{tier}</div>
                     <div className="text-white text-2xl font-bold">{count}</div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -237,14 +237,14 @@ export const WholesalePortal: React.FC<WholesalePortalProps> = ({
                   {order.status === 'pending' && (
                     <div className="flex gap-2">
                       <Button
-                        variant="success"
+                        variant="primary"
                         size="sm"
                         onClick={() => onApproveOrder?.(order.orderId)}
                       >
                         Approve
                       </Button>
                       <Button
-                        variant="danger"
+                        variant="destructive"
                         size="sm"
                         onClick={() => onRejectOrder?.(order.orderId)}
                       >

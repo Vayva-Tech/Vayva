@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Industry Dashboard Configuration
  * Complete dashboard layout and widget configuration for grocery stores

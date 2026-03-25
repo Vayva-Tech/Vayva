@@ -1,11 +1,10 @@
-// @ts-nocheck
 // Temporary workaround for Prisma client import
 // In a real implementation, this would import from the correct path
-const PrismaClient: any = {};
-import { 
-  DateRange, 
-  TravelProperty,
-  TravelBooking
+const _PrismaClient: any = {};
+import {
+  DateRange,
+  TravelProperty as _TravelProperty,
+  TravelBooking as _TravelBooking
 } from '../types';
 
 export interface AnalyticsQueryOptions {

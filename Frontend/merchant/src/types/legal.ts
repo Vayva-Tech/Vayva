@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Legal Industry Frontend Types
  * For use in React components and API calls

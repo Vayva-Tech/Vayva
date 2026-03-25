@@ -1,4 +1,4 @@
-import { prisma, ReturnStatus } from "@vayva/db";
+import { prisma, prismaDelegates, ReturnStatus } from "@vayva/db";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -21,7 +21,7 @@ export class ReturnService {
     }
 
     // Check if exists
-    const existing = await prisma.returnRequest.findFirst({
+    const existing = await prismaDelegates.returnRequest.findFirst({
       where: { orderId: orderId, status: { not: ReturnStatus.CANCELLED } },
     });
     if (existing) {
@@ -43,7 +43,7 @@ export class ReturnService {
       reasonCode = "CHANGED_MIND";
     }
 
-    const request = await prisma.returnRequest.create({
+    const request = await prismaDelegates.returnRequest.create({
       data: {
         storeId: order.storeId,
         merchantId: storeId,
@@ -58,7 +58,7 @@ export class ReturnService {
     return request;
   }
   static async getRequests(storeId: string) {
-    return prisma.returnRequest.findMany({
+    return prismaDelegates.returnRequest.findMany({
       where: { merchantId: storeId },
       orderBy: { createdAt: "desc" },
       // include: { items: true, logistics: true } // Removed
@@ -72,7 +72,7 @@ export class ReturnService {
   ) {
     // Logic for specific status transitions
     await prisma.$transaction(async (tx) => {
-      await tx.returnRequest.update({
+      await (tx as unknown as { returnRequest: { update: (args: unknown) => Promise<unknown> } }).returnRequest.update({
         where: { id: requestId },
         data: {
           status: status,

@@ -10,7 +10,7 @@ class EducationEngine {
   }
   
   async initialize() {
-    console.log('[EDUCATION_ENGINE] Initialized');
+    console.warn('[EDUCATION_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

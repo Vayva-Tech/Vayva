@@ -1,19 +1,24 @@
 /**
- * Patient Model - WatermelonDB Implementation
+ * Patient model — WatermelonDB
  */
 
-import { Model } from '@nozbe/watermelondb';
-import { field, relation, children } from '@nozbe/watermelondb/decorators';
+import { Model } from "@nozbe/watermelondb";
+import { children, field } from "@nozbe/watermelondb/decorators";
 
 export class PatientModel extends Model {
-  static table = 'patients';
+  static table = "patients";
 
-  @field('name') name!: string;
-  @field('email') email?: string;
-  @field('phone') phone?: string;
-  @field('date_of_birth') dateOfBirth?: Date;
-  @field('medical_history') medicalHistory?: string;
+  @field("first_name") firstName!: string;
+  @field("last_name") lastName!: string;
+  @field("date_of_birth") dateOfBirth?: string;
+  @field("email") email?: string;
+  @field("phone") phone?: string;
+  @field("insurance_provider") insuranceProvider?: string;
+  @field("insurance_id") insuranceId?: string;
+  @field("allergies") allergies?: string;
+  @field("medications") medications?: string;
+  @field("created_at") createdAtRaw!: number;
+  @field("updated_at") updatedAtRaw!: number;
 
-  // Relationships
-  @children('appointments') appointments!: any;
+  @children("appointments") appointments!: unknown;
 }

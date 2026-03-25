@@ -1,7 +1,6 @@
-// @ts-nocheck
 // Control Center Engine - Core business logic for store configuration and appearance
 import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
+import { logEngineError } from "@/lib/engines/log-engine-error";
 
 export interface StoreSettings {
   id: string;
@@ -82,7 +81,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson<StoreSettings>('/api/control-center/settings');
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_STORE_SETTINGS]', error);
+      logEngineError('[CONTROL_ENGINE_GET_STORE_SETTINGS]', error);
       throw error;
     }
   }
@@ -94,7 +93,7 @@ export class ControlCenterEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_UPDATE_STORE_SETTINGS]', error);
+      logEngineError('[CONTROL_ENGINE_UPDATE_STORE_SETTINGS]', error);
       throw error;
     }
   }
@@ -104,7 +103,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson<ThemeSettings>('/api/control-center/theme');
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_THEME_SETTINGS]', error);
+      logEngineError('[CONTROL_ENGINE_GET_THEME_SETTINGS]', error);
       throw error;
     }
   }
@@ -116,7 +115,7 @@ export class ControlCenterEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_UPDATE_THEME_SETTINGS]', error);
+      logEngineError('[CONTROL_ENGINE_UPDATE_THEME_SETTINGS]', error);
       throw error;
     }
   }
@@ -127,7 +126,7 @@ export class ControlCenterEngine {
         method: 'POST',
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_RESET_THEME]', error);
+      logEngineError('[CONTROL_ENGINE_RESET_THEME]', error);
       throw error;
     }
   }
@@ -137,7 +136,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson<NavigationMenu[]>('/api/control-center/navigation');
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_MENUS]', error);
+      logEngineError('[CONTROL_ENGINE_GET_MENUS]', error);
       throw error;
     }
   }
@@ -146,7 +145,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson<NavigationMenu>(`/api/control-center/navigation/${id}`);
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_MENU]', error);
+      logEngineError('[CONTROL_ENGINE_GET_MENU]', error);
       throw error;
     }
   }
@@ -158,7 +157,7 @@ export class ControlCenterEngine {
         body: JSON.stringify(menu),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_CREATE_MENU]', error);
+      logEngineError('[CONTROL_ENGINE_CREATE_MENU]', error);
       throw error;
     }
   }
@@ -170,7 +169,7 @@ export class ControlCenterEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_UPDATE_MENU]', error);
+      logEngineError('[CONTROL_ENGINE_UPDATE_MENU]', error);
       throw error;
     }
   }
@@ -181,7 +180,7 @@ export class ControlCenterEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_DELETE_MENU]', error);
+      logEngineError('[CONTROL_ENGINE_DELETE_MENU]', error);
       throw error;
     }
   }
@@ -193,7 +192,7 @@ export class ControlCenterEngine {
         body: JSON.stringify({ items }),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_REORDER_MENU_ITEMS]', error);
+      logEngineError('[CONTROL_ENGINE_REORDER_MENU_ITEMS]', error);
       throw error;
     }
   }
@@ -203,7 +202,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson('/api/control-center/domains');
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_DOMAINS]', error);
+      logEngineError('[CONTROL_ENGINE_GET_DOMAINS]', error);
       throw error;
     }
   }
@@ -215,7 +214,7 @@ export class ControlCenterEngine {
         body: JSON.stringify({ domain }),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_ADD_DOMAIN]', error);
+      logEngineError('[CONTROL_ENGINE_ADD_DOMAIN]', error);
       throw error;
     }
   }
@@ -227,7 +226,7 @@ export class ControlCenterEngine {
         body: JSON.stringify({ domain }),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_REMOVE_DOMAIN]', error);
+      logEngineError('[CONTROL_ENGINE_REMOVE_DOMAIN]', error);
       throw error;
     }
   }
@@ -239,29 +238,29 @@ export class ControlCenterEngine {
         body: JSON.stringify({ domain }),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_SET_PRIMARY_DOMAIN]', error);
+      logEngineError('[CONTROL_ENGINE_SET_PRIMARY_DOMAIN]', error);
       throw error;
     }
   }
 
   // Business Hours
-  static async getBusinessHours(): Promise<any> {
+  static async getBusinessHours(): Promise<unknown> {
     try {
       return await apiJson('/api/control-center/business-hours');
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_BUSINESS_HOURS]', error);
+      logEngineError('[CONTROL_ENGINE_GET_BUSINESS_HOURS]', error);
       throw error;
     }
   }
 
-  static async updateBusinessHours(hours: any): Promise<any> {
+  static async updateBusinessHours(hours: unknown): Promise<unknown> {
     try {
       return await apiJson('/api/control-center/business-hours', {
         method: 'PATCH',
         body: JSON.stringify(hours),
       });
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_UPDATE_BUSINESS_HOURS]', error);
+      logEngineError('[CONTROL_ENGINE_UPDATE_BUSINESS_HOURS]', error);
       throw error;
     }
   }
@@ -277,7 +276,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson('/api/control-center/health');
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_STORE_HEALTH]', error);
+      logEngineError('[CONTROL_ENGINE_GET_STORE_HEALTH]', error);
       throw error;
     }
   }
@@ -292,7 +291,7 @@ export class ControlCenterEngine {
     try {
       return await apiJson(`/api/control-center/analytics?period=${period}`);
     } catch (error) {
-      logger.error('[CONTROL_ENGINE_GET_STORE_ANALYTICS]', error);
+      logEngineError('[CONTROL_ENGINE_GET_STORE_ANALYTICS]', error);
       throw error;
     }
   }

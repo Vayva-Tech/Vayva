@@ -15,7 +15,7 @@ const recurringDonationSchema = z.object({
   paymentMethodId: z.string()
 });
 
-interface RouteParams {
+interface _RouteParams {
   params: Promise<{
     id?: string;
   }>;
@@ -25,7 +25,7 @@ interface RouteParams {
  * GET /api/donations/recurring
  * Get recurring donations list
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(_request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession();
     if (!session?.user) {

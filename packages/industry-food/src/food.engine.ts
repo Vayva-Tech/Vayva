@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Food & Beverage Industry Engine
  * Main orchestrator for recipe costing, menu engineering, and kitchen operations

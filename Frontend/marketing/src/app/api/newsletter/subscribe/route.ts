@@ -22,7 +22,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         errorType: "NEWSLETTER_SUBSCRIPTION",
         errorMessage: `Newsletter subscription: ${email}`,
         fingerprint: `newsletter-${email}-${Date.now()}`,
-        status: status as any,
+        status: "OPEN",
         diagnostics: {
           email,
           subscribedAt: new Date().toISOString(),

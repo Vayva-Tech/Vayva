@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Creative Industry Dashboard
  * Re-export dashboard configuration and components

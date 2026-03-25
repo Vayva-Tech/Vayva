@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useEffect, useState } from "react";
@@ -29,7 +28,8 @@ export function ResourceEditPage({
 }: ResourceEditPageProps) {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const rawId = params?.id;
+  const id = typeof rawId === "string" ? rawId : Array.isArray(rawId) ? rawId[0] ?? "" : "";
 
   const [isLoading, setIsLoading] = useState(true);
   const [initialData, setInitialData] = useState<Record<

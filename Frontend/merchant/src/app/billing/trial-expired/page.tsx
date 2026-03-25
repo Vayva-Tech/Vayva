@@ -126,8 +126,10 @@ export default function TrialExpiredPage() {
         </div>
 
         {/* Pricing Bridge */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-          {PLANS.filter((p: any) => p.key !== "STARTER").map((plan: { key: string; name: string; tagline?: string; monthlyAmount: number; bullets?: string[] }) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+          {PLANS.filter((p) =>
+            p.key === "STARTER" || p.key === "PRO" || p.key === "PRO_PLUS",
+          ).map((plan: { key: string; name: string; tagline?: string; monthlyAmount: number; bullets?: string[] }) => (
             <Card
               key={plan.key}
               className={`p-8 bg-white flex flex-col relative ${plan.key === "PRO" ? "border-2 border-black scale-105 z-10" : "border border-gray-100"}`}

@@ -3,8 +3,7 @@
  * Handles workflow execution
  */
 
-import type { Workflow, WorkflowExecution } from '@vayva/workflow-engine';
-import { getDefaultExecutor } from '@vayva/workflow-engine';
+import { type WorkflowExecution, getDefaultExecutor } from '@vayva/workflow-engine';
 import { WorkflowService } from './workflow-service.js';
 
 const executions = new Map<string, WorkflowExecution>();

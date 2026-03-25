@@ -12,7 +12,7 @@ export class CRMConnectorService {
 
   async initialize() {
     // Initialize service
-    console.log('[CRM_CONNECTOR_SERVICE] Initialized');
+    console.warn('[CRM_CONNECTOR_SERVICE] Initialized');
   }
 
   async createCustomer(customer) {

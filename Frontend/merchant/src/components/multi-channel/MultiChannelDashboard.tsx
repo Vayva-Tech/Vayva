@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Multi-Channel Management Dashboard
  * Channel status, inventory sync, and performance monitoring
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -132,7 +131,7 @@ export default function MultiChannelDashboard() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -143,7 +142,7 @@ export default function MultiChannelDashboard() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -268,7 +267,7 @@ function ChannelStatusView({
             
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>Last sync: {new Date(channel.lastSync).toLocaleDateString()}</span>
-              <button className="text-green-500 hover:underline">View Details</button>
+              <Button className="text-green-500 hover:underline">View Details</Button>
             </div>
             
             {channel.error && (
@@ -375,18 +374,18 @@ function SyncMonitor({ syncStatus, loading, channels }: { syncStatus: SyncStatus
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-3">
-            <button className="w-full flex items-center gap-2 p-3 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+            <Button className="w-full flex items-center gap-2 p-3 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
               <ArrowsClockwise className="h-4 w-4" />
               Sync All Channels
-            </button>
-            <button className="w-full flex items-center gap-2 p-3 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button className="w-full flex items-center gap-2 p-3 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
               <ShoppingCart className="h-4 w-4" />
               Sync Orders Only
-            </button>
-            <button className="w-full flex items-center gap-2 p-3 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button className="w-full flex items-center gap-2 p-3 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
               <CurrencyDollar className="h-4 w-4" />
               Sync Inventory Only
-            </button>
+            </Button>
           </div>
         </ThemedCard>
 

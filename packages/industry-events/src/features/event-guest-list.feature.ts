@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Guest List Feature
  * High-level API for guest list management

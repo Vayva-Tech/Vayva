@@ -1,12 +1,11 @@
-// @ts-nocheck
-import type { DashboardEngineConfig, WidgetDefinition } from '../types';
+import type { DashboardEngineConfig, WidgetDefinition } from '@vayva/industry-core';
 
 // Wellness KPI Widgets
 const CLIENT_ACQUISITION: WidgetDefinition = {
   id: 'client-acquisition',
   type: 'kpi-card',
   title: 'New Clients (30 Days)',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'clients.newThisMonth' },
   refreshInterval: 3600,
 };
@@ -15,7 +14,7 @@ const REVENUE_THIS_MONTH: WidgetDefinition = {
   id: 'revenue-this-month',
   type: 'kpi-card',
   title: 'Revenue This Month',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'revenue.thisMonth' },
   refreshInterval: 300,
 };
@@ -24,7 +23,7 @@ const APPOINTMENTS_TODAY: WidgetDefinition = {
   id: 'appointments-today',
   type: 'kpi-card',
   title: 'Appointments Today',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'appointments.today' },
   refreshInterval: 300,
 };
@@ -33,7 +32,7 @@ const CLIENT_RETENTION: WidgetDefinition = {
   id: 'client-retention',
   type: 'gauge',
   title: 'Client Retention Rate',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'clients.retentionRate' },
   visualization: { type: 'gauge', options: { min: 0, max: 100, unit: '%' } },
   refreshInterval: 3600,
@@ -44,7 +43,7 @@ const POPULAR_SERVICES: WidgetDefinition = {
   id: 'popular-services',
   type: 'chart-bar',
   title: 'Most Popular Services',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'services.popularity' },
   visualization: { type: 'horizontalBar' },
   refreshInterval: 3600,
@@ -54,7 +53,7 @@ const REVENUE_TRENDS: WidgetDefinition = {
   id: 'revenue-trends',
   type: 'chart-line',
   title: 'Revenue Trends',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'revenue.monthly' },
   visualization: { type: 'line', options: { currency: true } },
   refreshInterval: 3600,
@@ -64,7 +63,7 @@ const PRACTITIONER_PERFORMANCE: WidgetDefinition = {
   id: 'practitioner-performance',
   type: 'table',
   title: 'Practitioner Performance',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'practitioners.performance' },
   refreshInterval: 1800,
 };
@@ -73,7 +72,7 @@ const AT_RISK_CLIENTS: WidgetDefinition = {
   id: 'at-risk-clients',
   type: 'list',
   title: 'At-Risk Clients',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'clients.atRisk' },
   refreshInterval: 3600,
 };
@@ -83,7 +82,7 @@ const TODAY_SCHEDULE: WidgetDefinition = {
   id: 'today-schedule',
   type: 'table',
   title: "Today's Schedule",
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'schedule.today' },
   refreshInterval: 60,
 };
@@ -92,13 +91,24 @@ const UPCOMING_APPOINTMENTS: WidgetDefinition = {
   id: 'upcoming-appointments',
   type: 'calendar',
   title: 'Upcoming Appointments',
-  industry: 'wellness',
+  industry: 'spa',
   dataSource: { type: 'analytics', query: 'appointments.upcoming' },
   refreshInterval: 300,
 };
 
 export const WELLNESS_DASHBOARD_CONFIG: DashboardEngineConfig = {
-  industry: 'wellness',
+  industry: 'spa',
+  title: 'Wellness',
+  subtitle: 'Appointments, packages, and client retention',
+  primaryObjectLabel: 'Appointment',
+  defaultTimeHorizon: 'week',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
   widgets: [
     CLIENT_ACQUISITION,
     REVENUE_THIS_MONTH,
@@ -178,17 +188,47 @@ export const WELLNESS_DASHBOARD_CONFIG: DashboardEngineConfig = {
     { id: 'client-retention', label: 'Retention Rate', format: 'percent' },
   ],
   alertRules: [
-    { id: 'low-appointments', condition: 'appointments.today < threshold', threshold: 5, action: 'notify:manager' },
-    { id: 'high-cancellation', condition: 'appointments.cancellationRate > threshold', threshold: 20, action: 'notify:manager' },
-    { id: 'at-risk-clients', condition: 'clients.atRiskCount > threshold', threshold: 10, action: 'notify:marketing' },
-    { id: 'low-retention', condition: 'clients.retentionRate < threshold', threshold: 70, action: 'notify:management' },
+    {
+      id: 'low-appointments',
+      name: 'Low daily appointments',
+      condition: { metric: 'appointments.today', operator: 'lt', value: 5 },
+      severity: 'warning',
+      message: 'Fewer than 5 appointments scheduled today',
+    },
+    {
+      id: 'high-cancellation',
+      name: 'High cancellation rate',
+      condition: { metric: 'appointments.cancellationRate', operator: 'gt', value: 20 },
+      severity: 'warning',
+      message: 'Cancellation rate above 20%',
+    },
+    {
+      id: 'at-risk-clients',
+      name: 'At-risk client count',
+      condition: { metric: 'clients.atRiskCount', operator: 'gt', value: 10 },
+      severity: 'info',
+      message: 'More than 10 clients flagged at-risk',
+    },
+    {
+      id: 'low-retention',
+      name: 'Low retention',
+      condition: { metric: 'clients.retentionRate', operator: 'lt', value: 70 },
+      severity: 'warning',
+      message: 'Retention rate below 70%',
+    },
   ],
   actions: [
-    { id: 'book-appointment', label: 'Book Appointment', icon: 'calendar', action: 'navigate:/appointments/new' },
-    { id: 'view-clients', label: 'Client List', icon: 'users', action: 'navigate:/clients' },
-    { id: 'manage-packages', label: 'Manage Packages', icon: 'package', action: 'navigate:/packages' },
-    { id: 'performance-report', label: 'Performance Report', icon: 'bar-chart', action: 'download:performance.pdf' },
-    { id: 'send-communications', label: 'Send Messages', icon: 'mail', action: 'navigate:/communications' },
+    { id: 'book-appointment', label: 'Book Appointment', icon: 'calendar', href: '/appointments/new' },
+    { id: 'view-clients', label: 'Client List', icon: 'users', href: '/clients' },
+    { id: 'manage-packages', label: 'Manage Packages', icon: 'package', href: '/packages' },
+    { id: 'performance-report', label: 'Performance Report', icon: 'bar-chart', href: '/reports/performance' },
+    { id: 'send-communications', label: 'Send Messages', icon: 'mail', href: '/communications' },
+  ],
+  failureModes: [
+    'Underbooking',
+    'High no-shows',
+    'Package breakage',
+    'Staffing gaps',
   ],
 };
 

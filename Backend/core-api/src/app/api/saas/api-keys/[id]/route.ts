@@ -35,7 +35,7 @@ export const GET = withVayvaAPI(
         return NextResponse.json({ error: "API key not found" }, { status: 404 });
       }
 
-      const { keyHash, ...sanitizedKey } = apiKey;
+      const { _keyHash, ...sanitizedKey } = apiKey;
 
       return NextResponse.json({ apiKey: sanitizedKey }, { headers: { "Cache-Control": "no-store" } });
     } catch (error: unknown) {
@@ -72,7 +72,7 @@ export const PUT = withVayvaAPI(
         data: updateData,
       });
 
-      const { keyHash, ...sanitizedKey } = apiKey;
+      const { _keyHash, ...sanitizedKey } = apiKey;
 
       return NextResponse.json({ apiKey: sanitizedKey }, { headers: { "Cache-Control": "no-store" } });
     } catch (error: unknown) {
@@ -99,7 +99,7 @@ export const DELETE = withVayvaAPI(
         },
       });
 
-      const { keyHash, ...sanitizedKey } = apiKey;
+      const { _keyHash, ...sanitizedKey } = apiKey;
 
       return NextResponse.json({ apiKey: sanitizedKey }, { headers: { "Cache-Control": "no-store" } });
     } catch (error: unknown) {

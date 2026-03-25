@@ -4,7 +4,7 @@
  * Social media style portfolio feed with updates and work-in-progress
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PORTFOLIO_FEED_ADDON: AddOnDefinition = {
   id: 'vayva.portfolio-feed',

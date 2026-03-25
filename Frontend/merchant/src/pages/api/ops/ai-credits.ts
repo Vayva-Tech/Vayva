@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Ops Console - AI Credit Monitoring API
  * =======================================
@@ -10,6 +9,17 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { AICreditService } from '@/lib/ai/credit-service';
 import { logger } from '@/lib/logger';
+
+/** Row shape expected from AICreditService when fully implemented. */
+interface OpsAiCreditSubscriptionRow {
+  storeId: string;
+  storeName: string;
+  percentageUsed: number;
+  creditsRemaining: number;
+  totalCreditsPurchased: number;
+  isLowCredit: boolean;
+  lastTopupAt?: string | Date | null;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -54,7 +64,8 @@ async function handleGetAllSubscriptions(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const subscriptions = await AICreditService.getAllSubscriptionsWithCredits();
+  const subscriptions =
+    (await AICreditService.getAllSubscriptionsWithCredits()) as OpsAiCreditSubscriptionRow[];
 
   // Add filtering and sorting options
   const { 
@@ -106,9 +117,13 @@ async function handleGetAllSubscriptions(
     summary: {
       totalMerchants: subscriptions.length,
       lowCreditMerchants: subscriptions.filter(s => s.isLowCredit).length,
-      averageUsagePercent: Math.round(
-        subscriptions.reduce((sum, s) => sum + s.percentageUsed, 0) / subscriptions.length
-      ),
+      averageUsagePercent:
+        subscriptions.length === 0
+          ? 0
+          : Math.round(
+              subscriptions.reduce((sum, s) => sum + s.percentageUsed, 0) /
+                subscriptions.length,
+            ),
       totalCreditsPurchased: subscriptions.reduce((sum, s) => sum + s.totalCreditsPurchased, 0),
       totalCreditsRemaining: subscriptions.reduce((sum, s) => sum + s.creditsRemaining, 0),
     },

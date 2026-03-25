@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { apiJson } from "@/lib/api-client-shared";
@@ -29,8 +30,13 @@ const seatMapSchema = z.object({
  * GET /api/events/seat-map?eventId=xxx
  * Get seat map for an event
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get("eventId");
 
@@ -59,8 +65,8 @@ export async function GET(request: Request): Promise<Response> {
     }>(
       `${process.env.BACKEND_API_URL}/api/events/seat-map?eventId=${eventId}`,
       {
-        headers: {},
-      }
+        headers: auth.headers,
+      },
     );
     
     if (result.error) {

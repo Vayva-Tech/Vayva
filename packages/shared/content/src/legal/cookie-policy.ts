@@ -1,4 +1,4 @@
-import { LegalDocument } from "../types";
+import type { LegalDocument } from "../types";
 
 export const cookiePolicy: LegalDocument = {
   slug: "cookies",

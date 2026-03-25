@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
-import { Card, CardContent } from '@vayva/ui';
+import { Card, CardContent, Button } from "@vayva/ui";
 import { MapPin, Globe } from 'lucide-react';
 
 interface PropertyMapProps {
@@ -64,21 +63,21 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
               </div>
               <div className="mt-6">
                 <div className="flex flex-wrap gap-2">
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                  <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                     All
-                  </button>
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                  </Button>
+                  <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                     Villas
-                  </button>
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                  </Button>
+                  <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                     Apartments
-                  </button>
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                  </Button>
+                  <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                     Studios
-                  </button>
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                  </Button>
+                  <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                     Shared Rooms
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

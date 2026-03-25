@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wholesale Industry Dashboard Component
  * B2B wholesale distribution and supplier management dashboard
@@ -18,7 +17,7 @@ export function WholesaleDashboard({
   return (
     <UniversalProDashboard
       industry="wholesale"
-      variant="wholesale-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

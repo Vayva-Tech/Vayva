@@ -100,6 +100,7 @@ export interface SignUpInput {
   firstName: string;
   lastName: string;
   storeName: string;
+  storeSlug?: string;
 }
 
 export interface VerifyOTPInput {

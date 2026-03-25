@@ -52,7 +52,7 @@ async function reportMetric(metric: PerformanceMetric): Promise<void> {
 
   // Log to console in development
   if (process.env.NODE_ENV === "development") {
-    console.log(`[Performance] ${metric.name}: ${metric.value} (${metric.rating})`);
+    console.warn(`[Performance] ${metric.name}: ${metric.value} (${metric.rating})`);
   }
 
   // Report to Cloudflare Web Vitals if available
@@ -335,10 +335,12 @@ export function measureINP(): Promise<PerformanceMetric> {
     let maxDuration = 0;
 
     const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries() as PerformanceEventTiming[];
-      
+      type EventTimingEntry = PerformanceEntry & { processingEnd?: number };
+      const entries = list.getEntries() as EventTimingEntry[];
+
       entries.forEach((entry) => {
-        const duration = entry.processingEnd - entry.startTime;
+        const processingEnd = entry.processingEnd ?? entry.startTime;
+        const duration = processingEnd - entry.startTime;
         if (duration > maxDuration) {
           maxDuration = duration;
         }

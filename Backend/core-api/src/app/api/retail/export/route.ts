@@ -19,7 +19,7 @@ const ExportSchema = z.object({
 // GET /api/retail/export - Get export metadata
 export const GET = withVayvaAPI(
   PERMISSIONS.RETAIL_INVENTORY_VIEW,
-  async (req: NextRequest, { storeId, correlationId }: APIContext) => {
+  async (req: NextRequest, { _storeId, correlationId }: APIContext) => {
     const requestId = correlationId;
     
     try {
@@ -253,7 +253,7 @@ async function fetchInventory(storeId: string, filters?: any) {
   }));
 }
 
-async function fetchCustomers(storeId: string, filters?: any) {
+async function fetchCustomers(storeId: string, _filters?: any) {
   const customers = await prisma.customer.findMany({
     where: { storeId },
     include: {

@@ -2,7 +2,7 @@ import {
   logger,
   WithdrawalEligibility,
   WithdrawalQuote,
-  PayoutAccount,
+  PayoutAccount
 } from "@vayva/shared";
 import React, { useState, useEffect } from "react";
 import { Button, Icon, Modal, cn } from "@vayva/ui";

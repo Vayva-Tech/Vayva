@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 import { cn } from '@/lib/utils';
@@ -76,7 +77,7 @@ export const VayvaButton = React.forwardRef<HTMLButtonElement, VayvaButtonProps>
     };
 
     return (
-      <button
+      <Button
         ref={ref}
         className={cn(
           'inline-flex items-center justify-center font-medium rounded-xl',
@@ -123,7 +124,7 @@ export const VayvaButton = React.forwardRef<HTMLButtonElement, VayvaButtonProps>
         {!isLoading && rightIcon && (
           <span className="flex-shrink-0">{rightIcon}</span>
         )}
-      </button>
+      </Button>
     );
   }
 );
@@ -167,7 +168,7 @@ export const VayvaIconButton = React.forwardRef<HTMLButtonElement, VayvaIconButt
     };
 
     return (
-      <button
+      <Button
         ref={ref}
         className={cn(
           'inline-flex items-center justify-center rounded-lg',
@@ -180,9 +181,10 @@ export const VayvaIconButton = React.forwardRef<HTMLButtonElement, VayvaIconButt
         {...props}
       >
         {icon}
-      </button>
+      </Button>
     );
   }
 );
 
 VayvaIconButton.displayName = 'VayvaIconButton';
+

@@ -1,14 +1,13 @@
-// @ts-nocheck
 'use client';
 
 import dynamic from 'next/dynamic';
-import { type ComponentType } from 'react';
+import type { ComponentType } from 'react';
 
 /**
  * Dynamic import helper with loading and error states
  */
-export function createLazyComponent<T extends ComponentType<any>>(
-  importFn: () => Promise<{ default: T }>,
+export function createLazyComponent(
+  importFn: () => Promise<unknown>,
   options: {
     ssr?: boolean;
     loadingText?: string;
@@ -18,11 +17,11 @@ export function createLazyComponent<T extends ComponentType<any>>(
   const {
     ssr = true,
     loadingText = 'Loading...',
-    errorText = 'Failed to load component',
   } = options;
 
-  return dynamic<T>(
-    () => importFn(),
+  return dynamic(
+    () =>
+      importFn() as Promise<{ default: ComponentType<object> }>,
     {
       ssr,
       loading: () => (

@@ -1,10 +1,12 @@
-import { GroqClient } from "./groq-client";
+import { OpenRouterClient } from "./openrouter-client";
 
 interface CallAIOptions {
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>;
   temperature?: number;
   maxTokens?: number;
+  storeId?: string;
+  requestId?: string;
 }
 
 interface AIResponse {
@@ -17,17 +19,19 @@ interface AIResponse {
 
 /**
  * Call AI service to generate content
- * Uses GroqClient as the underlying implementation
+ * Uses OpenRouter as the underlying implementation
  */
 export async function callAI(options: CallAIOptions): Promise<AIResponse> {
-  const client = new GroqClient("MERCHANT");
+  const client = new OpenRouterClient("MERCHANT");
   
   const response = await client.chatCompletion(
     options.messages.map(m => ({ role: m.role, content: m.content })),
     {
       model: options.model,
       temperature: options.temperature,
-      max_tokens: options.maxTokens,
+      maxTokens: options.maxTokens,
+      storeId: options.storeId,
+      requestId: options.requestId,
     }
   );
 
@@ -45,7 +49,7 @@ export async function callAI(options: CallAIOptions): Promise<AIResponse> {
   }
 
   // Extract content from ChatCompletion response
-  const content = response.choices[0]?.message?.content || "";
+  const content = response.choices?.[0]?.message?.content ?? "";
 
   return {
     choices: [

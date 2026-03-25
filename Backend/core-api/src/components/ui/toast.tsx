@@ -1,3 +1,4 @@
+import { Button } from "@vayva/ui";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +24,7 @@ export const ToastAction = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     // eslint-disable-next-line no-restricted-syntax
-    <button ref={ref} className={cn("toast-action", className)} {...props} />
+    <Button ref={ref} className={cn("toast-action", className)} {...props} />
   );
 });
 ToastAction.displayName = "ToastAction";

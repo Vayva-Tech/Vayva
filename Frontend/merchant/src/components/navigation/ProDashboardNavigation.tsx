@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Enhanced Pro Dashboard Navigation
  * Industry-adaptive sidebar with all dashboard routes
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,21 +13,21 @@ import {
   Building,
   Megaphone,
   ChartLine,
-  Settings,
+  GearSix as Settings,
   Wrench,
   Package,
   ShoppingCart,
   Users,
-  Zap,
+  Lightning as Zap,
   Flask,
-  Sparkles,
+  Sparkle as Sparkles,
   FileText,
   CreditCard,
-  Store,
+  Storefront as Store,
   Plug,
-  ChevronDown,
-  ChevronRight,
-  LayoutDashboard
+  CaretDown as ChevronDown,
+  CaretRight as ChevronRight,
+  SquaresFour as LayoutDashboard
 } from '@phosphor-icons/react';
 import { useStore } from '@/providers/store-provider';
 import { getThemeColors } from '@/lib/design-system/theme-components';
@@ -38,7 +37,8 @@ import {
   getRoutesByCategory,
   getAdaptedRouteTitle
 } from '@/config/dashboard-routes';
-import { getIndustryConfig } from '@/lib/utils/industry-adaptation';
+import { INDUSTRY_CONFIG } from '@/config/industry';
+import type { IndustrySlug } from '@/lib/templates/types';
 
 interface NavItem {
   id: string;
@@ -53,8 +53,8 @@ interface NavItem {
 export function ProDashboardNavigation() {
   const pathname = usePathname();
   const { store } = useStore();
-  const industry = store?.industrySlug || 'retail';
-  const industryConfig = getIndustryConfig(industry);
+  const industry = (store?.industrySlug || 'retail') as IndustrySlug;
+  const industryConfig = (INDUSTRY_CONFIG as any)[industry] ?? (INDUSTRY_CONFIG as any).retail;
   const colors = getThemeColors(industry);
   const isProUser = true; // Assuming pro access for this component
   
@@ -88,23 +88,51 @@ export function ProDashboardNavigation() {
     }
   };
 
+  const getIndustryModuleLinks = () => {
+    const moduleRoutes: Record<string, any> | undefined = (industryConfig as any)?.moduleRoutes;
+    if (!moduleRoutes) return [];
+
+    const moduleLabels: Record<string, string> | undefined = (industryConfig as any)?.moduleLabels;
+    const moduleIcons: Record<string, string> | undefined = (industryConfig as any)?.moduleIcons;
+
+    return Object.entries(moduleRoutes)
+      .map(([moduleKey, cfg]) => {
+        const path = cfg?.index;
+        if (typeof path !== 'string' || !path.startsWith('/dashboard')) return null;
+        return {
+          id: `industry-module:${moduleKey}`,
+          title: moduleLabels?.[moduleKey] ?? moduleKey.replace(/_/g, ' '),
+          icon: getIcon(moduleIcons?.[moduleKey] ?? 'LayoutDashboard'),
+          href: path,
+          isActive: pathname === path,
+          isPro: false,
+        } satisfies NavItem;
+      })
+      .filter(Boolean) as NavItem[];
+  };
+
   // Build navigation structure
   const navigationStructure = NAVIGATION_CATEGORIES.map(category => {
     const routes = getRoutesByCategory(industry, isProUser)[category.id] || [];
+    const industryModuleLinks =
+      category.id === 'business' ? getIndustryModuleLinks() : [];
     
     return {
       id: category.id,
       title: category.label,
       icon: getIcon(category.icon),
       isExpanded: expandedCategories[category.id] ?? true,
-      items: routes.map(route => ({
+      items: [
+        ...industryModuleLinks,
+        ...routes.map(route => ({
         id: route.id,
         title: getAdaptedRouteTitle(route.id, industry),
         icon: getIcon(route.icon),
         href: route.path,
         isActive: pathname === route.path,
         isPro: route.requiresPro
-      }))
+        }))
+      ]
     };
   });
 
@@ -149,7 +177,7 @@ export function ProDashboardNavigation() {
         {navigationStructure.map((category) => (
           <div key={category.id} className="space-y-1">
             {/* Category Header */}
-            <button
+            <Button
               onClick={() => toggleCategory(category.id)}
               className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
@@ -162,7 +190,7 @@ export function ProDashboardNavigation() {
               ) : (
                 <ChevronRight className="h-4 w-4" />
               )}
-            </button>
+            </Button>
 
             {/* Category Items */}
             {category.isExpanded && (
@@ -227,9 +255,9 @@ export function ProDashboardNavigation() {
             <p className="text-xs text-gray-500 mb-3">
               Unlock advanced analytics, AI insights, and automation tools.
             </p>
-            <button className="w-full py-1.5 px-3 bg-green-500 text-white rounded text-xs font-medium hover:opacity-90 transition-opacity">
+            <Button className="w-full py-1.5 px-3 bg-green-500 text-white rounded text-xs font-medium hover:opacity-90 transition-opacity">
               Upgrade Now
-            </button>
+            </Button>
           </div>
         </div>
       </div>

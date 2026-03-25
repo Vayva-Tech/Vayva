@@ -1,27 +1,33 @@
 'use client';
 
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface UniversalSectionHeaderProps {
   title: string;
   subtitle?: string;
+  icon?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
 }
 
 export function UniversalSectionHeader({ 
   title, 
-  subtitle, 
+  subtitle,
+  icon,
   action,
   className = ""
 }: UniversalSectionHeaderProps) {
   return (
     <div className={`flex items-center justify-between ${className}`}>
-      <div>
-        <CardTitle className="text-xl">{title}</CardTitle>
-        {subtitle && (
-          <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-        )}
+      <div className="flex items-center gap-2">
+        {icon}
+        <div>
+          <CardTitle className="text-xl">{title}</CardTitle>
+          {subtitle && (
+            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+          )}
+        </div>
       </div>
       {action && <div>{action}</div>}
     </div>

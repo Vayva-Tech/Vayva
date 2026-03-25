@@ -93,7 +93,7 @@ export const GET = withVayvaAPI(
         const sumXX = xValues.reduce((sum, x) => sum + x * x, 0);
         
         const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-        const intercept = (sumY - slope * sumX) / n;
+        const _intercept = (sumY - slope * sumX) / n;
         
         // Moving average for smoothing
         const windowSize = Math.min(3, monthlyQuantities.length);

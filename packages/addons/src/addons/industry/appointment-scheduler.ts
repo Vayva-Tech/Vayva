@@ -4,7 +4,7 @@
  * Service-based business booking system
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const APPOINTMENT_SCHEDULER_ADDON: AddOnDefinition = {
   id: 'vayva.appointment-scheduler',

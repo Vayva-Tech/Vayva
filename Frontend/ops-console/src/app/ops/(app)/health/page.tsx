@@ -63,7 +63,10 @@ const categoryTitles = {
   integrations: "Integrations",
 };
 
-const serviceIcons: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const serviceIcons: Record<
+  string,
+  React.ComponentType<{ size?: number | string; className?: string }>
+> = {
   "PostgreSQL Database": Database,
   "Redis Cache": Server,
   "File Storage": FileText,

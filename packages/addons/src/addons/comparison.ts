@@ -8,7 +8,7 @@
  * - Mobile-friendly comparison view
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const COMPARISON_ADDON: AddOnDefinition = {
   id: 'vayva.comparison',

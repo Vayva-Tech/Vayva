@@ -13,16 +13,21 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@vayva/industry-core": "workspace:*",
-    "@vayva/db": "workspace:*",
-    "@vayva/realtime": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
-    "@vayva/shared": "workspace:*",
+    "@vayva/db": "workspace:*",
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/realtime": "workspace:*",
     "@vayva/schemas": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:^",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.0.2",
     "typescript": "^5.9.3",
     "vitest": "^1.6.0"
   },

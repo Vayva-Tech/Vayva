@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer-core';
+import _puppeteer from 'puppeteer-core';
 
 /**
  * POST /api/reports/export/pdf
@@ -239,7 +239,7 @@ export async function GET(req: NextRequest) {
 /**
  * Generate project report HTML template
  */
-async function generateProjectReportHTML(projectId: string): Promise<string> {
+async function generateProjectReportHTML(_projectId: string): Promise<string> {
   // In production: fetch project data from database
   return `
     <!DOCTYPE html>

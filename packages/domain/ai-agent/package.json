@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "@vayva/db": "workspace:*",
-    "@vayva/shared": "workspace:*",
-    "groq-sdk": "^0.37.0"
+    "@vayva/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",

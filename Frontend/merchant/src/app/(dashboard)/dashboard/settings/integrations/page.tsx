@@ -6,19 +6,17 @@ import {
   ArrowSquareOut as ExternalLink,
 } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function IntegrationsPage() {
   return (
     <div className="p-8">
-      <Breadcrumbs />
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Integrations
-        </h1>
-        <p className="text-gray-700 mb-8">
-          Connect your store with third-party services and tools.
-        </p>
+        <PageHeader
+          title="Integrations"
+          subtitle="Connect your store with third-party services and tools."
+          className="mb-8"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Payment Gateways */}

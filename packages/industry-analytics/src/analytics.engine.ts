@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Analytics Industry Engine
  * Provides data-driven decision making capabilities across all industries

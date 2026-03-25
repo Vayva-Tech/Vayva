@@ -1,12 +1,11 @@
-// @ts-nocheck
 "use client";
-
 import { logger } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button, Input, Switch } from "@vayva/ui";
-import { Building as Building2, CreditCard, WarningCircle as AlertCircle, Bank as PiggyBank, CurrencyDollar as DollarSign, CheckCircle, Wallet } from "@phosphor-icons/react";
+import { Building as Building2, CreditCard, WarningCircle as AlertCircle, Bank as PiggyBank, CurrencyDollar as DollarSign, CheckCircle, Wallet, Spinner as Loader2 } from "@phosphor-icons/react";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface SettlementAccount {
   bankName?: string;
@@ -85,7 +84,7 @@ export default function PaymentsSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 md:p-8 max-w-2xl mx-auto">
+      <div className="p-6 md:p-8 max-w-2xl">
         <div className="flex items-center justify-center h-64">
           <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
           <span className="ml-4 text-sm text-gray-500">Loading payment settings...</span>
@@ -100,13 +99,10 @@ export default function PaymentsSettingsPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Payment Settings</h1>
-          <p className="text-sm text-gray-500 mt-1">Configure payment methods and settlement accounts</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Payment Settings"
+        subtitle="Configure payment methods and settlement accounts"
+      />
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -176,12 +172,12 @@ export default function PaymentsSettingsPage() {
                     <div>Account: ****{settlementAccount.accountNumber?.slice(-4)}</div>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() => setShowBankDialog(true)}
                   className="px-3 py-1.5 text-sm font-medium text-green-700 bg-white hover:bg-green-100 rounded-lg transition-colors"
                 >
                   Edit
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -194,12 +190,12 @@ export default function PaymentsSettingsPage() {
                     Add your bank account details to receive payments
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() => setShowBankDialog(true)}
                   className="px-3 py-1.5 text-sm font-medium text-orange-700 bg-white hover:bg-orange-100 rounded-lg transition-colors"
                 >
                   Add Account
-                </button>
+                </Button>
               </div>
             </div>
           )}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { DashboardEngineConfig, WidgetDefinition } from '@vayva/industry-core';
 
 // ─── Nightlife Widget Definitions ────────────────────────────────────────────

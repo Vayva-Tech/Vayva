@@ -1,7 +1,7 @@
 "use client";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { LOCALES } from "@/data/locales";
-import { CreditCard, HelpCircle, LayoutDashboard, LogOut, MapPin, } from "lucide-react";
+import { CreditCard, HelpCircle, LayoutDashboard, LogOut, MapPin } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@vayva/ui";

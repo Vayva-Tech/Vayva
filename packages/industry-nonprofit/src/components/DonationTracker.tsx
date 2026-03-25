@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Donation Tracker Component
  */
@@ -13,7 +13,7 @@ interface Donation {
   campaign?: string;
 }
 
-interface DonationTrackerProps {
+export interface DonationTrackerProps {
   donations?: Donation[];
   goal?: number;
   onRecordDonation?: (donation: any) => void;
@@ -25,9 +25,9 @@ export const DonationTracker: React.FC<DonationTrackerProps> = ({
   onRecordDonation,
 }) => {
   const displayDonations = donations || [
-    { id: '1', donorName: 'John D.', amount: 500, date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), campaign: 'Annual Fund' },
-    { id: '2', donorName: 'Sarah M.', amount: 1000, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), campaign: 'Capital Campaign' },
-    { id: '3', donorName: 'Mike R.', amount: 250, date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), campaign: 'Annual Fund' },
+    { id: '1', donorName: 'John D.', amount: 500, date: new Date('2024-06-01'), campaign: 'Annual Fund' },
+    { id: '2', donorName: 'Sarah M.', amount: 1000, date: new Date('2024-05-28'), campaign: 'Capital Campaign' },
+    { id: '3', donorName: 'Mike R.', amount: 250, date: new Date('2024-05-20'), campaign: 'Annual Fund' },
   ];
 
   const totalRaised = displayDonations.reduce((sum, d) => sum + d.amount, 0);
@@ -38,9 +38,9 @@ export const DonationTracker: React.FC<DonationTrackerProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Donation Tracker</h3>
         {onRecordDonation && (
-          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <Button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
             + Record Donation
-          </button>
+          </Button>
         )}
       </div>
 

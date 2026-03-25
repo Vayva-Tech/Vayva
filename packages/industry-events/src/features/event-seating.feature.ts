@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Seating Feature
  * High-level API for seating management

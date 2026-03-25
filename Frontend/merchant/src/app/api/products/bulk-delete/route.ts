@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -9,20 +9,28 @@ import { handleApiError } from "@/lib/api-error-handler";
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { ids }: { ids: string[] } = body;
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return NextResponse.json(
-        { error: 'No product IDs provided' },
-        { status: 400 }
-      );
+    const body: unknown = await request.json();
+    if (body === null || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+    const idsRaw = (body as Record<string, unknown>).ids;
+    if (!Array.isArray(idsRaw) || idsRaw.length === 0) {
+      return NextResponse.json({ error: "No product IDs provided" }, { status: 400 });
+    }
+    const ids = idsRaw.filter((x): x is string => typeof x === "string");
+    if (ids.length !== idsRaw.length) {
+      return NextResponse.json({ error: "Invalid product IDs" }, { status: 400 });
     }
 
     if (ids.length > 100) {
       return NextResponse.json(
-        { error: 'Maximum 100 products per batch' },
-        { status: 400 }
+        { error: "Maximum 100 products per batch" },
+        { status: 400 },
       );
     }
 
@@ -30,30 +38,26 @@ export async function POST(request: NextRequest) {
       success: boolean;
       deleted: number;
       message?: string;
+      error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/products/bulk-delete`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify({ ids }),
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to delete products');
+      throw new Error(result.error || "Failed to delete products");
     }
 
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/products/bulk-delete',
-        operation: 'BULK_DELETE_PRODUCTS',
-      }
-    );
+    handleApiError(error, {
+      endpoint: "/api/products/bulk-delete",
+      operation: "BULK_DELETE_PRODUCTS",
+    });
     return NextResponse.json(
-      { error: 'Failed to delete products' },
-      { status: 500 }
+      { error: "Failed to delete products" },
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Customer Segmentation Service
  * Analyzes and segments customers based on behavior and demographics

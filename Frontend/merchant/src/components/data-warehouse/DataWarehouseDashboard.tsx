@@ -1,12 +1,11 @@
-// @ts-nocheck
 /**
  * Data Warehouse Dashboard
  * Query interface, pipeline monitoring, and dataset management
  */
-
 "use client";
 
-import { useState, useRef } from 'react';
+import { Button } from "@vayva/ui";
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Database, 
@@ -66,17 +65,31 @@ interface Dataset {
 
 interface QueryResult {
   columns: string[];
-  rows: any[];
+  rows: Record<string, unknown>[];
   rowCount: number;
   executionTime: number;
   dataSize: number;
+}
+
+type DashboardTab = 'query' | 'pipelines' | 'datasets';
+
+interface QueryEditorProps {
+  query: string;
+  setQuery: (q: string) => void;
+  isExecuting: boolean;
+  onExecute: () => void;
+  results: QueryResult | null;
+  history: QueryHistory[];
+  historyLoading: boolean;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  onAdjustHeight: () => void;
 }
 
 // Main Data Warehouse Dashboard
 export default function DataWarehouseDashboard() {
   const { store } = useStore();
   const colors = getThemeColors(store?.industrySlug || 'default');
-  const [activeTab, setActiveTab] = useState<'query' | 'pipelines' | 'datasets'>('query');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('query');
   const [query, setQuery] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
   const [queryResults, setQueryResults] = useState<QueryResult | null>(null);
@@ -148,8 +161,9 @@ export default function DataWarehouseDashboard() {
 
       setQueryResults(response);
       toast.success(`Query executed successfully! Returned ${response.rowCount} rows`);
-    } catch (error: any) {
-      toast.error(`Query failed: ${error.message}`);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      toast.error(`Query failed: ${msg}`);
     } finally {
       setIsExecuting(false);
     }
@@ -175,7 +189,7 @@ export default function DataWarehouseDashboard() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -186,7 +200,7 @@ export default function DataWarehouseDashboard() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -233,9 +247,8 @@ function QueryEditor({
   historyLoading,
   textareaRef,
   onAdjustHeight
-}: any) {
+}: QueryEditorProps) {
   const { store } = useStore();
-  const colors = getThemeColors(store?.industrySlug || 'default');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -248,18 +261,18 @@ function QueryEditor({
               SQL Query Editor
             </h3>
             <div className="flex gap-2">
-              <button className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+              <Button className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                 <FloppyDisk className="h-4 w-4" />
                 Save
-              </button>
-              <button 
+              </Button>
+              <Button 
                 onClick={onExecute}
                 disabled={isExecuting}
                 className="flex items-center gap-2 px-4 py-1.5 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 <Play className="h-4 w-4" />
                 {isExecuting ? 'Running...' : 'Execute'}
-              </button>
+              </Button>
             </div>
           </div>
           
@@ -307,11 +320,13 @@ function QueryEditor({
                   </tr>
                 </thead>
                 <tbody>
-                  {results.rows.slice(0, 10).map((row: any, rowIndex: number) => (
+                  {results.rows.slice(0, 10).map((row: Record<string, unknown>, rowIndex: number) => (
                     <tr key={rowIndex} className="border-b border-gray-100 hover:bg-gray-100">
                       {results.columns.map((col: string) => (
                         <td key={col} className="py-2 px-3">
-                          {typeof row[col] === 'object' ? JSON.stringify(row[col]) : String(row[col])}
+                          {typeof row[col] === 'object' && row[col] !== null
+                            ? JSON.stringify(row[col])
+                            : String(row[col] ?? '')}
                         </td>
                       ))}
                     </tr>
@@ -451,12 +466,12 @@ function PipelineMonitor({ pipelines, loading }: { pipelines: PipelineStatus[]; 
               </div>
               
               <div className="flex gap-2">
-                <button className="px-3 py-1 text-xs border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+                <Button className="px-3 py-1 text-xs border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                   View Logs
-                </button>
-                <button className="px-3 py-1 text-xs border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+                </Button>
+                <Button className="px-3 py-1 text-xs border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                   Run Now
-                </button>
+                </Button>
               </div>
             </motion.div>
           ))}
@@ -568,12 +583,12 @@ function DatasetManager({ datasets, loading }: { datasets: Dataset[]; loading: b
             </div>
             
             <div className="flex gap-2 mt-4">
-              <button className="flex-1 px-3 py-2 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+              <Button className="flex-1 px-3 py-2 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                 <Table className="h-4 w-4 mx-auto" />
-              </button>
-              <button className="flex-1 px-3 py-2 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+              </Button>
+              <Button className="flex-1 px-3 py-2 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                 <Download className="h-4 w-4 mx-auto" />
-              </button>
+              </Button>
             </div>
           </ThemedCard>
         </motion.div>

@@ -112,90 +112,13 @@ export function AccountingDashboard() {
       setPlReport(plData.report || null);
       setExpenses(expensesData.expenses || []);
     } catch {
-      // Generate mock data
-      generateMockData();
+      toast.error("Could not load accounting data. Check your connection and try again.");
+      setLedger([]);
+      setPlReport(null);
+      setExpenses([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateMockData = () => {
-    // Mock ledger entries
-    const mockLedger: LedgerEntry[] = [
-      {
-        id: "1",
-        date: new Date().toISOString(),
-        description: "Sale - Order #1234",
-        category: "Sales",
-        debit: 0,
-        credit: 50000,
-        balance: 50000,
-        reference: "ORD-1234",
-        type: "income",
-      },
-      {
-        id: "2",
-        date: new Date(Date.now() - 86400000).toISOString(),
-        description: "Shipping Cost",
-        category: "Shipping",
-        debit: 2500,
-        credit: 0,
-        balance: 47500,
-        reference: "SHIP-001",
-        type: "expense",
-      },
-      {
-        id: "3",
-        date: new Date(Date.now() - 172800000).toISOString(),
-        description: "Marketing Campaign",
-        category: "Marketing",
-        debit: 10000,
-        credit: 0,
-        balance: 37500,
-        reference: "MKT-001",
-        type: "expense",
-      },
-    ];
-
-    // Mock P&L
-    const mockPL: PLReport = {
-      period: "Current Month",
-      revenue: 250000,
-      cogs: 125000,
-      grossProfit: 125000,
-      operatingExpenses: 45000,
-      netIncome: 80000,
-      byCategory: {
-        Sales: { income: 250000, expense: 0 },
-        Shipping: { income: 0, expense: 15000 },
-        Marketing: { income: 0, expense: 20000 },
-        Software: { income: 0, expense: 10000 },
-      },
-    };
-
-    // Mock expenses
-    const mockExpenses: Expense[] = [
-      {
-        id: "1",
-        date: new Date().toISOString(),
-        description: "Facebook Ads",
-        category: "Marketing",
-        amount: 5000,
-        status: "approved",
-      },
-      {
-        id: "2",
-        date: new Date(Date.now() - 86400000).toISOString(),
-        description: "DHL Shipping",
-        category: "Shipping",
-        amount: 2500,
-        status: "reimbursed",
-      },
-    ];
-
-    setLedger(mockLedger);
-    setPlReport(mockPL);
-    setExpenses(mockExpenses);
   };
 
   const exportToCSV = () => {

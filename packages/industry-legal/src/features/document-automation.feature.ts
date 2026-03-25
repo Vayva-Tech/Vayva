@@ -1,13 +1,13 @@
-// @ts-nocheck
 /**
  * Document Automation Feature Module
  */
 
-import { DocumentAutomationService } from '../services/document-automation.service.js';
+import type { DocumentGenerationInput } from '../services/document-automation.service';
+import { DocumentAutomationService } from '../services/document-automation.service';
 
 export class DocumentAutomationFeature {
-  private service: DocumentAutomationService;
-  private initialized: boolean = false;
+  private readonly service: DocumentAutomationService;
+  private initialized = false;
 
   constructor() {
     this.service = new DocumentAutomationService();
@@ -21,20 +21,8 @@ export class DocumentAutomationFeature {
     }
   }
 
-  async getTemplatesByPracticeArea(storeId: string, practiceAreaId?: string) {
-    return this.service.getTemplatesByPracticeArea(storeId, practiceAreaId);
-  }
-
-  async assembleDocument(data: any) {
-    return this.service.assembleDocument(data);
-  }
-
-  async generateDocument(storeId: string, documentType: string, caseId: string, additionalData?: any) {
-    return this.service.generateDocument(storeId, documentType, caseId, additionalData);
-  }
-
-  async bulkGenerateDocuments(storeId: string, caseId: string, documentTypes: string[]) {
-    return this.service.bulkGenerateDocuments(storeId, caseId, documentTypes);
+  async generateDocument(input: DocumentGenerationInput) {
+    return this.service.generateDocument(input);
   }
 
   isInitialized(): boolean {
@@ -42,7 +30,6 @@ export class DocumentAutomationFeature {
   }
 
   async dispose(): Promise<void> {
-    await this.service.dispose();
     this.initialized = false;
   }
 }

@@ -1,13 +1,9 @@
-// @ts-nocheck
 /**
  * Automotive Industry Engine
  * Main orchestrator for all automotive-specific features
  */
 
-import {
-  DashboardEngine,
-  type DashboardEngineConfig,
-} from '@vayva/industry-core';
+import { DashboardEngine } from '@vayva/industry-core';
 
 import { VehicleGalleryService } from './services/vehicle-gallery.service';
 import { TestDriveCoordinatorService } from './services/test-drive-coordinator.service';
@@ -112,7 +108,7 @@ export class AutomotiveEngine {
 
       this.registerDataResolvers();
 
-      console.log(`[AUTOMOTIVE_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
+      console.warn(`[AUTOMOTIVE_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
     } catch (error) {
       console.error('[AUTOMOTIVE_ENGINE] Initialization failed:', error);
       throw error;

@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { TravelDashboard } from '@vayva/industry-travel';
@@ -42,7 +43,7 @@ const TravelDashboardDemo = () => {
                   <h3 className="text-lg font-medium mb-3">Select Theme</h3>
                   <div className="flex flex-wrap gap-3">
                     {themes.map((theme) => (
-                      <button
+                      <Button
                         key={theme.id}
                         onClick={() => setCurrentTheme(theme.id as any)}
                         className={`px-4 py-2 rounded-lg border-2 transition-all ${
@@ -55,7 +56,7 @@ const TravelDashboardDemo = () => {
                         <span className="font-medium text-white drop-shadow">
                           {theme.name}
                         </span>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>

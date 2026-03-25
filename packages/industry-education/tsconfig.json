@@ -1,15 +1,12 @@
 {
-  "extends": "@vayva/tsconfig/base.json",
+  "extends": "../tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "noEmit": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
     "moduleResolution": "bundler",
     "module": "ESNext"
   },

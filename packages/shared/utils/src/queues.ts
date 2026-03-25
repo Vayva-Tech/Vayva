@@ -10,5 +10,7 @@ export const QUEUES = {
   MANIFEST_SYNC: "manifest.sync",
   MAINTENANCE_CLEANUP: "maintenance.cleanup",
   THUMBNAIL_GENERATION: "thumbnail.generation",
-  HEALTH_SCORE_CALCULATION: "health.score.calculation"
+  HEALTH_SCORE_CALCULATION: "health.score.calculation",
+  NPS_SURVEY: "nps.survey",
+  PLAYBOOK_EXECUTION: "playbook.execution",
 };

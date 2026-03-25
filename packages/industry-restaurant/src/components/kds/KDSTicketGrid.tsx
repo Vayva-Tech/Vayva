@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { KDSService, type Order } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from '@vayva/ui';
+import { CardTitle } from '../restaurant-ui';
 import { 
   Timer,
   Clock,
@@ -233,7 +233,7 @@ export function KDSTicketGrid({ kdsService }: KDSTicketGridProps) {
         <CardTitle className="flex items-center gap-2 text-cyan-400">
           <Utensils className="h-5 w-5" />
           Kitchen Queue
-          <Badge variant="secondary" className="ml-auto bg-cyan-500/20 text-cyan-300">
+          <Badge variant="outline" className="ml-auto bg-cyan-500/20 text-cyan-300">
             {filteredTickets.length} active
           </Badge>
         </CardTitle>
@@ -241,7 +241,7 @@ export function KDSTicketGrid({ kdsService }: KDSTicketGridProps) {
         {/* Station Filter */}
         <div className="flex flex-wrap gap-2 mt-3">
           {stations.map(station => (
-            <button
+            <Button
               key={station}
               onClick={() => setSelectedStation(station)}
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
@@ -251,7 +251,7 @@ export function KDSTicketGrid({ kdsService }: KDSTicketGridProps) {
               }`}
             >
               {station}
-            </button>
+            </Button>
           ))}
         </div>
       </CardHeader>
@@ -333,7 +333,7 @@ export function KDSTicketGrid({ kdsService }: KDSTicketGridProps) {
                             <span className="font-medium text-current">
                               {item.quantity}× {item.name}
                             </span>
-                            <Badge variant="secondary" className="text-xs bg-black/20">
+                            <Badge variant="outline" className="text-xs bg-black/20">
                               {item.station}
                             </Badge>
                           </div>

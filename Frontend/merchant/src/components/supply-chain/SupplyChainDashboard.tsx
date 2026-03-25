@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Supply Chain Visibility Dashboard
  * Supplier management, purchase orders, and inventory forecasting
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -92,7 +91,7 @@ export default function SupplyChainDashboard() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'pending'>('all');
 
   // Fetch supply chain overview
-  const { data: overview, isLoading: overviewLoading } = useSWR<SupplyChainOverview>(
+  const { data: overview, isLoading: overviewLoading } = useSWR<SupplyChainOverview | null>(
     '/api/supply-chain/overview',
     async (url: string) => {
       try {
@@ -196,10 +195,10 @@ export default function SupplyChainDashboard() {
           <option value="pending">Pending</option>
         </select>
         
-        <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
+        <Button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
           <Package className="h-4 w-4" />
           New PO
-        </button>
+        </Button>
       </div>
 
       {/* Overview Cards */}
@@ -278,9 +277,9 @@ export default function SupplyChainDashboard() {
                 Supplier Performance
               </h3>
               <div className="flex gap-2">
-                <button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+                <Button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                   Export
-                </button>
+                </Button>
               </div>
             </div>
             
@@ -404,9 +403,9 @@ export default function SupplyChainDashboard() {
                           </div>
                         </div>
                         
-                        <button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+                        <Button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
                           View Details
-                        </button>
+                        </Button>
                       </div>
                     </motion.div>
                   );
@@ -479,18 +478,18 @@ export default function SupplyChainDashboard() {
           <ThemedCard industry={store?.industrySlug || 'default'}>
             <h3 className="font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+              <Button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
                 <Package className="h-5 w-5 text-green-500" />
                 <span className="font-medium">Create Purchase Order</span>
-              </button>
-              <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+              </Button>
+              <Button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
                 <Factory className="h-5 w-5 text-green-500" />
                 <span className="font-medium">Add New Supplier</span>
-              </button>
-              <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+              </Button>
+              <Button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
                 <TrendUp className="h-5 w-5 text-green-500" />
                 <span className="font-medium">Run Forecast</span>
-              </button>
+              </Button>
             </div>
           </ThemedCard>
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -8,6 +9,10 @@ import { handleApiError } from "@/lib/api-error-handler";
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const result = await apiJson<{
       success: boolean;
       data?: any;
@@ -40,6 +45,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     
     const result = await apiJson<{
@@ -48,9 +57,7 @@ export async function POST(request: NextRequest) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/notifications/preferences`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(body),
     });
 

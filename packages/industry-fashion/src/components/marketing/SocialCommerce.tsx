@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 
 export interface SocialPost {
   id: string;
@@ -56,12 +56,12 @@ export const SocialCommerce: React.FC<SocialCommerceProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Social Commerce</h2>
         {onSchedulePost && (
-          <button
+          <Button
             onClick={onSchedulePost}
             className="px-4 py-2 bg-pink-400 hover:bg-pink-500 text-white text-sm font-medium rounded-lg transition-colors"
           >
             📅 Schedule Post
-          </button>
+          </Button>
         )}
       </div>
 
@@ -146,9 +146,9 @@ export const SocialCommerce: React.FC<SocialCommerceProps> = ({
                 >
                   {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
                 </span>
-                <button className="text-xs text-white/60 hover:text-white transition-colors">
+                <Button className="text-xs text-white/60 hover:text-white transition-colors">
                   View →
-                </button>
+                </Button>
               </div>
             </div>
           </div>

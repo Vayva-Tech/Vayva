@@ -2,29 +2,11 @@
  * AI Provider Configuration
  * 
  * Supported providers:
- * - Groq: Ultra-fast inference for WhatsApp AI Agent and real-time tasks
  * - DeepSeek: Cost-effective general AI tasks and complex reasoning
  * - ML (Local): Free machine learning models running locally
  */
 
 export const AI_PROVIDERS = {
-  groq: {
-    baseUrl: "https://api.groq.com/openai/v1",
-    models: {
-      fast: "llama-3.1-8b-instant",           // For quick responses
-      balanced: "llama-3.1-70b-versatile",    // Default for most tasks
-      powerful: "mixtral-8x7b-32768",          // For complex reasoning
-    },
-    // Pricing per 1M tokens (as of Feb 2026)
-    pricing: {
-      input: 0.59,
-      output: 0.79,
-    },
-    context: {
-      MERCHANT: process.env.GROQ_API_KEY_MERCHANT,
-      SUPPORT: process.env.GROQ_API_KEY_SUPPORT,
-    },
-  },
   deepseek: {
     baseUrl: "https://api.deepseek.com",
     models: {
@@ -65,7 +47,6 @@ export const AI_PROVIDERS = {
 } as const;
 
 export type AIProvider = keyof typeof AI_PROVIDERS;
-export type GroqModel = typeof AI_PROVIDERS.groq.models[keyof typeof AI_PROVIDERS.groq.models];
 export type DeepSeekModel = typeof AI_PROVIDERS.deepseek.models[keyof typeof AI_PROVIDERS.deepseek.models];
 export type MLModel = typeof AI_PROVIDERS.ml.models[keyof typeof AI_PROVIDERS.ml.models];
 
@@ -75,8 +56,8 @@ export type MLModel = typeof AI_PROVIDERS.ml.models[keyof typeof AI_PROVIDERS.ml
 export function selectProvider(useCase: "whatsapp" | "general" | "coding" | "reasoning" | "ml" | "sentiment" | "forecast" | "recommend" | "intent"): AIProvider {
   switch (useCase) {
     case "whatsapp":
-      // Groq for WhatsApp - fast responses critical for conversational
-      return "groq";
+      // Route WhatsApp through the same primary provider
+      return "deepseek";
     case "coding":
       // DeepSeek Coder for code-related tasks
       return "deepseek";
@@ -104,18 +85,6 @@ export function getModelRecommendation(
   provider: AIProvider,
   priority: "speed" | "quality" | "cost"
 ): string {
-  if (provider === "groq") {
-    switch (priority) {
-      case "speed":
-        return AI_PROVIDERS.groq.models.fast;
-      case "quality":
-        return AI_PROVIDERS.groq.models.powerful;
-      case "cost":
-      default:
-        return AI_PROVIDERS.groq.models.balanced;
-    }
-  }
-
   if (provider === "deepseek") {
     switch (priority) {
       case "speed":
@@ -128,7 +97,7 @@ export function getModelRecommendation(
     }
   }
 
-  return AI_PROVIDERS.groq.models.balanced;
+  return AI_PROVIDERS.deepseek.models.chat;
 }
 
 /**

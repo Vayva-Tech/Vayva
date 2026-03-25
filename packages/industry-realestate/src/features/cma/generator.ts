@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CMA Generator
  * Main engine for generating Comparative Market Analysis reports

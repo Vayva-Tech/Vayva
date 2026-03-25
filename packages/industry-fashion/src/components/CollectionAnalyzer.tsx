@@ -1,8 +1,8 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
+import { Button } from '@vayva/ui';
 
 interface CollectionProduct {
   productId: string;
@@ -264,13 +264,13 @@ export const CollectionAnalyzer: React.FC<CollectionAnalyzerProps> = ({
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <GlassPanel variant="bordered" className="p-4">
+            <GlassPanel variant="default" className="p-4">
               <div className="text-sm text-white/60 mb-2">Best Day</div>
               <div className="text-xl font-bold text-white">
                 ${Math.max(...trendData.map(d => d.revenue)).toLocaleString()}
               </div>
             </GlassPanel>
-            <GlassPanel variant="bordered" className="p-4">
+            <GlassPanel variant="default" className="p-4">
               <div className="text-sm text-white/60 mb-2">Average Daily Revenue</div>
               <div className="text-xl font-bold text-white">
                 ${(trendData.reduce((sum, d) => sum + d.revenue, 0) / trendData.length).toLocaleString()}

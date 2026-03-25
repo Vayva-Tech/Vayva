@@ -59,7 +59,7 @@ describe("PaystackService", () => {
       ).rejects.toThrow("Invalid callbackUrl host");
     });
 
-    it("works without callback_url", async () => {
+    it("uses default merchant checkout URL when callback_url is omitted", async () => {
       vi.mocked(Paystack.initializeTransaction).mockResolvedValue({
         authorizationUrl: "https://checkout.paystack.com/abc",
         accessCode: "access_abc",
@@ -74,7 +74,9 @@ describe("PaystackService", () => {
 
       expect(result.status).toBe(true);
       expect(Paystack.initializeTransaction).toHaveBeenCalledWith(
-        expect.not.objectContaining({ callbackUrl: expect.any(String) }),
+        expect.objectContaining({
+          callbackUrl: "https://merchant.vayva.ng/checkout/success",
+        }),
       );
     });
   });
@@ -120,7 +122,7 @@ describe("PaystackService", () => {
       ).rejects.toThrow("Cannot create payment for free plan");
     });
 
-    it("calculates correct amount with VAT for STARTER plan", async () => {
+    it("calculates correct amount for STARTER plan (no VAT in metadata)", async () => {
       vi.mocked(Paystack.initializeTransaction).mockResolvedValue({
         authorizationUrl: "https://checkout.paystack.com/abc",
         accessCode: "access_abc",
@@ -136,22 +138,22 @@ describe("PaystackService", () => {
       expect(result.authorization_url).toBe(
         "https://checkout.paystack.com/abc",
       );
-      // STARTER = 25000 * 100 = 2,500,000 kobo; VAT = 187,500; Total = 2,687,500
+      // STARTER monthly = 25_000 NGN → 2_500_000 kobo
       expect(Paystack.initializeTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
-          amountKobo: 2687500,
+          amountKobo: 2500000,
           metadata: expect.objectContaining({
             type: "subscription",
             newPlan: "STARTER",
             baseAmountKobo: 2500000,
-            vatAmountKobo: 187500,
-            vatRate: 7.5,
+            vatAmountKobo: 0,
+            vatRate: 0,
           }),
         }),
       );
     });
 
-    it("calculates correct amount with VAT for PRO plan", async () => {
+    it("calculates correct amount for PRO plan (no VAT in metadata)", async () => {
       vi.mocked(Paystack.initializeTransaction).mockResolvedValue({
         authorizationUrl: "https://checkout.paystack.com/def",
         accessCode: "access_def",
@@ -164,14 +166,15 @@ describe("PaystackService", () => {
         "store_123",
       );
 
-      // PRO = 40000 * 100 = 4,000,000 kobo; VAT = 300,000; Total = 4,300,000
+      // PRO monthly = 35_000 NGN → 3_500_000 kobo
       expect(Paystack.initializeTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
-          amountKobo: 4300000,
+          amountKobo: 3500000,
           metadata: expect.objectContaining({
             newPlan: "PRO",
-            baseAmountKobo: 4000000,
-            vatAmountKobo: 300000,
+            baseAmountKobo: 3500000,
+            vatAmountKobo: 0,
+            vatRate: 0,
           }),
         }),
       );

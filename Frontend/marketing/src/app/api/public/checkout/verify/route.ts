@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       status: res.status,
       headers: { "Cache-Control": "no-store" },
     });
-  } catch (error: unknown) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Failed to verify payment" },
       { status: 500, headers: { "Cache-Control": "no-store" } },

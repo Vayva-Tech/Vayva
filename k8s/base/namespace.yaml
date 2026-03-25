@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: vayva
-  labels:
-    app.kubernetes.io/name: vayva
-    app.kubernetes.io/component: platform

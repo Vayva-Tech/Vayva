@@ -1,7 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from "react";
 import { Button } from "@vayva/ui";
-import { X, Calendar as CalendarIcon, Clock, CheckCircle, } from "lucide-react";
+import { X, Calendar as CalendarIcon, Clock, CheckCircle } from "lucide-react";
 const DEMO_SLOTS = ["09:00", "10:00", "11:30", "14:00", "16:30"];
 const DEMO_DATES = [
     { day: "Mon", date: "27" },

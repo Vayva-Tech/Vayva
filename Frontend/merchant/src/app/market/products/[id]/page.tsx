@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -36,7 +34,9 @@ interface Product {
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const slug = params.id as string;
+  const idParam = params?.id;
+  const slug =
+    typeof idParam === "string" ? idParam : Array.isArray(idParam) ? idParam[0] : "";
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -129,13 +129,13 @@ export default function ProductDetailPage() {
             {product.images.length > 1 && (
               <div className="flex gap-2">
                 {product.images.map((img, idx) => (
-                  <button
+                  <Button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
                     className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImage === idx ? "border-green-500" : "border-transparent"}`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

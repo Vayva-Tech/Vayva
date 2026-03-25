@@ -1,9 +1,6 @@
-// @ts-nocheck
-import { logger } from "@vayva/shared";
+import { logger, apiError, ApiErrorCode } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
-import { apiJson } from "@/lib/api-client-shared";
 import { checkRateLimitCustom } from "@/lib/ratelimit";
-import { apiError, ApiErrorCode } from "@vayva/shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 function getString(value: unknown): string | undefined {
@@ -43,24 +40,14 @@ export async function POST(request: NextRequest) {
     if (!process.env.BACKEND_API_URL) {
       logger.error("[LOGIN_POST] BACKEND_API_URL not configured - authentication impossible");
       return NextResponse.json(
-        apiError(ApiErrorCode.SERVICE_UNAVAILABLE, "Backend API URL not configured"),
+        apiError(ApiErrorCode.INTERNAL_SERVER_ERROR, "Backend API URL not configured"),
         { status: 503 },
       );
     }
 
-    // Call backend authentication endpoint
-    const result = await apiJson<{
-      success: boolean;
-      user?: { id: string; email: string; firstName?: string };
-      storeId?: string;
-      token?: string;
-      email?: string;
-      maskedPhone?: string;
-      phone?: string;
-      otp?: string;
-      method?: string;
-      error?: { code?: ApiErrorCode; message?: string };
-    }>(`${process.env.BACKEND_API_URL}/api/auth/merchant/login`, {
+    // Call backend directly so non-2xx (401, 403 OTP_REQUIRED) are preserved — apiJson throws on !ok.
+    const backendUrl = `${process.env.BACKEND_API_URL.replace(/\/$/, "")}/api/auth/merchant/login`;
+    const loginRes = await fetch(backendUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -70,22 +57,48 @@ export async function POST(request: NextRequest) {
       }),
     });
 
-    // If OTP is required, the backend returns specific error with email
-    if (result.error?.code === "OTP_REQUIRED" || result.error?.message === "OTP_REQUIRED") {
+    const result: {
+      success?: boolean;
+      user?: { id: string; email: string; firstName?: string };
+      storeId?: string;
+      token?: string;
+      email?: string;
+      maskedPhone?: string;
+      phone?: string;
+      otp?: string;
+      method?: string;
+      error?: { code?: string; message?: string };
+    } = await loginRes.json().catch(() => ({}));
+
+    const otpRequired =
+      String(result.error?.code) === "OTP_REQUIRED" ||
+      result.error?.message === "OTP_REQUIRED";
+
+    if (loginRes.status === 403 && otpRequired) {
       return NextResponse.json(
         {
           ...apiError(ApiErrorCode.FORBIDDEN, "OTP_REQUIRED"),
           email: result.email,
           maskedPhone: result.maskedPhone,
           phone: result.phone,
-          otp: result.otp, // Only in dev mode
-          method: result.method, // Only in dev mode
+          otp: result.otp,
+          method: result.method,
         },
         { status: 403 },
       );
     }
 
-    // Successful login (token already set by backend via cookie)
+    if (!loginRes.ok) {
+      const msg =
+        typeof result.error?.message === "string"
+          ? result.error.message
+          : "Authentication failed";
+      const status = loginRes.status === 401 ? 401 : loginRes.status;
+      return NextResponse.json(apiError(ApiErrorCode.UNAUTHORIZED, msg), {
+        status: status >= 400 && status < 600 ? status : 500,
+      });
+    }
+
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(

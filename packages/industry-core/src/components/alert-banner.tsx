@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 // ============================================================================
 // Alert Banner
 // ============================================================================
@@ -83,14 +83,14 @@ export function AlertBanner({
             {new Date(alert.triggeredAt).toLocaleTimeString()}
           </span>
           {onDismiss && (
-            <button
+            <Button
               type="button"
               className="alert-dismiss"
               onClick={() => onDismiss(alert.id)}
               aria-label="Dismiss alert"
             >
               ×
-            </button>
+            </Button>
           )}
         </div>
       ))}

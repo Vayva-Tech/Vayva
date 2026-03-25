@@ -4,7 +4,7 @@
  */
 
 import { Worker, Queue } from 'bullmq';
-import { logger, QUEUES } from '@vayva/shared';
+import { logger, QUEUES as _QUEUES } from '@vayva/shared';
 import type { RedisConnection } from '../types';
 import {
   healthScoreCalculator,

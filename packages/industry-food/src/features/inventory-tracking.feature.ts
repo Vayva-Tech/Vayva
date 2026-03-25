@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Inventory Tracking Feature
  * Track and manage food inventory with expiration monitoring

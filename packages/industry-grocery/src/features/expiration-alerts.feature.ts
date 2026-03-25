@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Expiration Alerts Feature
  * Manages expiration monitoring and alert workflows

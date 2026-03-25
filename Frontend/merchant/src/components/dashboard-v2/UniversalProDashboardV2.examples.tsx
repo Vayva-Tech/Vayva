@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Universal Pro Dashboard V2 - Usage Examples
 // ============================================================================
@@ -19,11 +18,11 @@ export function RetailDashboardExample() {
   );
 }
 
-// Example 2: Legal industry with specific design category
+// Example 2: Professional services (legal-style workflows use services slug in industry-core)
 export function LegalDashboardExample() {
   return (
     <UniversalProDashboardV2 
-      industry="legal"
+      industry="services"
       userId="lawyer-789"
       businessId="firm-101"
       designCategory="signature" // Will auto-default to signature for legal
@@ -47,7 +46,7 @@ export function HealthcareDashboardExample() {
 export function CreativeDashboardExample() {
   return (
     <UniversalProDashboardV2 
-      industry="creative"
+      industry="creative_portfolio"
       userId="designer-404"
       businessId="studio-505"
       designCategory="bold" // Creative gets bold by default

@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Inventory Manager Component
@@ -136,18 +136,18 @@ export const InventoryManager: React.FC<InventoryManagerProps> = ({
           </div>
 
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => setViewMode('grid')}
               className={`px-3 py-2 rounded ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100'}`}
             >
               Grid
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setViewMode('list')}
               className={`px-3 py-2 rounded ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100'}`}
             >
               List
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -157,24 +157,24 @@ export const InventoryManager: React.FC<InventoryManagerProps> = ({
             <span className="text-sm font-medium text-blue-800">
               {selectedVehicles.size} selected
             </span>
-            <button
+            <Button
               onClick={() => handleBulkAction('mark-available')}
               className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
             >
               Mark Available
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleBulkAction('mark-reserved')}
               className="px-3 py-1 bg-yellow-600 text-white text-sm rounded hover:bg-yellow-700"
             >
               Mark Reserved
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleBulkAction('export')}
               className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
             >
               Export
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -301,3 +301,4 @@ export const InventoryManager: React.FC<InventoryManagerProps> = ({
     </div>
   );
 };
+

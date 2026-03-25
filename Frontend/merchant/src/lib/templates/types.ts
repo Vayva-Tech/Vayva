@@ -1,37 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Hardcoded types to bypass resolution issues
-export type IndustrySlug =
-  | "retail"
-  | "fashion"
-  | "electronics"
-  | "beauty"
-  | "grocery"
-  | "one_product"
-  | "food"
-  | "restaurant"
-  | "catering"
-  | "services"
-  | "salon"
-  | "spa"
-  | "digital"
-  | "events"
-  | "b2b"
-  | "wholesale"
-  | "real_estate"
-  | "automotive"
-  | "travel_hospitality"
-  | "hotel"
-  | "blog_media"
-  | "creative_portfolio"
-  | "nonprofit"
-  | "education"
-  | "saas"
-  | "marketplace"
-  | "nightlife"
-  | "fitness"
-  | "healthcare"
-  | "legal"
-  | "jobs";
+export type { IndustrySlug } from "@vayva/industry-core";
 
 export type IndustryConfig = any;
 export type ExtendedMerchant = any;

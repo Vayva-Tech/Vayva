@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import Groq from "groq-sdk";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-
-const groq = new Groq({
-    apiKey: process.env.GROQ_ADMIN_KEY || "",
-});
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function GET(req: any) {

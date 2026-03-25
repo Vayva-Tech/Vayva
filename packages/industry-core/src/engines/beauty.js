@@ -10,7 +10,7 @@ class BeautyEngine {
   }
   
   async initialize() {
-    console.log('[BEAUTY_ENGINE] Initialized');
+    console.warn('[BEAUTY_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

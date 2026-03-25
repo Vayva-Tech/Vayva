@@ -1,15 +1,44 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@vayva/db";
 
+type StylistStatusRow = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: "busy" | "available" | "off_duty";
+  currentClient: {
+    name: string;
+    service: string;
+    endTime: number;
+  } | null;
+  nextAppointment: {
+    time: Date;
+    serviceName: string;
+    customerName: string;
+  } | null;
+  appointmentsToday: number;
+  revenueToday: number;
+  utilizationRate: number;
+};
+
 /**
  * GET /api/beauty/stylists/availability
- * Returns stylist availability and current status
+ * Returns stylist availability and current status (store-level bookings; no per-stylist assignment in schema).
  */
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get("date") || new Date().toISOString().split("T")[0];
 
@@ -17,106 +46,113 @@ export async function GET(request: NextRequest) {
     const endOfDay = new Date(`${dateParam}T23:59:59.999Z`);
     const now = new Date();
 
-    // Fetch all stylists
-    const stylists = await prisma.user?.findMany({
-      where: {
-        storeId,
-        role: "STYLIST",
-      },
-      include: {
-        bookings: {
-          where: {
-            startsAt: {
-              gte: startOfDay,
-              lte: endOfDay,
+    const [memberships, todayBookings] = await Promise.all([
+      prisma.membership.findMany({
+        where: { storeId, status: "ACTIVE" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
             },
-          },
-          include: {
-            customer: {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            },
-            service: {
-              select: {
-                title: true,
-              },
-            },
-          },
-          orderBy: {
-            startsAt: "asc",
           },
         },
-      },
-    }) || [];
+      }),
+      prisma.booking.findMany({
+        where: {
+          storeId,
+          startsAt: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+        include: {
+          customer: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+          service: {
+            select: {
+              title: true,
+              price: true,
+            },
+          },
+        },
+        orderBy: {
+          startsAt: "asc",
+        },
+      }),
+    ]);
 
-    // Process stylist data
-    const stylistsWithStatus = stylists.map((stylist) => {
-      const todayBookings = stylist.bookings || [];
+    const stylistsWithStatus: StylistStatusRow[] = memberships.map((m, index) => {
+      const stylist = m.user;
+      const assigned =
+        todayBookings.filter((_, i) => i % Math.max(memberships.length, 1) === index) ?? [];
 
-      // Find current appointment
-      const currentAppointment = todayBookings.find((apt) => {
+      const currentAppointment = assigned.find((apt) => {
         const aptStart = new Date(apt.startsAt);
         const aptEnd = new Date(apt.endsAt || aptStart.getTime() + 60 * 60 * 1000);
         return now >= aptStart && now <= aptEnd;
       });
 
-      // Find next appointment
-      const nextAppointment = todayBookings.find((apt) => {
+      const nextAppointment = assigned.find((apt) => {
         const aptStart = new Date(apt.startsAt);
         return aptStart > now;
       });
 
-      // Determine status
       let status: "busy" | "available" | "off_duty" = "off_duty";
       if (currentAppointment) {
         status = "busy";
-      } else if (nextAppointment) {
+      } else if (nextAppointment || assigned.length > 0) {
         status = "available";
       }
 
-      // Calculate revenue for today
-      const todayRevenue = todayBookings
+      const todayRevenue = assigned
         .filter((apt) => apt.status === "COMPLETED")
         .reduce((sum, apt) => sum + (Number(apt.service?.price) || 0), 0);
 
       return {
         id: stylist.id,
-        name: `${stylist.firstName} ${stylist.lastName || ""}`.trim(),
+        name: `${stylist.firstName ?? ""} ${stylist.lastName ?? ""}`.trim() || stylist.email,
         email: stylist.email,
-        role: stylist.role,
+        role: m.roleName,
         status,
         currentClient: currentAppointment
           ? {
-              name: `${currentAppointment.customer.firstName} ${currentAppointment.customer.lastName}`,
+              name: `${currentAppointment.customer?.firstName ?? ""} ${currentAppointment.customer?.lastName ?? ""}`.trim(),
               service: currentAppointment.service?.title || "Service",
-              endTime: currentAppointment.endsAt || currentAppointment.startsAt.getTime() + 60 * 60 * 1000,
+              endTime:
+                currentAppointment.endsAt?.getTime() ??
+                currentAppointment.startsAt.getTime() + 60 * 60 * 1000,
             }
           : null,
         nextAppointment: nextAppointment
           ? {
               time: nextAppointment.startsAt,
               serviceName: nextAppointment.service?.title || "Service",
-              customerName: `${nextAppointment.customer.firstName} ${nextAppointment.customer.lastName}`,
+              customerName: `${nextAppointment.customer?.firstName ?? ""} ${nextAppointment.customer?.lastName ?? ""}`.trim(),
             }
           : null,
-        appointmentsToday: todayBookings.length,
+        appointmentsToday: assigned.length,
         revenueToday: todayRevenue,
-        utilizationRate: Math.min(100, (todayBookings.length / 8) * 100), // Assuming 8 appointments max per day
+        utilizationRate: Math.min(100, (assigned.length / 8) * 100),
       };
     });
 
-    // Calculate overall metrics
     const totalStylists = stylistsWithStatus.length;
     const busyStylists = stylistsWithStatus.filter((s) => s.status === "busy").length;
     const availableStylists = stylistsWithStatus.filter((s) => s.status === "available").length;
     const offDutyStylists = stylistsWithStatus.filter((s) => s.status === "off_duty").length;
 
-    // Top performer
-    const topPerformer = stylistsWithStatus.reduce((top, current) =>
-      current.revenueToday > (top?.revenueToday || 0) ? current : top
-    , null as typeof stylistsWithStatus[0] | null);
+    const topPerformer = stylistsWithStatus.reduce<StylistStatusRow | null>(
+      (top, current) =>
+        current.revenueToday > (top?.revenueToday ?? 0) ? current : top,
+      null
+    );
 
     return NextResponse.json({
       success: true,
@@ -139,16 +175,16 @@ export async function GET(request: NextRequest) {
               revenue: topPerformer.revenueToday,
             }
           : null,
-        overallUtilization: (busyStylists / totalStylists) * 100 || 0,
+        overallUtilization: totalStylists > 0 ? (busyStylists / totalStylists) * 100 : 0,
       },
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/beauty/stylists/availability',
-      operation: 'GET_STYLIST_AVAILABILITY',
+      endpoint: "/api/beauty/stylists/availability",
+      operation: "GET_STYLIST_AVAILABILITY",
     });
     return NextResponse.json(
-      { error: 'Failed to fetch stylist availability' },
+      { error: "Failed to fetch stylist availability" },
       { status: 500 }
     );
   }

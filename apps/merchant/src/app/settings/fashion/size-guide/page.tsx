@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { GlassPanel } from '@vayva/ui/components/fashion';
@@ -37,7 +38,7 @@ const SizeGuideSettingsPage = () => {
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {['US', 'UK', 'EU'].map((format) => (
-                    <button
+                    <Button
                       key={format}
                       onClick={() => setSizeFormat(format)}
                       className={`px-4 py-3 rounded-lg border transition-all ${
@@ -47,7 +48,7 @@ const SizeGuideSettingsPage = () => {
                       }`}
                     >
                       {format}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -131,12 +132,12 @@ const SizeGuideSettingsPage = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <button className="px-3 py-1.5 text-xs text-white/60 hover:text-white transition-colors">
+                    <Button className="px-3 py-1.5 text-xs text-white/60 hover:text-white transition-colors">
                       Edit
-                    </button>
-                    <button className="px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors">
+                    </Button>
+                    <Button className="px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors">
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -201,3 +202,4 @@ const SizeGuideSettingsPage = () => {
 };
 
 export default SizeGuideSettingsPage;
+

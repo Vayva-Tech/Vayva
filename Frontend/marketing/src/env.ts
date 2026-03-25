@@ -6,7 +6,8 @@ import {
 } from "@vayva/shared";
 
 const MarketingEnvSchema = DomainEnvSchema.extend({
-  // No extra required vars for marketing yet
+  /** Optional GA4 measurement ID; analytics runs only when set and the user consents. */
+  NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().optional(),
 });
 
 export type MarketingEnv = z.infer<typeof MarketingEnvSchema>;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { Card, Badge, Button } from "@vayva/ui";
@@ -116,7 +115,7 @@ export function TodaysSchedule({
                     </div>
                   </div>
                   {apt.customerName && (
-                    <Badge variant="secondary" className="bg-white/10 text-white text-xs">
+                    <Badge variant="outline" className="bg-white/10 text-white text-xs">
                       {apt.customerName}
                     </Badge>
                   )}

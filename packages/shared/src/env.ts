@@ -1,13 +1,17 @@
 import { z } from "zod";
 
 export const DomainEnvSchema = z.object({
-  MARKETING_ORIGIN: z.string().url().default("https://vayva.ng"),
+  MARKETING_ORIGIN: z.string().url().default("https://www.vayva.ng"),
   MERCHANT_ORIGIN: z.string().url().default("https://merchant.vayva.ng"),
   OPS_ORIGIN: z.string().url().default("https://ops.vayva.ng"),
   STOREFRONT_ROOT_DOMAIN: z.string().default("vayva.ng"),
 });
 
 export type DomainEnv = z.infer<typeof DomainEnvSchema>;
+
+function stripMarketingWww(hostname: string): string {
+  return hostname.replace(/^www\./i, "");
+}
 
 export function validateDomainConsistency(env: DomainEnv) {
   // Skip domain pattern checks in development and CI (localhost doesn't match production patterns)
@@ -16,10 +20,11 @@ export function validateDomainConsistency(env: DomainEnv) {
   const marketingHost = new URL(env.MARKETING_ORIGIN).hostname;
   const merchantHost = new URL(env.MERCHANT_ORIGIN).hostname;
   const opsHost = new URL(env.OPS_ORIGIN).hostname;
+  const rootHost = stripMarketingWww(env.STOREFRONT_ROOT_DOMAIN.replace(/^https?:\/\//i, "").split("/")[0] ?? "");
 
-  if (marketingHost !== env.STOREFRONT_ROOT_DOMAIN) {
+  if (stripMarketingWww(marketingHost) !== rootHost) {
     throw new Error(
-      `MARKETING_ORIGIN host (${marketingHost}) must match STOREFRONT_ROOT_DOMAIN (${env.STOREFRONT_ROOT_DOMAIN})`
+      `MARKETING_ORIGIN host (${marketingHost}) must match STOREFRONT_ROOT_DOMAIN (${env.STOREFRONT_ROOT_DOMAIN}) (www is allowed)`,
     );
   }
 

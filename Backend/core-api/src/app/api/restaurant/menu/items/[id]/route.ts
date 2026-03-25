@@ -189,7 +189,7 @@ export async function DELETE(
     }
 
     // Soft delete
-    const deletedItem = await prisma.menuItem.update({
+    const _deletedItem = await prisma.menuItem.update({
       where: { id: params.id },
       data: {
         deletedAt: new Date(),

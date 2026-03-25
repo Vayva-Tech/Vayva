@@ -1,6 +1,5 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
-import { SizeCurveData } from '../services/size-curve-service';
+import { fashionPrisma as prisma } from '@fashion-prisma';
+import type { ProductSizeCurveRow } from '../services/size-curve-service';
 
 // ============================================================================
 // Size Curve Optimization Types
@@ -17,7 +16,7 @@ export interface SizeCurveOptimizationResult {
   productId: string;
   productName: string;
   category?: string;
-  currentCurve: SizeCurveData[];
+  currentCurve: ProductSizeCurveRow[];
   optimizedCurve: OptimizedSizeCurve[];
   buyingRecommendations: BuyingRecommendation[];
   potentialImpact: SizeCurveImpact;
@@ -210,7 +209,7 @@ export class SizeCurveOptimizer {
     productId: string,
     productName: string,
     category: string | null | undefined,
-    currentCurveData: SizeCurveData[],
+    currentCurveData: ProductSizeCurveRow[],
     variants: Array<{ size: string | null; inventoryQuantity: number; price: unknown }>
   ): Promise<SizeCurveOptimizationResult | null> {
     if (currentCurveData.length === 0 && variants.filter(v => v.size).length === 0) {
@@ -218,7 +217,7 @@ export class SizeCurveOptimizer {
     }
 
     // Build current curve from variants if no size curve data
-    const curve: SizeCurveData[] = currentCurveData.length > 0
+    const curve: ProductSizeCurveRow[] = currentCurveData.length > 0
       ? currentCurveData
       : variants
           .filter(v => v.size)

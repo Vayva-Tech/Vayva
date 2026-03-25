@@ -12,6 +12,8 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@vayva/ui";
 import { APP_URL } from "@/lib/constants";
+import { getOfferCopy } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 
 // Floating success notification component
 function SuccessVisual(): React.JSX.Element {
@@ -123,6 +125,9 @@ function SuccessVisual(): React.JSX.Element {
 }
 
 export function FinalCTASection(): React.JSX.Element {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const o = getOfferCopy(starterFirstMonthFree);
+
   return (
     <section className="section-lg relative overflow-hidden">
       {/* Background with green gradient theme */}
@@ -164,7 +169,7 @@ export function FinalCTASection(): React.JSX.Element {
                 ))}
               </div>
               <span className="text-slate-400 text-sm">
-                Trusted by 2,000+ Nigerian merchants
+                Built for Nigerian merchants
               </span>
             </motion.div>
 
@@ -174,8 +179,7 @@ export function FinalCTASection(): React.JSX.Element {
             </h2>
 
             <p className="text-xl text-slate-400 mb-8 max-w-xl">
-              Set up in 5 minutes. Try it free for 7 days. 
-              No credit card needed.
+              Set up in 5 minutes. {o.trialBadge}. {o.noCard}.
             </p>
 
             {/* CTA */}

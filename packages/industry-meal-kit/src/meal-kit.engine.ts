@@ -1,9 +1,17 @@
-// @ts-nocheck
 // ============================================================================
 // Meal Kit Engine - Core Business Logic
 // ============================================================================
 
-import { PrismaClient } from '@prisma/client';
+import type { DeliverySlot } from '../../../infra/db/src/generated/client';
+import { PrismaClient } from '@vayva/db';
+
+type MealKitPlanTypeDb =
+  | 'BASIC'
+  | 'PREMIUM'
+  | 'FAMILY'
+  | 'VEGAN'
+  | 'KETO'
+  | 'LOW_CARB';
 
 export interface MealKitConfig {
   defaultPortionsPerMeal: number;
@@ -62,9 +70,6 @@ export class MealKitEngine {
         weekStartDate,
         isActive: true,
       },
-      include: {
-        // Add recipe details if relation exists
-      },
     });
 
     return weekMenu?.recipes || [];
@@ -118,7 +123,9 @@ export class MealKitEngine {
       },
     });
 
-    const availableSlots = slots.filter(slot => slot.bookedCount < slot.maxCapacity);
+    const availableSlots = slots.filter(
+      (slot: DeliverySlot) => slot.bookedCount < slot.maxCapacity
+    );
 
     return {
       available: availableSlots.length > 0,
@@ -222,7 +229,13 @@ export class MealKitEngine {
 
     return this.prisma.mealKitSubscription.create({
       data: {
-        ...data,
+        storeId: data.storeId,
+        customerId: data.customerId,
+        planType: data.planType as MealKitPlanTypeDb,
+        portionsPerMeal: data.portionsPerMeal,
+        mealsPerWeek: data.mealsPerWeek,
+        nextDelivery: data.nextDelivery,
+        preferences: data.preferences ?? {},
         status: 'active',
         skipWeeks: [],
       },

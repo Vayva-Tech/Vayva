@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Food & Beverage Services
  */
@@ -23,7 +22,7 @@ export type { NutritionalInfo } from './nutritional-analysis.service';
 export { RecipeOptimizationService } from './recipe-optimization.service';
 export type { RecipeOptimizationInput } from './recipe-optimization.service';
 
-export { MenuEngineeringService as AIMenuEngineeringService } from './menu-engineering-ai.service';
+export { AIMenuEngineeringService } from './menu-engineering-ai.service';
 export type { MenuEngineeringInput } from './menu-engineering-ai.service';
 
 export { InventoryPredictionService } from './inventory-prediction.service';

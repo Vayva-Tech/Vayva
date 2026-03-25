@@ -129,7 +129,7 @@ export default function EditorPage() {
   }
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-20">
+    <div className="space-y-10 max-w-6xl pb-20">
       <PageHeader
         title="Editor"
         description="Design and customize your storefront experience"

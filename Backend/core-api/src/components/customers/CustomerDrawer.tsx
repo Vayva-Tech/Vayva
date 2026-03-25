@@ -5,7 +5,7 @@ import {
   CustomerInsight,
   CustomerActivity,
   logger,
-  formatCurrency,
+  formatCurrency
 } from "@vayva/shared";
 import { WhatsAppAction } from "./WhatsAppAction";
 import { CustomerForm } from "./CustomerForm";

@@ -4,6 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { APP_URL } from "@/lib/constants";
+import { PLANS, formatNGN, getOfferCopy } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 import { Button } from "@vayva/ui";
 import {
   MessageCircle,
@@ -11,13 +13,12 @@ import {
   Zap,
   Sparkles,
   Headphones,
-  Shield,
   CheckCircle2,
   CheckCircle,
   ArrowRight,
-  TrendingUp,
   Image as ImageIcon,
 } from "lucide-react";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 const capabilities = [
   {
@@ -48,68 +49,16 @@ const capabilities = [
   {
     icon: Headphones,
     title: "Voice Processing",
-    desc: "Transcribes voice notes",
-  },
-];
-
-const creditTiers = [
-  {
-    plan: "Starter",
-    price: 25000,
-    description: "For growing businesses ready to scale",
-    features: [
-      "Up to 500 products",
-      "Unlimited orders",
-      "Vayva Automation (WhatsApp & Instagram)",
-      "Storefront setup & customization",
-      "Advanced conversation customization",
-      "Remove Vayva branding",
-      "Priority support & training",
-      "7-day free trial included",
-    ],
-    cta: "Start Growing",
-    href: "/signup?plan=starter",
-    trialDays: 7,
-  },
-  {
-    plan: "Pro",
-    price: 35000,
-    description: "High-volume sellers scaling operations",
-    features: [
-      "Everything in Starter, plus:",
-      "Advanced conversation customization",
-      "Multi-location & warehouse support",
-      "API access for custom integrations",
-      "Dedicated account manager",
-      "Custom integrations",
-      "White-label options available",
-    ],
-    cta: "Scale Your Business",
-    href: "/signup?plan=pro",
-    popular: true,
-  },
-  {
-    plan: "Pro Plus",
-    price: 50000,
-    description: "Full power with industry tools and visual automation",
-    features: [
-      "Everything in Pro, plus:",
-      "Industry-specific operational tools",
-      "Merged industry dashboard",
-      "Visual workflow builder",
-      "25,000 AI credits/mo",
-      "5 team seats",
-      "5 templates",
-      "Priority support",
-    ],
-    cta: "Unlock Full Power",
-    href: "/signup?plan=pro_plus",
+    desc: "Transcribes voice notes (Pro+)",
   },
 ];
 
 export function RedesignedAIAgentPage(): React.JSX.Element {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const offerCopy = getOfferCopy(starterFirstMonthFree);
+
   return (
-    <main className="min-h-screen bg-transparent">
+    <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-transparent">
       {/* Hero Section - Clean & Minimal */}
       <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -127,7 +76,7 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-8 leading-tight"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-6 sm:mb-8 leading-tight px-1"
             >
               Your best salesperson,
               <br />
@@ -140,10 +89,12 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto"
+              className="text-base sm:text-xl text-slate-600 mb-10 sm:mb-12 max-w-2xl mx-auto px-1"
             >
-              While you sleep, AI takes orders, answers questions, and closes deals. 
-              Real conversations. Zero effort.
+              <span className="md:hidden">Orders, answers, and payment links while you&apos;re offline.</span>
+              <span className="hidden md:inline">
+                While you sleep, AI takes orders, answers questions, and closes deals. Real conversations. Zero effort.
+              </span>
             </motion.p>
 
             <motion.div
@@ -164,13 +115,16 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
                 </Button>
               </Link>
             </motion.div>
+            <p className="mt-8 text-xs text-slate-500 max-w-xl mx-auto px-2 leading-relaxed">
+              Channel connections, message limits, and advanced agent features depend on your plan and account setup.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Capabilities - Industry page style */}
       <section className="py-20 lg:py-28 bg-transparent">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -183,9 +137,10 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-6">
               Simple but powerful features
             </h2>
+            <p className="text-sm text-slate-500 sm:hidden -mt-2">Swipe to explore capabilities.</p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {capabilities.map((cap, i) => (
               <motion.div
                 key={cap.title}
@@ -193,18 +148,103 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="relative"
+                className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
               >
-                <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[28px] border-2 border-emerald-200/60" />
-                <div className="relative p-6 bg-white/90 backdrop-blur rounded-[28px] border-2 border-slate-900/10 shadow-[0_20px_50px_rgba(15,23,42,0.1)] hover:-translate-y-1 transition-all">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 mb-4 shadow-[0_10px_25px_rgba(16,185,129,0.25)]">
                     <cap.icon className="w-6 h-6" strokeWidth={1.6} />
                   </div>
                   <h3 className="font-semibold text-slate-900 mb-2">{cap.title}</h3>
                   <p className="text-sm text-slate-600">{cap.desc}</p>
-                </div>
               </motion.div>
             ))}
+          </div>
+          <div className="sm:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="AI agent capabilities"
+              hint="Swipe for each capability"
+              showDots
+              dotCount={capabilities.length}
+            >
+              {capabilities.map((cap) => (
+                <MarketingSnapItem key={cap.title}>
+                  <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm h-full">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 mb-4 shadow-[0_10px_25px_rgba(16,185,129,0.25)]">
+                      <cap.icon className="w-6 h-6" strokeWidth={1.6} />
+                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-2">{cap.title}</h3>
+                    <p className="text-sm text-slate-600">{cap.desc}</p>
+                  </div>
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
+          </div>
+        </div>
+      </section>
+
+      {/* Plan limits */}
+      <section className="py-20 lg:py-28 bg-transparent">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <span className="text-xs font-bold text-emerald-600 uppercase tracking-[0.35em] mb-4 block">
+              AI Usage Packages
+            </span>
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+              Clear limits. No surprises.
+            </h2>
+            <p className="text-slate-600">
+              AI usage is measured in <span className="font-semibold">AI messages</span>. One
+              AI reply typically uses 1 message. Some heavy features cost more.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Starter</h3>
+              <p className="text-sm text-slate-600 mb-4">
+                Built for daily sales chats.
+              </p>
+              <ul className="text-sm text-slate-700 space-y-2">
+                <li>AI messages: <span className="font-semibold">600 / month</span></li>
+                <li>Autopilot: <span className="font-semibold">Not included</span></li>
+                <li>Voice notes: <span className="font-semibold">Not included</span></li>
+              </ul>
+            </div>
+
+            <div className="rounded-[28px] border border-emerald-200 bg-emerald-50/40 p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Pro</h3>
+              <p className="text-sm text-slate-600 mb-4">
+                More volume + Autopilot insights.
+              </p>
+              <ul className="text-sm text-slate-700 space-y-2">
+                <li>AI messages: <span className="font-semibold">800 / month</span></li>
+                <li>Autopilot: <span className="font-semibold">20 runs / month</span></li>
+                <li>Autopilot cost: <span className="font-semibold">10 AI messages</span> per run</li>
+                <li>Voice notes: <span className="font-semibold">Not included</span></li>
+              </ul>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Pro+</h3>
+              <p className="text-sm text-slate-600 mb-4">
+                Everything unlocked (with caps).
+              </p>
+              <ul className="text-sm text-slate-700 space-y-2">
+                <li>AI messages: <span className="font-semibold">1,200 / month</span></li>
+                <li>Autopilot: <span className="font-semibold">60 runs / month</span></li>
+                <li>Autopilot cost: <span className="font-semibold">10 AI messages</span> per run</li>
+                <li>Voice notes: <span className="font-semibold">Enabled</span> (max 60s each)</li>
+                <li>Voice cost: <span className="font-semibold">5 AI messages</span> per voice note</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <Link href="/pricing">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-xl shadow-emerald-500/30">
+                See pricing
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -318,7 +358,7 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.8 }}
-                className="absolute -right-4 top-1/4 bg-white rounded-xl p-4 shadow-xl border border-emerald-100 hidden lg:block"
+                className="absolute -right-4 top-1/4 bg-white rounded-xl p-4 shadow-lg border border-slate-200/80 hidden lg:block"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -337,7 +377,7 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
 
       {/* Pricing - Industry page style */}
       <section className="py-20 lg:py-28 bg-transparent">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -350,36 +390,36 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-6">
               Choose your plan
             </h2>
+            <p className="text-sm text-slate-500 md:hidden">Swipe to compare plans.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {creditTiers.map((tier, i) => (
+          <div className="hidden md:grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {PLANS.map((tier, i) => (
               <motion.div
-                key={tier.plan}
+                key={tier.key}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`relative flex flex-col h-full ${tier.popular ? 'md:-mt-8' : ''}`}
+                className={`relative flex flex-col h-full ${tier.featured ? 'md:-mt-8' : ''}`}
               >
-                <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[28px] border-2 border-emerald-200/60" />
-                <div className={`relative flex flex-col flex-1 p-8 bg-white/90 backdrop-blur rounded-[28px] border-2 border-slate-900/10 shadow-[0_20px_50px_rgba(15,23,42,0.1)] hover:-translate-y-1 transition-all ${
-                  tier.popular ? 'ring-2 ring-emerald-500' : ''
+                <div className={`relative flex flex-col flex-1 p-8 bg-white rounded-[28px] border border-slate-200/80 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                  tier.featured ? 'ring-2 ring-emerald-500' : ''
                 }`}>
-                  {tier.popular && (
+                  {tier.featured && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-emerald-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                       Most Popular
                     </div>
                   )}
                   <div className="flex-shrink-0">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">{tier.plan}</h3>
-                    <p className="text-sm text-slate-500 mb-6">{tier.description}</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{tier.name}</h3>
+                    <p className="text-sm text-slate-500 mb-6">{tier.tagline}</p>
                     <div className="mb-6">
-                      <span className="text-4xl font-bold text-emerald-600">₦{(tier.price / 1000).toFixed(0)}k</span>
+                      <span className="text-4xl font-bold text-emerald-600">{formatNGN(tier.monthlyAmount)}</span>
                       <span className="text-sm text-slate-500 ml-2">/month</span>
                     </div>
                     <ul className="space-y-3 mb-8 flex-grow">
-                      {tier.features.map((feature, j) => (
+                      {tier.bullets.map((feature, j) => (
                         <li key={j} className="flex items-start gap-3">
                           <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                           <span className="text-sm text-slate-700">{feature}</span>
@@ -387,16 +427,66 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
                       ))}
                     </ul>
                   </div>
-                  <Link href={`${APP_URL}${tier.href}`} className={`w-full py-4 rounded-2xl font-semibold transition-all mt-auto text-center ${
-                    tier.popular 
+                  <Link href={tier.checkoutHref} className={`w-full py-4 rounded-2xl font-semibold transition-all mt-auto text-center ${
+                    tier.featured 
                       ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/25' 
                       : 'bg-slate-900 hover:bg-slate-800 text-white'
                   }`}>
-                    {tier.cta}
+                    {tier.ctaLabel}
                   </Link>
                 </div>
               </motion.div>
             ))}
+          </div>
+          <div className="md:hidden -mx-1 max-w-5xl mx-auto">
+            <MarketingSnapRow
+              ariaLabel="Pricing plans"
+              hint="Swipe to compare plans"
+              showDots
+              dotCount={PLANS.length}
+            >
+              {PLANS.map((tier) => (
+                <MarketingSnapItem key={tier.key}>
+                  <div
+                    className={`relative flex flex-col flex-1 p-6 bg-white rounded-[28px] border border-slate-200/80 shadow-sm h-full ${
+                      tier.featured ? 'ring-2 ring-emerald-500' : ''
+                    }`}
+                  >
+                    {tier.featured && (
+                      <div className="mb-3 text-center">
+                        <span className="inline-block bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                          Most Popular
+                        </span>
+                      </div>
+                    )}
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{tier.name}</h3>
+                    <p className="text-sm text-slate-500 mb-4">{tier.tagline}</p>
+                    <div className="mb-4">
+                      <span className="text-3xl font-bold text-emerald-600">{formatNGN(tier.monthlyAmount)}</span>
+                      <span className="text-sm text-slate-500 ml-2">/month</span>
+                    </div>
+                    <ul className="space-y-2 mb-6 flex-grow">
+                      {tier.bullets.map((feature, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={tier.checkoutHref}
+                      className={`w-full py-3 rounded-2xl font-semibold transition-all mt-auto text-center block ${
+                        tier.featured
+                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/25'
+                          : 'bg-slate-900 hover:bg-slate-800 text-white'
+                      }`}
+                    >
+                      {tier.ctaLabel}
+                    </Link>
+                  </div>
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
           </div>
         </div>
       </section>
@@ -436,7 +526,7 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
               </Button>
             </Link>
             <p className="text-sm text-slate-500 mt-6">
-              7-day free trial • No credit card required
+              {offerCopy.trialBadge} • {starterFirstMonthFree ? "No Paystack for monthly Starter signup" : offerCopy.noCard}
             </p>
           </motion.div>
         </div>

@@ -317,14 +317,14 @@ function TokenSetupModal({
         <div className={`${platform.color} p-5 rounded-t-2xl`}>
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-black text-white">Connect {platform.name}</h3>
-            <button
+            <Button
               onClick={onClose}
               className="text-white/80 hover:text-white"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
         
@@ -343,12 +343,12 @@ function TokenSetupModal({
                 className="pr-10"
               />
               {tokenValue && (
-                <button
+                <Button
                   onClick={() => onCopy(tokenValue)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <Copy className="w-5 h-5" />
-                </button>
+                </Button>
               )}
             </div>
             <p className="text-xs text-gray-500 mt-2">
@@ -360,18 +360,18 @@ function TokenSetupModal({
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-xs font-medium text-blue-700 mb-2">Quick Links:</p>
             <div className="flex flex-wrap gap-2">
-              <button
+              <Button
                 onClick={() => window.open(platform.setupUrl, '_blank')}
                 className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded"
               >
                 Get Token
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => onCopy(getHelpText())}
                 className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded"
               >
                 Copy Instructions
-              </button>
+              </Button>
             </div>
           </div>
 

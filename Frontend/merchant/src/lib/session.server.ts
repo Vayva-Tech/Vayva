@@ -2,6 +2,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 type SessionUser = {
   id: string;
@@ -31,6 +32,27 @@ function readBearerToken(req: Request): string | null {
   if (!auth.startsWith("Bearer ")) return null;
   const token = auth.slice("Bearer ".length).trim();
   return token || null;
+}
+
+function readCookieToken(req: Request): string | null {
+  const cookieHeader = req.headers.get("cookie") || "";
+  if (!cookieHeader) return null;
+  const cookieParts = cookieHeader.split(";").map((part) => part.trim());
+  const names = [
+    "vayva_session",
+    "session",
+    "__Secure-vayva-merchant-session",
+    "next-auth.merchant-session",
+    "__Secure-next-auth.session-token",
+    "next-auth.session-token",
+  ];
+  for (const name of names) {
+    const pair = cookieParts.find((part) => part.startsWith(`${name}=`));
+    if (!pair) continue;
+    const value = pair.slice(name.length + 1);
+    if (value) return decodeURIComponent(value);
+  }
+  return null;
 }
 
 async function validateBearerToken(token: string): Promise<SessionUser | null> {
@@ -103,23 +125,67 @@ export async function requireAuthFromRequest(req: Request) {
     if (user) return user;
   }
 
+  // 1.1) Cookie-based JWT fallback for OTP/session cookie flows
+  const cookieToken = readCookieToken(req);
+  if (cookieToken) {
+    const user = await validateBearerToken(cookieToken);
+    if (user) return user;
+  }
+
   // 2) Web: NextAuth cookie session
   const session = await getServerSession(authOptions);
   return session?.user || null;
 }
 
+/**
+ * Resolve the current merchant user for server components (e.g. dashboard layout).
+ * Prefer validating `vayva_session` / bearer-style cookies via the backend (same as
+ * middleware and BFF routes), then fall back to NextAuth JWT session.
+ */
 export async function getSessionUser() {
-  const session = await getServerSession(authOptions);
-  return session?.user || null;
+  const cookieStore = await cookies();
+  const all = cookieStore.getAll();
+  const cookieHeader = all.map((c) => `${c.name}=${c.value}`).join("; ");
+  const req = new Request("http://localhost/", {
+    headers: cookieHeader ? { cookie: cookieHeader } : {},
+  });
+  return requireAuthFromRequest(req);
 }
 
 export async function clearSession() {
-  // Intentional no-op: NextAuth signOut() handles session clearing
+  const cookieStore = await cookies();
+  const cookieNames = [
+    "vayva_session",
+    "session",
+    "__Secure-vayva-merchant-session",
+    "next-auth.merchant-session",
+    "__Secure-next-auth.session-token",
+    "next-auth.session-token",
+  ];
+  for (const name of cookieNames) {
+    cookieStore.delete(name);
+  }
   return true;
 }
 
 export async function createSession(...args: any[]) {
-  // Intentional no-op: NextAuth handles session creation via OAuth providers
+  const opts = args?.[0];
+  const token = opts?.token || opts?.accessToken || null;
+  if (!token || typeof token !== "string") return false;
+
+  const rememberMe = opts?.rememberMe === true;
+  const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7;
+
+  const cookieStore = await cookies();
+  const secure = process.env.NODE_ENV === "production";
+  cookieStore.set("vayva_session", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure,
+    path: "/",
+    maxAge,
+  });
+
   return true;
 }
 

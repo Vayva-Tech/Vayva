@@ -4,7 +4,7 @@
  * Showcase of trusted client and partner logos
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const CLIENT_LOGOS_ADDON: AddOnDefinition = {
   id: 'vayva.client-logos',

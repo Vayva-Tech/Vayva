@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import {
   Database,
@@ -145,10 +145,10 @@ export default function DataWarehousePage() {
             <Database className="w-5 h-5 text-gray-400" />
             <h2 className="font-semibold text-gray-900">Query Builder</h2>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
+          <Button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
             <Play className="w-4 h-4" />
             Run
-          </button>
+          </Button>
         </div>
         <textarea
           className="w-full h-32 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-mono text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
@@ -182,10 +182,10 @@ export default function DataWarehousePage() {
                   {exp.format}
                 </span>
                 <span className="text-xs text-gray-500 w-16 text-right">{exp.size}</span>
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                <Button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                   <Download className="w-3.5 h-3.5" />
                   Download
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -212,3 +212,4 @@ export default function DataWarehousePage() {
     </div>
   );
 }
+

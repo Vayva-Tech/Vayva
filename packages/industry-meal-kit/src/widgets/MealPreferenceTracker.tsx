@@ -1,17 +1,7 @@
-// @ts-nocheck
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@vayva/ui/components/ui/card';
-import { Button } from '@vayva/ui/components/ui/button';
-import { Badge } from '@vayva/ui/components/ui/badge';
-import { Input } from '@vayva/ui/components/ui/input';
-import { Label } from '@vayva/ui/components/ui/label';
-import { Textarea } from '@vayva/ui/components/ui/textarea';
-import { Switch } from '@vayva/ui/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@vayva/ui/components/ui/select';
-import { Heart, AlertTriangle, Check, Save, Plus, X } from 'lucide-react';
-
+import React, { useState } from "react";
+import { Badge, Card, CardContent, CardHeader, Button } from "@vayva/ui";
 interface MealPreferenceTrackerProps {
   storeId: string;
   customerId: string;
@@ -22,29 +12,35 @@ interface MealPreferenceTrackerProps {
     spiceLevel?: string;
     notes?: string;
   };
-  onSave?: (preferences: any) => void;
+  onSave?: (preferences: Record<string, unknown>) => void;
 }
 
 const DIETARY_TYPES = [
-  { value: 'none', label: 'No restrictions' },
-  { value: 'vegetarian', label: 'Vegetarian' },
-  { value: 'vegan', label: 'Vegan' },
-  { value: 'pescatarian', label: 'Pescatarian' },
-  { value: 'keto', label: 'Keto' },
-  { value: 'low-carb', label: 'Low Carb' },
-  { value: 'paleo', label: 'Paleo' },
-  { value: 'gluten-free', label: 'Gluten Free' },
-  { value: 'dairy-free', label: 'Dairy Free' },
+  { value: "none", label: "No restrictions" },
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "vegan", label: "Vegan" },
+  { value: "pescatarian", label: "Pescatarian" },
+  { value: "keto", label: "Keto" },
+  { value: "low-carb", label: "Low carb" },
+  { value: "gluten-free", label: "Gluten free" },
+  { value: "dairy-free", label: "Dairy free" },
 ];
 
 const SPICE_LEVELS = [
-  { value: 'mild', label: 'Mild' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'hot', label: 'Hot' },
+  { value: "mild", label: "Mild" },
+  { value: "medium", label: "Medium" },
+  { value: "hot", label: "Hot" },
 ];
 
 const COMMON_ALLERGENS = [
-  'Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 'Fish', 'Shellfish'
+  "Peanuts",
+  "Tree nuts",
+  "Milk",
+  "Eggs",
+  "Wheat",
+  "Soy",
+  "Fish",
+  "Shellfish",
 ];
 
 export function MealPreferenceTracker({
@@ -53,35 +49,45 @@ export function MealPreferenceTracker({
   existingPreferences,
   onSave,
 }: MealPreferenceTrackerProps) {
-  const [dislikes, setDislikes] = useState<string[]>(existingPreferences?.dislikes || []);
-  const [allergies, setAllergies] = useState<string[]>(existingPreferences?.allergies || []);
-  const [dietaryType, setDietaryType] = useState(existingPreferences?.dietaryType || 'none');
-  const [spiceLevel, setSpiceLevel] = useState(existingPreferences?.spiceLevel || 'medium');
-  const [notes, setNotes] = useState(existingPreferences?.notes || '');
-  const [newDislike, setNewDislike] = useState('');
-  const [newAllergy, setNewAllergy] = useState('');
+  const [dislikes, setDislikes] = useState<string[]>(
+    existingPreferences?.dislikes ?? []
+  );
+  const [allergies, setAllergies] = useState<string[]>(
+    existingPreferences?.allergies ?? []
+  );
+  const [dietaryType, setDietaryType] = useState(
+    existingPreferences?.dietaryType ?? "none"
+  );
+  const [spiceLevel, setSpiceLevel] = useState(
+    existingPreferences?.spiceLevel ?? "medium"
+  );
+  const [notes, setNotes] = useState(existingPreferences?.notes ?? "");
+  const [newDislike, setNewDislike] = useState("");
+  const [newAllergy, setNewAllergy] = useState("");
   const [saving, setSaving] = useState(false);
 
   const handleAddDislike = () => {
-    if (newDislike.trim() && !dislikes.includes(newDislike.trim())) {
-      setDislikes([...dislikes, newDislike.trim()]);
-      setNewDislike('');
+    const t = newDislike.trim();
+    if (t && !dislikes.includes(t)) {
+      setDislikes([...dislikes, t]);
+      setNewDislike("");
     }
   };
 
   const handleRemoveDislike = (dislike: string) => {
-    setDislikes(dislikes.filter(d => d !== dislike));
+    setDislikes(dislikes.filter((d) => d !== dislike));
   };
 
   const handleAddAllergy = () => {
-    if (newAllergy.trim() && !allergies.includes(newAllergy.trim())) {
-      setAllergies([...allergies, newAllergy.trim()]);
-      setNewAllergy('');
+    const t = newAllergy.trim();
+    if (t && !allergies.includes(t)) {
+      setAllergies([...allergies, t]);
+      setNewAllergy("");
     }
   };
 
   const handleRemoveAllergy = (allergy: string) => {
-    setAllergies(allergies.filter(a => a !== allergy));
+    setAllergies(allergies.filter((a) => a !== allergy));
   };
 
   const handleSave = async () => {
@@ -92,22 +98,22 @@ export function MealPreferenceTracker({
         customerId,
         dislikes,
         allergies,
-        dietaryType: dietaryType === 'none' ? undefined : dietaryType,
+        dietaryType: dietaryType === "none" ? undefined : dietaryType,
         spiceLevel,
         notes: notes.trim() || undefined,
       };
 
-      const response = await fetch('/api/meal-kit/preferences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/meal-kit/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(preferences),
       });
 
-      if (response.ok && onSave) {
-        onSave(preferences);
+      if (response.ok) {
+        onSave?.(preferences);
       }
-    } catch (error) {
-      console.error('Failed to save preferences:', error);
+    } catch (e) {
+      console.error("Failed to save preferences", e);
     } finally {
       setSaving(false);
     }
@@ -116,176 +122,150 @@ export function MealPreferenceTracker({
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5" />
-              Meal Preferences
-            </CardTitle>
-            <CardDescription>
-              Tell us about your dietary needs and preferences
-            </CardDescription>
-          </div>
-          <Button onClick={handleSave} disabled={saving} size="sm">
-            <Save className="h-4 w-4 mr-2" />
-            Save
-          </Button>
-        </div>
+        <h3 className="text-lg font-semibold">Meal preferences</h3>
+        <p className="text-sm text-gray-600">
+          Dislikes, allergies, and dietary choices
+        </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Dietary Type */}
-        <div className="space-y-3">
-          <Label>Dietary Type</Label>
-          <Select value={dietaryType} onValueChange={setDietaryType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select dietary type" />
-            </SelectTrigger>
-            <SelectContent>
-              {DIETARY_TYPES.map(type => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Spice Level */}
-        <div className="space-y-3">
-          <Label>Spice Level Preference</Label>
-          <div className="grid grid-cols-3 gap-3">
-            {SPICE_LEVELS.map(level => (
-              <Button
-                key={level.value}
-                variant={spiceLevel === level.value ? 'default' : 'outline'}
-                onClick={() => setSpiceLevel(level.value)}
-                className="w-full"
-              >
-                {level.label}
-              </Button>
+        <div className="space-y-2">
+          <label htmlFor="dietary" className="text-sm font-medium">
+            Dietary type
+          </label>
+          <select
+            id="dietary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            value={dietaryType}
+            onChange={(e) => setDietaryType(e.target.value)}
+          >
+            {DIETARY_TYPES.map((d) => (
+              <option key={d.value} value={d.value}>
+                {d.label}
+              </option>
             ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="spice" className="text-sm font-medium">
+            Spice level
+          </label>
+          <select
+            id="spice"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            value={spiceLevel}
+            onChange={(e) => setSpiceLevel(e.target.value)}
+          >
+            {SPICE_LEVELS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium">Common allergens</span>
+          <div className="flex flex-wrap gap-2">
+            {COMMON_ALLERGENS.map((a) => {
+              const on = allergies.includes(a);
+              return (
+                <Button
+                  key={a}
+                  type="button"
+                  className="rounded-full"
+                  onClick={() =>
+                    on ? handleRemoveAllergy(a) : setAllergies([...allergies, a])
+                  }
+                >
+                  <Badge variant={on ? "error" : "outline"}>{a}</Badge>
+                </Button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Allergies */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-            <Label className="text-destructive">Allergies (Critical)</Label>
+        <div className="space-y-2">
+          <label htmlFor="new-allergy" className="text-sm font-medium">
+            Add allergy
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="new-allergy"
+              className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+              value={newAllergy}
+              onChange={(e) => setNewAllergy(e.target.value)}
+            />
+            <Button
+              type="button"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              onClick={handleAddAllergy}
+            >
+              Add
+            </Button>
           </div>
-          
-          <div className="flex flex-wrap gap-2 mb-3">
-            {COMMON_ALLERGENS.map(allergen => (
-              <Badge
-                key={allergen}
-                variant={allergies.includes(allergen) ? 'destructive' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => {
-                  if (allergies.includes(allergen)) {
-                    handleRemoveAllergy(allergen);
-                  } else {
-                    handleAddAllergy();
-                    setAllergies([...allergies, allergen]);
-                  }
-                }}
-              >
-                {allergen}
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="new-dislike" className="text-sm font-medium">
+            Add dislike
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="new-dislike"
+              className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+              value={newDislike}
+              onChange={(e) => setNewDislike(e.target.value)}
+            />
+            <Button
+              type="button"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              onClick={handleAddDislike}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
+
+        {dislikes.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {dislikes.map((d) => (
+              <Badge key={d} variant="outline">
+                {d}
+                <Button
+                  type="button"
+                  className="ml-1"
+                  aria-label={`Remove ${d}`}
+                  onClick={() => handleRemoveDislike(d)}
+                >
+                  ×
+                </Button>
               </Badge>
             ))}
           </div>
+        ) : null}
 
-          <div className="flex gap-2">
-            <Input
-              placeholder="Add other allergy..."
-              value={newAllergy}
-              onChange={(e) => setNewAllergy(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddAllergy()}
-            />
-            <Button variant="outline" onClick={handleAddAllergy}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {allergies.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {allergies.map(allergy => (
-                <Badge key={allergy} variant="destructive" className="flex items-center gap-1">
-                  {allergy}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
-                    onClick={() => handleRemoveAllergy(allergy)}
-                  />
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Dislikes */}
-        <div className="space-y-3">
-          <Label>Ingredients You Don't Like</Label>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Add ingredient..."
-              value={newDislike}
-              onChange={(e) => setNewDislike(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddDislike()}
-            />
-            <Button variant="outline" onClick={handleAddDislike}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {dislikes.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {dislikes.map(dislike => (
-                <Badge key={dislike} variant="secondary" className="flex items-center gap-1">
-                  {dislike}
-                  <X 
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleRemoveDislike(dislike)}
-                  />
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Additional Notes */}
-        <div className="space-y-3">
-          <Label>Additional Notes or Special Requests</Label>
-          <Textarea
-            placeholder="Tell us anything else we should know about your food preferences..."
+        <div className="space-y-2">
+          <label htmlFor="notes" className="text-sm font-medium">
+            Notes
+          </label>
+          <textarea
+            id="notes"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
           />
         </div>
 
-        {/* Summary */}
-        <Card className="bg-slate-50">
-          <CardContent className="p-4">
-            <h4 className="font-semibold mb-3">Your Preferences Summary</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Dietary Type:</span>
-                <Badge variant="outline">{DIETARY_TYPES.find(t => t.value === dietaryType)?.label}</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Spice Level:</span>
-                <Badge variant="outline">{SPICE_LEVELS.find(l => l.value === spiceLevel)?.label}</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Allergies:</span>
-                <span className="text-destructive">{allergies.length > 0 ? `${allergies.length} listed` : 'None'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Dislikes:</span>
-                <span>{dislikes.length > 0 ? `${dislikes.length} listed` : 'None'}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <Button
+          type="button"
+          disabled={saving}
+          className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+          onClick={() => void handleSave()}
+        >
+          {saving ? "Saving…" : "Save preferences"}
+        </Button>
       </CardContent>
     </Card>
   );

@@ -5,7 +5,6 @@ import { logger } from "@vayva/shared";
 import { toast } from "sonner";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import {
   Storefront as Store,
   Envelope as Mail,
@@ -20,6 +19,7 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { Button, Input, Select, Textarea } from "@vayva/ui";
 import { FileUpload } from "@/components/ui/FileUpload";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface StoreProfile {
   name: string;
@@ -60,11 +60,24 @@ const DAYS = [
 
 import { apiJson } from "@/lib/api-client-shared";
 
+type StoreAiAgentSettings = {
+  enabled: boolean;
+  allowImageUnderstanding?: boolean;
+  allowVoiceNotes?: boolean;
+  oneQuestionRule?: boolean;
+  maxTokens?: number;
+  temperature?: number;
+};
+
 export default function StoreSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<StoreProfile | null>(null);
   const initialProfileRef = useRef<StoreProfile | null>(null);
+  const [aiSettings, setAiSettings] = useState<StoreAiAgentSettings | null>(
+    null,
+  );
+  const [aiSaving, setAiSaving] = useState(false);
 
   const isDirty =
     profile && initialProfileRef.current
@@ -76,6 +89,7 @@ export default function StoreSettingsPage() {
   useEffect(() => {
     const controller = new AbortController();
     void fetchProfile(controller.signal);
+    void fetchAiSettings(controller.signal);
 
     return () => {
       controller.abort();
@@ -100,6 +114,50 @@ export default function StoreSettingsPage() {
       toast.error(_errMsg || "Could not load store profile");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAiSettings = async (signal?: AbortSignal) => {
+    try {
+      const data = await apiJson<StoreAiAgentSettings>(
+        "/api/merchant/settings/ai-agent",
+        { signal },
+      );
+      setAiSettings(data);
+    } catch (error: unknown) {
+      const _errMsg = error instanceof Error ? error.message : String(error);
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      logger.warn("[FETCH_STORE_AI_SETTINGS_ERROR]", {
+        error: _errMsg,
+        app: "merchant",
+      });
+      // Non-blocking: store profile page should still work even if AI settings fail.
+      setAiSettings(null);
+    }
+  };
+
+  const saveAiSettings = async () => {
+    if (!aiSettings) return;
+    setAiSaving(true);
+    try {
+      const updated = await apiJson<StoreAiAgentSettings>(
+        "/api/merchant/settings/ai-agent",
+        {
+          method: "PATCH",
+          body: JSON.stringify(aiSettings),
+        },
+      );
+      setAiSettings(updated);
+      toast.success("AI settings updated");
+    } catch (error: unknown) {
+      const _errMsg = error instanceof Error ? error.message : String(error);
+      logger.warn("[SAVE_STORE_AI_SETTINGS_ERROR]", {
+        error: _errMsg,
+        app: "merchant",
+      });
+      toast.error(_errMsg || "Failed to save AI settings");
+    } finally {
+      setAiSaving(false);
     }
   };
 
@@ -162,20 +220,15 @@ export default function StoreSettingsPage() {
 
   return (
     <div className="max-w-4xl space-y-8">
-      <Breadcrumbs />
       <div className="flex items-center gap-4">
         <BackButton
           href="/dashboard/settings/overview"
           label="Back to Settings"
         />
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Store Settings
-          </h1>
-          <p className="text-gray-500">
-            Manage your public store profile and contact information.
-          </p>
-        </div>
+        <PageHeader
+          title="Store Settings"
+          subtitle="Manage your public store profile and contact information."
+        />
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
@@ -485,6 +538,128 @@ export default function StoreSettingsPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* AI Settings Section */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <LockOpen className="h-5 w-5 text-green-600" />
+            AI Features
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Control what AI is allowed to do for this store.
+          </p>
+
+          {aiSettings ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100">
+                <div>
+                  <p className="font-medium text-gray-900">Enable AI</p>
+                  <p className="text-xs text-gray-500">
+                    When off, AI chat/agent features are blocked for this store.
+                  </p>
+                </div>
+                <Input
+                  type="checkbox"
+                  checked={Boolean(aiSettings.enabled)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setAiSettings((s) =>
+                      s ? { ...s, enabled: e.target.checked } : s,
+                    )
+                  }
+                  disabled={aiSaving}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100">
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      Image understanding
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Allow AI to analyze images sent by customers.
+                    </p>
+                  </div>
+                  <Input
+                    type="checkbox"
+                    checked={Boolean(aiSettings.allowImageUnderstanding)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setAiSettings((s) =>
+                        s
+                          ? {
+                              ...s,
+                              allowImageUnderstanding: e.target.checked,
+                            }
+                          : s,
+                      )
+                    }
+                    disabled={aiSaving}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100">
+                  <div>
+                    <p className="font-medium text-gray-900">Voice notes</p>
+                    <p className="text-xs text-gray-500">
+                      Allow AI to respond to voice notes (transcription).
+                    </p>
+                  </div>
+                  <Input
+                    type="checkbox"
+                    checked={aiSettings.allowVoiceNotes ?? true}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setAiSettings((s) =>
+                        s ? { ...s, allowVoiceNotes: e.target.checked } : s,
+                      )
+                    }
+                    disabled={aiSaving}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void fetchAiSettings()}
+                  disabled={aiSaving}
+                >
+                  Refresh
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => void saveAiSettings()}
+                  disabled={aiSaving}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  {aiSaving ? "Saving..." : "Save AI Settings"}
+                </Button>
+              </div>
+
+              <p className="text-xs text-gray-500">
+                For advanced AI tuning (tone, knowledge base, model caps), use{" "}
+                <a
+                  href="/dashboard/settings/ai-agent"
+                  className="text-green-700 underline"
+                >
+                  AI Agent Settings
+                </a>
+                .
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">
+              AI settings unavailable right now. You can still configure them in{" "}
+              <a
+                href="/dashboard/settings/ai-agent"
+                className="text-green-700 underline"
+              >
+                AI Agent Settings
+              </a>
+              .
+            </p>
+          )}
         </div>
 
         <div className="flex justify-end pt-4 border-t border-gray-200">

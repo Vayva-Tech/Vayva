@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 /**
@@ -8,7 +7,7 @@
  * sales velocity, and tier breakdown.
  */
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { BaseWidget } from '@vayva/industry-core';
 import type { WidgetDefinition } from '@vayva/industry-core';
 import type { TicketTier } from '../types';
@@ -57,19 +56,15 @@ export function TicketSalesTrackerWidget({
   showProgress = true,
   showTiers = true,
 }: TicketSalesTrackerWidgetProps) {
-  const [tierBreakdown, setTierBreakdown] = useState<TierBreakdown[]>([]);
-
-  useEffect(() => {
-    if (tiers.length > 0) {
-      const breakdown = tiers.map((tier) => ({
-        name: tier.name,
-        sold: tier.quantitySold,
-        total: tier.quantity,
-        percentage: Math.round((tier.quantitySold / tier.quantity) * 100),
-        revenue: tier.quantitySold * tier.price,
-      }));
-      setTierBreakdown(breakdown);
-    }
+  const tierBreakdown = useMemo<TierBreakdown[]>(() => {
+    if (tiers.length === 0) return [];
+    return tiers.map((tier) => ({
+      name: tier.name,
+      sold: tier.quantitySold,
+      total: tier.quantity,
+      percentage: Math.round((tier.quantitySold / tier.quantity) * 100),
+      revenue: tier.quantitySold * tier.price,
+    }));
   }, [tiers]);
 
   const overallPercentage = Math.min(100, Math.round((ticketsSold / totalCapacity) * 100));

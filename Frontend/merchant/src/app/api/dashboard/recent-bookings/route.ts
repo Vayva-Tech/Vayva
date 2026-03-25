@@ -2,22 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { searchParams } = new URL(request.url);
       const limit = parseInt(searchParams.get("limit") || "5");
 
       const queryParams = new URLSearchParams();
-      queryParams.set("limit", limit.toString());// Call backend API
-      const result = await apiJson(`${process.env.BACKEND_API_URL}/api/endpoint`,
-      {
-          headers: {
-            "x-store-id": storeId,
-          },
-        }
-      );
+      queryParams.set("limit", limit.toString());
+      const result = await apiJson(`${buildBackendUrl("/api/dashboard/recent-bookings")}?${queryParams.toString()}`, {
+        headers: auth.headers,
+      });
       
       return NextResponse.json(result);
   } catch (error) {

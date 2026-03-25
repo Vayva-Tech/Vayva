@@ -183,7 +183,7 @@ export function OptimizedImage({
     : src;
 
   // Generate srcset for responsive images
-  const srcSet = useCloudflare && !fill
+  const _srcSet = useCloudflare && !fill
     ? generateSrcSet(src, DEFAULT_BREAKPOINTS, { quality, format, cdnDomain })
     : undefined;
 
@@ -191,7 +191,6 @@ export function OptimizedImage({
   if (!useCloudflare || src.startsWith("data:")) {
     return (
       <div className={`relative ${containerClassName}`} style={!fill ? { width, height } : undefined}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt}

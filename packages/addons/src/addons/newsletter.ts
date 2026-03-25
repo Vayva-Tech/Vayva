@@ -8,7 +8,7 @@
  * - Basic analytics
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const NEWSLETTER_ADDON: AddOnDefinition = {
   id: 'vayva.newsletter',

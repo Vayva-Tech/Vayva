@@ -85,7 +85,7 @@ export const GET = withVayvaAPI(
         ];
       }
 
-      const [volunteers, total] = await Promise.all([
+      const [volunteers, _total] = await Promise.all([
         prisma.nonprofitVolunteer.findMany({
           where,
           include: {

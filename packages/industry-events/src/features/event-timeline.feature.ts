@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Timeline Feature
  * High-level API for event timeline management

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Retail API Service Layer
 
 import { MultiChannelService } from '../features/multi-channel';

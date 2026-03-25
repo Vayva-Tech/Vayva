@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-restaurant - Unified Restaurant Industry Package
  * 
@@ -22,9 +21,8 @@ export {
   type RestaurantEngineStatus,
 } from './restaurant.engine';
 
-// Types - Merge both type sources
+// Types (includes kitchen-types via types/index)
 export * from './types/index';
-export type * from './types/kitchen-types';
 
 // Features (Backend Services)
 export * from './features/index';
@@ -41,5 +39,5 @@ export {
 // FOH & KDS UI Components
 export * from './components/index';
 
-// Backend Services (for API layer)
-export * from './services/index';
+// Backend services: import `@vayva/industry-restaurant/services` to avoid duplicate
+// symbols with feature modules (e.g. KDSService).

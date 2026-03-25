@@ -433,6 +433,24 @@ export const INTERNAL_EXTENSIONS: ExtensionManifest[] = [
     sidebarItems: [],
     primaryObject: "recommendation",
   },
+  {
+    id: "vayva.affiliate",
+    name: "Affiliate Program",
+    version: "1.0.0",
+    description:
+      "Enable an affiliate program on your storefront: affiliate signup, dashboard, referral tracking, and payouts.",
+    category: "marketing",
+    sidebarItems: [
+      {
+        id: "marketing_affiliates",
+        label: "Affiliates",
+        href: "/dashboard/marketing/affiliates",
+        icon: "Users",
+        parentGroup: "marketing",
+      },
+    ],
+    primaryObject: "affiliate",
+  },
 ];
 class ExtensionRegistry {
   private extensions: Map<string, ExtensionManifest>;

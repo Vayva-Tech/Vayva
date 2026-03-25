@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-events
  * Vayva Events Industry Engine

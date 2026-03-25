@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SaaS Industry Type Definitions
  * 
@@ -6,6 +5,7 @@
  */
 
 import type { z } from 'zod';
+import type { SaaSConfig as SaaSSubscriptionModuleConfig } from '../services/saas-subscription.service';
 
 // ============================================================================
 // Core Data Models
@@ -242,10 +242,10 @@ export interface GetChurnAnalyticsResponse {
   data: {
     churnRate: number;
     previousChurnRate: number;
-    churnedTenants: number;
+    churnedTenantCount: number;
     churnedMRR: number;
     reasons: Record<string, number>;
-    churnedTenants: ChurnData[];
+    churnedTenantRecords: ChurnData[];
   };
   timestamp: string;
 }
@@ -346,4 +346,9 @@ export interface SaaSSuggestedAction {
   href: string;
   icon: string;
   estimatedImpact?: string;
+}
+
+/** Engine wiring: feature toggles and per-feature service options. */
+export interface SaaSEngineConfig {
+  subscription?: false | SaaSSubscriptionModuleConfig;
 }

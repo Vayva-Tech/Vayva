@@ -3,9 +3,9 @@
  * =======================
  * Displays merchant's AI credit balance, usage, and top-up options
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React from 'react';
 import { useAICredits } from '@/hooks/use-ai-credits';
 
@@ -122,7 +122,7 @@ export function AICreditWidget() {
       </div>
 
       {/* Top-Up Button */}
-      <button
+      <Button
         onClick={handleTopUp}
         className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
       >
@@ -130,7 +130,7 @@ export function AICreditWidget() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
         Add 1,000 Credits - ₦3,000
-      </button>
+      </Button>
 
       {/* Info Text */}
       <p className="mt-3 text-xs text-gray-500 text-center">

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export {
   PROFESSIONAL_SERVICES_DASHBOARD_CONFIG,
   getProfessionalServicesDashboardConfig,

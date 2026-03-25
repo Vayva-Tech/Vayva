@@ -1,10 +1,10 @@
-// @ts-nocheck
 /**
  * Real Dashboard Data Services
  * Replaces mock data with actual API calls to backend services
  * Includes comprehensive error handling and reliability features
  */
 
+import type { ReactNode } from 'react';
 import { apiJson } from '@/lib/api-client-shared';
 import { logger } from '@vayva/shared';
 
@@ -24,9 +24,9 @@ const CACHE_CONFIG = {
 
 // Simple in-memory cache
 class SimpleCache {
-  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
   
-  get(key: string): any | null {
+  get<T = unknown>(key: string): T | null {
     const item = this.cache.get(key);
     if (!item) return null;
     
@@ -35,10 +35,10 @@ class SimpleCache {
       return null;
     }
     
-    return item.data;
+    return item.data as T;
   }
   
-  set(key: string, data: any): void {
+  set(key: string, data: unknown): void {
     if (this.cache.size >= CACHE_CONFIG.maxSize) {
       // Remove oldest entry
       const firstKey = this.cache.keys().next().value;
@@ -51,9 +51,21 @@ class SimpleCache {
   clear(): void {
     this.cache.clear();
   }
+
+  deleteWhere(predicate: (key: string) => boolean): void {
+    for (const key of [...this.cache.keys()]) {
+      if (predicate(key)) this.cache.delete(key);
+    }
+  }
 }
 
 const cache = new SimpleCache();
+
+function logErr(context: string, error: unknown): void {
+  logger.error(context, {
+    error: error instanceof Error ? error.message : String(error),
+  });
+}
 
 // Product interface
 interface Product {
@@ -94,7 +106,7 @@ async function retryWithBackoff<T>(
 ): Promise<T> {
   try {
     return await operation();
-  } catch (error) {
+  } catch (error: unknown) {
     if (retries <= 0) throw error;
     
     const delay = Math.min(
@@ -113,7 +125,7 @@ interface DashboardMetric {
   value: string | number;
   change: number;
   trend: 'up' | 'down';
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 interface FinancialMetric {
@@ -121,7 +133,7 @@ interface FinancialMetric {
   value: string;
   change: number;
   trend: 'up' | 'down';
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 interface Transaction {
@@ -166,7 +178,7 @@ export class ControlCenterDataService {
     const cacheKey = 'control-center-metrics';
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<DashboardMetric[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -216,8 +228,8 @@ export class ControlCenterDataService {
         
         cache.set(cacheKey, metrics);
         return metrics;
-      } catch (error) {
-        logger.error('[CONTROL_CENTER_METRICS_ERROR] Failed to fetch metrics:', error);
+      } catch (error: unknown) {
+        logErr('[CONTROL_CENTER_METRICS_ERROR] Failed to fetch metrics:', error);
         throw new Error('Failed to load dashboard metrics. Please try again.');
       }
     });
@@ -227,7 +239,7 @@ export class ControlCenterDataService {
     const cacheKey = 'control-center-kpis';
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<KPIData[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -269,8 +281,8 @@ export class ControlCenterDataService {
         
         cache.set(cacheKey, kpis);
         return kpis;
-      } catch (error) {
-        logger.error('[CONTROL_CENTER_KPIS_ERROR] Failed to fetch KPIs:', error);
+      } catch (error: unknown) {
+        logErr('[CONTROL_CENTER_KPIS_ERROR] Failed to fetch KPIs:', error);
         throw new Error('Failed to load business metrics. Please try again.');
       }
     });
@@ -280,7 +292,7 @@ export class ControlCenterDataService {
     const cacheKey = 'control-center-deadlines';
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<DeadlineItem[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -292,8 +304,8 @@ export class ControlCenterDataService {
         
         cache.set(cacheKey, response.deadlines);
         return response.deadlines;
-      } catch (error) {
-        logger.error('[CONTROL_CENTER_DEADLINES_ERROR] Failed to fetch deadlines:', error);
+      } catch (error: unknown) {
+        logErr('[CONTROL_CENTER_DEADLINES_ERROR] Failed to fetch deadlines:', error);
         throw new Error('Failed to load upcoming deadlines. Please try again.');
       }
     });
@@ -312,7 +324,7 @@ export class FinanceDataService {
     const cacheKey = `finance-metrics-${timeRange}`;
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<FinancialMetric[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -362,8 +374,8 @@ export class FinanceDataService {
         
         cache.set(cacheKey, metrics);
         return metrics;
-      } catch (error) {
-        logger.error('[FINANCE_METRICS_ERROR] Failed to fetch financial metrics:', error);
+      } catch (error: unknown) {
+        logErr('[FINANCE_METRICS_ERROR] Failed to fetch financial metrics:', error);
         throw new Error('Failed to load financial metrics. Please try again.');
       }
     });
@@ -373,7 +385,7 @@ export class FinanceDataService {
     const cacheKey = `finance-transactions-${filter}`;
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<Transaction[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -385,8 +397,8 @@ export class FinanceDataService {
         
         cache.set(cacheKey, response.transactions);
         return response.transactions;
-      } catch (error) {
-        logger.error('[FINANCE_TRANSACTIONS_ERROR] Failed to fetch transactions:', error);
+      } catch (error: unknown) {
+        logErr('[FINANCE_TRANSACTIONS_ERROR] Failed to fetch transactions:', error);
         throw new Error('Failed to load transactions. Please try again.');
       }
     });
@@ -396,7 +408,7 @@ export class FinanceDataService {
     const cacheKey = `finance-revenue-chart-${months}`;
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<number[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -408,8 +420,8 @@ export class FinanceDataService {
         
         cache.set(cacheKey, response.data);
         return response.data;
-      } catch (error) {
-        logger.error('[FINANCE_CHART_ERROR] Failed to fetch revenue chart data:', error);
+      } catch (error: unknown) {
+        logErr('[FINANCE_CHART_ERROR] Failed to fetch revenue chart data:', error);
         throw new Error('Failed to load revenue chart. Please try again.');
       }
     });
@@ -417,14 +429,7 @@ export class FinanceDataService {
   
   // Clear finance cache
   static clearCache(): void {
-    // Clear all finance-related cache entries
-    const keysToDelete: string[] = [];
-    cache['cache'].forEach((_, key) => {
-      if (key.startsWith('finance-')) {
-        keysToDelete.push(key);
-      }
-    });
-    keysToDelete.forEach(key => cache['cache'].delete(key));
+    cache.deleteWhere((key) => key.startsWith('finance-'));
     logger.info('[FINANCE] Cache cleared');
   }
 }
@@ -440,7 +445,12 @@ export class CustomerDataService {
     const cacheKey = 'customer-summary';
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<{
+        total: number;
+        active: number;
+        vip: number;
+        averageOrderValue: number;
+      }>(cacheKey);
       if (cached) return cached;
     }
     
@@ -455,8 +465,8 @@ export class CustomerDataService {
         
         cache.set(cacheKey, response);
         return response;
-      } catch (error) {
-        logger.error('[CUSTOMER_SUMMARY_ERROR] Failed to fetch customer summary:', error);
+      } catch (error: unknown) {
+        logErr('[CUSTOMER_SUMMARY_ERROR] Failed to fetch customer summary:', error);
         throw new Error('Failed to load customer summary. Please try again.');
       }
     });
@@ -471,7 +481,7 @@ export class CustomerDataService {
     const cacheKey = `customers-${searchTerm}-${statusFilter}-${sortBy}`;
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<Customer[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -488,8 +498,8 @@ export class CustomerDataService {
         
         cache.set(cacheKey, response.customers);
         return response.customers;
-      } catch (error) {
-        logger.error('[CUSTOMERS_LIST_ERROR] Failed to fetch customers:', error);
+      } catch (error: unknown) {
+        logErr('[CUSTOMERS_LIST_ERROR] Failed to fetch customers:', error);
         throw new Error('Failed to load customers. Please try again.');
       }
     });
@@ -497,13 +507,9 @@ export class CustomerDataService {
   
   // Clear customer cache
   static clearCache(): void {
-    const keysToDelete: string[] = [];
-    cache['cache'].forEach((_, key) => {
-      if (key.startsWith('customers-') || key === 'customer-summary') {
-        keysToDelete.push(key);
-      }
-    });
-    keysToDelete.forEach(key => cache['cache'].delete(key));
+    cache.deleteWhere(
+      (key) => key.startsWith('customers-') || key === 'customer-summary',
+    );
     logger.info('[CUSTOMERS] Cache cleared');
   }
 }
@@ -519,7 +525,12 @@ export class ProductService {
     const cacheKey = 'product-summary';
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<{
+        total: number;
+        active: number;
+        lowStock: number;
+        totalRevenue: number;
+      }>(cacheKey);
       if (cached) return cached;
     }
     
@@ -534,8 +545,8 @@ export class ProductService {
         
         cache.set(cacheKey, response);
         return response;
-      } catch (error) {
-        logger.error('[PRODUCT_SUMMARY_ERROR] Failed to fetch product summary:', error);
+      } catch (error: unknown) {
+        logErr('[PRODUCT_SUMMARY_ERROR] Failed to fetch product summary:', error);
         throw new Error('Failed to load product summary. Please try again.');
       }
     });
@@ -551,7 +562,7 @@ export class ProductService {
     const cacheKey = `products-${searchTerm}-${statusFilter}-${categoryFilter}-${sortBy}`;
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<Product[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -569,8 +580,8 @@ export class ProductService {
         
         cache.set(cacheKey, response.products);
         return response.products;
-      } catch (error) {
-        logger.error('[PRODUCTS_LIST_ERROR] Failed to fetch products:', error);
+      } catch (error: unknown) {
+        logErr('[PRODUCTS_LIST_ERROR] Failed to fetch products:', error);
         throw new Error('Failed to load products. Please try again.');
       }
     });
@@ -578,7 +589,7 @@ export class ProductService {
   
   static async getProductCategories(): Promise<string[]> {
     const cacheKey = 'product-categories';
-    const cached = cache.get(cacheKey);
+    const cached = cache.get<string[]>(cacheKey);
     if (cached) return cached;
     
     return retryWithBackoff(async () => {
@@ -589,8 +600,8 @@ export class ProductService {
         
         cache.set(cacheKey, response.categories);
         return response.categories;
-      } catch (error) {
-        logger.error('[PRODUCT_CATEGORIES_ERROR] Failed to fetch categories:', error);
+      } catch (error: unknown) {
+        logErr('[PRODUCT_CATEGORIES_ERROR] Failed to fetch categories:', error);
         // Return default categories as fallback
         return ['Clothing', 'Electronics', 'Food & Beverage', 'Beauty', 'Home & Garden'];
       }
@@ -599,13 +610,12 @@ export class ProductService {
   
   // Clear product cache
   static clearCache(): void {
-    const keysToDelete: string[] = [];
-    cache['cache'].forEach((_, key) => {
-      if (key.startsWith('products-') || key === 'product-summary' || key === 'product-categories') {
-        keysToDelete.push(key);
-      }
-    });
-    keysToDelete.forEach(key => cache['cache'].delete(key));
+    cache.deleteWhere(
+      (key) =>
+        key.startsWith('products-') ||
+        key === 'product-summary' ||
+        key === 'product-categories',
+    );
     logger.info('[PRODUCTS] Cache cleared');
   }
 }
@@ -624,7 +634,15 @@ export class OrderService {
     const cacheKey = 'order-summary';
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<{
+        total: number;
+        pending: number;
+        processing: number;
+        shipped: number;
+        delivered: number;
+        cancelled: number;
+        totalRevenue: number;
+      }>(cacheKey);
       if (cached) return cached;
     }
     
@@ -642,8 +660,8 @@ export class OrderService {
         
         cache.set(cacheKey, response);
         return response;
-      } catch (error) {
-        logger.error('[ORDER_SUMMARY_ERROR] Failed to fetch order summary:', error);
+      } catch (error: unknown) {
+        logErr('[ORDER_SUMMARY_ERROR] Failed to fetch order summary:', error);
         throw new Error('Failed to load order summary. Please try again.');
       }
     });
@@ -658,7 +676,7 @@ export class OrderService {
     const cacheKey = `orders-${searchTerm}-${statusFilter}-${sortBy}`;
     
     if (!forceRefresh) {
-      const cached = cache.get(cacheKey);
+      const cached = cache.get<Order[]>(cacheKey);
       if (cached) return cached;
     }
     
@@ -675,8 +693,8 @@ export class OrderService {
         
         cache.set(cacheKey, response.orders);
         return response.orders;
-      } catch (error) {
-        logger.error('[ORDERS_LIST_ERROR] Failed to fetch orders:', error);
+      } catch (error: unknown) {
+        logErr('[ORDERS_LIST_ERROR] Failed to fetch orders:', error);
         throw new Error('Failed to load orders. Please try again.');
       }
     });
@@ -684,13 +702,9 @@ export class OrderService {
   
   // Clear order cache
   static clearCache(): void {
-    const keysToDelete: string[] = [];
-    cache['cache'].forEach((_, key) => {
-      if (key.startsWith('orders-') || key === 'order-summary') {
-        keysToDelete.push(key);
-      }
-    });
-    keysToDelete.forEach(key => cache['cache'].delete(key));
+    cache.deleteWhere(
+      (key) => key.startsWith('orders-') || key === 'order-summary',
+    );
     logger.info('[ORDERS] Cache cleared');
   }
 }
@@ -699,9 +713,9 @@ export class OrderService {
 export class DashboardService {
   static async getTimeRangeData(timeRange: '7d' | '30d' | '90d' | '1y') {
     try {
-      const response = await apiJson<any>(`/api/dashboard/data?range=${timeRange}`);
+      const response = await apiJson<unknown>(`/api/dashboard/data?range=${timeRange}`);
       return response;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch time range data:', error);
       throw error;
     }
@@ -717,7 +731,7 @@ export class DashboardService {
       }>(`/api/export/${endpoint}?${searchParams.toString()}`);
       
       return response;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch export data:', error);
       throw error;
     }

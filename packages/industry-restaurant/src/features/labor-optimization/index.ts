@@ -1,13 +1,12 @@
-// @ts-nocheck
 /**
  * Labor Optimization Service - Stub Implementation
  * Full implementation pending database layer integration
  */
 
 import type {
-  StaffMember,
+  LaborRosterStaffMember,
   StaffRole,
-  Shift,
+  LaborRosterShift,
   WeeklySchedule,
   LaborMetrics,
   LaborDemandForecast,
@@ -19,11 +18,11 @@ import type {
 } from '../../types/labor.js';
 
 export class StaffService {
-  async getStaff(storeId: string): Promise<StaffMember[]> {
+  async getStaff(storeId: string): Promise<LaborRosterStaffMember[]> {
     return [];
   }
 
-  async updateAvailability(staffId: string): Promise<StaffMember> {
+  async updateAvailability(staffId: string): Promise<LaborRosterStaffMember> {
     throw new Error('Not implemented');
   }
 }
@@ -88,9 +87,9 @@ export class TimeClockService {
 
 // Re-export types
 export type {
-  StaffMember,
+  LaborRosterStaffMember,
   StaffRole,
-  Shift,
+  LaborRosterShift,
   WeeklySchedule,
   LaborMetrics,
   LaborDemandForecast,

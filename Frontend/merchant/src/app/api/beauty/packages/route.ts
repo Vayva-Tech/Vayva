@@ -1,25 +1,12 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { apiJson } from "@/lib/api-client-shared";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma } from "@vayva/db";
-import { z } from "zod";
+import type { Prisma } from "@vayva/db";
 
-const packageSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  type: z.enum(["PACKAGE", "MEMBERSHIP"]),
-  price: z.number(),
-  originalPrice: z.number().optional(),
-  validityDays: z.number().optional(),
-  recurringPeriod: z.enum(["MONTHLY", "QUARTERLY", "ANNUALLY"]).optional(),
-  services: z.array(z.string()).optional(), // Array of service IDs
-  benefits: z.array(z.string()).optional(),
-  terms: z.string().optional(),
-  imageUrl: z.string().optional(),
-  metadata: z.any().optional(),
-});
+function isServiceEntry(v: unknown): v is { serviceId?: string; quantity?: number } {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
 
 /**
  * GET /api/beauty/packages
@@ -27,46 +14,84 @@ const packageSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const packageType = searchParams.get("type");
-    const activeOnly = searchParams.get("activeOnly") === "true";
-
-    const where: any = {
-      merchantId: storeId,
-    };
-
-    if (packageType) {
-      where.type = packageType;
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const activeOnly = searchParams.get("activeOnly") === "true";
+
+    const where: Prisma.ServicePackageWhereInput = { storeId };
+
     if (activeOnly) {
-      where.status = "active";
+      where.isActive = true;
     }
 
     const packages = await prisma.servicePackage.findMany({
       where,
-      include: {
-        services: {
-          select: {
-            id: true,
-            name: true,
-            price: true,
-            duration: true,
-          },
-        },
-      },
       orderBy: {
         createdAt: "desc",
       },
     });
 
+    const allServiceIds = new Set<string>();
+    for (const pkg of packages) {
+      const raw = pkg.services;
+      if (Array.isArray(raw)) {
+        for (const entry of raw) {
+          if (isServiceEntry(entry) && typeof entry.serviceId === "string") {
+            allServiceIds.add(entry.serviceId);
+          }
+        }
+      }
+    }
+
+    const products =
+      allServiceIds.size > 0
+        ? await prisma.product.findMany({
+            where: { id: { in: [...allServiceIds] }, storeId },
+            select: { id: true, title: true, price: true, metadata: true },
+          })
+        : [];
+    const productById = new Map(products.map((p) => [p.id, p]));
+
     const packagesWithMetrics = packages.map((pkg) => {
-      const totalServicesValue = pkg.services.reduce((acc, service) => acc + (service.price || 0), 0);
-      const savings = totalServicesValue - pkg.price;
-      const savingsPercent = totalServicesValue > 0 ? ((savings / totalServicesValue) * 100) : 0;
+      const raw = pkg.services;
+      const lines: Array<{ id: string; name: string; price: number; duration: number }> = [];
+      if (Array.isArray(raw)) {
+        for (const entry of raw) {
+          if (isServiceEntry(entry) && typeof entry.serviceId === "string") {
+            const p = productById.get(entry.serviceId);
+            const duration =
+              p?.metadata !== null &&
+              p?.metadata !== undefined &&
+              typeof p.metadata === "object" &&
+              !Array.isArray(p.metadata) &&
+              typeof (p.metadata as Record<string, unknown>).duration === "number"
+                ? (p.metadata as Record<string, unknown>).duration
+                : 0;
+            lines.push({
+              id: entry.serviceId,
+              name: p?.title ?? "Service",
+              price: p ? Number(p.price) : 0,
+              duration: duration as number,
+            });
+          }
+        }
+      }
+
+      const totalServicesValue = lines.reduce((acc, service) => acc + (service.price || 0), 0);
+      const savings = totalServicesValue - Number(pkg.price);
+      const savingsPercent = totalServicesValue > 0 ? (savings / totalServicesValue) * 100 : 0;
 
       return {
         ...pkg,
+        services: lines,
         totalServicesValue,
         savings,
         savingsPercent,
@@ -82,9 +107,6 @@ export async function GET(request: NextRequest) {
       endpoint: "/api/beauty/packages",
       operation: "GET_PACKAGES",
     });
-    return NextResponse.json(
-      { error: "Failed to fetch packages" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch packages" }, { status: 500 });
   }
 }

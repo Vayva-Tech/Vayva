@@ -276,7 +276,7 @@ export const POST = withVayvaAPI(
 );
 
 // Determine stock status based on current stock levels
-function determineStockStatus(currentStock: number, minimumStock: number, reorderPoint: number): string {
+function _determineStockStatus(currentStock: number, minimumStock: number, reorderPoint: number): string {
   if (currentStock <= 0) return "out_of_stock";
   if (currentStock <= minimumStock) return "low_stock";
   if (currentStock <= reorderPoint) return "reorder_needed";

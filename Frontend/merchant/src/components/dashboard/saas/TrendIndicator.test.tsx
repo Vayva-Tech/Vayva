@@ -23,13 +23,13 @@ describe('TrendIndicator', () => {
 
   it('applies correct color classes for trends', () => {
     const { rerender } = render(<TrendIndicator trend="up" value={10} />);
-    expect(screen.getByText('10.0%')).toHaveClass('text-green-600');
+    expect(screen.getByText('10.0%').parentElement).toHaveClass('text-green-600');
 
     rerender(<TrendIndicator trend="down" value={-10} />);
-    expect(screen.getByText('10.0%')).toHaveClass('text-error');
+    expect(screen.getByText('10.0%').parentElement).toHaveClass('text-error');
 
     rerender(<TrendIndicator trend="neutral" value={0} />);
-    expect(screen.getByText('0.0%')).toHaveClass('text-gray-400');
+    expect(screen.getByText('0.0%').parentElement).toHaveClass('text-gray-400');
   });
 
   it('displays absolute value regardless of sign', () => {

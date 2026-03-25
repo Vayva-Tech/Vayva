@@ -14,7 +14,7 @@ import {
   PrimaryObjectHealth,
   LiveOperations,
   AlertsList,
-  SuggestedActionsList,
+  SuggestedActionsList
 } from "./IndustryNativeSections";
 import { DashboardSwitcher } from "./DashboardSwitcher";
 import { AutopilotBanner } from "./AutopilotBanner";
@@ -30,7 +30,7 @@ import type {
   IndustryOverviewDefinition,
   IndustryDashboardAlert,
   IndustrySuggestedAction,
-  ProductHealthItem,
+  ProductHealthItem
 } from "@/types/dashboard";
 import type { IndustrySlug } from "@/lib/templates/types";
 import type { DashboardThemeMode } from "@/config/dashboard-variants";

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMetricStats, metricsManager } from "@/lib/stubs/reliability";
+import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 
 /**
  * GET /api/ops/health/metrics
@@ -12,6 +14,15 @@ import { getMetricStats, metricsManager } from "@/lib/stubs/reliability";
  */
 export async function GET(_req: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPERATOR");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     // Initialize metrics manager
     await metricsManager.init();
 
@@ -48,6 +59,8 @@ export async function GET(_req: NextRequest) {
       }
     );
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[HEALTH_METRICS] Error fetching metrics:", error);
     return NextResponse.json(
       {

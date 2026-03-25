@@ -76,7 +76,7 @@ info:
   contact:
     name: Vayva Developer Support
     email: developers@vayva.ng
-    url: https://vayva.ng/developers
+    url: https://vayva.ng/help
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT

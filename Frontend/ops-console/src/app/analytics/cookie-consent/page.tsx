@@ -4,9 +4,9 @@
  * Track consent rates, monitor GDPR compliance health
  * Real-time analytics for cookie banner performance
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { TrendingUp, Users, AlertCircle, Download, Calendar } from 'lucide-react';
 // PDF export — inline until shared package is published
@@ -90,14 +90,14 @@ export default function CookieConsentAnalytics() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button 
+          <Button 
             onClick={handleExportReport}
             disabled={isLoading}
             className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
             {isLoading ? 'Generating...' : 'Export Report'}
-          </button>
+          </Button>
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}

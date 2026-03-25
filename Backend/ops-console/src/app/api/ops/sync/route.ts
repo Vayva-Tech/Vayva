@@ -126,7 +126,7 @@ export async function GET(req: NextRequest): Promise<Response> {
               data: { timestamp: Date.now() },
               timestamp: Date.now(),
             });
-          } catch (error) {
+          } catch {
             // Connection likely closed
             cleanup();
           }
@@ -178,7 +178,7 @@ function sendEvent(
   const message = `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`;
   try {
     controller.enqueue(encoder.encode(message));
-  } catch (error) {
+  } catch {
     // Controller is closed, ignore
   }
 }
@@ -216,14 +216,14 @@ async function fetchSystemHealth(): Promise<{
   timestamp: string;
 }> {
   const services: Record<string, { status: string; latency?: number; error?: string }> = {};
-  const startTime = Date.now();
+  const _startTime = Date.now();
 
   // Check database
   try {
     const dbStart = Date.now();
     await prisma.$queryRaw`SELECT 1`;
     services.database = { status: "healthy", latency: Date.now() - dbStart };
-  } catch (error) {
+  } catch {
     services.database = { status: "critical", error: "Connection failed" };
   }
 
@@ -232,7 +232,7 @@ async function fetchSystemHealth(): Promise<{
     const redisStart = Date.now();
     await redis.ping();
     services.redis = { status: "healthy", latency: Date.now() - redisStart };
-  } catch (error) {
+  } catch {
     services.redis = { status: "critical", error: "Connection failed" };
   }
 
@@ -372,7 +372,7 @@ async function fetchQueueStatus(): Promise<{
           failed: failed || 0,
           delayed: delayed || 0,
         };
-      } catch (error) {
+      } catch {
         return {
           name,
           waiting: 0,

@@ -40,7 +40,7 @@ export const GET = withVayvaAPI(
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const endOfLastMonth = startOfMonth;
+      const _endOfLastMonth = startOfMonth;
 
       // Get all active subscriptions
       const activeSubscriptions = await prisma.subscription.findMany({

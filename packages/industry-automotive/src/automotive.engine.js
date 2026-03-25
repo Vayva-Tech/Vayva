@@ -75,7 +75,7 @@ export class AutomotiveEngine {
 
       // Using simplified approach without data resolvers
 
-      console.log(`[AUTOMOTIVE_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
+      console.warn(`[AUTOMOTIVE_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
     } catch (error) {
       console.error('[AUTOMOTIVE_ENGINE] Initialization failed:', error);
       throw error;

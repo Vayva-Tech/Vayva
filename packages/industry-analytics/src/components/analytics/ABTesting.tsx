@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
 
 export interface ABTest {
@@ -33,12 +33,12 @@ export const ABTesting: React.FC<ABTestProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">A/B Testing</h2>
         {onCreateTest && (
-          <button
+          <Button
             onClick={onCreateTest}
             className="px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
           >
             + New Test
-          </button>
+          </Button>
         )}
       </div>
 

@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
+import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 
 // Get all feature flags
 export async function GET(req: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPERATOR");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("q") || "";
 
@@ -28,6 +39,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ flags });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[FEATURE_FLAGS_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to fetch feature flags" },
@@ -39,6 +52,15 @@ export async function GET(req: NextRequest) {
 // Create new feature flag
 export async function POST(req: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "SUPERVISOR");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const body = await req.json();
     const { key, description } = body;
 
@@ -59,6 +81,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, flag });
   } catch (error: unknown) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     const prismaError = error as { code?: string };
     if (prismaError.code === "P2002") {
       return NextResponse.json(

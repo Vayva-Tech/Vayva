@@ -8,7 +8,7 @@
  * - Customer reminders
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const TEST_DRIVE_ADDON: AddOnDefinition = {
   id: 'vayva.automotive.test-drive',

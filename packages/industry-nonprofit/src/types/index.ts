@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nonprofit Industry Type Definitions
  * 

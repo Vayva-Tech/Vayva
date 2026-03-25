@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Professional Services Industry Package Index
  */

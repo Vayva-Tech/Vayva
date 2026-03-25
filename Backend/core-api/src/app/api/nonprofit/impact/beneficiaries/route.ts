@@ -231,7 +231,7 @@ export const POST = withVayvaAPI(
 );
 
 // Generate demographic summary statistics
-function generateDemographicSummary(beneficiaries: any[]): any {
+function _generateDemographicSummary(beneficiaries: any[]): any {
   const summary: any = {
     total: beneficiaries.length,
     byGender: {} as Record<string, number>,

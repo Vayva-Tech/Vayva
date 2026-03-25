@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Guest List Manager Component
  */
@@ -54,9 +54,9 @@ export const GuestListManager: React.FC<GuestListManagerProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Guest List Manager</h3>
         {onAddGuest && (
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             + Add Guest
-          </button>
+          </Button>
         )}
       </div>
 

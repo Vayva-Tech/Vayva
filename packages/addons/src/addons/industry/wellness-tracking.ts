@@ -4,7 +4,7 @@
  * Patient wellness tracking and health goals
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const WELLNESS_TRACKING_ADDON: AddOnDefinition = {
   id: 'vayva.wellness-tracking',

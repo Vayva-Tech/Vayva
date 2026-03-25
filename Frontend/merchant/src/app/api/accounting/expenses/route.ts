@@ -1,7 +1,9 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
 /**
  * GET /api/accounting/expenses
@@ -13,6 +15,11 @@ export async function GET(request: NextRequest) {
   const end = searchParams.get("end");
 
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const data = await apiJson<{
       success?: boolean;
       error?: string;
@@ -25,24 +32,24 @@ export async function GET(request: NextRequest) {
         receiptUrl?: string;
         status: string;
       }>;
-    }>(`${process.env.BACKEND_API_URL}/api/accounting/expenses?start=${start}&end=${end}`);
+    }>(
+      `${backendBase()}/api/accounting/expenses?start=${encodeURIComponent(start ?? "")}&end=${encodeURIComponent(end ?? "")}`,
+      { headers: auth.headers },
+    );
 
     if (data.success === false) {
-      throw new Error(data.error || 'Failed to fetch expenses');
+      throw new Error(data.error || "Failed to fetch expenses");
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/accounting/expenses',
-        operation: 'GET_EXPENSES',
-      }
-    );
+    handleApiError(error, {
+      endpoint: "/api/accounting/expenses",
+      operation: "GET_EXPENSES",
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch expenses' },
-      { status: 500 }
+      { error: "Failed to fetch expenses" },
+      { status: 500 },
     );
   }
 }
@@ -53,32 +60,34 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const result = await apiJson<{ success: boolean; data?: any; error?: string }>(
-      `${process.env.BACKEND_API_URL}/api/accounting/expenses`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      }
-    );
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body: unknown = await request.json().catch(() => ({}));
+    const result = await apiJson<{
+      success: boolean;
+      data?: unknown;
+      error?: string;
+    }>(`${backendBase()}/api/accounting/expenses`, {
+      method: "POST",
+      headers: auth.headers,
+      body: JSON.stringify(body),
+    });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to create expense');
+      throw new Error(result.error || "Failed to create expense");
     }
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/accounting/expenses',
-        operation: 'CREATE_EXPENSE',
-      }
-    );
+    handleApiError(error, {
+      endpoint: "/api/accounting/expenses",
+      operation: "CREATE_EXPENSE",
+    });
     return NextResponse.json(
-      { error: 'Failed to create expense' },
-      { status: 500 }
+      { error: "Failed to create expense" },
+      { status: 500 },
     );
   }
 }

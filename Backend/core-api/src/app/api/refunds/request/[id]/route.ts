@@ -24,7 +24,7 @@ function getString(value: unknown): string | undefined {
 
 export const POST = withVayvaAPI(
   PERMISSIONS.ORDERS_MANAGE,
-  async (req, { storeId, params, user, correlationId }: APIContext) => {
+  async (req, { storeId, params, correlationId }: APIContext) => {
     try {
       const { id: orderId } = await params;
       if (!orderId) {
@@ -80,7 +80,7 @@ export const POST = withVayvaAPI(
           where: {
             storeId,
             orderId,
-            provider: "PAYSTACK",
+            provider: "paystack",
             status: "SUCCEEDED",
           },
           orderBy: { createdAt: "desc" },

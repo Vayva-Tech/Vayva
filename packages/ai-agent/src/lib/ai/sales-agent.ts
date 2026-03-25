@@ -1,16 +1,15 @@
-import { GroqClient } from "./groq-client";
-import { MerchantBrainService, } from "./merchant-brain.service";
+import { OpenRouterClient } from "./openrouter-client";
+import { MerchantBrainService } from "./merchant-brain.service";
 import { prisma, Prisma } from "@vayva/db";
-import { Chat } from "groq-sdk/resources/chat";
 import { AiUsageService } from "./ai-usage.service";
 import { DataGovernanceService } from "../governance/data-governance.service";
-import { EscalationService, } from "../support/escalation.service";
+import { EscalationService } from "../support/escalation.service";
 import { ConversionService } from "./conversion.service";
 import { reportError } from "../error";
 import { NotificationService } from "../../services/notifications";
 
 // Initialize centralised client
-const groqClient = new GroqClient("SUPPORT");
+const aiClient = new OpenRouterClient("SUPPORT");
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -24,6 +23,14 @@ function getMeta(value: unknown): UnknownRecord {
 
 function getString(value: unknown): string {
     return typeof value === "string" ? value : "";
+}
+
+function getNumber(value: unknown): number | undefined {
+    return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
+function clampNumber(n: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, n));
 }
 
 type IncomingMessage = {
@@ -49,6 +56,7 @@ type MerchantProfile = {
     tonePreset?: string;
     brevityMode?: string;
     persuasionLevel?: number;
+    oneQuestionRule?: boolean;
 };
 
 type StoreMetadata = {
@@ -170,6 +178,7 @@ export class SalesAgent {
                 : "STRATEGY: Be helpful but stay neutral. No active selling.";
             const settings = getMeta(store?.settings);
             const supportPhone = getString(settings.supportPhone);
+            const aiAgentSettings = getMeta(settings.aiAgent);
             const storeMetadata: StoreMetadata = {
                 description: getString(settings.description) || undefined,
                 hours: getString(settings.hours) || undefined,
@@ -196,11 +205,12 @@ export class SalesAgent {
                     tonePreset: profile.tonePreset || undefined,
                     brevityMode: profile.brevityMode || undefined,
                     persuasionLevel: typeof profile.persuasionLevel === "number" ? profile.persuasionLevel : undefined,
+                    oneQuestionRule: typeof (profile as any).oneQuestionRule === "boolean" ? (profile as any).oneQuestionRule : undefined,
                 }
                 : null;
             const systemPrompt = this.getSystemPrompt(store?.name || "the store", store?.category, normalizedProfile, contextString + "\n" + persuasionAdvice + "\n" + fulfillmentSnapshot, storeMetadata);
             // 4. Tool Definitions - Industry-aware tools
-            const tools = this.getToolsForIndustry(store?.category) as unknown as Chat.ChatCompletionTool[];
+            const tools = this.getToolsForIndustry(store?.category) as unknown as any[];
             // 5. LLM Execution
             const llmMessages = [
                 { role: "system", content: systemPrompt },
@@ -209,9 +219,18 @@ export class SalesAgent {
                     content: typeof m.content === "string" ? m.content : "",
                 }))
             ];
-            const response = await groqClient.chatCompletion(llmMessages, {
-                model: "llama-3.1-70b-versatile",
-                temperature: 0.1,
+            const configuredModel = getString(aiAgentSettings.model);
+            const configuredTemperature = getNumber(aiAgentSettings.temperature);
+            const configuredMaxTokens = getNumber(aiAgentSettings.maxTokens);
+
+            const response = await aiClient.chatCompletion(llmMessages, {
+                model: configuredModel || "google/gemini-2.5-flash",
+                temperature: typeof configuredTemperature === "number"
+                    ? clampNumber(configuredTemperature, 0, 2)
+                    : 0.1,
+                maxTokens: typeof configuredMaxTokens === "number"
+                    ? clampNumber(Math.floor(configuredMaxTokens), 100, 4096)
+                    : 1024,
                 tools,
                 tool_choice: "auto",
                 storeId,
@@ -254,6 +273,15 @@ export class SalesAgent {
                     }
                     else if (tool.function?.name === "get_store_fulfillment_policy") {
                         const result = await MerchantBrainService.getStoreFulfillmentPolicy(storeId);
+                        toolResults.push({
+                            role: "tool",
+                            tool_call_id: tool.id,
+                            content: JSON.stringify(result),
+                        });
+                    }
+                    else if (tool.function?.name === "get_tracking_info") {
+                        const args = JSON.parse(tool.function?.arguments);
+                        const result = await MerchantBrainService.getTrackingInfo(storeId, args);
                         toolResults.push({
                             role: "tool",
                             tool_call_id: tool.id,
@@ -488,13 +516,13 @@ export class SalesAgent {
                         });
                     }
                 }
-                const secondResponse = await groqClient.chatCompletion([
+                const secondResponse = await aiClient.chatCompletion([
                     { role: "system", content: systemPrompt },
                     ...messages,
                     choice,
                     ...toolResults,
                 ], {
-                    model: "llama-3.1-70b-versatile",
+                    model: "google/gemini-2.5-flash",
                     temperature: 0.1,
                     storeId,
                     requestId: options?.requestId,
@@ -510,7 +538,7 @@ export class SalesAgent {
             if (response && response.usage) {
                 await AiUsageService.logUsage({
                     storeId,
-                    model: "llama-3.1-70b-versatile",
+                    model: response.model || "openai/gpt-4o-mini",
                     inputTokens: response.usage?.prompt_tokens,
                     outputTokens: response.usage?.completion_tokens,
                     requestId: options?.requestId,
@@ -520,7 +548,7 @@ export class SalesAgent {
                     storeId,
                     conversationId: conversationId,
                     requestId: options?.requestId,
-                    model: "llama-3.1-70b-versatile",
+                    model: response.model || "openai/gpt-4o-mini",
                     toolsUsed: (choice.tool_calls || []).map((t) => t.function?.name),
                     retrievedDocs: retrievedDocIds,
                     inputSummary: lastMessage,
@@ -581,6 +609,8 @@ export class SalesAgent {
         const brevity = profile?.brevityMode === "Short"
             ? "Keep replies under 3 sentences."
             : "Be detailed.";
+        const oneQuestionRule =
+            typeof profile?.oneQuestionRule === "boolean" ? profile.oneQuestionRule : true;
         const storeInfo = storeMetadata ? `
 STORE INFO:
 - Description: ${storeMetadata.description || "N/A"}
@@ -663,7 +693,7 @@ IMAGE HANDLING (CRITICAL):
 CORE RULES:
 1. BE HUMAN: Write like a real person texting, not a corporate bot. Use contractions (I'm, you'll, we've).
 2. BE HELPFUL: Answer questions directly. If you don't know, say so honestly.
-3. ONE QUESTION: Ask only ONE follow-up question per message to keep conversation flowing.
+3. ONE QUESTION: ${oneQuestionRule ? "Ask only ONE follow-up question per message to keep conversation flowing." : "You may ask multiple questions when necessary, but keep it minimal and easy to answer."}
 4. NIGERIA CONTEXT: You're in Nigeria. Use ₦ for prices. Understand local context.
 5. TRUTHFULNESS: Only mention products/prices you find in the context below.
 6. ESCALATION: If user mentions "human", "scam", "fraud", "manager", "supervisor", or seems very angry, respond with exactly "[HANDOFF_REQUIRED]" and nothing else.
@@ -1080,6 +1110,23 @@ Remember: You're helping a real person. Be genuine, be helpful, be human.`;
                     name: "get_store_fulfillment_policy",
                     description: "Get store pickup/delivery capabilities, pickup points, and delivery mode (Kwik vs Manual)",
                     parameters: { type: "object", properties: {} },
+                },
+            },
+            {
+                type: "function",
+                function: {
+                    name: "get_tracking_info",
+                    description: "Fetch delivery tracking details (status, COD amount, merchant tracking link, and live rider location if available). Provide trackingCode if you have it; otherwise provide orderRef (refCode/orderNumber) or phone.",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            trackingCode: { type: "string" },
+                            orderRef: { type: "string", description: "Order reference or order number (refCode or numeric orderNumber)" },
+                            phoneE164: { type: "string", description: "Customer phone in E164 format (+234...)" },
+                        },
+                        // allow any one identifier
+                        required: [],
+                    },
                 },
             },
             {

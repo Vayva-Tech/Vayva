@@ -1,14 +1,9 @@
-import Groq from "groq-sdk";
 import { logger } from "@vayva/shared";
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || "",
-});
 
 export interface AIMessage {
   role: "system" | "user" | "assistant" | "tool";
   content: string | null;
-  tool_calls?: Groq.Chat.Completions.ChatCompletionMessageToolCall[];
+  tool_calls?: unknown[];
   tool_call_id?: string;
   name?: string; // For tool outputs
 }
@@ -35,7 +30,7 @@ export class AIProvider {
    */
   static async chatWithTools(
     messages: AIMessage[],
-    tools: Groq.Chat.Completions.ChatCompletionTool[],
+    tools: unknown[],
     context: {
       storeName: string;
       products?: Array<{ name: string; price: number; available?: boolean }>; // Legacy context, maybe less needed if using tools
@@ -115,30 +110,41 @@ If it sounds like gas refill or utility refill, confirm cylinder size and delive
 If it sounds like digital goods, confirm delivery method and expected turnaround time
 `;
 
-    const requestMessages: Groq.Chat.Completions.ChatCompletionMessageParam[] =
-      [
-        { role: "system", content: systemPrompt },
-        ...messages.map(
-          (m) =>
-            ({
-              role: m.role as "system" | "user" | "assistant" | "tool",
-              content: m.content,
-              tool_calls: m.tool_calls,
-              tool_call_id: m.tool_call_id,
-              name: m.name,
-            }) as Groq.Chat.Completions.ChatCompletionMessageParam,
-        ),
-      ];
+    const requestMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages.map((m) => ({
+        role: m.role as "system" | "user" | "assistant" | "tool",
+        content: m.content,
+        tool_calls: m.tool_calls,
+        tool_call_id: m.tool_call_id,
+        name: m.name,
+      })),
+    ];
 
     try {
-      const completion = await groq.chat.completions.create({
-        messages: requestMessages,
-        model: "llama-3.1-70b-versatile",
-        temperature: 0.5, // Lower temperature for tool accuracy
-        tools: tools.length > 0 ? tools : undefined,
-        tool_choice: tools.length > 0 ? "auto" : "none",
+      const apiKey = process.env.OPENROUTER_API_KEY || "";
+      if (!apiKey) throw new Error("OPENROUTER_API_KEY not configured");
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://vayva.tech",
+          "X-Title": "Vayva Worker AI",
+        },
+        body: JSON.stringify({
+          messages: requestMessages,
+          model: "google/gemini-2.5-flash",
+          temperature: 0.5,
+          tools: tools.length > 0 ? tools : undefined,
+          tool_choice: tools.length > 0 ? "auto" : "none",
+        }),
+        signal: AbortSignal.timeout(25_000),
       });
 
+      if (!response.ok) throw new Error(`OpenRouter error: ${response.status}`);
+      const completion = await response.json();
       const choice = completion.choices[0];
       return {
         content: choice?.message?.content || "",

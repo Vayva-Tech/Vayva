@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { logger } from "@vayva/shared";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import {
   Card,
   CardContent,
@@ -31,6 +30,8 @@ import {
 import { FoodProductMetadata } from "@/lib/types/food";
 import { Spinner as Loader2 } from "@phosphor-icons/react/ssr";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 export default function NewMenuItemPage() {
   const router = useRouter();
@@ -79,22 +80,37 @@ export default function NewMenuItemPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-10">
-      <Breadcrumbs />
-      <BackButton
-        href="/dashboard/menu-items"
-        label="Back to Menu"
-        className="mb-4"
-      />
+    <div className="space-y-6">
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Tip
+              </div>
+              <div className="mt-2 text-sm font-semibold text-gray-900">
+                Better descriptions sell
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Mention ingredients, portion size, and spice level to reduce questions.
+              </p>
+            </div>
+          </>
+        }
+      >
+        <div className="flex items-center gap-4">
+          <BackButton
+            href="/dashboard/menu-items"
+            label="Back to Menu"
+            className="mb-0"
+          />
+          <PageHeader
+            title="Add Menu Item"
+            subtitle="Create a new dish for your restaurant menu."
+          />
+        </div>
 
-      <div className="space-y-1">
-        <h2 className="text-3xl font-bold tracking-tight">Add Menu Item</h2>
-        <p className="text-gray-500">
-          Create a new dish for your restaurant menu.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="max-w-2xl">
         <Card>
           <CardHeader>
             <CardTitle>Basic Details</CardTitle>
@@ -222,7 +238,8 @@ export default function NewMenuItemPage() {
             </Button>
           </CardFooter>
         </Card>
-      </form>
+        </form>
+      </PageWithInsights>
     </div>
   );
 }

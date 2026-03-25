@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Freshness Tracker Widget Component
  * Displays produce freshness status and quality metrics
@@ -41,9 +41,9 @@ export const FreshnessTracker: React.FC<FreshnessTrackerProps> = ({
 }) => {
   // Mock data if not provided
   const displayRecords = records.length > 0 ? records : [
-    { id: '1', productId: 'prod-1', productName: 'Organic Apples', batchNumber: 'BATCH-001', freshnessScore: 95, qualityGrade: 'A', status: 'fresh', expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
-    { id: '2', productId: 'prod-2', productName: 'Fresh Lettuce', batchNumber: 'BATCH-002', freshnessScore: 72, qualityGrade: 'B', status: 'aging', expirationDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) },
-    { id: '3', productId: 'prod-3', productName: 'Strawberries', batchNumber: 'BATCH-003', freshnessScore: 45, qualityGrade: 'C', status: 'near-expiry', expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) },
+    { id: '1', productId: 'prod-1', productName: 'Organic Apples', batchNumber: 'BATCH-001', freshnessScore: 95, qualityGrade: 'A', status: 'fresh', expirationDate: new Date('2030-01-08T12:00:00Z') },
+    { id: '2', productId: 'prod-2', productName: 'Fresh Lettuce', batchNumber: 'BATCH-002', freshnessScore: 72, qualityGrade: 'B', status: 'aging', expirationDate: new Date('2030-01-03T12:00:00Z') },
+    { id: '3', productId: 'prod-3', productName: 'Strawberries', batchNumber: 'BATCH-003', freshnessScore: 45, qualityGrade: 'C', status: 'near-expiry', expirationDate: new Date('2030-01-02T12:00:00Z') },
   ];
 
   const displayStats = stats || {
@@ -88,9 +88,9 @@ export const FreshnessTracker: React.FC<FreshnessTrackerProps> = ({
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-semibold">Freshness Overview</h3>
           {onRefresh && (
-            <button onClick={onRefresh} className="text-blue-600 hover:text-blue-800">
+            <Button onClick={onRefresh} className="text-blue-600 hover:text-blue-800">
               ↻ Refresh
-            </button>
+            </Button>
           )}
         </div>
         
@@ -124,12 +124,12 @@ export const FreshnessTracker: React.FC<FreshnessTrackerProps> = ({
           <p className="text-sm text-gray-500">Monitor produce quality and shelf life</p>
         </div>
         {onRefresh && (
-          <button 
+          <Button 
             onClick={onRefresh}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             ↻ Refresh
-          </button>
+          </Button>
         )}
       </div>
 

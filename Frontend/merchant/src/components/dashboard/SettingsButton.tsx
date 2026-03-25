@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -27,7 +26,7 @@ export function SettingsButton({ className }: SettingsButtonProps) {
       </Button>
 
       {showSettings && (
-        <SettingsPanel onClose={() => setShowSettings(false)} />
+        <SettingsPanel isOpen={showSettings} onClose={() => setShowSettings(false)} />
       )}
     </>
   );

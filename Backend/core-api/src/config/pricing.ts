@@ -5,7 +5,7 @@
  * This file is the single source of truth for all pricing, plans, and fees
  * across the Vayva platform (marketing, dashboard, and legal).
  */
-export const PRICING_VERSION = "2026-03-23_v3";
+export const PRICING_VERSION = "2026-03-25_v5";
 export const CURRENCY = "NGN";
 // Transaction Fees
 export const FEES = {
@@ -21,9 +21,9 @@ export const PLANS = [
     tagline: "Grow without the busywork. AI handles your orders 24/7.",
     bullets: [
       "1 Staff Seat",
-      "Up to 500 Products",
+      "Up to 100 Products",
       "WhatsApp & Instagram Automation",
-      "Remove Branding & Custom Domain",
+      "Remove Vayva Branding (Custom Domain from Pro)",
     ],
     ctaLabel: "Upgrade to Starter",
     featured: true,
@@ -37,6 +37,7 @@ export const PLANS = [
     tagline: "Scale with AI doing the heavy lifting. Your team, unlimited growth.",
     bullets: [
       "3 Staff Seats",
+      "Up to 300 Products",
       "Multi-Location & API Access",
       "Dedicated Account Manager",
       "Custom Integrations",
@@ -52,8 +53,9 @@ export const PLANS = [
     tagline: "Everything unlocked. Maximum power for serious businesses.",
     bullets: [
       "5 Staff Seats",
-      "All Features Unlocked",
+      "Up to 500 Products",
       "Visual Workflow Builder",
+      "Merged Industry View",
       "Priority Support & AI Autopilot",
     ],
     ctaLabel: "Upgrade to Pro+",

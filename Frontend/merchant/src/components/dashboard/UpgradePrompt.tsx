@@ -121,12 +121,12 @@ export function UpgradePrompt({
                     </Button>
                   </Link>
 
-                  <button
+                  <Button
                     onClick={handleDismiss}
                     className="text-white/70 hover:text-white text-sm font-medium transition-colors"
                   >
                     Maybe later
-                  </button>
+                  </Button>
 
                   {/* Trial countdown */}
                   <div className="ml-auto flex items-center gap-2 text-white/80 text-sm">

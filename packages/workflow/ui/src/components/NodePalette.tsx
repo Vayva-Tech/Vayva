@@ -5,7 +5,7 @@
 
 import React, { useMemo } from 'react';
 import type { IndustrySlug, NodeType, NodeDefinition } from '@vayva/workflow-engine';
-import { getNodesByIndustry, getNodesByCategory, NODE_DEFINITIONS } from '@vayva/workflow-engine';
+import { getNodesByIndustry } from '@vayva/workflow-engine';
 import { 
   Play, 
   GitBranch, 
@@ -38,34 +38,6 @@ export interface NodePaletteProps {
   industry: IndustrySlug;
   className?: string;
 }
-
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Play,
-  GitBranch,
-  Clock,
-  Mail,
-  MessageSquare,
-  Database,
-  User,
-  Tag,
-  Sparkles,
-  ShoppingBag,
-  Utensils,
-  Home,
-  Heart,
-  Split,
-  Merge,
-  RotateCcw,
-  Bell,
-  FileText,
-  Search,
-  Filter,
-  Package,
-  Layers,
-  Plus,
-  Minus,
-  Percent,
-};
 
 const categoryLabels: Record<string, string> = {
   trigger: 'Trigger',
@@ -135,8 +107,6 @@ function getIconForNodeType(type: NodeType): React.ComponentType<{ className?: s
 }
 
 function NodePaletteItem({ node, onDragStart }: { node: NodeDefinition; onDragStart: (e: React.DragEvent, type: NodeType) => void }) {
-  const Icon = getIconForNodeType(node.type);
-
   return (
     <div
       draggable
@@ -144,7 +114,9 @@ function NodePaletteItem({ node, onDragStart }: { node: NodeDefinition; onDragSt
       className="flex items-center gap-3 p-3 mb-2 bg-white border border-gray-200 rounded-lg cursor-move hover:border-blue-400 hover:shadow-sm transition-all"
     >
       <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-md">
-        <Icon className="w-4 h-4 text-gray-600" />
+        {React.createElement(getIconForNodeType(node.type), {
+          className: "w-4 h-4 text-gray-600",
+        })}
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-gray-900 truncate">{node.label}</div>

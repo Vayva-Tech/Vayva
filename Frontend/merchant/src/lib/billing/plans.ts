@@ -16,7 +16,7 @@ export const PLANS = {
     slug: "starter",
     name: "Starter",
     priceNgn: 25000,
-    quarterlyPriceNgn: 67500, // 3 months at ₦22,500/month (10% discounted)
+    quarterlyPriceNgn: 60000, // 3 months @ 20% off vs monthly × 3
     limits: {
       teamSeats: 1,
       monthlyCampaignSends: 1000,
@@ -28,11 +28,24 @@ export const PLANS = {
   PRO: {
     slug: "pro",
     name: "Pro",
-    priceNgn: 40000,
-    quarterlyPriceNgn: 108000, // 3 months at ₦36,000/month (10% discounted)
+    priceNgn: 35000,
+    quarterlyPriceNgn: 84000, // 3 months @ 20% off vs monthly × 3
     limits: {
       teamSeats: 3,
       monthlyCampaignSends: 10000,
+    },
+    features: {
+      approvals: true,
+    },
+  },
+  PRO_PLUS: {
+    slug: "pro_plus",
+    name: "Pro+",
+    priceNgn: 50000,
+    quarterlyPriceNgn: 120000, // 3 months @ 20% off vs monthly × 3
+    limits: {
+      teamSeats: 5,
+      monthlyCampaignSends: 50000,
     },
     features: {
       approvals: true,

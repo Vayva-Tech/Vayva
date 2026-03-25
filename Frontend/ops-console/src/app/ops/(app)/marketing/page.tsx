@@ -405,7 +405,7 @@ export default function MarketingDashboardPage(): React.JSX.Element {
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1">
             {(["24h", "7d", "30d", "90d"] as Period[]).map((p) => (
-              <button
+              <Button
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -415,7 +415,7 @@ export default function MarketingDashboardPage(): React.JSX.Element {
                 }`}
               >
                 {p === "24h" ? "24H" : p === "7d" ? "7D" : p === "30d" ? "30D" : "90D"}
-              </button>
+              </Button>
             ))}
           </div>
           <Button

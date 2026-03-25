@@ -4,7 +4,7 @@
  * Displays list of patients with search, filter, and offline support
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -17,13 +17,48 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { backendAPIService } from '../../services/api/backend-api.service';
-import { database } from '../../database';
-import type { Patient } from '../../database/models/Patient';
-import Icon from 'lucide-react-native';
+import { database, PatientModel } from '../../database';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Calendar,
+  Phone,
+  Plus,
+  Search,
+  Users,
+  X,
+} from 'lucide-react-native';
+
+interface PatientListRow {
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  email: string;
+  phone: string;
+  allergies?: string;
+  medications?: string;
+}
+
+/** Normalized patient row for Watermelon + list state. */
+interface SanitizedPatientRecord {
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  email: string;
+  phone: string;
+  insurance_provider: string;
+  insurance_id: string;
+  allergies: string;
+  medications: string;
+  created_at: number;
+  updated_at: number;
+}
 
 interface PatientItemProps {
-  patient: any;
-  onPress: (patient: any) => void;
+  patient: PatientListRow;
+  onPress: (patient: PatientListRow) => void;
 }
 
 const PatientItem: React.FC<PatientItemProps> = ({ patient, onPress }) => {
@@ -36,18 +71,18 @@ const PatientItem: React.FC<PatientItemProps> = ({ patient, onPress }) => {
       
       <View style={styles.patientInfo}>
         <View style={styles.infoRow}>
-          <Icon name="calendar" size={16} color="#666" />
+          <Calendar size={16} color="#666" />
           <Text style={styles.infoText}>DOB: {patient.date_of_birth}</Text>
         </View>
         
         <View style={styles.infoRow}>
-          <Icon name="phone" size={16} color="#666" />
+          <Phone size={16} color="#666" />
           <Text style={styles.infoText}>{patient.phone}</Text>
         </View>
         
         {patient.allergies && (
           <View style={[styles.alertBox, styles.allergyAlert]}>
-            <Icon name="alert-circle" size={16} color="#ef4444" />
+            <AlertCircle size={16} color="#ef4444" />
             <Text style={styles.alertText}>Allergies: {patient.allergies}</Text>
           </View>
         )}
@@ -56,8 +91,22 @@ const PatientItem: React.FC<PatientItemProps> = ({ patient, onPress }) => {
   );
 };
 
-export default function PatientsScreen({ navigation }: any) {
-  const [patients, setPatients] = useState<any[]>([]);
+function patientModelToRow(p: PatientModel): PatientListRow {
+  return {
+    id: p.id,
+    first_name: p.firstName,
+    last_name: p.lastName,
+    date_of_birth: p.dateOfBirth ?? "",
+    email: p.email ?? "",
+    phone: p.phone ?? "",
+    allergies: p.allergies,
+    medications: p.medications,
+  };
+}
+
+type NavigationLike = { navigate: (routeName: string, params?: Record<string, unknown>) => void };
+export default function PatientsScreen({ navigation }: { navigation: NavigationLike }) {
+  const [patients, setPatients] = useState<PatientListRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,45 +125,72 @@ export default function PatientsScreen({ navigation }: any) {
 
       // Try to load from local database first (offline-first)
       const localPatients = await database
-        .get<Patient>('patients')
+        .get<PatientModel>("patients")
         .query()
         .fetch();
 
       if (localPatients.length > 0) {
-        setPatients(localPatients);
+        setPatients(localPatients.map(patientModelToRow));
         setLoading(false);
       }
 
       // Then sync with backend
       const response = await backendAPIService.getPatients();
-      
+
       // Update local database with fresh data
       await database.write(async () => {
-        // Delete existing records
-        await localPatients.forEach(p => p.destroyPermanently());
-        
-        // Insert fresh data
-        for (const patientData of response.data) {
-          await database.get<Patient>('patients').create((record) => {
-            record._raw = sanitizeRecord(patientData);
+        for (const p of localPatients) {
+          await p.destroyPermanently();
+        }
+
+        const collection = database.get<PatientModel>("patients");
+        for (const patientData of response.data as unknown[]) {
+          const raw = sanitizeRecord(patientData as Record<string, unknown>);
+          await collection.create((record: PatientModel) => {
+            record._raw.id = raw.id;
+            record.firstName = raw.first_name;
+            record.lastName = raw.last_name;
+            record.dateOfBirth = raw.date_of_birth;
+            record.email = raw.email;
+            record.phone = raw.phone;
+            record.insuranceProvider = raw.insurance_provider;
+            record.insuranceId = raw.insurance_id;
+            record.allergies = raw.allergies;
+            record.medications = raw.medications;
+            record.createdAtRaw = raw.created_at;
+            record.updatedAtRaw = raw.updated_at;
           });
         }
       });
 
-      setPatients(response.data);
-    } catch (err: any) {
+      setPatients(
+        (response.data as Record<string, unknown>[]).map((d) => {
+          const r = sanitizeRecord(d);
+          return {
+            id: r.id,
+            first_name: r.first_name,
+            last_name: r.last_name,
+            date_of_birth: r.date_of_birth,
+            email: r.email,
+            phone: r.phone,
+            allergies: r.allergies || undefined,
+            medications: r.medications || undefined,
+          };
+        }),
+      );
+    } catch (err: unknown) {
       console.error('[PATIENTS] Load error:', err);
-      setError(err.message || 'Failed to load patients');
+      setError(err instanceof Error ? err.message : "Failed to load patients");
       
       // If API fails, try to show cached data
       try {
         const cachedPatients = await database
-          .get<Patient>('patients')
+          .get<PatientModel>("patients")
           .query()
           .fetch();
-        
+
         if (cachedPatients.length > 0) {
-          setPatients(cachedPatients);
+          setPatients(cachedPatients.map(patientModelToRow));
         }
       } catch (cacheErr) {
         console.error('[PATIENTS] Cache error:', cacheErr);
@@ -125,28 +201,30 @@ export default function PatientsScreen({ navigation }: any) {
     }
   }
 
-  function sanitizeRecord(data: any): any {
+  function sanitizeRecord(data: Record<string, unknown>): SanitizedPatientRecord {
     return {
-      id: data.id,
-      first_name: data.firstName || data.first_name || '',
-      last_name: data.lastName || data.last_name || '',
-      date_of_birth: data.dateOfBirth || data.date_of_birth || '',
-      email: data.email || '',
-      phone: data.phone || '',
-      insurance_provider: data.insuranceProvider || data.insurance_provider || '',
-      insurance_id: data.insuranceId || data.insurance_id || '',
-      allergies: data.allergies || '',
-      medications: data.medications || '',
-      created_at: data.createdAt || Date.now(),
-      updated_at: data.updatedAt || Date.now(),
+      id: String(data.id ?? ""),
+      first_name: String(data.firstName ?? data.first_name ?? ""),
+      last_name: String(data.lastName ?? data.last_name ?? ""),
+      date_of_birth: String(data.dateOfBirth ?? data.date_of_birth ?? ""),
+      email: String(data.email ?? ""),
+      phone: String(data.phone ?? ""),
+      insurance_provider: String(
+        data.insuranceProvider ?? data.insurance_provider ?? "",
+      ),
+      insurance_id: String(data.insuranceId ?? data.insurance_id ?? ""),
+      allergies: String(data.allergies ?? ""),
+      medications: String(data.medications ?? ""),
+      created_at: typeof data.createdAt === "number" ? data.createdAt : Date.now(),
+      updated_at: typeof data.updatedAt === "number" ? data.updatedAt : Date.now(),
     };
   }
 
-  function handlePatientPress(patient: any) {
+  function handlePatientPress(patient: PatientListRow) {
     navigation.navigate('PatientDetails', { patientId: patient.id });
   }
 
-  const filteredPatients = patients.filter(patient => {
+  const filteredPatients = patients.filter((patient: PatientListRow) => {
     const fullName = `${patient.first_name} ${patient.last_name}`.toLowerCase();
     return fullName.includes(searchQuery.toLowerCase()) ||
            patient.id.toLowerCase().includes(searchQuery.toLowerCase());
@@ -166,7 +244,7 @@ export default function PatientsScreen({ navigation }: any) {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <Icon name="search" size={20} color="#666" />
+          <Search size={20} color="#666" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search patients..."
@@ -177,7 +255,7 @@ export default function PatientsScreen({ navigation }: any) {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Icon name="x" size={20} color="#666" />
+              <X size={20} color="#666" />
             </TouchableOpacity>
           )}
         </View>
@@ -186,14 +264,14 @@ export default function PatientsScreen({ navigation }: any) {
           style={styles.addButton}
           onPress={() => navigation.navigate('AddPatient')}
         >
-          <Icon name="plus" size={24} color="#fff" />
+          <Plus size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
       {/* Error Message */}
       {error && (
         <View style={styles.errorContainer}>
-          <Icon name="alert-triangle" size={20} color="#ef4444" />
+          <AlertTriangle size={20} color="#ef4444" />
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
@@ -214,7 +292,7 @@ export default function PatientsScreen({ navigation }: any) {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="users" size={48} color="#ccc" />
+            <Users size={48} color="#ccc" />
             <Text style={styles.emptyText}>No patients found</Text>
           </View>
         }

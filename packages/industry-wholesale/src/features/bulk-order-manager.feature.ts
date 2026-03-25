@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Bulk Order Manager Feature
  */

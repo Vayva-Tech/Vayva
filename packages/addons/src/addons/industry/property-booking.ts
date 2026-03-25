@@ -4,7 +4,7 @@
  * Schedule property viewings and open houses
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PROPERTY_BOOKING_ADDON: AddOnDefinition = {
   id: 'vayva.property-booking',

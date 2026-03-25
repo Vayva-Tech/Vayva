@@ -111,7 +111,7 @@ export const GET = withVayvaAPI(
 
 export const POST = withVayvaAPI(
   PERMISSIONS.KITCHEN_MANAGE,
-  async (req: NextRequest, { storeId, user, correlationId }: APIContext) => {
+  async (req: NextRequest, { storeId, _user, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
       const json = await req.json().catch(() => ({}));

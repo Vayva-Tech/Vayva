@@ -1,6 +1,6 @@
 import type {
   IndustryDashboardDefinition,
-  AlertThreshold,
+  AlertThreshold
 } from "@/config/industry-dashboard-definitions";
 
 // ---------------------------------------------------------------------------

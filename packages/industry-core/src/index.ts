@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // @vayva/industry-core
 // ============================================================================
@@ -13,6 +12,11 @@ export * from "./lib/dashboard/universal-types";
 
 // Export engine
 export { DashboardEngine } from "./engine";
+export { IndustryEngine, type Feature } from "./industry-engine-base";
+export type {
+  DataResolver,
+  DataResolutionContext,
+} from "./engine";
 
 // Export widgets
 export * from "./widgets/index";

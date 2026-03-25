@@ -9,8 +9,8 @@ async function main() {
   const app = createServer();
 
   app.listen(config.port, () => {
-    console.log(`Workflow service running on port ${config.port}`);
-    console.log(`Environment: ${config.nodeEnv}`);
+    console.warn(`Workflow service running on port ${config.port}`);
+    console.warn(`Environment: ${config.nodeEnv}`);
   });
 }
 

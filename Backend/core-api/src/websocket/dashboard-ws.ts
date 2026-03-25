@@ -22,12 +22,12 @@ interface DashboardClient extends WebSocket {
 // WebSocket message format
 interface WebSocketMessage {
   event: string;
-  data: any;
-  timestamp: number;
+  data: unknown;
+  timestamp?: number;
 }
 
 // Industry-specific update types
-type IndustryUpdateType = 
+type _IndustryUpdateType = 
   | "order_created"
   | "order_updated"
   | "kitchen_status"
@@ -43,10 +43,24 @@ export class DashboardWebSocketServer {
   private clients: Map<string, Set<DashboardClient>> = new Map();
   private heartbeatInterval: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(server: any) {
+  private static asReq(value: unknown): {
+    headers?: { authorization?: string; host?: string };
+    url?: string;
+    user?: unknown;
+  } {
+    return typeof value === "object" && value !== null
+      ? (value as {
+          headers?: { authorization?: string; host?: string };
+          url?: string;
+          user?: unknown;
+        })
+      : {};
+  }
+
+  constructor(server: unknown) {
     // Initialize WebSocket server
     this.wss = new WebSocketServer({ 
-      server, 
+      server: server as unknown as import("node:http").Server,
       path: "/ws/dashboard",
       verifyClient: this.verifyClient.bind(this)
     });
@@ -57,8 +71,8 @@ export class DashboardWebSocketServer {
     logger.info("[WEBSOCKET] Dashboard WebSocket server initialized");
   }
 
-  private verifyClient(info: any, cb: (result: boolean, code?: number, message?: string) => void) {
-    const { req } = info;
+  private verifyClient(info: unknown, cb: (result: boolean, code?: number, message?: string) => void) {
+    const req = DashboardWebSocketServer.asReq((info as { req?: unknown })?.req);
     const token = this.extractToken(req);
     
     if (!token) {
@@ -67,17 +81,22 @@ export class DashboardWebSocketServer {
     }
 
     try {
-      const decoded = verify(token, process.env.JWT_SECRET!) as any;
-      req.user = decoded;
+      const decoded = verify(token, process.env.JWT_SECRET!) as unknown;
+      (req as { user?: unknown }).user = decoded;
       cb(true);
-    } catch (error) {
+    } catch {
       cb(false, 4002, "Invalid token");
     }
   }
 
   private setupEventHandlers() {
-    this.wss.on("connection", (ws: DashboardClient, req: any) => {
-      const user = req.user;
+    this.wss.on("connection", (ws: DashboardClient, req: unknown) => {
+      const r = DashboardWebSocketServer.asReq(req);
+      const user = (r.user ?? {}) as {
+        merchantId?: string;
+        id?: string;
+        industrySlug?: string;
+      };
       ws.merchantId = user.merchantId;
       ws.userId = user.id;
       ws.industrySlug = user.industrySlug;
@@ -103,12 +122,14 @@ export class DashboardWebSocketServer {
         }
       });
       
-      ws.on("message", (data) => {
+      ws.on("message", (data: unknown) => {
         try {
-          const message = JSON.parse(data.toString());
+          const message = JSON.parse(String(data));
           this.handleMessage(ws, message);
         } catch (error) {
-          logger.error("[WEBSOCKET] Message parse error:", error);
+          logger.error("[WEBSOCKET] Message parse error", {
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
         }
       });
       
@@ -122,23 +143,29 @@ export class DashboardWebSocketServer {
     });
     
     this.wss.on("error", (error) => {
-      logger.error("[WEBSOCKET] Server error:", error);
+      logger.error("[WEBSOCKET] Server error", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     });
   }
 
-  private handleMessage(ws: DashboardClient, message: any) {
-    switch (message.event) {
+  private handleMessage(ws: DashboardClient, message: unknown) {
+    const m = (message ?? {}) as Record<string, unknown>;
+    const event = typeof m.event === "string" ? m.event : "";
+    const data = typeof m.data === "object" && m.data !== null ? (m.data as Record<string, unknown>) : {};
+
+    switch (event) {
       case "subscribe":
-        this.handleSubscribe(ws, message.data?.channel);
+        this.handleSubscribe(ws, data.channel as string);
         break;
       case "unsubscribe":
-        this.handleUnsubscribe(ws, message.data?.channel);
+        this.handleUnsubscribe(ws, data.channel as string);
         break;
       case "ping":
         this.sendMessage(ws, { event: "pong", data: {}, timestamp: Date.now() });
         break;
       default:
-        logger.warn(`[WEBSOCKET] Unknown event: ${message.event}`);
+        logger.warn(`[WEBSOCKET] Unknown event: ${event}`);
     }
   }
 
@@ -202,19 +229,25 @@ export class DashboardWebSocketServer {
 
   private sendMessage(ws: DashboardClient, message: WebSocketMessage) {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(message));
+      ws.send(
+        JSON.stringify({
+          timestamp: message.timestamp ?? Date.now(),
+          ...message,
+        }),
+      );
     }
   }
 
-  private extractToken(req: any): string | null {
-    const authHeader = req.headers.authorization;
+  private extractToken(req: unknown): string | null {
+    const r = DashboardWebSocketServer.asReq(req);
+    const authHeader = r.headers?.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
       return authHeader.substring(7);
     }
     
     // Also check query params for WebSocket connections
-    if (req.url) {
-      const url = new URL(req.url, `http://${req.headers.host}`);
+    if (r.url) {
+      const url = new URL(r.url, `http://${r.headers?.host}`);
       return url.searchParams.get("token");
     }
     
@@ -223,20 +256,21 @@ export class DashboardWebSocketServer {
 
   private startHeartbeat() {
     this.heartbeatInterval = setInterval(() => {
-      this.wss.clients.forEach((ws: DashboardClient) => {
-        if (ws.readyState === WebSocket.OPEN) {
-          this.sendMessage(ws, {
+      for (const ws of this.wss.clients) {
+        const client = ws as DashboardClient;
+        if (client.readyState === WebSocket.OPEN) {
+          this.sendMessage(client, {
             event: "heartbeat",
             data: { ping: Date.now() },
             timestamp: Date.now()
           });
         }
-      });
+      }
     }, 30000); // Every 30 seconds
   }
 
   // Public methods for broadcasting updates
-  public broadcastToIndustry(industry: string, event: string, data: any) {
+  public broadcastToIndustry(industry: string, event: string, data: unknown) {
     const channelKey = `industry:${industry}`;
     const clients = this.clients.get(channelKey);
     
@@ -257,7 +291,7 @@ export class DashboardWebSocketServer {
     }
   }
 
-  public broadcastToMerchant(merchantId: string, event: string, data: any) {
+  public broadcastToMerchant(merchantId: string, event: string, data: unknown) {
     const channelKey = `merchant:${merchantId}`;
     const clients = this.clients.get(channelKey);
     
@@ -278,18 +312,19 @@ export class DashboardWebSocketServer {
     }
   }
 
-  public broadcastToAll(event: string, data: any) {
+  public broadcastToAll(event: string, data: unknown) {
     const message: WebSocketMessage = {
       event,
       data,
       timestamp: Date.now()
     };
     
-    this.wss.clients.forEach((ws: DashboardClient) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(message));
+    for (const ws of this.wss.clients) {
+      const client = ws as DashboardClient;
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(message));
       }
-    });
+    }
     
     logger.debug(`[WEBSOCKET] Broadcast to all clients: ${event}`);
   }
@@ -332,9 +367,9 @@ export class DashboardWebSocketServer {
       clearInterval(this.heartbeatInterval);
     }
     
-    this.wss.clients.forEach((ws: DashboardClient) => {
-      ws.close(1001, "Server shutting down");
-    });
+    for (const ws of this.wss.clients) {
+      (ws as DashboardClient).close(1001, "Server shutting down");
+    }
     
     this.wss.close();
     logger.info("[WEBSOCKET] Dashboard WebSocket server shut down");
@@ -344,7 +379,7 @@ export class DashboardWebSocketServer {
 // Singleton instance
 let dashboardWS: DashboardWebSocketServer | null = null;
 
-export function initializeDashboardWebSocket(server: any): DashboardWebSocketServer {
+export function initializeDashboardWebSocket(server: unknown): DashboardWebSocketServer {
   if (!dashboardWS) {
     dashboardWS = new DashboardWebSocketServer(server);
   }

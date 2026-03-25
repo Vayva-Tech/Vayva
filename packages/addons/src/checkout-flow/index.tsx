@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Checkout Flow Add-On Components
@@ -11,7 +12,7 @@
  * - CheckoutProgress: Step indicator for multi-step checkout
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Truck,
@@ -25,7 +26,8 @@ import {
   Clock,
   Package,
   ChevronLeft,
-  AlertCircle
+  AlertCircle,
+  ShoppingBag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '../shopping-cart';
@@ -100,7 +102,7 @@ export function CheckoutForm({
   onError,
   className 
 }: CheckoutFormProps) {
-  const { items, subtotal, clearCart } = useCart();
+  const { items, clearCart } = useCart();
   const [state, setState] = useState<CheckoutState>({
     step: 0,
     shippingAddress: null,
@@ -449,13 +451,13 @@ function InformationStep({ address, onSubmit, config }: InformationStepProps) {
           Your information is securely encrypted
         </div>
 
-        <button
+        <Button
           type="submit"
           className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
         >
           Continue to Shipping
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -507,9 +509,9 @@ function ShippingStep({
             <p className="text-sm text-muted-foreground">{address.city}, {address.state}</p>
             <p className="text-sm text-muted-foreground">{address.phone}</p>
           </div>
-          <button onClick={onBack} className="text-sm text-primary hover:underline">
+          <Button onClick={onBack} className="text-sm text-primary hover:underline">
             Change
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -558,21 +560,21 @@ function ShippingStep({
       )}
 
       <div className="flex gap-3 mt-6">
-        <button
+        <Button
           onClick={onBack}
           className="px-6 py-3 border rounded-lg font-medium hover:bg-accent transition-colors flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onContinue}
           disabled={!selectedMethod}
           className="flex-1 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           Continue to Payment
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -644,21 +646,21 @@ function PaymentStep({ selectedMethod, onSelect, onContinue, onBack }: PaymentSt
       </div>
 
       <div className="flex gap-3 mt-6">
-        <button
+        <Button
           onClick={onBack}
           className="px-6 py-3 border rounded-lg font-medium hover:bg-accent transition-colors flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onContinue}
           disabled={!selectedMethod}
           className="flex-1 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           Review Order
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -676,7 +678,7 @@ interface ReviewStepProps {
 }
 
 function ReviewStep({ state, onSubmit, onBack, isProcessing }: ReviewStepProps) {
-  const { items, subtotal } = useCart();
+  const { items } = useCart();
 
   return (
     <div className="space-y-6">
@@ -723,9 +725,9 @@ function ReviewStep({ state, onSubmit, onBack, isProcessing }: ReviewStepProps) 
                   {state.shippingAddress.city}, {state.shippingAddress.state}
                 </p>
               </div>
-              <button onClick={onBack} className="text-sm text-primary hover:underline">
+              <Button onClick={onBack} className="text-sm text-primary hover:underline">
                 Change
-              </button>
+              </Button>
             </div>
           )}
 
@@ -736,23 +738,23 @@ function ReviewStep({ state, onSubmit, onBack, isProcessing }: ReviewStepProps) 
                 {state.paymentMethod?.replace('_', ' ')}
               </p>
             </div>
-            <button onClick={onBack} className="text-sm text-primary hover:underline">
+            <Button onClick={onBack} className="text-sm text-primary hover:underline">
               Change
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={onBack}
           disabled={isProcessing}
           className="px-6 py-3 border rounded-lg font-medium hover:bg-accent transition-colors disabled:opacity-50 flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" />
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onSubmit}
           disabled={isProcessing}
           className="flex-1 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
@@ -768,7 +770,7 @@ function ReviewStep({ state, onSubmit, onBack, isProcessing }: ReviewStepProps) 
               Complete Order
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -873,3 +875,4 @@ function EmptyCheckout() {
     </div>
   );
 }
+

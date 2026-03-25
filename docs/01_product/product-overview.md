@@ -51,7 +51,7 @@ Vayva has three paid tiers. There is no free tier. All plans include a 7-day fre
 | **Monthly Price** | NGN 25,000/mo | NGN 35,000/mo | NGN 50,000/mo |
 | **Tagline** | Grow without the busywork. AI handles your orders 24/7. | Scale with AI doing the heavy lifting. Your team, unlimited growth. | Everything unlocked. Maximum power for serious businesses. |
 | **Staff Seats** | 1 | 3 | 5 |
-| **Products** | Up to 500 | Up to 1,000 | Unlimited |
+| **Products** | Up to 100 | Up to 300 | Up to 500 |
 | **Orders/Month** | Up to 500 | Up to 10,000 | Unlimited |
 | **Customers** | Up to 1,000 | Unlimited | Unlimited |
 | **AI Credits/Month** | 5,000 | 10,000 | 25,000 |
@@ -64,7 +64,7 @@ Vayva has three paid tiers. There is no free tier. All plans include a 7-day fre
 | **WhatsApp & Instagram Automation** | Yes | Yes | Yes |
 | **AI Autopilot** | No | Yes | Yes |
 | **Custom Domain** | No | Yes | Yes |
-| **Remove Branding** | No | Yes | Yes |
+| **Remove Branding** | Yes | Yes | Yes |
 | **API Access** | No | Yes | Yes |
 | **Approval Workflows** | No | Yes | Yes |
 | **Visual Workflow Builder** | No | No | Yes |

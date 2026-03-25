@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Export all blog/media industry modules
 
 // Main engine
@@ -19,3 +18,6 @@ export { BLOG_MEDIA_DASHBOARD_CONFIG, BLOG_MEDIA_THEMES } from './dashboard-conf
 
 // API Services
 export { BlogMediaApiService } from './api/blog-api';
+
+// Dashboard UI
+export { BlogMediaDashboard } from './components/BlogMediaDashboard';

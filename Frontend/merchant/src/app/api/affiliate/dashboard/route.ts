@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { affiliateService } from "@vayva/affiliate";
 import { prisma } from "@vayva/db";
 import { z } from "zod";
@@ -13,7 +14,11 @@ import { logger, ErrorCategory } from "@/lib/logger";
  */
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const affiliate = await prisma.affiliate.findFirst({
       where: { storeId },
     });

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Dynamic Pricing AI Service
  * 
@@ -6,8 +5,32 @@
  * competition, and market conditions
  */
 
-import { BaseAIService } from '@vayva/ai-agent';
-import type { DynamicPricingResult } from '@vayva/ai-agent';
+import { BaseAIService } from "../lib/base-ai-service";
+
+export interface DynamicPricingResult {
+  productId: string;
+  currentPrice: number;
+  recommendedPrice: {
+    amount: number;
+    confidence: number;
+    reasoning?: string;
+  };
+  elasticity: {
+    coefficient: number;
+    interpretation: "elastic" | "inelastic" | "unit_elastic" | string;
+    priceSensitivity: string;
+  };
+  competitivePosition: {
+    marketAverage: number;
+    position: "below_market" | "at_market" | "above_market" | string;
+    recommendedStrategy: string;
+  };
+  impact: {
+    projectedRevenueChange: number;
+    projectedVolumeChange: number;
+    projectedMarginChange: number;
+  };
+}
 
 export interface DynamicPricingInput {
   /** Product identifier */
@@ -148,68 +171,6 @@ Ensure recommended price respects all constraints.`;
       if (!parsed.elasticity) {
         throw new Error('Missing elasticity analysis');
       }
-
-      // Add validation rules
-      this.addValidationRule({
-        id: 'valid_price_recommendation',
-        validate: (data) => data.recommendedPrice.amount > 0,
-        errorMessage: 'Recommended price must be positive',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'respects_min_constraint',
-        validate: (data) => {
-          if (!input.constraints?.minPrice) return true;
-          return data.recommendedPrice.amount >= input.constraints.minPrice;
-        },
-        errorMessage: 'Recommended price below minimum constraint',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'respects_max_constraint',
-        validate: (data) => {
-          if (!input.constraints?.maxPrice) return true;
-          return data.recommendedPrice.amount <= input.constraints.maxPrice;
-        },
-        errorMessage: 'Recommended price above maximum constraint',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'maintains_min_margin',
-        validate: (data) => {
-          if (!input.constraints?.minMargin) return true;
-          const margin = ((data.recommendedPrice.amount - input.costBasis) / data.recommendedPrice.amount) * 100;
-          return margin >= input.constraints.minMargin;
-        },
-        errorMessage: 'Recommended price does not maintain minimum margin',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'has_elasticity_analysis',
-        validate: (data) => ['elastic', 'inelastic', 'unit_elastic'].includes(data.elasticity.interpretation),
-        errorMessage: 'Invalid elasticity interpretation',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'has_competitive_analysis',
-        validate: (data) => ['below_market', 'at_market', 'above_market'].includes(data.competitivePosition.position),
-        errorMessage: 'Invalid competitive position',
-        isCritical: false,
-      });
-
-      this.addValidationRule({
-        id: 'reasonable_confidence',
-        validate: (data) => 
-          data.recommendedPrice.confidence >= 0.5 &&
-          data.recommendedPrice.confidence <= 1.0,
-        errorMessage: 'Confidence score must be between 0.5 and 1.0',
-        isCritical: false,
-      });
 
       return {
         productId: parsed.productId || input.productId,

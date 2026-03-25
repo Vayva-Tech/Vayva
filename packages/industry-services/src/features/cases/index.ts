@@ -1,10 +1,7 @@
-// @ts-nocheck
 /**
  * Cases Feature Module
  * Dedicated module for case management functionality
  */
-
-export * from '../../services/case-service';
 
 export interface CaseFeatureConfig {
   enableSLA: boolean;

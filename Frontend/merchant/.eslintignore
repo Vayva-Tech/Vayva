@@ -3,3 +3,6 @@ public/
 node_modules/
 out/
 build/
+next.config.example.js
+clean-broken-comments.js
+test-imports.js

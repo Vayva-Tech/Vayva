@@ -116,6 +116,10 @@ const config: Config = {
         "102": "1.02",
         "98": "0.98",
       },
+      padding: {
+        "safe-top": "max(0px, env(safe-area-inset-top, 0px))",
+        "safe-bottom": "max(0.5rem, env(safe-area-inset-bottom, 0px))",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -7,7 +7,7 @@ import {
   standardHeaders,
   logger,
   BaseError,
-  PaymentStatus,
+  PaymentStatus
 } from "@vayva/shared";
 
 function getRecord(value: unknown): Record<string, unknown> | null {

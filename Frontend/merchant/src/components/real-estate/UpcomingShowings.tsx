@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 
@@ -71,12 +72,12 @@ export const UpcomingShowings: React.FC = () => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold">Upcoming Showings</h3>
         <div className="flex gap-2">
-          <button className="glass-card px-3 py-1 text-sm hover:text-white transition-colors">
+          <Button className="glass-card px-3 py-1 text-sm hover:text-white transition-colors">
             View Calendar
-          </button>
-          <button className="btn-gradient text-sm">
+          </Button>
+          <Button className="btn-gradient text-sm">
             Schedule Showing
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -113,28 +114,28 @@ export const UpcomingShowings: React.FC = () => {
               <div className="flex gap-2">
                 {showing.status === 'scheduled' && (
                   <>
-                    <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                    <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                       Check-in
-                    </button>
-                    <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                    </Button>
+                    <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                       Reschedule
-                    </button>
+                    </Button>
                   </>
                 )}
                 {showing.status === 'confirmed' && (
                   <>
-                    <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                    <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                       Check-in
-                    </button>
-                    <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                    </Button>
+                    <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                       Notes
-                    </button>
+                    </Button>
                   </>
                 )}
                 {showing.status === 'arrived' && (
-                  <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                  <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                     Complete
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -143,13 +144,14 @@ export const UpcomingShowings: React.FC = () => {
       </div>
 
       <div className="mt-4 flex gap-2">
-        <button className="glass-card px-4 py-2 text-sm flex-1 hover:text-white transition-colors">
+        <Button className="glass-card px-4 py-2 text-sm flex-1 hover:text-white transition-colors">
           Send Reminders
-        </button>
-        <button className="glass-card px-4 py-2 text-sm flex-1 hover:text-white transition-colors">
+        </Button>
+        <Button className="glass-card px-4 py-2 text-sm flex-1 hover:text-white transition-colors">
           Export Schedule
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
+

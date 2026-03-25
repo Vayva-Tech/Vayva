@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Course Management Feature
  * 
@@ -38,7 +37,7 @@ export async function getCourseStats(
   }
 
   // Fetch courses with enrollments and revenue data
-  const courses = await prisma.course.findMany({
+  const courses = await (prisma as any).course.findMany({
     where,
     include: {
       _count: {
@@ -139,7 +138,7 @@ export async function createCourse(
     thumbnailUrl?: string;
   }
 ): Promise<Course> {
-  const course = await prisma.course.create({
+  const course = await (prisma as any).course.create({
     data: {
       storeId,
       instructorId,
@@ -184,7 +183,7 @@ export async function updateCourse(
     status?: 'draft' | 'published' | 'archived';
   }>
 ): Promise<Course> {
-  const course = await prisma.course.update({
+  const course = await (prisma as any).course.update({
     where: { id: courseId },
     data,
     include: {
@@ -227,7 +226,7 @@ export async function getCourseAnalytics(
     where.id = courseId;
   }
 
-  const courses = await prisma.course.findMany({
+  const courses = await (prisma as any).course.findMany({
     where,
     include: {
       enrollments: {

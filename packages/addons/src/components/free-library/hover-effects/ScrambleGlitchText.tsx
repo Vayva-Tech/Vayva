@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -24,15 +24,29 @@ export function ScrambleGlitchText({
   const [displayText, setDisplayText] = useState(text);
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const scramble = useCallback(() => {
+  const clearScramble = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const resetToText = useCallback(() => {
+    clearScramble();
+    setDisplayText(text);
+  }, [text, clearScramble]);
+
+  const runScramble = useCallback(() => {
+    clearScramble();
     if (prefersReducedMotion) {
       setDisplayText(text);
       return;
     }
 
     let iteration = 0;
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setDisplayText(
         text
           .split('')
@@ -47,29 +61,30 @@ export function ScrambleGlitchText({
       );
 
       if (iteration >= text.length) {
-        clearInterval(interval);
+        clearScramble();
       }
 
       iteration += 1 / 3;
     }, 30);
+  }, [text, scrambleChars, prefersReducedMotion, clearScramble]);
 
-    return () => clearInterval(interval);
-  }, [text, scrambleChars, prefersReducedMotion]);
+  useEffect(() => () => clearScramble(), [clearScramble]);
 
-  useEffect(() => {
-    if (isHovered) {
-      const cleanup = scramble();
-      return cleanup;
-    } else {
-      setDisplayText(text);
-    }
-  }, [isHovered, scramble, text]);
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    runScramble();
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    resetToText();
+  };
 
   return (
     <motion.span
       className={`inline-block font-mono cursor-pointer ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       whileHover={{ scale: prefersReducedMotion ? 1 : 1.02 }}
     >
       {displayText}

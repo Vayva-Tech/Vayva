@@ -1,4 +1,13 @@
-// @ts-nocheck
+export {};
+
+declare global {
+  interface Window {
+    vayvaToggleChat?: () => void;
+    vayvaSendMessage?: () => void;
+    vayvaSendQuickReply?: (message: string) => void;
+  }
+}
+
 /**
  * Vayva Customer Support Chat Widget (with WebSocket, i18n, Custom CSS, Analytics)
  * 
@@ -84,7 +93,7 @@
   function initChat() {
     const container = document.getElementById('vayva-support-chat');
     
-    if (!container) return;
+    if (!(container instanceof HTMLElement)) return;
 
     const storeId = container.getAttribute('data-store-id');
     const theme = container.getAttribute('data-theme') || 'light';
@@ -112,14 +121,14 @@
     createFloatingButton(container, storeId, theme, position, language, enableAnalytics);
   }
   
-  function loadCustomCSS(url) {
+  function loadCustomCSS(url: string) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = url;
     document.head.appendChild(link);
   }
   
-  function trackEvent(eventName, data) {
+  function trackEvent(eventName: string, data: Record<string, unknown>) {
     // Send analytics event to API
     fetch(`${VAYVA_API_BASE}/api/embedded/analytics`, {
       method: 'POST',
@@ -133,8 +142,15 @@
     }).catch(() => {}); // Silent fail to not disrupt UX
   }
 
-  function createFloatingButton(container, storeId, theme, position) {
-    const positionStyles = {
+  function createFloatingButton(
+    container: HTMLElement,
+    storeId: string,
+    theme: string,
+    position: string,
+    _language?: string,
+    _enableAnalytics?: boolean,
+  ) {
+    const positionStyles: Record<string, string> = {
       'bottom-right': 'bottom: 24px; right: 24px;',
       'bottom-left': 'bottom: 24px; left: 24px;',
       'top-right': 'top: 24px; right: 24px;',
@@ -145,7 +161,7 @@
       <style>
         .vayva-chat-button {
           position: fixed;
-          ${positionStyles[position] || positionStyles['bottom-right']}
+          ${positionStyles[position as keyof typeof positionStyles] || positionStyles["bottom-right"]}
           width: 64px;
           height: 64px;
           border-radius: 50%;
@@ -414,16 +430,19 @@
   // Expose global functions
   window.vayvaToggleChat = function() {
     const chatWindow = document.getElementById('vayva-chat-window');
+    if (!chatWindow) return;
     if (chatWindow.style.display === 'flex') {
       chatWindow.style.display = 'none';
     } else {
       chatWindow.style.display = 'flex';
-      document.getElementById('vayva-chat-input').focus();
+      const inputEl = document.getElementById('vayva-chat-input');
+      if (inputEl instanceof HTMLElement) inputEl.focus();
     }
   };
 
   window.vayvaSendMessage = function() {
     const input = document.getElementById('vayva-chat-input');
+    if (!(input instanceof HTMLTextAreaElement) && !(input instanceof HTMLInputElement)) return;
     const message = input.value.trim();
     
     if (!message) return;
@@ -441,14 +460,16 @@
     }, 1500);
   };
 
-  window.vayvaSendQuickReply = function(message) {
+  window.vayvaSendQuickReply = function(message: string) {
     const input = document.getElementById('vayva-chat-input');
+    if (!(input instanceof HTMLTextAreaElement) && !(input instanceof HTMLInputElement)) return;
     input.value = message;
-    window.vayvaSendMessage();
+    window.vayvaSendMessage?.();
   };
 
-  function addMessage(text, sender) {
+  function addMessage(text: string, sender: 'user' | 'support') {
     const messagesDiv = document.getElementById('vayva-chat-messages');
+    if (!messagesDiv) return;
     const messageHtml = `
       <div class="vayva-message ${sender === 'user' ? 'vayva-message-user' : ''}">
         <div class="vayva-avatar vayva-avatar-${sender}">${sender === 'support' ? '🎧' : '👤'}</div>
@@ -461,6 +482,7 @@
 
   function showTyping() {
     const messagesDiv = document.getElementById('vayva-chat-messages');
+    if (!messagesDiv) return;
     const typingHtml = `
       <div class="vayva-message" id="vayva-typing-indicator">
         <div class="vayva-avatar vayva-avatar-support">🎧</div>

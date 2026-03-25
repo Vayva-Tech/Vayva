@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 
@@ -90,12 +91,12 @@ export const AIInsightsPanel: React.FC = () => {
 
                 <div className="flex gap-2">
                   {insight.actions.map((action, index) => (
-                    <button
+                    <Button
                       key={index}
                       className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors"
                     >
                       {action}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -108,10 +109,11 @@ export const AIInsightsPanel: React.FC = () => {
         <p className="text-xs text-[var(--re-text-secondary)]">
           AI insights are updated every 15 minutes based on real-time market data
         </p>
-        <button className="glass-card px-4 py-2 text-xs hover:text-white transition-colors">
+        <Button className="glass-card px-4 py-2 text-xs hover:text-white transition-colors">
           Customize Insights
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
+

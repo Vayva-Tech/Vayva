@@ -1,26 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await apiJson<{
       success: boolean;
       data?: any;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/auth/merchant/me`, {
-      headers: {
-        "x-store-id": storeId,
-      },
-    });
+    }>(buildBackendUrl("/api/auth/merchant/me"), { headers: auth.headers, cache: "no-store" });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch merchant data');
     }
 
     return NextResponse.json({
-      storeId,
+      storeId: auth.user.storeId,
       ...result.data,
     }, {
       headers: {

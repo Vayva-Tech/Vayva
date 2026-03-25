@@ -10,33 +10,23 @@ import {
   ArrowRight,
   CheckCircle,
   Shield,
-  TrendingUp,
   CreditCard,
   Store,
-  BarChart3,
-  ChevronDown,
-  ChevronUp,
   Package,
   Truck,
   Users,
   Wallet,
   Heart,
   Star,
-  Lightbulb,
   Cog,
-  AlertCircle,
-  MoreHorizontal,
-  Bot,
-  MessageSquare,
-  Image as ImageIcon,
 } from "lucide-react";
-import {
-  IconBrandWhatsapp,
-  IconBrandInstagram,
-} from "@tabler/icons-react";
+import { IconBrandWhatsapp } from "@tabler/icons-react";
+import { getOfferCopy, QUARTERLY_DISCOUNT_PERCENT } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 import { IndustryFeatureRequest } from "./IndustryFeatureRequest";
 import { DashboardPreviewSection } from "./DashboardPreview";
 import { ProDashboardMarketing } from "./ProDashboardMarketing";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 // ============================================
 // LIGHT GREEN & WHITE THEME - VAYVA BRAND
@@ -50,15 +40,23 @@ import { ProDashboardMarketing } from "./ProDashboardMarketing";
 // SECTION 1: HERO - CENTERED LAYOUT
 // ============================================
 function HeroSection() {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const offerCopy = getOfferCopy(starterFirstMonthFree);
+  const heroTrustChips = [
+    offerCopy.trialBadge,
+    offerCopy.noCard,
+    offerCopy.cancelAnytime,
+  ] as const;
+
   return (
-    <section className="relative min-h-screen overflow-hidden bg-transparent">
+    <section className="relative min-h-screen overflow-x-hidden bg-transparent w-full min-w-0">
       {/* Subtle decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-emerald-100/10 via-teal-50/10 to-transparent rounded-full blur-3xl transform translate-x-1/4 -translate-y-1/4" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-teal-50/10 via-emerald-50/10 to-transparent rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4" />
       </div>
 
-      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 pt-8 pb-16">
+      <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-16 w-full min-w-0">
         {/* Centered Content */}
         <div className="flex flex-col items-center text-center">
        
@@ -67,10 +65,15 @@ function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-sm font-semibold text-slate-700 mb-6"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-xs sm:text-sm font-semibold text-slate-700 mb-6 text-center max-w-[95vw]"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Business Operating System • Powered by Artificial Intelligence
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <span>
+              <span className="md:hidden">Business OS · AI-powered</span>
+              <span className="hidden md:inline">
+                Business Operating System • Powered by Artificial Intelligence
+              </span>
+            </span>
           </motion.div>
           
           {/* Headline - Centered */}
@@ -78,11 +81,11 @@ function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-slate-900 max-w-4xl"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-slate-900 max-w-4xl text-balance px-1"
           >
             The <span className="relative inline-block text-emerald-600">
               operating system
-              <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" preserveAspectRatio="none">
+              <svg className="absolute -bottom-2 left-0 w-full hidden sm:block" height="12" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden>
                 <path d="M0,8 Q50,0 100,8 T200,8" stroke="#10b981" strokeWidth="3" fill="none" />
               </svg>
             </span> that runs your business smoothly with AI
@@ -93,11 +96,16 @@ function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mb-8"
+            className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-3xl mb-8 text-pretty px-1"
           >
-            Vayva is the complete operating system for your business. Manage orders, inventory, 
-            payments, deliveries, and customer relationships in one unified dashboard. 
-            Artificial intelligence handles the busywork while you focus on growth.
+            <span className="md:hidden">
+              Orders, inventory, payments, and deliveries in one dashboard—AI handles the busywork.
+            </span>
+            <span className="hidden md:inline">
+              Vayva is the complete operating system for your business. Manage orders, inventory,
+              payments, deliveries, and customer relationships in one unified dashboard.
+              Artificial intelligence handles the busywork while you focus on growth.
+            </span>
           </motion.p>
 
           {/* Dashboard Mockup - Desktop */}
@@ -113,15 +121,18 @@ function HeroSection() {
             {/* Pro Dashboard UI Replica */}
             <div className="relative bg-white rounded-2xl shadow-md border border-slate-200/50 overflow-hidden">
               {/* Browser Header */}
-              <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
                 <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-rose-500" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
                 </div>
-                <div className="flex-1 bg-white rounded-md px-3 py-1.5 text-xs text-slate-500 font-mono">
+                <div className="min-w-0 flex-1 rounded-md bg-white px-3 py-1.5 font-mono text-xs text-slate-500">
                   merchant.vayva.ng/dashboard
                 </div>
+                <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                  Example · not live data
+                </span>
               </div>
 
               {/* Dashboard Content - Scrollable */}
@@ -141,16 +152,19 @@ function HeroSection() {
             <div className="absolute -inset-3 bg-gradient-to-br from-emerald-500/15 via-teal-400/10 to-emerald-400/15 rounded-2xl blur-xl opacity-40" />
             <div className="relative bg-white overflow-hidden">
               {/* Mini browser bar */}
-              <div className="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
+              <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-rose-500" />
-                  <div className="w-2 h-2 rounded-full bg-amber-500" />
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <div className="h-2 w-2 rounded-full bg-rose-500" />
+                  <div className="h-2 w-2 rounded-full bg-amber-500" />
+                  <div className="h-2 w-2 rounded-full bg-emerald-500" />
                 </div>
-                <div className="flex-1 bg-white rounded px-2 py-1 text-[10px] text-slate-500 font-mono">
+                <div className="min-w-0 flex-1 rounded bg-white px-2 py-1 font-mono text-[10px] text-slate-500">
                   merchant.vayva.ng/dashboard
                 </div>
               </div>
+              <p className="border-b border-slate-100 bg-slate-50/80 px-2 py-1 text-center text-[9px] font-medium text-slate-400">
+                Example dashboard (sample data)
+              </p>
               {/* Scaled-down full dashboard */}
               <div className="origin-top-left" style={{ transform: "scale(0.55)", width: "182%", maxHeight: "400px", overflow: "hidden" }}>
                 <ProDashboardMarketing />
@@ -185,7 +199,7 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="flex flex-wrap justify-center gap-4 text-sm text-slate-500"
           >
-            {["1 month free on Starter", "No credit card needed", "Cancel anytime"].map((stat) => (
+            {heroTrustChips.map((stat) => (
               <span key={stat} className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                 {stat}
@@ -226,7 +240,7 @@ function TrustBarSection() {
             <span className="w-px h-4 bg-emerald-200 hidden sm:block" />
             <span className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-500" />
-              99.9% uptime guarantee
+              Built for high availability
             </span>
           </div>
 
@@ -267,13 +281,12 @@ function RealityGapSection() {
                 width={480}
                 height={360}
                 className="w-full h-auto object-cover"
-                unoptimized
               />
               {/* Subtle overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/10 via-transparent to-transparent" />
             </div>
             {/* Floating element */}
-            <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-sm border border-emerald-100">
+            <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-sm border border-slate-200/80">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                   <span className="text-xl">😰</span>
@@ -423,12 +436,11 @@ function SolutionSection() {
                 width={480}
                 height={360}
                 className="w-full h-auto object-cover"
-                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-transparent to-transparent" />
             </div>
             {/* Floating element */}
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-3 shadow-sm border border-emerald-100">
+            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-3 shadow-sm border border-slate-200/80">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
                   <span className="text-xl">😌</span>
@@ -443,7 +455,7 @@ function SolutionSection() {
         </div>
 
         {/* Pillar cards below */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-16">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-16">
           {pillars.map((pillar, i) => (
             <motion.div
               key={i}
@@ -451,7 +463,7 @@ function SolutionSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="p-5 rounded-xl bg-white border border-emerald-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group h-full"
+              className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group h-full"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                 <pillar.icon className="w-5 h-5 text-emerald-600" />
@@ -460,6 +472,26 @@ function SolutionSection() {
               <p className="text-sm text-slate-600 leading-relaxed">{pillar.description}</p>
             </motion.div>
           ))}
+        </div>
+        <div className="md:hidden mt-12 -mx-1">
+          <MarketingSnapRow
+            ariaLabel="What you get with Vayva"
+            hint="Swipe through highlights"
+            showDots
+            dotCount={pillars.length}
+          >
+            {pillars.map((pillar, i) => (
+              <MarketingSnapItem key={i}>
+                <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm h-full">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-3">
+                    <pillar.icon className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mb-1">{pillar.title}</h3>
+                  <p className="text-sm text-slate-600 leading-snug">{pillar.description}</p>
+                </div>
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
         </div>
       </div>
     </section>
@@ -471,10 +503,10 @@ function SolutionSection() {
 // ============================================
 function IndustrySection() {
   const industries = [
-    { name: "Fashion", icon: "👗", color: "from-emerald-100 to-teal-100", desc: "From boutique to beloved brand" },
-    { name: "Beauty", icon: "💄", color: "from-teal-100 to-emerald-100", desc: "Scale your glow, grow your business" },
-    { name: "Food", icon: "🍲", color: "from-green-100 to-emerald-100", desc: "Serve more customers with ease" },
-    { name: "Retail", icon: "🛍️", color: "from-teal-100 to-cyan-100", desc: "Modernize your store operations" },
+    { slug: "fashion", name: "Fashion", icon: "👗", color: "from-emerald-100 to-teal-100", desc: "From boutique to beloved brand" },
+    { slug: "beauty", name: "Beauty", icon: "💄", color: "from-teal-100 to-emerald-100", desc: "Scale your glow, grow your business" },
+    { slug: "food", name: "Food", icon: "🍲", color: "from-green-100 to-emerald-100", desc: "Serve more customers with ease" },
+    { slug: "retail", name: "Retail", icon: "🛍️", color: "from-teal-100 to-cyan-100", desc: "Modernize your store operations" },
   ];
 
   return (
@@ -508,27 +540,63 @@ function IndustrySection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {industries.map((industry, i) => (
             <motion.div
-              key={i}
+              key={industry.slug}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group p-8 rounded-2xl bg-white border border-emerald-100 shadow-sm hover:shadow-md hover:border-emerald-300 hover:-translate-y-1 transition-all cursor-pointer h-full flex flex-col"
+              className="h-full"
             >
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${industry.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                <span className="text-3xl">{industry.icon}</span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">{industry.name}</h3>
-              <p className="text-slate-600 mb-4 flex-grow">{industry.desc}</p>
-              <div className="flex items-center text-emerald-600 text-sm font-semibold group-hover:translate-x-1 transition-transform mt-auto">
-                Learn more
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </div>
+              <Link
+                href={`/industries/${industry.slug}`}
+                className="group flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm outline-none ring-emerald-500/40 transition-all hover:-translate-y-1 hover:border-slate-300 hover:shadow-md focus-visible:ring-2"
+              >
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${industry.color} mb-6 flex items-center justify-center transition-transform group-hover:scale-110`}>
+                  <span className="text-3xl" aria-hidden>
+                    {industry.icon}
+                  </span>
+                </div>
+                <h3 className="mb-2 text-xl font-bold text-slate-900">{industry.name}</h3>
+                <p className="mb-4 flex-grow text-slate-600">{industry.desc}</p>
+                <span className="mt-auto flex items-center text-sm font-semibold text-emerald-600 transition-transform group-hover:translate-x-1">
+                  Learn more
+                  <ArrowRight className="ml-1 h-4 w-4" aria-hidden />
+                </span>
+              </Link>
             </motion.div>
           ))}
+        </div>
+        <div className="md:hidden -mx-1">
+          <MarketingSnapRow
+            ariaLabel="Industries we serve"
+            hint="Swipe to explore industries"
+            showDots
+            dotCount={industries.length}
+          >
+            {industries.map((industry) => (
+              <MarketingSnapItem key={industry.slug}>
+                <Link
+                  href={`/industries/${industry.slug}`}
+                  className="group flex h-full min-h-[220px] flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"
+                >
+                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${industry.color} mb-4 flex items-center justify-center`}>
+                    <span className="text-2xl" aria-hidden>
+                      {industry.icon}
+                    </span>
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-slate-900">{industry.name}</h3>
+                  <p className="mb-3 flex-grow text-sm text-slate-600 leading-snug">{industry.desc}</p>
+                  <span className="mt-auto flex items-center text-sm font-semibold text-emerald-600">
+                    Learn more
+                    <ArrowRight className="ml-1 h-4 w-4" aria-hidden />
+                  </span>
+                </Link>
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
         </div>
       </div>
     </section>
@@ -585,7 +653,7 @@ function GrowthTechSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, i) => (
             <motion.div
               key={i}
@@ -593,7 +661,7 @@ function GrowthTechSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="p-6 rounded-2xl bg-white border border-emerald-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group h-full"
+              className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group h-full"
             >
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <feature.icon className="w-6 h-6 text-emerald-600" />
@@ -603,353 +671,25 @@ function GrowthTechSection() {
             </motion.div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================
-// SECTION 7: FEATURE ACCORDION - CLEAN GREEN
-// ============================================
-function FeatureAccordion() {
-  const [openIndex, setOpenIndex] = React.useState<number | null>(0);
-
-  type FeatureItem =
-    | {
-        kind: "single";
-        icon: React.ComponentType<{ className?: string }>;
-        title: string;
-        content: string;
-      }
-    | {
-        kind: "multi";
-        icons: Array<React.ComponentType<{ className?: string }>>;
-        title: string;
-        content: string;
-      };
-
-  const features: FeatureItem[] = [
-    {
-      kind: "single",
-      icon: Store,
-      title: "Professional Storefront",
-      content: "Beautiful, mobile-optimized templates that make your business look established from day one. Custom domains, SEO-ready, and designed to convert visitors into customers."
-    },
-    {
-      kind: "multi",
-      icons: [IconBrandWhatsapp, IconBrandInstagram],
-      title: "Unified Order Capture",
-      content: "All your orders—whether from WhatsApp, Instagram, or your website—flow into one organized dashboard. No more scattered DMs or missed sales."
-    },
-    {
-      kind: "single",
-      icon: Package,
-      title: "Smart Inventory Management",
-      content: "Real-time stock tracking across all channels. Low-stock alerts, automatic updates, and forecasting so you never run out of your bestsellers."
-    },
-    {
-      kind: "single",
-      icon: CreditCard,
-      title: "Integrated Payments",
-      content: "Paystack-powered cards, bank transfers, and USSD—all automated. Instant settlement to your Nigerian bank account with automatic reconciliation."
-    },
-    {
-      kind: "single",
-      icon: Truck,
-      title: "Coordinated Delivery",
-      content: "One-click dispatch with Kwik Delivery for same-day Lagos deliveries. Live tracking for you and your customers, nationwide options available."
-    },
-    {
-      kind: "single",
-      icon: BarChart3,
-      title: "Business Intelligence",
-      content: "Real-time dashboards showing revenue, bestsellers, customer trends, and growth opportunities. Export reports for your accountant or investors."
-    },
-  ];
-
-  const activeIndex = openIndex ?? 0;
-  const active = features[Math.min(Math.max(activeIndex, 0), features.length - 1)];
-  const arcStartDeg = 210;
-  const arcEndDeg = -30;
-  const arcSpan = arcStartDeg - arcEndDeg;
-  const arcStep = features.length > 1 ? arcSpan / (features.length - 1) : 0;
-
-  return (
-    <section className="relative py-16 bg-transparent">
-      <div className="max-w-[1000px] mx-auto px-6 lg:px-12">
-        <div className="text-center mb-16">
-          <span className="text-sm font-bold text-emerald-600 uppercase tracking-wider">
-            Everything You Need
-          </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mt-3 mb-4">
-            All the tools to run and grow your business—
-            <span className="relative inline-block text-emerald-600 mx-2">
-              powered by AI
-              <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 100 8" preserveAspectRatio="none">
-                <path d="M0,6 Q25,0 50,6 T100,6" stroke="#10b981" strokeWidth="2" fill="none" />
-              </svg>
-            </span>.
-          </h2>
-          <p className="text-lg text-slate-600 max-w-xl mx-auto">
-            A complete suite of commerce tools designed for modern businesses with intelligent automation.
-          </p>
-        </div>
-
-        <div className="md:hidden space-y-4">
-          {features.map((feature, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className={`rounded-2xl border-2 transition-all ${
-                openIndex === i
-                  ? "bg-white border-emerald-300 shadow-sm"
-                  : "bg-slate-50 border-slate-100 hover:border-emerald-200"
-              }`}
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full px-6 py-5 flex items-center justify-between text-left"
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
-                      openIndex === i
-                        ? "bg-gradient-to-br from-emerald-100 to-teal-100"
-                        : "bg-white"
-                    }`}
-                  >
-                    {feature.kind === "multi" ? (
-                      <div className="flex -space-x-1">
-                        {feature.icons.map((IconComponent, idx) => (
-                          <IconComponent
-                            key={idx}
-                            className={`w-5 h-5 transition-colors ${
-                              openIndex === i
-                                ? "text-emerald-600"
-                                : "text-slate-400"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <feature.icon
-                        className={`w-5 h-5 transition-colors ${
-                          openIndex === i
-                            ? "text-emerald-600"
-                            : "text-slate-400"
-                        }`}
-                      />
-                    )}
+        <div className="md:hidden -mx-1">
+          <MarketingSnapRow
+            ariaLabel="Growth features"
+            hint="Swipe for more"
+            showDots
+            dotCount={features.length}
+          >
+            {features.map((feature, i) => (
+              <MarketingSnapItem key={i}>
+                <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm h-full">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
+                    <feature.icon className="w-6 h-6 text-emerald-600" />
                   </div>
-                  <span
-                    className={`font-bold text-lg transition-colors ${
-                      openIndex === i ? "text-slate-900" : "text-slate-600"
-                    }`}
-                  >
-                    {feature.title}
-                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h3>
+                  <p className="text-slate-600 text-sm leading-snug">{feature.desc}</p>
                 </div>
-                {openIndex === i ? (
-                  <ChevronUp className="w-5 h-5 text-emerald-500" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-slate-400" />
-                )}
-              </button>
-              {openIndex === i && (
-                <div className="px-6 pb-5 pl-[88px]">
-                  <p className="text-slate-600 leading-relaxed">
-                    {feature.content}
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Desktop Arc Layout with Vayva Logo Center */}
-        <div className="hidden md:block">
-          <div className="relative mx-auto w-full max-w-[1000px]">
-            {/* Main semicircle container */}
-            <div className="relative w-full h-[500px]">
-              
-              {/* Background semicircle segments */}
-              <div className="absolute inset-x-0 bottom-0 h-[400px] overflow-hidden">
-                <svg viewBox="0 0 400 200" className="w-full h-full" preserveAspectRatio="xMidYMax meet">
-                  {/* 6 colored segments forming semicircle */}
-                  {features.map((_, i) => {
-                    const startAngle = 180 - (i * 30); // 180 to 0 degrees
-                    const endAngle = 180 - ((i + 1) * 30);
-                    const colors = [
-                      "#f0fdf4", // emerald-50
-                      "#ecfdf5", // emerald-100
-                      "#d1fae5", // emerald-200
-                      "#a7f3d0", // emerald-300
-                      "#6ee7b7", // emerald-400
-                      "#34d399", // emerald-500
-                    ];
-                    const rad1 = (startAngle * Math.PI) / 180;
-                    const rad2 = (endAngle * Math.PI) / 180;
-                    const r = 180;
-                    const cx = 200;
-                    const cy = 200;
-                    const x1 = cx + Math.cos(rad1) * r;
-                    const y1 = cy - Math.sin(rad1) * r;
-                    const x2 = cx + Math.cos(rad2) * r;
-                    const y2 = cy - Math.sin(rad2) * r;
-                    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2} Z`;
-                    
-                    return (
-                      <path
-                        key={i}
-                        d={path}
-                        fill={colors[i]}
-                        className="transition-opacity duration-300"
-                        style={{ opacity: i === activeIndex ? 0.6 : 0.3 }}
-                      />
-                    );
-                  })}
-                </svg>
-              </div>
-
-              {/* Center Logo Circle */}
-              <div className="absolute left-1/2 bottom-[40px] -translate-x-1/2 z-20">
-                <div className="w-[160px] h-[80px] rounded-t-full bg-white border-2 border-emerald-300 shadow-sm flex items-center justify-center pt-4">
-                  <Image
-                    src="/vayva-logo-official.svg"
-                    alt="Vayva"
-                    width={80}
-                    height={55}
-                    className="w-20 h-auto"
-                    priority
-                  />
-                </div>
-              </div>
-
-              {/* Feature cards positioned on the arc */}
-              <div className="absolute inset-0">
-                {features.map((feature, i) => {
-                  const isActive = i === activeIndex;
-                  // Position cards along the arc
-                  const angle = 180 - (i * 30) - 15; // Center of each 30-degree segment
-                  const rad = (angle * Math.PI) / 180;
-                  const radius = 140; // Distance from center
-                  const centerX = 50; // percentage
-                  const bottomY = 80; // percentage from bottom
-                  const x = centerX + (Math.cos(rad) * radius / 5);
-                  const y = bottomY - (Math.sin(rad) * radius / 5);
-
-                  return (
-                    <motion.button
-                      key={i}
-                      type="button"
-                      onClick={() => setOpenIndex(i)}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1, duration: 0.4 }}
-                      className={`absolute z-10 transition-all duration-300 ${
-                        isActive ? "scale-110" : "hover:scale-105"
-                      }`}
-                      style={{
-                        left: `${x}%`,
-                        bottom: `${y}%`,
-                        transform: "translateX(-50%)",
-                      }}
-                    >
-                      <div
-                        className={`w-[160px] text-center transition-all duration-300 ${
-                          isActive ? "opacity-100" : "opacity-80 hover:opacity-100"
-                        }`}
-                      >
-                        {/* Number Circle */}
-                        <div
-                          className={`w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-bold border-2 transition-all ${
-                            isActive
-                              ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-300"
-                              : "bg-white border-emerald-300 text-emerald-600"
-                          }`}
-                        >
-                          {String(i + 1).padStart(2, "0")}
-                        </div>
-
-                        {/* Icon */}
-                        <div className={`w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center ${
-                          isActive ? "bg-emerald-500" : "bg-white shadow-md"
-                        }`}>
-                          {feature.kind === "multi" ? (
-                            <div className="flex -space-x-1">
-                              {feature.icons.map((Icon, idx) => (
-                                <Icon 
-                                  key={idx} 
-                                  className={`w-4 h-4 ${isActive ? "text-white" : "text-emerald-600"}`} 
-                                />
-                              ))}
-                            </div>
-                          ) : (
-                            <feature.icon 
-                              className={`w-5 h-5 ${isActive ? "text-white" : "text-emerald-600"}`} 
-                            />
-                          )}
-                        </div>
-
-                        {/* Title */}
-                        <h3 className={`text-xs font-bold leading-tight ${
-                          isActive ? "text-slate-900" : "text-slate-600"
-                        }`}>
-                          {feature.title}
-                        </h3>
-
-                        {/* Description on hover/active */}
-                        {isActive && (
-                          <motion.p
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            className="text-[10px] text-slate-500 mt-1 leading-tight"
-                          >
-                            {feature.content.slice(0, 60)}...
-                          </motion.p>
-                        )}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              {/* Active feature detail panel */}
-              <div className="absolute left-1/2 bottom-[140px] -translate-x-1/2 w-[320px]">
-                <motion.div
-                  key={activeIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/95 backdrop-blur-sm rounded-xl border-2 border-emerald-200 shadow-md px-6 py-4 text-center"
-                >
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
-                      {active.kind === "multi" ? (
-                        <div className="flex -space-x-1">
-                          {active.icons.map((Icon, idx) => (
-                            <Icon key={idx} className="w-3 h-3 text-white" />
-                          ))}
-                        </div>
-                      ) : (
-                        <active.icon className="w-4 h-4 text-white" />
-                      )}
-                    </div>
-                    <span className="text-emerald-600 font-bold text-sm">
-                      {String(activeIndex + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-slate-900 mb-1">{active.title}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    {active.content}
-                  </p>
-                </motion.div>
-              </div>
-            </div>
-          </div>
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
         </div>
       </div>
     </section>
@@ -960,6 +700,9 @@ function FeatureAccordion() {
 // SECTION 10: FINAL CTA - LIGHT GREEN
 // ============================================
 function FinalCTASection() {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const offerCopy = getOfferCopy(starterFirstMonthFree);
+
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden bg-transparent">
       {/* Subtle decorative elements */}
@@ -978,14 +721,19 @@ function FinalCTASection() {
             Just launched — be an early adopter
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-5 sm:mb-6 leading-tight text-balance px-1">
             Ready to transform your business?
           </h2>
-          
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-            Join thousands of entrepreneurs worldwide who&apos;ve moved from chaos to clarity. 
-            Join thousands of entrepreneurs who&apos;ve moved from chaos to clarity.
-            Get your first month free on the Starter plan.
+
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-2xl mx-auto px-1 text-pretty">
+            <span className="md:hidden">
+              From chat chaos to clear orders and payments. {offerCopy.trialBadge} on Starter &amp; Pro.
+            </span>
+            <span className="hidden md:inline">
+              Move from chat chaos to clear orders, payments, and delivery in one place.{" "}
+              {offerCopy.trialFootnote}{" "}
+              Save {QUARTERLY_DISCOUNT_PERCENT}% when you pay quarterly at checkout.
+            </span>
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
@@ -1003,7 +751,8 @@ function FinalCTASection() {
           </div>
 
           <p className="text-sm text-slate-500 mt-8">
-            1 month free on Starter • No credit card required • Cancel anytime
+            {offerCopy.trialBadge} on Starter &amp; Pro • {offerCopy.noCard} for trials •{" "}
+            {offerCopy.cancelAnytime}
           </p>
         </motion.div>
       </div>
@@ -1016,7 +765,7 @@ function FinalCTASection() {
 // ============================================
 export function CleanLandingClient(): React.JSX.Element {
   return (
-    <main className="min-h-screen bg-transparent">
+    <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-transparent">
       <HeroSection />
       <TrustBarSection />
       <RealityGapSection />

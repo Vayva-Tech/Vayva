@@ -1,7 +1,6 @@
-// @ts-nocheck
-export { 
-  TRAVEL_DASHBOARD_CONFIG, 
-  WIDGET_GROUPS, 
+export {
+  TRAVEL_DASHBOARD_CONFIG,
+  WIDGET_GROUPS,
   DASHBOARD_LAYOUTS,
   type TravelDashboardConfig,
   type TravelWidget,

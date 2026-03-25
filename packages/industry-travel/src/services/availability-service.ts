@@ -1,8 +1,7 @@
-// @ts-nocheck
-import type { 
-  Availability, 
-  PricingRule, 
-  DateRange, 
+import type {
+  Availability,
+  PricingRule as _PricingRule,
+  DateRange,
   PriceCalculationResult,
   AvailabilityCheckResult
 } from '../types';
@@ -210,7 +209,7 @@ export class AvailabilityService {
     let total = 0;
     const currentDate = new Date(startDate);
     const end = new Date(endDate);
-    const lengthOfStay = Math.ceil((end.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+    const _lengthOfStay = Math.ceil((end.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
 
     while (currentDate < end) {
       const dailyPrice = await this.getPrice(roomId, currentDate);
@@ -328,7 +327,7 @@ export class AvailabilityService {
 
     // Log the blocking reason if needed
     if (reason) {
-      console.log(`Blocked dates ${dates.startDate} to ${dates.endDate} for room ${roomId}: ${reason}`);
+      console.warn(`Blocked dates ${dates.startDate} to ${dates.endDate} for room ${roomId}: ${reason}`);
     }
   }
 
@@ -396,12 +395,12 @@ export class AvailabilityService {
   async getPriceBreakdown(
     roomId: string, 
     dateRange: DateRange,
-    guests: number = 1
+    _guests: number = 1
   ): Promise<PriceCalculationResult> {
     const { startDate, endDate } = dateRange;
     
     const basePrice = await this.calculatePrice(roomId, dateRange);
-    const lengthOfStay = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const _lengthOfStay = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     
     const breakdown: Array<{description: string; amount: number; type: 'base' | 'tax' | 'fee' | 'discount'}> = [
       {

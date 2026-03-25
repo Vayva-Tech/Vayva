@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Client Proofing Service
  * Handles client feedback, annotation system, and approval workflows
  */
 
-import { PrismaClient } from '@vayva/prisma';
+import { PrismaClient } from '@vayva/db';
 
 export interface ProofingRequest {
   id: string;

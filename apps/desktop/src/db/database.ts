@@ -2,7 +2,7 @@ import DatabaseLib from 'better-sqlite3';
 import * as path from 'path';
 
 export class Database {
-  private db: any | null = null;
+  private db: unknown | null = null;
   private dbPath: string;
 
   constructor(userDataPath: string) {
@@ -11,9 +11,7 @@ export class Database {
 
   async initialize(): Promise<void> {
     try {
-      // Initialize better-sqlite3
-      const BetterSQLite3 = require('better-sqlite3');
-      this.db = new BetterSQLite3(this.dbPath) as DatabaseLib.Database;
+      this.db = new DatabaseLib(this.dbPath);
       
       // Enable WAL mode for better performance
       this.db.pragma('journal_mode = WAL');
@@ -21,7 +19,7 @@ export class Database {
       // Create tables if they don't exist
       this.createTables();
       
-      console.log('Database initialized at:', this.dbPath);
+      console.warn('Database initialized at:', this.dbPath);
     } catch (error) {
       console.error('Failed to initialize database:', error);
       throw error;
@@ -120,10 +118,10 @@ export class Database {
       )
     `);
 
-    console.log('Database tables created successfully');
+    console.warn('Database tables created successfully');
   }
 
-  execute(query: string, params?: any[]): any {
+  execute(query: string, params?: unknown[]): unknown {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
@@ -140,7 +138,7 @@ export class Database {
     }
   }
 
-  query(query: string, params?: any[]): any[] {
+  query(query: string, params?: unknown[]): unknown[] {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
@@ -157,7 +155,7 @@ export class Database {
     }
   }
 
-  transaction(queries: Array<{ sql: string; params?: any[] }>): void {
+  transaction(queries: Array<{ sql: string; params?: unknown[] }>): void {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
@@ -178,7 +176,7 @@ export class Database {
     if (this.db) {
       this.db.close();
       this.db = null;
-      console.log('Database connection closed');
+      console.warn('Database connection closed');
     }
   }
 }

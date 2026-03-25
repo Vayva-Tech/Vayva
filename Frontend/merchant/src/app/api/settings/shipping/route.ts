@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     // Call backend API to fetch shipping settings
     const zones = await apiJson<Array<{
         id: string;
@@ -21,9 +26,7 @@ export async function GET(request: NextRequest) {
     }>>(
         `${process.env.BACKEND_API_URL}/api/settings/shipping`,
         {
-            headers: {
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
         }
     );
 
@@ -38,7 +41,6 @@ export async function GET(request: NextRequest) {
         {
             endpoint: "/api/settings/shipping",
             operation: "GET_SHIPPING",
-            storeId,
         }
     );
     return NextResponse.json({ error: "Failed to fetch shipping settings" }, { status: 500 });
@@ -46,8 +48,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const zones = await request.json();
 
     // Call backend API to update shipping settings
@@ -55,10 +61,7 @@ export async function POST(request: NextRequest) {
         `${process.env.BACKEND_API_URL}/api/settings/shipping`,
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
             body: JSON.stringify({ zones }),
         }
     );
@@ -70,7 +73,6 @@ export async function POST(request: NextRequest) {
         {
             endpoint: "/api/settings/shipping",
             operation: "UPDATE_SHIPPING",
-            storeId,
         }
     );
     return NextResponse.json({ error: "Failed to update shipping settings" }, { status: 500 });

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Document, DocumentStatus } from '../types';
 
 export class DocumentService {

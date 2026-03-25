@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@vayva/ui";
 import { PartyPopper, BarChart3, Plus } from "lucide-react";
 
-interface Event {
+export interface Event {
   id: string;
   title: string;
   status: string;

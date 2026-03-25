@@ -67,9 +67,20 @@ export const PUT = withVayvaAPI(
 
       if (body.status) updateData.status = body.status;
 
-      const review = await prisma.travelReview.update({
-        where: { id },
+      const upd = await prisma.travelReview.updateMany({
+        where: { id, storeId },
         data: updateData,
+      });
+
+      if (upd.count === 0) {
+        return NextResponse.json(
+          { error: "Review not found" },
+          { status: 404, headers: standardHeaders(requestId) }
+        );
+      }
+
+      const review = await prisma.travelReview.findFirst({
+        where: { id, storeId },
         include: {
           customer: {
             select: {
@@ -93,6 +104,13 @@ export const PUT = withVayvaAPI(
           },
         },
       });
+
+      if (!review) {
+        return NextResponse.json(
+          { error: "Review not found" },
+          { status: 404, headers: standardHeaders(requestId) }
+        );
+      }
 
       return NextResponse.json(review, {
         headers: standardHeaders(requestId),

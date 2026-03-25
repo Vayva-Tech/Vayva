@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,20 +7,14 @@ import {
   TableManagementService,
   ReservationService
 } from '../services';
-import { 
-  UniversalMetricCard,
-  UniversalSectionHeader,
-  UniversalChartContainer
-} from '@vayva/ui'; // Assuming universal components are available
-import { Button } from '@vayva/ui';
-import { 
-  Utensils, 
-  Users, 
-  Clock, 
-  TrendingUp, 
-  Calendar,
+import { Button, Card } from '@vayva/ui';
+import {
+  Utensils,
+  Users,
+  Clock,
+  TrendingUp,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 // Restaurant-specific components
@@ -175,66 +168,44 @@ export function RestaurantDashboard({
       {/* KPI Cards */}
       {dashboardData && (
         <section className="mb-8">
-          <UniversalSectionHeader
-            title="Service Overview"
-            subtitle="Today's performance metrics"
-            icon={<TrendingUp className="h-5 w-5 text-orange-600" />}
-          />
-          
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="h-5 w-5 text-orange-600" />
+            <div>
+              <h2 className="text-lg font-semibold text-orange-900">Service Overview</h2>
+              <p className="text-sm text-orange-600">Today&apos;s performance metrics</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-4">
-            <UniversalMetricCard
+            <RestaurantMetricTile
               title="Revenue"
               value={formatCurrency(dashboardData.revenue?.current || 0)}
-              change={{
-                value: dashboardData.revenue?.change || 0,
-                isPositive: (dashboardData.revenue?.change || 0) >= 0
-              }}
+              change={dashboardData.revenue?.change ?? 0}
               icon={<Utensils className="h-5 w-5" />}
-              status={getMetricStatus(dashboardData.revenue)}
             />
-            
-            <UniversalMetricCard
+            <RestaurantMetricTile
               title="Orders"
               value={(dashboardData.orders?.current || 0).toLocaleString()}
-              change={{
-                value: Math.abs(dashboardData.orders?.change || 0),
-                isPositive: (dashboardData.orders?.change || 0) >= 0
-              }}
+              change={dashboardData.orders?.change ?? 0}
               icon={<Users className="h-5 w-5" />}
-              status={getMetricStatus(dashboardData.orders)}
             />
-            
-            <UniversalMetricCard
+            <RestaurantMetricTile
               title="Guests"
               value={(dashboardData.guests?.current || 0).toLocaleString()}
-              change={{
-                value: Math.abs(dashboardData.guests?.change || 0),
-                isPositive: (dashboardData.guests?.change || 0) >= 0
-              }}
+              change={dashboardData.guests?.change ?? 0}
               icon={<Users className="h-5 w-5" />}
-              status={getMetricStatus(dashboardData.guests)}
             />
-            
-            <UniversalMetricCard
+            <RestaurantMetricTile
               title="Table Turn"
               value={`${dashboardData.tableTurnRate?.current || 0}x`}
-              change={{
-                value: Math.abs(dashboardData.tableTurnRate?.change || 0),
-                isPositive: (dashboardData.tableTurnRate?.change || 0) >= 0
-              }}
+              change={dashboardData.tableTurnRate?.change ?? 0}
               icon={<Clock className="h-5 w-5" />}
-              status={getMetricStatus(dashboardData.tableTurnRate)}
             />
-            
-            <UniversalMetricCard
+            <RestaurantMetricTile
               title="Avg Ticket"
               value={formatCurrency(dashboardData.avgTicket?.current || 0)}
-              change={{
-                value: Math.abs(dashboardData.avgTicket?.change || 0),
-                isPositive: (dashboardData.avgTicket?.change || 0) >= 0
-              }}
+              change={dashboardData.avgTicket?.change ?? 0}
               icon={<TrendingUp className="h-5 w-5" />}
-              status={getMetricStatus(dashboardData.avgTicket)}
             />
           </div>
         </section>
@@ -343,6 +314,37 @@ function RestaurantDashboardSkeleton() {
 }
 
 // Helper Functions
+function RestaurantMetricTile({
+  title,
+  value,
+  change,
+  icon,
+}: {
+  title: string;
+  value: string;
+  change: number;
+  icon: React.ReactNode;
+}): React.JSX.Element {
+  const isPositive = change >= 0;
+  return (
+    <Card className="border border-orange-200 bg-white p-4">
+      <div className="flex justify-between items-start gap-2">
+        <div>
+          <p className="text-sm text-orange-600">{title}</p>
+          <p className="text-2xl font-bold text-orange-900 mt-1">{value}</p>
+          {change !== 0 && (
+            <p className={`text-xs mt-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+              {isPositive ? '+' : ''}
+              {typeof change === 'number' && change % 1 !== 0 ? change.toFixed(1) : change}% vs prior
+            </p>
+          )}
+        </div>
+        <div className="text-orange-500 shrink-0">{icon}</div>
+      </div>
+    </Card>
+  );
+}
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -350,16 +352,4 @@ function formatCurrency(value: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
-}
-
-function getMetricStatus(metric: any): 'success' | 'warning' | 'error' | 'default' {
-  if (!metric?.change) return 'default';
-  
-  const isPositive = metric.isPositive ?? metric.change >= 0;
-  const absChange = Math.abs(metric.change);
-  
-  if (absChange > 20) return isPositive ? 'success' : 'error';
-  if (absChange > 5) return isPositive ? 'success' : 'warning';
-  
-  return 'default';
 }

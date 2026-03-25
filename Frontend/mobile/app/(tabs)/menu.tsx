@@ -1,5 +1,4 @@
 /* eslint-disable */
-// @ts-nocheck
 import React from "react";
 import { View, Text, ScrollView, TouchableOpacity, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

@@ -4,7 +4,7 @@
  * Kitchen display system for restaurant order management
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const KITCHEN_DISPLAY_ADDON: AddOnDefinition = {
   id: 'vayva.kitchen-display',

@@ -22,7 +22,7 @@ interface AlertPayload {
   severity: AlertSeverity;
   source: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   dedupKey?: string;
 }
 
@@ -57,7 +57,7 @@ class AlertingService {
   /**
    * Convenience methods for different severities
    */
-  async critical(title: string, description?: string, metadata?: Record<string, any>) {
+  async critical(title: string, description?: string, metadata?: Record<string, unknown>) {
     return this.sendAlert({
       title,
       description,
@@ -69,7 +69,7 @@ class AlertingService {
     });
   }
 
-  async error(title: string, description?: string, metadata?: Record<string, any>) {
+  async error(title: string, description?: string, metadata?: Record<string, unknown>) {
     return this.sendAlert({
       title,
       description,
@@ -80,7 +80,7 @@ class AlertingService {
     });
   }
 
-  async warning(title: string, description?: string, metadata?: Record<string, any>) {
+  async warning(title: string, description?: string, metadata?: Record<string, unknown>) {
     return this.sendAlert({
       title,
       description,
@@ -91,7 +91,7 @@ class AlertingService {
     });
   }
 
-  async info(title: string, description?: string, metadata?: Record<string, any>) {
+  async info(title: string, description?: string, metadata?: Record<string, unknown>) {
     return this.sendAlert({
       title,
       description,
@@ -139,7 +139,7 @@ class AlertingService {
         throw new Error(`PagerDuty API error: ${response.status}`);
       }
 
-      console.log('Alert sent to PagerDuty');
+      console.warn('Alert sent to PagerDuty');
       return { success: true };
     } catch (error) {
       console.error('Failed to send alert to PagerDuty:', error);
@@ -183,7 +183,7 @@ class AlertingService {
         throw new Error(`Opsgenie API error: ${response.status}`);
       }
 
-      console.log('Alert sent to Opsgenie');
+      console.warn('Alert sent to Opsgenie');
       return { success: true };
     } catch (error) {
       console.error('Failed to send alert to Opsgenie:', error);
@@ -263,7 +263,7 @@ class AlertingService {
         throw new Error(`Slack webhook error: ${response.status}`);
       }
 
-      console.log('Alert sent to Slack');
+      console.warn('Alert sent to Slack');
       return { success: true };
     } catch (error) {
       console.error('Failed to send alert to Slack:', error);
@@ -338,7 +338,7 @@ export function createErrorAlerter(options?: { threshold?: number }) {
   let errorCount = 0;
   let lastReset = Date.now();
 
-  return async (error: Error, context?: Record<string, any>) => {
+  return async (error: Error, context?: Record<string, unknown>) => {
     const now = Date.now();
     
     // Reset counter every minute

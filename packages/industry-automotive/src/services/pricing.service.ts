@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Vehicle } from '../types';
 
 /**
@@ -120,14 +119,14 @@ export class VehiclePricingService {
     });
 
     const analysis = await Promise.all(
-      vehicles.map(async (vehicle) => {
+      vehicles.map(async (vehicle: Vehicle) => {
         const optimalPrice = await this.calculateOptimalPrice(vehicle.id);
         const priceChange = ((optimalPrice - vehicle.price) / vehicle.price) * 100;
         return { vehicle, optimalPrice, priceChange };
       })
     );
 
-    const totalChange = analysis.reduce((sum, item) => sum + item.priceChange, 0);
+    const totalChange = analysis.reduce((sum: number, item) => sum + item.priceChange, 0);
     const avgPriceChange = analysis.length > 0 ? totalChange / analysis.length : 0;
 
     const vehiclesBelowMarket = analysis.filter(item => item.priceChange > 2).length;
@@ -211,7 +210,9 @@ export class VehiclePricingService {
 
     if (similarVehicles.length === 0) return null;
 
-    const avgPrice = similarVehicles.reduce((sum, v) => sum + v.price, 0) / similarVehicles.length;
+    const avgPrice =
+      similarVehicles.reduce((sum: number, v: Vehicle) => sum + v.price, 0) /
+      similarVehicles.length;
     return avgPrice;
   }
 

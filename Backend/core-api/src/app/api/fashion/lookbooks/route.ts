@@ -14,7 +14,7 @@ const CreateLookbookSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
-const UpdateLookbookSchema = z.object({
+const _UpdateLookbookSchema = z.object({
   title: z.string().min(1, "Title is required").optional(),
   description: z.string().optional(),
   coverImage: z.string().url().optional().nullable(),

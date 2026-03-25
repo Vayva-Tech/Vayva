@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 
@@ -80,18 +80,18 @@ export function ClientProofingInterface({ businessId, projectId, onSubmitProof }
                 </div>
 
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={handleSubmit}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   >
                     Submit Feedback
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setSelectedArea(null)}
                     className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -104,12 +104,12 @@ export function ClientProofingInterface({ businessId, projectId, onSubmitProof }
           <div className="mt-6 bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-2">
-              <button className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+              <Button className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                 ✓ Approve Design
-              </button>
-              <button className="w-full px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+              </Button>
+              <Button className="w-full px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
                 Request Changes
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -117,3 +117,4 @@ export function ClientProofingInterface({ businessId, projectId, onSubmitProof }
     </div>
   );
 }
+

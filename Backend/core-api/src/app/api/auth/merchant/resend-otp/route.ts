@@ -8,7 +8,7 @@ import {
   createOTP,
   formatPhoneNumber,
   isValidPhoneNumber,
-  OTPMethod,
+  OTPMethod
 } from "@/lib/whatsapp-otp";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const otpIdentifier = isWhatsAppMethod
       ? formatPhoneNumber(user.phone!)
       : normalizedEmail;
-    const otpType = isWhatsAppMethod ? "PHONE_VERIFICATION" : "EMAIL_VERIFICATION";
+    const _otpType = isWhatsAppMethod ? "PHONE_VERIFICATION" : "EMAIL_VERIFICATION";
 
     // Generate new OTP using centralized function
     const otpCode = await createOTP(otpIdentifier, otpMethod);

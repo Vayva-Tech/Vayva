@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-grocery
  * Vayva Grocery Industry Engine

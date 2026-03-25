@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -31,7 +29,7 @@ interface Order {
 
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get("orderId");
+  const orderId = searchParams?.get("orderId") ?? null;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 

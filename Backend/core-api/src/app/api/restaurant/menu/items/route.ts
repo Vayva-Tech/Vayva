@@ -118,8 +118,8 @@ export async function POST(request: Request) {
       status,
       sortOrder,
       allergens,
-      ingredients,
-      modifiers,
+      _ingredients,
+      _modifiers,
     } = body;
 
     if (!businessId || !categoryId || !name || price === undefined) {

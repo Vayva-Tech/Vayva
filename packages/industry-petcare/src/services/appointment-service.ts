@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Petcare Appointment Service
  * Specialized service for pet appointment management
  */
 
-import { prisma } from '@vayva/db';
+import { prisma } from '../db/petcare-prisma';
 import { PetAppointment, AppointmentStatus } from '../types';
 
 export class AppointmentService {
@@ -58,7 +57,7 @@ export class AppointmentService {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const existingAppointments = await prisma.petAppointment.findMany({
+    const existingAppointments = (await prisma.petAppointment.findMany({
       where: {
         storeId: this.storeId,
         startDate: { gte: startOfDay, lte: endOfDay },
@@ -66,7 +65,7 @@ export class AppointmentService {
         ...(veterinarianId ? { veterinarianId } : {}),
       },
       orderBy: { startDate: 'asc' },
-    });
+    })) as Array<{ startDate: Date; endDate: Date }>;
 
     // Generate available slots (assuming 8am-6pm working hours)
     const slots = [];

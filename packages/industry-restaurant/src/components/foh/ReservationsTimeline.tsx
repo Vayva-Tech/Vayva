@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { ReservationService, type Reservation } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from '@vayva/ui';
+import { CardTitle } from '../restaurant-ui';
 import { 
   Calendar,
   Clock,
@@ -19,6 +19,11 @@ interface ReservationsTimelineProps {
   reservationService: ReservationService;
 }
 
+function reservationDateTime(r: Reservation): Date {
+  const day = r.date.includes('T') ? r.date.slice(0, 10) : r.date;
+  return new Date(`${day}T${r.time}:00`);
+}
+
 export function ReservationsTimeline({ reservationService }: ReservationsTimelineProps) {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,59 +33,105 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
     const fetchReservations = async () => {
       try {
         // Mock data - in real implementation, this would come from the service
+        const now = new Date();
         const mockReservations: Reservation[] = [
           {
             id: '1',
+            confirmationNumber: 'R-1001',
+            customerId: 'c1',
             customerName: 'John Smith',
+            customerPhone: '+1234567890',
+            customerEmail: 'john@example.com',
             partySize: 4,
-            reservationTime: new Date(Date.now() + 3600000), // 1 hour from now
-            tableNumber: '12',
+            date: '2030-06-15',
+            time: '18:00',
+            duration: 90,
+            tableId: '12',
             status: 'confirmed',
-            phoneNumber: '+1234567890',
+            source: 'online',
             specialRequests: 'Window seat preferred',
-            createdAt: new Date(Date.now() - 86400000)
+            createdAt: now,
+            updatedAt: now,
+            depositPaid: false,
+            remindersSent: false,
           },
           {
             id: '2',
+            confirmationNumber: 'R-1002',
+            customerId: 'c2',
             customerName: 'Sarah Johnson',
+            customerPhone: '+1987654321',
+            customerEmail: 'sarah@example.com',
             partySize: 2,
-            reservationTime: new Date(Date.now() + 7200000), // 2 hours from now
-            tableNumber: '5',
+            date: '2030-06-15',
+            time: '19:00',
+            duration: 90,
+            tableId: '5',
             status: 'confirmed',
-            phoneNumber: '+1987654321',
-            createdAt: new Date(Date.now() - 43200000)
+            source: 'phone',
+            createdAt: now,
+            updatedAt: now,
+            depositPaid: false,
+            remindersSent: false,
           },
           {
             id: '3',
+            confirmationNumber: 'R-1003',
+            customerId: 'c3',
             customerName: 'Mike Wilson',
+            customerPhone: '+1555123456',
+            customerEmail: 'mike@example.com',
             partySize: 6,
-            reservationTime: new Date(Date.now() - 1800000), // 30 mins ago
-            tableNumber: '18',
+            date: '2030-06-15',
+            time: '17:30',
+            duration: 120,
+            tableId: '18',
             status: 'seated',
-            phoneNumber: '+1555123456',
-            createdAt: new Date(Date.now() - 10800000)
+            source: 'online',
+            createdAt: now,
+            updatedAt: now,
+            depositPaid: false,
+            remindersSent: false,
           },
           {
             id: '4',
+            confirmationNumber: 'R-1004',
+            customerId: 'c4',
             customerName: 'Emily Davis',
+            customerPhone: '+1444987654',
+            customerEmail: 'emily@example.com',
             partySize: 3,
-            reservationTime: new Date(Date.now() + 10800000), // 3 hours from now
-            tableNumber: '8',
+            date: '2030-06-15',
+            time: '20:00',
+            duration: 90,
+            tableId: '8',
             status: 'pending',
-            phoneNumber: '+1444987654',
-            createdAt: new Date()
+            source: 'walk_in',
+            createdAt: now,
+            updatedAt: now,
+            depositPaid: false,
+            remindersSent: false,
           },
           {
             id: '5',
+            confirmationNumber: 'R-1005',
+            customerId: 'c5',
             customerName: 'Robert Brown',
+            customerPhone: '+1333654321',
+            customerEmail: 'robert@example.com',
             partySize: 5,
-            reservationTime: new Date(Date.now() - 3600000), // 1 hour ago
-            tableNumber: '22',
+            date: '2030-06-15',
+            time: '16:00',
+            duration: 90,
+            tableId: '22',
             status: 'cancelled',
-            phoneNumber: '+1333654321',
-            cancellationReason: 'Family emergency',
-            createdAt: new Date(Date.now() - 7200000)
-          }
+            source: 'online',
+            notes: 'Cancelled: family emergency',
+            createdAt: now,
+            updatedAt: now,
+            depositPaid: false,
+            remindersSent: false,
+          },
         ];
         
         setReservations(mockReservations);
@@ -151,7 +202,7 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
 
   const filteredReservations = reservations.filter(res => {
     const now = new Date();
-    const reservationDate = new Date(res.reservationTime);
+    const reservationDate = reservationDateTime(res);
     
     switch (timeFilter) {
       case 'today':
@@ -169,17 +220,13 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
     }
   });
 
-  const upcomingReservations = filteredReservations.filter(res => 
-    new Date(res.reservationTime) > new Date()
-  ).sort((a, b) => 
-    new Date(a.reservationTime).getTime() - new Date(b.reservationTime).getTime()
-  );
+  const upcomingReservations = filteredReservations
+    .filter((res) => reservationDateTime(res) > new Date())
+    .sort((a, b) => reservationDateTime(a).getTime() - reservationDateTime(b).getTime());
 
-  const recentReservations = filteredReservations.filter(res => 
-    new Date(res.reservationTime) <= new Date()
-  ).sort((a, b) => 
-    new Date(b.reservationTime).getTime() - new Date(a.reservationTime).getTime()
-  );
+  const recentReservations = filteredReservations
+    .filter((res) => reservationDateTime(res) <= new Date())
+    .sort((a, b) => reservationDateTime(b).getTime() - reservationDateTime(a).getTime());
 
   if (loading) {
     return (
@@ -211,7 +258,7 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
         
         {/* Time Filters */}
         <div className="flex gap-2 mt-3">
-          <button
+          <Button
             onClick={() => setTimeFilter('today')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               timeFilter === 'today'
@@ -220,8 +267,8 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
             }`}
           >
             Today
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setTimeFilter('week')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               timeFilter === 'week'
@@ -230,8 +277,8 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
             }`}
           >
             This Week
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setTimeFilter('month')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               timeFilter === 'month'
@@ -240,7 +287,7 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
             }`}
           >
             This Month
-          </button>
+          </Button>
         </div>
       </CardHeader>
       
@@ -261,10 +308,10 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
                   >
                     <div className="flex-shrink-0 text-center">
                       <div className="text-lg font-bold text-orange-600">
-                        {formatReservationTime(new Date(reservation.reservationTime))}
+                        {formatReservationTime(reservationDateTime(reservation))}
                       </div>
                       <div className="text-xs text-orange-500">
-                        {formatReservationDate(new Date(reservation.reservationTime))}
+                        {formatReservationDate(reservationDateTime(reservation))}
                       </div>
                     </div>
                     
@@ -287,12 +334,12 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
                           Party of {reservation.partySize}
                         </div>
                         <div className="flex items-center gap-1">
-                          <span>Table {reservation.tableNumber}</span>
+                          <span>Table {reservation.tableId ?? '—'}</span>
                         </div>
-                        {reservation.phoneNumber && (
+                        {reservation.customerPhone && (
                           <div className="flex items-center gap-1">
                             <Phone className="h-4 w-4" />
-                            {reservation.phoneNumber}
+                            {reservation.customerPhone}
                           </div>
                         )}
                       </div>
@@ -349,10 +396,10 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
                         reservation.status === 'cancelled' ? 'text-red-600' :
                         reservation.status === 'seated' ? 'text-blue-600' : 'text-green-600'
                       }`}>
-                        {formatReservationTime(new Date(reservation.reservationTime))}
+                        {formatReservationTime(reservationDateTime(reservation))}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {formatReservationDate(new Date(reservation.reservationTime))}
+                        {formatReservationDate(reservationDateTime(reservation))}
                       </div>
                     </div>
                     
@@ -378,13 +425,13 @@ export function ReservationsTimeline({ reservationService }: ReservationsTimelin
                           Party of {reservation.partySize}
                         </div>
                         <div className="flex items-center gap-1">
-                          <span>Table {reservation.tableNumber}</span>
+                          <span>Table {reservation.tableId ?? '—'}</span>
                         </div>
                       </div>
                       
-                      {reservation.cancellationReason && (
+                      {reservation.notes && reservation.status === 'cancelled' && (
                         <p className="text-xs text-red-600 mt-1 italic">
-                          Cancelled: {reservation.cancellationReason}
+                          {reservation.notes}
                         </p>
                       )}
                     </div>

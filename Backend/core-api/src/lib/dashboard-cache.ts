@@ -1,6 +1,6 @@
 import { getRedisClient } from "@/lib/redis";
 import { logger } from "@vayva/shared";
-import type { UniversalDashboardData } from "@vayva/industry-core";
+import type { UniversalDashboardData as _UniversalDashboardData } from "@vayva/industry-core";
 
 // ========================================================================
 // Dashboard Cache Configuration

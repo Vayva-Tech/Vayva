@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Nonprofit Settings Page
 // ============================================================================
@@ -27,10 +26,39 @@ import {
   FileText
 } from 'lucide-react';
 
+type NonprofitSwitchBind = (idx: number) => {
+  checked: boolean;
+  onCheckedChange: (v: boolean) => void;
+};
+
+const NonprofitSwitchContext = React.createContext<NonprofitSwitchBind | null>(null);
+
+function useNonprofitSwitchBind(): NonprofitSwitchBind {
+  const ctx = React.useContext(NonprofitSwitchContext);
+  if (!ctx) {
+    throw new Error('useNonprofitSwitchBind must be used within NonprofitSettingsPage');
+  }
+  return ctx;
+}
+
 export default function NonprofitSettingsPage() {
   const [activeTab, setActiveTab] = useState('donation');
+  const [npSw, setNpSw] = useState(() => [
+    true, true, false, true, true, false,
+    true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+  ]);
+  const npBind: NonprofitSwitchBind = (idx: number) => ({
+    checked: npSw[idx]!,
+    onCheckedChange: (v: boolean) =>
+      setNpSw((prev) => {
+        const next = [...prev];
+        next[idx] = v;
+        return next;
+      }),
+  });
 
   return (
+    <NonprofitSwitchContext.Provider value={npBind}>
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Nonprofit Settings</h1>
@@ -108,10 +136,12 @@ export default function NonprofitSettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </NonprofitSwitchContext.Provider>
   );
 }
 
 function DonationSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -148,7 +178,7 @@ function DonationSettings() {
                     Allow donors to set up monthly/yearly giving
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(0)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -158,7 +188,7 @@ function DonationSettings() {
                     Enable honorary/memorial gift options
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(1)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -168,7 +198,7 @@ function DonationSettings() {
                     Accept Bitcoin, Ethereum, and other cryptocurrencies
                   </p>
                 </div>
-                <Switch />
+                <Switch {...npBind(2)} />
               </div>
             </div>
           </div>
@@ -196,6 +226,7 @@ function DonationSettings() {
 }
 
 function DonorManagementSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -253,7 +284,7 @@ function DonorManagementSettings() {
                     Send immediate acknowledgment for donations
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(3)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -263,7 +294,7 @@ function DonorManagementSettings() {
                     Regular updates on how donations are used
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(4)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -273,7 +304,7 @@ function DonorManagementSettings() {
                     Personal milestone acknowledgments
                   </p>
                 </div>
-                <Switch />
+                <Switch {...npBind(5)} />
               </div>
             </div>
           </div>
@@ -284,6 +315,7 @@ function DonorManagementSettings() {
 }
 
 function CampaignSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -323,7 +355,7 @@ function CampaignSettings() {
                     Visual progress indicator on campaign pages
                 </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(6)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -333,7 +365,7 @@ function CampaignSettings() {
                     Show recent donors publicly (anonymized)
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(7)} />
               </div>
             </div>
           </div>
@@ -350,7 +382,7 @@ function CampaignSettings() {
                     Allow supporters to create personal fundraising pages
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(8)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -360,7 +392,7 @@ function CampaignSettings() {
                     Show top fundraisers publicly
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(9)} />
               </div>
             </div>
           </div>
@@ -371,6 +403,7 @@ function CampaignSettings() {
 }
 
 function GrantSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -417,7 +450,7 @@ function GrantSettings() {
                     Keep foundation profiles updated automatically
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(10)} />
               </div>
               
               <div className="space-y-2">
@@ -437,6 +470,7 @@ function GrantSettings() {
 }
 
 function ProgramSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -482,7 +516,7 @@ function ProgramSettings() {
                     Track individuals served by program
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(11)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -492,7 +526,7 @@ function ProgramSettings() {
                     Collect feedback from program participants
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(12)} />
               </div>
             </div>
           </div>
@@ -503,6 +537,7 @@ function ProgramSettings() {
 }
 
 function EventSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -551,7 +586,7 @@ function EventSettings() {
                     Offer discounted rates for early registrants
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(13)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -561,7 +596,7 @@ function EventSettings() {
                     Allow bulk registrations for groups
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(14)} />
               </div>
             </div>
           </div>
@@ -572,6 +607,7 @@ function EventSettings() {
 }
 
 function ComplianceSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -611,7 +647,7 @@ function ComplianceSettings() {
                     Automatically send tax-deductible receipts
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(15)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -621,7 +657,7 @@ function ComplianceSettings() {
                     Encourage electronic receipts by default
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(16)} />
               </div>
             </div>
           </div>
@@ -638,7 +674,7 @@ function ComplianceSettings() {
                     Maintain organized records for audits
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(17)} />
               </div>
             </div>
           </div>
@@ -649,6 +685,7 @@ function ComplianceSettings() {
 }
 
 function NotificationSettings() {
+  const npBind = useNonprofitSwitchBind();
   return (
     <div className="space-y-6">
       <Card>
@@ -672,7 +709,7 @@ function NotificationSettings() {
                     Notify for every new donation
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(18)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -682,7 +719,7 @@ function NotificationSettings() {
                     Receive daily donation totals
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(19)} />
               </div>
             </div>
           </div>
@@ -699,7 +736,7 @@ function NotificationSettings() {
                     Alert at 25%, 50%, 75%, 90% of goals
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(20)} />
               </div>
               
               <div className="flex items-center justify-between">
@@ -709,7 +746,7 @@ function NotificationSettings() {
                     Notify 7 days before campaign ends
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(21)} />
               </div>
             </div>
           </div>
@@ -726,7 +763,7 @@ function NotificationSettings() {
                     Advance notice for upcoming deadlines
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch {...npBind(22)} />
               </div>
             </div>
           </div>

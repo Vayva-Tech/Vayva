@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 
 /**
  * SSE endpoint for real-time notifications

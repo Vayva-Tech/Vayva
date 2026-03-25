@@ -10,126 +10,123 @@ const AvailabilityQuerySchema = z.object({
   travelers: z.coerce.number().int().min(1).default(2),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const { searchParams } = new URL(req.url);
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.PRODUCTS_VIEW,
+  async (req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
+      const { searchParams } = new URL(req.url);
 
-    const parseResult = AvailabilityQuerySchema.safeParse(
-      Object.fromEntries(searchParams)
-    );
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid query parameters",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400, headers: standardHeaders(requestId) }
+      const parseResult = AvailabilityQuerySchema.safeParse(
+        Object.fromEntries(searchParams),
       );
-    }
 
-    const { date, travelers } = parseResult.data;
-    const checkDate = new Date(date);
-
-    // Get the package
-    const travelPackage = await prisma.travelPackage.findFirst({
-      where: { id, storeId },
-    });
-
-    if (!travelPackage) {
-      return NextResponse.json(
-        { error: "Package not found" },
-        { status: 404, headers: standardHeaders(requestId) }
-      );
-    }
-
-    // Check if date is within package availability period
-    const isDateValid = (!travelPackage.startDate || checkDate >= travelPackage.startDate) &&
-                       (!travelPackage.endDate || checkDate <= travelPackage.endDate);
-
-    if (!isDateValid) {
-      return NextResponse.json(
-        {
-          data: {
-            available: false,
-            reason: "Date outside package availability period",
-            packageStartDate: travelPackage.startDate,
-            packageEndDate: travelPackage.endDate,
+      if (!parseResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid query parameters",
+            details: parseResult.error.flatten(),
           },
-        },
-        { headers: standardHeaders(requestId) }
-      );
-    }
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
 
-    // Check traveler limits
-    const withinTravelerLimits = travelers >= travelPackage.minTravelers && 
-                                travelers <= travelPackage.maxTravelers;
+      const { date, travelers } = parseResult.data;
+      const checkDate = new Date(date);
 
-    if (!withinTravelerLimits) {
-      return NextResponse.json(
-        {
-          data: {
-            available: false,
-            reason: `Package requires ${travelPackage.minTravelers}-${travelPackage.maxTravelers} travelers`,
-            minTravelers: travelPackage.minTravelers,
-            maxTravelers: travelPackage.maxTravelers,
-            requestedTravelers: travelers,
+      const travelPackage = await prisma.travelPackage.findFirst({
+        where: { id, storeId },
+      });
+
+      if (!travelPackage) {
+        return NextResponse.json(
+          { error: "Package not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      const isDateValid =
+        (!travelPackage.startDate || checkDate >= travelPackage.startDate) &&
+        (!travelPackage.endDate || checkDate <= travelPackage.endDate);
+
+      if (!isDateValid) {
+        return NextResponse.json(
+          {
+            data: {
+              available: false,
+              reason: "Date outside package availability period",
+              packageStartDate: travelPackage.startDate,
+              packageEndDate: travelPackage.endDate,
+            },
           },
+          { headers: standardHeaders(requestId) },
+        );
+      }
+
+      const withinTravelerLimits =
+        travelers >= travelPackage.minTravelers &&
+        travelers <= travelPackage.maxTravelers;
+
+      if (!withinTravelerLimits) {
+        return NextResponse.json(
+          {
+            data: {
+              available: false,
+              reason: `Package requires ${travelPackage.minTravelers}-${travelPackage.maxTravelers} travelers`,
+              minTravelers: travelPackage.minTravelers,
+              maxTravelers: travelPackage.maxTravelers,
+              requestedTravelers: travelers,
+            },
+          },
+          { headers: standardHeaders(requestId) },
+        );
+      }
+
+      const existingBookings = await prisma.travelBooking.count({
+        where: {
+          travelPackageId: id,
+          storeId,
+          travelDate: checkDate,
+          status: { in: ["pending", "confirmed"] },
         },
-        { headers: standardHeaders(requestId) }
+      });
+
+      const totalCapacity = travelPackage.maxTravelers;
+      const bookedTravelers = existingBookings * 2;
+      const availableCapacity = totalCapacity - bookedTravelers;
+
+      const isAvailable = availableCapacity >= travelers;
+
+      const availabilityInfo = {
+        data: {
+          available: isAvailable,
+          packageId: id,
+          packageName: travelPackage.name,
+          checkDate: checkDate.toISOString(),
+          requestedTravelers: travelers,
+          availableCapacity,
+          totalCapacity,
+          bookedTravelers,
+          pricePerPerson: travelPackage.price,
+          totalPrice: travelPackage.price * travelers,
+          currency: travelPackage.currency,
+          reason: isAvailable
+            ? "Package is available for the requested date and traveler count"
+            : `Insufficient capacity. Only ${availableCapacity} spots available for ${travelers} travelers`,
+        },
+      };
+
+      return NextResponse.json(availabilityInfo, {
+        headers: standardHeaders(requestId),
+      });
+    } catch (error: unknown) {
+      const { id: packageId } = await params;
+      logger.error("[TRAVEL_PACKAGE_AVAILABILITY_GET]", { error, packageId });
+      return NextResponse.json(
+        { error: "Failed to check package availability" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-
-    // Check existing bookings for capacity
-    const existingBookings = await prisma.travelBooking.count({
-      where: {
-        travelPackageId: id,
-        travelDate: checkDate,
-        status: { in: ["pending", "confirmed"] },
-      },
-    });
-
-    const totalCapacity = travelPackage.maxTravelers;
-    const bookedTravelers = existingBookings * 2; // Assuming average 2 travelers per booking
-    const availableCapacity = totalCapacity - bookedTravelers;
-
-    const isAvailable = availableCapacity >= travelers;
-
-    const availabilityInfo = {
-      data: {
-        available: isAvailable,
-        packageId: id,
-        packageName: travelPackage.name,
-        checkDate: checkDate.toISOString(),
-        requestedTravelers: travelers,
-        availableCapacity,
-        totalCapacity,
-        bookedTravelers,
-        pricePerPerson: travelPackage.price,
-        totalPrice: travelPackage.price * travelers,
-        currency: travelPackage.currency,
-        reason: isAvailable 
-          ? "Package is available for the requested date and traveler count"
-          : `Insufficient capacity. Only ${availableCapacity} spots available for ${travelers} travelers`,
-      },
-    };
-
-    return NextResponse.json(availabilityInfo, {
-      headers: standardHeaders(requestId),
-    });
-  } catch (error: unknown) {
-    logger.error("[TRAVEL_PACKAGE_AVAILABILITY_GET]", { error, packageId: params.id });
-    return NextResponse.json(
-      { error: "Failed to check package availability" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+  },
+);

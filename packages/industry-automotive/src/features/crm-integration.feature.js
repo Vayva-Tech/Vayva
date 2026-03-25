@@ -51,7 +51,7 @@ export class CRMIntegrationFeature {
     return this.crmService.logInteraction(interactionData);
   }
 
-  getFollowUpTasks(dateRange) {
+  getFollowUpTasks(_dateRange) {
     const interactions = this.crmService.getInteractions({});
     // Filter for follow-up tasks
     return interactions.filter(i => i.type === 'follow_up');

@@ -12,8 +12,13 @@ function getString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
-function isPlanKey(value: unknown): value is "FREE" | "STARTER" | "PRO" {
-  return value === "FREE" || value === "STARTER" || value === "PRO";
+function isPlanKey(value: unknown): value is "FREE" | "STARTER" | "PRO" | "PRO_PLUS" {
+  return (
+    value === "FREE" ||
+    value === "STARTER" ||
+    value === "PRO" ||
+    value === "PRO_PLUS"
+  );
 }
 
 const PLAN_LIMITS = {
@@ -38,6 +43,13 @@ const PLAN_LIMITS = {
     staffSeats: 3,
     templates: "unlimited",
     price: 35000,
+  },
+  PRO_PLUS: {
+    ordersPerMonth: "unlimited",
+    whatsappMessages: "unlimited",
+    staffSeats: 5,
+    templates: "unlimited",
+    price: 50000,
   },
 };
 

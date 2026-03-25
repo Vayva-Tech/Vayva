@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { processSamlResponse , roleMappingService } from '@vayva/security';
+import { processSamlResponse, roleMappingService } from '@vayva/security';
 
 /**
  * POST /api/auth/saml/acs

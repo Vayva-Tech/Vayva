@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withVayvaAPI , APIContext } from "@/lib/api-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { withVayvaAPI, APIContext } from "@/lib/api-handler";
+import { PERMISSIONS as _PERMISSIONS } from "@/lib/team/permissions";
 import { logger } from "@/lib/logger";
 
 /**
@@ -19,7 +19,7 @@ export abstract class BaseIndustryController {
   /**
    * Standard success response format
    */
-  protected success(data: any, meta?: Record<string, any>) {
+  protected success(data: unknown, meta?: Record<string, unknown>) {
     return NextResponse.json({
       success: true,
       data,
@@ -49,7 +49,7 @@ export abstract class BaseIndustryController {
   /**
    * Pagination helper
    */
-  protected paginate(items: any[], page: number = 1, limit: number = 20) {
+  protected paginate(items: unknown[], page: number = 1, limit: number = 20) {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedItems = items.slice(startIndex, endIndex);
@@ -68,9 +68,9 @@ export abstract class BaseIndustryController {
   /**
    * Extract query parameters with defaults
    */
-  protected getQueryParams(req: NextRequest, defaults: Record<string, any> = {}) {
+  protected getQueryParams(req: NextRequest, defaults: Record<string, unknown> = {}) {
     const { searchParams } = new URL(req.url);
-    const params: Record<string, any> = { ...defaults };
+    const params: Record<string, unknown> = { ...defaults };
 
     for (const [key, value] of searchParams.entries()) {
       // Handle numeric values
@@ -89,7 +89,7 @@ export abstract class BaseIndustryController {
   /**
    * Validate required parameters
    */
-  protected validateRequired(params: Record<string, any>, required: string[]) {
+  protected validateRequired(params: Record<string, unknown>, required: string[]) {
     const missing = required.filter(key => !(key in params) || params[key] === undefined || params[key] === null);
     if (missing.length > 0) {
       throw new Error(`Missing required parameters: ${missing.join(", ")}`);
@@ -99,7 +99,7 @@ export abstract class BaseIndustryController {
   /**
    * Parse request body with validation
    */
-  protected async parseBody(req: NextRequest, validator?: (data: any) => boolean) {
+  protected async parseBody(req: NextRequest, validator?: (data: unknown) => boolean) {
     try {
       const body = await req.json();
       
@@ -108,7 +108,7 @@ export abstract class BaseIndustryController {
       }
       
       return body;
-    } catch (error) {
+    } catch {
       throw new Error("Invalid JSON in request body");
     }
   }
@@ -116,7 +116,7 @@ export abstract class BaseIndustryController {
   /**
    * Log API access with context
    */
-  protected logAccess(context: APIContext, action: string, details?: Record<string, any>) {
+  protected logAccess(context: APIContext, action: string, details?: Record<string, unknown>) {
     logger.info(`[${this.industry.toUpperCase()}_${action}]`, {
       userId: context.user.id,
       storeId: context.storeId,
@@ -147,19 +147,25 @@ export abstract class BaseIndustryController {
       });
       
       return this.success(result, { message: successMessage });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const e =
+        error instanceof Error ? error : new Error("Operation failed");
+      const statusCode =
+        typeof error === "object" && error !== null && "statusCode" in error
+          ? Number((error as { statusCode?: unknown }).statusCode) || 500
+          : 500;
       logger.error(`[${this.industry.toUpperCase()}_${action}_ERROR]`, {
-        error: error.message,
-        stack: error.stack,
+        error: e.message,
+        stack: e.stack,
         userId: context.user.id,
         storeId: context.storeId,
         action,
       });
       
       return this.error(
-        error.message || "Operation failed",
+        e.message || "Operation failed",
         "OPERATION_FAILED",
-        error.statusCode || 500
+        statusCode
       );
     }
   }
@@ -176,10 +182,12 @@ export function createIndustryAPI(
   return withVayvaAPI(permission, async (req, context) => {
     try {
       return await handler(req, context);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const e =
+        error instanceof Error ? error : new Error("An unexpected error occurred");
       logger.error(`[${industry.toUpperCase()}_API_ERROR]`, {
-        error: error.message,
-        stack: error.stack,
+        error: e.message,
+        stack: e.stack,
         userId: context.user.id,
         storeId: context.storeId,
         url: req.url,

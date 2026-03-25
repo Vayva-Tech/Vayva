@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Clinical Note Summarization AI Service
  * 
@@ -6,8 +5,7 @@
  * for efficient review and handoff
  */
 
-import { BaseAIService } from '@vayva/ai-agent';
-import type { ClinicalNoteSummary } from '@vayva/ai-agent';
+import { BaseAIService, type ClinicalNoteSummary } from '@vayva/ai-agent';
 
 export interface ClinicalNoteInput {
   /** Type of clinical note */
@@ -172,6 +170,17 @@ Ensure the summary is concise yet comprehensive, capturing all clinically releva
     }
   }
 
+  protected defaultOutput(input: ClinicalNoteInput): ClinicalNoteSummary {
+    return {
+      chiefComplaint: input.chiefComplaint ?? 'Not summarized',
+      hpi: '',
+      keyFindings: [],
+      assessment: 'Not summarized',
+      plan: ['Review with a licensed clinician'],
+      suggestedCptCodes: [],
+    };
+  }
+
   /**
    * Quick summary of a clinical note
    */
@@ -187,7 +196,9 @@ Ensure the summary is concise yet comprehensive, capturing all clinically releva
     await this.initialize();
     
     const summaries = await Promise.all(
-      notes.map(note => this.execute(note))
+      notes.map((note) =>
+        this.execute({ noteType: note.noteType, clinicalText: note.text }),
+      ),
     );
     
     return summaries;

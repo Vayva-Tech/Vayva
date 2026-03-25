@@ -1,5 +1,6 @@
 import React from "react";
 import { Image } from "react-native";
+import logoSource from "../../assets/vayva-logo.png";
 
 type Props = {
   sizeClassName?: string;
@@ -8,7 +9,7 @@ type Props = {
 export default function VayvaLogo({ sizeClassName = "w-16" }: Props) {
   return (
     <Image
-      source={require("../../assets/vayva-logo.png")}
+      source={logoSource}
       style={{ width: 217, height: 150 }}
       className={`${sizeClassName} h-auto`}
       resizeMode="contain"

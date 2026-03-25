@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Services Industry Dashboard Component
  * General service business management dashboard
@@ -18,7 +17,7 @@ export function ServicesDashboard({
   return (
     <UniversalProDashboard
       industry="services"
-      variant="services-pro"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

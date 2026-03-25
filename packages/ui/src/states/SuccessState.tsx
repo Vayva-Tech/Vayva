@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Icon, IconName } from "../components/Icon";
+import { Icon, type IconName } from "../components/Icon";
 import { Button } from "../components/Button";
 import { GlassPanel } from "../components/GlassPanel";
 import { motion, scaleIn } from "../motion";

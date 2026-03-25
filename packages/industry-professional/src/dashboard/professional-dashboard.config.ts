@@ -1,12 +1,11 @@
-// @ts-nocheck
-import type { DashboardEngineConfig, WidgetDefinition } from '../types';
+import type { DashboardEngineConfig, WidgetDefinition } from '@vayva/industry-core';
 
 // Firm Overview Widgets
 const ACTIVE_MATTERS_WIDGET: WidgetDefinition = {
   id: 'active-matters',
   type: 'kpi-card',
   title: 'Active Matters',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'matters.active',
@@ -18,7 +17,7 @@ const UTILIZATION_RATE_WIDGET: WidgetDefinition = {
   id: 'utilization-rate',
   type: 'gauge',
   title: 'Utilization Rate',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.utilizationRate',
@@ -34,7 +33,7 @@ const REVENUE_MTD_WIDGET: WidgetDefinition = {
   id: 'revenue-mtd',
   type: 'kpi-card',
   title: 'Revenue MTD',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.revenueMTD',
@@ -47,7 +46,7 @@ const MATTERS_BY_PRACTICE_AREA_WIDGET: WidgetDefinition = {
   id: 'matters-by-practice-area',
   type: 'chart-bar',
   title: 'Matters by Practice Area',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'matters.byPracticeArea',
@@ -63,7 +62,7 @@ const PENDING_CONFLICTS_WIDGET: WidgetDefinition = {
   id: 'pending-conflicts',
   type: 'kpi-card',
   title: 'Pending Conflicts',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'conflicts.pending',
@@ -76,7 +75,7 @@ const CLIENT_OVERVIEW_WIDGET: WidgetDefinition = {
   id: 'client-overview',
   type: 'table',
   title: 'Client Overview',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'clients.overview',
@@ -97,7 +96,7 @@ const MONTHLY_HOURS_WIDGET: WidgetDefinition = {
   id: 'monthly-hours',
   type: 'chart-line',
   title: 'Monthly Hours Summary',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.monthlyHours',
@@ -113,7 +112,7 @@ const COLLECTION_RATE_WIDGET: WidgetDefinition = {
   id: 'collection-rate',
   type: 'kpi-card',
   title: 'Collection Rate',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.collectionRate',
@@ -125,7 +124,7 @@ const REALIZATION_RATE_WIDGET: WidgetDefinition = {
   id: 'realization-rate',
   type: 'kpi-card',
   title: 'Realization Rate',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.realizationRate',
@@ -138,7 +137,7 @@ const DOCUMENT_PIPELINE_WIDGET: WidgetDefinition = {
   id: 'document-pipeline',
   type: 'chart-pie',
   title: 'Document Pipeline',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'documents.pipeline',
@@ -153,7 +152,7 @@ const PENDING_SIGNATURES_WIDGET: WidgetDefinition = {
   id: 'pending-signatures',
   type: 'kpi-card',
   title: 'Pending Signatures',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'documents.pendingSignatures',
@@ -166,7 +165,7 @@ const OUTSTANDING_INVOICES_WIDGET: WidgetDefinition = {
   id: 'outstanding-invoices',
   type: 'chart-bar',
   title: 'Outstanding Invoices by Aging',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.arAging',
@@ -182,7 +181,7 @@ const TOP_DEBTORS_WIDGET: WidgetDefinition = {
   id: 'top-debtors',
   type: 'table',
   title: 'Top Debtors',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'billing.topDebtors',
@@ -202,7 +201,7 @@ const TODAY_COURT_CALENDAR_WIDGET: WidgetDefinition = {
   id: 'today-court-calendar',
   type: 'list',
   title: 'Today\'s Court Calendar',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'calendar.courtToday',
@@ -218,7 +217,7 @@ const UPCOMING_DEADLINES_WIDGET: WidgetDefinition = {
   id: 'upcoming-deadlines',
   type: 'calendar',
   title: 'Upcoming Deadlines',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'calendar.upcomingDeadlines',
@@ -235,7 +234,7 @@ const TASK_QUEUE_WIDGET: WidgetDefinition = {
   id: 'task-queue',
   type: 'kanban',
   title: 'Task Queue',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'tasks.queue',
@@ -252,7 +251,7 @@ const CONFLICTS_CHECK_QUEUE_WIDGET: WidgetDefinition = {
   id: 'conflicts-check-queue',
   type: 'kpi-card',
   title: 'Conflicts Check Queue',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'conflicts.queue',
@@ -264,7 +263,7 @@ const CLE_COMPLIANCE_WIDGET: WidgetDefinition = {
   id: 'cle-compliance',
   type: 'table',
   title: 'CLE Compliance Tracker',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'compliance.cleTracking',
@@ -284,7 +283,7 @@ const PIPELINE_OPPORTUNITIES_WIDGET: WidgetDefinition = {
   id: 'pipeline-opportunities',
   type: 'kpi-card',
   title: 'Pipeline Opportunities',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'businessDevelopment.pipeline',
@@ -296,7 +295,7 @@ const WIN_RATE_WIDGET: WidgetDefinition = {
   id: 'win-rate',
   type: 'gauge',
   title: 'Win Rate',
-  industry: 'professional',
+  industry: 'services',
   dataSource: {
     type: 'analytics',
     query: 'businessDevelopment.winRate',
@@ -309,7 +308,19 @@ const WIN_RATE_WIDGET: WidgetDefinition = {
 };
 
 export const PROFESSIONAL_SERVICES_DASHBOARD_CONFIG: DashboardEngineConfig = {
-  industry: 'professional',
+  industry: 'services',
+  title: 'Professional Services',
+  subtitle: 'Matters, billing, and firm operations',
+  primaryObjectLabel: 'Matters',
+  defaultTimeHorizon: 'month',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
+  failureModes: [],
   widgets: [
     // Firm Overview
     ACTIVE_MATTERS_WIDGET,
@@ -414,36 +425,40 @@ export const PROFESSIONAL_SERVICES_DASHBOARD_CONFIG: DashboardEngineConfig = {
   alertRules: [
     {
       id: 'low-utilization',
-      condition: 'billing.utilizationRate < threshold',
-      threshold: 60,
-      action: 'notify:management',
+      name: 'Low utilization',
+      condition: { metric: 'billing.utilizationRate', operator: 'lt', value: 60 },
+      severity: 'warning',
+      message: 'Utilization is below {value}%',
     },
     {
       id: 'high-dso',
-      condition: 'billing.dso > threshold',
-      threshold: 45,
-      action: 'notify:billing',
+      name: 'High DSO',
+      condition: { metric: 'billing.dso', operator: 'gt', value: 45 },
+      severity: 'warning',
+      message: 'Days sales outstanding exceeds {value}',
     },
     {
       id: 'pending-conflicts',
-      condition: 'conflicts.pending > threshold',
-      threshold: 3,
-      action: 'notify:compliance',
+      name: 'Pending conflicts',
+      condition: { metric: 'conflicts.pending', operator: 'gt', value: 3 },
+      severity: 'critical',
+      message: 'Too many pending conflict checks ({value})',
     },
     {
       id: 'overdue-invoices',
-      condition: 'billing.overdueInvoices > threshold',
-      threshold: 5,
-      action: 'notify:billing',
+      name: 'Overdue invoices',
+      condition: { metric: 'billing.overdueInvoices', operator: 'gt', value: 5 },
+      severity: 'warning',
+      message: 'Overdue invoice count is high ({value})',
     },
   ],
   actions: [
-    { id: 'new-matter', label: 'New Matter', icon: 'briefcase-plus', action: 'navigate:/matters/new' },
-    { id: 'new-client', label: 'New Client', icon: 'user-plus', action: 'navigate:/clients/new' },
-    { id: 'log-time', label: 'Log Time', icon: 'clock-plus', action: 'navigate:/time/log' },
-    { id: 'create-invoice', label: 'Create Invoice', icon: 'file-invoice', action: 'navigate:/billing/invoices/new' },
-    { id: 'view-calendar', label: 'Calendar', icon: 'calendar', action: 'navigate:/calendar' },
-    { id: 'conflicts-check', label: 'Run Conflicts Check', icon: 'shield-check', action: 'modal:conflicts-check' },
+    { id: 'new-matter', label: 'New Matter', icon: 'briefcase-plus', href: '/matters/new' },
+    { id: 'new-client', label: 'New Client', icon: 'user-plus', href: '/clients/new' },
+    { id: 'log-time', label: 'Log Time', icon: 'clock-plus', href: '/time/log' },
+    { id: 'create-invoice', label: 'Create Invoice', icon: 'file-invoice', href: '/billing/invoices/new' },
+    { id: 'view-calendar', label: 'Calendar', icon: 'calendar', href: '/calendar' },
+    { id: 'conflicts-check', label: 'Run Conflicts Check', icon: 'shield-check', href: '/conflicts/check' },
   ],
 };
 

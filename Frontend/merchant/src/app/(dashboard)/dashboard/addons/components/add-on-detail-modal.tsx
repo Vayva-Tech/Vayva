@@ -1,5 +1,4 @@
 'use client';
-
 /**
  * Add-On Detail Modal
  * 
@@ -69,12 +68,12 @@ export function AddOnDetailModal({
             className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden"
           >
             {/* Close button */}
-            <button
+            <Button
               onClick={onClose}
               className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/30 text-white transition-colors"
             >
               <X className="w-5 h-5" />
-            </button>
+            </Button>
 
             <ScrollArea className="h-[90vh]">
               <div className="flex flex-col">
@@ -95,21 +94,21 @@ export function AddOnDetailModal({
                   {/* Screenshot navigation */}
                   {screenshots.length > 1 && (
                     <>
-                      <button
+                      <Button
                         onClick={() => setActiveScreenshot(i => (i - 1 + screenshots.length) % screenshots.length)}
                         className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white"
                       >
                         <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setActiveScreenshot(i => (i + 1) % screenshots.length)}
                         className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white"
                       >
                         <ChevronRight className="w-5 h-5" />
-                      </button>
+                      </Button>
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                         {screenshots.map((_, i) => (
-                          <button
+                          <Button
                             key={i}
                             onClick={() => setActiveScreenshot(i)}
                             className={cn(
@@ -420,3 +419,4 @@ export function AddOnDetailModal({
     </AnimatePresence>
   );
 }
+

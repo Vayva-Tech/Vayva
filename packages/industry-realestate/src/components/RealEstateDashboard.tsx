@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real Estate Industry Dashboard Component
  * Property management and real estate agency dashboard
@@ -17,8 +16,8 @@ export function RealEstateDashboard({
 }: IndustryDashboardProps) {
   return (
     <UniversalProDashboard
-      industry="realestate"
-      variant="realestate-pro"
+      industry="real_estate"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

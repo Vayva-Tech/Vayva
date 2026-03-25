@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -163,7 +162,7 @@ export default function SubscriptionsPage() {
   const growthRate = total > 0 ? ((activeCount - trialingCount) / total) * 100 : 0;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="max-w-7xl">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-3">

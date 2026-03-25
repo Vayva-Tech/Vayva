@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { BaseIndustryController, createIndustryAPI } from "@/lib/industry/base-controller";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { APIContext } from "@/lib/api-handler";
+import { logger } from "@/lib/logger";
 import { prisma } from "@vayva/db";
 
 class EightySixBoardController extends BaseIndustryController {
@@ -59,7 +60,7 @@ class EightySixBoardController extends BaseIndustryController {
       context,
       async () => {
         const body = await this.parseBody(req);
-        const { itemId, itemName, reason, quantityRemaining, estimatedRestock, notes } = body;
+        const { itemId, itemName, reason, quantityRemaining, estimatedRestock, _notes } = body;
 
         if (!itemId || !itemName || !reason) {
           throw new Error("Item ID, name, and reason are required");
@@ -230,7 +231,7 @@ class EightySixBoardController extends BaseIndustryController {
         );
 
         // Find possible substitutions from inventory
-        const hasSubstitute = affectedIngredients.every(ing => {
+        const hasSubstitute = affectedIngredients.every(_ing => {
           // Check if similar ingredient exists in inventory
           return false; // Production: Query @vayva/inventory for substitutes
         });

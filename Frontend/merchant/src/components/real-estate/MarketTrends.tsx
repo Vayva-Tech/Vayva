@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 
@@ -55,9 +56,9 @@ export const MarketTrends: React.FC = () => {
     <div className="glass-panel p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold">Market Trends</h3>
-        <button className="glass-card px-3 py-1 text-sm hover:text-white transition-colors">
+        <Button className="glass-card px-3 py-1 text-sm hover:text-white transition-colors">
           Full Market Report
-        </button>
+        </Button>
       </div>
 
       <h4 className="text-sm font-semibold mb-3 text-[var(--re-text-secondary)]">Market Indicators</h4>
@@ -106,3 +107,4 @@ export const MarketTrends: React.FC = () => {
     </div>
   );
 };
+

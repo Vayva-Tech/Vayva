@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // ============================================================================
@@ -33,7 +34,7 @@ interface KanbanResponse {
 // When a real backend endpoint is wired, replace this function body with
 //   const result = await apiJson<KanbanResponse>(
 //     `${process.env.BACKEND_API_URL}/api/dashboard/kanban?limit=8`,
-//     { headers: { "x-store-id": storeId } }
+//     { headers: auth.headers }
 //   );
 // ============================================================================
 function generateKanbanData(): KanbanResponse {

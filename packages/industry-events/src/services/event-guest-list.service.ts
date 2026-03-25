@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Guest List Service
  * Manages guest lists, RSVPs, and attendance tracking
@@ -75,9 +74,9 @@ export class EventGuestListService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[EVENT_GUEST] Initializing service...');
+    console.warn('[EVENT_GUEST] Initializing service...');
     this.initializeSampleData();
-    console.log('[EVENT_GUEST] Service initialized');
+    console.warn('[EVENT_GUEST] Service initialized');
   }
 
   private initializeSampleData(): void {

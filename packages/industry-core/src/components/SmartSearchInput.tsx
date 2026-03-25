@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 
 export interface SmartSearchInputProps {
   placeholder?: string;
@@ -38,19 +37,6 @@ export function SmartSearchInput({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Filter suggestions based on input
-  useEffect(() => {
-    if (value.trim() === '') {
-      setFilteredSuggestions([]);
-      return;
-    }
-
-    const filtered = suggestions.filter(suggestion =>
-      suggestion.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredSuggestions(filtered);
-  }, [value, suggestions]);
 
   // Debounced search
   useEffect(() => {

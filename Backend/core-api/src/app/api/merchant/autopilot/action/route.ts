@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
+import { prisma, Prisma } from "@vayva/db";
 import { logger, standardHeaders } from "@vayva/shared";
+import { fireAutopilotApprovedWebhook } from "@/lib/autopilot-webhooks";
 
 function getHeaders(correlationId: string | undefined) {
   return standardHeaders(correlationId ?? "");
@@ -68,13 +69,67 @@ async function handler(
     }
 
     const now = new Date();
-    const updated = await prisma.autopilotRun.update({
-      where: { id: runId },
-      data:
-        action === "approve"
-          ? { status: "APPROVED", approvedAt: now }
-          : { status: "DISMISSED", dismissedAt: now },
+
+    let updateResult: { count: number };
+    let automationWebhookDispatched: boolean | undefined;
+
+    if (action === "dismiss") {
+      updateResult = await prisma.autopilotRun.updateMany({
+        where: { id: runId, storeId },
+        data: { status: "DISMISSED", dismissedAt: now },
+      });
+    } else {
+      const store = await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { settings: true },
+      });
+
+      const webhookSent = fireAutopilotApprovedWebhook(
+        storeId,
+        store?.settings,
+        {
+          runId: run.id,
+          ruleSlug: run.ruleSlug,
+          category: run.category,
+          title: run.title,
+          summary: run.summary,
+          reasoning: run.reasoning,
+          input: run.input,
+        },
+      );
+
+      automationWebhookDispatched = webhookSent;
+
+      updateResult = await prisma.autopilotRun.updateMany({
+        where: { id: runId, storeId },
+        data: {
+          status: "APPROVED",
+          approvedAt: now,
+          output: {
+            automationWebhookDispatched: webhookSent,
+          } as Prisma.InputJsonValue,
+          ...(webhookSent ? { executedAt: now } : {}),
+        },
+      });
+    }
+
+    if (updateResult.count === 0) {
+      return NextResponse.json(
+        { error: "Autopilot run not found", requestId: correlationId },
+        { status: 404, headers: getHeaders(correlationId) },
+      );
+    }
+
+    const updated = await prisma.autopilotRun.findFirst({
+      where: { id: runId, storeId },
     });
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Autopilot run not found", requestId: correlationId },
+        { status: 404, headers: getHeaders(correlationId) },
+      );
+    }
 
     logger.info(`[AutopilotAction] Run ${action}d`, {
       storeId,
@@ -90,6 +145,10 @@ async function handler(
           status: updated.status,
           approvedAt: updated.approvedAt,
           dismissedAt: updated.dismissedAt,
+          executedAt: updated.executedAt,
+          ...(automationWebhookDispatched !== undefined && {
+            automationWebhookDispatched,
+          }),
         },
         requestId: correlationId,
       },

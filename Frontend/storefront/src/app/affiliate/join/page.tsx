@@ -12,14 +12,14 @@ import { apiJson } from "@/lib/api-client-shared";
 import {
   Gift,
   DollarSign,
-  Users,
+  Users as _Users,
   TrendingUp,
   Check,
   ArrowRight,
   Sparkles,
   Shield,
   Zap,
-  RefreshCw,
+  RefreshCw
 } from "lucide-react";
 
 interface AffiliateProgramInfo {
@@ -43,9 +43,33 @@ export default function AffiliateJoinPage() {
     marketingMethod: "",
     agreedToTerms: false,
   });
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendCooldownSec, setResendCooldownSec] = useState(0);
+
+  const affiliateAddonEnabled =
+    Array.isArray((store as any)?.enabledAddOns) &&
+    (store as any).enabledAddOns.includes("vayva.affiliate");
+
+  if (store && !affiliateAddonEnabled) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-3">Affiliate Program not enabled</h1>
+          <p className="text-gray-600 mb-6">
+            This store has not enabled the Affiliate Program add-on.
+          </p>
+          <Button variant="outline" onClick={() => router.push("/")}>
+            Back to Store
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Default program info - in production this would come from API
   const programInfo: AffiliateProgramInfo = {
@@ -82,6 +106,47 @@ export default function AffiliateJoinPage() {
     }
   };
 
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setVerifying(true);
+    try {
+      await apiJson("/api/affiliate/verify", {
+        method: "POST",
+        body: JSON.stringify({ email: form.email, code: otp }),
+      });
+      router.push("/affiliate/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Verification failed");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (resendCooldownSec <= 0) return;
+    const t = setInterval(() => {
+      setResendCooldownSec((s) => Math.max(0, s - 1));
+    }, 1000);
+    return () => clearInterval(t);
+  }, [resendCooldownSec]);
+
+  const handleResend = async () => {
+    setError("");
+    setResending(true);
+    try {
+      await apiJson("/api/affiliate/resend", {
+        method: "POST",
+        body: JSON.stringify({ email: form.email }),
+      });
+      setResendCooldownSec(60);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Resend failed");
+    } finally {
+      setResending(false);
+    }
+  };
+
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -91,26 +156,45 @@ export default function AffiliateJoinPage() {
               <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Check className="w-10 h-10 text-emerald-600" />
               </div>
-              <h1 className="text-2xl font-bold mb-2">Application Submitted!</h1>
+              <h1 className="text-2xl font-bold mb-2">Verify your email</h1>
               <p className="text-gray-600 mb-6">
-                Thank you for applying to the {store?.name} affiliate program. 
-                We&apos;ll review your application and get back to you within 24-48 hours.
+                We sent a 6-digit code to <span className="font-medium">{form.email}</span>. Enter it below to activate your affiliate account.
               </p>
-              <div className="space-y-3">
-                <Button 
-                  className="w-full" 
-                  onClick={() => router.push("/")}
+              <form onSubmit={handleVerify} className="space-y-3 text-left">
+                <div>
+                  <Label htmlFor="otp">Verification code</Label>
+                  <Input
+                    id="otp"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="123456"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                  />
+                </div>
+                {error ? (
+                  <p className="text-sm text-red-600">{error}</p>
+                ) : null}
+                <Button className="w-full" type="submit" disabled={verifying || otp.length !== 6}>
+                  {verifying ? "Verifying..." : "Verify & Continue"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resending || resendCooldownSec > 0 || !form.email}
                 >
+                  {resendCooldownSec > 0
+                    ? `Resend code (${resendCooldownSec}s)`
+                    : resending
+                      ? "Sending..."
+                      : "Resend code"}
+                </Button>
+                <Button variant="outline" className="w-full" type="button" onClick={() => router.push("/")}>
                   Back to Store
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => router.push("/account")}
-                >
-                  Go to My Account
-                </Button>
-              </div>
+              </form>
             </CardContent>
           </Card>
         </div>

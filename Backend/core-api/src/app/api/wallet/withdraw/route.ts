@@ -52,7 +52,8 @@ async function initiateTransferIfNeeded(withdrawalId: string) {
     const t = await Paystack.initiateTransfer({
       amountKobo: Number(w.amountNetKobo),
       recipientCode,
-      reference: w.referenceCode,
+      // Use a webhook-matchable reference so we can settle the withdrawal asynchronously.
+      reference: `WALLET-WITHDRAW-${w.id}`,
       reason: "Merchant payout",
     });
 

@@ -7,8 +7,10 @@
 
 // Export all runtime modules
 export { AddOnSandbox } from './sandbox';
-export { PermissionManager, AddOnPermission } from './permissions';
-export { LifecycleManager, AddOnLifecycleHooks } from './lifecycle';
+export { PermissionManager } from './permissions';
+export type { AddOnPermission } from './permissions';
+export { LifecycleManager } from './lifecycle';
+export type { AddOnLifecycleHooks } from './lifecycle';
 export { AddOnErrorBoundary } from './error-boundary';
 
 // Re-export types for convenience

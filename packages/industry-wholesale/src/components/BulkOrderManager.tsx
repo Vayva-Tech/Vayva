@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Bulk Order Manager Component
  */
@@ -11,7 +11,7 @@ interface BulkOrderItem {
   unitPrice: number;
 }
 
-interface BulkOrderManagerProps {
+export interface BulkOrderManagerProps {
   orders?: Array<{
     id: string;
     customerId: string;
@@ -39,7 +39,7 @@ export const BulkOrderManager: React.FC<BulkOrderManagerProps> = ({
       ],
       totalValue: 3250,
       status: 'confirmed',
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      createdAt: new Date('2025-03-20T12:00:00.000Z'),
     },
     {
       id: 'bulk_002',
@@ -47,7 +47,7 @@ export const BulkOrderManager: React.FC<BulkOrderManagerProps> = ({
       items: [{ productId: 'prod_3', quantity: 200, unitPrice: 10 }],
       totalValue: 2000,
       status: 'pending',
-      createdAt: new Date(),
+      createdAt: new Date('2025-03-25T12:00:00.000Z'),
     },
   ];
 
@@ -73,9 +73,9 @@ export const BulkOrderManager: React.FC<BulkOrderManagerProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Bulk Orders</h3>
         {onCreateOrder && (
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             + Create Order
-          </button>
+          </Button>
         )}
       </div>
 

@@ -42,6 +42,22 @@ export const POST = withVayvaAPI(
         return NextResponse.json({ error: "Store not found" }, { status: 404 });
       }
 
+      // Enforce store-level AI settings: merchants can disable AI functions per store.
+      const storeSettings = store.settings as Record<string, unknown> | null;
+      const aiAgentSettings = (storeSettings?.aiAgent ??
+        null) as Record<string, unknown> | null;
+      const aiEnabled = Boolean(aiAgentSettings?.enabled);
+      if (!aiEnabled) {
+        return NextResponse.json(
+          {
+            error:
+              "AI is disabled for this store. Enable it in Settings → AI Agent.",
+            code: "AI_DISABLED",
+          },
+          { status: 403 },
+        );
+      }
+
       // Get recent products
       const products = await prisma.product.findMany({
         where: { storeId },
@@ -60,7 +76,8 @@ export const POST = withVayvaAPI(
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const [recentOrders, customerCount] = await Promise.all([
+      const [recentOrders, customerCount, deliverySettings, shipmentStats] =
+        await Promise.all([
         prisma.order.findMany({
           where: {
             storeId,
@@ -85,6 +102,14 @@ export const POST = withVayvaAPI(
         }),
         prisma.customer.count({
           where: { storeId },
+        }),
+        prisma.storeDeliverySettings.findUnique({
+          where: { storeId },
+        }),
+        prisma.shipment.groupBy({
+          by: ["status", "provider"],
+          where: { storeId },
+          _count: { _all: true },
         }),
       ]);
 
@@ -117,9 +142,31 @@ export const POST = withVayvaAPI(
       const avgOrderValue = orderCount > 0 ? totalRevenue / orderCount : 0;
 
       // Enrich the system message with merchant context
-      const settings = store.settings as Record<string, unknown> | null;
-      const aiAgentSettings = settings?.aiAgent as Record<string, unknown> | null;
       const knowledgeBase = (aiAgentSettings?.knowledgeBase as string) || "";
+
+      const codDefaults = (() => {
+        const dp =
+          storeSettings?.deliveryPolicy &&
+          typeof storeSettings.deliveryPolicy === "object"
+            ? (storeSettings.deliveryPolicy as Record<string, unknown>)
+            : {};
+        return {
+          codEnabledByDefault: Boolean(dp.codEnabledByDefault),
+          codIncludesDeliveryByDefault: Boolean(dp.codIncludesDeliveryByDefault),
+          deliveryFeePayerDefault:
+            dp.deliveryFeePayerDefault === "MERCHANT" ? "MERCHANT" : "CUSTOMER",
+        };
+      })();
+
+      const shipmentSummary = shipmentStats
+        .slice(0, 20)
+        .map((row) => {
+          const status = (row as any).status;
+          const provider = (row as any).provider;
+          const count = (row as any)._count?._all ?? 0;
+          return `- ${provider}/${status}: ${count}`;
+        })
+        .join("\n");
 
       const enrichedContext = `
 ## Your Merchant Context (INTERNAL - Not shared with customers)
@@ -141,6 +188,23 @@ ${topProducts.map((p) => `- ${p.name}: ${p.quantity} sold`).join("\n")}
 
 **Your Knowledge Base:**
 ${knowledgeBase}
+
+**Delivery & Logistics (Operational):**
+- deliveryEnabled: ${Boolean(deliverySettings?.isEnabled)}
+- provider: ${deliverySettings?.provider || "CUSTOM"}
+- pickup: ${[
+        deliverySettings?.pickupAddressLine1,
+        deliverySettings?.pickupCity,
+        deliverySettings?.pickupState,
+      ]
+        .filter(Boolean)
+        .join(", ") || "not set"}
+- COD default enabled: ${codDefaults.codEnabledByDefault}
+- COD includes delivery by default: ${codDefaults.codIncludesDeliveryByDefault}
+- Delivery fee payer default: ${codDefaults.deliveryFeePayerDefault}
+
+**Shipment Health (All time, grouped):**
+${shipmentSummary || "No shipments yet"}
 
 **AI Configuration:**
 - Tone: ${aiAgentSettings?.tone || "PROFESSIONAL"}

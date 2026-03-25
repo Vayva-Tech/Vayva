@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "@vayva/ui";
@@ -15,7 +13,6 @@ import {
   Plus,
   FileText,
 } from "@phosphor-icons/react";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { apiJson } from "@/lib/api-client-shared";
 import type { NightlifeMetrics, VenueStatus } from "@/types/nightlife";
 import { NightlifeKPICard } from "@/components/nightlife/NightlifeKPICard";
@@ -26,6 +23,7 @@ import { PromoterPerformance } from "@/components/nightlife/PromoterPerformance"
 import { DoorActivity } from "@/components/nightlife/DoorActivity";
 import { SecurityLog } from "@/components/nightlife/SecurityLog";
 import { AIInsightsPanel } from "@/components/nightlife/AIInsightsPanel";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface DashboardData {
   metrics: NightlifeMetrics;
@@ -50,21 +48,17 @@ export default function NightlifeDashboardPage() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      // In production, use actual venueId and eventId from context
-      const venueId = "venue_123";
-      const eventId = "event_456";
-      
-      const data = await apiJson<{
-        metrics: NightlifeMetrics;
-        venueStatus?: VenueStatus;
-      }>(
-        `/api/nightlife/dashboard?venueId=${venueId}&eventId=${eventId}`
-      );
-      
-      if (data?.metrics) {
+
+      const result = await apiJson<{
+        success?: boolean;
+        data?: { metrics: NightlifeMetrics; venueStatus?: VenueStatus };
+      }>("/api/nightlife/dashboard");
+
+      const payload = result?.data;
+      if (result?.success !== false && payload?.metrics) {
         setDashboardData({
-          metrics: data.metrics,
-          venueStatus: data.venueStatus || {
+          metrics: payload.metrics,
+          venueStatus: payload.venueStatus ?? {
             isOpen: true,
             capacity: 500,
             currentOccupancy: 342,
@@ -106,42 +100,39 @@ export default function NightlifeDashboardPage() {
       className="space-y-6"
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <Breadcrumbs />
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">
-            Nightlife Dashboard
-          </h1>
-          <p className="text-gray-700 mt-1">
-            Elysium Nightclub | {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+      <PageHeader
+        title="Nightlife Dashboard"
+        subtitle={
+          <>
+            Elysium Nightclub ·{" "}
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
-            {lastUpdated && (
-              <span className="ml-2 text-xs">
-                • Updated {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => void loadDashboardData()}>
-            <TrendingUp size={18} className="mr-2" />
-            Refresh
-          </Button>
-          <Button>
-            <Plus size={18} className="mr-2" />
-            New Reservation
-          </Button>
-          <Button variant="outline">
-            <FileText size={18} className="mr-2" />
-            Night Report
-          </Button>
-        </div>
-      </div>
+            {lastUpdated ? (
+              <span className="ml-2 text-xs">• Updated {lastUpdated.toLocaleTimeString()}</span>
+            ) : null}
+          </>
+        }
+        actions={
+          <>
+            <Button variant="outline" onClick={() => void loadDashboardData()}>
+              <TrendingUp size={18} className="mr-2" />
+              Refresh
+            </Button>
+            <Button>
+              <Plus size={18} className="mr-2" />
+              New Reservation
+            </Button>
+            <Button variant="outline">
+              <FileText size={18} className="mr-2" />
+              Night Report
+            </Button>
+          </>
+        }
+      />
 
       {/* Venue Status Bar */}
       {dashboardData?.venueStatus && (
@@ -197,40 +188,40 @@ export default function NightlifeDashboardPage() {
           <NightlifeKPICard
             label="Revenue"
             value={`₦${dashboardData.metrics.revenue.toLocaleString()}`}
-            change={`${dashboardData.metrics.revenueChange > 0 ? '+' : ''}${dashboardData.metrics.revenueChange}%`}
-            trend={dashboardData.metrics.revenueChange >= 0 ? 'up' : 'down'}
+            change={`${(dashboardData.metrics.revenueChange ?? 0) > 0 ? '+' : ''}${dashboardData.metrics.revenueChange ?? 0}%`}
+            trend={(dashboardData.metrics.revenueChange ?? 0) >= 0 ? 'up' : 'down'}
             icon={<Wine size={24} className="text-cyan-400" />}
             live
           />
           <NightlifeKPICard
             label="Covers"
             value={dashboardData.metrics.covers.toString()}
-            change={`${dashboardData.metrics.coversChange > 0 ? '+' : ''}${dashboardData.metrics.coversChange}%`}
-            trend={dashboardData.metrics.coversChange >= 0 ? 'up' : 'down'}
+            change={`${(dashboardData.metrics.coversChange ?? 0) > 0 ? '+' : ''}${dashboardData.metrics.coversChange ?? 0}%`}
+            trend={(dashboardData.metrics.coversChange ?? 0) >= 0 ? 'up' : 'down'}
             icon={<Users size={24} className="text-purple-400" />}
             live
           />
           <NightlifeKPICard
             label="VIP Guests"
             value={dashboardData.metrics.vipCount.toString()}
-            change={`${dashboardData.metrics.vipCountChange > 0 ? '+' : ''}${dashboardData.metrics.vipCountChange}%`}
-            trend={dashboardData.metrics.vipCountChange >= 0 ? 'up' : 'down'}
+            change={`${(dashboardData.metrics.vipCountChange ?? 0) > 0 ? '+' : ''}${dashboardData.metrics.vipCountChange ?? 0}%`}
+            trend={(dashboardData.metrics.vipCountChange ?? 0) >= 0 ? 'up' : 'down'}
             icon={<UserStar size={24} className="text-yellow-400" />}
             live
           />
           <NightlifeKPICard
             label="Bottle Sales"
             value={dashboardData.metrics.bottleSales.toString()}
-            change={`${dashboardData.metrics.bottleSalesChange > 0 ? '+' : ''}${dashboardData.metrics.bottleSalesChange}%`}
-            trend={dashboardData.metrics.bottleSalesChange >= 0 ? 'up' : 'down'}
+            change={`${(dashboardData.metrics.bottleSalesChange ?? 0) > 0 ? '+' : ''}${dashboardData.metrics.bottleSalesChange ?? 0}%`}
+            trend={(dashboardData.metrics.bottleSalesChange ?? 0) >= 0 ? 'up' : 'down'}
             icon={<Wine size={24} className="text-pink-400" />}
             live
           />
           <NightlifeKPICard
             label="Occupancy"
             value={`${dashboardData.metrics.occupancyRate}%`}
-            change={`${dashboardData.metrics.occupancyChange > 0 ? '+' : ''}${dashboardData.metrics.occupancyChange}%`}
-            trend={dashboardData.metrics.occupancyChange >= 0 ? 'up' : 'down'}
+            change={`${(dashboardData.metrics.occupancyChange ?? 0) > 0 ? '+' : ''}${dashboardData.metrics.occupancyChange ?? 0}%`}
+            trend={(dashboardData.metrics.occupancyChange ?? 0) >= 0 ? 'up' : 'down'}
             icon={<Activity size={24} className="text-green-400" />}
             live
           />

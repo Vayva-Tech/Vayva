@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { memo } from 'react';
@@ -54,7 +53,7 @@ export const SparklineChart = memo(function SparklineChart({
               fontSize: '12px',
               padding: '4px 8px'
             }}
-            formatter={(value: number) => [value.toLocaleString(), 'Value']}
+            formatter={(value) => [Number(value ?? 0).toLocaleString(), 'Value']}
           />
         </LineChart>
       </ResponsiveContainer>

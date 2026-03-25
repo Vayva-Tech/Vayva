@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import React, {
   createContext,
@@ -18,6 +17,8 @@ import { InactivityListener } from "@/components/auth/InactivityListener";
 interface AuthContextType {
   user: User | null;
   merchant: ExtendedMerchant | null;
+  /** Bearer token when provided at login (e.g. for WebSocket query auth). */
+  token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (
@@ -42,9 +43,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [merchant, setMerchant] = useState<ExtendedMerchant | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   const fetchProfile = async () => {
     try {
@@ -57,10 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUser(null);
         setMerchant(null);
+        setToken(null);
       }
     } catch (_error) {
       setUser(null);
       setMerchant(null);
+      setToken(null);
     }
   };
 
@@ -93,6 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     newUser: User,
     newMerchant?: MerchantContext | null,
   ) => {
+    setToken(newToken ?? null);
     setUser(newUser);
     const extendedMerchant = (newMerchant || null) as ExtendedMerchant | null;
     setMerchant(extendedMerchant);
@@ -123,6 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     setUser(null);
     setMerchant(null);
+    setToken(null);
     if (pathname !== "/signin") {
       router.replace("/signin");
     }
@@ -217,6 +223,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value: AuthContextType = {
     user,
     merchant,
+    token,
     isLoading,
     isAuthenticated: !!user,
     login,

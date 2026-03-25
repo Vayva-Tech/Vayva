@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 
 interface ProjectRiskFactor {
   category: 'budget' | 'timeline' | 'resource' | 'client';
@@ -26,12 +27,11 @@ interface ProjectRisk {
  */
 export async function GET(req: NextRequest) {
   try {
-    const searchParams = req.nextUrl.searchParams;
-    const storeId = searchParams.get('storeId');
-
-    if (!storeId) {
-      return NextResponse.json({ error: 'Store ID required' }, { status: 400 });
+    const auth = await buildBackendAuthHeaders(req);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const storeId = auth.user.storeId;
 
     // Call backend API instead of direct Prisma queries
     const result = await apiJson<{
@@ -47,10 +47,8 @@ export async function GET(req: NextRequest) {
         };
       };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/creative/ai/insights?storeId=${storeId}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+    }>(`${process.env.BACKEND_API_URL}/api/creative/ai/insights?storeId=${encodeURIComponent(storeId)}`, {
+      headers: auth.headers,
     });
 
     return NextResponse.json(result);

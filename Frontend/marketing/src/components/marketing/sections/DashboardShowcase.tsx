@@ -5,7 +5,6 @@ import {
   IconShoppingBag as ShoppingBag,
   IconPackage as Package,
   IconCreditCard as CreditCard,
-  IconTruck as Truck,
   IconUsers as Users,
   IconRobot as Bot,
 } from "@tabler/icons-react";
@@ -19,7 +18,7 @@ export default function DashboardShowcase(): React.JSX.Element {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="max-w-[1600px] mx-auto px-6"
+        className="max-w-[1400px] mx-auto px-6"
       >
         {/* Section Header */}
         <div className="text-center mb-12">

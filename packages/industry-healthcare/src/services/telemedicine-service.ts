@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TelemedicineSession } from '../types';
 
@@ -13,11 +12,14 @@ export interface TelemedicineSessionParams {
  * Handles room creation, session lifecycle, and recording
  */
 export class TelemedicineService {
-  private db: any;
+  private readonly db: any;
+  private readonly memory = new Map<string, TelemedicineSession>();
 
-  constructor(db: any) {
+  constructor(db?: any) {
     this.db = db;
   }
+
+  async initialize(): Promise<void> {}
 
   /**
    * Create a telemedicine room for an appointment
@@ -35,7 +37,11 @@ export class TelemedicineService {
       chatLog: [],
     };
 
-    await this.db.telemedicineSession.create({ data: session });
+    if (this.db?.telemedicineSession?.create) {
+      await this.db.telemedicineSession.create({ data: session });
+    } else {
+      this.memory.set(session.id, session);
+    }
 
     return session;
   }
@@ -44,10 +50,21 @@ export class TelemedicineService {
    * Start a telemedicine session (doctor joins)
    */
   async startSession(sessionId: string): Promise<void> {
-    await this.db.telemedicineSession.update({
-      where: { id: sessionId },
-      data: { status: 'active', startedAt: new Date() },
-    });
+    if (this.db?.telemedicineSession?.update) {
+      await this.db.telemedicineSession.update({
+        where: { id: sessionId },
+        data: { status: 'active', startedAt: new Date() },
+      });
+      return;
+    }
+    const s = this.memory.get(sessionId);
+    if (s) {
+      this.memory.set(sessionId, {
+        ...s,
+        status: 'active',
+        startedAt: new Date(),
+      } as TelemedicineSession);
+    }
   }
 
   /**
@@ -56,48 +73,70 @@ export class TelemedicineService {
   async endSession(sessionId: string): Promise<void> {
     const endedAt = new Date();
 
-    const session = await this.db.telemedicineSession.findUnique({
-      where: { id: sessionId },
-    });
+    if (this.db?.telemedicineSession?.findUnique) {
+      const session = await this.db.telemedicineSession.findUnique({
+        where: { id: sessionId },
+      });
 
-    const startedAt = session?.startedAt as Date | undefined;
-    const duration = startedAt
-      ? Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
-      : 0;
+      const startedAt = session?.startedAt as Date | undefined;
+      const duration = startedAt
+        ? Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
+        : 0;
 
-    await this.db.telemedicineSession.update({
-      where: { id: sessionId },
-      data: { status: 'ended', endedAt, duration },
-    });
+      await this.db.telemedicineSession.update({
+        where: { id: sessionId },
+        data: { status: 'ended', endedAt, duration },
+      });
+      return;
+    }
+
+    const s = this.memory.get(sessionId);
+    if (s) {
+      const startedAt = (s as TelemedicineSession & { startedAt?: Date }).startedAt;
+      const duration = startedAt
+        ? Math.floor((endedAt.getTime() - startedAt.getTime()) / 1000)
+        : 0;
+      this.memory.set(sessionId, {
+        ...s,
+        status: 'ended',
+        endedAt,
+        duration,
+      } as TelemedicineSession);
+    }
   }
 
   /**
    * Get a session by ID
    */
   async getSession(sessionId: string): Promise<TelemedicineSession | null> {
-    const record = await this.db.telemedicineSession.findUnique({
-      where: { id: sessionId },
-    });
-
-    return record as TelemedicineSession | null;
+    if (this.db?.telemedicineSession?.findUnique) {
+      const record = await this.db.telemedicineSession.findUnique({
+        where: { id: sessionId },
+      });
+      return record as TelemedicineSession | null;
+    }
+    return this.memory.get(sessionId) ?? null;
   }
 
   /**
    * Get active sessions for a doctor
    */
   async getActiveSessions(doctorId: string): Promise<TelemedicineSession[]> {
-    const records = await this.db.telemedicineSession.findMany({
-      where: { doctorId, status: { in: ['waiting', 'active'] } },
-    });
-
-    return records as TelemedicineSession[];
+    if (this.db?.telemedicineSession?.findMany) {
+      const records = await this.db.telemedicineSession.findMany({
+        where: { doctorId, status: { in: ['waiting', 'active'] } },
+      });
+      return records as TelemedicineSession[];
+    }
+    return Array.from(this.memory.values()).filter(
+      (s) => s.doctorId === doctorId && (s.status === 'waiting' || s.status === 'active'),
+    );
   }
 
   /**
    * Generate a join URL for a session (integration point for video provider)
    */
   generateJoinUrl(session: TelemedicineSession, role: 'patient' | 'doctor'): string {
-    // In production, integrate with Twilio/Daily.co/Zoom SDK
     const baseUrl = process.env['TELEMEDICINE_BASE_URL'] ?? 'https://meet.vayva.io';
     return `${baseUrl}/room/${session.roomId}?role=${role}&token=${session.id}`;
   }

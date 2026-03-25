@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@vayva/prisma';
 import { getSessionUser } from '@/lib/session.server';
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const user = await getSessionUser();
     if (!user) {

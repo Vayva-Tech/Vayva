@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real Estate Property Types
  * Core domain models for properties and listings

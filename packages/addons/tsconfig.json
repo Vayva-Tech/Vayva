@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/lib/utils": ["src/lib/utils.ts"]
+    },
     "target": "ES2020",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
@@ -30,8 +34,9 @@
     "verbatimModuleSyntax": true
   },
   "include": [
-    "*.ts",
-    "*.tsx"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tsup.config.ts"
   ],
   "exclude": [
     "node_modules",

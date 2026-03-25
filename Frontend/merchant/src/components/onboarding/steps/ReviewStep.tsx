@@ -24,7 +24,7 @@ import {
 
 interface ReviewSectionProps {
   title: string;
-  icon: React.ComponentType<{ className?: string; size?: number }>;
+  icon: React.ComponentType<{ className?: string; size?: number | string }>;
   children: React.ReactNode;
   onEdit?: () => void;
 }

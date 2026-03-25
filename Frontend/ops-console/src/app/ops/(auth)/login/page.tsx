@@ -201,7 +201,7 @@ function LoginContent(): React.JSX.Element {
                     placeholder="••••••••••"
                     className="w-full h-11 px-4 pr-11 rounded-xl bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 disabled:opacity-50 hover:border-slate-300 transition-colors"
                   />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading}
@@ -209,7 +209,7 @@ function LoginContent(): React.JSX.Element {
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  </Button>
                 </div>
               </FormField>
             </>

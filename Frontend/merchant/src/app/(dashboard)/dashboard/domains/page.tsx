@@ -108,7 +108,7 @@ export default function DomainsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-10 max-w-6xl mx-auto pb-20">
+      <div className="space-y-10 max-w-6xl pb-20">
         <div className="space-y-4">
           <div className="h-10 w-48 bg-white animate-pulse rounded-xl" />
           <div className="h-4 w-96 bg-white animate-pulse rounded-lg" />
@@ -119,7 +119,7 @@ export default function DomainsPage() {
   }
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-20">
+    <div className="space-y-10 max-w-6xl pb-20">
       <PageHeader
         title="Domains"
         description="Manage your store's web address and custom domains"

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nutritional Analysis Service
  * Nutrition calculations and dietary information
@@ -42,7 +41,8 @@ export class NutritionalAnalysisService {
         return {
           calories: acc.calories + (ing.caloriesPerUnit || 0) * multiplier,
           protein: acc.protein + (ing.proteinPerUnit || 0) * multiplier,
-          carbohydrates: acc.carbs + (ing.carbsPerUnit || 0) * multiplier,
+          carbohydrates:
+            acc.carbohydrates + (ing.carbsPerUnit || 0) * multiplier,
           fat: acc.fat + (ing.fatPerUnit || 0) * multiplier,
           fiber: acc.fiber + (ing.fiberPerUnit || 0) * multiplier,
           sodium: acc.sodium + (ing.sodiumPerUnit || 0) * multiplier,

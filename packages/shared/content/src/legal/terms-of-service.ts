@@ -1,4 +1,4 @@
-import { LegalDocument } from "../types";
+import type { LegalDocument } from "../types";
 
 export const termsOfService: LegalDocument = {
   slug: "terms",
@@ -36,7 +36,7 @@ export const termsOfService: LegalDocument = {
     {
       heading: "4. Verification and Compliance",
       content: [
-        "We may require identity and business verification to comply with legal and risk controls. Verification can include NIN, BVN, and CAC checks. We may use YouVerify for NIN checks, Paystack for BVN checks, and manual review for CAC through our Ops Console. You agree to provide accurate documents and keep verification information current.",
+        "We may require identity and business verification to comply with legal and risk controls. Verification can include NIN, BVN, and CAC checks. We may use Paystack and/or manual review through our Compliance Team. You agree to provide accurate documents and keep verification information current.",
       ],
     },
     {

@@ -1,16 +1,15 @@
-// @ts-nocheck
 /**
  * New Workflow Page
  * Create a new workflow from scratch or template
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  ArrowLeft, 
-  Plus, 
+import {
+  ArrowLeft,
+  Plus,
   Copy,
   Sparkles,
   ShoppingBag,
@@ -19,15 +18,23 @@ import {
   Heart,
   Building2,
 } from 'lucide-react';
-import type { IndustrySlug, WorkflowTemplate } from '@vayva/workflow-engine';
+import type { IndustrySlug } from '@vayva/workflow-engine';
+
+interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  industry: IndustrySlug;
+}
+
 // import { getAllTemplates } from '@vayva/workflow-templates';
-const getAllTemplates = () => []; // Placeholder
+const getAllTemplates = (): WorkflowTemplate[] => [];
 
 const industries: { id: IndustrySlug; name: string; icon: React.ReactNode }[] = [
   { id: 'fashion', name: 'Fashion', icon: <ShoppingBag className="w-5 h-5" /> },
   { id: 'restaurant', name: 'Restaurant', icon: <Utensils className="w-5 h-5" /> },
   { id: 'healthcare', name: 'Healthcare', icon: <Heart className="w-5 h-5" /> },
-  { id: 'realestate', name: 'Real Estate', icon: <Home className="w-5 h-5" /> },
+  { id: 'real-estate', name: 'Real Estate', icon: <Home className="w-5 h-5" /> },
   { id: 'retail', name: 'Retail', icon: <Building2 className="w-5 h-5" /> },
 ];
 
@@ -62,12 +69,12 @@ export default function NewWorkflowPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={() => router.back()}
           className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
         >
           <ArrowLeft className="w-5 h-5" />
-        </button>
+        </Button>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Create New Workflow</h1>
           <p className="text-gray-600 mt-1">Choose how you want to create your workflow</p>
@@ -79,7 +86,7 @@ export default function NewWorkflowPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">1. Select Industry</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {industries.map((industry) => (
-            <button
+            <Button
               key={industry.id}
               onClick={() => {
                 setSelectedIndustry(industry.id);
@@ -103,7 +110,7 @@ export default function NewWorkflowPage() {
               }`}>
                 {industry.name}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -152,13 +159,13 @@ export default function NewWorkflowPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <button
+                  <Button
                     onClick={handleCreateFromScratch}
                     disabled={!workflowName}
                     className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Create Workflow
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -177,7 +184,7 @@ export default function NewWorkflowPage() {
                 {templates.length > 0 ? (
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {templates.map((template) => (
-                      <button
+                      <Button
                         key={template.id}
                         onClick={() => setSelectedTemplate(template)}
                         className={`
@@ -201,7 +208,7 @@ export default function NewWorkflowPage() {
                             <p className="text-sm text-gray-500">{template.description}</p>
                           </div>
                         </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 ) : (
@@ -211,12 +218,12 @@ export default function NewWorkflowPage() {
                 )}
 
                 {selectedTemplate && (
-                  <button
+                  <Button
                     onClick={handleCreateFromTemplate}
                     className="w-full mt-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                   >
                     Use Template
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

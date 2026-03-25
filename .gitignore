@@ -12,6 +12,7 @@ playwright-report/
 apps/merchant-admin/cookies.txt
 .windsurf/
 .claude/
+.cursor/
 
 # Production
 build/
@@ -33,6 +34,9 @@ Frontend/**/public/workbox-*.js.map
 *.pem
 .turbo
 .vercel
+
+# Legacy root storefront demos removed; canonical data is template-gallery/
+/templates/
 
 # One-off artifacts (local-only)
 *.bak
@@ -150,3 +154,6 @@ worker.env.*
 logs_59765035677/
 .pnpm-store/
 .agents/
+
+# Firecrawl outputs
+.firecrawl/

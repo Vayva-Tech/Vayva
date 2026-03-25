@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Kitchen Display System (KDS) Service
  * 

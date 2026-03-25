@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -8,41 +8,44 @@ const MAX_PAGE_SIZE = 100;
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
-        const page = parseInt(searchParams.get("page") || "1", 10);
-        const limit = Math.min(
-            parseInt(searchParams.get("limit") || String(DEFAULT_PAGE_SIZE), 10),
-            MAX_PAGE_SIZE
-        );
+    const page = Number.parseInt(searchParams.get("page") || "1", 10);
+    const limit = Math.min(
+      Number.parseInt(
+        searchParams.get("limit") || String(DEFAULT_PAGE_SIZE),
+        10,
+      ),
+      MAX_PAGE_SIZE,
+    );
 
-        // Call backend API to fetch collections
-        const result = await apiJson<{
-            success: boolean;
-            data: Array<{
-                id: string;
-                name: string;
-                handle: string;
-                count: number;
-                visibility: string;
-                updated: string;
-            }>;
-            pagination: {
-                page: number;
-                limit: number;
-                total: number;
-                totalPages: number;
-            };
-        }>(
-            `${process.env.BACKEND_API_URL}/api/collections?page=${page}&limit=${limit}`,
+    const result = await apiJson<{
+      success: boolean;
+      data: Array<{
+        id: string;
+        name: string;
+        handle: string;
+        count: number;
+        visibility: string;
+        updated: string;
+      }>;
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    }>(
+      `${process.env.BACKEND_API_URL}/api/collections?page=${page}&limit=${limit}`,
       {
-                headers: {
-                    "x-store-id": storeId,
-                },
-            }
-        );
-        
-        return NextResponse.json(result);
+        headers: auth.headers,
+      },
+    );
+
+    return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, { endpoint: "/api/collections", operation: "GET" });
     return NextResponse.json(

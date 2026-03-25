@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@vayva/ui";
 
 interface Recommendation {
   id: string;
@@ -110,17 +111,19 @@ export function AutopilotDemo(): React.JSX.Element {
           {/* Category tabs */}
           <div className="flex flex-wrap gap-2 mb-6">
             {["All", "Inventory", "Pricing", "Marketing", "Engagement", "Operations"].map((cat, i) => (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 key={cat}
                 onClick={() => setActiveIndex(i === 0 ? 0 : recommendations.findIndex(r => r.category === cat) || 0)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all h-auto ${
                   (i === 0 && activeIndex === 0) || recommendations[activeIndex]?.category === cat
-                    ? "bg-slate-900 text-white"
+                    ? "bg-slate-900 text-white hover:bg-slate-900 hover:text-white"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
                 {cat}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -159,12 +162,19 @@ export function AutopilotDemo(): React.JSX.Element {
 
               {/* Actions */}
               <div className="flex gap-3">
-                <button className={`flex-1 py-2.5 px-4 bg-${active.color}-600 hover:bg-${active.color}-700 text-white rounded-xl font-semibold text-sm transition-colors`}>
+                <Button
+                  type="button"
+                  className={`flex-1 py-2.5 px-4 bg-${active.color}-600 hover:bg-${active.color}-700 text-white rounded-xl font-semibold text-sm transition-colors h-auto`}
+                >
                   Approve
-                </button>
-                <button className="flex-1 py-2.5 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold text-sm transition-colors">
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 py-2.5 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold text-sm transition-colors h-auto"
+                >
                   Dismiss
-                </button>
+                </Button>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -172,12 +182,15 @@ export function AutopilotDemo(): React.JSX.Element {
           {/* Progress dots */}
           <div className="flex justify-center gap-2 mt-6">
             {recommendations.map((_, i) => (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 key={i}
                 onClick={() => setActiveIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === activeIndex ? "w-8 bg-slate-900" : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                className={`h-1.5 min-w-0 p-0 rounded-full transition-all ${
+                  i === activeIndex ? "w-8 bg-slate-900 hover:bg-slate-900" : "w-1.5 bg-slate-300 hover:bg-slate-400"
                 }`}
+                aria-label={`Show recommendation ${i + 1}`}
               />
             ))}
           </div>

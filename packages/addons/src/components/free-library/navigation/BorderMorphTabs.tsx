@@ -1,6 +1,7 @@
 'use client';
+import { Button } from "@vayva/ui";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -28,7 +29,7 @@ export function BorderMorphTabs({ tabs, className = '' }: BorderMorphTabsProps) 
       {/* Tab Buttons */}
       <div className="relative flex border-b border-gray-200">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`relative px-6 py-3 text-sm font-medium transition-colors ${
@@ -50,7 +51,7 @@ export function BorderMorphTabs({ tabs, className = '' }: BorderMorphTabsProps) 
                 }}
               />
             )}
-          </button>
+          </Button>
         ))}
         
         {/* Background pill that morphs */}
@@ -89,3 +90,4 @@ export function BorderMorphTabs({ tabs, className = '' }: BorderMorphTabsProps) 
     </div>
   );
 }
+

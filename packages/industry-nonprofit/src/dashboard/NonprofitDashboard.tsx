@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 // ============================================================================
 // Nonprofit Industry Dashboard Main Component
@@ -154,13 +154,13 @@ export function NonprofitDashboard({
             Track donations, campaigns, and community impact
           </p>
         </div>
-        <button
+        <Button
           onClick={refresh}
           disabled={isValidating}
           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors disabled:opacity-50"
         >
           {isValidating ? 'Refreshing...' : 'Refresh Data'}
-        </button>
+        </Button>
       </div>
 
       {/* Impact Overview */}

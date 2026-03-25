@@ -1,6 +1,4 @@
-// @ts-nocheck
 'use client';
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -116,7 +114,7 @@ function MobileTabBar({ activeTab, onChange }: MobileTabBarProps) {
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t safe-area-pb">
       <div className="flex items-center justify-around py-2">
         {tabs.map((tab, index) => (
-          <button
+          <Button
             key={index}
             onClick={() => onChange(index)}
             className={cn(
@@ -128,7 +126,7 @@ function MobileTabBar({ activeTab, onChange }: MobileTabBarProps) {
           >
             <span className="text-xl">{tab.icon}</span>
             <span className="text-xs font-medium">{tab.label}</span>
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -249,3 +247,4 @@ export function SafeArea({ children, className }: { children: React.ReactNode; c
     </div>
   );
 }
+

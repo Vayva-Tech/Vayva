@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { Card, Button } from "@vayva/ui";
 
 interface StorePerformance {
   id: string;
@@ -80,36 +79,36 @@ export const StorePerformanceCharts: React.FC<StorePerformanceChartsProps> = ({
       {/* Comparison Summary */}
       {comparison && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <GlassPanel variant="elevated" className="p-6">
+          <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
             <div className="text-sm text-white/60 mb-2">Top Performer</div>
             <div className="text-lg font-bold text-white mb-1">{comparison.topPerformer.name}</div>
             <div className="text-2xl font-bold text-green-400">{formatCurrency(comparison.topPerformer.revenue)}</div>
             <div className="text-xs text-green-400 mt-1">+{formatPercent(comparison.topPerformer.growth)}</div>
-          </GlassPanel>
+          </Card>
 
-          <GlassPanel variant="elevated" className="p-6">
+          <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
             <div className="text-sm text-white/60 mb-2">Needs Attention</div>
             <div className="text-lg font-bold text-white mb-1">{comparison.lowestPerformer.name}</div>
             <div className="text-2xl font-bold text-red-400">{formatCurrency(comparison.lowestPerformer.revenue)}</div>
             <div className="text-xs text-red-400 mt-1">{formatPercent(comparison.lowestPerformer.growth)} growth</div>
-          </GlassPanel>
+          </Card>
 
-          <GlassPanel variant="elevated" className="p-6">
+          <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
             <div className="text-sm text-white/60 mb-2">Average Revenue</div>
             <div className="text-2xl font-bold text-white">{formatCurrency(comparison.averageRevenue)}</div>
             <div className="text-xs text-white/40 mt-1">Across {comparison.totalStores} stores</div>
-          </GlassPanel>
+          </Card>
 
-          <GlassPanel variant="elevated" className="p-6">
+          <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
             <div className="text-sm text-white/60 mb-2">Total Stores</div>
             <div className="text-2xl font-bold text-white">{comparison.totalStores}</div>
             <div className="text-xs text-white/40 mt-1">{stores.filter(s => s.status === 'open').length} open</div>
-          </GlassPanel>
+          </Card>
         </div>
       )}
 
       {/* Revenue Comparison Chart */}
-      <GlassPanel variant="elevated" className="p-6">
+      <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Revenue by Store</h3>
         <div className="space-y-3">
           {sortedByRevenue.map((store) => (
@@ -142,12 +141,12 @@ export const StorePerformanceCharts: React.FC<StorePerformanceChartsProps> = ({
             </div>
           ))}
         </div>
-      </GlassPanel>
+      </Card>
 
       {/* Performance Metrics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Growth Leaders */}
-        <GlassPanel variant="elevated" className="p-6">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
           <h3 className="text-lg font-semibold text-white mb-4">📈 Growth Leaders</h3>
           <div className="space-y-3">
             {sortedByGrowth.slice(0, 5).map((store, index) => (
@@ -165,10 +164,10 @@ export const StorePerformanceCharts: React.FC<StorePerformanceChartsProps> = ({
               </div>
             ))}
           </div>
-        </GlassPanel>
+        </Card>
 
         {/* Conversion Rate Leaders */}
-        <GlassPanel variant="elevated" className="p-6">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
           <h3 className="text-lg font-semibold text-white mb-4">🎯 Conversion Rate Leaders</h3>
           <div className="space-y-3">
             {sortedByConversion.slice(0, 5).map((store, index) => (
@@ -186,11 +185,11 @@ export const StorePerformanceCharts: React.FC<StorePerformanceChartsProps> = ({
               </div>
             ))}
           </div>
-        </GlassPanel>
+        </Card>
       </div>
 
       {/* Detailed Metrics Table */}
-      <GlassPanel variant="elevated" className="p-6">
+      <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Detailed Store Metrics</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -250,7 +249,7 @@ export const StorePerformanceCharts: React.FC<StorePerformanceChartsProps> = ({
             </tbody>
           </table>
         </div>
-      </GlassPanel>
+      </Card>
     </div>
   );
 };

@@ -119,7 +119,7 @@ export default function PublishPage() {
 
   if (loading) {
     return (
-      <div className="space-y-10 max-w-6xl mx-auto pb-20">
+      <div className="space-y-10 max-w-6xl pb-20">
         <div className="space-y-4">
           <div className="h-10 w-48 bg-white animate-pulse rounded-xl" />
           <div className="h-4 w-96 bg-white animate-pulse rounded-lg" />
@@ -133,7 +133,7 @@ export default function PublishPage() {
   }
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-20">
+    <div className="space-y-10 max-w-6xl pb-20">
       <PageHeader
         title="Publish"
         description="Review changes and make your site live"

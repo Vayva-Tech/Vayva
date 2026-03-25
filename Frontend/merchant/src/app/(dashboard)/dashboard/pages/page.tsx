@@ -2,6 +2,8 @@
 
 import { FileText, Plus, House, Phone, Question, Info, Lock } from "@phosphor-icons/react";
 import { Button } from "@vayva/ui";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 const SAMPLE_PAGES = [
   { id: '1', title: 'Home', slug: '/', type: 'system', status: 'published', views: 1250 },
@@ -19,17 +21,45 @@ export default function PagesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Pages</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your site content pages</p>
-        </div>
-        <Button className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
-          <Plus size={18} className="mr-2" />
-          Create Page
-        </Button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-xl font-semibold justify-between">
+                  <span>Create page</span>
+                  <Plus size={18} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Insight
+              </div>
+              <div className="mt-2 text-sm font-semibold text-gray-900">
+                Keep it simple
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                A short About page + clear Contact page improves trust and conversions.
+              </p>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Pages"
+          subtitle="Manage your site content pages"
+          actions={
+            <Button className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
+              <Plus size={18} className="mr-2" />
+              Create Page
+            </Button>
+          }
+        />
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -107,12 +137,12 @@ export default function PagesPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                      <Button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
                         <FileText size={16} />
-                      </button>
-                      <button className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                      </Button>
+                      <Button className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
                         <Lock size={16} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -121,6 +151,7 @@ export default function PagesPage() {
           </table>
         </div>
       </div>
+      </PageWithInsights>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 // ============================================================================
 // Quick Actions Panel
 // ============================================================================
@@ -44,14 +44,14 @@ export function QuickActionsPanel({
       <div className="quick-actions-header">
         <h4>Quick Actions</h4>
         {onToggle && (
-          <button
+          <Button
             type="button"
             className="quick-actions-toggle"
             onClick={onToggle}
             aria-label={collapsed ? "Expand actions" : "Collapse actions"}
           >
             {collapsed ? "→" : "←"}
-          </button>
+          </Button>
         )}
       </div>
 

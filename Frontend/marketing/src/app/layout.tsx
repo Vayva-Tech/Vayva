@@ -17,6 +17,13 @@ const inter = Inter({
   display: "swap",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+  themeColor: "#ffffff",
+};
+
 export const metadata = {
   metadataBase: new URL(urls.marketingBase()),
   title:
@@ -133,11 +140,6 @@ export default function RootLayout({
           dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
           opens: "09:00",
           closes: "18:00",
-        },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "4.8",
-          reviewCount: "5000",
         },
       },
     ],

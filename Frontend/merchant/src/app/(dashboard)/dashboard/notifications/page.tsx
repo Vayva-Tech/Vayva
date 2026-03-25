@@ -157,7 +157,7 @@ export default function NotificationsPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-6 border-b border-gray-200 pb-3">
-        <button
+        <Button
           onClick={() => setStatusFilter("unread")}
           className={`text-sm font-medium border-b-2 pb-3 -mb-3.5 transition-colors ${
             statusFilter === "unread"
@@ -166,8 +166,8 @@ export default function NotificationsPage() {
           }`}
         >
           Unread
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setStatusFilter("all")}
           className={`text-sm font-medium border-b-2 pb-3 -mb-3.5 transition-colors ${
             statusFilter === "all"
@@ -176,7 +176,7 @@ export default function NotificationsPage() {
           }`}
         >
           All Notifications
-        </button>
+        </Button>
       </div>
 
       {/* List */}
@@ -246,12 +246,12 @@ export default function NotificationsPage() {
                       </Link>
                     )}
                     {!n.isRead && (
-                      <button
+                      <Button
                         onClick={() => markAsRead(n.id)}
                         className="text-xs text-gray-500 hover:text-gray-700 font-medium p-0 h-auto"
                       >
                         Mark as read
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>

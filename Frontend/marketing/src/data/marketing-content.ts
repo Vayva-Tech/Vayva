@@ -6,7 +6,7 @@ export const landingContent = {
   heroHighlight: "that runs your business smoothly",
   heroDescription:
     "Turn WhatsApp conversations into organized business records. Track orders, manage inventory, and grow your revenue—all in one command center. AI handles the busywork while you focus on growth.",
-  heroStats: ["7-day trial on Starter", "No credit card", "AI-powered automation"],
+  heroStats: ["7-day free trial on Starter & Pro", "No credit card required", "AI-powered automation"],
   trustTitle: "Powering commerce with intelligent automation.",
   trustHighlights: [
     "Paystack payments",
@@ -29,7 +29,7 @@ export const landingContent = {
     {
       title: "Storefront builder",
       description:
-        "Professional templates with easy customization. Starter includes 4 templates; Pro and Pro+ unlock the full library.",
+        "Professional templates with easy customization. Starter includes one storefront template; Pro includes two and Pro+ five, with the full library available to purchase and unlock.",
     },
     {
       title: "Operational command",
@@ -68,7 +68,7 @@ export const landingContent = {
     {
       title: "Professional Templates",
       description:
-        "Choose from ready-made designs. Starter includes 4 templates; upgrade to unlock the full library.",
+        "Choose from ready-made designs. Plans include 1, 2, or 5 storefront templates respectively; upgrade or add purchases to unlock more from the library.",
     },
     {
       title: "AI-Powered Automation",
@@ -96,71 +96,16 @@ export const landingContent = {
   ],
 };
 
-export const pricingPlans = [
-  {
-    name: "Starter",
-    price: 25000,
-    description: "For growing businesses ready to scale",
-    features: [
-      "Up to 500 products",
-      "Unlimited orders",
-      "Vayva Automation (WhatsApp & Instagram)",
-      "Storefront setup & customization",
-      "Advanced conversation customization",
-      "Remove Vayva branding",
-      "Priority support & training",
-      "7-day free trial included",
-    ],
-    cta: "Start Growing",
-    href: "/checkout?plan=starter",
-    trialDays: 7,
-  },
-  {
-    name: "Pro",
-    price: 35000,
-    description: "High-volume sellers scaling operations",
-    features: [
-      "Everything in Starter, plus:",
-      "Advanced conversation customization",
-      "Multi-location & warehouse support",
-      "API access for custom integrations",
-      "Dedicated account manager",
-      "Custom integrations",
-      "White-label options available",
-    ],
-    cta: "Scale Your Business",
-    href: "/checkout?plan=pro",
-    popular: true,
-  },
-  {
-    name: "Pro Plus",
-    price: 50000,
-    description: "Full power with industry tools and visual automation",
-    features: [
-      "Everything in Pro, plus:",
-      "Industry-specific operational tools",
-      "Merged industry dashboard",
-      "Visual workflow builder",
-      "25,000 AI credits/mo",
-      "5 team seats",
-      "5 templates",
-      "Priority support",
-    ],
-    cta: "Unlock Full Power",
-    href: "/checkout?plan=pro_plus",
-  },
-];
-
 export const aboutContent = {
   heroTitle: "Building tools that support",
   heroHighlight: "business owners everywhere",
   heroDescription:
     "Vayva was born from a simple observation: millions of businesses run on WhatsApp, but the platform wasn't built for commerce. We're changing that.",
   stats: [
-    { value: "2026", label: "Founded" },
-    { value: "Global", label: "Built for businesses worldwide" },
-    { value: "99.9%", label: "Uptime" },
-    { value: "24/7", label: "System availability" },
+    { value: "2024", label: "Founded" },
+    { value: "Africa-first", label: "Product focus" },
+    { value: "High availability", label: "Platform commitment" },
+    { value: "24/7", label: "Help when you need it" },
   ],
   founder: {
     name: "Nyamsi Fredrick",
@@ -201,7 +146,7 @@ export const aboutContent = {
         "Built from the ground up for Nigerian connectivity, power, and business realities.",
     },
   ],
-  backing: ["Paystack", "YouVerify", "Kwik Delivery", "123Design"],
+  backing: ["Paystack", "Kwik Delivery", "123Design"],
   ctaTitle: "Join us in building the future",
   ctaDescription:
     "We’re hiring engineers, designers, and operators who believe African commerce deserves world-class tools.",
@@ -363,7 +308,7 @@ export const howItWorksContent = {
       step: "2",
       title: "Choose a Store Template",
       description:
-        "Select from professionally designed templates. Starter includes 4 templates; upgrade to unlock more designs. Preview, customize, and launch—no coding needed.",
+        "Select from professionally designed templates. Starter includes 1 included design; Pro and Pro+ include more (2 and 5). Preview, customize, and launch—no coding needed.",
     },
     {
       step: "3",
@@ -1317,7 +1262,7 @@ export const pricingFaqs = [
   {
     question: "How does the free trial work?",
     answer:
-      "Starter plans include a 7-day trial with full access — no credit card required. If you don't subscribe after the trial, your account is paused until you choose a plan.",
+      "Starter on monthly billing: your first month is free when you create a merchant account (no Paystack charge). Starter quarterly, Pro, and Pro+ are paid at checkout. Pro may include a short trial when offered through signup flows. Pro+ has no trial. If you don't subscribe after a trial ends, your account is paused until you choose a plan.",
   },
   {
     question: "Do I need design or coding skills?",
@@ -1340,9 +1285,14 @@ export const pricingFaqs = [
       "Yes. Vayva is month-to-month with no long-term contracts. You can cancel, upgrade, or downgrade your plan instantly from your dashboard. No penalties or hidden fees.",
   },
   {
+    question: "Is there a discount for quarterly billing?",
+    answer:
+      "Yes. On checkout you can choose quarterly billing and pay for three months at once with a 20% discount compared to three separate monthly payments. You still get the same features for the whole period.",
+  },
+  {
     question: "What features are included?",
     answer:
-      "All plans include AI order capture, Paystack payments, inventory tracking, and delivery management. Starter includes 4 templates. Pro and Pro+ unlock additional features like conversation customization, multi-location support, and API access.",
+      "All plans include AI order capture, Paystack payments, inventory tracking, and delivery management. Storefront templates are tiered (1 on Starter, 2 on Pro, 5 on Pro+) with more available to purchase. Pro adds advanced operations; Pro+ adds industry dashboards, merged views, and the visual workflow builder.",
   },
   {
     question: "Is my data secure?",
@@ -1449,9 +1399,9 @@ export const templatesContent = {
   heroTitle: "Professional Website Templates",
   heroHighlight: "Ready to Launch",
   heroDescription:
-    "Choose from professionally designed templates for your business. Customize colors, fonts, and layouts with our visual editor—no code required. Starter includes 4 templates; upgrade to unlock more.",
+    "Choose from professionally designed templates for your business. Customize colors, fonts, and layouts with our visual editor—no code required. Starter includes one template; Pro and Pro+ include two and five respectively, with more available from the library.",
   heroStats: [
-    { value: "4+", label: "Templates (Starter)", subtext: "Upgrade for full library" },
+    { value: "1", label: "Templates (Starter)", subtext: "2 on Pro, 5 on Pro+" },
     { value: "0", label: "Code Required", subtext: "Visual editing only" },
     { value: "<5min", label: "Setup Time", subtext: "From template to live store" },
   ],
@@ -1460,7 +1410,7 @@ export const templatesContent = {
     {
       step: "1",
       title: "Choose Your Template",
-      description: "Browse available designs. Starter includes 4 templates; upgrade for more options.",
+      description: "Browse available designs. Included templates follow your plan (1 / 2 / 5); purchase more from the full library anytime.",
     },
     {
       step: "2",
@@ -1504,6 +1454,7 @@ export const allFeaturesContent = {
     { title: "Customer CRM", description: "Track purchase history, preferences, and segments" },
   ],
   ctaTitle: "See all features in action",
-  ctaDescription: "Start your 7-day free trial and explore the complete platform.",
+  ctaDescription:
+    "Start with a 7-day free trial on Starter and Pro and explore the complete platform.",
   ctaButton: "Start Free Trial",
 };

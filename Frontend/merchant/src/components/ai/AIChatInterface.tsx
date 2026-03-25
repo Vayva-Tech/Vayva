@@ -1,9 +1,7 @@
-// @ts-nocheck
 /**
  * Enhanced AI Chat Interface - ChatGPT Style
  * Features conversation history, threading, and smart context awareness
  */
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -58,6 +56,7 @@ interface AIChatInterfaceProps {
 }
 
 export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfaceProps) {
+  void merchantId;
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [input, setInput] = useState('');
@@ -171,16 +170,35 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
     }, 800);
 
     try {
-      // Simulate API call to AI service
-      await new Promise(resolve => setTimeout(resolve, 3200));
-      
+      const res = await fetch('/api/merchant/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...updatedConversation.messages, userMessage]
+            .filter(m => m.role !== 'system')
+            .map(m => ({ role: m.role, content: m.content })),
+          conversationId: updatedConversation.id,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'Failed to get AI response');
+      }
+
+      const data = await res.json();
+      const assistantText =
+        typeof data?.message === 'string'
+          ? data.message
+          : typeof data?.data?.message === 'string'
+            ? data.data.message
+            : "I'm not sure how to help with that.";
+
       const aiResponse: ChatMessage = {
         id: `msg_${Date.now()}`,
         role: 'assistant',
-        content: generateAIResponse(input, industry),
+        content: assistantText,
         timestamp: new Date(),
-        confidence: 0.92,
-        tokensUsed: Math.floor(Math.random() * 200) + 100
       };
 
       const finalConversation = {
@@ -200,7 +218,10 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
       const errorMessage: ChatMessage = {
         id: `msg_${Date.now()}`,
         role: 'assistant',
-        content: "I apologize, I'm experiencing some technical difficulties right now. Please try again in a moment.",
+        content:
+          error instanceof Error
+            ? error.message
+            : "I apologize, I'm experiencing some technical difficulties right now. Please try again in a moment.",
         timestamp: new Date()
       };
 
@@ -281,7 +302,7 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
           
           <div className="flex gap-1">
             {(['all', 'today', 'week'] as const).map((option) => (
-              <button
+              <Button
                 key={option}
                 onClick={() => setFilter(option)}
                 className={`px-3 py-1 text-xs rounded-full transition-colors ${
@@ -291,7 +312,7 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
                 }`}
               >
                 {option.charAt(0).toUpperCase() + option.slice(1)}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -313,16 +334,15 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
                   <h3 className="font-medium text-sm truncate flex-1">
                     {conversation.title}
                   </h3>
-                  <Badge 
-                    variant="secondary" 
-                    className="text-xs"
-                    style={{ 
+                  <span
+                    className="inline-flex items-center rounded-md border border-gray-100 px-2 py-0.5 text-xs font-medium"
+                    style={{
                       backgroundColor: `${colors.primary}15`,
-                      color: colors.primary
+                      color: colors.primary,
                     }}
                   >
                     {conversation.industry.replace(/[-_]/g, ' ')}
-                  </Badge>
+                  </span>
                 </div>
                 <p className="text-xs text-gray-500 truncate mb-2">
                   {conversation.messages.length} messages
@@ -535,37 +555,4 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
   );
 }
 
-// Generate simulated AI responses based on industry
-function generateAIResponse(input: string, industry: IndustrySlug): string {
-  const responses: Record<IndustrySlug, string[]> = {
-    fashion: [
-      "Based on current fashion trends, I'd recommend focusing on sustainable materials and limited edition drops to increase exclusivity and demand.",
-      "Your customer data shows peak engagement during evening hours. Consider scheduling your social media posts between 7-9 PM for maximum reach.",
-      "I notice your inventory turnover rate is 2.3x monthly. To optimize cash flow, consider implementing a pre-order system for new collections."
-    ],
-    retail: [
-      "Your foot traffic analysis shows 40% higher conversion rates on weekends. Consider extending weekend hours or offering special weekend promotions.",
-      "Cross-selling opportunities are strong between electronics and accessories. I recommend bundling tablets with protective cases and screen protectors.",
-      "Customer feedback indicates interest in loyalty programs. A points-based system could increase repeat purchases by an estimated 25%."
-    ],
-    food: [
-      "Peak ordering times are 12-1 PM and 7-8 PM. Consider offering early bird specials from 11-12 PM to spread demand throughout the day.",
-      "Your most popular dishes have 4.7-star ratings. Featuring these prominently in marketing materials could boost conversion rates by 18%.",
-      "Delivery radius optimization suggests you could expand coverage by 15% without impacting delivery times significantly."
-    ],
-    beauty: [
-      "Subscription box concept shows 65% customer retention rate. Consider launching a monthly skincare routine box for recurring revenue.",
-      "Video tutorials increase product understanding and reduce return rates by 30%. I recommend creating how-to content for complex treatments.",
-      "Seasonal color palettes drive 40% more engagement. Plan your summer collection launch around trending warm tones."
-    ]
-    // Add more industries...
-  };
-
-  const industryResponses = responses[industry] || [
-    "I'd be happy to help you with that. Could you provide more specific details about what you're looking to achieve?",
-    "That's an interesting question. Based on general business principles, I'd suggest analyzing your current metrics and identifying areas for optimization.",
-    "I can help you develop a strategy for this. What specific outcomes are you hoping to achieve?"
-  ];
-
-  return industryResponses[Math.floor(Math.random() * industryResponses.length)];
-}
+// Note: previously simulated responses were removed; this component now calls `/api/merchant/ai-chat`.

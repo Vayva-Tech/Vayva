@@ -40,7 +40,7 @@ export const POST = withVayvaAPI(
         symptoms,
         temperature,
         bloodPressure,
-        notes,
+        _notes,
       } = body;
 
       // Verify appointment exists

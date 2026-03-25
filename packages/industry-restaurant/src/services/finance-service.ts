@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Restaurant Finance Module
  * 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Phase 5 Integration Example
  * ============================
@@ -24,8 +23,8 @@ export async function useInMerchantAdmin() {
     const serviceFeature = automotiveEngine.engine.serviceScheduler;
     const appointments = await serviceFeature?.getUpcomingAppointments();
     
-    console.log('Vehicles:', vehicles);
-    console.log('Appointments:', appointments);
+    console.warn('Vehicles:', vehicles);
+    console.warn('Appointments:', appointments);
   }
 }
 
@@ -300,5 +299,5 @@ class TemplateBackendService {
 // READY TO USE!
 // ============================================================================
 
-console.log('Phase 5 Integration Ready! 🚀');
-console.log('Available industries:', industryEngineManager.getAvailableIndustries());
+console.warn('Phase 5 Integration Ready! 🚀');
+console.warn('Available industries:', industryEngineManager.getAvailableIndustries());

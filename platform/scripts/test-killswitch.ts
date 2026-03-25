@@ -9,7 +9,7 @@ import {
   KillSwitchService,
   KillSwitchFeature,
 } from "../apps/merchant/src/lib/ops/KillSwitch";
-import { _prisma } from "../apps/merchant/src/lib/prisma";
+import { prisma as _prisma } from "../apps/merchant/src/lib/prisma";
 
 async function _main() {
   console.log("--- Testing Kill Switch ---");

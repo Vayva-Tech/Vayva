@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 import type { TrendData } from '../types';
 
 export interface TrendForecastingWidgetProps {
@@ -71,9 +71,9 @@ export const TrendForecastingWidget: React.FC<TrendForecastingWidgetProps> = ({
         </div>
       )}
 
-      <button className="mt-4 w-full py-2 bg-white/5 hover:bg-white/10 text-rose-400 text-sm font-medium rounded-lg transition-colors border border-white/10">
+      <Button className="mt-4 w-full py-2 bg-white/5 hover:bg-white/10 text-rose-400 text-sm font-medium rounded-lg transition-colors border border-white/10">
         View Full Report →
-      </button>
+      </Button>
     </GlassPanel>
   );
 };

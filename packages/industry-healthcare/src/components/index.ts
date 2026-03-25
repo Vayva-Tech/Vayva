@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Healthcare Components
  * Re-export all UI components

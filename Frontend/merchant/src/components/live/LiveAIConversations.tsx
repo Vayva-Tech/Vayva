@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Live AI Conversations Monitor
  * Displays real-time AI conversation activity and sales
@@ -9,7 +8,7 @@
 import React, { useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Bot, MessageSquare, TrendingUp, Users, Zap } from 'lucide-react';
-import { useLiveConversations } from '@vayva/realtime';
+import { useLiveConversations, type AIConversationEventData } from '@vayva/realtime';
 import { cn } from '@/lib/utils';
 
 interface LiveAIConversationsProps {
@@ -117,7 +116,9 @@ export function LiveAIConversations({ storeId, className }: LiveAIConversationsP
 
     const stats = useMemo(() => {
         const totalConversations = conversations.length;
-        const salesCount = conversations.filter(c => c.saleValue && c.saleValue > 0).length;
+        const salesCount = conversations.filter(
+            (c: AIConversationEventData) => c.saleValue && c.saleValue > 0,
+        ).length;
         const conversionRate = totalConversations > 0
             ? (salesCount / totalConversations) * 100
             : 0;
@@ -202,7 +203,7 @@ export function LiveAIConversations({ storeId, className }: LiveAIConversationsP
                     </div>
                 ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                        {conversations.slice(0, 10).map((conversation, index) => (
+                        {conversations.slice(0, 10).map((conversation: AIConversationEventData, index: number) => (
                             <ConversationItem
                                 key={conversation.conversationId}
                                 conversation={conversation}

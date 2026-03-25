@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/session.server";
 import { ActivityLogTable } from "@/components/settings/ActivityLogTable";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { cookies } from "next/headers";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface ActivityLog {
   id: string;
@@ -47,17 +47,10 @@ export default async function ActivityPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <Breadcrumbs />
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Activity Logs
-          </h1>
-          <p className="text-gray-500">
-            Audit trail of staff actions and changes.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Activity Logs"
+        subtitle="Audit trail of staff actions and changes."
+      />
 
       <ActivityLogTable logs={logs} />
     </div>

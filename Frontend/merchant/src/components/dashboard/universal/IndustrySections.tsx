@@ -82,14 +82,14 @@ function SectionShell({ title, icon, children, className, designCategory }: Sect
 // Primary Object Health
 // ---------------------------------------------------------------------------
 
-interface ProductHealthItem {
+export interface ProductHealthItem {
   id: string;
   title: string;
   unitsSold?: number;
   stock?: number;
 }
 
-interface PrimaryObjectHealthProps {
+export interface PrimaryObjectHealthProps {
   label: string;
   topSelling: ProductHealthItem[];
   lowStock: ProductHealthItem[];
@@ -308,7 +308,7 @@ export function PrimaryObjectHealth({
 // Live Operations
 // ---------------------------------------------------------------------------
 
-interface LiveOpsItem {
+export interface LiveOpsItem {
   key: string;
   label: string;
   value: number | string | null;
@@ -316,7 +316,7 @@ interface LiveOpsItem {
   emptyText?: string;
 }
 
-interface LiveOperationsProps {
+export interface LiveOperationsProps {
   title: string;
   items: LiveOpsItem[];
   isLoading?: boolean;
@@ -448,7 +448,7 @@ export function LiveOperations({
 // Bottlenecks & Alerts
 // ---------------------------------------------------------------------------
 
-interface AlertsListProps {
+export interface AlertsListProps {
   alerts: DashboardAlert[];
   isLoading?: boolean;
   designCategory: DesignCategory;
@@ -607,7 +607,7 @@ export function AlertsList({ alerts, isLoading, designCategory }: AlertsListProp
 // Suggested Actions
 // ---------------------------------------------------------------------------
 
-interface SuggestedActionsListProps {
+export interface SuggestedActionsListProps {
   actions: SuggestedAction[];
   isLoading?: boolean;
   designCategory: DesignCategory;

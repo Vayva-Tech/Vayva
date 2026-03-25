@@ -13,7 +13,7 @@ import {
   Truck,
   Check,
   X,
-  Spinner as Loader2,
+  Spinner as Loader2
 } from "@phosphor-icons/react/ssr";
 import { AddressInputNG } from "@/components/ui/AddressInputNG";
 import { apiJson } from "@/lib/api-client-shared";

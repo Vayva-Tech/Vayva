@@ -12,13 +12,13 @@ import {
   IconChevronRight as ChevronRight,
   IconMessageCircle as MessageCircle,
   IconShoppingCart as ShoppingCart,
-  IconPackage as Package,
   IconTrendingUp as TrendingUp,
   IconUsers as Users,
   IconHeartHandshake as HeartHandshake,
   IconCpu as Cpu,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { Button } from "@vayva/ui";
 
 // Industry-specific mockup components
 function RetailMockup() {
@@ -226,12 +226,12 @@ function AIMockup() {
                 <div>
                   <div className="text-[10px] text-slate-700">{item.text}</div>
                   <div className="flex items-center gap-2 mt-1">
-                    <button className="text-[8px] bg-white px-2 py-1 rounded border border-slate-200 text-slate-600">
+                    <Button type="button" variant="outline" className="text-[8px] bg-white px-2 py-1 rounded border border-slate-200 text-slate-600 h-auto min-h-0 min-w-0">
                       View
-                    </button>
-                    <button className="text-[8px] text-emerald-600 font-medium">
+                    </Button>
+                    <Button type="button" variant="link" className="text-[8px] text-emerald-600 font-medium h-auto min-h-0 min-w-0 p-0">
                       Apply
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -336,12 +336,9 @@ export function IndustrySection(): React.JSX.Element {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <div className="relative inline-flex mb-4">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-full border-2 border-emerald-200/60" />
-            <div className="relative inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-emerald-700 text-sm font-medium border-2 border-slate-900/10 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
-              <Users className="w-4 h-4" />
-              19 industries supported
-            </div>
+          <div className="inline-flex mb-4 items-center gap-2 px-4 py-2 rounded-full bg-white text-emerald-700 text-sm font-medium border border-slate-200/80 shadow-sm">
+            <Users className="w-4 h-4" />
+            19 industries supported
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900">
             Built for your specific business
@@ -354,18 +351,20 @@ export function IndustrySection(): React.JSX.Element {
         {/* Industry tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {industries.map((industry) => (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               key={industry.key}
               onClick={() => setActiveTab(industry.key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all h-auto ${
                 activeTab === industry.key
-                  ? `${industry.color} text-white shadow-lg`
+                  ? `${industry.color} text-white shadow-lg hover:opacity-95`
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               <industry.icon className="w-4 h-4" />
               {industry.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -378,11 +377,9 @@ export function IndustrySection(): React.JSX.Element {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="max-w-[1600px] mx-auto px-6"
+              className="max-w-[1400px] mx-auto px-6"
             >
-              <div className="relative">
-                <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border-2 border-emerald-200/60" />
-                <div className="relative rounded-[32px] border-2 border-slate-900/10 bg-white/90 p-8 shadow-[0_24px_55px_rgba(15,23,42,0.12)]">
+              <div className="rounded-[32px] border border-slate-200/80 bg-white p-8 shadow-sm">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     {/* Left: Content */}
                     <div className="order-2 md:order-1">
@@ -439,9 +436,8 @@ export function IndustrySection(): React.JSX.Element {
                     {/* Right: Visual Mockup */}
                     <div className="order-1 md:order-2">
                       <div className="relative">
-                        <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border-2 border-emerald-200/60" />
                         {/* Phone frame */}
-                        <div className="relative mx-auto w-64 h-80 bg-slate-900 rounded-[2.5rem] p-2 shadow-2xl border-2 border-slate-900/10">
+                        <div className="relative mx-auto w-64 h-80 bg-slate-900 rounded-[2.5rem] p-2 shadow-xl border border-slate-800/80">
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-slate-900 rounded-b-2xl z-10" />
                           <div className="w-full h-full bg-white rounded-[2rem] overflow-hidden">
                             <activeIndustry.mockup />
@@ -453,7 +449,6 @@ export function IndustrySection(): React.JSX.Element {
                       </div>
                     </div>
                   </div>
-                </div>
               </div>
             </motion.div>
           )}

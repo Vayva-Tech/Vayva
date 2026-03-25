@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
@@ -68,22 +67,22 @@ export function LivePreviewClient({
   const demo: PreviewStore = (storeData as PreviewStore | undefined) || store;
 
   const initialMode = clamp(
-    params.get("mode"),
+    params?.get("mode") ?? null,
     ["live", "images"] as const,
     supportsLive ? "live" : "images",
   );
   const initialDevice = clamp(
-    params.get("device"),
+    params?.get("device") ?? null,
     ["desktop", "mobile"] as const,
     "desktop",
   );
   const initialView = clamp(
-    params.get("view"),
+    params?.get("view") ?? null,
     ["home", "collection", "product"] as const,
     "home",
   );
 
-  const initialCategoryParam = params.get("category");
+  const initialCategoryParam = params?.get("category");
   const initialCategory = demo.categories.includes(initialCategoryParam ?? "")
     ? (initialCategoryParam as string)
     : demo.categories[0];

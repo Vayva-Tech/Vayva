@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(req);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { amount, platform, method } = body;
 
-    // Get merchant session info from headers
-    const email = req.headers.get("x-merchant-email") || "merchant@vayva.ng";
-    const storeId = req.headers.get("x-store-id") || "unknown";
-    const storeName = req.headers.get("x-store-name") || "Unknown Store";
+    const email = auth.user.email || "merchant@vayva.ng";
+    const storeId = auth.user.storeId;
+    const storeName = auth.user.storeName || "Unknown Store";
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -30,9 +35,8 @@ export async function POST(req: NextRequest) {
     }>(`${process.env.BACKEND_API_URL}/api/campaigns/fund`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...auth.headers,
         'x-merchant-email': email,
-        'x-store-id': storeId,
         'x-store-name': storeName,
       },
       body: JSON.stringify({ amount, platform, method }),

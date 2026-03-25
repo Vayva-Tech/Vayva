@@ -2,21 +2,22 @@
 // Meal Kit Subscriptions API Route - Merchant Admin
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/meal-kit/subscriptions - List all subscriptions for a store
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const searchParams = request.nextUrl.searchParams;
-    const storeId = searchParams.get('storeId');
     const customerId = searchParams.get('customerId');
     const status = searchParams.get('status');
-
-    if (!storeId) {
-      return NextResponse.json({ error: 'storeId is required' }, { status: 400 });
-    }
 
     // Build query parameters
     const queryParams = new URLSearchParams();
@@ -38,9 +39,7 @@ export async function GET(request: NextRequest) {
       }>;
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/meal-kit/subscriptions?${queryParams.toString()}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
     });
 
     return NextResponse.json(result);
@@ -59,9 +58,14 @@ export async function GET(request: NextRequest) {
 // POST /api/meal-kit/subscriptions - Create new subscription
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json();
     const {
-      storeId,
+      storeId: _bodyStoreId,
       customerId,
       planType,
       portionsPerMeal,
@@ -71,7 +75,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!storeId || !customerId || !planType || !nextDelivery) {
+    if (!customerId || !planType || !nextDelivery) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -92,10 +96,7 @@ export async function POST(request: NextRequest) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/meal-kit/subscriptions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify({
         customerId,
         planType,

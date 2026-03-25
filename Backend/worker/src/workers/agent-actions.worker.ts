@@ -3,7 +3,6 @@ import { prisma } from "@vayva/db";
 import { QUEUES, logger } from "@vayva/shared";
 import { AIProvider, AIMessage } from "../lib/ai";
 import type { RedisConnection, AgentActionsJobData } from "../types";
-import Groq from "groq-sdk";
 
 // Helper to format currency
 const formatMoney = (amount: number) => `₦${amount.toLocaleString()}`;
@@ -236,7 +235,7 @@ export function registerAgentActionsWorker(connection: RedisConnection): void {
         }));
 
       // 3. Define Tools
-      const tools: Groq.Chat.Completions.ChatCompletionTool[] = [
+      const tools: unknown[] = [
         {
           type: "function",
           function: {
@@ -302,6 +301,21 @@ export function registerAgentActionsWorker(connection: RedisConnection): void {
                 orderId: { type: "string", description: "The order id" },
               },
               required: ["orderId"],
+            },
+          },
+        },
+        {
+          type: "function",
+          function: {
+            name: "get_tracking_info",
+            description:
+              "Get delivery tracking info by tracking code OR order reference/number. Use when the customer asks 'track my order' or 'where is my rider'.",
+            parameters: {
+              type: "object",
+              properties: {
+                trackingCode: { type: "string" },
+                orderRef: { type: "string" },
+              },
             },
           },
         },
@@ -562,6 +576,128 @@ export function registerAgentActionsWorker(connection: RedisConnection): void {
                       }
                     : null,
                 });
+              }
+            } else if (functionName === "get_tracking_info") {
+              const trackingCode = safeString(args.trackingCode).trim();
+              const orderRef = safeString(args.orderRef).trim();
+              const ref = trackingCode || orderRef;
+
+              if (!ref) {
+                toolResult = JSON.stringify({ ok: false, error: "IDENTIFIER_REQUIRED" });
+              } else {
+                const maybeNumber = Number(ref);
+                const shipment = await prisma.shipment.findFirst({
+                  where: {
+                    storeId,
+                    OR: [
+                      ...(trackingCode ? [{ trackingCode }] : []),
+                      ...(orderRef
+                        ? [
+                            {
+                              order: {
+                                is: {
+                                  OR: [
+                                    { refCode: orderRef },
+                                    ...(Number.isFinite(maybeNumber)
+                                      ? [{ orderNumber: maybeNumber }]
+                                      : []),
+                                  ],
+                                },
+                              },
+                            },
+                          ]
+                        : []),
+                    ],
+                  },
+                  include: {
+                    store: { select: { slug: true, settings: true } },
+                    order: {
+                      select: {
+                        refCode: true,
+                        orderNumber: true,
+                        total: true,
+                        shippingTotal: true,
+                        paymentStatus: true,
+                        createdAt: true,
+                      },
+                    },
+                    trackingEvents: {
+                      orderBy: { createdAt: "desc" },
+                      take: 10,
+                      select: {
+                        status: true,
+                        locationText: true,
+                        description: true,
+                        occurredAt: true,
+                      },
+                    },
+                  },
+                  orderBy: { updatedAt: "desc" },
+                });
+
+                if (!shipment) {
+                  toolResult = JSON.stringify({ ok: false, error: "NOT_FOUND" });
+                } else {
+                  // Parse COD meta from notes when present (best-effort)
+                  let cod: unknown = null;
+                  let notesMeta: Record<string, unknown> = {};
+                  if (shipment.notes) {
+                    try {
+                      notesMeta = JSON.parse(shipment.notes) as Record<string, unknown>;
+                      if ("cod" in notesMeta) cod = notesMeta.cod;
+                    } catch {
+                      // ignore
+                    }
+                  }
+
+                  const storeSettings =
+                    shipment.store?.settings && typeof shipment.store.settings === "object"
+                      ? (shipment.store.settings as Record<string, unknown>)
+                      : {};
+                  const customDomain =
+                    typeof storeSettings.customDomain === "string"
+                      ? storeSettings.customDomain
+                      : "";
+                  const root = process.env.STOREFRONT_ROOT_DOMAIN || "vayva.ng";
+                  const storeSlug = shipment.store?.slug || "";
+                  const base =
+                    customDomain
+                      ? (customDomain.startsWith("http") ? customDomain : `https://${customDomain}`)
+                      : (storeSlug ? `https://${storeSlug}.${root}` : "");
+
+                  const merchantTrackingUrl =
+                    shipment.trackingCode && base
+                      ? `${base}/order/track?code=${encodeURIComponent(shipment.trackingCode)}`
+                      : null;
+
+                  toolResult = JSON.stringify({
+                    ok: true,
+                    tracking: {
+                      code: shipment.trackingCode,
+                      provider: shipment.provider,
+                      status: shipment.status,
+                      merchantTrackingUrl,
+                      externalTrackingUrl: shipment.trackingUrl || null,
+                      payment: { cod },
+                      order: shipment.order
+                        ? {
+                            refCode: shipment.order.refCode,
+                            orderNumber: shipment.order.orderNumber,
+                            total: Number(shipment.order.total),
+                            shippingTotal: Number(shipment.order.shippingTotal),
+                            paymentStatus: shipment.order.paymentStatus,
+                            createdAt: shipment.order.createdAt.toISOString(),
+                          }
+                        : null,
+                      timeline: (shipment.trackingEvents || []).map((e) => ({
+                        status: e.status,
+                        note: e.description,
+                        location: e.locationText,
+                        timestamp: e.occurredAt.toISOString(),
+                      })),
+                    },
+                  });
+                }
               }
             } else if (functionName === "add_to_cart") {
               if (!phone) throw new Error("Customer phone number not found.");

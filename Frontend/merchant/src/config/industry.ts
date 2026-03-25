@@ -59,6 +59,46 @@ const BASE_PRODUCT_FORM = {
   validation: { minImages: 1, minDescriptionLength: 20 },
 };
 export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
+  // --- ANALYTICS & BI ---
+  analytics: {
+    displayName: "Analytics & BI",
+    description: "Metrics, reporting, and experimentation.",
+    primaryObject: "digital_asset",
+    modules: [
+      "dashboard",
+      "catalog",
+      "sales",
+      "marketing",
+      "settings",
+    ],
+    moduleLabels: { catalog: "Data Sources", sales: "Reports" },
+    moduleIcons: { catalog: "BarChart3", sales: "FileText" },
+    moduleRoutes: {
+      catalog: { index: "/dashboard/analytics" },
+      sales: { index: "/dashboard/reports" },
+    },
+    dashboardWidgets: [
+      {
+        id: "active_reports",
+        title: "Active Reports",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      ...COMMON_WIDGETS,
+    ],
+    forms: {
+      digital_asset: {
+        requiredFields: ["name", "description"],
+        optionalFields: [],
+        variantLabel: "Sources",
+        validation: { minImages: 0 },
+      },
+    },
+    onboardingSteps: ["store_profile", "connect_sources"],
+    features: { content: true },
+    aiTools: ["get_promotions"],
+  },
   // --- RETAIL & COMMERCE ---
   retail: {
     displayName: "General Retail",
@@ -156,6 +196,7 @@ export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
       "catalog",
       "sales",
       "fulfillment",
+      "meal_kit",
       "finance",
       "marketing",
       "settings",
@@ -164,6 +205,70 @@ export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
       catalog: "Menu Items",
       sales: "Orders",
       fulfillment: "Kitchen View",
+      meal_kit: "Meal kit",
+    },
+    moduleIcons: { catalog: "UtensilsCrossed", fulfillment: "ChefHat" },
+    moduleRoutes: {
+      catalog: {
+        index: "/dashboard/menu-items",
+        create: "/dashboard/menu-items/new",
+      },
+      fulfillment: { index: "/dashboard/kitchen" },
+    },
+    dashboardWidgets: [
+      {
+        id: "active_orders",
+        title: "Active Orders",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      {
+        id: "revenue_today",
+        title: "Revenue Today",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      ...COMMON_WIDGETS,
+    ],
+    forms: {
+      menu_item: {
+        requiredFields: ["price", "prep_time", "veg_non_veg"],
+        optionalFields: ["calories", "allergens", "spice_level", "ingredients"],
+        variantLabel: "Modifiers",
+        validation: { minImages: 1 },
+      },
+    },
+    onboardingSteps: ["store_profile", "menu_setup", "delivery_settings"],
+    features: { delivery: true },
+    aiTools: [
+      "get_menu",
+      "place_order",
+      "check_order_status",
+      "get_promotions",
+    ],
+  },
+  "meal-kit": {
+    displayName: "Meal Kits & Subscriptions",
+    description:
+      "Subscription meal boxes, weekly menus, and recurring fulfillment.",
+    primaryObject: "menu_item",
+    modules: [
+      "dashboard",
+      "catalog",
+      "sales",
+      "fulfillment",
+      "meal_kit",
+      "finance",
+      "marketing",
+      "settings",
+    ],
+    moduleLabels: {
+      catalog: "Menu Items",
+      sales: "Orders",
+      fulfillment: "Kitchen View",
+      meal_kit: "Meal kit",
     },
     moduleIcons: { catalog: "UtensilsCrossed", fulfillment: "ChefHat" },
     moduleRoutes: {
@@ -1476,5 +1581,82 @@ export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
     onboardingSteps: ["company_verification", "first_product"],
     features: { inventory: true, quotes: true },
     aiTools: ["get_wholesale_pricing", "get_inventory"],
+  },
+  petcare: {
+    displayName: "Pet care",
+    description: "Veterinary clinics and pet services with appointments.",
+    primaryObject: "service",
+    modules: SERVICE_MODULES,
+    moduleLabels: { catalog: "Services", bookings: "Appointments" },
+    moduleIcons: { catalog: "HeartPulse", bookings: "Calendar" },
+    moduleRoutes: {
+      catalog: { index: "/dashboard/services", create: "/dashboard/services/new" },
+      bookings: { index: "/dashboard/appointments" },
+    },
+    dashboardWidgets: [
+      {
+        id: "today_appointments",
+        title: "Today's appointments",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      ...COMMON_WIDGETS,
+    ],
+    forms: {
+      service: {
+        requiredFields: ["name", "price"],
+        optionalFields: ["duration_min"],
+        variantLabel: "Service types",
+        validation: { minImages: 0 },
+      },
+    },
+    onboardingSteps: ["store_profile", "services"],
+    features: { bookings: true },
+    aiTools: ["get_services", "book_appointment"],
+  },
+  specialized: {
+    displayName: "Specialized",
+    description: "Niche and custom business models.",
+    primaryObject: "product",
+    modules: COMMERCE_MODULES,
+    dashboardWidgets: COMMERCE_WIDGETS,
+    forms: { product: { ...BASE_PRODUCT_FORM } },
+    onboardingSteps: ["store_profile", "first_product"],
+    features: { inventory: true },
+    aiTools: ["get_inventory", "get_promotions"],
+  },
+  wellness: {
+    displayName: "Wellness",
+    description: "Wellness centers, therapy, and holistic health.",
+    primaryObject: "service",
+    modules: SERVICE_MODULES,
+    moduleLabels: { catalog: "Programs", bookings: "Appointments" },
+    moduleIcons: { catalog: "Sparkles", bookings: "Calendar" },
+    moduleRoutes: {
+      catalog: { index: "/dashboard/services", create: "/dashboard/services/new" },
+      bookings: { index: "/dashboard/appointments" },
+    },
+    dashboardWidgets: [
+      {
+        id: "today_sessions",
+        title: "Today's sessions",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      ...COMMON_WIDGETS,
+    ],
+    forms: {
+      service: {
+        requiredFields: ["name", "price"],
+        optionalFields: ["duration_min"],
+        variantLabel: "Programs",
+        validation: { minImages: 0 },
+      },
+    },
+    onboardingSteps: ["store_profile", "services"],
+    features: { bookings: true },
+    aiTools: ["get_services", "book_appointment"],
   },
 };

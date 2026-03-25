@@ -308,11 +308,10 @@ export class VersioningEngine {
   getVersionInfo(
     addOnId: string,
     currentVersion: string,
-    hostVersion: string
+    _hostVersion: string
   ): VersionInfo {
     const latest = this.getLatestVersion(addOnId);
-    const allVersions = this.getVersions(addOnId);
-    
+
     if (!latest) {
       return {
         current: currentVersion,

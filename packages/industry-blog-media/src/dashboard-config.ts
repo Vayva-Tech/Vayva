@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { IndustryDashboardDefinition } from '@vayva/industry-core';
 
 export const BLOG_MEDIA_DASHBOARD_CONFIG: IndustryDashboardDefinition = {

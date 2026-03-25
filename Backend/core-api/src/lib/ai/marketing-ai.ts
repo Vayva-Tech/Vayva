@@ -38,7 +38,7 @@ If they seem ready, kindly invite them to click "Start selling for free." If you
           "X-Title": "Vayva Marketing",
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
+          model: "google/gemini-2.0-flash-lite-001",
           messages: [
             { role: "system", content: this.SYSTEM_PROMPT },
             ...messages,

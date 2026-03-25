@@ -149,9 +149,9 @@ Would you like to top up?
 ```
 Here's a quick comparison of our plans:
 
-Starter (₦25,000/mo): 500 products, 1 staff seat, 5,000 AI credits, WhatsApp automation, 7-day free trial
-Pro (₦35,000/mo): 1,000 products, 3 staff seats, 10,000 AI credits, AI Autopilot, custom domain, 7-day free trial
-Pro+ (₦50,000/mo): Unlimited products, 5 staff seats, 25,000 AI credits, visual workflow builder, industry dashboards, priority support
+Starter (₦25,000/mo): 100 products, 1 staff seat, 5,000 AI credits, WhatsApp automation, 7-day free trial
+Pro (₦35,000/mo): 300 products, 3 staff seats, 10,000 AI credits, AI Autopilot, custom domain, 7-day free trial
+Pro+ (₦50,000/mo): 500 products, 5 staff seats, 25,000 AI credits, visual workflow builder, industry dashboards, priority support
 
 All plans include Paystack payments, storefront at yourname.vayva.ng, and WhatsApp integration.
 ```

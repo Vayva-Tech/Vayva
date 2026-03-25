@@ -1,16 +1,15 @@
-// @ts-nocheck
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  TravelAnalyticsService,
-  TravelPropertyService,
+import {
+  TravelAnalyticsService as _TravelAnalyticsService,
+  TravelPropertyService as _TravelPropertyService,
   ReviewService,
   PerformanceBenchmarkingService
 } from '../services';
-import { 
-  OccupancyMetrics, 
-  RevenueReport, 
+import {
+  OccupancyMetrics,
+  RevenueReport,
   GuestDemographics,
   BenchmarkData,
   AnalyticsQueryOptions
@@ -67,7 +66,7 @@ export const useTravelDashboardData = (tenantId?: string): UseTravelDashboardDat
   const [subscribers] = useState<Set<() => void>>(new Set());
 
   // Analytics query options
-  const analyticsOptions: AnalyticsQueryOptions = {
+  const _analyticsOptions: AnalyticsQueryOptions = {
     propertyIds: tenantId ? undefined : undefined, // Filter by tenant if provided
     dateRange: {
       startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),

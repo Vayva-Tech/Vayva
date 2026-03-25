@@ -9,7 +9,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI, APIContext } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { collectBatchFromRequest, CollectedEventSchema } from "@vayva/analytics";
+import {
+  CollectedEventSchema,
+  persistStampedCollectedEvents,
+  type CollectedEvent
+} from "@vayva/analytics";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 
@@ -27,7 +31,7 @@ const IncomingBatchSchema = z.object({
 
 export const POST = withVayvaAPI(
   PERMISSIONS.DASHBOARD_VIEW,
-  async (req: NextRequest, { storeId }: APIContext) => {
+  async (req: NextRequest, { storeId, db }: APIContext) => {
     try {
       const body = await req.json().catch(() => null);
 
@@ -47,21 +51,14 @@ export const POST = withVayvaAPI(
       }
 
       // Stamp every event with the authenticated storeId
-      const stampedBody = {
-        events: parsed.data.events.map((e) => ({ ...e, storeId })),
-      };
+      const stampedEvents: CollectedEvent[] = parsed.data.events.map((e) => ({
+        ...e,
+        storeId,
+      }));
 
-      const result = await collectBatchFromRequest(stampedBody);
+      const { count } = await persistStampedCollectedEvents(stampedEvents, db);
 
-      if (!result.success) {
-        logger.warn("[ANALYTICS_EVENTS] Batch validation failed", {
-          error: result.error,
-          storeId,
-        });
-        return NextResponse.json(result, { status: 422 });
-      }
-
-      return NextResponse.json(result, { status: 201 });
+      return NextResponse.json({ success: true, count }, { status: 200 });
     } catch (error) {
       logger.error("[ANALYTICS_EVENTS] Unexpected error", {
         error: error instanceof Error ? error.message : String(error),

@@ -335,7 +335,24 @@ Vayva is not a website builder. It is not a payment tool. It is not a chatbot. V
 
 ## 9. Paid Advertising
 
+### 9.0 Weekly budget reality (₦50,000/week)
+
+This marketing plan must be executable with a small, consistent spend.\n
+**Budget constraint:** **₦50,000/week** (≈ ₦200,000/month).\n
+
+**Rule:** at this budget, we do **1–2 channels at a time**, not all channels.\n
+We optimize for **activation** (merchants connecting WhatsApp + Paystack + adding products) rather than raw traffic.
+
 ### 9.1 Channel Strategy
+
+#### Recommended split (₦50,000/week)
+
+| Channel | Weekly Budget | Goal | Notes |
+|---|---:|---|---|
+| Instagram/Facebook Ads | ₦35,000 | Signups + retargeting | Best for short demo videos + lookalikes |
+| TikTok Ads | ₦15,000 | Awareness + cheap clicks | Use UGC-style demos + captions |
+
+**Optional swap (if search intent is strong):** move ₦10,000/week from TikTok to **Google Search** for “WhatsApp selling tool Nigeria” keywords.
 
 | Channel | Objective | Monthly Budget | Target CPA |
 |---|---|---|---|
@@ -343,6 +360,8 @@ Vayva is not a website builder. It is not a payment tool. It is not a chatbot. V
 | Google Search | High-intent capture | ₦300K-500K | ₦8,000 |
 | TikTok Ads | Awareness, signups | ₦200K-400K | ₦4,000 |
 | Twitter/X Ads | Awareness, engagement | ₦100K-200K | ₦6,000 |
+
+> The table above reflects an “at scale” budget. For launch, use the weekly split table.
 
 ### 9.2 Ad Creative Strategy
 
@@ -385,7 +404,16 @@ Vayva is not a website builder. It is not a payment tool. It is not a chatbot. V
 
 ## 11. Budget Allocation
 
-### 11.1 Monthly Marketing Budget (Year 1 Ramp)
+### 11.1 Monthly Marketing Budget (₦50,000/week baseline)
+
+| Category | Monthly Budget (₦) | What it covers |
+|---|---:|---|
+| Paid ads | **₦200,000** | Meta + TikTok (or Meta + Search) |
+| Content creation | ₦0–₦50,000 | Simple screen-record demos + merchant stories |
+| Tools | ₦0 | Use existing stack initially |
+| **Total** | **₦200,000–₦250,000** | Keep predictable |
+
+### 11.2 Monthly Marketing Budget (Year 1 Ramp)
 
 | Category | Month 1-3 | Month 4-6 | Month 7-12 |
 |---|---|---|---|
@@ -440,6 +468,31 @@ Vayva is not a website builder. It is not a payment tool. It is not a chatbot. V
 | Marketing performance review | Bi-weekly | Full team |
 | MRR and unit economics | Monthly | Leadership, board |
 | Quarterly marketing review | Quarterly | Board, investors |
+
+### 12.4 Weekly operating cadence (launch)
+
+**Monday (setup + creative):**
+- Build 2 ad variants (same offer, different hook)\n
+- Update landing copy based on objections seen last week\n
+
+**Wednesday (optimize):**
+- Pause worst-performing ad set\n
+- Reallocate spend to best CTR + best activation\n
+
+**Friday (report):**
+- Track: spend, clicks, signups, activated stores, CAC, activation rate\n
+- Decide next week’s single experiment (one change only)
+
+---
+
+## 13. Where to sign up / set up accounts (awareness stack)
+
+- Meta Ads Manager (Instagram/Facebook)\n
+- TikTok for Business\n
+- Google Ads (optional)\n
+- X Ads (later, optional)\n
+- WhatsApp Community for merchants (owned channel)\n
+- Partnerships (Paystack ecosystem, logistics partners, market associations)\n
 
 ---
 

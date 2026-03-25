@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
 import { getRedis } from "@vayva/redis";
+import { openRouterChatCompletion } from "@/lib/openrouter";
 
 const RATE_LIMIT = 10;
 const WINDOW_MS = 60_000;
@@ -30,22 +30,7 @@ export async function POST(req: NextRequest) {
 
     const { messages } = await req.json();
 
-    const apiKey =
-      process.env.GROQ_API_KEY_RESCUE || process.env.GROQ_API_KEY_MARKETING;
-
-    if (!apiKey || apiKey === "placeholder-key") {
-      return NextResponse.json({
-        success: false,
-        message: "AI service temporarily unavailable (Configuration Error)",
-      });
-    }
-
-    const client = new Groq({
-      apiKey,
-      dangerouslyAllowBrowser: false,
-    });
-
-    const completion = await client.chat.completions.create({
+    const message = await openRouterChatCompletion({
       messages: [
         {
           role: "system",
@@ -54,15 +39,14 @@ export async function POST(req: NextRequest) {
         },
         ...messages,
       ],
-      model: "llama3-70b-8192",
+      model: "openai/gpt-4o-mini",
       temperature: 0.7,
-      max_tokens: 150,
+      maxTokens: 150,
     });
 
     return NextResponse.json({
       success: true,
-      message:
-        completion.choices[0]?.message?.content || "I didn't catch that.",
+      message: message || "I didn't catch that.",
     });
   } catch (error: unknown) {
     console.error("Marketing AI Error:", error);

@@ -1,9 +1,9 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 import { Ticket, Clock, TrendingUp } from "lucide-react";
-import { formatCurrency } from "@vayva/ui";
+import { formatCurrency } from "@/lib/utils";
 
 interface Sale {
   id: string;
@@ -76,7 +76,7 @@ export function LiveTicketSales({ data, dashboardData }: LiveTicketSalesProps) {
               {sale.checkedIn ? (
                 <span className="text-xs font-bold text-green-700">✓ Checked in</span>
               ) : (
-                <button className="text-xs font-bold text-pink-600 hover:underline">Check-in</button>
+                <Button className="text-xs font-bold text-pink-600 hover:underline">Check-in</Button>
               )}
             </div>
           </div>
@@ -122,3 +122,4 @@ export function LiveTicketSales({ data, dashboardData }: LiveTicketSalesProps) {
     </div>
   );
 }
+

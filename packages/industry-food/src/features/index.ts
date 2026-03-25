@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Food Industry Features
  * Core feature modules for food businesses

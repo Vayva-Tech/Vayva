@@ -13,7 +13,7 @@ export const GET = withVayvaAPI(
     try {
       const now = new Date();
       const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const _sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
       // Get conversation statistics
       const [totalConversations, activeConversations, recentConversations] = await Promise.all([

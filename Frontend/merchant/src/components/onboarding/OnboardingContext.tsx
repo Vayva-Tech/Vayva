@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { logger } from "@vayva/shared";
@@ -184,18 +183,21 @@ export function OnboardingProvider({
     [reload, formData],
   );
 
-  const updateData = async (newData: Partial<OnboardingState>, showToast = true) => {
-    setFormData((prev: any) => ({ ...prev, ...newData }));
-    // Auto-save after state update with debounce
-    const timeoutId = setTimeout(async () => {
-      try {
-        await saveState(newData, undefined, false, showToast);
-      } catch (err) {
-        // Error already handled in saveState
-      }
-    }, 500); // 500ms debounce
-    
-    return () => clearTimeout(timeoutId);
+  const updateData = async (
+    newData: Partial<OnboardingState>,
+    showToast = true,
+  ): Promise<void> => {
+    setFormData((prev) => ({ ...prev, ...newData }));
+    await new Promise<void>((resolve, reject) => {
+      setTimeout(async () => {
+        try {
+          await saveState(newData, undefined, false, showToast);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      }, 500);
+    });
   };
 
   const validateStep = (

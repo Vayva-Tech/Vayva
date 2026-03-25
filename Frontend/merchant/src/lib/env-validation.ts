@@ -20,19 +20,19 @@ const ENV = {
   REDIS_URL: process.env.REDIS_URL,
   // Payment
   PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
-  PAYSTACK_PUBLIC_KEY: process.env.PAYSTACK_PUBLIC_KEY,
+  PAYSTACK_PUBLIC_KEY:
+    process.env.NEXT_PUBLIC_PAYSTACK_KEY || process.env.PAYSTACK_PUBLIC_KEY,
   // Email
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
   // WhatsApp
-  WHATSAPP_API_KEY: process.env.WHATSAPP_API_KEY,
-  WHATSAPP_PHONE_NUMBER: process.env.WHATSAPP_PHONE_NUMBER,
-  WHATSAPP_WEBHOOK_SECRET: process.env.WHATSAPP_WEBHOOK_SECRET,
+  EVOLUTION_API_URL: process.env.EVOLUTION_API_URL,
+  EVOLUTION_API_KEY: process.env.EVOLUTION_API_KEY,
   // Delivery
   KWIK_API_KEY: process.env.KWIK_API_KEY,
   KWIK_MERCHANT_ID: process.env.KWIK_MERCHANT_ID,
   // KYC (Manual - Admin Approval)
-  // KYC is now handled via manual admin review, not automated via YouVerify
+  // KYC is handled via manual admin review
   MANUAL_KYC_ENABLED: process.env.MANUAL_KYC_ENABLED === "true" || true,
   // Storage (MinIO S3-compatible)
   MINIO_ENDPOINT: process.env.MINIO_ENDPOINT,
@@ -45,10 +45,8 @@ const ENV = {
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
   // Monitoring
   SENTRY_DSN: process.env.SENTRY_DSN,
-  // AI (Groq)
-  GROQ_ADMIN_KEY: process.env.GROQ_ADMIN_KEY,
-  GROQ_MARKETING_KEY: process.env.GROQ_MARKETING_KEY,
-  GROQ_WHATSAPP_KEY: process.env.GROQ_WHATSAPP_KEY,
+  // AI (OpenRouter)
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
 };
 /**
  * FEATURE FLAGS
@@ -74,12 +72,10 @@ export const FEATURES = {
   EMAIL_ENABLED: Boolean(ENV.RESEND_API_KEY && ENV.RESEND_FROM_EMAIL),
   /**
    * WhatsApp Integration
-   * Requires: WHATSAPP_API_KEY, WHATSAPP_PHONE_NUMBER, WHATSAPP_WEBHOOK_SECRET
+   * Requires: EVOLUTION_API_URL, EVOLUTION_API_KEY
    */
   WHATSAPP_ENABLED: Boolean(
-    ENV.WHATSAPP_API_KEY &&
-    ENV.WHATSAPP_PHONE_NUMBER &&
-    ENV.WHATSAPP_WEBHOOK_SECRET,
+    ENV.EVOLUTION_API_URL && ENV.EVOLUTION_API_KEY,
   ),
   /**
    * Delivery Integration
@@ -116,14 +112,14 @@ export const FEATURES = {
   SENTRY_ENABLED: Boolean(ENV.SENTRY_DSN),
   /**
    * AI Assistant (Core & Support)
-   * Requires: GROQ_ADMIN_KEY
+   * Requires: OPENROUTER_API_KEY
    */
-  AI_ASSISTANT_ENABLED: Boolean(ENV.GROQ_ADMIN_KEY),
+  AI_ASSISTANT_ENABLED: Boolean(ENV.OPENROUTER_API_KEY),
   /**
    * Marketing AI Assistant
-   * Requires: GROQ_MARKETING_KEY
+   * Requires: OPENROUTER_API_KEY
    */
-  MARKETING_AI_ENABLED: Boolean(ENV.GROQ_MARKETING_KEY),
+  MARKETING_AI_ENABLED: Boolean(ENV.OPENROUTER_API_KEY),
   /**
    * Transactions & Payments UI
    * Shows detailed transaction history, payment tracking, and financial reports.

@@ -27,12 +27,13 @@ import {
   Sparkles,
   Star,
   Check,
-  X,
-  ChevronRight,
   Zap,
   ArrowRight,
   Search,
 } from "lucide-react";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
+import { getOfferCopy } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 
 const iconMap: Record<string, React.ElementType> = {
   ShoppingCart,
@@ -66,10 +67,8 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }): R
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
-      className="group relative"
+      className="group relative h-full rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
     >
-      <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl border-2 border-emerald-200/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="relative h-full rounded-2xl border-2 border-slate-900/10 bg-white/90 backdrop-blur p-5 shadow-[0_8px_30px_rgba(15,23,42,0.08)] hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)] transition-all">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
@@ -106,7 +105,6 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }): R
             ))}
           </ul>
         )}
-      </div>
     </motion.div>
   );
 }
@@ -131,28 +129,44 @@ function CategorySection({
       exit={{ opacity: 0 }}
       className="py-8"
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0">
           <Icon className="w-6 h-6 text-emerald-600" />
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">{category.name}</h2>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{category.name}</h2>
           <p className="text-sm text-slate-500">{category.description}</p>
         </div>
-        <span className="ml-auto px-3 py-1 bg-slate-100 text-slate-600 text-sm font-medium rounded-full">
+        <span className="px-3 py-1 bg-slate-100 text-slate-600 text-sm font-medium rounded-full shrink-0">
           {features.length} features
         </span>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {features.map((feature, index) => (
           <FeatureCard key={feature.id} feature={feature} index={index} />
         ))}
+      </div>
+      <div className="sm:hidden -mx-1">
+        <MarketingSnapRow
+          ariaLabel={`${category.name} features`}
+          hint="Swipe to browse features"
+          showDots={features.length <= 12}
+          dotCount={features.length <= 12 ? features.length : undefined}
+        >
+          {features.map((feature, index) => (
+            <MarketingSnapItem key={feature.id}>
+              <FeatureCard feature={feature} index={index} />
+            </MarketingSnapItem>
+          ))}
+        </MarketingSnapRow>
       </div>
     </motion.section>
   );
 }
 
 export function AllFeaturesClient(): React.JSX.Element {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const offerCopy = getOfferCopy(starterFirstMonthFree);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [activeTier, setActiveTier] = useState<PlanTier | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -187,8 +201,8 @@ export function AllFeaturesClient(): React.JSX.Element {
       <section className="relative overflow-hidden border-b border-slate-200/70">
         <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-200/30 blur-3xl" />
         <div className="absolute right-6 -top-8 h-56 w-56 rounded-full bg-violet-200/30 blur-3xl" />
-        <div className="relative max-w-[1600px] mx-auto px-6 py-20">
-          <div className="text-center max-w-3xl mx-auto">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-16 sm:py-20 min-w-0">
+          <div className="text-center max-w-3xl mx-auto px-1">
             <motion.span
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -201,7 +215,7 @@ export function AllFeaturesClient(): React.JSX.Element {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
+              className="mt-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight"
             >
               Everything you need to{" "}
               <span className="text-emerald-600">scale your business</span>
@@ -210,10 +224,15 @@ export function AllFeaturesClient(): React.JSX.Element {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mt-6 text-lg text-slate-600"
+              className="mt-6 text-base sm:text-lg text-slate-600"
             >
-              From AI-powered order capture to advanced analytics, Vayva gives you the tools 
-              to run your entire commerce operation in one place.
+              <span className="sm:hidden">
+                AI order capture to analytics—one stack for your whole operation.
+              </span>
+              <span className="hidden sm:inline">
+                From AI-powered order capture to advanced analytics, Vayva gives you the tools
+                to run your entire commerce operation in one place.
+              </span>
             </motion.p>
           </div>
 
@@ -241,7 +260,7 @@ export function AllFeaturesClient(): React.JSX.Element {
 
       {/* Popular Features */}
       <section className="py-16 bg-slate-50/50">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl font-bold text-slate-900">Most Popular Features</h2>
@@ -249,10 +268,24 @@ export function AllFeaturesClient(): React.JSX.Element {
             </div>
             <Star className="w-6 h-6 text-amber-500" />
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {popularFeatures.slice(0, 4).map((feature, index) => (
               <FeatureCard key={feature.id} feature={feature} index={index} />
             ))}
+          </div>
+          <div className="sm:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Popular features"
+              hint="Swipe for popular picks"
+              showDots
+              dotCount={4}
+            >
+              {popularFeatures.slice(0, 4).map((feature, index) => (
+                <MarketingSnapItem key={feature.id}>
+                  <FeatureCard feature={feature} index={index} />
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
           </div>
         </div>
       </section>
@@ -260,7 +293,7 @@ export function AllFeaturesClient(): React.JSX.Element {
       {/* New Features */}
       {newFeatures.length > 0 && (
         <section className="py-16">
-          <div className="max-w-[1600px] mx-auto px-6">
+          <div className="max-w-[1400px] mx-auto px-6">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">Recently Added</h2>
@@ -270,10 +303,24 @@ export function AllFeaturesClient(): React.JSX.Element {
                 New
               </span>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {newFeatures.slice(0, 4).map((feature, index) => (
                 <FeatureCard key={feature.id} feature={feature} index={index} />
               ))}
+            </div>
+            <div className="sm:hidden -mx-1">
+              <MarketingSnapRow
+                ariaLabel="New features"
+                hint="Swipe for what’s new"
+                showDots
+                dotCount={Math.min(4, newFeatures.slice(0, 4).length)}
+              >
+                {newFeatures.slice(0, 4).map((feature, index) => (
+                  <MarketingSnapItem key={feature.id}>
+                    <FeatureCard feature={feature} index={index} />
+                  </MarketingSnapItem>
+                ))}
+              </MarketingSnapRow>
             </div>
           </div>
         </section>
@@ -281,28 +328,32 @@ export function AllFeaturesClient(): React.JSX.Element {
 
       {/* Filters */}
       <section className="sticky top-0 z-30 py-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/70">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             {/* Category Tabs */}
             <div className="flex-1 overflow-x-auto">
               <div className="flex gap-2 min-w-max">
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => setActiveCategory("all")}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all h-auto ${
                     activeCategory === "all"
-                      ? "bg-slate-900 text-white"
+                      ? "bg-slate-900 text-white hover:bg-slate-900 hover:text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   All Features
-                </button>
+                </Button>
                 {featureCategories.map((cat) => (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 h-auto ${
                       activeCategory === cat.id
-                        ? "bg-slate-900 text-white"
+                        ? "bg-slate-900 text-white hover:bg-slate-900 hover:text-white"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
@@ -312,28 +363,30 @@ export function AllFeaturesClient(): React.JSX.Element {
                     }`}>
                       {cat.featureCount}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
 
             {/* Tier Filter */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 md:mx-0 md:px-0 md:overflow-visible">
               {(["all", "free", "starter", "pro"] as const).map((tier) => (
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
                   key={tier}
                   onClick={() => setActiveTier(tier)}
-                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all h-auto ${
                     activeTier === tier
-                      ? tier === "free" ? "bg-slate-600 text-white" :
-                        tier === "starter" ? "bg-emerald-600 text-white" :
-                        tier === "pro" ? "bg-violet-600 text-white" :
-                        "bg-slate-900 text-white"
+                      ? tier === "free" ? "bg-slate-600 text-white hover:bg-slate-600 hover:text-white" :
+                        tier === "starter" ? "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white" :
+                        tier === "pro" ? "bg-violet-600 text-white hover:bg-violet-600 hover:text-white" :
+                        "bg-slate-900 text-white hover:bg-slate-900 hover:text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   {tier === "all" ? "All Tiers" : tierConfig[tier].label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -353,7 +406,7 @@ export function AllFeaturesClient(): React.JSX.Element {
 
       {/* Feature Grid */}
       <section className="py-8 min-h-[600px]">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <AnimatePresence mode="wait">
             {activeCategory === "all" ? (
               // Show all categories
@@ -371,11 +424,27 @@ export function AllFeaturesClient(): React.JSX.Element {
               })
             ) : (
               // Show single category
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredFeatures.map((feature, index) => (
-                  <FeatureCard key={feature.id} feature={feature} index={index} />
-                ))}
-              </div>
+              <>
+                <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {filteredFeatures.map((feature, index) => (
+                    <FeatureCard key={feature.id} feature={feature} index={index} />
+                  ))}
+                </div>
+                <div className="sm:hidden -mx-1">
+                  <MarketingSnapRow
+                    ariaLabel="Features"
+                    hint="Swipe to browse"
+                    showDots={filteredFeatures.length <= 12}
+                    dotCount={filteredFeatures.length <= 12 ? filteredFeatures.length : undefined}
+                  >
+                    {filteredFeatures.map((feature, index) => (
+                      <MarketingSnapItem key={feature.id}>
+                        <FeatureCard feature={feature} index={index} />
+                      </MarketingSnapItem>
+                    ))}
+                  </MarketingSnapRow>
+                </div>
+              </>
             )}
           </AnimatePresence>
 
@@ -393,7 +462,7 @@ export function AllFeaturesClient(): React.JSX.Element {
 
       {/* CTA Section */}
       <section className="py-20 border-t border-slate-200/70">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="relative rounded-[40px] border-2 border-slate-900/10 bg-gradient-to-br from-slate-900 to-slate-800 p-12 md:p-16 text-center overflow-hidden">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             <div className="relative">
@@ -401,13 +470,12 @@ export function AllFeaturesClient(): React.JSX.Element {
                 Ready to explore these features?
               </h2>
               <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
-                Start your 7-day free trial and get full access to all Starter features. 
-                No credit card required.
+                {offerCopy.primaryCta}. Get full access to those features. {offerCopy.noCard}.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link href={`${APP_URL}/signup`}>
                   <Button className="bg-emerald-500 hover:bg-emerald-400 text-white px-8 py-6 rounded-2xl text-base font-semibold">
-                    Start Free Trial
+                    {offerCopy.primaryCta}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>

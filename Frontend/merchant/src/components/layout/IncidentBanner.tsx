@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { logger } from "@vayva/shared";
@@ -47,7 +46,7 @@ export function IncidentBanner() {
   }, []);
 
   // Don't show on auth pages
-  if (pathname.includes("/signin") || pathname.includes("/signup")) {
+  if (pathname?.includes("/signin") || pathname?.includes("/signup")) {
     return null;
   }
 

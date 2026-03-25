@@ -9,13 +9,37 @@ import { prisma } from '@vayva/db';
 import { Queue } from 'bullmq';
 import { getRedis } from '@vayva/redis';
 import { QUEUES } from '@vayva/shared';
+import { OpsAuthService } from '@/lib/ops-auth';
+import { opsApiAuthErrorResponse } from '@/lib/ops-api-auth';
 
 // GET /api/nps - Get NPS metrics
 export async function GET(req: NextRequest) {
   try {
+    let user: { role?: string };
+    try {
+      const ctx = await OpsAuthService.requireSession();
+      user = ctx.user;
+    } catch (e) {
+      const res = opsApiAuthErrorResponse(e);
+      if (res) return res;
+      throw e;
+    }
+
     const { searchParams } = new URL(req.url);
     const storeId = searchParams.get('storeId');
     const period = searchParams.get('period') || '90d'; // 30d, 90d, 1y, all
+
+    try {
+      if (storeId) {
+        OpsAuthService.requireRole(user, 'OPS_SUPPORT');
+      } else {
+        OpsAuthService.requireRole(user, 'OPERATOR');
+      }
+    } catch (e) {
+      const res = opsApiAuthErrorResponse(e);
+      if (res) return res;
+      throw e;
+    }
 
     // Calculate date range
     const now = new Date();
@@ -36,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     // If storeId provided, get store-specific NPS data
     if (storeId) {
-      const surveys = await prisma.npsSurvey.findMany({
+      const surveys = await prisma.nPSSurvey.findMany({
         where: {
           storeId,
           sentAt: { gte: startDate },
@@ -71,8 +95,8 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Get global NPS metrics
-    const surveys = await prisma.npsSurvey.findMany({
+    // Get global NPS metrics (cross-tenant — OPERATOR+ only, enforced above)
+    const surveys = await prisma.nPSSurvey.findMany({
       where: {
         sentAt: { gte: startDate },
       },
@@ -110,27 +134,13 @@ export async function GET(req: NextRequest) {
             npsScore: 0,
           };
 
-    // Get recent responses with store info
-    const recentResponses = await prisma.npsSurvey.findMany({
+    const recentResponses = await prisma.nPSSurvey.findMany({
       where: {
         status: 'responded',
         sentAt: { gte: startDate },
       },
       orderBy: { respondedAt: 'desc' },
       take: 20,
-      include: {
-        store: {
-          select: {
-            name: true,
-            owner: {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            },
-          },
-        },
-      },
     });
 
     return NextResponse.json({
@@ -149,6 +159,24 @@ export async function GET(req: NextRequest) {
 // POST /api/nps/send - Send NPS survey
 export async function POST(req: NextRequest) {
   try {
+    let user: { role?: string };
+    try {
+      const ctx = await OpsAuthService.requireSession();
+      user = ctx.user;
+    } catch (e) {
+      const res = opsApiAuthErrorResponse(e);
+      if (res) return res;
+      throw e;
+    }
+
+    try {
+      OpsAuthService.requireRole(user, 'OPERATOR');
+    } catch (e) {
+      const res = opsApiAuthErrorResponse(e);
+      if (res) return res;
+      throw e;
+    }
+
     const body = await req.json();
     const { storeId } = body;
 
@@ -159,7 +187,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Queue NPS survey
     const connection = await getRedis();
     const queue = new Queue(QUEUES.NPS_SURVEY, { connection });
 

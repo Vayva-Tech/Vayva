@@ -1,18 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { AuthService } from "@/services/auth";
 import { SplitAuthLayout } from "@/components/auth/SplitAuthLayout";
-import { logger } from "@vayva/shared";
 import { Button, Input, Label } from "@vayva/ui";
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const q = searchParams?.get("email")?.trim();
+    if (q) {
+      setEmail((prev) => (prev.trim() ? prev : decodeURIComponent(q)));
+    }
+  }, [searchParams]);
 
   // RFC 5322 compliant email validation
   const validateEmail = (value: string) => {
@@ -152,5 +160,13 @@ export default function ForgotPasswordPage() {
         </form>
       )}
     </SplitAuthLayout>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }

@@ -1,10 +1,11 @@
-// @ts-nocheck
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import useSWR from "swr";
+import { Loader2 } from "lucide-react";
 import { VayvaThemeProvider, type DesignCategory } from "@/components/vayva-ui/VayvaThemeProvider";
-import { EventHeader } from "./EventHeader";
+import { EventHeader, type Event as EventRecord } from "./EventHeader";
+import type { Metrics as EventsMetrics } from "./EventsKpiRow";
 import { EventsKpiRow } from "./EventsKpiRow";
 import { LiveTicketSales } from "./LiveTicketSales";
 import { EventTimeline } from "./EventTimeline";
@@ -14,7 +15,24 @@ import { VendorsLogistics } from "./VendorsLogistics";
 import { MarketingPerformance } from "./MarketingPerformance";
 import { AIInsightsPanel } from "./AIInsightsPanel";
 import { apiJson } from "@/lib/api-client-shared";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
+/** API envelope for `/api/dashboard/events` */
+interface EventsDashboardApiResponse {
+  data?: {
+    hasActiveEvent?: boolean;
+    event?: EventRecord;
+    metrics?: EventsMetrics;
+    eventTimeline?: {
+      eventDate?: string;
+      daysUntilEvent?: number;
+      schedule?: unknown[];
+      venueCapacity?: number;
+      venueLayout?: string;
+    };
+  };
+}
+
+type JsonEnvelope = { data?: unknown };
 
 interface EventsDashboardProps {
   eventId?: string;
@@ -28,46 +46,46 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
   const isPro = planTier === "advanced" || planTier === "pro";
 
   // Fetch dashboard data
-  const { data: dashboardData, error: dashboardError } = useSWR(
+  const { data: dashboardData, error: dashboardError } = useSWR<EventsDashboardApiResponse>(
     eventId ? `/api/dashboard/events?eventId=${eventId}` : "/api/dashboard/events",
     fetcher,
     { refreshInterval: 30000 } // Refresh every 30 seconds
   );
 
   // Fetch live sales
-  const { data: liveSalesData, error: liveSalesError } = useSWR(
+  const { data: liveSalesData, error: liveSalesError } = useSWR<JsonEnvelope>(
     eventId ? `/api/events/tickets/sales/live?eventId=${eventId}&limit=5` : null,
     fetcher,
     { refreshInterval: 10000 } // Refresh every 10 seconds for live feel
   );
 
   // Fetch check-in stats
-  const { data: checkInData, error: checkInError } = useSWR(
+  const { data: checkInData, error: checkInError } = useSWR<JsonEnvelope>(
     eventId ? `/api/events/attendees/checkins/stats?eventId=${eventId}` : null,
     fetcher,
     { refreshInterval: 15000 }
   );
 
   // Fetch sponsors
-  const { data: sponsorsData, error: sponsorsError } = useSWR(
+  const { data: sponsorsData, error: sponsorsError } = useSWR<JsonEnvelope>(
     eventId ? `/api/events/sponsors?eventId=${eventId}` : null,
     fetcher
   );
 
   // Fetch vendors
-  const { data: vendorsData, error: vendorsError } = useSWR(
+  const { data: vendorsData, error: vendorsError } = useSWR<JsonEnvelope>(
     eventId ? `/api/events/vendors?eventId=${eventId}` : null,
     fetcher
   );
 
   // Fetch marketing performance
-  const { data: marketingData, error: marketingError } = useSWR(
+  const { data: marketingData, error: marketingError } = useSWR<JsonEnvelope>(
     eventId ? `/api/events/marketing/performance?eventId=${eventId}` : null,
     fetcher
   );
 
   // Fetch AI insights (Pro only)
-  const { data: aiData, error: aiError } = useSWR(
+  const { data: aiData, error: aiError } = useSWR<JsonEnvelope>(
     isPro && eventId ? `/api/events/ai/insights?eventId=${eventId}` : null,
     fetcher,
     { refreshInterval: 60000 }
@@ -78,7 +96,7 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+        <Loader2 className="h-10 w-10 animate-spin text-gray-500" aria-hidden />
       </div>
     );
   }
@@ -95,7 +113,7 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
   const hasActiveEvent = dashboardData?.data?.hasActiveEvent;
 
   return (
-    <VayvaThemeProvider designCategory={designCategory}>
+    <VayvaThemeProvider defaultCategory={designCategory}>
       <div className="min-h-screen bg-white p-6">
         <div className="max-w-[1800px] mx-auto space-y-6">
           {/* Header */}
@@ -127,18 +145,18 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
                 <div className="space-y-6">
                   {/* Live Ticket Sales */}
                   <LiveTicketSales 
-                    data={liveSalesData?.data}
+                    data={liveSalesData?.data as any}
                     dashboardData={dashboardData?.data}
                   />
 
                   {/* Attendee Check-in */}
                   <AttendeeCheckIn 
-                    data={checkInData?.data}
+                    data={checkInData?.data as any}
                   />
 
                   {/* Vendors & Logistics */}
                   <VendorsLogistics 
-                    data={vendorsData?.data}
+                    data={vendorsData?.data as any}
                   />
                 </div>
 
@@ -151,12 +169,12 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
 
                   {/* Sponsor Showcase */}
                   <SponsorShowcase 
-                    data={sponsorsData?.data}
+                    data={sponsorsData?.data as any}
                   />
 
                   {/* Marketing Performance */}
                   <MarketingPerformance 
-                    data={marketingData?.data}
+                    data={marketingData?.data as any}
                   />
                 </div>
               </div>
@@ -164,7 +182,7 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
               {/* AI Insights Panel (Pro Tier Only) */}
               {isPro && (
                 <AIInsightsPanel 
-                  data={aiData?.data}
+                  data={aiData?.data as any}
                   loading={!aiData && !aiError}
                 />
               )}

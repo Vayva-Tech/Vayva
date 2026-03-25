@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
 export interface SessionMetrics {
   totalSessions: number;
@@ -170,20 +169,20 @@ export class AnalyticsIntegrationService {
       },
     });
 
-    const customerValues = customers.map((c) =>
-      c.orders.reduce((sum, o) => sum + Number(o.totalAmount), 0)
+    const customerValues = customers.map((c: any) =>
+      c.orders.reduce((sum: number, o: any) => sum + Number(o.totalAmount), 0),
     );
 
-    const avgCLV = customerValues.reduce((a, b) => a + b, 0) / customerValues.length || 0;
+    const avgCLV = customerValues.reduce((a: number, b: number) => a + b, 0) / customerValues.length || 0;
     
     // Top 20% segment
-    const sortedValues = customerValues.sort((a, b) => b - a);
+    const sortedValues = customerValues.sort((a: number, b: number) => b - a);
     const topSegmentCount = Math.ceil(customers.length * 0.2);
     const topSegmentCLV =
-      sortedValues.slice(0, topSegmentCount).reduce((a, b) => a + b, 0) / topSegmentCount || 0;
+      sortedValues.slice(0, topSegmentCount).reduce((a: number, b: number) => a + b, 0) / topSegmentCount || 0;
 
     // Repeat purchase rate
-    const repeatCustomers = customers.filter((c) => c.orders.length > 1).length;
+    const repeatCustomers = customers.filter((c: any) => c.orders.length > 1).length;
     const repeatPurchaseRate = repeatCustomers / customers.length || 0;
 
     return {

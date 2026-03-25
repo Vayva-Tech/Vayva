@@ -34,6 +34,7 @@ export function registerWhatsAppOutboundWorker(
       }
 
       const evolutionKey = process.env.EVOLUTION_API_KEY || "";
+      // Legacy / deprecated (Meta WhatsApp Cloud API)
       const metaToken = process.env.WHATSAPP_API_TOKEN || "";
       const metaPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID || "";
 
@@ -58,7 +59,7 @@ export function registerWhatsAppOutboundWorker(
         } else {
           // Previously MetaProvider would "simulate" a send here, which can silently break the product.
           throw new Error(
-            "WhatsApp outbound is not configured: set EVOLUTION_API_KEY + EVOLUTION_INSTANCE_NAME (preferred), or WHATSAPP_API_TOKEN + WHATSAPP_PHONE_NUMBER_ID.",
+            "WhatsApp outbound is not configured: set EVOLUTION_API_URL + EVOLUTION_API_KEY (preferred).",
           );
         }
 

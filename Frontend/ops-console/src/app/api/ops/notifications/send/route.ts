@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 import { logger } from "@vayva/shared";
 
 export async function POST(req: NextRequest) {
-  const { user } = await OpsAuthService.requireSession();
-
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPERATOR");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { merchantIds, type, template, customMessage } = await req.json();
 
     if (
@@ -145,6 +153,8 @@ export async function POST(req: NextRequest) {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     logger.error("[SEND_NOTIFICATION_ERROR]", { error });
     return NextResponse.json(
       { error: "Failed to send notifications" },

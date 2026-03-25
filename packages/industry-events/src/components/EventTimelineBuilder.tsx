@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Event Timeline Builder Component
  */
@@ -34,9 +34,9 @@ export const EventTimelineBuilder: React.FC<EventTimelineBuilderProps> = ({
     id: 'timeline-1',
     name: 'Wedding Planning Timeline',
     events: [
-      { id: '1', name: 'Book Venue', date: new Date(), type: 'milestone', status: 'completed', priority: 'high' },
-      { id: '2', name: 'Send Invitations', date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), type: 'task', status: 'in-progress', priority: 'high' },
-      { id: '3', name: 'Final Fitting', date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), type: 'reminder', status: 'pending', priority: 'medium' },
+      { id: '1', name: 'Book Venue', date: new Date('2030-01-01T12:00:00Z'), type: 'milestone', status: 'completed', priority: 'high' },
+      { id: '2', name: 'Send Invitations', date: new Date('2030-01-08T12:00:00Z'), type: 'task', status: 'in-progress', priority: 'high' },
+      { id: '3', name: 'Final Fitting', date: new Date('2030-01-15T12:00:00Z'), type: 'reminder', status: 'pending', priority: 'medium' },
     ],
     progress: 45,
   };
@@ -96,14 +96,14 @@ export const EventTimelineBuilder: React.FC<EventTimelineBuilderProps> = ({
             key={event.id}
             className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <button
+            <Button
               onClick={() => onUpdateStatus?.(event.id, event.status === 'completed' ? 'pending' : 'completed')}
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 event.status === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-300'
               }`}
             >
               {getStatusIcon(event.status)}
-            </button>
+            </Button>
 
             <div className="flex-1">
               <h4 className="font-medium">{event.name}</h4>
@@ -128,12 +128,12 @@ export const EventTimelineBuilder: React.FC<EventTimelineBuilderProps> = ({
       </div>
 
       {onAddEvent && (
-        <button
+        <Button
           onClick={() => onAddEvent({ name: 'New Event', type: 'task', status: 'pending' })}
           className="mt-4 w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           + Add Event
-        </button>
+        </Button>
       )}
     </div>
   );

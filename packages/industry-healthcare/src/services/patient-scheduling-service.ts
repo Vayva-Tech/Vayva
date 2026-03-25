@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { z } from 'zod';
 import type { 
   Appointment, 
@@ -97,9 +96,11 @@ export class PatientSchedulingService {
   private readonly DEFAULT_BUFFER_TIME = 15; // minutes
   private readonly MAX_DAILY_APPOINTMENTS = 16; // 8am-6pm with 30min slots
 
-  constructor(db: any) {
+  constructor(db?: any) {
     this.db = db;
   }
+
+  async initialize(): Promise<void> {}
 
   /**
    * Smart appointment scheduling with conflict detection
@@ -538,6 +539,7 @@ export class PatientSchedulingService {
           estimatedWaitTime: waitlistEntry.estimatedWaitTime,
           conflictsDetected: conflicts
         };
+      }
 
       default:
         return {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Inventory Tracking Service
  * Ingredient inventory management and tracking

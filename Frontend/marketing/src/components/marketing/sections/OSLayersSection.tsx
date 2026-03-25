@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, CreditCard, Package, Truck, BarChart3, Users } from "lucide-react";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 const layers = [
   {
@@ -49,42 +50,74 @@ const layers = [
   },
 ];
 
+function LayerCard({
+  layer,
+  index,
+}: {
+  layer: (typeof layers)[number];
+  index: number;
+}): React.JSX.Element {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="group h-full"
+    >
+      <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm h-full group-hover:-translate-y-1 group-hover:shadow-md transition-all">
+        <div
+          className={`w-12 h-12 rounded-xl bg-gradient-to-r ${layer.gradient} flex items-center justify-center text-white mb-4`}
+        >
+          <layer.icon className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 mb-2">{layer.title}</h3>
+        <p className="text-sm text-slate-600 leading-relaxed">{layer.description}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 export function OSLayersSection(): React.JSX.Element {
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+    <section className="py-24 px-4 sm:px-6 w-full min-w-0 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto min-w-0">
+        <div className="text-center mb-16 px-1">
           <p className="text-sm uppercase tracking-[0.35em] text-emerald-600 font-semibold mb-4">
             Why "operating system" matters
           </p>
-          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Not just tools.<span className="text-emerald-600"> Infrastructure.</span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            Like Windows runs your laptop, Vayva runs your business—coordinating every message, payment, product, and delivery in one unified system.
+          <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto">
+            <span className="md:hidden">
+              One system for messages, payments, stock, and delivery—swipe the layers.
+            </span>
+            <span className="hidden md:inline">
+              Like Windows runs your laptop, Vayva runs your business—coordinating every message,
+              payment, product, and delivery in one unified system.
+            </span>
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {layers.map((layer, index) => (
-            <motion.div
-              key={layer.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative"
-            >
-              <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl bg-gradient-to-r from-slate-200 to-slate-300" />
-              <div className="relative bg-white rounded-2xl p-6 border-2 border-slate-900/10 shadow-[0_10px_30px_rgba(15,23,42,0.08)] h-full group-hover:-translate-y-1 transition-transform">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${layer.gradient} flex items-center justify-center text-white mb-4`}>
-                  <layer.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{layer.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{layer.description}</p>
-              </div>
-            </motion.div>
+            <LayerCard key={layer.title} layer={layer} index={index} />
           ))}
+        </div>
+        <div className="md:hidden -mx-1">
+          <MarketingSnapRow
+            ariaLabel="Operating system layers"
+            hint="Swipe through each layer"
+            showDots
+            dotCount={layers.length}
+          >
+            {layers.map((layer, index) => (
+              <MarketingSnapItem key={layer.title}>
+                <LayerCard layer={layer} index={index} />
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
         </div>
       </div>
     </section>

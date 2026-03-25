@@ -10,29 +10,21 @@ jobs:
       
       - name: Tripwire - Merchant Admin Platform Leakage
         run: |
-          if grep -r "src/app/admin" apps/merchant/src/app --include="*.ts" --include="*.tsx" 2>/dev/null; then
-            echo "FAIL: Found legacy admin routes in merchant"
-            exit 1
-          fi
-          if grep -r "/api/admin/ops" apps/merchant/src --include="*.ts" --include="*.tsx" 2>/dev/null; then
-             echo "FAIL: Found legacy ops api calls in merchant"
-             exit 1
-          fi
-
-      - name: Tripwire - Ops Auth Enforcement
-        run: |
-          # Ensure every Ops API route uses OpsAuthService (except auth routes)
-          # We look for route.ts files in api/ops and check if they contain the guard
-          for file in $(find apps/ops-console/src/app/api/ops -name "route.ts"); do
-            # Skip auth routes (login, logout, etc.) as they can't require auth
-            if echo "$file" | grep -q "/api/ops/auth/"; then
-              continue
-            fi
-            if ! grep -qE "(OpsAuthService\.requireSession|withOpsAPI|withOpsAuth)" "$file"; then
-              echo "FAIL: $file is missing OpsAuthService.requireSession() or withOpsAPI/withOpsAuth wrapper"
-              exit 1
+          for root in apps/merchant/src Frontend/merchant/src; do
+            if [ -d "$root" ]; then
+              if grep -r "src/app/admin" "$root/app" --include="*.ts" --include="*.tsx" 2>/dev/null; then
+                echo "FAIL: Found legacy admin routes in $root"
+                exit 1
+              fi
+              if grep -r "/api/admin/ops" "$root" --include="*.ts" --include="*.tsx" 2>/dev/null; then
+                echo "FAIL: Found legacy ops api calls in $root"
+                exit 1
+              fi
             fi
           done
+
+      - name: Tripwire - Ops console API route auth (Frontend/ops-console)
+        run: bash Frontend/ops-console/scripts/verify-api-route-auth.sh
 
       - name: Tripwire - Domain Safety
         run: |

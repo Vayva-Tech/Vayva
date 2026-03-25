@@ -30,17 +30,27 @@ class TicketBumpController extends BaseIndustryController {
           throw new Error("Ticket not found");
         }
 
-        // Bump ticket (send to expo)
-        const bumpedTicket = await prisma.kitchenTicket.update({
-          where: { id: ticketId },
+        // Bump ticket (send to expo) — compound scope on write (defense in depth)
+        const updated = await prisma.kitchenTicket.updateMany({
+          where: { id: ticketId, storeId: context.storeId },
           data: {
             status: "ready",
             bumpTime: new Date(),
             priority: body.priority || "normal",
             updatedAt: new Date(),
           },
+        });
+        if (updated.count === 0) {
+          throw new Error("Ticket not found");
+        }
+
+        const bumpedTicket = await prisma.kitchenTicket.findUnique({
+          where: { id: ticketId, storeId: context.storeId },
           include: { station: true },
         });
+        if (!bumpedTicket) {
+          throw new Error("Ticket not found");
+        }
 
         // Send notification to expo station
         await this.notifyExpoStation(context.storeId, ticket.stationId);
@@ -73,7 +83,7 @@ class TicketBumpController extends BaseIndustryController {
         },
       });
       
-      console.log(`[EXPO_WS] Notified expo station - Store: ${storeId}, From: ${fromStationId}`);
+      console.warn(`[EXPO_WS] Notified expo station - Store: ${storeId}, From: ${fromStationId}`);
     } catch (error) {
       console.error('[EXPO_WS] Failed to notify expo station:', error);
     }

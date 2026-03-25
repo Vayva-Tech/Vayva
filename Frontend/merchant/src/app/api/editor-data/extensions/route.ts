@@ -1,47 +1,50 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { apiJson } from "@/lib/api-client-shared";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma } from "@vayva/db";
+
+function getBaseExtensionIds(_industrySlug: string): string[] {
+  return [];
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    const store = await prisma.store?.findUnique({
-        where: { id: storeId },
-        select: { industrySlug: true },
-      });
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-      const baseExtensionIds = getBaseExtensionIds(store?.industrySlug || "");
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { industrySlug: true },
+    });
 
-      const addOns =
-        (await prisma.storeAddOn?.findMany({
-          where: {
-            storeId,
-            status: "ACTIVE" as any,
-          },
-          select: { extensionId: true },
-        })) || [];
+    const baseExtensionIds = getBaseExtensionIds(store?.industrySlug ?? "");
 
-      // Use extensionId from StoreAddOn
-      const addOnExtensionIds = addOns
-        .map((a) => a.extensionId)
-        .filter((v): v is string => typeof v === "string" && v.length > 0);
+    const addOns = await prisma.storeAddOn.findMany({
+      where: {
+        storeId,
+        status: "ACTIVE",
+      },
+      select: { extensionId: true },
+    });
 
-      const enabledExtensionIds = Array.from(
-        new Set([...baseExtensionIds, ...addOnExtensionIds]),
-      );
+    const addOnExtensionIds = addOns
+      .map((a) => a.extensionId)
+      .filter((v): v is string => typeof v === "string" && v.length > 0);
 
-      return NextResponse.json(
-        { data: enabledExtensionIds },
-        { headers: { "Cache-Control": "no-store" } },
-      );
+    const enabledExtensionIds = Array.from(new Set([...baseExtensionIds, ...addOnExtensionIds]));
+
+    return NextResponse.json(
+      { data: enabledExtensionIds },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (error) {
     handleApiError(error, { endpoint: "/api/editor-data/extensions", operation: "GET" });
-    return NextResponse.json(
-      { error: "Failed to complete operation" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

@@ -4,19 +4,13 @@ import { authOptions } from "@/lib/auth";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
-// GET /api/loyalty/program - Get or create loyalty program
+// GET /api/loyalty/program — store from session only
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const storeId = searchParams.get("storeId");
-
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const storeId = session?.user?.storeId;
+    if (!session?.user || !storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!storeId) {
-      return NextResponse.json({ error: "storeId required" }, { status: 400 });
     }
 
     // Fetch loyalty program via API
@@ -24,7 +18,9 @@ export async function GET(req: Request) {
       success: boolean;
       data?: any;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/loyalty/program?storeId=${storeId}`);
+    }>(`${process.env.BACKEND_API_URL}/api/loyalty/program?storeId=${encodeURIComponent(storeId)}`, {
+      headers: { "x-store-id": storeId },
+    });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch loyalty program');
@@ -45,20 +41,15 @@ export async function GET(req: Request) {
 
 // POST /api/loyalty/program - Update loyalty program
 export async function POST(req: Request) {
-  let storeId: string | undefined;
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const storeId = session?.user?.storeId;
+    if (!session?.user || !storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { storeId: bodyStoreId, ...input } = body;
-    storeId = bodyStoreId;
-
-    if (!storeId) {
-      return NextResponse.json({ error: "storeId required" }, { status: 400 });
-    }
+    const { storeId: _bodyStoreId, ...input } = body;
 
     // Update loyalty program via API
     const result = await apiJson<{

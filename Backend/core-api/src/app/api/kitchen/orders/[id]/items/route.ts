@@ -14,141 +14,149 @@ const ItemStatusUpdateSchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.ORDERS_VIEW,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    // Verify order exists
-    const order = await prisma.kitchenOrder.findFirst({
-      where: { id, storeId },
-    });
+      const order = await prisma.kitchenOrder.findFirst({
+        where: { id, storeId },
+      });
 
-    if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404, headers: standardHeaders(requestId) }
-      );
-    }
+      if (!order) {
+        return NextResponse.json(
+          { error: "Order not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
 
-    const items = await prisma.kitchenOrderItem.findMany({
-      where: { orderId: id },
-      include: {
-        menuItem: {
-          select: {
-            id: true,
-            name: true,
-            category: true,
+      const items = await prisma.kitchenOrderItem.findMany({
+        where: {
+          orderId: id,
+          order: { storeId },
+        },
+        include: {
+          menuItem: {
+            select: {
+              id: true,
+              name: true,
+              category: true,
+            },
+          },
+          station: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
           },
         },
-        station: {
-          select: {
-            id: true,
-            name: true,
-            type: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "asc" },
-    });
+        orderBy: { createdAt: "asc" },
+      });
 
-    return NextResponse.json(
-      { data: items },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[KITCHEN_ORDER_ITEMS_GET]", { error, orderId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch order items" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const json = await req.json().catch(() => ({}));
-    const parseResult = ItemStatusUpdateSchema.safeParse(json);
-
-    if (!parseResult.success) {
       return NextResponse.json(
-        {
-          error: "Invalid item update data",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400, headers: standardHeaders(requestId) }
+        { data: items },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: orderId } = await params;
+      logger.error("[KITCHEN_ORDER_ITEMS_GET]", { error, orderId });
+      return NextResponse.json(
+        { error: "Failed to fetch order items" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
+  },
+);
 
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const PATCH = withVayvaAPI(
+  PERMISSIONS.ORDERS_MANAGE,
+  async (req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
+      const json = await req.json().catch(() => ({}));
+      const parseResult = ItemStatusUpdateSchema.safeParse(json);
 
-    const { itemId, status, startTime, completionTime, assignedTo, notes } = parseResult.data;
+      if (!parseResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid item update data",
+            details: parseResult.error.flatten(),
+          },
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
 
-    // Verify item belongs to order
-    const item = await prisma.kitchenOrderItem.findFirst({
-      where: { 
+      const { itemId, status, startTime, completionTime, assignedTo, notes } =
+        parseResult.data;
+
+      const itemScope = {
         id: itemId,
         orderId: id,
-      },
-    });
+        order: { storeId },
+      } as const;
 
-    if (!item) {
+      const updateResult = await prisma.kitchenOrderItem.updateMany({
+        where: itemScope,
+        data: {
+          status,
+          startTime: startTime ? new Date(startTime) : undefined,
+          completionTime: completionTime ? new Date(completionTime) : undefined,
+          assignedTo,
+          notes,
+        },
+      });
+
+      if (updateResult.count === 0) {
+        return NextResponse.json(
+          { error: "Order item not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      const updatedItem = await prisma.kitchenOrderItem.findFirst({
+        where: itemScope,
+        include: {
+          menuItem: {
+            select: {
+              name: true,
+            },
+          },
+          station: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!updatedItem) {
+        return NextResponse.json(
+          { error: "Order item not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      logger.info("[KITCHEN_ITEM_STATUS_UPDATE]", {
+        orderId: id,
+        itemId,
+        newStatus: status,
+      });
+
       return NextResponse.json(
-        { error: "Order item not found" },
-        { status: 404, headers: standardHeaders(requestId) }
+        { data: updatedItem },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: orderId } = await params;
+      logger.error("[KITCHEN_ITEM_STATUS_UPDATE]", { error, orderId });
+      return NextResponse.json(
+        { error: "Failed to update item status" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-
-    const updatedItem = await prisma.kitchenOrderItem.update({
-      where: { id },
-      data: {
-        status,
-        startTime: startTime ? new Date(startTime) : undefined,
-        completionTime: completionTime ? new Date(completionTime) : undefined,
-        assignedTo,
-        notes,
-      },
-      include: {
-        menuItem: {
-          select: {
-            name: true,
-          },
-        },
-        station: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-
-    logger.info("[KITCHEN_ITEM_STATUS_UPDATE]", {
-      orderId: id,
-      itemId,
-      newStatus: status,
-    });
-
-    return NextResponse.json(
-      { data: updatedItem },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[KITCHEN_ITEM_STATUS_UPDATE]", { error, orderId: params.id });
-    return NextResponse.json(
-      { error: "Failed to update item status" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+  },
+);

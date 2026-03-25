@@ -21,6 +21,7 @@ const UNIVERSAL_ROUTES = new Set([
   "/dashboard/notifications",
   "/dashboard/setup-checklist",
   "/dashboard/wa-agent",
+  "/beta/desktop-app",
   "/dashboard/settings",
   "/dashboard/reports",
   "/dashboard/reviews",

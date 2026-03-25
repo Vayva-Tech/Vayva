@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -15,8 +14,10 @@ export async function POST(request: NextRequest) {
     if (!domainMappingId) {
       return NextResponse.json({ error: "Domain mapping ID required" }, { status: 400 });
     }
-
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Call backend API to verify domain
     const result = await apiJson<{
       message: string;
@@ -24,10 +25,7 @@ export async function POST(request: NextRequest) {
       provider: unknown | null;
     }>(`${process.env.BACKEND_API_URL}/api/account/domains/verify`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
       body: JSON.stringify({ domainMappingId }),
     });
     

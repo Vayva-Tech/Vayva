@@ -78,7 +78,7 @@ export const GET = withVayvaAPI(
       if (claim.patient.insuranceInfo) {
         try {
           patientInsurance = JSON.parse(claim.patient.insuranceInfo);
-        } catch (e) {
+        } catch {
           patientInsurance = null;
         }
       }

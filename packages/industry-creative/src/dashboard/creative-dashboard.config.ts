@@ -1,12 +1,13 @@
-// @ts-nocheck
 import type { DashboardEngineConfig, WidgetDefinition } from '../types';
+
+const CREATIVE_INDUSTRY = 'creative_portfolio' as const;
 
 // Portfolio & Gallery Widgets
 const PORTFOLIO_ITEMS_WIDGET: WidgetDefinition = {
   id: 'portfolio-items',
   type: 'gallery',
   title: 'Portfolio Gallery',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'analytics',
     query: 'portfolio.items',
@@ -18,7 +19,7 @@ const RECENT_PROJECTS_WIDGET: WidgetDefinition = {
   id: 'recent-projects',
   type: 'list',
   title: 'Recent Projects',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'analytics',
     query: 'projects.recent',
@@ -35,7 +36,7 @@ const PENDING_PROOFS_WIDGET: WidgetDefinition = {
   id: 'pending-proofs',
   type: 'kpi-card',
   title: 'Pending Client Proofs',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'analytics',
     query: 'proofs.pending',
@@ -47,7 +48,7 @@ const REVISIONS_WIDGET: WidgetDefinition = {
   id: 'revisions',
   type: 'table',
   title: 'Active Revisions',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'analytics',
     query: 'revisions.active',
@@ -67,7 +68,7 @@ const PROJECT_STATUS_WIDGET: WidgetDefinition = {
   id: 'project-status',
   type: 'kanban',
   title: 'Project Workflow Board',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'analytics',
     query: 'projects.workflow',
@@ -85,7 +86,7 @@ const TIME_TRACKING_WIDGET: WidgetDefinition = {
   id: 'time-tracking',
   type: 'chart-bar',
   title: 'Time Tracked This Week',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'analytics',
     query: 'time.weekly',
@@ -102,7 +103,7 @@ const ASSET_LIBRARY_WIDGET: WidgetDefinition = {
   id: 'asset-library',
   type: 'grid',
   title: 'Asset Library',
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
   dataSource: {
     type: 'entity',
     entity: 'assets',
@@ -115,7 +116,23 @@ const ASSET_LIBRARY_WIDGET: WidgetDefinition = {
 };
 
 export const CREATIVE_DASHBOARD_CONFIG: DashboardEngineConfig = {
-  industry: 'creative',
+  industry: CREATIVE_INDUSTRY,
+  title: 'Creative studio',
+  subtitle: 'Portfolio, proofing, and delivery',
+  primaryObjectLabel: 'Project',
+  defaultTimeHorizon: 'week',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
+  layouts: [],
+  kpiCards: [],
+  alertRules: [],
+  actions: [],
+  failureModes: [],
   widgets: [
     // Portfolio & Gallery
     PORTFOLIO_ITEMS_WIDGET,

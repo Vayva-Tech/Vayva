@@ -23,13 +23,10 @@ vi.mock('@/lib/logger', () => ({
 import { GET } from '@/app/api/kyc/status/route';
 import { prisma } from '@vayva/db';
 
-describe('KYC Status - GET /api/kyc/status', () => {
-    const mockContext = {
-        storeId: 'store_test_123',
-        userId: 'user_test_123',
-        user: { id: 'user_test_123', email: 'test@example.com' },
-    };
+const kycReq = (path = '/api/kyc/status') =>
+    createMockRequest('GET', path, { headers: { 'x-store-id': 'store_test_123' } });
 
+describe('KYC Status - GET /api/kyc/status', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -40,8 +37,8 @@ describe('KYC Status - GET /api/kyc/status', () => {
             kycRecord: null,
         });
 
-        const request = createMockRequest('GET', '/api/kyc/status');
-        const response = await GET(request, mockContext);
+        const request = kycReq();
+        const response = await GET(request);
         const data = await getResponseJson(response);
 
         expect(response.status).toBe(200);
@@ -63,8 +60,8 @@ describe('KYC Status - GET /api/kyc/status', () => {
             },
         });
 
-        const request = createMockRequest('GET', '/api/kyc/status');
-        const response = await GET(request, mockContext);
+        const request = kycReq();
+        const response = await GET(request);
         const data = await getResponseJson(response);
 
         expect(response.status).toBe(200);
@@ -90,8 +87,8 @@ describe('KYC Status - GET /api/kyc/status', () => {
             },
         });
 
-        const request = createMockRequest('GET', '/api/kyc/status');
-        const response = await GET(request, mockContext);
+        const request = kycReq();
+        const response = await GET(request);
         const data = await getResponseJson(response);
 
         expect(response.status).toBe(200);
@@ -105,8 +102,8 @@ describe('KYC Status - GET /api/kyc/status', () => {
     it('should return 404 when store not found', async () => {
         (prisma.store.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(null);
 
-        const request = createMockRequest('GET', '/api/kyc/status');
-        const response = await GET(request, mockContext);
+        const request = kycReq();
+        const response = await GET(request);
 
         expect(response.status).toBe(404);
     });
@@ -114,8 +111,8 @@ describe('KYC Status - GET /api/kyc/status', () => {
     it('should handle database errors gracefully', async () => {
         (prisma.store.findUnique as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('DB error'));
 
-        const request = createMockRequest('GET', '/api/kyc/status');
-        const response = await GET(request, mockContext);
+        const request = kycReq();
+        const response = await GET(request);
 
         expect(response.status).toBe(500);
     });
@@ -126,8 +123,8 @@ describe('KYC Status - GET /api/kyc/status', () => {
             kycRecord: null,
         });
 
-        const request = createMockRequest('GET', '/api/kyc/status');
-        const response = await GET(request, mockContext);
+        const request = kycReq();
+        const response = await GET(request);
 
         expect(response.headers.get('Cache-Control')).toBe('no-store');
     });

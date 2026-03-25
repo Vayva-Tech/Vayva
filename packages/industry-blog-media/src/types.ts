@@ -1,11 +1,11 @@
-// @ts-nocheck
 import { z } from 'zod';
 
 // ============================================================================
 // Blog Post Types
 // ============================================================================
 
-export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED';
+/** Matches `PostStatus` in Prisma (`platform/infra/db` schema). */
+export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 
 export interface BlogPost {
   id: string;
@@ -404,7 +404,7 @@ export const CreateBlogPostSchema = z.object({
   excerpt: z.string().max(500).optional(),
   content: z.string().optional(),
   featuredImage: z.string().url().optional(),
-  status: z.enum(['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED']).optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
   tags: z.array(z.string()).optional(),
   metaTitle: z.string().max(60).optional(),
   metaDesc: z.string().max(160).optional(),

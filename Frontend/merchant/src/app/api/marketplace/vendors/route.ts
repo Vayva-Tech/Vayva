@@ -1,9 +1,13 @@
-// @ts-nocheck
-import { logger } from "@vayva/shared";
-import { NextResponse } from "next/server";
+import { logger, ErrorCategory } from "@/lib/logger";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@vayva/db";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
 const vendorSchema = z.object({
   userId: z.string(),
@@ -14,15 +18,19 @@ const vendorSchema = z.object({
   bannerUrl: z.string().url().optional(),
   commissionRate: z.number().min(0).max(100).default(10),
   paymentSchedule: z.enum(["daily", "weekly", "biweekly", "monthly"]).default("weekly"),
-  documents: z.object({
-    id: z.string().url().optional(),
-    businessReg: z.string().url().optional(),
-    tax: z.string().url().optional(),
-  }).optional(),
-  settings: z.object({
-    autoAcceptOrders: z.boolean().default(false),
-    vacationMode: z.boolean().default(false),
-  }).optional(),
+  documents: z
+    .object({
+      id: z.string().url().optional(),
+      businessReg: z.string().url().optional(),
+      tax: z.string().url().optional(),
+    })
+    .optional(),
+  settings: z
+    .object({
+      autoAcceptOrders: z.boolean().default(false),
+      vacationMode: z.boolean().default(false),
+    })
+    .optional(),
 });
 
 const vendorUpdateSchema = vendorSchema.partial().omit({ userId: true, slug: true });
@@ -33,91 +41,103 @@ const statusUpdateSchema = z.object({
   onboardingStatus: z.enum(["pending", "in_review", "approved", "rejected"]).optional(),
 });
 
+function vendorUpdateToPrisma(
+  v: z.infer<typeof vendorUpdateSchema>
+): Prisma.VendorUpdateInput {
+  const data: Prisma.VendorUpdateInput = {};
+  if (v.businessName !== undefined) data.businessName = v.businessName;
+  if (v.description !== undefined) data.description = v.description;
+  if (v.logoUrl !== undefined) data.logoUrl = v.logoUrl;
+  if (v.bannerUrl !== undefined) data.bannerUrl = v.bannerUrl;
+  if (v.commissionRate !== undefined) data.commissionRate = v.commissionRate;
+  if (v.paymentSchedule !== undefined) data.paymentSchedule = v.paymentSchedule;
+  if (v.documents !== undefined) {
+    data.documents = v.documents as Prisma.InputJsonValue;
+  }
+  if (v.settings !== undefined) {
+    data.settings = v.settings as Prisma.InputJsonValue;
+  }
+  return data;
+}
+
 /**
- * GET /api/marketplace/vendors?storeId=xxx&status=xxx
- * List vendors for a store
+ * GET /api/marketplace/vendors — store from session only
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
     const isActive = searchParams.get("isActive");
     const isVerified = searchParams.get("isVerified");
     const onboardingStatus = searchParams.get("onboardingStatus");
 
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
-    }
-
-    // Fetch vendors via API
     const queryParams = new URLSearchParams({ storeId });
-    if (isActive !== null) queryParams.append('isActive', String(isActive === "true"));
-    if (isVerified !== null) queryParams.append('isVerified', String(isVerified === "true"));
-    if (onboardingStatus) queryParams.append('onboardingStatus', onboardingStatus);
+    if (isActive !== null) queryParams.append("isActive", String(isActive === "true"));
+    if (isVerified !== null) queryParams.append("isVerified", String(isVerified === "true"));
+    if (onboardingStatus) queryParams.append("onboardingStatus", onboardingStatus);
 
     const result = await apiJson<{
       success: boolean;
-      data?: Array<any>;
+      data?: unknown[];
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/marketplace/vendors?${queryParams.toString()}`);
+    }>(`${backendBase()}/api/marketplace/vendors?${queryParams.toString()}`, {
+      headers: auth.headers,
+    });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch vendors');
+      throw new Error(result.error || "Failed to fetch vendors");
     }
 
-    return NextResponse.json({ vendors: result.data, stats: { total: result.data?.length || 0 } });
+    const vendors = Array.isArray(result.data) ? result.data : [];
+
+    return NextResponse.json({
+      vendors,
+      stats: { total: vendors.length },
+    });
   } catch (error: unknown) {
-    handleApiError(
-      error,
-      {
-        endpoint: "/api/marketplace/vendors",
-        operation: "FETCH_VENDORS",
-      }
-    );
-    return NextResponse.json(
-      { error: "Failed to fetch vendors" },
-      { status: 500 }
-    );
+    handleApiError(error, {
+      endpoint: "/api/marketplace/vendors",
+      operation: "FETCH_VENDORS",
+    });
+    return NextResponse.json({ error: "Failed to fetch vendors" }, { status: 500 });
   }
 }
-
 
 /**
  * POST /api/marketplace/vendors
  * Create a new vendor
  */
-export async function POST(request: Request): Promise<Response> {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
-    const body = await request.json();
-    const validated = vendorSchema.parse(body);
-
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if slug is unique within store
-    const existing = await prisma.vendor?.findFirst({
+    const body: unknown = await request.json();
+    const validated = vendorSchema.parse(body);
+
+    const existing = await prisma.vendor.findFirst({
       where: { slug: validated.slug },
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "Vendor slug already exists" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "Vendor slug already exists" }, { status: 409 });
     }
 
-    // Check if user is already a vendor in this store
-    const existingUser = await prisma.vendor?.findFirst({
+    const existingUser = await prisma.vendor.findFirst({
       where: { storeId, userId: validated.userId },
     });
 
@@ -128,7 +148,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    const vendor = await prisma.vendor?.create({
+    const vendor = await prisma.vendor.create({
       data: {
         storeId,
         userId: validated.userId,
@@ -141,7 +161,7 @@ export async function POST(request: Request): Promise<Response> {
         paymentSchedule: validated.paymentSchedule,
         documents: validated.documents || {},
         settings: validated.settings || { autoAcceptOrders: false, vacationMode: false },
-        isActive: false, // Requires approval
+        isActive: false,
         isVerified: false,
         onboardingStatus: "pending",
       },
@@ -157,15 +177,12 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
+        { error: "Invalid input", details: error.issues },
         { status: 400 }
       );
     }
-    logger.error("[VENDORS_POST] Failed", { error });
-    return NextResponse.json(
-      { error: "Failed to create vendor" },
-      { status: 500 }
-    );
+    logger.error("[VENDORS_POST] Failed", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to create vendor" }, { status: 500 });
   }
 }
 
@@ -173,26 +190,38 @@ export async function POST(request: Request): Promise<Response> {
  * PATCH /api/marketplace/vendors?id=xxx
  * Update vendor details
  */
-export async function PATCH(request: Request): Promise<Response> {
+export async function PATCH(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Vendor ID required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Vendor ID required" }, { status: 400 });
     }
 
-    const body = await request.json();
+    const owned = await prisma.vendor.findFirst({
+      where: { id, storeId },
+      select: { id: true },
+    });
+    if (!owned) {
+      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+    }
+
+    const body: unknown = await request.json();
     const validated = vendorUpdateSchema.parse(body);
 
-    const vendor = await prisma.vendor?.update({
+    const vendor = await prisma.vendor.update({
       where: { id },
-      data: {
-        ...validated,
-      } as any,
+      data: vendorUpdateToPrisma(validated),
     });
 
     logger.info("[VENDORS_PATCH] Updated", { vendorId: id });
@@ -201,15 +230,12 @@ export async function PATCH(request: Request): Promise<Response> {
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
+        { error: "Invalid input", details: error.issues },
         { status: 400 }
       );
     }
-    logger.error("[VENDORS_PATCH] Failed", { error });
-    return NextResponse.json(
-      { error: "Failed to update vendor" },
-      { status: 500 }
-    );
+    logger.error("[VENDORS_PATCH] Failed", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to update vendor" }, { status: 500 });
   }
 }
 
@@ -217,34 +243,47 @@ export async function PATCH(request: Request): Promise<Response> {
  * PUT /api/marketplace/vendors/status?id=xxx
  * Update vendor status (admin action)
  */
-export async function PUT(request: Request): Promise<Response> {
+export async function PUT(request: NextRequest): Promise<Response> {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Vendor ID required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Vendor ID required" }, { status: 400 });
     }
 
-    const body = await request.json();
+    const owned = await prisma.vendor.findFirst({
+      where: { id, storeId },
+      select: { id: true },
+    });
+    if (!owned) {
+      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
+    }
+
+    const body: unknown = await request.json();
     const validated = statusUpdateSchema.parse(body);
 
-    const updateData: Record<string, unknown> = {};
-    
+    const updateData: Prisma.VendorUpdateInput = {};
+
     if (validated.isActive !== undefined) updateData.isActive = validated.isActive;
     if (validated.isVerified !== undefined) updateData.isVerified = validated.isVerified;
     if (validated.onboardingStatus !== undefined) {
       updateData.onboardingStatus = validated.onboardingStatus;
-      // Auto-activate if approved
       if (validated.onboardingStatus === "approved") {
         updateData.isActive = true;
       }
     }
 
-    const vendor = await prisma.vendor?.update({
+    const vendor = await prisma.vendor.update({
       where: { id },
       data: updateData,
     });
@@ -258,14 +297,11 @@ export async function PUT(request: Request): Promise<Response> {
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input", details: error.errors },
+        { error: "Invalid input", details: error.issues },
         { status: 400 }
       );
     }
-    logger.error("[VENDORS_STATUS] Failed", { error });
-    return NextResponse.json(
-      { error: "Failed to update vendor status" },
-      { status: 500 }
-    );
+    logger.error("[VENDORS_STATUS] Failed", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to update vendor status" }, { status: 500 });
   }
 }

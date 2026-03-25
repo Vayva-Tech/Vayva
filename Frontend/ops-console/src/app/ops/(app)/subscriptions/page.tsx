@@ -1,5 +1,5 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState } from "react";
 import {
@@ -588,9 +588,9 @@ export default function SubscriptionsPage(): React.JSX.Element {
       title="Subscription Management"
       description="Monitor SaaS revenue, merchant subscriptions, and churn metrics"
       headerActions={
-        <button className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" title="Refresh">
+        <Button className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" title="Refresh">
           <RefreshCw size={16} className="text-gray-500" />
-        </button>
+        </Button>
       }
     >
       {/* KPI Cards */}
@@ -635,7 +635,7 @@ export default function SubscriptionsPage(): React.JSX.Element {
         {sectionTabs.map((tab) => {
           const TabIcon = tab.icon;
           return (
-            <button
+            <Button
               key={tab.key}
               onClick={() => setActiveSection(tab.key)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors flex-1 justify-center ${
@@ -646,7 +646,7 @@ export default function SubscriptionsPage(): React.JSX.Element {
             >
               <TabIcon size={16} />
               {tab.label}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -758,3 +758,4 @@ export default function SubscriptionsPage(): React.JSX.Element {
     </OpsPageShell>
   );
 }
+

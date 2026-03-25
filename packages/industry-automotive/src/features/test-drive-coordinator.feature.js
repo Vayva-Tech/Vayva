@@ -22,7 +22,7 @@ export class TestDriveCoordinatorFeature {
     return this.coordinatorService.scheduleTestDrive(testDriveData);
   }
 
-  getAvailableSlots(date) {
+  getAvailableSlots(_date) {
     // Simple implementation - return some sample time slots
     return [
       { time: '09:00', available: true },

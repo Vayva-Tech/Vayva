@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { z } from 'zod';
 import type { 
   MedicalRecord, 
@@ -144,9 +143,11 @@ export interface AccessLog {
 export class MedicalRecordsService {
   private db: any;
 
-  constructor(db: any) {
+  constructor(db?: any) {
     this.db = db;
   }
+
+  async initialize(): Promise<void> {}
 
   /**
    * Create a new medical record

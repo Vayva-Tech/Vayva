@@ -4,7 +4,7 @@
  * Booking system for hiring the creative professional
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const HIRE_ME_ADDON: AddOnDefinition = {
   id: 'vayva.hire-me',

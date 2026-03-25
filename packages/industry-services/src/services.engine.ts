@@ -1,14 +1,13 @@
-// @ts-nocheck
 /**
  * Services Industry Engine
  */
 
 import { IndustryEngine, Feature } from '@vayva/industry-core';
-import type { ServicesConfig } from './types';
+import type { ServicesEngineConfig } from './types';
 import { ServicesBookingManagement } from './services/services-booking-management.service';
 import { ServicesBookingFeature } from './features/services-booking.feature';
 
-export class ServicesEngine extends IndustryEngine<ServicesConfig> {
+export class ServicesEngine extends IndustryEngine<ServicesEngineConfig> {
   private bookingService?: ServicesBookingManagement;
   private bookingFeature?: ServicesBookingFeature;
 

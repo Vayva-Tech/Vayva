@@ -8,10 +8,7 @@ import { logger } from "@vayva/shared";
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await OpsAuthService.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { user } = await OpsAuthService.requireSession();
 
     const { code } = await req.json();
 
@@ -22,7 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isValid = await (OpsAuthService as any).verifyAndEnableMFA(session.user?.id, code);
+    const isValid = await (OpsAuthService as any).verifyAndEnableMFA(user.id, code);
 
     if (!isValid) {
       return NextResponse.json(
@@ -36,6 +33,9 @@ export async function POST(req: NextRequest) {
       message: "MFA enabled successfully",
     });
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     logger.error("[MFA_VERIFY_ERROR]", { error });
     return NextResponse.json(
       { error: "Failed to verify MFA" },

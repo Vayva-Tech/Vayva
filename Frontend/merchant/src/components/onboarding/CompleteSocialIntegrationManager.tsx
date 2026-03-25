@@ -553,14 +553,14 @@ function SetupTokenModal({
             <h3 className="text-2xl font-black text-white">
               Connect {platform.name}
             </h3>
-            <button
+            <Button
               onClick={onClose}
               className="text-white/80 hover:text-white p-1"
             >
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
         
@@ -580,13 +580,13 @@ function SetupTokenModal({
                 disabled={loading}
               />
               {token && (
-                <button
+                <Button
                   onClick={() => onCopy(token)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   disabled={loading}
                 >
                   <Copy className="w-5 h-5" />
-                </button>
+                </Button>
               )}
             </div>
             <p className="text-sm text-gray-500 mt-2">
@@ -598,18 +598,18 @@ function SetupTokenModal({
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm font-medium text-blue-700 mb-2">Need help?</p>
             <div className="flex flex-wrap gap-2">
-              <button
+              <Button
                 onClick={() => window.open(platform.setupUrl, '_blank')}
                 className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded font-medium"
               >
                 Open Setup Guide
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => onCopy(getHelpInstructions())}
                 className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded font-medium"
               >
                 Copy Instructions
-              </button>
+              </Button>
             </div>
           </div>
 

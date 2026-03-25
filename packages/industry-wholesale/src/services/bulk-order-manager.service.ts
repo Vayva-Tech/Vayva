@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Bulk Order Manager Service
  * Handles large quantity orders with special pricing and fulfillment

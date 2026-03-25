@@ -89,6 +89,7 @@ export const GET = withVayvaAPI(
           sku: true,
           status: true,
           price: true,
+          productType: true,
           createdAt: true,
           updatedAt: true,
           productImages: {
@@ -133,6 +134,7 @@ export const GET = withVayvaAPI(
           id: p.id,
           name: p.title,
           sku: p.sku ?? null,
+          productType: p.productType ?? null,
           status: p.status,
           published: p.status === "ACTIVE",
           price: Number(p.price),

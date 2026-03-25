@@ -1,11 +1,25 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
+import type { Ticket } from '@/types/kitchen';
 import { TicketCard } from './TicketCard';
 import { StationFilter } from './StationFilter';
-import { TimerDisplay } from '../shared/TimerDisplay';
 import { useRealTimeKDS } from '@/hooks/useRealTimeKDS';
-import { ChefHat, Clock, AlertTriangle } from 'lucide-react';
+import { ChefHat, AlertTriangle } from 'lucide-react';
+
+function isUrgentTicket(ticket: Ticket): boolean {
+  if (ticket.priority === 'rush') return true;
+  if (
+    ticket.promisedTime &&
+    new Date(ticket.promisedTime) < new Date() &&
+    ticket.status !== 'ready' &&
+    ticket.status !== 'served'
+  ) {
+    return true;
+  }
+  return false;
+}
 
 interface ActiveTicketsByStationProps {
   designCategory?: string;
@@ -29,13 +43,13 @@ export function ActiveTicketsByStation({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Filter tickets by selected station
-  const filteredTickets = selectedStation === 'all'
-    ? tickets
-    : tickets.filter(ticket => ticket.stationId === selectedStation);
+  const filteredTickets =
+    selectedStation === 'all'
+      ? tickets
+      : tickets.filter((ticket) => ticket.station === selectedStation);
 
-  // Group tickets by urgency
-  const urgentTickets = filteredTickets.filter(t => t.priority === 'urgent' || t.status === 'overdue');
-  const normalTickets = filteredTickets.filter(t => t.priority !== 'urgent' && t.status !== 'overdue');
+  const urgentTickets = filteredTickets.filter(isUrgentTicket);
+  const normalTickets = filteredTickets.filter((t) => !isUrgentTicket(t));
 
   if (isLoading) {
     return (
@@ -83,12 +97,12 @@ export function ActiveTicketsByStation({
             onChange={setSelectedStation}
           />
           
-          <button
+          <Button
             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             className="px-3 py-1.5 text-sm border rounded hover:bg-gray-50 transition-colors"
           >
             {viewMode === 'grid' ? 'List View' : 'Grid View'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -141,3 +155,4 @@ export function ActiveTicketsByStation({
     </div>
   );
 }
+

@@ -1,38 +1,87 @@
 "use client";
 
 import React from "react";
-import { PLANS, FEES } from "@/config/pricing";
+import { PLANS, FEES, type PlanKey } from "@/config/pricing";
 
 interface FeatureRow {
   name: string;
-  free: string | boolean;
-  starter: string | boolean;
-  pro: string | boolean;
+  values: Record<PlanKey, string | boolean>;
   tooltip?: string;
-  isComingSoon?: boolean;
 }
 
+const MONTHLY_PRICE_ROW: FeatureRow = {
+  name: "Monthly price (NGN)",
+  values: PLANS.reduce(
+    (acc, plan) => {
+      acc[plan.key] = plan.monthlyAmount.toLocaleString("en-NG");
+      return acc;
+    },
+    {} as Record<PlanKey, string>,
+  ),
+};
+
 const COMPARISON_DATA: FeatureRow[] = [
-  { name: "Monthly Orders", free: "100", starter: "1,000", pro: "Unlimited" },
-  { name: "Products / SKUs", free: "50", starter: "500", pro: "Unlimited" },
-  { name: "Team members", free: "1 seat", starter: "1 seat", pro: "5 seats" },
+  MONTHLY_PRICE_ROW,
+  {
+    name: "Staff seats",
+    values: {
+      starter: "1",
+      pro: "3",
+      pro_plus: "5",
+    },
+  },
+  {
+    name: "Products / SKUs",
+    values: {
+      starter: "Up to 100",
+      pro: "Up to 300",
+      pro_plus: "Up to 500",
+    },
+  },
   {
     name: "WhatsApp order capture",
-    free: true,
-    starter: true,
-    pro: true,
+    values: { starter: true, pro: true, pro_plus: true },
     tooltip: "Automated extraction of orders from WhatsApp chats.",
   },
-  { name: "Blueprint templates", free: "Basic", starter: "All", pro: "All" },
-  { name: "Inventory tracking", free: false, starter: true, pro: true },
-  { name: "Custom domain", free: false, starter: true, pro: true },
-  { name: "Audit Logs", free: false, starter: false, pro: true },
-  { name: "Priority Support", free: false, starter: false, pro: true },
   {
-    name: "Withdrawal Transaction Fee",
-    free: `${FEES.WITHDRAWAL_PERCENTAGE}%`,
-    starter: `${FEES.WITHDRAWAL_PERCENTAGE}%`,
-    pro: `${FEES.WITHDRAWAL_PERCENTAGE}%`,
+    name: "Industry dashboards",
+    values: {
+      starter: false,
+      pro: true,
+      pro_plus: true,
+    },
+  },
+  {
+    name: "Merged industry view",
+    values: {
+      starter: false,
+      pro: false,
+      pro_plus: true,
+    },
+  },
+  {
+    name: "Visual workflow builder",
+    values: {
+      starter: false,
+      pro: false,
+      pro_plus: true,
+    },
+  },
+  {
+    name: "API access",
+    values: {
+      starter: false,
+      pro: true,
+      pro_plus: true,
+    },
+  },
+  {
+    name: "Withdrawal transaction fee",
+    values: {
+      starter: `${FEES.WITHDRAWAL_PERCENTAGE}%`,
+      pro: `${FEES.WITHDRAWAL_PERCENTAGE}%`,
+      pro_plus: `${FEES.WITHDRAWAL_PERCENTAGE}%`,
+    },
     tooltip: "Charged on every payout to your bank account.",
   },
 ];
@@ -46,7 +95,7 @@ export const PlanComparisonTable = (): React.JSX.Element => {
             <th className="p-8 text-sm font-black text-muted-foreground uppercase tracking-widest w-1/4">
               Features
             </th>
-            {PLANS.map((plan: { key: string; name: string; featured?: boolean }) => (
+            {PLANS.map((plan) => (
               <th
                 key={plan.key}
                 className={`p-8 text-xl font-black text-foreground text-center ${plan.featured ? "bg-primary/5" : ""}`}
@@ -85,11 +134,14 @@ export const PlanComparisonTable = (): React.JSX.Element => {
                   )}
                 </div>
               </td>
-              <td className="p-6 text-center">{renderValue(row.free)}</td>
-              <td className="p-6 text-center bg-primary/5">
-                {renderValue(row.starter)}
-              </td>
-              <td className="p-6 text-center">{renderValue(row.pro)}</td>
+              {PLANS.map((plan) => (
+                <td
+                  key={plan.key}
+                  className={`p-6 text-center ${plan.featured ? "bg-primary/5" : ""}`}
+                >
+                  {renderValue(row.values[plan.key])}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -101,7 +153,7 @@ export const PlanComparisonTable = (): React.JSX.Element => {
 function renderValue(val: string | boolean) {
   if (typeof val === "boolean") {
     return val ? (
-      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
+      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary mx-auto">
         <svg
           className="w-5 h-5"
           fill="none"

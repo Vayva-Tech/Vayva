@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 // ============================================================================
 // Base Widget
 // ============================================================================
@@ -46,7 +46,7 @@ export function BaseWidget({
           )}
           {header}
           {onRefresh && (
-            <button
+            <Button
               type="button"
               className="vayva-widget-refresh"
               onClick={onRefresh}
@@ -54,7 +54,7 @@ export function BaseWidget({
               aria-label="Refresh widget"
             >
               {isLoading ? "Loading..." : "Refresh"}
-            </button>
+            </Button>
           )}
         </div>
       )}

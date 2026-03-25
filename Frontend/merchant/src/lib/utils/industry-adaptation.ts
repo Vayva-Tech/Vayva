@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Industry Adaptation Utilities
 // ============================================================================
@@ -9,6 +8,8 @@ import type { IndustrySlug } from '@vayva/industry-core';
 
 export interface IndustryConfig {
   displayName: string;
+  /** Lowercase catalog entity for URLs (e.g. product → products) */
+  primaryObject?: string;
   primaryMetric: string;
   secondaryMetric: string;
   tertiaryMetric: string;
@@ -34,11 +35,12 @@ export interface IndustryConfig {
   rightPanelSections: string[];
 }
 
-// Industry configuration mapping
-export const INDUSTRY_ADAPTATIONS: Record<IndustrySlug, IndustryConfig> = {
+// Industry configuration mapping (includes string keys beyond IndustrySlug, e.g. legal, saas, default)
+export const INDUSTRY_ADAPTATIONS: Record<string, IndustryConfig> = {
   // Retail/E-commerce
   retail: {
     displayName: "Store",
+    primaryObject: "product",
     primaryMetric: "REVENUE",
     secondaryMetric: "ORDERS",
     tertiaryMetric: "CUSTOMERS",

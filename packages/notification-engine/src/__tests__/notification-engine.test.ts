@@ -52,9 +52,9 @@ describe('NotificationDispatcher', () => {
     mockEmailSend = jest.fn().mockResolvedValue(true);
     mockSMSSend = jest.fn().mockResolvedValue(true);
     
-    // @ts-ignore - accessing private property for testing
+    // @ts-expect-error — test-only access to private `channels` map
     dispatcher['channels'].set('email', { send: mockEmailSend } as any);
-    // @ts-ignore - accessing private property for testing
+    // @ts-expect-error — test-only access to private `channels` map
     dispatcher['channels'].set('sms', { send: mockSMSSend } as any);
   });
 
@@ -122,8 +122,8 @@ describe('NotificationDispatcher', () => {
       // Mock current time during quiet hours
       const originalDate = global.Date;
       const mockDate = new Date('2023-01-01T23:00:00'); // 11 PM - during quiet hours
-      // @ts-ignore
-      global.Date = jest.fn(() => mockDate);
+      // @ts-expect-error — replace Date constructor for quiet-hours test
+      global.Date = jest.fn(() => mockDate) as unknown as DateConstructor;
       global.Date.now = originalDate.now;
 
       const result = await dispatcher.send(baseMessage);
@@ -132,7 +132,6 @@ describe('NotificationDispatcher', () => {
       // Should be queued, not sent immediately
       expect(mockEmailSend).not.toHaveBeenCalled();
 
-      // @ts-ignore
       global.Date = originalDate;
     });
 

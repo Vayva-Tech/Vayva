@@ -1,8 +1,7 @@
-// @ts-nocheck
-import { 
-  TravelProperty, 
-  TravelBooking,
-  DateRange
+import {
+  TravelProperty as _TravelProperty,
+  TravelBooking as _TravelBooking,
+  DateRange as _DateRange
 } from '../types';
 
 export interface ExternalAPIConfig {
@@ -308,11 +307,11 @@ export class ExternalAPIService {
   async getNearbyPOIs(
     latitude: number, 
     longitude: number, 
-    radius: number = 1000,
-    types: string[] = ['restaurant', 'tourist_attraction']
+    _radius: number = 1000,
+    _types: string[] = ['restaurant', 'tourist_attraction']
   ): Promise<any[]> {
     // This would integrate with Google Places API or similar
-    console.log(`Searching for POIs near ${latitude}, ${longitude}`);
+    console.warn(`Searching for POIs near ${latitude}, ${longitude}`);
     
     // Mock implementation
     return [
@@ -338,16 +337,16 @@ export class ExternalAPIService {
    */
   async sendSMS(phone: string, message: string): Promise<boolean> {
     // This would integrate with Twilio, AWS SNS, or similar
-    console.log(`Sending SMS to ${phone}: ${message}`);
+    console.warn(`Sending SMS to ${phone}: ${message}`);
     return true; // Mock success
   }
 
   /**
    * Send email using external provider
    */
-  async sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  async sendEmail(to: string, subject: string, _html: string): Promise<boolean> {
     // This would integrate with SendGrid, AWS SES, or similar
-    console.log(`Sending email to ${to} with subject: ${subject}`);
+    console.warn(`Sending email to ${to} with subject: ${subject}`);
     return true; // Mock success
   }
 
@@ -356,7 +355,7 @@ export class ExternalAPIService {
    */
   async uploadFile(file: Buffer, filename: string, folder?: string): Promise<string> {
     // This would integrate with AWS S3, Cloudinary, or similar
-    console.log(`Uploading file: ${filename}`);
+    console.warn(`Uploading file: ${filename}`);
     return `https://cdn.example.com/${folder || 'uploads'}/${filename}`;
   }
 
@@ -391,7 +390,7 @@ export class ExternalAPIService {
       'Content-Type': 'application/json'
     };
 
-    const options: RequestInit = { method, headers };
+    const options: NonNullable<Parameters<typeof fetch>[1]> = { method, headers };
     
     if (method === 'POST') {
       options.body = JSON.stringify(params);

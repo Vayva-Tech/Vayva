@@ -3,7 +3,7 @@ import { prisma } from "@vayva/db";
 import { QUEUES, logger } from "@vayva/shared";
 import { getRedis } from "@vayva/redis";
 import { kwikProvider } from "../lib/providers";
-import { sendTrackingNotification } from "../lib/tracking-notifications";
+import { sendTrackingNotification as _sendTrackingNotification } from "../lib/tracking-notifications";
 import type { RedisConnection, DeliveryJobData } from "../types";
 
 export function registerDeliveryWorker(connection: RedisConnection): void {

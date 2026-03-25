@@ -10,7 +10,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button, EmptyState } from "@vayva/ui";
@@ -19,7 +19,7 @@ import {
   Tag,
   Percent,
   CurrencyDollar as DollarSign,
-  PencilSimple as Edit2,
+  PencilSimple as Edit2
 } from "@phosphor-icons/react/ssr";
 import { toast } from "sonner";
 import Link from "next/link";

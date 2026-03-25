@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { z } from "zod";
@@ -14,29 +14,30 @@ const programSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  let storeId: string | undefined;
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = await request.json();
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
+    const body: unknown = await request.json();
 
     const validated = programSchema.safeParse(body);
     if (!validated.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: validated.error?.format() },
+        { error: "Invalid input", details: validated.error.format() },
         { status: 400 }
       );
     }
 
-    // Create/update program via API
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/referrals/program`, {
+    }>(buildBackendUrl("/api/merchant/referrals/program"), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(validated.data),
     });
 
@@ -45,8 +46,12 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, program: result.data });
-  } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/referrals/program", operation: "POST" });
+  } catch (error: unknown) {
+    handleApiError(error, {
+      endpoint: "/api/merchant/referrals/program",
+      operation: "POST",
+      storeId,
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -9,8 +10,12 @@ interface PlanLimit {
 }
 
 export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     // Call backend API to fetch product limits
     const result = await apiJson<{
       plan: string;
@@ -21,9 +26,7 @@ export async function GET(request: NextRequest) {
     }>(
       `${process.env.BACKEND_API_URL}/api/products/limits`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
+        headers: auth.headers,
       }
     );
 
@@ -38,7 +41,6 @@ export async function GET(request: NextRequest) {
       {
         endpoint: "/api/products/limits",
         operation: "GET_PRODUCT_LIMITS",
-        storeId,
       }
     );
     throw error;

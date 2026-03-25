@@ -74,7 +74,7 @@ export const GET = withVayvaAPI(
         ];
       }
 
-      const [programs, total] = await Promise.all([
+      const [programs, _total] = await Promise.all([
         prisma.wellnessProgram.findMany({
           where,
           include: {

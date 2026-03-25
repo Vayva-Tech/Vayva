@@ -4,7 +4,7 @@
  * Community discussion forum for courses
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const FORUM_ADDON: AddOnDefinition = {
   id: 'vayva.forum',

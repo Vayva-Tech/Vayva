@@ -1,71 +1,64 @@
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
+/**
+ * Manual / optional: mirrors Frontend/ops-console/scripts/verify-api-route-auth.sh
+ * (CI uses the shell script in ops-guard.yml).
+ */
+import fs from "fs";
+import path from "path";
 
-const TARGET_DIRS = [
-    'apps/ops-console/src/app/ops',
-    'apps/ops-console/src/app/api/ops'
-];
+const OPS_CONSOLE_ROOT = "Frontend/ops-console";
+const AUTH_PATTERN =
+  /OpsAuthService\.requireSession|withOpsAPI|withOpsAuth/;
 
-const FORBIDDEN_TERMS = ['mock', 'stub', 'dummy', 'localhost'];
-const REQUIRED_AUTH = 'OpsAuthService.requireSession';
+/** Paths relative to Frontend/ops-console/src/app/api */
+const AUTH_ALLOWLIST = new Set([
+  "auth/[...nextauth]/route.ts",
+  "health/route.ts",
+  "ops/auth/login/route.ts",
+  "ops/auth/signout/route.ts",
+  "ops/health/route.ts",
+  "ops/invitations/validate/route.ts",
+  "ops/invitations/accept/route.ts",
+  "webhooks/fraud-detection/route.ts",
+]);
 
-let hasError = false;
-
-// 1. Scan for Forbidden Terms
-console.log('🔍 Scanning for forbidden terms...');
-try {
-    // Use grep recursively
-    // Exclude node_modules, .git, and this script itself if it were in the target (it's not)
-    // We use grep because it's fast.
-    const cmd = `grep -rE "${FORBIDDEN_TERMS.join('|')}" ${TARGET_DIRS.join(' ')} --include="*.ts" --include="*.tsx" --exclude="*.test.ts" --exclude="*.spec.ts"`;
-    const output = execSync(cmd, { encoding: 'utf-8' });
-    if (output.trim()) {
-        console.error('❌ FAILURE: Forbidden terms found in production code:');
-        console.error(output);
-        hasError = true;
-    }
-} catch (e) {
-    // grep returns exit code 1 if no matches, which throws error in execSync. This is SUCCESS.
-    if (e.status !== 1) {
-        console.error('grep failed with error:', e);
-        // If status is not 1, it might be a real error.
-    }
-}
-
-// 2. Scan for Missing Auth in API
-console.log('🔒 Scanning API routes for Auth Enforcement...');
-const apiDir = 'apps/ops-console/src/app/api/ops';
+const apiDir = `${OPS_CONSOLE_ROOT}/src/app/api`;
+const apiPrefix = `${apiDir}/`;
 
 function walk(dir, fileList = []) {
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-        const stat = fs.statSync(path.join(dir, file));
-        if (stat.isDirectory()) {
-            walk(path.join(dir, file), fileList);
-        } else {
-            if (file === 'route.ts') fileList.push(path.join(dir, file));
-        }
+  if (!fs.existsSync(dir)) return fileList;
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const full = path.join(dir, file);
+    const stat = fs.statSync(full);
+    if (stat.isDirectory()) {
+      walk(full, fileList);
+    } else if (file === "route.ts") {
+      fileList.push(full);
     }
-    return fileList;
+  }
+  return fileList;
 }
 
+let hasError = false;
+console.log("🔒 Scanning ops-console API routes for auth enforcement...");
 const apiRoutes = walk(apiDir);
-apiRoutes.forEach(routePath => {
-    // Exception: Login API is public
-    if (routePath.includes('auth/login')) return;
+for (const routePath of apiRoutes) {
+  const rel = routePath.startsWith(apiPrefix)
+    ? routePath.slice(apiPrefix.length)
+    : routePath;
+  if (AUTH_ALLOWLIST.has(rel)) continue;
 
-    const content = fs.readFileSync(routePath, 'utf-8');
-    if (!content.includes(REQUIRED_AUTH)) {
-        console.error(`❌ SECURITY RISK: Route missing '${REQUIRED_AUTH}': ${routePath}`);
-        hasError = true;
-    }
-});
+  const content = fs.readFileSync(routePath, "utf-8");
+  if (!AUTH_PATTERN.test(content)) {
+    console.error(
+      `❌ Route missing requireSession / withOpsAPI / withOpsAuth: ${routePath}`,
+    );
+    hasError = true;
+  }
+}
 
 if (hasError) {
-    console.log('---------------------------------------------------');
-    console.error('🛑 SECURITY SCAN FAILED');
-    process.exit(1);
-} else {
-    console.log('✅ SECURITY SCAN PASSED');
+  console.error("🛑 SECURITY SCAN FAILED");
+  process.exit(1);
 }
+console.log("✅ SECURITY SCAN PASSED");

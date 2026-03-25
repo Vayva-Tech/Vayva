@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Retail Industry Engine
  * Main orchestrator for all retail-specific features
@@ -16,9 +15,9 @@ import { ChannelSyncFeature } from './features/channel-sync.feature';
 import { CustomerSegmentationFeature } from './features/customer-segmentation.feature';
 
 // Import AI services
-import { DemandForecastingService, type DemandForecastingInput } from './services/demand-forecasting-ai.service';
-import { ProductRecommendationService, type ProductRecommendationInput } from './services/product-recommendation.service';
-import { DynamicPricingService, type DynamicPricingInput } from './services/dynamic-pricing.service';
+import { DemandForecastingService } from './services/demand-forecasting-ai.service';
+import { ProductRecommendationService } from './services/product-recommendation.service';
+import { DynamicPricingService } from './services/dynamic-pricing.service';
 
 export interface RetailEngineConfig {
   inventory?: boolean;

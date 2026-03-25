@@ -1,15 +1,14 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Loader2, 
-  CheckCircle, 
-  AlertCircle, 
-  CreditCard, 
-  Calendar,
+import {
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  CreditCard,
+  Calendar as _Calendar,
   Shield,
   ChevronRight
 } from "lucide-react";
@@ -44,8 +43,8 @@ const PROVIDERS = [
 export function BNPLWidget({
   orderId,
   totalAmount,
-  customerEmail,
-  customerPhone,
+  customerEmail: _customerEmail,
+  customerPhone: _customerPhone,
   onApply,
   onCancel,
   className,
@@ -53,7 +52,7 @@ export function BNPLWidget({
   const [quotes, setQuotes] = useState<BNPLQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   // Fetch BNPL quotes on mount
   useEffect(() => {
@@ -161,7 +160,7 @@ export function BNPLWidget({
               const isSelected = selectedProvider === quote.provider;
               
               return (
-                <button
+                <Button
                   key={quote.provider}
                   onClick={() => setSelectedProvider(quote.provider)}
                   className={cn(
@@ -182,7 +181,7 @@ export function BNPLWidget({
                   {isSelected && (
                     <CheckCircle className="h-5 w-5 text-emerald-600" />
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -271,3 +270,4 @@ export function BNPLWidget({
 }
 
 export default BNPLWidget;
+

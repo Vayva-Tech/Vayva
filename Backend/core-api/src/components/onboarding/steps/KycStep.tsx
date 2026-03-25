@@ -10,7 +10,7 @@ import {
   Spinner as Loader2,
   UserCheck,
   ShieldCheck,
-  Info,
+  Info
 } from "@phosphor-icons/react/ssr";
 import { toast } from "sonner";
 

@@ -83,7 +83,7 @@ Support Guidelines:
               "X-Title": "Vayva Support Bot",
             },
             body: JSON.stringify({
-              model: "openai/gpt-4o-mini",
+              model: "google/gemini-2.0-flash-lite-001",
               messages: [
                 { role: "system", content: systemPrompt },
                 ...history,
@@ -97,7 +97,7 @@ Support Guidelines:
             const data = await response.json();
             reply = data.choices[0].message.content || reply;
           }
-        } catch (error) {
+        } catch {
           logger.warn("[SupportBot] AI generation failed, using fallback");
         }
       }
@@ -113,8 +113,7 @@ Support Guidelines:
           aiSummary: `Auto-escalation triggered. Reason: ${decision.reason}. User Query: "${query}"`,
         });
         // Telemetry: Log Escalation
-        const prismaCtx = global.prisma ?? (await import("@vayva/db")).prisma;
-        await prismaCtx.supportTelemetryEvent.create({
+        await prismaClient.supportTelemetryEvent.create({
           data: {
             storeId,
             conversationId: "support_bot_" + Date.now(),

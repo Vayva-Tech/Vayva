@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
@@ -14,17 +13,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { 
-  BarChart3, 
-  Download, 
-  FileSpreadsheet, 
-  PieChart, 
-  TrendingUp,
+import {
+  BarChart3,
   Calendar,
+  Download,
+  Edit3,
+  FileSpreadsheet,
   Filter,
+  PieChart,
   Plus,
-  Trash2
-} from 'lucide-react';
+  Trash2,
+  TrendingUp,
+  Eye,
+} from "lucide-react";
 import { toast } from 'sonner';
 
 interface ReportConfig {
@@ -445,6 +446,3 @@ export default function AdvancedReporting() {
     </div>
   );
 }
-
-// Add missing import
-import { Edit3 } from 'lucide-react';

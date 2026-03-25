@@ -38,8 +38,8 @@ Detailed tier comparison page:
 |---|---------|-----|----------|
 | **Monthly** | N25,000 | N35,000 | N50,000 |
 | **AI messages** | 500 | 2,000 | 10,000 |
-| **Products** | 100 | 1,000 | Unlimited |
-| **Team members** | 2 | 5 | Unlimited |
+| **Products** | 100 | 300 | 500 |
+| **Team members** | 1 | 3 | 5 |
 
 Additional content:
 - **Feature matrix** -- Exhaustive feature-by-tier comparison table
@@ -143,7 +143,7 @@ Most marketing copy is managed as static content within the Next.js application:
 
 ### Dynamic Content
 
-- **Blog posts** -- Managed through a headless CMS or markdown files in the repository
+- **Blog posts** -- Not shipped on the marketing app today; future long-form content may use a CMS or markdown in-repo
 - **Testimonials** -- Stored in the database and fetched at build time via ISR (Incremental Static Regeneration)
 - **Pricing data** -- Tier pricing and feature lists are defined in a shared configuration to ensure consistency with the billing system
 

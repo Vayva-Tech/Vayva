@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Portfolio Management Service
  * Handles portfolio creation, gallery management, and showcase features
  */
 
-import { PrismaClient } from '@vayva/prisma';
+import { PrismaClient } from '@vayva/db';
 
 export interface PortfolioItem {
   id: string;

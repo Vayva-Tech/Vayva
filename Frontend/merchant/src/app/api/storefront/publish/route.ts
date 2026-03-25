@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 /**
  * POST /api/storefront/publish
@@ -8,6 +9,10 @@ import { handleApiError } from "@/lib/api-error-handler";
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const validated = await request.json().catch(() => ({}));
 
     // Call backend API using apiJson to publish storefront
@@ -15,10 +20,11 @@ export async function POST(request: NextRequest) {
       success: boolean;
       data?: { deployment?: any; message?: string };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/storefront/publish`, {
+    }>(buildBackendUrl("/api/storefront/publish"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...auth.headers,
       },
       body: JSON.stringify(validated),
     });
@@ -27,7 +33,7 @@ export async function POST(request: NextRequest) {
       throw new Error(result.error || 'Failed to publish storefront');
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(
       error,

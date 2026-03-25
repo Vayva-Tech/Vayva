@@ -1,12 +1,18 @@
-// @ts-nocheck
 /**
  * AI-Powered Predictive Analytics Service
  * 
  * Machine learning-powered forecasting and trend prediction
  */
 
-import { AIAgent } from '@vayva/ai-agent';
-import { prisma } from '@vayva/prisma';
+import { analyticsPrisma } from './analytics-prisma';
+
+/** Minimal LLM facade; wire to @vayva/ai-agent when a stable `generate` API exists. */
+class PredictiveLLMClient {
+  constructor(_opts: { model?: string; temperature?: number }) {}
+  async generate(_prompt: string): Promise<string> {
+    return "";
+  }
+}
 import { z } from 'zod';
 
 const forecastRequestSchema = z.object({
@@ -17,12 +23,12 @@ const forecastRequestSchema = z.object({
   confidenceLevel: z.number().min(0.5).max(0.99).optional(),
 });
 
-interface TimeSeriesDataPoint {
+export interface TimeSeriesDataPoint {
   timestamp: string;
   value: number;
 }
 
-interface ForecastResult {
+export interface ForecastResult {
   metric: string;
   businessId: string;
   generatedAt: string;
@@ -61,10 +67,10 @@ interface ForecastResult {
 }
 
 export class AIPredictiveAnalyticsService {
-  private aiAgent?: AIAgent;
+  private aiAgent?: PredictiveLLMClient;
 
   async initialize() {
-    this.aiAgent = new AIAgent({
+    this.aiAgent = new PredictiveLLMClient({
       model: 'analytics-predictive',
       temperature: 0.3, // Low temperature for analytical accuracy
     });
@@ -158,7 +164,7 @@ export class AIPredictiveAnalyticsService {
     metric: string,
     days: number
   ): Promise<TimeSeriesDataPoint[]> {
-    const snapshots = await prisma.analyticsSnapshot.findMany({
+    const snapshots = await analyticsPrisma.analyticsSnapshot.findMany({
       where: {
         businessId,
         metricType: metric,
@@ -171,7 +177,7 @@ export class AIPredictiveAnalyticsService {
       },
     });
 
-    return snapshots.map((s) => ({
+    return snapshots.map((s: { timestamp: Date; value: unknown }) => ({
       timestamp: s.timestamp.toISOString(),
       value: s.value as number,
     }));
@@ -391,9 +397,10 @@ export class AIPredictiveAnalyticsService {
     }
 
     // Anomaly insights
-    if (anomalies.length > 0) {
+    const anomalyList = anomalies ?? [];
+    if (anomalyList.length > 0) {
       insights.push(
-        `${anomalies.length} anomalous data point${anomalies.length > 1 ? 's' : ''} detected in historical data`
+        `${anomalyList.length} anomalous data point${anomalyList.length > 1 ? 's' : ''} detected in historical data`
       );
     }
 
@@ -463,7 +470,7 @@ export class AIPredictiveAnalyticsService {
     // Get forecasts made daysAgo days ago
     const forecastDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
 
-    const forecasts = await prisma.analyticsForecast.findMany({
+    const forecasts = await analyticsPrisma.analyticsForecast.findMany({
       where: {
         businessId,
         metricType: metric,
@@ -475,7 +482,7 @@ export class AIPredictiveAnalyticsService {
     });
 
     // Get actuals for the forecasted period
-    const actuals = await prisma.analyticsSnapshot.findMany({
+    const actuals = await analyticsPrisma.analyticsSnapshot.findMany({
       where: {
         businessId,
         metricType: metric,
@@ -489,9 +496,13 @@ export class AIPredictiveAnalyticsService {
     const errors: number[] = [];
     const percentageErrors: number[] = [];
 
-    forecasts.forEach((forecast) => {
+    forecasts.forEach(
+      (forecast: {
+        forecastDate: Date;
+        predictedValue: unknown;
+      }) => {
       const actual = actuals.find(
-        (a) =>
+        (a: { timestamp: Date; value: unknown }) =>
           Math.abs(
             new Date(a.timestamp).getTime() -
               new Date(forecast.forecastDate).getTime()
@@ -505,7 +516,8 @@ export class AIPredictiveAnalyticsService {
           percentageErrors.push(error / Math.abs(actual.value as number));
         }
       }
-    });
+    }
+    );
 
     const mae = errors.reduce((sum, e) => sum + e, 0) / errors.length;
     const rmse = Math.sqrt(

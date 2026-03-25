@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * Food Industry Components
  * UI components for recipe costing, menu engineering, and kitchen operations
@@ -274,12 +274,12 @@ export const InventoryTracker: FC<InventoryTrackerProps> = ({
                 </td>
                 <td>
                   {needsReorder && (
-                    <button 
+                    <Button 
                       onClick={() => onReorder?.(item.id)}
                       className="reorder-btn"
                     >
                       Reorder
-                    </button>
+                    </Button>
                   )}
                 </td>
               </tr>
@@ -400,3 +400,4 @@ export const FOOD_COMPONENTS = {
   NutritionalInfoDisplay,
   MenuBuilder,
 };
+

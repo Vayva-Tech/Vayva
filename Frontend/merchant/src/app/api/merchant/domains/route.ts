@@ -1,19 +1,17 @@
-// @ts-nocheck
 /**
  * Custom Domains API
  *
  * Manage custom domains for merchant stores
- * - Add custom domain
- * - Verify DNS records
- * - Configure SSL
- * - Set primary domain
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
+import { logger, ErrorCategory } from "@/lib/logger";
 
-// Validation schema
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
+
 const addDomainSchema = z.object({
   domain: z
     .string()
@@ -23,39 +21,73 @@ const addDomainSchema = z.object({
     ),
 });
 
+type CustomDomainApi = {
+  id: string;
+  storeId: string;
+  domain: string;
+  status?: string;
+  verificationType?: string;
+  expectedValue?: string;
+  createdAt?: string | Date;
+};
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null;
+}
+
+function parseCustomDomain(v: unknown): CustomDomainApi | null {
+  if (!isRecord(v)) return null;
+  const id = v.id;
+  const storeId = v.storeId;
+  const domain = v.domain;
+  if (typeof id !== "string" || typeof storeId !== "string" || typeof domain !== "string") {
+    return null;
+  }
+  return {
+    id,
+    storeId,
+    domain,
+    status: typeof v.status === "string" ? v.status : undefined,
+    verificationType:
+      typeof v.verificationType === "string" ? v.verificationType : undefined,
+    expectedValue: typeof v.expectedValue === "string" ? v.expectedValue : undefined,
+    createdAt: v.createdAt as string | Date | undefined,
+  };
+}
+
 /**
  * GET /api/merchant/domains
- * List all domains for the current store
  */
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    if (!storeId) {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch domains from backend
-    const customDomains = await apiJson<Array<any>>(
-      `${process.env.BACKEND_API_URL}/api/customdomain`,
-      {
-        headers: { "x-store-id": storeId },
+    const customDomainsRaw = await apiJson<unknown>(`${backendBase()}/api/customdomain`, {
+      headers: auth.headers,
+    });
+
+    const storePayload = await apiJson<unknown>(`${backendBase()}/api/store`, {
+      headers: auth.headers,
+    });
+
+    let primaryDomain: string | undefined;
+    if (isRecord(storePayload)) {
+      const settings = storePayload.settings;
+      if (isRecord(settings) && typeof settings.primaryDomain === "string") {
+        primaryDomain = settings.primaryDomain;
       }
-    );
+    }
 
-    // Get primary domain info from store settings
-    const store = await apiJson<any>(
-      `${process.env.BACKEND_API_URL}/api/store`,
-      {
-        headers: { "x-store-id": storeId },
-      }
-    );
+    const listRaw = Array.isArray(customDomainsRaw) ? customDomainsRaw : [];
+    const list = listRaw.map(parseCustomDomain).filter((d): d is CustomDomainApi => d !== null);
 
-    const storeSettings = store?.settings as { primaryDomain?: string } | null;
-    const primaryDomain = storeSettings?.primaryDomain;
-
-    const list = Array.isArray(customDomains) ? customDomains : [];
-
-    const domains = list.map((domain: any) => ({
+    const domains = list.map((domain) => ({
       id: domain.id,
       domain: domain.domain,
       status: domain.status === "active" ? "active" : "pending",
@@ -72,47 +104,44 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ domains });
   } catch (error) {
-    console.error("Failed to fetch domains:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch domains" },
-      { status: 500 }
-    );
+    logger.error("Failed to fetch domains:", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to fetch domains" }, { status: 500 });
   }
 }
 
 /**
  * POST /api/merchant/domains
- * Add a new custom domain
  */
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    if (!storeId) {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body: unknown = await request.json();
     const result = addDomainSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid domain format", details: result.error.flatten() },
+        { error: "Invalid domain format", details: result.error.issues },
         { status: 400 }
       );
     }
 
-    // Create domain via backend API
-    const customDomain = await apiJson<any>(
-      `${process.env.BACKEND_API_URL}/api/customdomain`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-store-id": storeId,
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const customDomainRaw = await apiJson<unknown>(`${backendBase()}/api/customdomain`, {
+      method: "POST",
+      headers: { ...auth.headers },
+      body: JSON.stringify(body),
+    });
+
+    const customDomain = parseCustomDomain(customDomainRaw);
+    if (!customDomain) {
+      return NextResponse.json({ error: "Invalid response from server" }, { status: 502 });
+    }
 
     const newDomain = {
       id: customDomain.id,
@@ -132,22 +161,21 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ domain: newDomain }, { status: 201 });
   } catch (error) {
-    console.error("Failed to add domain:", error);
-    return NextResponse.json(
-      { error: "Failed to add domain" },
-      { status: 500 }
-    );
+    logger.error("Failed to add domain:", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to add domain" }, { status: 500 });
   }
 }
 
 /**
  * DELETE /api/merchant/domains
- * Remove a custom domain
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    if (!storeId) {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -155,27 +183,20 @@ export async function DELETE(request: NextRequest) {
     const domainId = searchParams.get("id");
 
     if (!domainId) {
-      return NextResponse.json(
-        { error: "Domain ID parameter required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Domain ID parameter required" }, { status: 400 });
     }
 
-    // Delete via backend API
     const deleteResult = await apiJson<{ success: boolean; error?: string }>(
-      `${process.env.BACKEND_API_URL}/api/customdomain/${domainId}`,
+      `${backendBase()}/api/customdomain/${encodeURIComponent(domainId)}`,
       {
         method: "DELETE",
-        headers: { "x-store-id": storeId },
+        headers: auth.headers,
       }
     );
 
     return NextResponse.json(deleteResult);
   } catch (error) {
-    console.error("Failed to remove domain:", error);
-    return NextResponse.json(
-      { error: "Failed to remove domain" },
-      { status: 500 }
-    );
+    logger.error("Failed to remove domain:", ErrorCategory.API, error);
+    return NextResponse.json({ error: "Failed to remove domain" }, { status: 500 });
   }
 }

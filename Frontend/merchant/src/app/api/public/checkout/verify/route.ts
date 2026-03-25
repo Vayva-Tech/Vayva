@@ -1,11 +1,12 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PaystackService } from "@/lib/payment/paystack";
-import { getPlanPrice, type PlanKey } from "@/lib/billing/plans";
-import { ResendEmailService } from "@/lib/email/resend";
-
+import {
+  getPlanPrice,
+  type PlanKey,
+  type BillingCycle,
+} from "@/lib/billing/plans";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,33 @@ function getString(value: unknown): string | undefined {
 }
 
 function isPlanKey(value: string): value is PlanKey {
-  return value === "FREE" || value === "STARTER" || value === "PRO";
+  return value === "FREE" || value === "STARTER" || value === "PRO" || value === "PRO_PLUS";
+}
+
+function parseBillingCycle(metadata: Record<string, unknown>): BillingCycle {
+  const raw =
+    (typeof metadata.billingCycle === "string" && metadata.billingCycle) ||
+    (typeof metadata.billing_cycle === "string" && metadata.billing_cycle) ||
+    "";
+  if (raw.trim().toLowerCase() === "quarterly") return "quarterly";
+
+  const cf = metadata.custom_fields;
+  if (Array.isArray(cf)) {
+    for (const item of cf) {
+      if (
+        typeof item === "object" &&
+        item !== null &&
+        "variable_name" in item &&
+        "value" in item &&
+        (item as { variable_name?: string }).variable_name === "billingCycle" &&
+        typeof (item as { value?: string }).value === "string" &&
+        (item as { value: string }).value.trim().toLowerCase() === "quarterly"
+      ) {
+        return "quarterly";
+      }
+    }
+  }
+  return "monthly";
 }
 
 function slugify(input: string): string {
@@ -62,8 +89,9 @@ export async function POST(req: NextRequest) {
       const txData = existingTx.data;
       const meta = isRecord(txData.metadata) ? txData.metadata : {};
       const email = typeof meta.email === "string" ? meta.email : "";
-      const planKey = typeof meta.planKey === "string" ? meta.planKey : "";
-      const plan = isPlanKey(planKey) ? planKey.toLowerCase() : "starter";
+      const planKeyNorm =
+        (typeof meta.planKey === "string" ? meta.planKey : "").trim().toUpperCase();
+      const plan = isPlanKey(planKeyNorm) ? planKeyNorm.toLowerCase() : "starter";
       return NextResponse.json(
         {
           success: true,
@@ -86,6 +114,7 @@ export async function POST(req: NextRequest) {
     }
 
     const metadata = isRecord(verifiedData.metadata) ? verifiedData.metadata : {};
+    const billingCycle = parseBillingCycle(metadata);
     const planKeyRaw = typeof metadata.planKey === "string" ? metadata.planKey : "";
     const emailRaw = typeof metadata.email === "string" ? metadata.email : "";
     const phoneRaw = typeof metadata.phone === "string" ? metadata.phone : "";
@@ -102,7 +131,7 @@ export async function POST(req: NextRequest) {
     }
 
     const amountKobo = Number(verifiedData.amount || 0);
-    const expectedAmountNgn = getPlanPrice(planKey, "monthly");
+    const expectedAmountNgn = getPlanPrice(planKey, billingCycle);
     const expectedAmountKobo = expectedAmountNgn * 100;
 
     if (!Number.isFinite(amountKobo) || amountKobo !== expectedAmountKobo) {
@@ -123,6 +152,7 @@ export async function POST(req: NextRequest) {
         phone: phoneRaw,
         storeName: storeNameRaw,
         planKey,
+        billingCycle,
         amount: amountKobo,
         currency: String(verifiedData.currency || "NGN"),
       }),
@@ -132,12 +162,7 @@ export async function POST(req: NextRequest) {
       throw new Error(result.error || "Failed to provision account");
     }
 
-    // Best-effort OTP email
-    try {
-      await ResendEmailService.sendOTPEmail(email, "XXXXXX", "Merchant");
-    } catch {
-      // non-fatal
-    }
+    // OTP / welcome email is sent by the backend provision flow when applicable.
 
     return NextResponse.json(
       {

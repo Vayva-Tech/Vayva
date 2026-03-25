@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { Card, Button } from "@vayva/ui";
 
 interface TransferItem {
   productId: string;
@@ -131,10 +130,9 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
       {/* Transfers List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filteredTransfers.map((transfer) => (
-          <GlassPanel
+          <Card
             key={transfer.id}
-            variant="elevated"
-            className={`p-6 cursor-pointer transition-all hover:scale-[1.02] ${
+            className={`border-white/10 bg-white/5 backdrop-blur-md p-6 cursor-pointer transition-all hover:scale-[1.02] ${
               selectedTransfer === transfer.id ? 'ring-2 ring-blue-500' : ''
             }`}
             onClick={() => setSelectedTransfer(transfer.id)}
@@ -201,9 +199,9 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
             {transfer.status === 'requested' && (
               <div className="flex gap-2 pt-4 border-t border-white/10">
                 <Button
-                  variant="success"
+                  variant="primary"
                   className="flex-1"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     handleApprove(transfer.id);
                   }}
@@ -211,9 +209,9 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
                   Approve Transfer
                 </Button>
                 <Button
-                  variant="danger"
+                  variant="destructive"
                   className="flex-1"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     setSelectedTransfer(transfer.id);
                     setShowRejectModal(true);
@@ -230,7 +228,7 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
                 <Button
                   variant="primary"
                   className="w-full"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     onUpdateStatus?.(transfer.id, 'completed');
                   }}
@@ -239,14 +237,14 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
                 </Button>
               </div>
             )}
-          </GlassPanel>
+          </Card>
         ))}
       </div>
 
       {/* Rejection Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <GlassPanel variant="elevated" className="p-6 max-w-md w-full mx-4">
+          <Card className="border-white/10 bg-white/5 backdrop-blur-md p-6 max-w-md w-full mx-4">
             <h3 className="text-xl font-bold text-white mb-4">Reject Transfer</h3>
             <p className="text-sm text-white/60 mb-4">Please provide a reason for rejection:</p>
             <textarea
@@ -259,17 +257,17 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
               <Button variant="ghost" className="flex-1" onClick={() => setShowRejectModal(false)}>
                 Cancel
               </Button>
-              <Button variant="danger" className="flex-1" onClick={handleReject}>
+              <Button variant="destructive" className="flex-1" onClick={handleReject}>
                 Confirm Rejection
               </Button>
             </div>
-          </GlassPanel>
+          </Card>
         </div>
       )}
 
       {/* Empty State */}
       {filteredTransfers.length === 0 && (
-        <GlassPanel variant="bordered" className="p-12 text-center">
+        <Card className="border-white/10 bg-white/5 backdrop-blur-md p-12 text-center">
           <svg className="w-16 h-16 text-white/20 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
           </svg>
@@ -279,7 +277,7 @@ export const TransferApprovalUI: React.FC<TransferApprovalUIProps> = ({
               ? 'No pending transfer requests'
               : `No ${activeTab} transfers`}
           </p>
-        </GlassPanel>
+        </Card>
       )}
     </div>
   );

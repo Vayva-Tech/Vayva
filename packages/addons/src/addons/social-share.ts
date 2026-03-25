@@ -8,7 +8,7 @@
  * - Share analytics
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const SOCIAL_SHARING_ADDON: AddOnDefinition = {
   id: 'vayva.social-share',

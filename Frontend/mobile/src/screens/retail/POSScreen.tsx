@@ -16,15 +16,34 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { backendAPIService } from '../../services/api/backend-api.service';
-import Icon from 'lucide-react-native';
+import {
+  CreditCard,
+  Image as ImageIcon,
+  Minus,
+  Package,
+  Plus,
+  ScanBarcode,
+  Search,
+  ShoppingCart,
+  Trash2,
+} from 'lucide-react-native';
 
 interface CartItem {
-  product: any;
+  product: Product;
   quantity: number;
 }
 
-export default function POSScreen({ navigation }: any) {
-  const [products, setProducts] = useState<any[]>([]);
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  image_url?: string;
+  imageUrl?: string;
+  sku?: string;
+};
+
+export default function POSScreen() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -38,8 +57,8 @@ export default function POSScreen({ navigation }: any) {
     try {
       setLoading(true);
       const response = await backendAPIService.getProducts();
-      setProducts(response.data);
-    } catch (error) {
+      setProducts(response.data as Product[]);
+    } catch (error: unknown) {
       console.error('[POS] Failed to load products:', error);
       Alert.alert('Error', 'Failed to load products. Please try again.');
     } finally {
@@ -47,12 +66,12 @@ export default function POSScreen({ navigation }: any) {
     }
   }
 
-  function addToCart(product: any) {
+  function addToCart(product: Product) {
     setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.product.id === product.id);
+      const existingItem = prevCart.find((item) => item.product.id === product.id);
       
       if (existingItem) {
-        return prevCart.map(item =>
+        return prevCart.map((item) =>
           item.product.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -64,7 +83,7 @@ export default function POSScreen({ navigation }: any) {
   }
 
   function removeFromCart(productId: string) {
-    setCart(prevCart => prevCart.filter(item => item.product.id !== productId));
+    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
   }
 
   function updateQuantity(productId: string, quantity: number) {
@@ -116,12 +135,13 @@ export default function POSScreen({ navigation }: any) {
 
       // Try to process online
       try {
-        const response = await backendAPIService.processOrder(orderData);
+        const _response = await backendAPIService.processOrder(orderData);
         Alert.alert('Success', `Order completed! Total: $${calculateTotal().toFixed(2)}`);
         setCart([]);
-      } catch (error: any) {
+      } catch (error: unknown) {
         // If offline, queue for later sync
-        if (error.message.includes('Network')) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.includes("Network")) {
           await backendAPIService.queueRequest('create', 'orders', orderData);
           Alert.alert(
             'Offline Mode',
@@ -132,9 +152,12 @@ export default function POSScreen({ navigation }: any) {
           throw error;
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[POS] Payment error:', error);
-      Alert.alert('Payment Failed', error.message || 'Failed to process payment');
+      Alert.alert(
+        "Payment Failed",
+        error instanceof Error ? error.message : "Failed to process payment",
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -165,9 +188,10 @@ export default function POSScreen({ navigation }: any) {
     );
   }
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.sku?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.sku?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -184,7 +208,7 @@ export default function POSScreen({ navigation }: any) {
       {/* Products List */}
       <View style={styles.productsSection}>
         <View style={styles.searchBar}>
-          <Icon name="search" size={20} color="#666" />
+          <Search size={20} color="#666" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search products..."
@@ -193,7 +217,7 @@ export default function POSScreen({ navigation }: any) {
             autoCapitalize="none"
           />
           <TouchableOpacity style={styles.scanButton}>
-            <Icon name="scan-barcode" size={24} color="#10b981" />
+            <ScanBarcode size={24} color="#10b981" />
           </TouchableOpacity>
         </View>
 
@@ -208,13 +232,13 @@ export default function POSScreen({ navigation }: any) {
               style={styles.productCard}
               onPress={() => addToCart(item)}
             >
-              {item.image_url ? (
+              {item.image_url || item.imageUrl ? (
                 <View style={styles.productImage}>
-                  <Icon name="image" size={40} color="#ccc" />
+                  <ImageIcon size={40} color="#ccc" />
                 </View>
               ) : (
                 <View style={[styles.productImage, styles.noImage]}>
-                  <Icon name="package" size={40} color="#999" />
+                  <Package size={40} color="#999" />
                 </View>
               )}
               
@@ -237,7 +261,7 @@ export default function POSScreen({ navigation }: any) {
 
         {cart.length === 0 ? (
           <View style={styles.emptyCart}>
-            <Icon name="shopping-cart" size={48} color="#ccc" />
+            <ShoppingCart size={48} color="#ccc" />
             <Text style={styles.emptyCartText}>Cart is empty</Text>
           </View>
         ) : (
@@ -261,7 +285,7 @@ export default function POSScreen({ navigation }: any) {
                     style={styles.quantityButton}
                     onPress={() => updateQuantity(item.product.id, item.quantity - 1)}
                   >
-                    <Icon name="minus" size={16} color="#fff" />
+                    <Minus size={16} color="#fff" />
                   </TouchableOpacity>
                   
                   <Text style={styles.quantityText}>{item.quantity}</Text>
@@ -270,7 +294,7 @@ export default function POSScreen({ navigation }: any) {
                     style={styles.quantityButton}
                     onPress={() => updateQuantity(item.product.id, item.quantity + 1)}
                   >
-                    <Icon name="plus" size={16} color="#fff" />
+                    <Plus size={16} color="#fff" />
                   </TouchableOpacity>
                 </View>
                 
@@ -278,7 +302,7 @@ export default function POSScreen({ navigation }: any) {
                   style={styles.removeButton}
                   onPress={() => removeFromCart(item.product.id)}
                 >
-                  <Icon name="trash-2" size={18} color="#ef4444" />
+                  <Trash2 size={18} color="#ef4444" />
                 </TouchableOpacity>
               </View>
             )}
@@ -312,7 +336,7 @@ export default function POSScreen({ navigation }: any) {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Icon name="credit-card" size={20} color="#fff" />
+                  <CreditCard size={20} color="#fff" />
                   <Text style={styles.checkoutText}>Process Payment</Text>
                 </>
               )}

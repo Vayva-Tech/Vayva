@@ -1,5 +1,5 @@
-// @ts-nocheck
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@vayva/db';
+import type { BlogMediaPrismaClient } from '../db/blog-media-prisma-client';
 import type {
   BlogPost,
   CreateBlogPostInput,
@@ -30,13 +30,13 @@ import type {
   TopPerformingContent,
   PostAnalytics,
   PageviewMetric,
-} from './types';
+} from '../types';
 
 export class BlogMediaApiService {
-  private prisma: PrismaClient;
+  private prisma: BlogMediaPrismaClient;
 
   constructor(prismaClient: PrismaClient) {
-    this.prisma = prismaClient;
+    this.prisma = prismaClient as BlogMediaPrismaClient;
   }
 
   // ============================================================================
@@ -157,7 +157,7 @@ export class BlogMediaApiService {
         storeId,
       },
       data: {
-        status: 'SCHEDULED',
+        status: 'DRAFT',
         publishedAt: publishDate,
       },
     });
@@ -172,11 +172,24 @@ export class BlogMediaApiService {
     scheduled: number;
     archived: number;
   }> {
+    const now = new Date();
     const [total, published, drafts, scheduled, archived] = await Promise.all([
       this.prisma.blogPost.count({ where: { storeId } }),
       this.prisma.blogPost.count({ where: { storeId, status: 'PUBLISHED' } }),
-      this.prisma.blogPost.count({ where: { storeId, status: 'DRAFT' } }),
-      this.prisma.blogPost.count({ where: { storeId, status: 'SCHEDULED' } }),
+      this.prisma.blogPost.count({
+        where: {
+          storeId,
+          status: 'DRAFT',
+          OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
+        },
+      }),
+      this.prisma.blogPost.count({
+        where: {
+          storeId,
+          status: 'DRAFT',
+          publishedAt: { gt: now },
+        },
+      }),
       this.prisma.blogPost.count({ where: { storeId, status: 'ARCHIVED' } }),
     ]);
 
@@ -284,29 +297,29 @@ export class BlogMediaApiService {
     const upcoming = await this.getUpcomingContent(storeId, 30);
     
     // Calculate pipeline stats
-    const allItems = await this.prisma.contentCalendar.findMany({
+    const allItems = (await this.prisma.contentCalendar.findMany({
       where: { storeId },
       select: { status: true },
-    });
+    })) as Array<{ status: string }>;
 
     const pipelineStats = {
-      ideas: allItems.filter(i => i.status === 'planned').length,
-      drafts: allItems.filter(i => i.status === 'in_progress').length,
-      editing: allItems.filter(i => i.status === 'in_progress').length,
-      scheduled: allItems.filter(i => i.status === 'scheduled').length,
+      ideas: allItems.filter((i) => i.status === 'planned').length,
+      drafts: allItems.filter((i) => i.status === 'in_progress').length,
+      editing: allItems.filter((i) => i.status === 'in_progress').length,
+      scheduled: allItems.filter((i) => i.status === 'scheduled').length,
     };
 
     // Calculate publishing streak
     const today = new Date();
     const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const publishedItems = await this.prisma.contentCalendar.findMany({
+    const publishedItems = (await this.prisma.contentCalendar.findMany({
       where: {
         storeId,
         status: 'published',
         scheduledDate: { gte: thirtyDaysAgo, lte: today },
       },
       orderBy: { scheduledDate: 'desc' },
-    });
+    })) as ContentCalendar[];
 
     const publishingStreak = this.calculatePublishingStreak(publishedItems);
     const consistencyScore = this.calculateConsistencyScore(publishedItems);
@@ -701,7 +714,7 @@ export class BlogMediaApiService {
       ORDER BY "postId", "keyword", "trackedAt" DESC
     `;
 
-    return latestMetrics.map(m => ({
+    return latestMetrics.map((m: SEOMetric) => ({
       keyword: m.keyword,
       position: m.position,
       previousPosition: m.avgPosition,
@@ -841,7 +854,7 @@ export class BlogMediaApiService {
     totalShares: number;
     totalComments: number;
   }>> {
-    const stats = await this.prisma.socialMediaPost.groupBy({
+    const stats = (await this.prisma.socialMediaPost.groupBy({
       by: ['platform'],
       where: { storeId },
       _sum: {
@@ -850,9 +863,13 @@ export class BlogMediaApiService {
         comments: true,
       },
       _count: true,
-    });
+    })) as Array<{
+      platform: string;
+      _count: number;
+      _sum: { likes: number | null; shares: number | null; comments: number | null };
+    }>;
 
-    return stats.map(s => ({
+    return stats.map((s) => ({
       platform: s.platform as SocialPlatform,
       totalPosts: s._count,
       totalLikes: s._sum.likes || 0,
@@ -1186,7 +1203,7 @@ export class BlogMediaApiService {
     const categoryMap = new Map<string, { count: number; totalViews: number }>();
 
     posts.forEach(post => {
-      post.tags.forEach(tag => {
+      post.tags.forEach((tag: string) => {
         const existing = categoryMap.get(tag) || { count: 0, totalViews: 0 };
         existing.count++;
         existing.totalViews += Math.floor(Math.random() * 10000) + 5000;

@@ -75,20 +75,8 @@ export class OpenRouterClient {
    * Get recommended model based on use case
    */
   getRecommendedModel(useCase: string = "general"): string {
-    const models = {
-      // Cost-effective general purpose
-      general: "deepseek/deepseek-chat",
-      // High reasoning capability
-      reasoning: "deepseek/deepseek-chat", // Using same model but with different parameters
-      // Fast response for real-time
-      realtime: "mistralai/mistral-large",
-      // Code and technical tasks
-      technical: "deepseek/deepseek-chat",
-      // Creative and writing tasks
-      creative: "mistralai/mistral-large"
-    };
-
-    return models[useCase as keyof typeof models] || models.general;
+    void useCase;
+    return "google/gemini-2.5-flash";
   }
 
   /**

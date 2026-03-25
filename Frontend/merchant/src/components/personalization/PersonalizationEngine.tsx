@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Advanced Personalization Engine
  * AI-driven adaptive experiences for individual merchants
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -97,7 +96,7 @@ export function usePersonalizationEngine(industry: IndustrySlug) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch user behavior data
-  const { data: behaviorData } = useSWR<UserBehavior>(
+  const { data: behaviorData } = useSWR<UserBehavior | null>(
     `/api/personalization/user-behavior/${store?.id}`,
     async (url: string) => {
       try {
@@ -111,7 +110,7 @@ export function usePersonalizationEngine(industry: IndustrySlug) {
   );
 
   // Fetch personalization profile
-  const { data: profileData } = useSWR<PersonalizationProfile>(
+  const { data: profileData } = useSWR<PersonalizationProfile | null>(
     `/api/personalization/profile/${store?.id}`,
     async (url: string) => {
       try {
@@ -308,7 +307,7 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
             Smart Suggestions
           </h3>
           <div className="space-y-3">
-            <button className="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+            <Button className="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="font-medium">Optimize Layout</span>
                 <span className="text-xs text-gray-500">Recommended</span>
@@ -316,8 +315,8 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
               <p className="text-sm text-gray-500 mt-1">
                 Based on your usage patterns
               </p>
-            </button>
-            <button className="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button className="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="font-medium">Enable Predictive Widgets</span>
                 <span className="text-xs text-gray-500">Try Now</span>
@@ -325,8 +324,8 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
               <p className="text-sm text-gray-500 mt-1">
                 Get ahead with AI predictions
               </p>
-            </button>
-            <button className="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button className="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="font-medium">Adjust Notification Settings</span>
                 <span className="text-xs text-gray-500">Customize</span>
@@ -334,7 +333,7 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
               <p className="text-sm text-gray-500 mt-1">
                 Match your preferred timing
               </p>
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>
@@ -385,9 +384,9 @@ export default function PersonalizationDashboard({ industry }: { industry: Indus
                     +{rec.estimatedImpact}% impact
                   </span>
                 </div>
-                <button className="px-3 py-1 text-sm bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+                <Button className="px-3 py-1 text-sm bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
                   {rec.cta}
-                </button>
+                </Button>
               </div>
             </motion.div>
           ))}

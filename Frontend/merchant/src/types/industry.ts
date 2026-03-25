@@ -18,6 +18,8 @@ export interface IndustryConfig {
   icon?: string;
   features?: readonly string[] | string[] | Record<string, boolean>;
   primaryObject?: string;
+  /** Optional display label for industry archetype (API / settings UI). */
+  archetype?: string;
   modules?: readonly string[] | string[];
   moduleLabels?: Record<string, string>;
   moduleRoutes?: Record<string, string | { index: string; create?: string }>;

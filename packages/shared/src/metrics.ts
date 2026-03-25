@@ -332,7 +332,7 @@ export function createMetricsMiddleware() {
 
       // Record metrics
       httpRequestsTotal.inc({ method, path, status: status.toString() });
-      httpRequestDuration.observe(duration, { method, path });
+      httpRequestDuration.observe(duration);
 
       logger.debug('Request metrics recorded', {
         method,

@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -7,18 +7,27 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-    const result = await apiJson(
-      `${process.env.BACKEND_API_URL}/api/merchant/whatsapp/broadcasts/${id}`,
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
+    const result = await apiJson<unknown>(
+      buildBackendUrl(`/api/merchant/whatsapp/broadcasts/${id}`),
       {
-        headers: { "x-store-id": storeId },
+        headers: auth.headers,
       }
     );
     return NextResponse.json(result);
-  } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/whatsapp/broadcasts/:id", operation: "GET" });
+  } catch (error: unknown) {
+    handleApiError(error, {
+      endpoint: "/api/merchant/whatsapp/broadcasts/[id]",
+      operation: "GET",
+      storeId,
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -30,20 +39,22 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = await request.json();
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
+    const body: unknown = await request.json();
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/whatsapp/broadcasts/${id}`, {
+    }>(buildBackendUrl(`/api/merchant/whatsapp/broadcasts/${id}`), {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
       body: JSON.stringify(body),
     });
 
@@ -52,8 +63,12 @@ export async function PATCH(
     }
 
     return NextResponse.json(result.data);
-  } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/whatsapp/broadcasts/:id", operation: "PATCH" });
+  } catch (error: unknown) {
+    handleApiError(error, {
+      endpoint: "/api/merchant/whatsapp/broadcasts/[id]",
+      operation: "PATCH",
+      storeId,
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -65,16 +80,21 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/whatsapp/broadcasts/${id}`, {
+    }>(buildBackendUrl(`/api/merchant/whatsapp/broadcasts/${id}`), {
       method: "DELETE",
-      headers: { "x-store-id": storeId },
+      headers: auth.headers,
     });
 
     if (!result.success) {
@@ -82,8 +102,12 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/whatsapp/broadcasts/:id", operation: "DELETE" });
+  } catch (error: unknown) {
+    handleApiError(error, {
+      endpoint: "/api/merchant/whatsapp/broadcasts/[id]",
+      operation: "DELETE",
+      storeId,
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

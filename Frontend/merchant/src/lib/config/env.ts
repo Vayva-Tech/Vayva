@@ -39,9 +39,7 @@ const envSchema = z.object({
     KWIK_PASSWORD: z.string().optional(),
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
     SENTRY_DSN: z.string().url().optional(),
-    GROQ_ADMIN_KEY: z.string().optional(),
-    GROQ_MARKETING_KEY: z.string().optional(),
-    GROQ_WHATSAPP_KEY: z.string().optional(),
+    OPENROUTER_API_KEY: z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

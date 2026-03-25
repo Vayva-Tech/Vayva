@@ -1,11 +1,11 @@
-// @ts-nocheck
-import type { 
-  TravelProperty, 
-  TravelRoom, 
-  SearchFilters, 
-  DateRange 
+import {
+  PropertyType,
+  RoomType as _RoomType,
+  type TravelProperty,
+  type TravelRoom as _TravelRoom,
+  type SearchFilters,
+  type DateRange
 } from '../types';
-import { PropertyType, RoomType } from '../types';
 
 export interface CreatePropertyParams {
   tenantId: string;
@@ -288,7 +288,7 @@ export class TravelPropertyService {
     let filtered = [...properties];
 
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-      filtered = filtered.filter(prop => {
+      filtered = filtered.filter(_prop => {
         // This would typically join with rooms to get min/max prices
         // For simplicity, we'll assume properties have a price range
         return true; // Placeholder - implement actual price filtering
@@ -298,13 +298,13 @@ export class TravelPropertyService {
     // Apply sorting
     switch (filters.sortBy) {
       case 'price_asc':
-        filtered.sort((a, b) => {
+        filtered.sort((_a, _b) => {
           // Sort by minimum room price
           return 0; // Placeholder
         });
         break;
       case 'price_desc':
-        filtered.sort((a, b) => {
+        filtered.sort((_a, _b) => {
           // Sort by maximum room price
           return 0; // Placeholder
         });

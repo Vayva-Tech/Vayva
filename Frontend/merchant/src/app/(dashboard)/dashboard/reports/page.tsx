@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import {
   FileText,
@@ -119,14 +119,14 @@ export default function ReportsPage() {
           <p className="text-sm text-gray-500 mt-1">Generate, view, and export business reports</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+          <Button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
             <Download className="w-4 h-4" />
             Export All
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
+          </Button>
+          <Button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
             <Plus className="w-4 h-4" />
             Generate Report
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -153,14 +153,14 @@ export default function ReportsPage() {
                   <span>Last generated: {report.lastGenerated}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <Button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <Eye className="w-3.5 h-3.5" />
                     View
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                  </Button>
+                  <Button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                     <Download className="w-3.5 h-3.5" />
                     Download
-                  </button>
+                  </Button>
                 </div>
               </div>
             );
@@ -196,9 +196,9 @@ export default function ReportsPage() {
                 >
                   {report.format}
                 </span>
-                <button className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                <Button className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
                   <Download className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -207,3 +207,4 @@ export default function ReportsPage() {
     </div>
   );
 }
+

@@ -1,17 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@vayva/db";
 
 /**
  * POST /api/retail/transfers/approve
- * Approve/reject inventory transfer requests
+ * Approve/reject inventory transfer requests.
+ * Caller must belong to the source or destination store.
  */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const storeId = (session.user as { storeId?: string }).storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -19,20 +25,24 @@ export async function POST(request: NextRequest) {
 
     if (!transferId || !action) {
       return NextResponse.json(
-        { error: 'Transfer ID and action required' },
-        { status: 400 }
+        { error: "Transfer ID and action required" },
+        { status: 400 },
       );
     }
 
-    if (!['approve', 'reject'].includes(action)) {
+    if (!["approve", "reject"].includes(action)) {
       return NextResponse.json(
         { error: 'Action must be "approve" or "reject"' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const transfer = await prisma.inventoryTransfer.findUnique({
-      where: { id: transferId },
+    const transfer = await prisma.inventoryTransfer.findFirst({
+      where: {
+        id: transferId,
+        status: "pending",
+        OR: [{ fromStoreId: storeId }, { toStoreId: storeId }],
+      },
       include: {
         fromStore: true,
         toStore: true,
@@ -41,32 +51,45 @@ export async function POST(request: NextRequest) {
     });
 
     if (!transfer) {
-      return NextResponse.json(
-        { error: 'Transfer not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Transfer not found" }, { status: 404 });
     }
 
-    if (transfer.status !== 'pending') {
-      return NextResponse.json(
-        { error: 'Transfer is not pending approval' },
-        { status: 400 }
-      );
-    }
-
-    // Update transfer status
-    const updatedTransfer = await prisma.inventoryTransfer.update({
-      where: { id: transferId },
+    const upd = await prisma.inventoryTransfer.updateMany({
+      where: {
+        id: transferId,
+        status: "pending",
+        OR: [{ fromStoreId: storeId }, { toStoreId: storeId }],
+      },
       data: {
-        status: action === 'approve' ? 'approved' : 'rejected',
+        status: action === "approve" ? "approved" : "rejected",
         approvedAt: new Date(),
         approvedBy: session.user.id,
-        rejectionReason: action === 'reject' ? notes : null,
+        rejectionReason: action === "reject" ? notes : null,
       },
     });
 
+    if (upd.count === 0) {
+      return NextResponse.json(
+        { error: "Transfer is not pending approval" },
+        { status: 400 },
+      );
+    }
+
+    const updatedTransfer = await prisma.inventoryTransfer.findUnique({
+      where: { id: transferId },
+      include: {
+        fromStore: true,
+        toStore: true,
+        items: true,
+      },
+    });
+
+    if (!updatedTransfer) {
+      return NextResponse.json({ error: "Transfer not found" }, { status: 404 });
+    }
+
     // If approved, update inventory levels
-    if (action === 'approve') {
+    if (action === "approve") {
       await Promise.all(
         transfer.items.map(async (item) => {
           // Decrease from source store
@@ -113,13 +136,17 @@ export async function POST(request: NextRequest) {
               },
             });
           }
-        })
+        }),
       );
 
-      // Mark items as transferred
       await prisma.transferItem.updateMany({
-        where: { transferId },
-        data: { status: 'transferred' },
+        where: {
+          transferId,
+          transfer: {
+            OR: [{ fromStoreId: storeId }, { toStoreId: storeId }],
+          },
+        },
+        data: { status: "transferred" },
       });
     }
 
@@ -131,10 +158,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Transfer approval error:', error);
+    console.error("Transfer approval error:", error);
     return NextResponse.json(
-      { error: 'Failed to process transfer approval' },
-      { status: 500 }
+      { error: "Failed to process transfer approval" },
+      { status: 500 },
     );
   }
 }

@@ -10,19 +10,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@vayva/schemas": "workspace:*",
-    "@vayva/db": "workspace:*",
-    "@vayva/shared": "workspace:*",
+    "@hookform/resolvers": "^3.3.4",
     "@vayva/ai-agent": "workspace:*",
+    "@vayva/db": "workspace:*",
     "@vayva/industry-core": "workspace:*",
     "@vayva/realtime": "workspace:*",
-    "@hookform/resolvers": "^3.3.4",
+    "@vayva/schemas": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:^",
+    "react": "19.2.3",
     "react-hook-form": "^7.50.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
-    "@types/react": "^18.x",
+    "@types/react": "19.2.7",
     "typescript": "^5.9.3"
   },
   "exports": {

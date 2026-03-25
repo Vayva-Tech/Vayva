@@ -1,5 +1,5 @@
 import React from 'react';
-import { CrownIcon, SparklesIcon, StarIcon, UsersIcon } from '@heroicons/react/24/outline';
+import { TrophyIcon, SparklesIcon, StarIcon, UsersIcon } from '@heroicons/react/24/outline';
 
 interface LuxuryBadgeProps {
   level: 'silver' | 'gold' | 'platinum' | 'diamond';
@@ -35,7 +35,7 @@ export const LuxuryBadge: React.FC<LuxuryBadgeProps> = ({
 
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${config.bg} ${className}`}>
-      {showIcon && <CrownIcon className="h-3 w-3 mr-1" />}
+      {showIcon && <TrophyIcon className="h-3 w-3 mr-1" />}
       {config.label}
     </span>
   );
@@ -68,7 +68,7 @@ export const VIPStatusBadge: React.FC<VIPStatusBadgeProps> = ({
     },
     platinum: {
       bg: 'bg-purple-50 text-purple-700 border-purple-200',
-      icon: CrownIcon,
+      icon: TrophyIcon,
       label: 'Platinum VIP'
     }
   };

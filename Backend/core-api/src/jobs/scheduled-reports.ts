@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prismaDelegates } from "@vayva/db";
 import { sendClientReport } from '../services/email-automation';
-
-const prisma = new PrismaClient();
 
 /**
  * Automated Report Scheduler
@@ -12,11 +10,12 @@ const prisma = new PrismaClient();
 
 interface ScheduledReport {
   id: string;
-  storeId: number;
+  storeId: string;
   clientId: string;
   clientEmail: string;
   projectName: string;
-  frequency: 'weekly' | 'monthly';
+  projectId?: string | null;
+  frequency: "weekly" | "monthly";
   lastSent?: Date;
   nextSend: Date;
 }
@@ -25,13 +24,13 @@ interface ScheduledReport {
  * Main scheduler function - call this daily via cron
  */
 export async function runScheduledReports() {
-  console.log('Starting scheduled report job...');
+  console.warn('Starting scheduled report job...');
 
   try {
     const now = new Date();
 
     // Get all reports scheduled for today
-    const reportsToSend = await prisma.scheduledReport.findMany({
+    const reportsToSend = await prismaDelegates.scheduledReport.findMany({
       where: {
         nextSend: {
           lte: now,
@@ -43,13 +42,18 @@ export async function runScheduledReports() {
       },
     });
 
-    console.log(`Found ${reportsToSend.length} reports to send`);
+    console.warn(`Found ${reportsToSend.length} reports to send`);
 
     for (const report of reportsToSend) {
-      await processReport(report);
+      const row = report as ScheduledReport & { project?: { id: string } | null };
+      await processReport({
+        ...row,
+        storeId: String(row.storeId),
+        projectId: row.projectId ?? row.project?.id ?? null,
+      });
     }
 
-    console.log('Scheduled report job completed');
+    console.warn('Scheduled report job completed');
     return { success: true, count: reportsToSend.length };
   } catch (error) {
     console.error('Error in scheduled reports:', error);
@@ -65,7 +69,7 @@ export async function runScheduledReports() {
  */
 async function processReport(report: ScheduledReport) {
   try {
-    console.log(`Processing report for ${report.clientEmail}`);
+    console.warn(`Processing report for ${report.clientEmail}`);
 
     // Gather report data based on frequency
     const reportData = await gatherReportData(report);
@@ -82,7 +86,7 @@ async function processReport(report: ScheduledReport) {
       // Update next send date
       const nextSendDate = calculateNextSendDate(report.frequency);
       
-      await prisma.scheduledReport.update({
+      await prismaDelegates.scheduledReport.update({
         where: { id: report.id },
         data: {
           lastSent: new Date(),
@@ -90,7 +94,7 @@ async function processReport(report: ScheduledReport) {
         },
       });
 
-      console.log(`Report sent successfully to ${report.clientEmail}`);
+      console.warn(`Report sent successfully to ${report.clientEmail}`);
     } else {
       console.error(`Failed to send report to ${report.clientEmail}:`, result.error);
     }
@@ -115,37 +119,44 @@ async function gatherReportData(report: ScheduledReport) {
 
   // Fetch project metrics
   const [timeEntries, tasks, invoices, milestones] = await Promise.all([
-    prisma.timeEntry.findMany({
+    prismaDelegates.timeEntry.findMany({
       where: {
         projectId: report.projectId || undefined,
         createdAt: { gte: startDate, lte: endDate },
       },
     }),
-    prisma.task.findMany({
+    prismaDelegates.task.findMany({
       where: {
         projectId: report.projectId || undefined,
         completedAt: { gte: startDate, lte: endDate },
       },
     }),
-    prisma.invoice.findMany({
+    prismaDelegates.invoice.findMany({
       where: {
         projectId: report.projectId || undefined,
         createdAt: { gte: startDate, lte: endDate },
       },
     }),
-    prisma.milestone.findMany({
+    prismaDelegates.milestone.findMany({
       where: {
         projectId: report.projectId || undefined,
         dueDate: { gte: endDate },
       },
-      orderBy: { dueDate: 'asc' },
+      orderBy: { dueDate: "asc" },
       take: 3,
     }),
   ]);
 
   // Calculate metrics
-  const totalHours = timeEntries.reduce((sum, te) => sum + (te.duration / 60), 0);
-  const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+  const totalHours = timeEntries.reduce(
+    (sum: number, te: { duration: number }) => sum + te.duration / 60,
+    0,
+  );
+  const totalRevenue = invoices.reduce(
+    (sum: number, inv: { totalAmount?: number | null }) =>
+      sum + (inv.totalAmount ?? 0),
+    0,
+  );
   
   // You would calculate expenses and profit margin here based on your data model
   const totalExpenses = 0; // Placeholder
@@ -167,7 +178,7 @@ async function gatherReportData(report: ScheduledReport) {
       `Logged ${Math.round(totalHours)} hours of work`,
       totalRevenue > 0 ? `Generated $${totalRevenue.toLocaleString()} in value` : '',
     ].filter(Boolean),
-    upcomingMilestones: milestones.map(m => ({
+    upcomingMilestones: milestones.map((m: { name: string; dueDate: Date }) => ({
       name: m.name,
       dueDate: m.dueDate.toISOString(),
     })),
@@ -193,15 +204,15 @@ function calculateNextSendDate(frequency: 'weekly' | 'monthly'): Date {
  * Create a new scheduled report subscription
  */
 export async function createScheduledReport(data: {
-  storeId: number;
+  storeId: string;
   clientId: string;
   clientEmail: string;
   projectName: string;
-  frequency: 'weekly' | 'monthly';
+  frequency: "weekly" | "monthly";
 }) {
   const nextSend = calculateNextSendDate(data.frequency);
 
-  const report = await prisma.scheduledReport.create({
+  const report = await prismaDelegates.scheduledReport.create({
     data: {
       storeId: data.storeId,
       clientId: data.clientId,
@@ -212,7 +223,7 @@ export async function createScheduledReport(data: {
     },
   });
 
-  console.log(`Created scheduled report: ${report.id}`);
+  console.warn(`Created scheduled report: ${report.id}`);
   return report;
 }
 
@@ -220,9 +231,9 @@ export async function createScheduledReport(data: {
  * Cancel a scheduled report
  */
 export async function cancelScheduledReport(reportId: string) {
-  await prisma.scheduledReport.delete({
+  await prismaDelegates.scheduledReport.delete({
     where: { id: reportId },
   });
 
-  console.log(`Cancelled scheduled report: ${reportId}`);
+  console.warn(`Cancelled scheduled report: ${reportId}`);
 }

@@ -34,7 +34,7 @@ export function StationFilter({
         <option value="all">All Stations</option>
         {stations.map(station => (
           <option key={station.id} value={station.id}>
-            {station.name} ({station.tickets?.length || 0})
+            {station.name}
           </option>
         ))}
       </select>

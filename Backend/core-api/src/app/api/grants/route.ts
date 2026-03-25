@@ -16,7 +16,7 @@ const grantSchema = z.object({
   requirements: z.array(z.string()).optional()
 });
 
-interface RouteParams {
+interface _RouteParams {
   params: Promise<{
     id?: string;
   }>;
@@ -26,7 +26,7 @@ interface RouteParams {
  * GET /api/grants
  * Get all grants
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(_request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession();
     if (!session?.user) {
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
  * GET /api/grants/pipeline
  * Get grant pipeline summary
  */
-export async function GET_PIPELINE(request: NextRequest): Promise<NextResponse> {
+export async function GET_PIPELINE(_request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession();
     if (!session?.user) {

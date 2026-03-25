@@ -8,7 +8,7 @@ import {
   ShoppingBag,
   Robot as Bot,
   CreditCard,
-  Info,
+  Info
 } from "@phosphor-icons/react/ssr";
 
 interface NotificationsDrawerProps {

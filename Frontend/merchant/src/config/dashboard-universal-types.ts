@@ -4,14 +4,16 @@
 // Shared types for the unified dashboard system
 // ============================================================================
 
-import type { IndustrySlug } from "@/lib/templates/types";
+import type { IndustrySlug } from "@vayva/industry-core";
 import type { DesignCategory } from "@/components/vayva-ui/VayvaThemeProvider";
+
+export type { IndustrySlug };
 
 // ---------------------------------------------------------------------------
 // Core Dashboard Types
 // ---------------------------------------------------------------------------
 
-export type DashboardVariant = 'basic' | 'standard' | 'advanced' | 'pro';
+export type DashboardVariant = 'basic' | 'standard' | 'advanced' | 'pro' | 'legacy';
 export type DashboardTimeHorizon = 'now' | 'today' | 'week' | 'month' | 'quarter' | 'year';
 
 export interface DashboardMetric {
@@ -182,6 +184,8 @@ export interface UniversalDashboardProps {
   variant: DashboardVariant;
   userId: string;
   businessId: string;
+  designCategory?: DesignCategory;
+  planTier?: string;
   className?: string;
   onConfigChange?: (config: Partial<UniversalDashboardConfig>) => void;
   onError?: (error: DashboardError) => void;
@@ -352,6 +356,25 @@ export const PLAN_TIER_FEATURES: Record<DashboardVariant, PlanTierConfig> = {
       dataRetentionDays: 730,
       apiRequestsPerHour: 10000,
       teamMembers: 50
+    }
+  },
+  legacy: {
+    name: 'legacy',
+    features: {
+      maxMetrics: 4,
+      maxSections: 3,
+      chartTypes: ['bar'],
+      alertTypes: ['info'],
+      exportFormats: ['csv'],
+      customSections: false,
+      advancedAnalytics: false,
+      aiInsights: false,
+      customBranding: false
+    },
+    limits: {
+      dataRetentionDays: 30,
+      apiRequestsPerHour: 100,
+      teamMembers: 1
     }
   }
 };

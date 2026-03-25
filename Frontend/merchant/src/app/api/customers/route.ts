@@ -1,21 +1,8 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-
-// Customer creation validation schema
-const customerCreateSchema = z.object({
-  firstName: z.string().min(1).max(100),
-  lastName: z.string().min(1).max(100),
-  email: z.string().email().max(255).optional(),
-  phone: z.string().min(10).max(20).optional(),
-  address: z.string().max(500).optional(),
-  city: z.string().max(100).optional(),
-  state: z.string().max(100).optional(),
-  country: z.string().max(100).optional(),
-  tags: z.array(z.string().max(50)).max(20).optional(),
-});
 
 const customerQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
@@ -26,7 +13,11 @@ const customerQuerySchema = z.object({
 // GET /api/customers - Get all customers for the merchant
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     
     const queryValidation = customerQuerySchema.safeParse({
@@ -48,11 +39,9 @@ export async function GET(request: NextRequest) {
       data: Array<{ id: string; firstName: string; lastName: string; email?: string; phone?: string }>;
       meta: { total: number; limit: number; offset: number };
     }>(
-      `${process.env.BACKEND_API_URL}/api/customers?limit=${limit}&offset=${offset}&search=${search || ''}`,
+      `${process.env.BACKEND_API_URL}/api/customers?limit=${limit}&offset=${offset}&search=${encodeURIComponent(search ?? "")}`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
+        headers: auth.headers,
       }
     );
     

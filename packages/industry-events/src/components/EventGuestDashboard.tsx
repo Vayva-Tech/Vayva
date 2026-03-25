@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 /**
  * Event Guest List & Seating Dashboard Component

@@ -10,7 +10,7 @@ class RetailEngine {
   }
   
   async initialize() {
-    console.log('[RETAIL_ENGINE] Initialized');
+    console.warn('[RETAIL_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

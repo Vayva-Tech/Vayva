@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
+import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPS_SUPPORT");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { id } = await params;
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("q") || "";
@@ -59,6 +70,8 @@ export async function GET(
       },
     });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[MERCHANT_CUSTOMERS_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to fetch customers" },

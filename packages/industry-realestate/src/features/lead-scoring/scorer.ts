@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Lead Scoring Engine
  * Main engine for calculating lead scores

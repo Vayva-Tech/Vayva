@@ -211,7 +211,7 @@ export function CampaignWallet({ balance, platform, onFundSuccess }: CampaignWal
 
                   <div className="space-y-3">
                     {FUNDING_OPTIONS.map((option) => (
-                      <button
+                      <Button
                         key={option.id}
                         onClick={() => setSelectedMethod(option.id)}
                         className={`w-full p-4 rounded-lg border text-left transition-all ${
@@ -244,7 +244,7 @@ export function CampaignWallet({ balance, platform, onFundSuccess }: CampaignWal
                             <CheckCircle className="h-5 w-5 text-green-500" />
                           )}
                         </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
 
@@ -304,7 +304,7 @@ export function CampaignWallet({ balance, platform, onFundSuccess }: CampaignWal
                             <span className="text-xl font-bold tracking-wider">
                               {virtualAccount.accountNumber}
                             </span>
-                            <button
+                            <Button
                               onClick={() => copyToClipboard(virtualAccount.accountNumber)}
                               className="p-1 hover:bg-white rounded transition-colors"
                             >
@@ -313,7 +313,7 @@ export function CampaignWallet({ balance, platform, onFundSuccess }: CampaignWal
                               ) : (
                                 <Copy className="h-4 w-4 text-gray-500" />
                               )}
-                            </button>
+                            </Button>
                           </div>
                         </div>
 

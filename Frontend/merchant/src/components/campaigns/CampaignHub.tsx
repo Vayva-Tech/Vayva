@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Campaign Hub Component
  * Main entry point for ad platform management

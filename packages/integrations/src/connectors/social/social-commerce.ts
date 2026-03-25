@@ -3,6 +3,7 @@
  * Instagram, Facebook, and TikTok Shop integrations
  */
 
+import { createHmac } from 'node:crypto';
 import type { ConnectorConfig, SyncResult } from '../../marketplace/types';
 
 // ============================================================
@@ -399,13 +400,12 @@ export class TikTokShopConnector {
   private buildSignature(endpoint: string, params: Record<string, string>): string {
     // TikTok API signature - simplified placeholder
     // In production: HMAC-SHA256 with appSecret
-    const crypto = require('crypto') as typeof import('crypto');
     const sortedParams = Object.keys(params)
       .sort()
       .map((k) => `${k}${params[k]}`)
       .join('');
     const stringToSign = `${this.config.appSecret}${endpoint}${sortedParams}${this.config.appSecret}`;
-    return crypto.createHmac('sha256', this.config.appSecret).update(stringToSign).digest('hex');
+    return createHmac('sha256', this.config.appSecret).update(stringToSign).digest('hex');
   }
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

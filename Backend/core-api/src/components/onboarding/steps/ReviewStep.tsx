@@ -16,7 +16,7 @@ import {
   Rocket,
   PencilSimple as Edit2,
   MapPin,
-  CheckCircle,
+  CheckCircle
 } from "@phosphor-icons/react/ssr";
 
 interface ReviewSectionProps {

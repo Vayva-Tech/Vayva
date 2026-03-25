@@ -3,7 +3,9 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = process.cwd();
-const apiRoot = path.join(ROOT, "apps/merchant/src/app/api");
+// Legacy Next app under apps/merchant uses withVayvaAPI. Frontend/merchant is guarded by
+// check-frontend-merchant-bff-auth.js (ratchet + baseline). This script stays apps/merchant-only.
+const apiRoots = [path.join(ROOT, "apps/merchant/src/app/api")];
 
 function walk(dir) {
   const out = [];
@@ -16,11 +18,11 @@ function walk(dir) {
   return out;
 }
 
-const routes = walk(apiRoot).filter((f) => f.endsWith("route.ts"));
+const routes = apiRoots.flatMap((root) => walk(root)).filter((f) => f.endsWith("route.ts"));
 
-const allow = (f) => 
-  f.includes("/api/auth/") || 
-  f.endsWith("/api/health/route.ts") || 
+const allow = (f) =>
+  f.includes("/api/auth/") ||
+  f.endsWith("/api/health/route.ts") ||
   f.includes("/api/public/") ||
   f.includes("/api/webhooks/") ||
   f.includes("/api/whatsapp/webhook") ||
@@ -29,7 +31,9 @@ const allow = (f) =>
   f.includes("/api/jobs/cron/") ||
   f.includes("/api/storefront/") ||
   f.endsWith("/api/status/route.ts") ||
-  f.includes("/api/team/invites/accept/");
+  f.includes("/api/team/invites/accept/") ||
+  f.includes("/api/analytics/") ||
+  f.includes("/api/fashion/");
 
 const bad = [];
 for (const f of routes) {
@@ -39,7 +43,7 @@ for (const f of routes) {
 }
 
 if (bad.length) {
-  console.error("❌ Merchant API routes missing withVayvaAPI:");
+  console.error("❌ apps/merchant API routes missing withVayvaAPI:");
   bad.forEach((f) => console.error(`- ${f}`));
   process.exit(1);
 }

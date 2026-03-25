@@ -26,7 +26,7 @@
         "../../packages/compliance/src/index.ts"
       ],
       "@vayva/db": [
-        "../../infra/db/src/client.ts"
+        "../../platform/infra/db/src/client.ts"
       ],
       "@vayva/ui": [
         "../../packages/ui/src/index.ts"

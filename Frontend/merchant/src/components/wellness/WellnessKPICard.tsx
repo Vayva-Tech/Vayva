@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { TrendUp as TrendingUp, TrendDown as TrendingDown } from "@phosphor-icons/react/ssr";

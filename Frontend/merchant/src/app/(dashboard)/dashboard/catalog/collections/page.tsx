@@ -1,16 +1,17 @@
-// @ts-nocheck
 "use client";
-
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { FolderSimple as FolderOpen, Plus, PencilSimple as Pencil, Trash, Package, Eye } from "@phosphor-icons/react";
+import { FolderSimple as FolderOpen, Plus, PencilSimple as Pencil, Trash, Package, Eye, Spinner as Loader2 } from "@phosphor-icons/react";
 import { formatDate, logger } from "@vayva/shared";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button, Input } from "@vayva/ui";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ProductPicker } from "@/components/bundles/ProductPicker";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface Collection {
   id: string;
@@ -168,17 +169,59 @@ export default function CollectionsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Collections</h1>
-          <p className="text-sm text-gray-500 mt-1">Organize products into curated groups</p>
-        </div>
-        <Button onClick={handleOpenCreate} className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
-          <Plus size={18} className="mr-2" />
-          New Collection
-        </Button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button
+                  onClick={handleOpenCreate}
+                  className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-xl font-semibold justify-between"
+                >
+                  <span>New collection</span>
+                  <Plus size={18} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Visible</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {visibleCollections}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Hidden</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {hiddenCollections}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Collections"
+          subtitle="Organize products into curated groups"
+          actions={
+            <Button
+              onClick={handleOpenCreate}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold"
+            >
+              <Plus size={18} className="mr-2" />
+              New Collection
+            </Button>
+          }
+        />
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -274,20 +317,20 @@ export default function CollectionsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
                           onClick={() => void handleOpenEdit(col)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Pencil size={16} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => handleDeleteClick(col.id, col.name)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
                           <Trash size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -376,6 +419,7 @@ export default function CollectionsPage() {
         title="Delete Collection"
         message={deleteConfirm ? `Delete "${deleteConfirm.name}"? This cannot be undone.` : ""}
       />
+      </PageWithInsights>
     </div>
   );
 }

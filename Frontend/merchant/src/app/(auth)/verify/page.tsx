@@ -1,9 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { Button, Icon } from "@vayva/ui";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button, Icon, Label } from "@vayva/ui";
+import { Envelope, WhatsappLogo } from "@phosphor-icons/react/ssr";
 import { OTPInput } from "@/components/ui/OTPInput";
 import { AuthService } from "@/services/auth";
 import { SplitAuthLayout } from "@/components/auth/SplitAuthLayout";
@@ -12,20 +12,19 @@ import { logger } from "@vayva/shared";
 import Link from "next/link";
 import type { User, MerchantContext } from "@vayva/shared/types";
 
-interface VerifyOtpResponse {
-  token: string;
-  user: User;
-  merchant?: MerchantContext | null;
-}
-
 const VerifyContent = () => {
-  // const router = useRouter();
+  const router = useRouter();
   const { login } = useAuth();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "";
-  const otpFromQuery = searchParams.get("otp") || "";
-  const method = (searchParams.get("method") as "EMAIL" | "WHATSAPP") || "EMAIL";
-  const maskedPhone = searchParams.get("maskedPhone") || "";
+  const email = searchParams?.get("email") || "";
+  const otpFromQuery = searchParams?.get("otp") || "";
+  const method =
+    (searchParams?.get("method") as "EMAIL" | "WHATSAPP") || "EMAIL";
+  const maskedPhone = searchParams?.get("maskedPhone") || "";
+
+  const [selectedMethod, setSelectedMethod] = useState<"EMAIL" | "WHATSAPP">(
+    method === "WHATSAPP" ? "WHATSAPP" : "EMAIL",
+  );
 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,11 +34,23 @@ const VerifyContent = () => {
   const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
+    setSelectedMethod(method === "WHATSAPP" ? "WHATSAPP" : "EMAIL");
+  }, [method]);
+
+  useEffect(() => {
+    if (!email.trim()) {
+      router.replace("/signin");
+    }
+  }, [email, router]);
+
+  useEffect(() => {
     if (process.env?.NODE_ENV === "production") return;
+    if (!email.trim()) return;
     if (!otpFromQuery || otpFromQuery.length !== 6) return;
     setOtp(otpFromQuery);
     handleVerify(otpFromQuery);
-  }, [otpFromQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- dev-only auto-verify from query
+  }, [otpFromQuery, email]);
 
   // Auto-focus first OTP input on mount
   useEffect(() => {
@@ -65,7 +76,21 @@ const VerifyContent = () => {
     setError(null);
 
     try {
-      const response = await AuthService.verifyOTP(email, otpValue, selectedMethod);
+      let rememberMe = false;
+      try {
+        rememberMe =
+          typeof window !== "undefined" &&
+          sessionStorage.getItem("vayva_auth_remember_me") === "1";
+      } catch {
+        /* ignore */
+      }
+
+      const response = await AuthService.verifyOTP(
+        email,
+        otpValue,
+        selectedMethod,
+        rememberMe,
+      );
 
       if (!response.success || !response.token) {
         throw new Error("Invalid verification code");
@@ -73,6 +98,12 @@ const VerifyContent = () => {
 
       if (!response.user) {
         throw new Error("Missing user from verification response");
+      }
+
+      try {
+        sessionStorage.removeItem("vayva_auth_remember_me");
+      } catch {
+        /* ignore */
       }
 
       const { token, user, merchant } = response;
@@ -120,7 +151,7 @@ const VerifyContent = () => {
       <div className="mb-6">
         <Label className="mb-3 block">Receive code via</Label>
         <div className="grid grid-cols-2 gap-3">
-          <button
+          <Button
             type="button"
             onClick={() => {
               setSelectedMethod("EMAIL");
@@ -128,16 +159,16 @@ const VerifyContent = () => {
             }}
             className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${
               selectedMethod === "EMAIL"
-                ? "border-black bg-black/5"
-                : "border-studio-border hover:border-black/30"
+                ? "border-green-500 bg-green-500/5"
+                : "border-gray-200 hover:border-green-200"
             }`}
           >
-            <Envelope className={`w-5 h-5 ${selectedMethod === "EMAIL" ? "text-black" : "text-gray-400"}`} />
-            <span className={`text-sm font-medium ${selectedMethod === "EMAIL" ? "text-black" : "text-gray-500"}`}>
+            <Envelope className={`w-5 h-5 ${selectedMethod === "EMAIL" ? "text-green-600" : "text-gray-400"}`} />
+            <span className={`text-sm font-medium ${selectedMethod === "EMAIL" ? "text-gray-900" : "text-gray-500"}`}>
               Email
             </span>
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => {
               setSelectedMethod("WHATSAPP");
@@ -145,15 +176,15 @@ const VerifyContent = () => {
             }}
             className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${
               selectedMethod === "WHATSAPP"
-                ? "border-black bg-black/5"
-                : "border-studio-border hover:border-black/30"
+                ? "border-green-500 bg-green-500/5"
+                : "border-gray-200 hover:border-green-200"
             }`}
           >
-            <WhatsappLogo className={`w-5 h-5 ${selectedMethod === "WHATSAPP" ? "text-black" : "text-gray-400"}`} />
-            <span className={`text-sm font-medium ${selectedMethod === "WHATSAPP" ? "text-black" : "text-gray-500"}`}>
+            <WhatsappLogo className={`w-5 h-5 ${selectedMethod === "WHATSAPP" ? "text-green-600" : "text-gray-400"}`} />
+            <span className={`text-sm font-medium ${selectedMethod === "WHATSAPP" ? "text-gray-900" : "text-gray-500"}`}>
               WhatsApp
             </span>
-          </button>
+          </Button>
         </div>
         <p className="text-xs text-gray-400 mt-2 text-center">
           {selectedMethod === "EMAIL"
@@ -166,8 +197,8 @@ const VerifyContent = () => {
 
       {/* Icon */}
       <div className="flex justify-center mb-6">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${method === "WHATSAPP" ? "bg-green-500/10" : "bg-black/5"}`}>
-          <Icon name={method === "WHATSAPP" ? "ChatCircle" : "Mail"} className={`w-8 h-8 ${method === "WHATSAPP" ? "text-green-600" : "text-black"}`} />
+        <div className="w-16 h-16 rounded-full flex items-center justify-center bg-green-500/10">
+          <Icon name={method === "WHATSAPP" ? "ChatCircle" : "Mail"} className="w-8 h-8 text-green-600" />
         </div>
       </div>
 
@@ -200,7 +231,7 @@ const VerifyContent = () => {
             variant="link"
             onClick={handleResend}
             disabled={resendLoading}
-            className="text-sm text-gray-900 hover:text-black font-medium pl-0 pr-0"
+            className="text-sm text-green-700 hover:text-green-800 font-medium pl-0 pr-0"
           >
             {resendLoading ? (
               <>
@@ -222,7 +253,7 @@ const VerifyContent = () => {
       <Button
         variant="primary"
         size="lg"
-        className="w-full !bg-black !text-white hover:!bg-black/90 !rounded-xl !h-12"
+        className="w-full rounded-xl h-12"
         onClick={() => handleVerify(otp)}
         disabled={loading || otp.length !== 6}
         data-testid="auth-verify-submit"
@@ -245,7 +276,7 @@ const VerifyContent = () => {
             variant="link"
             onClick={handleResend}
             disabled={!canResend || resendLoading}
-            className="text-gray-900 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed font-medium pl-0 pr-0 h-auto"
+            className="text-green-700 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed font-medium pl-0 pr-0 h-auto"
           >
             {resendLoading ? "sending..." : "request a new one"}
           </Button>
@@ -254,7 +285,7 @@ const VerifyContent = () => {
           Wrong {method === "WHATSAPP" ? "phone number" : "email"}?{" "}
           <Link
             href={`/signup${email ? `?email=${encodeURIComponent(email)}` : ""}`}
-            className="text-gray-900 hover:text-black font-medium underline"
+            className="text-green-700 hover:text-green-800 font-medium underline"
           >
             Go back to update
           </Link>

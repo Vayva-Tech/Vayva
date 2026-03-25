@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { WarningCircle as AlertCircle } from "@phosphor-icons/react/dist/ssr/WarningCircle";
 import { Button } from "./Button";

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { normalizePhoneToE164, shouldSendMessage, } from "../../apps/merchant/src/lib/consent/consent";
-import { createPreferencesToken, verifyPreferencesToken, } from "../../apps/merchant/src/lib/consent/token";
+import { normalizePhoneToE164, shouldSendMessage } from "../../apps/merchant/src/lib/consent/consent";
+import { createPreferencesToken, verifyPreferencesToken } from "../../apps/merchant/src/lib/consent/token";
 import { MessageIntent } from "@vayva/db";
 describe("Consent Logic", () => {
     it("normalizes Nigeria phone numbers", () => {

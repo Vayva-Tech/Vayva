@@ -4,7 +4,7 @@
  * Secure lab result viewing and trend analysis
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const LAB_RESULTS_ADDON: AddOnDefinition = {
   id: 'vayva.lab-results',

@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { RestaurantDashboardService } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from '@vayva/ui';
+import { CardTitle } from '../restaurant-ui';
 import { 
   CircleOff,
   Circle,
@@ -156,7 +156,7 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
             <CircleOff className="h-5 w-5" />
             86 Board
             {unavailableCount > 0 && (
-              <Badge variant="destructive" className="bg-red-100 text-red-700">
+              <Badge variant="error" className="bg-red-100 text-red-700">
                 {unavailableCount} items
               </Badge>
             )}
@@ -165,7 +165,7 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
         
         {/* Filters */}
         <div className="flex gap-2 mt-3">
-          <button
+          <Button
             onClick={() => setFilter('all')}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               filter === 'all'
@@ -174,8 +174,8 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
             }`}
           >
             All
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setFilter('available')}
             className={`px-3 py-1 text-sm rounded-full transition-colors flex items-center gap-1 ${
               filter === 'available'
@@ -185,8 +185,8 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
           >
             <Circle className="h-3 w-3" />
             Available
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setFilter('unavailable')}
             className={`px-3 py-1 text-sm rounded-full transition-colors flex items-center gap-1 ${
               filter === 'unavailable'
@@ -196,7 +196,7 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
           >
             <CircleOff className="h-3 w-3" />
             86'd
-          </button>
+          </Button>
         </div>
       </CardHeader>
       
@@ -227,8 +227,8 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
                     }`}>
                       {item.name}
                     </h3>
-                    <Badge 
-                      variant="secondary" 
+                    <Badge
+                      variant="outline"
                       className="text-xs bg-white/70"
                     >
                       {item.category}
@@ -252,7 +252,7 @@ export function EightySixBoard({ dashboardService }: EightySixBoardProps) {
                 
                 <Button
                   size="sm"
-                  variant={item.isAvailable ? "destructive" : "default"}
+                  variant={item.isAvailable ? "destructive" : "primary"}
                   onClick={() => toggleAvailability(item.id)}
                   className={`
                     ml-3 transition-colors

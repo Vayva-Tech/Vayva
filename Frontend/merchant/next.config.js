@@ -78,6 +78,16 @@ const nextConfig = {
                 destination: "/signup",
                 permanent: true,
             },
+            {
+                source: "/beta/meal-kit",
+                destination: "/dashboard/meal-kit",
+                permanent: true,
+            },
+            {
+                source: "/dashboard/desktop-app",
+                destination: "/beta/desktop-app",
+                permanent: true,
+            },
         ];
     },
     async headers() {

@@ -1,5 +1,5 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -688,7 +688,7 @@ export default function MerchantDiagnosticPage() {
           {tabs.map((tab) => {
             const TabIcon = tab.icon;
             return (
-              <button
+              <Button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex-1 justify-center ${
@@ -699,7 +699,7 @@ export default function MerchantDiagnosticPage() {
               >
                 <TabIcon size={16} />
                 {tab.label}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -713,3 +713,4 @@ export default function MerchantDiagnosticPage() {
     </OpsPageShell>
   );
 }
+

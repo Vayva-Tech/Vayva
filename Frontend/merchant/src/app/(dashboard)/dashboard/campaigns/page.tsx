@@ -1,11 +1,13 @@
-// @ts-nocheck
 "use client";
-
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Megaphone, Plus, PencilSimple as Edit, Trash, Play, Pause, ChartBar, Envelope, ShareNetwork, ChatCircleDots, Bell } from "@phosphor-icons/react";
 import { logger } from "@vayva/shared";
-import { Button } from "@vayva/ui";
+import { Button, Input } from "@vayva/ui";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiJson } from "@/lib/api-client-shared";
 
 interface Campaign {
@@ -307,7 +309,7 @@ export default function CampaignsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
                           onClick={() => handleToggleStatus(campaign.id, campaign.status)}
                           className={`p-1.5 rounded-lg transition-colors ${
                             campaign.status === "active"
@@ -317,21 +319,21 @@ export default function CampaignsPage() {
                           title={campaign.status === "active" ? "Pause" : "Activate"}
                         >
                           {campaign.status === "active" ? <Pause size={16} /> : <Play size={16} />}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => openEdit(campaign)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Edit size={16} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => setDeleteConfirm({ id: campaign.id, name: campaign.name })}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
                           <Trash size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>

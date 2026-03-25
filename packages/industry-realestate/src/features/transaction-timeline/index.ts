@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Transaction Timeline Feature Module
  * Export all transaction timeline functionality

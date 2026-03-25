@@ -22,9 +22,9 @@ function getString(value: unknown): string | undefined {
  * GET /api/social-connections
  * Get all social platform connections for the store
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   return withVayvaAPI(
-    PERMISSIONS.INTEGRATIONS_VIEW,
+    PERMISSIONS.INTEGRATIONS_MANAGE,
     async (_req, { storeId }) => {
       try {
         // Get existing connections
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
  * POST /api/social-connections
  * Connect a new social platform
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   return withVayvaAPI(
     PERMISSIONS.INTEGRATIONS_MANAGE,
     async (req, { storeId, user }) => {
@@ -194,71 +194,10 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * DELETE /api/social-connections/[platformId]
- * Disconnect a social platform
- */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { platformId: string } }
-) {
-  const platformId = params.platformId;
-
-  return withVayvaAPI(
-    PERMISSIONS.INTEGRATIONS_MANAGE,
-    async (_req, { storeId, user }) => {
-      try {
-        // Find and delete the connection
-        const connection = await prisma.socialConnection.findUnique({
-          where: {
-            storeId_platform: {
-              storeId,
-              platform: platformId,
-            }
-          }
-        });
-
-        if (!connection) {
-          return NextResponse.json(
-            { error: "Connection not found" },
-            { status: 404 }
-          );
-        }
-
-        await prisma.socialConnection.delete({
-          where: {
-            id: connection.id
-          }
-        });
-
-        // Log the disconnection
-        logger.info("[SOCIAL_CONNECTION_DELETED]", {
-          storeId,
-          platform: platformId,
-          userId: user.id,
-          accountName: connection.accountName,
-        });
-
-        return NextResponse.json({
-          success: true,
-          message: `${platformId} disconnected successfully`
-        });
-
-      } catch (error: unknown) {
-        logger.error("[SOCIAL_CONNECTIONS_DELETE]", error, { storeId, platformId });
-        return NextResponse.json(
-          { error: "Failed to disconnect social platform" },
-          { status: 500 }
-        );
-      }
-    }
-  );
-}
-
-/**
  * Test platform connection
  * In production, this would make actual API calls to validate tokens
  */
-async function testPlatformConnection(platform: string, token: string): Promise<{
+async function testPlatformConnection(platform: string, _token: string): Promise<{
   success: boolean;
   accountName?: string;
   error?: string;
@@ -300,7 +239,7 @@ function encryptToken(token: string): string {
  * Decrypt token for use
  * In production, use proper decryption
  */
-function decryptToken(encryptedToken: string): string {
+function _decryptToken(encryptedToken: string): string {
   // Placeholder - implement proper decryption
   return Buffer.from(encryptedToken, 'base64').toString();
 }

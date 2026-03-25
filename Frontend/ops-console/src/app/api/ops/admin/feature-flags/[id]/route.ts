@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@vayva/db";
+import { OpsAuthService } from "@/lib/ops-auth";
+import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 
 // Update feature flag
 export async function PATCH(
@@ -7,6 +9,15 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "SUPERVISOR");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { id } = await params;
     const body = await req.json();
     const { enabled, description } = body;
@@ -29,6 +40,8 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, flag });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[FEATURE_FLAG_UPDATE_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to update feature flag" },
@@ -43,6 +56,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, "OPERATOR");
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { id } = await params;
     const flag = await prisma.featureFlag.findUnique({
       where: { id },
@@ -64,6 +86,8 @@ export async function GET(
 
     return NextResponse.json({ flag });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error("[FEATURE_FLAG_GET_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to fetch feature flag" },

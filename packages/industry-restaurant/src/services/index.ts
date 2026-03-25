@@ -1,4 +1,5 @@
-// @ts-nocheck
+export type { Order, Reservation, Table } from '../types';
+
 /**
  * Restaurant Industry Services
  * 
@@ -18,7 +19,7 @@
 // Traditional Services
 export * from './kds-service';
 export * from './dashboard-service';
-export * from './86_board-service';
+export * from './86-board-service';
 export * from './table-service';
 export * from './recipe-costing-service';
 export * from './reservation-service';

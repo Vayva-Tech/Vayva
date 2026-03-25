@@ -1,4 +1,25 @@
-// @ts-nocheck
+export {};
+
+declare global {
+  interface Window {
+    vayvaTrackOrder?: (storeId: string) => void;
+  }
+}
+
+interface TrackTimelineEvent {
+  title: string;
+  date: string;
+}
+
+interface TrackOrderShape {
+  status: string;
+  orderNumber: string;
+  customerName: string;
+  itemCount: number;
+  total: number;
+  deliveryAddress?: string;
+}
+
 /**
  * Vayva Order Tracking Widget
  * 
@@ -15,7 +36,7 @@
   function initTracker() {
     const container = document.getElementById('vayva-order-tracker');
     
-    if (!container) {
+    if (!(container instanceof HTMLElement)) {
       console.error('[Vayva] Order tracker container not found');
       return;
     }
@@ -38,7 +59,11 @@
     renderTrackingForm(container, storeId, theme);
   }
 
-  function renderTrackingForm(container, storeId, theme) {
+  function renderTrackingForm(
+    container: HTMLElement,
+    storeId: string,
+    theme: string,
+  ) {
     container.innerHTML = `
       <style>
         .vayva-tracker {
@@ -267,10 +292,19 @@
   }
 
   // Expose global function
-  window.vayvaTrackOrder = function(storeId) {
-    const orderNumber = document.getElementById('vayva-order-number').value.trim();
-    const email = document.getElementById('vayva-order-email').value.trim();
+  window.vayvaTrackOrder = function(storeId: string) {
+    const orderEl = document.getElementById('vayva-order-number');
+    const emailEl = document.getElementById('vayva-order-email');
     const resultDiv = document.getElementById('vayva-tracking-result');
+    if (
+      !(orderEl instanceof HTMLInputElement) ||
+      !(emailEl instanceof HTMLInputElement) ||
+      !resultDiv
+    ) {
+      return;
+    }
+    const orderNumber = orderEl.value.trim();
+    const email = emailEl.value.trim();
 
     if (!orderNumber || !email) {
       resultDiv.innerHTML = '<div class="vayva-error">Please enter both order number and email</div>';
@@ -287,19 +321,34 @@
 
     fetch(`${VAYVA_API_BASE}/api/embedded/orders/track?storeId=${storeId}&orderNumber=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}`)
       .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          throw new Error(data.error);
+      .then((data: unknown) => {
+        const payload = data as {
+          error?: string;
+          order?: TrackOrderShape;
+          timeline?: TrackTimelineEvent[];
+        };
+        if (payload.error) {
+          throw new Error(payload.error);
         }
-        renderTrackingResult(resultDiv, data.order, data.timeline);
+        if (!payload.order || !payload.timeline) {
+          throw new Error('Invalid response');
+        }
+        renderTrackingResult(resultDiv, payload.order, payload.timeline);
       })
-      .catch(err => {
-        resultDiv.innerHTML = `<div class="vayva-error">❌ ${err.message || 'Order not found. Please check your details.'}</div>`;
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Order not found. Please check your details.';
+        resultDiv.innerHTML = `<div class="vayva-error">❌ ${msg}</div>`;
       });
   };
 
-  function renderTrackingResult(container, order, timeline) {
-    const statusIcons = {
+  function renderTrackingResult(
+    container: HTMLElement,
+    order: TrackOrderShape,
+    timeline: TrackTimelineEvent[],
+  ) {
+    const root = document.getElementById("vayva-order-tracker");
+    const theme = (root && root.getAttribute("data-theme")) || "light";
+    const statusIcons: Record<string, string> = {
       'PENDING': '⏳',
       'PROCESSING': '🔄',
       'SHIPPED': '🚚',
@@ -307,7 +356,7 @@
       'CANCELLED': '❌'
     };
 
-    const statusClasses = {
+    const statusClasses: Record<string, string> = {
       'PENDING': 'vayva-status-pending',
       'PROCESSING': 'vayva-status-processing',
       'SHIPPED': 'vayva-status-shipped',
@@ -330,7 +379,7 @@
         </div>
         
         <div class="vayva-timeline">
-          ${timeline.map((event, index) => `
+          ${timeline.map((event: TrackTimelineEvent, index: number) => `
             <div class="vayva-timeline-item">
               <div class="vayva-timeline-dot ${index === timeline.length - 1 ? 'active' : ''}"></div>
               <div class="vayva-timeline-title">${event.title}</div>

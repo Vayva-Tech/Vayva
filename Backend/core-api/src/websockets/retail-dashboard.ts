@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { prisma } from '@vayva/db';
+import { prismaDelegates } from "@vayva/db";
 import type { Server } from 'http';
 
 interface ChannelSubscribers {
@@ -28,7 +28,7 @@ export class RetailWebSocketServer {
 
   private initialize() {
     this.wss.on('connection', (ws: AuthenticatedSocket) => {
-      console.log('[Retail WS] New connection');
+      console.warn('[Retail WS] New connection');
       
       ws.isAuthenticated = false;
 
@@ -64,7 +64,7 @@ export class RetailWebSocketServer {
       });
 
       ws.on('close', () => {
-        console.log('[Retail WS] Connection closed');
+        console.warn('[Retail WS] Connection closed');
         this.removeClient(ws);
       });
 
@@ -93,7 +93,7 @@ export class RetailWebSocketServer {
       const { storeId, userId } = data;
       
       // Validate user has access to store
-      const membership = await prisma.teamMember.findFirst({
+      const membership = await prismaDelegates.teamMember.findFirst({
         where: {
           userId,
           storeId,
@@ -119,7 +119,7 @@ export class RetailWebSocketServer {
         userId,
       }));
 
-      console.log(`[Retail WS] User ${userId} authenticated for store ${storeId}`);
+      console.warn(`[Retail WS] User ${userId} authenticated for store ${storeId}`);
     } catch (error) {
       console.error('[Retail WS] Auth error:', error);
       ws.send(JSON.stringify({ 
@@ -158,7 +158,7 @@ export class RetailWebSocketServer {
     
     this.channels[channel].add(ws);
     
-    console.log(`[Retail WS] Client subscribed to ${channel}`);
+    console.warn(`[Retail WS] Client subscribed to ${channel}`);
     
     ws.send(JSON.stringify({
       type: 'subscribed',
@@ -180,7 +180,7 @@ export class RetailWebSocketServer {
         delete this.channels[channel];
       }
       
-      console.log(`[Retail WS] Client unsubscribed from ${channel}`);
+      console.warn(`[Retail WS] Client unsubscribed from ${channel}`);
     }
   }
 
@@ -196,10 +196,10 @@ export class RetailWebSocketServer {
   /**
    * Broadcast message to all clients in a channel
    */
-  public broadcastToChannel(channel: string, data: any) {
+  public broadcastToChannel(channel: string, data: unknown) {
     const subscribers = this.channels[channel];
     if (!subscribers || subscribers.size === 0) {
-      console.log(`[Retail WS] No subscribers for ${channel}`);
+      console.warn(`[Retail WS] No subscribers for ${channel}`);
       return;
     }
 
@@ -222,16 +222,16 @@ export class RetailWebSocketServer {
     });
 
     if (removedCount > 0) {
-      console.log(`[Retail WS] Cleaned up ${removedCount} closed connections`);
+      console.warn(`[Retail WS] Cleaned up ${removedCount} closed connections`);
     }
 
-    console.log(`[Retail WS] Broadcast to ${subscribers.size} clients in ${channel}`);
+    console.warn(`[Retail WS] Broadcast to ${subscribers.size} clients in ${channel}`);
   }
 
   /**
    * Broadcast to all channels matching a pattern
    */
-  public broadcastToStore(storeId: string, type: string, data: any) {
+  public broadcastToStore(storeId: string, type: string, data: unknown) {
     const pattern = `store:${storeId}:${type}`;
     const matchingChannels = Object.keys(this.channels).filter((ch) => 
       ch.startsWith(pattern)
@@ -241,7 +241,7 @@ export class RetailWebSocketServer {
       this.broadcastToChannel(channel, data);
     });
 
-    console.log(`[Retail WS] Store broadcast to ${matchingChannels.length} channels`);
+    console.warn(`[Retail WS] Store broadcast to ${matchingChannels.length} channels`);
   }
 
   /**
@@ -293,11 +293,11 @@ export function getRetailWebSocketServer(): RetailWebSocketServer | null {
 
 export function initializeRetailWebSocketServer(server: Server): RetailWebSocketServer {
   if (instance) {
-    console.log('[Retail WS] Using existing instance');
+    console.warn('[Retail WS] Using existing instance');
     return instance;
   }
 
   instance = new RetailWebSocketServer(server);
-  console.log('[Retail WS] Server initialized on port 3001');
+  console.warn('[Retail WS] Server initialized on port 3001');
   return instance;
 }

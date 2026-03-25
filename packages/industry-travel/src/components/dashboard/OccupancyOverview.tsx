@@ -1,9 +1,8 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@vayva/ui';
-import { TrendingUp, Users, DollarSign } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@vayva/ui';
+import { TrendingUp, Users as _Users, DollarSign as _DollarSign } from 'lucide-react';
 
 interface OccupancyOverviewProps {
   data: {
@@ -26,7 +25,7 @@ const OccupancyOverview: React.FC<OccupancyOverviewProps> = ({ data }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="glass-effect border-0 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Today's Check-ins</CardTitle>
+            <div className="text-sm font-medium text-gray-600">Today&apos;s Check-ins</div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">{data.todayCheckIns}</div>
@@ -36,7 +35,7 @@ const OccupancyOverview: React.FC<OccupancyOverviewProps> = ({ data }) => {
         
         <Card className="glass-effect border-0 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Tonight's Occupancy</CardTitle>
+            <div className="text-sm font-medium text-gray-600">Tonight&apos;s Occupancy</div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">{data.tonightOccupancy}%</div>
@@ -46,7 +45,7 @@ const OccupancyOverview: React.FC<OccupancyOverviewProps> = ({ data }) => {
         
         <Card className="glass-effect border-0 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Avg Daily Rate</CardTitle>
+            <div className="text-sm font-medium text-gray-600">Avg Daily Rate</div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">${data.avgDailyRate}/night</div>

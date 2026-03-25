@@ -10,6 +10,7 @@ import {
   Users,
   BarChart3,
 } from "lucide-react";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 // ============================================
 // SECTION: DASHBOARD FEATURES PREVIEW
@@ -67,8 +68,8 @@ const features = [
 
 export function DashboardPreviewSection(): React.JSX.Element {
   return (
-    <section className="relative py-20 lg:py-28 bg-gradient-to-b from-white to-emerald-50/30 overflow-hidden">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+    <section className="relative w-full min-w-0 overflow-x-hidden py-20 lg:py-28 bg-gradient-to-b from-white to-emerald-50/30">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 min-w-0">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,14 +84,16 @@ export function DashboardPreviewSection(): React.JSX.Element {
             Manage everything from{" "}
             <span className="text-emerald-600">one powerful dashboard</span>
           </h2>
-          <p className="text-lg text-slate-600 mt-4 max-w-2xl mx-auto">
-            Orders, payments, inventory, AI insights, customers, analytics — all
-            managed from a single powerful interface.
+          <p className="text-lg text-slate-600 mt-4 max-w-2xl mx-auto px-2">
+            <span className="md:hidden">Swipe for each area of the dashboard.</span>
+            <span className="hidden md:inline">
+              Orders, payments, inventory, AI insights, customers, analytics — all managed from a single powerful
+              interface.
+            </span>
           </p>
         </motion.div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, idx) => (
             <motion.div
               key={feature.title}
@@ -123,6 +126,34 @@ export function DashboardPreviewSection(): React.JSX.Element {
               </div>
             </motion.div>
           ))}
+        </div>
+        <div className="md:hidden -mx-1">
+          <MarketingSnapRow
+            ariaLabel="Dashboard capabilities"
+            hint="Swipe for each module"
+            showDots
+            dotCount={features.length}
+          >
+            {features.map((feature) => (
+              <MarketingSnapItem key={feature.title}>
+                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-full">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                      <feature.icon size={20} className="text-emerald-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-900 mb-1">{feature.title}</h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
+                    <span className="text-2xl font-bold text-emerald-600">{feature.stat}</span>
+                    <span className="text-xs text-slate-500">{feature.statLabel}</span>
+                  </div>
+                </div>
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
         </div>
       </div>
     </section>

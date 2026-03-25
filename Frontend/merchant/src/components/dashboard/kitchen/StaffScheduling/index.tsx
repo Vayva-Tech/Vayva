@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { Calendar, Clock, Users, TrendingUp, AlertTriangle } from 'lucide-react';
@@ -167,7 +168,7 @@ export function StaffSchedulingOptimization({
             AI Powered
           </span>
           <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
+            <Button
               onClick={() => setViewMode('day')}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 viewMode === 'day'
@@ -176,8 +177,8 @@ export function StaffSchedulingOptimization({
               }`}
             >
               Day
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setViewMode('week')}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 viewMode === 'week'
@@ -186,7 +187,7 @@ export function StaffSchedulingOptimization({
               }`}
             >
               Week
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -325,3 +326,4 @@ export function StaffSchedulingOptimization({
     </div>
   );
 }
+

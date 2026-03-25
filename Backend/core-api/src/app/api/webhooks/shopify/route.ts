@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = JSON.parse(body);
-    console.log(`[SHOPIFY] Received topic: ${topic} from ${shopDomain}`);
+    console.warn(`[SHOPIFY] Received topic: ${topic} from ${shopDomain}`);
 
     // Handle different topics
     switch (topic) {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         break;
         
       default:
-        console.log(`[SHOPIFY] Unhandled topic: ${topic}`);
+        console.warn(`[SHOPIFY] Unhandled topic: ${topic}`);
     }
 
     return new Response(
@@ -207,7 +207,7 @@ async function handleOrderCreated(order: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Order synced: ${order.id} for merchant ${merchantId}`);
+    console.warn(`[SHOPIFY] Order synced: ${order.id} for merchant ${merchantId}`);
   } catch (error) {
     console.error("[SHOPIFY] Error syncing order:", error);
     throw new WebhookEventError(
@@ -237,7 +237,7 @@ async function handleOrderUpdated(order: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Order updated: ${order.id}`);
+    console.warn(`[SHOPIFY] Order updated: ${order.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error updating order:", error);
   }
@@ -261,7 +261,7 @@ async function handleOrderCancelled(order: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Order cancelled: ${order.id}`);
+    console.warn(`[SHOPIFY] Order cancelled: ${order.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error cancelling order:", error);
   }
@@ -273,7 +273,7 @@ async function handleOrderDeleted(order: any) {
       where: { externalId: `shopify_${order.id}` },
     });
 
-    console.log(`[SHOPIFY] Order deleted: ${order.id}`);
+    console.warn(`[SHOPIFY] Order deleted: ${order.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error deleting order:", error);
   }
@@ -345,7 +345,7 @@ async function handleProductCreated(product: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Product synced: ${product.id}`);
+    console.warn(`[SHOPIFY] Product synced: ${product.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error syncing product:", error);
     throw new WebhookEventError(
@@ -373,7 +373,7 @@ async function handleProductUpdated(product: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Product updated: ${product.id}`);
+    console.warn(`[SHOPIFY] Product updated: ${product.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error updating product:", error);
   }
@@ -385,7 +385,7 @@ async function handleProductDeleted(product: any) {
       where: { externalId: `shopify_${product.id}` },
     });
 
-    console.log(`[SHOPIFY] Product deleted: ${product.id}`);
+    console.warn(`[SHOPIFY] Product deleted: ${product.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error deleting product:", error);
   }
@@ -447,7 +447,7 @@ async function handleCustomerCreated(customer: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Customer synced: ${customer.id}`);
+    console.warn(`[SHOPIFY] Customer synced: ${customer.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error syncing customer:", error);
   }
@@ -473,7 +473,7 @@ async function handleCustomerUpdated(customer: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Customer updated: ${customer.id}`);
+    console.warn(`[SHOPIFY] Customer updated: ${customer.id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error updating customer:", error);
   }
@@ -516,7 +516,7 @@ async function handleFulfillmentCreated(fulfillment: any) {
       },
     });
 
-    console.log(`[SHOPIFY] Fulfillment created: ${fulfillment.id} for order ${fulfillment.order_id}`);
+    console.warn(`[SHOPIFY] Fulfillment created: ${fulfillment.id} for order ${fulfillment.order_id}`);
   } catch (error) {
     console.error("[SHOPIFY] Error creating fulfillment:", error);
   }

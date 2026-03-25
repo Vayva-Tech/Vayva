@@ -7,7 +7,7 @@ import crypto from 'crypto';
 
 export interface WebhookVerificationResult {
   valid: boolean;
-  payload?: any;
+  payload?: unknown;
   error?: string;
 }
 

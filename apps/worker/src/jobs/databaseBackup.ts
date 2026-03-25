@@ -1,4 +1,5 @@
 import { exec } from "child_process";
+import { writeFileSync } from "node:fs";
 import { promisify } from "util";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { logger } from "@vayva/shared";
@@ -260,9 +261,7 @@ export async function restoreDatabase(
     }
     const buffer = Buffer.concat(chunks);
     await execAsync(`cat > ${tempPath}`, { encoding: "buffer" });
-    // Write buffer to temp file using fs
-    const fs = require("fs");
-    fs.writeFileSync(tempPath, buffer);
+    writeFileSync(tempPath, buffer);
 
     // Restore database
     const restoreCmd = `gunzip -c ${tempPath} | PGPASSWORD="${fullConfig.dbPassword}" psql \

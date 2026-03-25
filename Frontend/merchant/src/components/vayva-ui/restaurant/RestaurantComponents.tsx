@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 import { VayvaCard, VayvaCardHeader, VayvaCardTitle, VayvaCardContent } from '../VayvaCard';
@@ -53,10 +53,13 @@ export const RestaurantKPICard: React.FC<KPIMetric & { className?: string }> = (
         <div className="flex items-start justify-between mb-3">
           <div className="text-sm font-bold text-gray-700 uppercase tracking-wide">{title}</div>
           {icon && (
-            <div className={cn('p-2 rounded-lg', colorClasses[color])}>
-              {React.cloneElement(icon as React.ReactElement, {
-                className: 'w-5 h-5 text-white',
-              })}
+            <div
+              className={cn(
+                "p-2 rounded-lg text-white [&_svg]:h-5 [&_svg]:w-5",
+                colorClasses[color],
+              )}
+            >
+              {icon}
             </div>
           )}
         </div>
@@ -247,7 +250,7 @@ export const TableStatusGrid: React.FC<TableGridProps> = ({ tables, onTableClick
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {tables.map((table) => (
-        <button
+        <Button
           key={table.tableNumber}
           onClick={() => onTableClick?.(table)}
           className={cn(
@@ -266,8 +269,9 @@ export const TableStatusGrid: React.FC<TableGridProps> = ({ tables, onTableClick
           {table.timeSeated && (
             <div className="text-xs mt-1 opacity-75">{table.timeSeated}</div>
           )}
-        </button>
+        </Button>
       ))}
     </div>
   );
 };
+

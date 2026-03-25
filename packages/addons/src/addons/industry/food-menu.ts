@@ -4,7 +4,7 @@
  * Restaurant menu display with categories, dietary filters, and pricing
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const FOOD_MENU_ADDON: AddOnDefinition = {
   id: 'vayva.food-menu',

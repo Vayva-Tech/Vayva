@@ -13,8 +13,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
 import { samlSsoProvider } from '@vayva/security';
-import { auth } from '@/lib/auth';
+import { authOptions } from '@/lib/auth';
 
 /**
  * GET /api/auth/saml/metadata
@@ -37,7 +38,7 @@ export async function GET(_request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

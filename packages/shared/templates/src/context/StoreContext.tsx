@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -37,7 +36,7 @@ export function StoreProvider({
   children: React.ReactNode;
   initialStore?: PublicStore | null;
 }): React.JSX.Element {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ?? new URLSearchParams();
   const [store, setStore] = useState<PublicStore | null>(initialStore);
   const [isLoading, setIsLoading] = useState(!initialStore);
   const [error, setError] = useState<string | null>(null);

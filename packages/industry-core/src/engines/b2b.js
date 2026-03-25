@@ -10,7 +10,7 @@ class B2BEngine {
   }
   
   async initialize() {
-    console.log('[B2B_ENGINE] Initialized');
+    console.warn('[B2B_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

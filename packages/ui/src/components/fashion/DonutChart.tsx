@@ -14,11 +14,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   showPercentage = true,
 }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
-  const center = size / 2;
   const radius = size * 0.4;
-  const circumference = 2 * Math.PI * radius;
-
-  let cumulativePercent = 0;
 
   const defaultColors = [
     '#E8B4B8', // Rose gold
@@ -35,13 +31,22 @@ export const DonutChart: React.FC<DonutChartProps> = ({
     return [x, y];
   };
 
-  const slices = data.map((item, index) => {
+  const slices: Array<{
+    pathData: string;
+    color: string;
+    label: string;
+    percentage: string;
+  }> = [];
+
+  let runningPercent = 0;
+  for (let index = 0; index < data.length; index++) {
+    const item = data[index];
     const percent = item.value / total;
-    const startPercent = cumulativePercent;
-    cumulativePercent += percent;
+    const startPercent = runningPercent;
+    runningPercent += percent;
 
     const [startX, startY] = getCoordinatesForPercent(startPercent);
-    const [endX, endY] = getCoordinatesForPercent(cumulativePercent);
+    const [endX, endY] = getCoordinatesForPercent(runningPercent);
 
     const largeArcFlag = percent > 0.5 ? 1 : 0;
 
@@ -51,13 +56,13 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       `L 0 0`,
     ].join(' ');
 
-    return {
+    slices.push({
       pathData,
       color: item.color || defaultColors[index % defaultColors.length],
       label: item.label,
       percentage: (percent * 100).toFixed(1),
-    };
-  });
+    });
+  }
 
   return (
     <div className="flex flex-col items-center">

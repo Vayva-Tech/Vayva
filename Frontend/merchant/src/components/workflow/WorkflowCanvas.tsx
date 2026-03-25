@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import { useState, useCallback, useRef, useMemo, DragEvent } from 'react';
 import {
@@ -377,7 +377,7 @@ function Sidebar() {
 
           return (
             <div key={group.category}>
-              <button
+              <Button
                 onClick={() => toggleCategory(group.category)}
                 className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-700"
               >
@@ -388,7 +388,7 @@ function Sidebar() {
                 <ChevronDown
                   className={`w-3 h-3 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
                 />
-              </button>
+              </Button>
 
               {!isCollapsed && (
                 <div className="space-y-1.5 mt-1">
@@ -544,40 +544,40 @@ export default function WorkflowCanvas() {
         <div className="flex items-center gap-2">
           {/* Templates dropdown */}
           <div className="relative">
-            <button
+            <Button
               onClick={() => setShowTemplates(!showTemplates)}
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
             >
               <Layers className="w-3.5 h-3.5" />
               Templates
               <ChevronDown className="w-3 h-3" />
-            </button>
+            </Button>
 
             {showTemplates && (
               <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 z-50 py-1">
                 {WORKFLOW_TEMPLATES.map((template) => (
-                  <button
+                  <Button
                     key={template.id}
                     onClick={() => handleLoadTemplate(template.id)}
                     className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
                   >
                     {template.name}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
           </div>
 
           {/* Load */}
-          <button
+          <Button
             onClick={handleLoad}
             className="px-3 py-2 text-xs font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
           >
             Load
-          </button>
+          </Button>
 
           {/* Save */}
-          <button
+          <Button
             onClick={handleSave}
             className={`flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl transition-all ${
               isSaved
@@ -587,13 +587,13 @@ export default function WorkflowCanvas() {
           >
             <Save className="w-3.5 h-3.5" />
             {isSaved ? 'Saved!' : 'Save'}
-          </button>
+          </Button>
 
           {/* Run/Test */}
-          <button className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+          <Button className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors shadow-sm">
             <Play className="w-3.5 h-3.5" />
             Run / Test
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -695,3 +695,4 @@ export function WorkflowCanvasLocked() {
     </div>
   );
 }
+

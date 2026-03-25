@@ -1,6 +1,6 @@
 import * as React from "react";
 import { VayvaGlowLayout } from "../components/VayvaGlowLayout";
-// @ts-expect-error
+// @ts-expect-error Icons package may not ship TS declarations for this barrel.
 import { IconBell, IconCalendar, IconXCircle } from "../components/icons";
 
 export function AccountDeletionScheduledEmail(props: {

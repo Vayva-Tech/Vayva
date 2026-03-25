@@ -4,7 +4,7 @@
  * Visual workflow of the creative process
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PROCESS_ADDON: AddOnDefinition = {
   id: 'vayva.process',

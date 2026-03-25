@@ -1,9 +1,8 @@
-// @ts-nocheck
 /**
  * Conflict Checking Feature Module
  */
 
-import { ConflictCheckService } from '../services/conflict-check.service.js';
+import { ConflictCheckService } from '../services/conflict-check.service';
 
 export class ConflictCheckingFeature {
   private service: ConflictCheckService;

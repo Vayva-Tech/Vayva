@@ -1,7 +1,6 @@
-// @ts-nocheck
 // WhatsApp AI Engine - Core business logic for WhatsApp AI agent management
 import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
+import { logEngineError } from "@/lib/engines/log-engine-error";
 
 export interface WhatsAppAgent {
   id: string;
@@ -50,6 +49,13 @@ export interface TemplateButton {
   phoneNumber?: string;
 }
 
+export interface WhatsAppChatMessage {
+  id: string;
+  content: string;
+  timestamp: string;
+  sender: 'customer' | 'agent' | 'system';
+}
+
 export interface WhatsAppConversation {
   id: string;
   customerPhone: string;
@@ -71,7 +77,7 @@ export class WhatsAppAIEngine {
     try {
       return await apiJson<WhatsAppAgent>('/api/whatsapp/agent');
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_GET_AGENT]', error);
+      logEngineError('[WHATSAPP_ENGINE_GET_AGENT]', error);
       throw error;
     }
   }
@@ -83,7 +89,7 @@ export class WhatsAppAIEngine {
         body: JSON.stringify(updates),
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_UPDATE_AGENT]', error);
+      logEngineError('[WHATSAPP_ENGINE_UPDATE_AGENT]', error);
       throw error;
     }
   }
@@ -95,7 +101,7 @@ export class WhatsAppAIEngine {
         body: JSON.stringify({ phoneNumber }),
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_CONNECT_PHONE]', error);
+      logEngineError('[WHATSAPP_ENGINE_CONNECT_PHONE]', error);
       throw error;
     }
   }
@@ -106,7 +112,7 @@ export class WhatsAppAIEngine {
         method: 'POST',
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_DISCONNECT_PHONE]', error);
+      logEngineError('[WHATSAPP_ENGINE_DISCONNECT_PHONE]', error);
       throw error;
     }
   }
@@ -115,7 +121,7 @@ export class WhatsAppAIEngine {
     try {
       return await apiJson<WhatsAppTemplate[]>('/api/whatsapp/templates');
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_GET_TEMPLATES]', error);
+      logEngineError('[WHATSAPP_ENGINE_GET_TEMPLATES]', error);
       throw error;
     }
   }
@@ -127,7 +133,7 @@ export class WhatsAppAIEngine {
         body: JSON.stringify(template),
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_CREATE_TEMPLATE]', error);
+      logEngineError('[WHATSAPP_ENGINE_CREATE_TEMPLATE]', error);
       throw error;
     }
   }
@@ -138,7 +144,7 @@ export class WhatsAppAIEngine {
         method: 'DELETE',
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_DELETE_TEMPLATE]', error);
+      logEngineError('[WHATSAPP_ENGINE_DELETE_TEMPLATE]', error);
       throw error;
     }
   }
@@ -159,23 +165,23 @@ export class WhatsAppAIEngine {
       
       return await apiJson<WhatsAppConversation[]>(url);
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_GET_CONVERSATIONS]', error);
+      logEngineError('[WHATSAPP_ENGINE_GET_CONVERSATIONS]', error);
       throw error;
     }
   }
 
-  static async getConversationMessages(conversationId: string): Promise<any[]> {
+  static async getConversationMessages(conversationId: string): Promise<WhatsAppChatMessage[]> {
     try {
-      return await apiJson<any[]>(`/api/whatsapp/conversations/${conversationId}/messages`);
+      return await apiJson<WhatsAppChatMessage[]>(`/api/whatsapp/conversations/${conversationId}/messages`);
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_GET_CONVERSATION_MESSAGES]', error);
+      logEngineError('[WHATSAPP_ENGINE_GET_CONVERSATION_MESSAGES]', error);
       throw error;
     }
   }
 
-  static async sendMessage(conversationId: string, content: string): Promise<any> {
+  static async sendMessage(conversationId: string, content: string): Promise<WhatsAppChatMessage> {
     try {
-      return await apiJson('/api/whatsapp/messages', {
+      return await apiJson<WhatsAppChatMessage>('/api/whatsapp/messages', {
         method: 'POST',
         body: JSON.stringify({
           conversationId,
@@ -184,7 +190,7 @@ export class WhatsAppAIEngine {
         }),
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_SEND_MESSAGE]', error);
+      logEngineError('[WHATSAPP_ENGINE_SEND_MESSAGE]', error);
       throw error;
     }
   }
@@ -196,7 +202,7 @@ export class WhatsAppAIEngine {
         body: JSON.stringify({ agentId }),
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_ASSIGN_CONVERSATION]', error);
+      logEngineError('[WHATSAPP_ENGINE_ASSIGN_CONVERSATION]', error);
       throw error;
     }
   }
@@ -207,7 +213,7 @@ export class WhatsAppAIEngine {
         method: 'POST',
       });
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_MARK_RESOLVED]', error);
+      logEngineError('[WHATSAPP_ENGINE_MARK_RESOLVED]', error);
       throw error;
     }
   }
@@ -223,7 +229,7 @@ export class WhatsAppAIEngine {
     try {
       return await apiJson(`/api/whatsapp/analytics?from=${dateFrom}&to=${dateTo}`);
     } catch (error) {
-      logger.error('[WHATSAPP_ENGINE_GET_ANALYTICS]', error);
+      logEngineError('[WHATSAPP_ENGINE_GET_ANALYTICS]', error);
       throw error;
     }
   }

@@ -10,7 +10,7 @@ class GroceryEngine {
   }
   
   async initialize() {
-    console.log('[GROCERY_ENGINE] Initialized');
+    console.warn('[GROCERY_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

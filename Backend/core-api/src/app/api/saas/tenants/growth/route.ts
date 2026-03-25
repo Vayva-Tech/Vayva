@@ -32,7 +32,7 @@ export const GET = withVayvaAPI(
     try {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const _startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
       // Get all tenants
       const allTenants = await prisma.tenant.findMany({

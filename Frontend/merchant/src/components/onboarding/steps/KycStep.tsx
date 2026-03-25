@@ -200,11 +200,11 @@ export default function KycStep() {
       {!submitted && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {ID_OPTIONS.map((option) => (
-            <button key={option.type} onClick={() => { setSelectedIdType(option.type); setIdNumber(""); }} disabled={submitting}
+            <Button key={option.type} onClick={() => { setSelectedIdType(option.type); setIdNumber(""); }} disabled={submitting}
               className={cn("flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all", selectedIdType === option.type ? "border-vayva-green bg-vayva-green/5" : "border-gray-100 hover:border-vayva-green/30")}>
               <option.icon className={cn("w-5 h-5", selectedIdType === option.type ? "text-vayva-green" : "text-gray-400")} />
               <span className={cn("text-[10px] font-bold text-center leading-tight", selectedIdType === option.type ? "text-gray-900" : "text-gray-400")}>{option.label}</span>
-            </button>
+            </Button>
           ))}
         </div>
       )}

@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 
@@ -9,7 +9,7 @@ export interface TimeTrackingUIProps {
   onLogTime?: (entry: TimeEntry) => Promise<void>;
 }
 
-interface TimeEntry {
+export interface TimeEntry {
   id: string;
   matterId: string;
   matterName: string;
@@ -74,7 +74,7 @@ export function TimeTrackingUI({ businessId, attorneyId, onLogTime }: TimeTracki
             {formatTime(elapsedTime)}
           </div>
           
-          <button
+          <Button
             onClick={() => setTimerRunning(!timerRunning)}
             className={`px-6 py-3 rounded-md font-medium transition-colors ${
               timerRunning
@@ -83,15 +83,15 @@ export function TimeTrackingUI({ businessId, attorneyId, onLogTime }: TimeTracki
             }`}
           >
             {timerRunning ? 'Pause' : 'Start'}
-          </button>
+          </Button>
           
           {timerRunning && (
-            <button
+            <Button
               onClick={handleStop}
               className="px-6 py-3 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition-colors"
             >
               Stop & Log
-            </button>
+            </Button>
           )}
         </div>
 
@@ -146,3 +146,4 @@ export function TimeTrackingUI({ businessId, attorneyId, onLogTime }: TimeTracki
     </div>
   );
 }
+

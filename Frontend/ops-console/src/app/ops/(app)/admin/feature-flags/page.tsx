@@ -200,7 +200,7 @@ export default function FeatureFlagsPage(): React.JSX.Element {
                   )}
                 </div>
                 <div className="flex items-center gap-4">
-                  <button
+                  <Button
                     onClick={() => handleToggle(flag)}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
@@ -209,7 +209,7 @@ export default function FeatureFlagsPage(): React.JSX.Element {
                     ) : (
                       <ToggleLeft className="h-8 w-8 text-gray-400" />
                     )}
-                  </button>
+                  </Button>
                   <Button variant="ghost" size="sm" asChild>
                     <a href={`/ops/admin/feature-flags/${flag.id}`}>Edit</a>
                   </Button>

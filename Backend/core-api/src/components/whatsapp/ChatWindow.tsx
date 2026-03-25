@@ -2,7 +2,7 @@ import {
   logger,
   WhatsAppMessage,
   WhatsAppMessageSender,
-  WhatsAppConversation,
+  WhatsAppConversation
 } from "@vayva/shared";
 import React, { useState, useRef, useEffect } from "react";
 import { Icon, cn, Button } from "@vayva/ui";

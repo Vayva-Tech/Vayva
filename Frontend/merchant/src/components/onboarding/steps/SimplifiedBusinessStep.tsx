@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Simplified Business Step Form
  * Streamlined onboarding with essential fields only
@@ -7,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { useOnboarding } from "../OnboardingContext";
 import { Button, Input, Label } from "@vayva/ui";
-import { EnhancedIndustrySelector } from "./EnhancedIndustrySelector";
+import { EnhancedIndustrySelector } from "../EnhancedIndustrySelector";
 import { Storefront as Store, ArrowRight, Info } from "@phosphor-icons/react/ssr";
 import { IndustrySlug } from "@/lib/templates/types";
 import { toast } from "sonner";

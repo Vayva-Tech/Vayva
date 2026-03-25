@@ -10,7 +10,7 @@
 
 // Cloudflare Worker global types
 declare type ExecutionContext = {
-  waitUntil(promise: Promise<any>): void;
+  waitUntil(promise: Promise<unknown>): void;
   passThroughOnException(): void;
 };
 
@@ -26,7 +26,7 @@ export interface Env {
 class WorkerStorageProvider implements StorageProvider {
   async upload(data: Buffer | string, path: string): Promise<string> {
     // In a real implementation, use R2 or another storage service
-    console.log(`[Storage] Would upload to ${path}`);
+    console.warn(`[Storage] Would upload to ${path}`);
     return path;
   }
 
@@ -81,7 +81,7 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<void> {
-    console.log("[GDPR Worker] Starting scheduled deletion process...");
+    console.warn("[GDPR Worker] Starting scheduled deletion process...");
 
     const storage = new WorkerStorageProvider();
     const whatsapp = new WorkerWhatsAppNotifier(
@@ -94,7 +94,7 @@ export default {
       // Get pending deletions that are due
       const pendingDeletions = await gdpr.getPendingDeletionsDue();
 
-      console.log(`[GDPR Worker] Found ${pendingDeletions.length} deletions to process`);
+      console.warn(`[GDPR Worker] Found ${pendingDeletions.length} deletions to process`);
 
       // Process each deletion
       for (const deletion of pendingDeletions) {
@@ -103,7 +103,7 @@ export default {
         );
       }
 
-      console.log("[GDPR Worker] Scheduled deletion process completed");
+      console.warn("[GDPR Worker] Scheduled deletion process completed");
     } catch (error) {
       console.error("[GDPR Worker] Error during deletion process:", error);
       throw error;
@@ -156,14 +156,14 @@ export default {
 async function processDeletion(
   gdpr: GdprAutomation,
   storeId: string,
-  deletionRequestId: string
+  _deletionRequestId: string
 ): Promise<void> {
   try {
-    console.log(`[GDPR Worker] Processing deletion for store ${storeId}`);
+    console.warn(`[GDPR Worker] Processing deletion for store ${storeId}`);
 
     const report = await gdpr.executeDeletion(storeId);
 
-    console.log(`[GDPR Worker] Deletion completed for store ${storeId}:`, {
+    console.warn(`[GDPR Worker] Deletion completed for store ${storeId}:`, {
       anonymizedId: report.anonymizedId,
       deletedAt: report.deletedAt,
       retentionDate: report.retentionDate,

@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, cn } from "@vayva/ui";
+import { Card, CardContent, CardHeader, Badge, cn } from "@vayva/ui";
 import type { LucideIcon } from "lucide-react";
 
 /**
@@ -74,13 +73,13 @@ export function PremiumCard({
                 </div>
               )}
               <div>
-                <CardTitle className="text-base font-bold text-gray-900 tracking-tight">
+                <h3 className="text-base font-bold text-gray-900 tracking-tight">
                   {title}
-                </CardTitle>
+                </h3>
                 {description && (
-                  <CardDescription className="text-sm text-gray-500 mt-1 font-medium">
+                  <p className="text-sm text-gray-500 mt-1 font-medium">
                     {description}
-                  </CardDescription>
+                  </p>
                 )}
               </div>
             </div>
@@ -136,9 +135,9 @@ export function PremiumMetricCard({
         <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-6 relative">
-          <CardTitle className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
             {title}
-          </CardTitle>
+          </h3>
           <motion.div 
             className="p-2 rounded-xl transition-all duration-300 shadow-md"
             whileHover={{ scale: 1.1, rotate: 5 }}

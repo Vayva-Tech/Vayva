@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Enhanced Social Connection Manager
  * Unified interface for all social platform connections
@@ -7,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { 
-  MessageSquare, 
+  ChatCircle as MessageSquare, 
   InstagramLogo, 
   TelegramLogo, 
   DiscordLogo, 

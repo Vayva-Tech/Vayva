@@ -1,14 +1,13 @@
-// @ts-nocheck
 "use client";
-
 import { logger, formatCurrency } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Plus, Wallet, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, WarningCircle as AlertCircle } from "@phosphor-icons/react";
+import { Plus, Wallet, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, WarningCircle as AlertCircle, Spinner as Loader2 } from "@phosphor-icons/react";
 import { Button, Input, Select } from "@vayva/ui";
 import { Payout, BankAccount, PayoutResponse } from "@/types/finance";
 import { apiJson } from "@/lib/api-client-shared";
 import { PaymentService } from "@/services/payment";
+import { AffiliatePayoutApproval } from "@/components/finance/affiliate-payout-approval";
 
 export default function PayoutsPage() {
   const [loading, setLoading] = useState(true);
@@ -59,8 +58,8 @@ export default function PayoutsPage() {
   // Calculate metrics
   const totalPayouts = payouts.length;
   const pending = payouts.filter(p => p.status === 'pending').length;
-  const completed = payouts.filter(p => p.status === 'completed').length;
-  const failed = payouts.filter(p => p.status === 'failed').length;
+  const completed = payouts.filter((p) => p.status === "SUCCESS").length;
+  const failed = payouts.filter((p) => p.status === "FAILED").length;
   const totalAmount = payouts.reduce((sum, p) => sum + p.amount, 0);
 
   if (loading) {
@@ -168,18 +167,21 @@ export default function PayoutsPage() {
                       {formatCurrency(payout.amount, payout.currency)}
                     </td>
                     <td className="px-6 py-4 text-gray-700">
-                      {payout.bankName || payout.accountNumber || '—'}
+                      {payout.destination
+                        ? `${payout.destination.bankName} · ${payout.destination.accountNumber}`
+                        : "—"}
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          payout.status === 'completed'
+                          payout.status === "SUCCESS"
                             ? "bg-green-50 text-green-600"
-                            : payout.status === 'pending'
-                            ? "bg-orange-50 text-orange-600"
-                            : payout.status === 'failed'
-                            ? "bg-red-50 text-red-600"
-                            : "bg-gray-50 text-gray-600"
+                            : payout.status === "pending" ||
+                                payout.status === "PROCESSING"
+                              ? "bg-orange-50 text-orange-600"
+                              : payout.status === "FAILED"
+                                ? "bg-red-50 text-red-600"
+                                : "bg-gray-50 text-gray-600"
                         }`}
                       >
                         {payout.status}
@@ -191,6 +193,15 @@ export default function PayoutsPage() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Affiliate Payouts (merchant approval) */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Affiliate payouts</h2>
+          <p className="text-sm text-gray-500">Approve or reject affiliate payout requests.</p>
+        </div>
+        <AffiliatePayoutApproval />
       </div>
     </div>
   );

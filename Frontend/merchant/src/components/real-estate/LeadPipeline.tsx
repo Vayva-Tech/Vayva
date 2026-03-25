@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 
@@ -28,12 +29,12 @@ export const LeadPipeline: React.FC<LeadPipelineProps> = ({ initialData }) => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold">Lead Pipeline</h3>
         <div className="flex gap-2">
-          <button className="glass-card px-3 py-1 text-sm hover:text-white transition-colors">
+          <Button className="glass-card px-3 py-1 text-sm hover:text-white transition-colors">
             View All Leads
-          </button>
-          <button className="btn-gradient text-sm">
+          </Button>
+          <Button className="btn-gradient text-sm">
             + Add Lead
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -70,10 +71,11 @@ export const LeadPipeline: React.FC<LeadPipelineProps> = ({ initialData }) => {
       </div>
 
       <div className="mt-4 flex gap-2">
-        <button className="glass-card px-4 py-2 text-sm flex-1 hover:text-white transition-colors">
+        <Button className="glass-card px-4 py-2 text-sm flex-1 hover:text-white transition-colors">
           Import Leads
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
+

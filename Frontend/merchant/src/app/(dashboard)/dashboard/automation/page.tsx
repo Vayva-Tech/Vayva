@@ -1,12 +1,11 @@
-// @ts-nocheck
 "use client";
-
 import { useState, useEffect } from "react";
 import { Button, Input } from "@vayva/ui";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
 import { logger } from "@vayva/shared";
-import { Bell, Clock, Package, CheckCircle, Plus, ToggleRight, Lightning as Zap, Envelope, ChatCircleText, Warning } from "@phosphor-icons/react";
+import { Bell, Clock, Package, CheckCircle, Plus, ToggleRight, Lightning as Zap, Envelope, ChatCircleText, Warning, DeviceMobile } from "@phosphor-icons/react";
 
 interface AutomationRule {
   id: string;
@@ -209,7 +208,7 @@ export default function AutomationPage() {
                       </div>
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={() => toggleRule(rule.id, rule.isActive)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                       rule.isActive ? 'bg-green-600' : 'bg-gray-200'
@@ -220,7 +219,7 @@ export default function AutomationPage() {
                         rule.isActive ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -296,14 +295,14 @@ function RuleRow({ rule, onToggle }: { rule: AutomationRule; onToggle: () => voi
               <span>Delay: {rule.conditions.delayHours}h</span>
             )}
             <span className="flex items-center gap-1">
-              {rule.actions.sendEmail && <Mail className="w-3 h-3" />}
-              {rule.actions.sendWhatsApp && <MessageSquare className="w-3 h-3" />}
-              {rule.actions.sendPush && <Smartphone className="w-3 h-3" />}
+              {rule.actions.sendEmail && <Envelope className="w-3 h-3" />}
+              {rule.actions.sendWhatsApp && <ChatCircleText className="w-3 h-3" />}
+              {rule.actions.sendPush && <DeviceMobile className="w-3 h-3" />}
             </span>
           </div>
         </div>
       </div>
-      <button
+      <Button
         onClick={onToggle}
           className={`w-12 h-7 rounded-full transition relative ${
             rule.isActive ? "bg-green-500" : "bg-border"
@@ -314,7 +313,7 @@ function RuleRow({ rule, onToggle }: { rule: AutomationRule; onToggle: () => voi
             rule.isActive ? "left-6" : "left-1"
           }`}
         />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -386,10 +385,13 @@ function CreateRuleModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="space-y-2">
             <Label>Rule Type *</Label>
-            <Select
+            <select
               value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setSelectedType(e.target.value)
+              }
               required
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
             >
               <option value="">Select a template...</option>
               {templates.map((t) => (
@@ -397,7 +399,7 @@ function CreateRuleModal({
                   {t.name}
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           {selectedTemplate && (
@@ -454,7 +456,7 @@ function CreateRuleModal({
                 onChange={(e) => setForm({ ...form, sendEmail: e.target.checked })}
                 className="rounded"
               />
-              <Mail className="w-4 h-4" />
+              <Envelope className="w-4 h-4" />
               <span>Email</span>
             </label>
             <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-white">
@@ -464,7 +466,7 @@ function CreateRuleModal({
                 onChange={(e) => setForm({ ...form, sendWhatsApp: e.target.checked })}
                 className="rounded"
               />
-              <MessageSquare className="w-4 h-4" />
+              <ChatCircleText className="w-4 h-4" />
               <span>WhatsApp</span>
             </label>
             <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-white">
@@ -474,7 +476,7 @@ function CreateRuleModal({
                 onChange={(e) => setForm({ ...form, sendPush: e.target.checked })}
                 className="rounded"
               />
-              <Smartphone className="w-4 h-4" />
+              <DeviceMobile className="w-4 h-4" />
               <span>Push Notification</span>
             </label>
           </div>

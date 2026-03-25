@@ -4,7 +4,7 @@
  * Personalized student dashboard with progress, courses, and achievements
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const STUDENT_DASHBOARD_ADDON: AddOnDefinition = {
   id: 'vayva.student-dashboard',

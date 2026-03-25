@@ -26,39 +26,39 @@ export interface FeatureConfig {
 export const FEATURE_FLAGS: FeatureConfig[] = [
   {
     key: 'products_unlimited',
-    name: 'Unlimited Products',
-    description: 'Add unlimited products to your catalog',
-    enabledForTiers: ['PRO']
+    name: 'Higher catalog limits',
+    description: 'Larger product caps by tier (300 on Pro, 500 on Pro+)',
+    enabledForTiers: ['PRO', 'PRO_PLUS']
   },
   {
     key: 'advanced_analytics',
     name: 'Advanced Analytics',
     description: 'Access detailed business insights and reports',
-    enabledForTiers: ['STARTER', 'PRO']
+    enabledForTiers: ['STARTER', 'PRO', 'PRO_PLUS']
   },
   {
     key: 'custom_domains',
     name: 'Custom Domains',
     description: 'Use your own domain name for your store',
-    enabledForTiers: ['STARTER', 'PRO']
+    enabledForTiers: ['PRO', 'PRO_PLUS']
   },
   {
     key: 'api_access',
     name: 'API Access',
     description: 'Programmatic access to your store data',
-    enabledForTiers: ['PRO']
+    enabledForTiers: ['PRO', 'PRO_PLUS']
   },
   {
     key: 'priority_support',
     name: 'Priority Support',
     description: 'Get faster response times from our support team',
-    enabledForTiers: ['PRO']
+    enabledForTiers: ['PRO_PLUS']
   },
   {
     key: 'multi_store',
     name: 'Multi-Store Management',
     description: 'Manage multiple stores from one dashboard',
-    enabledForTiers: ['PRO']
+    enabledForTiers: ['PRO', 'PRO_PLUS']
   },
   {
     key: 'automation_rules',
@@ -70,19 +70,19 @@ export const FEATURE_FLAGS: FeatureConfig[] = [
     key: 'custom_reports',
     name: 'Custom Reports',
     description: 'Create and schedule custom business reports',
-    enabledForTiers: ['PRO']
+    enabledForTiers: ['PRO', 'PRO_PLUS']
   },
   {
     key: 'remove_branding',
     name: 'Remove Branding',
     description: 'Remove Vayva branding from your storefront',
-    enabledForTiers: ['STARTER', 'PRO']
+    enabledForTiers: ['STARTER', 'PRO', 'PRO_PLUS']
   },
   {
     key: 'team_collaboration',
     name: 'Team Collaboration',
     description: 'Invite team members and manage permissions',
-    enabledForTiers: ['STARTER', 'PRO']
+    enabledForTiers: ['STARTER', 'PRO', 'PRO_PLUS']
   }
 ];
 

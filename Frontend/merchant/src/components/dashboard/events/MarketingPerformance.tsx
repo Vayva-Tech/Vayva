@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
 import { Mail, Share2, Users, TrendingUp } from "lucide-react";
-import { formatCurrency } from "@vayva/ui";
+import { formatCurrency } from "@/lib/utils";
 
 interface MarketingPerformanceProps {
   data?: {
@@ -14,6 +13,7 @@ interface MarketingPerformanceProps {
         openRate: number;
         clickRate: number;
         revenue: number;
+        conversionRate?: number;
       };
     };
     socialMedia?: {

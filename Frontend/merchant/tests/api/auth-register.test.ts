@@ -6,8 +6,12 @@ vi.mock("@/lib/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
-vi.mock("@/lib/flags/flagService", () => ({
+vi.mock("@/services/flag", () => ({
   FlagService: { isEnabled: vi.fn().mockResolvedValue(true) },
+}));
+
+vi.mock("@/lib/email/resend", () => ({
+  ResendEmailService: { sendOTPEmail: vi.fn().mockResolvedValue(undefined) },
 }));
 
 vi.mock("@/lib/ai/revenue.service", () => ({
@@ -54,22 +58,25 @@ describe("Auth Register - POST /api/auth/merchant/register", () => {
   });
 
   it("should register a new user successfully", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({
-        success: true,
-        data: {
-          user: {
-            id: "user_new_123",
-            email: "new@example.com",
-            firstName: "John",
-            lastName: "Doe",
-            emailVerified: false,
-          },
-        },
-      }),
-    });
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ exists: false }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          id: "user_new_123",
+          email: "new@example.com",
+          firstName: "John",
+          lastName: "Doe",
+          otpCode: "123456",
+          isPhoneVerified: false,
+          createdAt: new Date().toISOString(),
+        }),
+      });
 
     const request = createMockRequest("POST", "/api/auth/merchant/register", {
       body: validBody,
@@ -82,6 +89,10 @@ describe("Auth Register - POST /api/auth/merchant/register", () => {
     expect(data.data.user.email).toBe("new@example.com");
     expect(data.data.user.emailVerified).toBe(false);
     expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/check-email?email="),
+      expect.objectContaining({ method: "GET" })
+    );
+    expect(mockFetch).toHaveBeenCalledWith(
       "http://localhost:3001/api/auth/register",
       expect.objectContaining({
         method: "POST",
@@ -91,7 +102,6 @@ describe("Auth Register - POST /api/auth/merchant/register", () => {
           password: "securepass123",
           firstName: "John",
           lastName: "Doe",
-          businessName: "Test Business",
         }),
       })
     );
@@ -128,17 +138,20 @@ describe("Auth Register - POST /api/auth/merchant/register", () => {
 
   it("should reject duplicate email", async () => {
     mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 409,
-      json: async () => ({ error: { code: "EMAIL_EXISTS", message: "Email already registered" } }),
+      ok: true,
+      status: 200,
+      json: async () => ({ exists: true }),
     });
 
     const request = createMockRequest("POST", "/api/auth/merchant/register", {
       body: validBody,
     });
     const response = await POST(request);
+    const data = await getResponseJson(response);
 
     expect(response.status).toBe(409);
+    expect(data.success).toBe(false);
+    expect(data.error?.code).toBeDefined();
   });
 
   it("should return 429 when rate limited", async () => {
@@ -157,7 +170,17 @@ describe("Auth Register - POST /api/auth/merchant/register", () => {
   });
 
   it("should handle backend errors gracefully", async () => {
-    mockFetch.mockRejectedValueOnce(new Error("Backend connection failed"));
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ exists: false }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: async () => ({ error: "Registration failed" }),
+      });
 
     const request = createMockRequest("POST", "/api/auth/merchant/register", {
       body: validBody,

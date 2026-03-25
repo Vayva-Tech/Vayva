@@ -1,38 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
-import { apiJson } from "@/lib/api-client-shared";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 
 /**
  * GET /api/merchant/autopilot/feed
- * Get autopilot activity feed
+ * Proxies core-api Autopilot feed (runs, pendingCount).
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const limit = searchParams.get("limit") || "20";
-
-    const result = await apiJson<{
-      success: boolean;
-      data?: any[];
-      error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/autopilot/feed?limit=${limit}`);
-
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch autopilot feed');
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json(result);
-  } catch (error) {
-    handleApiError(
-      error,
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get("limit") || "20";
+    const offset = searchParams.get("offset") || "0";
+    const status = searchParams.get("status");
+
+    const qs = new URLSearchParams({ limit, offset });
+    if (status) qs.set("status", status);
+
+    const base = process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
+    const res = await fetch(
+      `${base}/api/merchant/autopilot/feed?${qs.toString()}`,
       {
-        endpoint: '/api/merchant/autopilot/feed',
-        operation: 'GET_AUTOPILOT_FEED',
-      }
+        headers: auth.headers,
+        cache: "no-store",
+      },
     );
+
+    const data = await res.json().catch(() => ({}));
+    return NextResponse.json(data, { status: res.status });
+  } catch (error) {
+    handleApiError(error, {
+      endpoint: "/api/merchant/autopilot/feed",
+      operation: "GET_AUTOPILOT_FEED",
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch autopilot feed' },
-      { status: 500 }
+      { error: "Failed to fetch autopilot feed" },
+      { status: 500 },
     );
   }
 }

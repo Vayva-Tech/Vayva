@@ -65,7 +65,7 @@ export const POST = withVayvaAPI(
       const sku = getString(body.sku);
       const price = body.price;
       const barcode = getString(body.barcode);
-      const trackInventory =
+      const _trackInventory =
         typeof body.trackInventory === "boolean"
           ? body.trackInventory
           : undefined;

@@ -1,9 +1,8 @@
-// @ts-nocheck
 /**
  * Deadline Calendar Feature Module
  */
 
-import { DeadlineCalendarService } from '../services/deadline-calendar.service.js';
+import { DeadlineCalendarService } from '../services/deadline-calendar.service';
 
 export class DeadlineCalendarFeature {
   private service: DeadlineCalendarService;

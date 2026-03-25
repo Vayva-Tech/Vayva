@@ -2176,6 +2176,38 @@ model Store {
   segments                Segment[]
   addOns                  StoreAddOn[]
   autopilotRuns           AutopilotRun[]
+  merchantWorkflows       MerchantWorkflow[]
+}
+
+/// Visual automation workflows (merchant workflow builder); merchantId in API = storeId
+model MerchantWorkflow {
+  id             String                 @id @default(cuid())
+  storeId        String
+  store          Store                  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  industry       String
+  trigger        Json
+  nodes          Json
+  edges          Json
+  status         MerchantWorkflowStatus @default(draft)
+  version        Int                    @default(1)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  createdBy      String
+  executionCount Int                    @default(0)
+  lastExecutedAt DateTime?
+
+  @@index([storeId])
+  @@index([storeId, status])
+  @@map("merchant_workflows")
+}
+
+enum MerchantWorkflowStatus {
+  draft
+  active
+  paused
+  archived
 }
 
 model FlashSale {

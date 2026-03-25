@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Guest List Manager Component for Nightlife
  */
@@ -14,13 +14,13 @@ interface GuestListEntry {
   tableReservation?: boolean;
 }
 
-interface GuestListManagerProps {
+export interface NightlifeGuestListProps {
   guests?: GuestListEntry[];
   onCheckIn?: (guestId: string) => void;
-  onAddGuest?: (guest: any) => void;
+  onAddGuest?: (guest: unknown) => void;
 }
 
-export const NightlifeGuestList: React.FC<GuestListManagerProps> = ({
+export const NightlifeGuestList: React.FC<NightlifeGuestListProps> = ({
   guests,
   onCheckIn,
   onAddGuest,
@@ -43,9 +43,9 @@ export const NightlifeGuestList: React.FC<GuestListManagerProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">VIP Guest List</h3>
         {onAddGuest && (
-          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+          <Button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
             + Add Guest
-          </button>
+          </Button>
         )}
       </div>
 
@@ -97,12 +97,12 @@ export const NightlifeGuestList: React.FC<GuestListManagerProps> = ({
                 <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Table Reserved</span>
               )}
               {!guest.checkedIn && onCheckIn && (
-                <button
+                <Button
                   onClick={() => onCheckIn(guest.id)}
                   className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                 >
                   Check In
-                </button>
+                </Button>
               )}
               {guest.checkedIn && (
                 <span className="text-xs text-green-600 font-medium">Checked In</span>

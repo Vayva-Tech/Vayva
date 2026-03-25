@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { logger } from "@vayva/shared";
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -8,7 +6,6 @@ import { Button, Card, Input, Label, Select, Textarea } from "@vayva/ui";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import {
   Plus,
   Trash as Trash2,
@@ -19,6 +16,8 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { format } from "date-fns";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface TicketType {
   id?: string;
@@ -52,7 +51,9 @@ import { apiJson } from "@/lib/api-client-shared";
 export default function EventDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const eventId = params.id as string;
+  const rawId = params?.id;
+  const eventId =
+    typeof rawId === "string" ? rawId : Array.isArray(rawId) ? rawId[0] : "";
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -170,70 +171,58 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <Breadcrumbs />
-      <BackButton
-        href="/dashboard/nightlife/events"
-        label="Back to Events"
-        className="mb-6"
-      />
-
-      {/* Event Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-violet/10 rounded-lg">
-              <Ticket size={20} className="text-violet" />
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">Tickets Sold</div>
-              <div className="text-xl font-bold">{event.ticketsSold}</div>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <Users size={20} className="text-green-600" />
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">Revenue</div>
-              <div className="text-xl font-bold">
-                ₦{(event.revenue || 0).toLocaleString()}
+    <div className="space-y-6">
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Snapshot
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Tickets sold</span>
+                  <span className="font-semibold text-gray-900">{event.ticketsSold}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Revenue</span>
+                  <span className="font-semibold text-gray-900">
+                    ₦{(event.revenue || 0).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Date</span>
+                  <span className="font-semibold text-gray-900">
+                    {event.eventDate ? format(new Date(event.eventDate), "MMM d") : "TBD"}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <Calendar size={20} className="text-green-600" />
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">Event Date</div>
-              <div className="text-xl font-bold">
-                {event.eventDate
-                  ? format(new Date(event.eventDate), "MMM d")
-                  : "TBD"}
+          </>
+        }
+      >
+        <div className="flex items-center gap-4">
+          <BackButton href="/dashboard/nightlife/events" label="Back to Events" />
+          <PageHeader
+            title={
+              <div className="flex items-center gap-3">
+                <span>Edit Event</span>
+                <Badge
+                  className={
+                    event.status === "active"
+                      ? "bg-green-50 text-green-600"
+                      : "bg-white text-gray-700"
+                  }
+                >
+                  {event.status}
+                </Badge>
               </div>
-            </div>
-          </div>
-        </Card>
-      </div>
+            }
+            subtitle={event.title || "Update event details and ticket types."}
+          />
+        </div>
 
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Edit Event</h1>
-        <Badge
-          className={event.status === "active"
-              ? "bg-green-50 text-green-600"
-              : "bg-white text-gray-700"
-          }
-        >
-          {event.status}
-        </Badge>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
         {/* Basic Info */}
         <Card className="p-6">
           <h2 className="font-bold text-lg mb-4">Event Details</h2>
@@ -333,7 +322,7 @@ export default function EventDetailPage() {
             label="Upload Event Flyer"
             accept="image/jpeg,image/png,image/webp"
             purpose="PRODUCT_IMAGE"
-            entityId={params.id as string}
+            entityId={eventId}
             maxSizeMB={5}
           />
         </Card>
@@ -438,6 +427,7 @@ export default function EventDetailPage() {
           </Button>
         </div>
       </form>
+      </PageWithInsights>
     </div>
   );
 }

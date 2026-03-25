@@ -5,7 +5,7 @@
  * Required for: Public sector clients, EU market, disability discrimination prevention
  */
 
-import { LegalDocument } from "../types";
+import type { LegalDocument } from "../types";
 
 export const accessibilityStatement: LegalDocument = {
   slug: "accessibility-statement",

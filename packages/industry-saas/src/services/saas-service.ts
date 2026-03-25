@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SaaS Industry Service
  * 
@@ -138,10 +137,10 @@ export class SaaSDashboardService {
   ): Promise<{
     churnRate: number;
     previousChurnRate: number;
-    churnedTenants: number;
+    churnedTenantCount: number;
     churnedMRR: number;
     reasons: Record<string, number>;
-    churnedTenants: ChurnData[];
+    churnedTenantRecords: ChurnData[];
   }> {
     const params = new URLSearchParams({ 
       organizationId: this.organizationId,
@@ -304,7 +303,7 @@ export class SaaSDashboardService {
         type: 'critical',
         category: 'revenue',
         title: 'MRR Declining',
-        message: `MRR down ${Math.abs(data.metrics.revenue.change.toFixed(1))}% this period`,
+        message: `MRR down ${Math.abs(data.metrics.revenue.change).toFixed(1)}% this period`,
         suggestedAction: {
           title: 'Review Revenue Metrics',
           href: '/dashboard/revenue',

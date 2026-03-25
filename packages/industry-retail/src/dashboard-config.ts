@@ -1,8 +1,19 @@
-// @ts-nocheck
-import { DashboardEngineConfig } from './types';
+import type { DashboardEngineConfig } from "@vayva/industry-core";
 
 export const RETAIL_DASHBOARD_CONFIG: DashboardEngineConfig = {
-  industry: 'retail',
+  industry: "retail",
+  title: "Retail command center",
+  subtitle: "Inventory, channels, and store performance in one place",
+  primaryObjectLabel: "Product",
+  defaultTimeHorizon: "today",
+  sections: [
+    "primary_object_health",
+    "live_operations",
+    "decision_kpis",
+    "bottlenecks_alerts",
+    "suggested_actions",
+  ],
+  failureModes: ["pos_offline", "inventory_sync_stale", "payment_provider_degraded"],
 
   widgets: [
     // Revenue & KPI Widgets
@@ -205,7 +216,7 @@ export const RETAIL_DASHBOARD_CONFIG: DashboardEngineConfig = {
         params: { horizonDays: 7 },
       },
       refreshInterval: 3600, // 1 hour
-      permissions: [{ resource: 'ai-insights', action: 'view' }],
+      permissions: ["read:ai-insights"],
     },
   ],
 
@@ -277,69 +288,61 @@ export const RETAIL_DASHBOARD_CONFIG: DashboardEngineConfig = {
 
   alertRules: [
     {
-      id: 'critical-stock',
-      condition: 'inventory-level < reorder-point',
-      threshold: 0,
-      action: 'notify-inventory-manager',
+      id: "critical-stock",
+      name: "Critical stock",
+      condition: { metric: "inventory_level", operator: "lt", value: 0 },
+      severity: "critical",
+      message: "{productName} is critically low ({currentStock} left)",
       enabled: true,
-      message: '{productName} is critically low ({currentStock} left)',
-      severity: 'high',
     },
     {
-      id: 'low-conversion',
-      condition: 'conversion-rate < 0.02',
-      threshold: 0.02,
-      action: 'alert-merchant',
+      id: "low-conversion",
+      name: "Low conversion",
+      condition: { metric: "conversion_rate", operator: "lt", value: 0.02 },
+      severity: "warning",
+      message: "Conversion rate dropped to {value}",
       enabled: true,
-      message: 'Conversion rate dropped to {value}',
-      severity: 'medium',
     },
     {
-      id: 'store-underperforming',
-      condition: 'store-growth < -0.1',
-      threshold: -0.1,
-      action: 'flag-store-review',
+      id: "store-underperforming",
+      name: "Store underperforming",
+      condition: { metric: "store_growth", operator: "lt", value: -0.1 },
+      severity: "warning",
+      message: "{storeName} revenue down {value}",
       enabled: true,
-      message: '{storeName} revenue down {value}',
-      severity: 'medium',
     },
   ],
 
   actions: [
-    { 
-      id: 'create-product', 
-      label: 'Add Product', 
-      icon: 'plus', 
-      action: 'open-product-creator',
-      href: '/products/new',
+    {
+      id: "create-product",
+      label: "Add Product",
+      icon: "plus",
+      href: "/products/new",
     },
-    { 
-      id: 'create-po', 
-      label: 'Create Purchase Order', 
-      icon: 'fileText', 
-      action: 'open-po-creator',
-      href: '/inventory/purchase-orders/new',
+    {
+      id: "create-po",
+      label: "Create Purchase Order",
+      icon: "fileText",
+      href: "/inventory/purchase-orders/new",
     },
-    { 
-      id: 'transfer-stock', 
-      label: 'Transfer Stock', 
-      icon: 'truck', 
-      action: 'open-transfer-creator',
-      href: '/inventory/transfers/new',
+    {
+      id: "transfer-stock",
+      label: "Transfer Stock",
+      icon: "truck",
+      href: "/inventory/transfers/new",
     },
-    { 
-      id: 'generate-report', 
-      label: 'Generate Report', 
-      icon: 'barChart', 
-      action: 'open-report-builder',
-      href: '/analytics/reports/new',
+    {
+      id: "generate-report",
+      label: "Generate Report",
+      icon: "barChart",
+      href: "/analytics/reports/new",
     },
-    { 
-      id: 'manage-loyalty', 
-      label: 'Loyalty Program', 
-      icon: 'users', 
-      action: 'open-loyalty-dashboard',
-      href: '/customers/loyalty',
+    {
+      id: "manage-loyalty",
+      label: "Loyalty Program",
+      icon: "users",
+      href: "/customers/loyalty",
     },
   ],
 };

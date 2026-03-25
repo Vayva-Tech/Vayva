@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Travel Industry Engine
  */
@@ -16,13 +15,13 @@ export class TravelEngine {
   }
 
   async initialize(): Promise<void> {
-    console.log('[TRAVEL] Initializing engine...');
+    console.warn('[TRAVEL] Initializing engine...');
 
     this.bookingService = new TravelBookingService(this.config);
     await this.bookingService.initialize();
     this.bookingFeature = new TravelBookingFeature(this.bookingService);
 
-    console.log('[TRAVEL] Engine initialized');
+    console.warn('[TRAVEL] Engine initialized');
   }
 
   get booking(): TravelBookingFeature | undefined {

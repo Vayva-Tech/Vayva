@@ -34,6 +34,16 @@ function mapPlanKeyToTier(planKey: string): SubscriptionTier {
   return "starter";
 }
 
+function mapStoreToTier(store: { plan: string | null; tier: string | null }): SubscriptionTier {
+  const plan = (store.plan ?? "").toUpperCase();
+  const tier = (store.tier ?? "").toUpperCase();
+  if (plan === "PRO" && tier === "PRO_PLUS") return "pro_plus";
+  if (plan === "PRO") return "pro";
+  if (plan === "STARTER") return "starter";
+  if (plan === "FREE") return "free";
+  return "starter";
+}
+
 /**
  * Check if user has required subscription tier
  */
@@ -58,34 +68,43 @@ export async function checkSubscription(
     };
   }
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { storeId: membership.storeId },
-  });
+  const [subscription, store] = await Promise.all([
+    prisma.subscription.findUnique({
+      where: { storeId: membership.storeId },
+    }),
+    prisma.store.findUnique({
+      where: { id: membership.storeId },
+      select: { plan: true, tier: true },
+    }),
+  ]);
 
-  if (!subscription) {
-    return {
-      hasAccess: requiredTier === "free",
-      currentTier: "free",
-      requiredTier,
-      isTrialing: false,
-      expiresAt: null,
-    };
+  // Prefer the Subscription model when present (it has period + trial semantics),
+  // but fall back to store.plan/tier to avoid entitlements drift.
+  let currentTier: SubscriptionTier = "free";
+  let isTrialing = false;
+  let expiresAt: Date | null = null;
+  let isActive = false;
+
+  if (subscription) {
+    currentTier = mapPlanKeyToTier(subscription.planKey);
+    isActive = subscription.status === "ACTIVE" || subscription.status === "TRIALING";
+    isTrialing = subscription.status === "TRIALING";
+    expiresAt = isTrialing ? subscription.trialEndsAt : subscription.currentPeriodEnd;
+  } else if (store) {
+    currentTier = mapStoreToTier(store);
+    isActive = currentTier !== "free";
+    isTrialing = false;
+    expiresAt = null;
   }
 
-  const currentTier = mapPlanKeyToTier(subscription.planKey);
-  const isActive = subscription.status === "ACTIVE" || subscription.status === "TRIALING";
   const hasRequiredTier = tierHierarchy[currentTier] >= tierHierarchy[requiredTier];
-  // Use trialEndsAt if trialing, otherwise currentPeriodEnd
-  const expiresAt = subscription.status === "TRIALING" 
-    ? subscription.trialEndsAt 
-    : subscription.currentPeriodEnd;
   const isExpired = expiresAt && expiresAt < new Date();
 
   return {
     hasAccess: isActive && !isExpired && hasRequiredTier,
     currentTier,
     requiredTier,
-    isTrialing: subscription.status === "TRIALING",
+    isTrialing,
     expiresAt,
   };
 }
@@ -149,7 +168,7 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
       features: ["basic_dashboard", "paystack_payments", "dashboard_metrics_4"],
     },
     starter: {
-      maxProducts: 500,
+      maxProducts: 100,
       maxOrders: 500,
       maxTeamMembers: 1,
       features: [
@@ -166,7 +185,7 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
       ],
     },
     pro: {
-      maxProducts: -1, // Unlimited
+      maxProducts: 300,
       maxOrders: 10000,
       maxTeamMembers: 3,
       features: [
@@ -190,7 +209,7 @@ export function getSubscriptionLimits(tier: SubscriptionTier) {
       ],
     },
     pro_plus: {
-      maxProducts: -1, // Unlimited
+      maxProducts: 500,
       maxOrders: -1, // Unlimited
       maxTeamMembers: 5,
       features: [

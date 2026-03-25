@@ -11,7 +11,7 @@ import {
   CreditCard,
   ArrowRight,
   ArrowLeft,
-  Shield,
+  Shield
 } from "@phosphor-icons/react/ssr";
 
 interface Bank {

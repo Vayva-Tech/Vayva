@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
 export interface Review {
   id: string;
@@ -47,7 +46,7 @@ export class ReviewSystemIntegrationService {
       },
     });
 
-    return reviews.map((r) => ({
+    return reviews.map((r: any) => ({
       id: r.id,
       productId: r.productId,
       customerId: r.customerId,
@@ -72,7 +71,7 @@ export class ReviewSystemIntegrationService {
       },
     });
 
-    const allReviews = products.flatMap((p) => p.reviews);
+    const allReviews = products.flatMap((p: any) => p.reviews);
     const totalReviews = allReviews.length;
 
     if (totalReviews === 0) {
@@ -88,20 +87,20 @@ export class ReviewSystemIntegrationService {
 
     // Calculate average rating
     const averageRating =
-      allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+      allReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / totalReviews;
 
     // Rating distribution
     const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    allReviews.forEach((r) => {
+    allReviews.forEach((r: any) => {
       ratingDistribution[r.rating] = (ratingDistribution[r.rating] || 0) + 1;
     });
 
     // Recommendation rate (4-5 star reviews)
-    const recommendedReviews = allReviews.filter((r) => r.rating >= 4).length;
+    const recommendedReviews = allReviews.filter((r: any) => r.rating >= 4).length;
     const recommendationRate = recommendedReviews / totalReviews;
 
     // Response rate (reviews with merchant responses)
-    const respondedReviews = allReviews.filter((r) => r.merchantResponse).length;
+    const respondedReviews = allReviews.filter((r: any) => r.merchantResponse).length;
     const responseRate = respondedReviews / totalReviews;
 
     // Average response time (mock calculation)
@@ -197,11 +196,11 @@ export class ReviewSystemIntegrationService {
       },
     });
 
-    const allReviews = products.flatMap((p) => p.reviews);
+    const allReviews = products.flatMap((p: any) => p.reviews);
     return allReviews
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, limit)
-      .map((r) => ({
+      .map((r: any) => ({
         id: r.id,
         productId: r.productId,
         customerId: r.customerId,

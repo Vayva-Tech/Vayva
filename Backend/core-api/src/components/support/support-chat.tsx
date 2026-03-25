@@ -9,7 +9,7 @@ import {
   PaperPlaneRight as Send,
   X,
   ThumbsUp,
-  ThumbsDown,
+  ThumbsDown
 } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
 

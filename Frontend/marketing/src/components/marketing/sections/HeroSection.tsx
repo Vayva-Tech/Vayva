@@ -2,11 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { IconArrowRight as ArrowRight, IconSparkles as Sparkles, IconBolt as Zap, IconShield as Shield, IconClock as Clock, IconTrendingUp as TrendingUp, IconUsers as Users, IconPackage as Package, IconCreditCard as CreditCard, IconMessageCircle as MessageCircle, IconChartBar as BarChart3, IconCircleCheck as CheckCircle2 } from "@tabler/icons-react";
+import { IconArrowRight as ArrowRight, IconSparkles as Sparkles, IconBolt as Zap, IconShield as Shield, IconPackage as Package, IconCreditCard as CreditCard, IconMessageCircle as MessageCircle, IconChartBar as BarChart3 } from "@tabler/icons-react";
 import { Button } from "@vayva/ui";
 import { APP_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { getOfferCopy } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 
 // Feature card component
 function FeatureCard({
@@ -105,11 +108,17 @@ function DashboardMockup() {
           {/* Sidebar */}
           <div className="w-60 bg-[#0a0a0a] border-r border-white/[0.06] p-4 flex flex-col">
             {/* Logo */}
-            <div className="flex items-center gap-2 mb-6 px-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xs">V</span>
+            <div className="flex items-center gap-2 mb-6 px-2 min-w-0">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/95">
+                <Image
+                  src="/vayva-logo-official.svg"
+                  alt="Vayva"
+                  width={28}
+                  height={20}
+                  className="h-5 w-auto object-contain"
+                />
               </div>
-              <span className="text-white font-semibold">Vayva</span>
+              <span className="text-white font-semibold truncate">Luxe Fashion</span>
             </div>
 
             {/* Nav Groups */}
@@ -164,7 +173,7 @@ function DashboardMockup() {
             {/* Header */}
             <header className="h-14 border-b border-white/[0.06] flex items-center justify-between px-6">
               <div className="flex items-center gap-3">
-                <h1 className="text-white font-semibold">Amina's Boutique</h1>
+                <h1 className="text-white font-semibold">Luxe Fashion</h1>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   Live
@@ -175,7 +184,7 @@ function DashboardMockup() {
                   <BellIcon />
                 </div>
                 <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-semibold">
-                  AA
+                  LF
                 </div>
               </div>
             </header>
@@ -273,8 +282,11 @@ function BellIcon() {
 }
 
 export function HeroSection(): React.JSX.Element {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const offerCopy = getOfferCopy(starterFirstMonthFree);
+
   return (
-    <section className="relative min-h-screen bg-[#0a0a0a] overflow-hidden">
+    <section className="relative min-h-screen w-full min-w-0 bg-[#0a0a0a] overflow-x-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-transparent rounded-full blur-3xl" />
@@ -284,8 +296,8 @@ export function HeroSection(): React.JSX.Element {
       {/* Content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <div className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[1600px] mx-auto text-center">
+        <div className="pt-32 pb-16 px-4 sm:px-6 lg:px-8 min-w-0">
+          <div className="max-w-[1400px] mx-auto text-center min-w-0">
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -357,7 +369,7 @@ export function HeroSection(): React.JSX.Element {
 
         {/* Features Section */}
         <div className="py-24 px-4 sm:px-6 lg:px-8 border-t border-white/[0.06]">
-          <div className="max-w-[1600px] mx-auto">
+          <div className="max-w-[1400px] mx-auto">
             <div className="text-center mb-16">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -421,7 +433,7 @@ export function HeroSection(): React.JSX.Element {
 
         {/* Testimonials */}
         <div className="py-24 px-4 sm:px-6 lg:px-8 border-t border-white/[0.06]">
-          <div className="max-w-[1600px] mx-auto">
+          <div className="max-w-[1400px] mx-auto">
             <div className="text-center mb-16">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -438,7 +450,7 @@ export function HeroSection(): React.JSX.Element {
                 transition={{ delay: 0.1 }}
                 className="text-zinc-400"
               >
-                Join 500+ Nigerian businesses using Vayva
+                Join Nigerian businesses using Vayva
               </motion.p>
             </div>
 
@@ -467,7 +479,7 @@ export function HeroSection(): React.JSX.Element {
 
         {/* CTA Section */}
         <div className="py-24 px-4 sm:px-6 lg:px-8 border-t border-white/[0.06]">
-          <div className="max-w-[1600px] mx-auto text-center">
+          <div className="max-w-[1400px] mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -478,7 +490,7 @@ export function HeroSection(): React.JSX.Element {
                 Ready to get organized?
               </h2>
               <p className="text-zinc-400 mb-8 max-w-lg mx-auto">
-                Start your 7-day free trial today. No credit card required. Cancel anytime.
+                {offerCopy.trialBadge}. Paid plans use checkout. {offerCopy.cancelAnytime}.
               </p>
               <Link href={`${APP_URL}/signup`}>
                 <Button
@@ -495,7 +507,7 @@ export function HeroSection(): React.JSX.Element {
 
         {/* Footer */}
         <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-white/[0.06]">
-          <div className="max-w-[1600px] mx-auto">
+          <div className="max-w-[1400px] mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
               <div className="col-span-2">
                 <div className="flex items-center gap-2 mb-4">

@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { Card, Button } from "@vayva/ui";
 
 interface ChannelStatus {
   channelId: string;
@@ -88,28 +87,28 @@ export const ChannelSyncMonitor: React.FC<ChannelSyncMonitorProps> = ({
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassPanel variant="bordered" className="p-4">
+        <Card className="border-white/10 bg-white/5 p-4 backdrop-blur-md">
           <div className="text-sm text-white/60 mb-2">Total Channels</div>
           <div className="text-2xl font-bold text-white">{channels.length}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 p-4 backdrop-blur-md">
           <div className="text-sm text-white/60 mb-2">Synced</div>
           <div className="text-2xl font-bold text-green-400">{syncedCount}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 p-4 backdrop-blur-md">
           <div className="text-sm text-white/60 mb-2">Errors</div>
           <div className="text-2xl font-bold text-red-400">{errorCount}</div>
-        </GlassPanel>
-        <GlassPanel variant="bordered" className="p-4">
+        </Card>
+        <Card className="border-white/10 bg-white/5 p-4 backdrop-blur-md">
           <div className="text-sm text-white/60 mb-2">Success Rate</div>
           <div className="text-2xl font-bold text-white">
             {channels.length > 0 ? ((syncedCount / channels.length) * 100).toFixed(0) : 0}%
           </div>
-        </GlassPanel>
+        </Card>
       </div>
 
       {/* Channels List */}
-      <GlassPanel variant="elevated" className="p-6">
+      <Card className="border-white/10 bg-white/5 p-6 backdrop-blur-md">
         <h3 className="text-lg font-semibold text-white mb-4">Channel Status</h3>
         <div className="space-y-3">
           {channels.map((channel) => (
@@ -167,10 +166,10 @@ export const ChannelSyncMonitor: React.FC<ChannelSyncMonitorProps> = ({
             </div>
           ))}
         </div>
-      </GlassPanel>
+      </Card>
 
       {/* Recent Sync Activity */}
-      <GlassPanel variant="elevated" className="p-6">
+      <Card className="border-white/10 bg-white/5 p-6 backdrop-blur-md">
         <h3 className="text-lg font-semibold text-white mb-4">Recent Sync Activity</h3>
         <div className="space-y-2">
           {channels
@@ -192,7 +191,7 @@ export const ChannelSyncMonitor: React.FC<ChannelSyncMonitorProps> = ({
               </div>
             ))}
         </div>
-      </GlassPanel>
+      </Card>
     </div>
   );
 };

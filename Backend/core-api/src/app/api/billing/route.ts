@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger';
  * GET /api/billing/quota-status
  * Get current usage quota status for the authenticated user
  */
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     const session = await getServerSession(authOptions);
     

@@ -2,9 +2,10 @@ import { urls } from "@vayva/shared";
 import { NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma , SupportTicketCategory, SupportTicketPriority } from "@vayva/db";
+import { prisma, SupportTicketCategory, SupportTicketPriority } from "@vayva/db";
 import { Resend } from "resend";
 import { logger, ErrorCategory } from "@/lib/logger";
+import { OpenRouterClient } from "@/lib/ai/openrouter-client";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -32,12 +33,11 @@ export const POST = withVayvaAPI(
         );
       }
 
-      // AI Auto-Classification using Groq
+      // AI Auto-Classification (OpenRouter)
       let finalPriority = (priority || "medium").toLowerCase();
       try {
-        const { GroqClient } = await import("@/lib/ai/groq-client");
-        const groq = new GroqClient("SUPPORT");
-        const classification = await groq.chatCompletion(
+        const ai = new OpenRouterClient("SUPPORT");
+        const classification = await ai.chatCompletion(
           [
             {
               role: "system",
@@ -49,9 +49,15 @@ export const POST = withVayvaAPI(
               content: `Subject: ${subject}\nDescription: ${description}`,
             },
           ],
-          { temperature: 0.1, maxTokens: 10 },
+          {
+            model: "google/gemini-2.0-flash-lite-001",
+            temperature: 0.1,
+            maxTokens: 10,
+            storeId,
+            requestId: `support-classify-${Date.now()}`,
+          },
         );
-        const aiPriority = classification?.choices[0]?.message?.content
+        const aiPriority = classification?.choices?.[0]?.message?.content
           ?.toLowerCase()
           .trim();
         if (aiPriority && ["low", "medium", "high"].includes(aiPriority)) {
@@ -62,7 +68,7 @@ export const POST = withVayvaAPI(
           storeId,
           error: e,
         });
-        // Fallback to simple logic if Groq fails
+        // Fallback to simple logic if AI fails
         const lowerDesc = description.toLowerCase();
         if (
           lowerDesc.includes("urgent") ||

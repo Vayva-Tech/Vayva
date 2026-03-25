@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -126,7 +124,7 @@ function EmbeddedMap({
 
 export default function LiveTrackingPage() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get("order");
+  const orderId = searchParams?.get("order") ?? null;
   
   const [tracking, setTracking] = useState<LiveTrackingData | null>(null);
   const [loading, setLoading] = useState(true);

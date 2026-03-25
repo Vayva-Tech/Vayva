@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nonprofit Donor Management Service
  * Manages donor relationships, contributions, and engagement
@@ -69,8 +68,8 @@ export class DonorManagementService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[DONOR_MGMT] Initializing service...');
-    console.log('[DONOR_MGMT] Service initialized');
+    console.warn('[DONOR_MGMT] Initializing service...');
+    console.warn('[DONOR_MGMT] Service initialized');
   }
 
   addDonor(donorData: Partial<Donor>): Donor {

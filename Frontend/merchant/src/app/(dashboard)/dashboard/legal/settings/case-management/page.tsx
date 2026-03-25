@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Scale, Clock, DollarSign, FileText, AlertCircle, CheckCircle } from 'lucide-react';
@@ -20,6 +18,9 @@ interface CaseManagementSettings {
   enableConflictChecks: boolean;
   requireEngagementLetter: boolean;
   autoCloseInactiveDays: number;
+  statuteLimitationAlerts: boolean;
+  malpracticeIncidentReporting: boolean;
+  clientConfidentialityWarnings: boolean;
 }
 
 export default function CaseManagementSettingsPage() {
@@ -31,6 +32,9 @@ export default function CaseManagementSettingsPage() {
     enableConflictChecks: true,
     requireEngagementLetter: false,
     autoCloseInactiveDays: 365,
+    statuteLimitationAlerts: true,
+    malpracticeIncidentReporting: true,
+    clientConfidentialityWarnings: true,
   });
 
   const [success, setSuccess] = useState('');
@@ -94,11 +98,12 @@ export default function CaseManagementSettingsPage() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="defaultPracticeArea">Default Practice Area</Label>
-                <Select
+                <select
                   id="defaultPracticeArea"
+                  className="flex h-10 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
                   value={settings.defaultPracticeAreaId || ''}
-                  onValueChange={(value) =>
-                    setSettings({ ...settings, defaultPracticeAreaId: value })
+                  onChange={(e) =>
+                    setSettings({ ...settings, defaultPracticeAreaId: e.target.value })
                   }
                 >
                   <option value="">None (require selection)</option>
@@ -107,7 +112,7 @@ export default function CaseManagementSettingsPage() {
                   <option value="personal-injury">Personal Injury</option>
                   <option value="real-estate">Real Estate</option>
                   <option value="corporate">Corporate Law</option>
-                </Select>
+                </select>
               </div>
 
               <div className="flex items-center justify-between">
@@ -216,11 +221,12 @@ export default function CaseManagementSettingsPage() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="defaultStage">Default Initial Stage</Label>
-                <Select
+                <select
                   id="defaultStage"
+                  className="flex h-10 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
                   value={settings.defaultStage}
-                  onValueChange={(value) =>
-                    setSettings({ ...settings, defaultStage: value })
+                  onChange={(e) =>
+                    setSettings({ ...settings, defaultStage: e.target.value })
                   }
                 >
                   <option value="intake">Intake</option>
@@ -230,7 +236,7 @@ export default function CaseManagementSettingsPage() {
                   <option value="trial">Trial</option>
                   <option value="post_trial">Post-Trial</option>
                   <option value="appeal">Appeal</option>
-                </Select>
+                </select>
               </div>
 
               <div>
@@ -277,7 +283,12 @@ export default function CaseManagementSettingsPage() {
                     Enable automatic tracking and alerts for limitation periods
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  checked={settings.statuteLimitationAlerts}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, statuteLimitationAlerts: checked })
+                  }
+                />
               </div>
 
               <div className="flex items-center justify-between">
@@ -287,7 +298,12 @@ export default function CaseManagementSettingsPage() {
                     Allow staff to report potential malpractice incidents
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  checked={settings.malpracticeIncidentReporting}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, malpracticeIncidentReporting: checked })
+                  }
+                />
               </div>
 
               <div className="flex items-center justify-between">
@@ -297,7 +313,12 @@ export default function CaseManagementSettingsPage() {
                     Display reminders when accessing sensitive case information
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  checked={settings.clientConfidentialityWarnings}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, clientConfidentialityWarnings: checked })
+                  }
+                />
               </div>
             </div>
           </Card>

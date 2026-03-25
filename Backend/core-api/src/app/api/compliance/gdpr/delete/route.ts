@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     
     // Get request body
     const body = await request.json().catch(() => ({}));
-    const { storeId, reason, confirm } = body;
+    const { storeId, _reason, confirm } = body;
 
     if (!storeId) {
       return NextResponse.json(

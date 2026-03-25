@@ -1,3 +1,4 @@
+import { Button } from "@vayva/ui";
 /**
  * WorkflowBuilder Component
  * Main workflow builder component with drag-and-drop functionality
@@ -278,28 +279,28 @@ export function WorkflowBuilder({
           <div className="flex items-center gap-2">
             {!readOnly && (
               <>
-                <button
+                <Button
                   onClick={handleValidate}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   Validate
-                </button>
+                </Button>
                 {onTest && (
-                  <button
+                  <Button
                     onClick={handleTest}
                     disabled={isTestMode}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                   >
                     {isTestMode ? 'Testing...' : 'Test'}
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
                   onClick={handleSave}
                   disabled={isSaving}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSaving ? 'Saving...' : 'Save'}
-                </button>
+                </Button>
               </>
             )}
           </div>

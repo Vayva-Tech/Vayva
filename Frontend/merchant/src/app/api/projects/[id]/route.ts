@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { id } = await params;
 
     // Call backend API to fetch project
@@ -21,9 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }>(
       `${process.env.BACKEND_API_URL}/api/projects/${id}`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
+        headers: auth.headers,
       }
     );
 
@@ -40,7 +43,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     handleApiError(error, {
       endpoint: `/api/projects`,
       operation: "GET_PROJECT",
-      storeId,
     });
     throw error;
   }

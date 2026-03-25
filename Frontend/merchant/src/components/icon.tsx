@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
@@ -15,8 +14,19 @@ interface IconProps {
 /**
  * Generic Icon component that renders Phosphor icons by name.
  */
+type PhosphorIconComponent = React.ComponentType<{
+  size?: number;
+  weight?: IconProps['weight'];
+  className?: string;
+  color?: string;
+}>;
+
 export function Icon({ name, size = 24, weight = 'regular', className, color }: IconProps) {
-  const IconComponent = (PhosphorIcons as any)[name];
+  const registry = PhosphorIcons as unknown as Record<
+    string,
+    PhosphorIconComponent | undefined
+  >;
+  const IconComponent = registry[name];
 
   if (!IconComponent) {
     return <span className={className} style={{ width: size, height: size, display: 'inline-block' }} />;

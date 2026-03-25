@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
@@ -8,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useVayvaTheme } from '@/components/vayva-ui/VayvaThemeProvider';
 import type { DesignCategory } from '@/components/vayva-ui/VayvaThemeProvider';
 
-interface UniversalSectionHeaderProps {
+export interface UniversalSectionHeaderProps {
   title: string;
   subtitle?: string;
   icon?: React.ReactNode;
@@ -86,6 +85,8 @@ export function UniversalSectionHeader({
         return baseClasses;
     }
   };
+
+  const getTextContainerClasses = () => "flex flex-col flex-1 min-w-0";
 
   if (loading) {
     return (

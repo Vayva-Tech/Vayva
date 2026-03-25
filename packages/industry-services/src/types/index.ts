@@ -1,7 +1,13 @@
-// @ts-nocheck
 // ============================================================================
 // Services Industry Types
 // ============================================================================
+
+import type { ServicesConfig as ServicesBookingModuleConfig } from '../services/services-booking-management.service';
+
+/** Engine wiring for optional booking feature module. */
+export interface ServicesEngineConfig {
+  booking?: false | ServicesBookingModuleConfig;
+}
 
 export interface Service {
   id: string;

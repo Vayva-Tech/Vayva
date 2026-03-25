@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Industry-Specific Widget Components
  * Adaptive widgets that optimize for each industry's unique requirements
@@ -37,6 +37,35 @@ import { useStore } from '@/providers/store-provider';
 import { IndustrySlug } from '@/lib/templates/types';
 import { getIndustryOptimization } from '@/lib/industry-optimizations';
 
+type InventoryHealthPayload = {
+  turnoverRate?: number;
+  stockoutRate?: number;
+  accuracy?: number;
+  daysOfSupply?: number;
+};
+
+type AppointmentsPayload = {
+  appointments?: Array<{
+    id: string;
+    clientName: string;
+    service: string;
+    time: string;
+    duration: number;
+  }>;
+  total?: number;
+  showRate?: number;
+};
+
+type PerformanceWidgetPayload = {
+  metrics?: Record<string, number>;
+  growth?: number;
+  efficiency?: number;
+};
+
+type SeasonalPayload = {
+  currentSeason?: string;
+};
+
 // Base Widget Props Interface
 interface BaseWidgetProps {
   industry: IndustrySlug;
@@ -54,10 +83,9 @@ export function InventoryHealthWidget({ industry, className }: { industry: Indus
   const colors = getThemeColors(industry);
   const optimization = getIndustryOptimization(industry);
   
-  const { data, isLoading } = useSWR(`/api/${industry}/inventory/health`, async (url: string) => {
+  const { data, isLoading } = useSWR<InventoryHealthPayload | null>(`/api/${industry}/inventory/health`, async (url: string) => {
     try {
-      const response = await apiJson(url);
-      return response;
+      return await apiJson<InventoryHealthPayload>(url);
     } catch (error) {
       console.error('Failed to fetch inventory health:', error);
       return null;
@@ -151,10 +179,9 @@ export function AppointmentSchedulerWidget({ industry, className }: { industry: 
   const colors = getThemeColors(industry);
   const optimization = getIndustryOptimization(industry);
 
-  const { data, isLoading } = useSWR(`/api/${industry}/appointments/today`, async (url: string) => {
+  const { data, isLoading } = useSWR<AppointmentsPayload | null>(`/api/${industry}/appointments/today`, async (url: string) => {
     try {
-      const response = await apiJson(url);
-      return response;
+      return await apiJson<AppointmentsPayload>(url);
     } catch (error) {
       console.error('Failed to fetch appointments:', error);
       return null;
@@ -181,9 +208,9 @@ export function AppointmentSchedulerWidget({ industry, className }: { industry: 
             <p className="text-sm text-gray-500">Schedule Management</p>
           </div>
         </div>
-        <button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+        <Button className="px-3 py-1 text-sm border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
           + Add
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-3">
@@ -233,10 +260,9 @@ export function PerformanceOptimizerWidget({ industry, className }: { industry: 
 
   const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
 
-  const { data, isLoading } = useSWR(`/api/${industry}/performance/${timeframe}`, async (url: string) => {
+  const { data, isLoading } = useSWR<PerformanceWidgetPayload | null>(`/api/${industry}/performance/${timeframe}`, async (url: string) => {
     try {
-      const response = await apiJson(url);
-      return response;
+      return await apiJson<PerformanceWidgetPayload>(url);
     } catch (error) {
       console.error('Failed to fetch performance data:', error);
       return null;
@@ -338,10 +364,9 @@ export function SeasonalInsightsWidget({ industry, className }: { industry: Indu
   const colors = getThemeColors(industry);
   const optimization = getIndustryOptimization(industry);
 
-  const { data, isLoading } = useSWR(`/api/${industry}/seasonal/insights`, async (url: string) => {
+  const { data, isLoading } = useSWR<SeasonalPayload | null>(`/api/${industry}/seasonal/insights`, async (url: string) => {
     try {
-      const response = await apiJson(url);
-      return response;
+      return await apiJson<SeasonalPayload>(url);
     } catch (error) {
       console.error('Failed to fetch seasonal insights:', error);
       return null;
@@ -396,9 +421,9 @@ export function SeasonalInsightsWidget({ industry, className }: { industry: Indu
         </div>
 
         <div className="pt-3 border-t border-gray-100">
-          <button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+          <Button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
             View Full Calendar
-          </button>
+          </Button>
         </div>
       </div>
     </ThemedCard>

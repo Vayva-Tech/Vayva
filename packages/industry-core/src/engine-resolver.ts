@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Industry Engine Resolver
  * ========================
@@ -142,7 +141,7 @@ export class IndustryEngineManager {
       };
 
       this.engineCache.set(industry, instance);
-      console.log(`[IndustryEngine] Initialized: ${industry}`);
+      console.warn(`[IndustryEngine] Initialized: ${industry}`);
     } catch (error) {
       console.error(`[IndustryEngine] Failed to initialize ${industry}:`, error);
       throw error;

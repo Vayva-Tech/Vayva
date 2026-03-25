@@ -3,19 +3,24 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/meal-kit/preferences - Get customer preferences
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const searchParams = request.nextUrl.searchParams;
-    const storeId = searchParams.get('storeId');
     const customerId = searchParams.get('customerId');
 
-    if (!storeId || !customerId) {
+    if (!customerId) {
       return NextResponse.json(
-        { error: 'storeId and customerId are required' },
+        { error: 'customerId is required' },
         { status: 400 }
       );
     }
@@ -31,10 +36,8 @@ export async function GET(request: NextRequest) {
         notes: string | null;
       };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/meal-kit/preferences?storeId=${storeId}&customerId=${customerId}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+    }>(`${process.env.BACKEND_API_URL}/api/meal-kit/preferences?storeId=${encodeURIComponent(storeId)}&customerId=${encodeURIComponent(customerId)}`, {
+      headers: auth.headers,
     });
 
     return NextResponse.json(result);
@@ -53,9 +56,14 @@ export async function GET(request: NextRequest) {
 // POST /api/meal-kit/preferences - Create or update preferences
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json();
     const {
-      storeId,
+      storeId: _bodyStoreId,
       customerId,
       dislikes,
       allergies,
@@ -65,9 +73,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!storeId || !customerId) {
+    if (!customerId) {
       return NextResponse.json(
-        { error: 'storeId and customerId are required' },
+        { error: 'customerId is required' },
         { status: 400 }
       );
     }
@@ -88,10 +96,7 @@ export async function POST(request: NextRequest) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/meal-kit/preferences`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify({
         customerId,
         dislikes: dislikes || [],

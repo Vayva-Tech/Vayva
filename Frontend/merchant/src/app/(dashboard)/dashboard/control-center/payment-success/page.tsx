@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { logger } from "@vayva/shared";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -25,7 +23,7 @@ export default function TemplateSwitchPaymentSuccess() {
   );
 
   useEffect(() => {
-    const reference = searchParams.get("reference");
+    const reference = searchParams?.get("reference");
 
     if (!reference) {
       setTimeout(() => setStatus("failed"), 0);

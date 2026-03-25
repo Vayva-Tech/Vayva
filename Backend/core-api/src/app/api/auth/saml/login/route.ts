@@ -7,7 +7,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAuthRequest, samlSsoProvider } from '@vayva/security';
+import {
+  createAuthRequest,
+  samlSsoProvider,
+  type SamlIdentityProvider
+} from '@vayva/security';
 
 /**
  * GET /api/auth/saml/login
@@ -16,7 +20,7 @@ import { createAuthRequest, samlSsoProvider } from '@vayva/security';
 export async function GET(_request: NextRequest) {
   const idps = await samlSsoProvider.listIdentityProviders();
   return NextResponse.json({
-    idps: idps.map((idp) => ({
+    idps: idps.map((idp: SamlIdentityProvider) => ({
       id: idp.id,
       name: idp.name,
       entityId: idp.entityId,

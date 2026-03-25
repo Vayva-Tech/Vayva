@@ -3,7 +3,7 @@
  * Provides a clean API for database operations across all industries
  */
 
-import { Database, Q } from '@nozbe/watermelondb';
+import { Database, Q, type Model } from '@nozbe/watermelondb';
 import { Observable } from 'rxjs';
 
 // Type definitions
@@ -96,7 +96,7 @@ export class DatabaseService {
     try {
       const record = await this.db.get(collectionName).find(id);
       return record as unknown as T;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -107,10 +107,12 @@ export class DatabaseService {
   ): Promise<T> {
     const collection = this.db.get(collectionName);
     
-    const record = await collection.create((record: any) => {
-      Object.keys(data).forEach(key => {
-        if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
-          record[key] = data[key];
+    const dataRecord = data as Record<string, unknown>;
+    const record = await collection.create((rec: Model) => {
+      const r = rec as unknown as Record<string, unknown>;
+      Object.keys(data).forEach((key) => {
+        if (key !== "id" && key !== "createdAt" && key !== "updatedAt") {
+          r[key] = dataRecord[key];
         }
       });
     });
@@ -125,10 +127,12 @@ export class DatabaseService {
   ): Promise<T> {
     const record = await this.db.get(collectionName).find(id);
     
-    await record.update((updated: any) => {
-      Object.keys(data).forEach(key => {
-        if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
-          updated[key] = data[key];
+    const dataRecord = data as Record<string, unknown>;
+    await record.update((updated: Model) => {
+      const u = updated as unknown as Record<string, unknown>;
+      Object.keys(data).forEach((key) => {
+        if (key !== "id" && key !== "createdAt" && key !== "updatedAt") {
+          u[key] = dataRecord[key];
         }
       });
     });
@@ -144,39 +148,43 @@ export class DatabaseService {
   // Query helpers
   async query<T>(
     collectionName: string,
-    filters: { field: string; op: string; value: any }[]
+    filters: { field: string; op: string; value: unknown }[]
   ): Promise<T[]> {
     const collection = this.db.get(collectionName);
-    let query = collection.query();
+    const clauses: ReturnType<typeof Q.where>[] = [];
 
     filters.forEach(({ field, op, value }) => {
+      const col = field as never;
       switch (op) {
-        case 'eq':
-          query = query.where(field, '=', value);
+        case "eq":
+          clauses.push(Q.where(col, value as never));
           break;
-        case 'ne':
-          query = query.where(field, '!=', value);
+        case "ne":
+          clauses.push(Q.where(col, Q.notEq(value as never)));
           break;
-        case 'gt':
-          query = query.where(field, '>', value);
+        case "gt":
+          clauses.push(Q.where(col, Q.gt(value as never)));
           break;
-        case 'gte':
-          query = query.where(field, '>=', value);
+        case "gte":
+          clauses.push(Q.where(col, Q.gte(value as never)));
           break;
-        case 'lt':
-          query = query.where(field, '<', value);
+        case "lt":
+          clauses.push(Q.where(col, Q.lt(value as never)));
           break;
-        case 'lte':
-          query = query.where(field, '<=', value);
+        case "lte":
+          clauses.push(Q.where(col, Q.lte(value as never)));
           break;
-        case 'in':
-          query = query.where(field, 'in', value);
+        case "in":
+          clauses.push(Q.where(col, Q.oneOf(value as never[])));
           break;
-        case 'contains':
-          query = query.where(field, 'like', `%${value}%`);
+        case "contains":
+          clauses.push(Q.where(col, Q.like(`%${value}%`)));
           break;
       }
     });
+
+    const query =
+      clauses.length > 0 ? collection.query(...clauses) : collection.query();
 
     const results = await query.fetch();
     return results as unknown as T[];
@@ -197,10 +205,12 @@ export class DatabaseService {
     
     await this.db.batch(
       ...dataItems.map(data => 
-        collection.prepareCreate((record: any) => {
-          Object.keys(data).forEach(key => {
-            if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
-              record[key] = data[key];
+        collection.prepareCreate((record: Model) => {
+          const r = record as unknown as Record<string, unknown>;
+          const dataRecord = data as Record<string, unknown>;
+          Object.keys(data).forEach((key) => {
+            if (key !== "id" && key !== "createdAt" && key !== "updatedAt") {
+              r[key] = dataRecord[key];
             }
           });
         })

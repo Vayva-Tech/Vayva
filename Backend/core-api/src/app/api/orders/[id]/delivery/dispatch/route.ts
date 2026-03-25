@@ -29,6 +29,14 @@ const DispatchSchema = z.object({
   recipientPhone: z.string().regex(/^[0-9+ ]{10,15}$/, "Invalid phone number"),
   addressLine1: z.string().min(5, "Valid street address required"),
   addressCity: z.string().min(2, "City required"),
+  cod: z
+    .object({
+      enabled: z.boolean().optional(),
+      // Amount to collect on delivery (product or product+delivery)
+      amount: z.number().positive().optional(),
+      includesDelivery: z.boolean().optional(),
+    })
+    .optional(),
 });
 export const POST = withVayvaAPI(
   PERMISSIONS.FULFILLMENT_MANAGE,
@@ -178,6 +186,22 @@ export const POST = withVayvaAPI(
         recipientPhone,
         addressLine1,
         addressCity,
+        cod:
+          isRecord(body.cod) && body.cod
+            ? {
+                enabled: typeof body.cod.enabled === "boolean" ? body.cod.enabled : undefined,
+                amount:
+                  typeof body.cod.amount === "number"
+                    ? body.cod.amount
+                    : typeof body.cod.amount === "string"
+                      ? Number(body.cod.amount)
+                      : undefined,
+                includesDelivery:
+                  typeof body.cod.includesDelivery === "boolean"
+                    ? body.cod.includesDelivery
+                    : undefined,
+              }
+            : undefined,
       });
       if (!validation.success) {
         return NextResponse.json(
@@ -196,6 +220,8 @@ export const POST = withVayvaAPI(
         addressLine1,
         addressCity,
         parcelDescription: `Order #${order.orderNumber || order.refCode}`,
+        // Payment/collection policy (used by providers that support COD)
+        cod: validation.data.cod,
       };
       // 5. Get Provider and Dispatch
       let provider;
@@ -216,6 +242,7 @@ export const POST = withVayvaAPI(
         providerJobId?: string;
         trackingUrl?: string;
         rawResponse?: unknown;
+        notesMeta?: unknown;
       };
       if (!result.success) {
         return NextResponse.json(
@@ -238,7 +265,11 @@ export const POST = withVayvaAPI(
           trackingCode: result.providerJobId,
           trackingUrl: result.trackingUrl,
           notes: result.rawResponse
-            ? JSON.stringify(result.rawResponse)
+            ? JSON.stringify(
+                result.notesMeta
+                  ? { ...(isRecord(result.rawResponse) ? result.rawResponse : { raw: result.rawResponse }), ...(isRecord(result.notesMeta) ? result.notesMeta : { notesMeta: result.notesMeta }) }
+                  : result.rawResponse,
+              )
             : undefined,
         },
         update: {
@@ -247,7 +278,11 @@ export const POST = withVayvaAPI(
           trackingCode: result.providerJobId,
           trackingUrl: result.trackingUrl,
           notes: result.rawResponse
-            ? JSON.stringify(result.rawResponse)
+            ? JSON.stringify(
+                result.notesMeta
+                  ? { ...(isRecord(result.rawResponse) ? result.rawResponse : { raw: result.rawResponse }), ...(isRecord(result.notesMeta) ? result.notesMeta : { notesMeta: result.notesMeta }) }
+                  : result.rawResponse,
+              )
             : undefined,
         },
       });

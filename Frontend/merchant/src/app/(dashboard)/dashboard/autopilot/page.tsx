@@ -1,167 +1,161 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { apiJson } from "@/lib/api-client-shared";
+import { logger } from "@vayva/shared";
 import {
-  Lightning as Zap,
-  Play,
-  Pause,
-  Clock,
-  WebhooksLogo as Webhook,
-  CalendarBlank as CalendarClock,
-  BellRinging as BellRing,
-  Plus,
-  CheckCircle as CheckCircle2,
-  ChartBar as BarChart3,
-  ChatCircle as MessageCircle,
-  ShoppingCart,
-  Package,
-  FileText,
-  TrendUp as TrendingUp,
-  ArrowRight,
-  X,
-  FlowArrow as Workflow,
-  Timer,
-  ArrowCounterClockwise as RotateCcw,
-  PaperPlaneTilt as Send,
+  ArrowClockwise,
+  CheckCircle,
+  Sparkle,
+  XCircle,
 } from "@phosphor-icons/react";
 
-// ── Mock Data ────────────────────────────────────────────────────────────────
+type AutopilotStatus =
+  | "PROPOSED"
+  | "APPROVED"
+  | "DISMISSED"
+  | "COMPLETED"
+  | "FAILED";
 
-interface Workflow {
+interface AutopilotRunRow {
   id: string;
-  name: string;
-  description: string;
-  status: 'active' | 'paused';
-  triggerType: 'event' | 'webhook' | 'schedule';
-  lastRun: string;
-  executionsCount: number;
-  successRate: number;
+  ruleSlug: string;
+  category: string;
+  status: AutopilotStatus;
+  title: string;
+  summary: string;
+  reasoning: string | null;
+  createdAt: string;
+  approvedAt: string | null;
+  dismissedAt: string | null;
 }
 
-const SUMMARY_CARDS = [
-  { label: "Active Workflows", value: "5", icon: Zap, color: "bg-green-100 text-green-600" },
-  { label: "Executions Today", value: "127", icon: Play, color: "bg-blue-100 text-blue-600" },
-  { label: "Time Saved", value: "4.2hrs", icon: Timer, color: "bg-purple-100 text-purple-600" },
-];
+interface FeedResponse {
+  runs: AutopilotRunRow[];
+  total: number;
+  pendingCount: number;
+  usage?: {
+    runsThisMonth?: number;
+    runsLimit?: number;
+    messagesPerRun?: number;
+  };
+}
 
-const WORKFLOWS: Workflow[] = [
-  {
-    id: "1",
-    name: "Auto-reply WhatsApp inquiries",
-    description: "Respond to customer messages on WhatsApp automatically",
-    status: "active" as const,
-    triggerType: "event" as const,
-    lastRun: "5 mins ago",
-    executionsCount: 48,
-    successRate: 98,
-  },
-  {
-    id: "2",
-    name: "Restock alert for low inventory",
-    description: "Notify when product stock drops below threshold",
-    status: "active" as const,
-    triggerType: "event" as const,
-    lastRun: "12 mins ago",
-    executionsCount: 15,
-    successRate: 100,
-  },
-  {
-    id: "3",
-    name: "Order confirmation flow",
-    description: "Send confirmation SMS and email after each purchase",
-    status: "active" as const,
-    triggerType: "webhook" as const,
-    lastRun: "2 mins ago",
-    executionsCount: 34,
-    successRate: 97,
-  },
-  {
-    id: "4",
-    name: "Abandoned cart recovery",
-    description: "Send WhatsApp reminder 2 hours after cart abandonment",
-    status: "paused" as const,
-    triggerType: "schedule" as const,
-    lastRun: "3 hours ago",
-    executionsCount: 22,
-    successRate: 85,
-  },
-  {
-    id: "5",
-    name: "Daily sales report",
-    description: "Generate and send daily sales summary every evening at 8PM WAT",
-    status: "active" as const,
-    triggerType: "schedule" as const,
-    lastRun: "Yesterday 8:00 PM",
-    executionsCount: 8,
-    successRate: 100,
-  },
-];
+interface AddonRow {
+  id: string;
+  purchase?: { status?: string };
+}
 
-const WORKFLOW_TEMPLATES = [
-  {
-    id: "t1",
-    name: "Customer Onboarding",
-    description: "Welcome new customers with a series of personalized messages",
-    icon: Send,
-    category: "Engagement",
-  },
-  {
-    id: "t2",
-    name: "Flash Sale Notification",
-    description: "Automatically notify customers when a flash sale goes live",
-    icon: BellRing,
-    category: "Marketing",
-  },
-  {
-    id: "t3",
-    name: "Inventory Sync",
-    description: "Sync inventory levels across all your sales channels",
-    icon: RotateCcw,
-    category: "Operations",
-  },
-  {
-    id: "t4",
-    name: "Review Request",
-    description: "Ask customers for reviews 3 days after delivery",
-    icon: MessageCircle,
-    category: "Engagement",
-  },
-];
-
-// ── Trigger Icons ────────────────────────────────────────────────────────────
-
-const TRIGGER_ICONS = {
-  schedule: CalendarClock,
-  webhook: Webhook,
-  event: BellRing,
-};
-
-const TRIGGER_LABELS = {
-  schedule: "Schedule",
-  webhook: "Webhook",
-  event: "Event",
-};
-
-// ── Page Component ───────────────────────────────────────────────────────────
+interface AddonsResponse {
+  addOns?: AddonRow[];
+}
 
 export default function AutopilotPage() {
-  const [workflows, setWorkflows] = useState(WORKFLOWS);
-  const [showModal, setShowModal] = useState(false);
+  const [addonActive, setAddonActive] = useState<boolean | null>(null);
+  const [runs, setRuns] = useState<AutopilotRunRow[]>([]);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [runUsage, setRunUsage] = useState<FeedResponse["usage"] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [evaluating, setEvaluating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [actionId, setActionId] = useState<string | null>(null);
 
-  const toggleWorkflow = (id: string) => {
-    setWorkflows((prev) =>
-      prev.map((w) =>
-        w.id === id
-          ? { ...w, status: w.status === "active" ? ("paused" as const) : ("active" as const) }
-          : w
-      )
-    );
+  const loadFeed = useCallback(async () => {
+    setError(null);
+    try {
+      const addonsData = await apiJson<AddonsResponse>("/api/merchant/addons");
+      const autopilot = (addonsData?.addOns || []).find(
+        (a) => a.id === "vayva.autopilot",
+      );
+      const active =
+        autopilot?.purchase?.status?.toUpperCase() === "ACTIVE";
+      setAddonActive(active);
+
+      if (!active) {
+        setRuns([]);
+        setPendingCount(0);
+        return;
+      }
+
+      const feed = await apiJson<FeedResponse>(
+        "/api/merchant/autopilot/feed?limit=50",
+      );
+      setRuns(feed.runs || []);
+      setPendingCount(feed.pendingCount ?? 0);
+      setRunUsage(feed.usage ?? null);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to load Autopilot";
+      setError(msg);
+      logger.error("[AutopilotPage] load failed", {
+        error: msg,
+        app: "merchant",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadFeed();
+  }, [loadFeed]);
+
+  const runEvaluate = async () => {
+    setEvaluating(true);
+    setError(null);
+    try {
+      await apiJson("/api/merchant/autopilot/evaluate", { method: "POST" });
+      await loadFeed();
+    } catch (e: unknown) {
+      const msg =
+        e instanceof Error ? e.message : "Analysis run failed";
+      setError(msg);
+    } finally {
+      setEvaluating(false);
+    }
   };
+
+  const runAction = async (runId: string, action: "approve" | "dismiss") => {
+    setActionId(runId);
+    setError(null);
+    try {
+      await apiJson("/api/merchant/autopilot/action", {
+        method: "POST",
+        body: JSON.stringify({ runId, action }),
+      });
+      await loadFeed();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Action failed";
+      setError(msg);
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4 pb-10">
+        <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+        <div className="h-32 bg-gray-50 rounded-2xl animate-pulse" />
+      </div>
+    );
+  }
+
+  if (addonActive === false) {
+    return (
+      <div className="space-y-4 pb-10 max-w-xl">
+        <h1 className="text-2xl font-bold text-gray-900">Autopilot</h1>
+        <p className="text-sm text-gray-600">
+          Autopilot is an add-on for eligible plans. Subscribe from Billing to
+          get AI recommendations based on your store data.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-10">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold text-gray-900">Autopilot</h1>
@@ -170,253 +164,116 @@ export default function AutopilotPage() {
             </span>
           </div>
           <p className="text-sm text-gray-500">
-            Automate your business operations
-          </p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Create Workflow
-        </button>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {SUMMARY_CARDS.map((card) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={card.label}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {card.label}
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{card.value}</p>
-                </div>
-                <div className={`p-2.5 rounded-xl ${card.color}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Workflow List */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-          Your Workflows
-        </h2>
-        <div className="space-y-3">
-          {workflows.map((workflow) => {
-            const TriggerIcon = TRIGGER_ICONS[workflow.triggerType];
-            return (
-              <div
-                key={workflow.id}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5 mb-1">
-                      <h3 className="text-sm font-semibold text-gray-900 truncate">
-                        {workflow.name}
-                      </h3>
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
-                          workflow.status === "active"
-                            ? "bg-green-50 text-green-600"
-                            : "bg-orange-50 text-orange-600"
-                        }`}
-                      >
-                        {workflow.status === "active" ? (
-                          <Play className="w-2.5 h-2.5" />
-                        ) : (
-                          <Pause className="w-2.5 h-2.5" />
-                        )}
-                        {workflow.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-3">{workflow.description}</p>
-
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <TriggerIcon className="w-3.5 h-3.5" />
-                        {TRIGGER_LABELS[workflow.triggerType]}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Clock className="w-3.5 h-3.5" />
-                        {workflow.lastRun}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <BarChart3 className="w-3.5 h-3.5" />
-                        {workflow.executionsCount} runs
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                        <span className="text-green-600 font-medium">
-                          {workflow.successRate}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Toggle */}
-                  <button
-                    onClick={() => toggleWorkflow(workflow.id)}
-                    className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${
-                      workflow.status === "active" ? "bg-green-500" : "bg-gray-300"
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-                        workflow.status === "active"
-                          ? "translate-x-[22px]"
-                          : "translate-x-0.5"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Visual Workflow Builder - PRO_PLUS */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-          Advanced Tools
-        </h2>
-        <a
-          href="/dashboard/workflow-automation"
-          className="group block bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:border-green-200 hover:shadow-md transition-all relative overflow-hidden"
-        >
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-sm">
-              <Workflow className="w-6 h-6" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-sm font-bold text-gray-900">
-                  Visual Workflow Builder
-                </h3>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white">
-                  PRO+
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 leading-relaxed mb-3">
-                Drag-and-drop automation canvas with AI decision nodes, conditional branching,
-                delays, and pre-built templates. Build complex workflows visually.
-              </p>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-600 group-hover:text-green-700 transition-colors">
-                Open Builder
-                <ArrowRight className="w-3.5 h-3.5" />
+            AI suggestions from your live data. Approve or dismiss each
+            recommendation.
+            {pendingCount > 0 && (
+              <span className="ml-1 font-semibold text-gray-700">
+                {pendingCount} pending
               </span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      {/* Workflow Templates */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-          Pre-built Templates
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {WORKFLOW_TEMPLATES.map((template) => {
-            const Icon = template.icon;
-            return (
-              <div
-                key={template.id}
-                className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:border-green-200 hover:shadow-md transition-all cursor-pointer"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 p-2.5 rounded-xl bg-gray-100 text-gray-600 group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-sm font-semibold text-gray-900">
-                        {template.name}
-                      </h3>
-                      <span className="text-[10px] font-semibold text-gray-400 uppercase">
-                        {template.category}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      {template.description}
-                    </p>
-                    <button className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-green-600 hover:text-green-700 transition-colors">
-                      Use Template
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Create Workflow Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-md mx-4 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-green-100 text-green-600">
-                  <Workflow className="w-5 h-5" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Create Workflow</h3>
-              </div>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-500 mb-6">
-              The workflow builder is coming soon. In the meantime, you can use
-              one of our pre-built templates below to get started.
+            )}
+          </p>
+          {runUsage?.runsLimit != null && (
+            <p className="text-xs text-gray-400 mt-1">
+              This month:{" "}
+              <span className="font-semibold text-gray-500">
+                {runUsage.runsThisMonth ?? 0}/{runUsage.runsLimit}
+              </span>{" "}
+              runs ·{" "}
+              <span className="font-semibold text-gray-500">
+                {runUsage.messagesPerRun ?? 0}
+              </span>{" "}
+              AI messages per run
             </p>
+          )}
+        </div>
+        <Button
+          type="button"
+          onClick={() => void runEvaluate()}
+          disabled={evaluating}
+          className="rounded-xl gap-2 shrink-0"
+        >
+          <ArrowClockwise
+            className={`w-4 h-4 ${evaluating ? "animate-spin" : ""}`}
+          />
+          {evaluating ? "Running…" : "Run analysis"}
+        </Button>
+      </div>
 
-            <div className="space-y-3 mb-6">
-              {WORKFLOW_TEMPLATES.slice(0, 3).map((t) => {
-                const Icon = t.icon;
-                return (
-                  <button
-                    key={t.id}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-green-200 hover:bg-green-50/50 transition-all text-left"
-                  >
-                    <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{t.name}</p>
-                      <p className="text-xs text-gray-500">{t.category}</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-300" />
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => setShowModal(false)}
-              className="w-full py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </button>
-          </div>
+      {error && (
+        <div
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+          role="alert"
+        >
+          {error}
         </div>
       )}
+
+      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+          <Sparkle className="w-5 h-5 text-green-600" weight="fill" />
+          <h2 className="text-sm font-semibold text-gray-900">
+            Recommendations
+          </h2>
+        </div>
+
+        {runs.length === 0 ? (
+          <div className="px-5 py-12 text-center text-sm text-gray-500">
+            No Autopilot runs yet. Click &quot;Run analysis&quot; to generate
+            suggestions.
+          </div>
+        ) : (
+          <ul className="divide-y divide-gray-100">
+            {runs.map((run) => (
+              <li key={run.id} className="px-5 py-4 space-y-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                      {run.category} · {run.status}
+                    </p>
+                    <h3 className="text-base font-semibold text-gray-900 mt-0.5">
+                      {run.title}
+                    </h3>
+                  </div>
+                  {run.status === "PROPOSED" && (
+                    <div className="flex gap-2 shrink-0">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="rounded-lg h-8 text-xs gap-1"
+                        disabled={actionId === run.id}
+                        onClick={() => void runAction(run.id, "dismiss")}
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        Dismiss
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="rounded-lg h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
+                        disabled={actionId === run.id}
+                        onClick={() => void runAction(run.id, "approve")}
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Approve
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <div className="text-sm text-gray-700 whitespace-pre-wrap">
+                  {run.summary}
+                </div>
+                {run.reasoning && (
+                  <p className="text-xs text-gray-400">{run.reasoning}</p>
+                )}
+                <p className="text-[11px] text-gray-400">
+                  {new Date(run.createdAt).toLocaleString()}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

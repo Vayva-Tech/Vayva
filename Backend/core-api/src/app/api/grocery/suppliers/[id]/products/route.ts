@@ -15,111 +15,130 @@ const SupplierProductsQuerySchema = z.object({
   search: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const { searchParams } = new URL(req.url);
-    
-    const parseResult = SupplierProductsQuerySchema.parse({
-      page: searchParams.get("page"),
-      limit: searchParams.get("limit"),
-      status: searchParams.get("status"),
-      categoryId: searchParams.get("categoryId"),
-      minPrice: searchParams.get("minPrice"),
-      maxPrice: searchParams.get("maxPrice"),
-      search: searchParams.get("search"),
-    });
+export const GET = withVayvaAPI(
+  PERMISSIONS.SUPPLIERS_VIEW,
+  async (req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
+      const { searchParams } = new URL(req.url);
 
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+      const parseResult = SupplierProductsQuerySchema.parse({
+        page: searchParams.get("page"),
+        limit: searchParams.get("limit"),
+        status: searchParams.get("status"),
+        categoryId: searchParams.get("categoryId"),
+        minPrice: searchParams.get("minPrice"),
+        maxPrice: searchParams.get("maxPrice"),
+        search: searchParams.get("search"),
+      });
 
-    // Verify supplier exists
-    const supplier = await prisma.grocerySupplier.findFirst({
-      where: { id, storeId },
-    });
+      const supplier = await prisma.grocerySupplier.findFirst({
+        where: { id, storeId },
+      });
 
-    if (!supplier) {
+      if (!supplier) {
+        return NextResponse.json(
+          { error: "Supplier not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      const skip = (parseResult.page - 1) * parseResult.limit;
+
+      const priceFilter =
+        parseResult.minPrice !== undefined || parseResult.maxPrice !== undefined
+          ? {
+              ...(parseResult.minPrice !== undefined && {
+                gte: parseResult.minPrice,
+              }),
+              ...(parseResult.maxPrice !== undefined && {
+                lte: parseResult.maxPrice,
+              }),
+            }
+          : undefined;
+
+      const whereClause = {
+        supplierId: id,
+        storeId,
+        ...(parseResult.status && { active: parseResult.status === "active" }),
+        ...(parseResult.categoryId && { categoryId: parseResult.categoryId }),
+        ...(priceFilter && Object.keys(priceFilter).length > 0
+          ? { price: priceFilter }
+          : {}),
+        ...(parseResult.search && {
+          OR: [
+            { name: { contains: parseResult.search, mode: "insensitive" } },
+            { sku: { contains: parseResult.search, mode: "insensitive" } },
+            {
+              description: {
+                contains: parseResult.search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }),
+      };
+
+      const [products, total] = await Promise.all([
+        prisma.groceryProduct.findMany({
+          where: whereClause,
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            _count: {
+              select: {
+                sales: true,
+                reviews: true,
+              },
+            },
+          },
+          skip,
+          take: parseResult.limit,
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.groceryProduct.count({ where: whereClause }),
+      ]);
+
+      const performanceMetrics = {
+        totalProducts: total,
+        activeProducts: products.filter((p) => p.active).length,
+        lowStockProducts: products.filter((p) => p.lowStockAlert).length,
+        averageRating:
+          products.length > 0
+            ? products.reduce((sum, p) => sum + (p.averageRating || 0), 0) /
+              products.length
+            : 0,
+        totalRevenue: products.reduce(
+          (sum, p) => sum + (p.totalRevenue || 0),
+          0,
+        ),
+      };
+
       return NextResponse.json(
-        { error: "Supplier not found" },
-        { status: 404, headers: standardHeaders(requestId) }
+        {
+          data: products,
+          meta: {
+            page: parseResult.page,
+            limit: parseResult.limit,
+            total,
+            totalPages: Math.ceil(total / parseResult.limit),
+            performance: performanceMetrics,
+          },
+        },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: supplierId } = await params;
+      logger.error("[SUPPLIER_PRODUCTS_GET]", { error, supplierId });
+      return NextResponse.json(
+        { error: "Failed to fetch supplier products" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-
-    const skip = (parseResult.page - 1) * parseResult.limit;
-
-    const whereClause = {
-      supplierId: id,
-      storeId,
-      ...(parseResult.status && { active: parseResult.status === "active" }),
-      ...(parseResult.categoryId && { categoryId: parseResult.categoryId }),
-      ...(parseResult.minPrice && { price: { gte: parseResult.minPrice } }),
-      ...(parseResult.maxPrice && { price: { lte: parseResult.maxPrice } }),
-      ...(parseResult.search && {
-        OR: [
-          { name: { contains: parseResult.search, mode: "insensitive" } },
-          { sku: { contains: parseResult.search, mode: "insensitive" } },
-          { description: { contains: parseResult.search, mode: "insensitive" } },
-        ],
-      }),
-    };
-
-    const [products, total] = await Promise.all([
-      prisma.groceryProduct.findMany({
-        where: whereClause,
-        include: {
-          category: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          _count: {
-            select: {
-              sales: true,
-              reviews: true,
-            },
-          },
-        },
-        skip,
-        take: parseResult.limit,
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.groceryProduct.count({ where: whereClause }),
-    ]);
-
-    // Calculate supplier performance metrics
-    const performanceMetrics = {
-      totalProducts: total,
-      activeProducts: products.filter(p => p.active).length,
-      lowStockProducts: products.filter(p => p.lowStockAlert).length,
-      averageRating: products.length > 0 
-        ? products.reduce((sum, p) => sum + (p.averageRating || 0), 0) / products.length
-        : 0,
-      totalRevenue: products.reduce((sum, p) => sum + (p.totalRevenue || 0), 0),
-    };
-
-    return NextResponse.json(
-      {
-        data: products,
-        meta: {
-          page: parseResult.page,
-          limit: parseResult.limit,
-          total,
-          totalPages: Math.ceil(total / parseResult.limit),
-          performance: performanceMetrics,
-        },
-      },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[SUPPLIER_PRODUCTS_GET]", { error, supplierId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch supplier products" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+  },
+);

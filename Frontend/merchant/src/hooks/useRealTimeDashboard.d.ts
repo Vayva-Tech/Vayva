@@ -16,7 +16,8 @@ export declare function useRealTimeDashboard({ industry, userId, businessId, ena
     systemStatus: unknown;
     isLoading: boolean;
     isError: boolean;
-    error: unknown;
+    /** SWR / network error (not a boolean) */
+    error: Error | undefined;
     wsConnected: boolean;
     retryCount: number;
     refresh: () => Promise<void>;

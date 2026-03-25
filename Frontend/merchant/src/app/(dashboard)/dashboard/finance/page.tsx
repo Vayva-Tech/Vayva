@@ -1,8 +1,15 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import useSWR from "swr";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { AffiliatePayoutApproval } from "@/components/finance/affiliate-payout-approval";
+import { AccountCard } from "@/components/finance/AccountCard";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
+import Link from "next/link";
 import {
   DollarSign,
   TrendingUp,
@@ -10,12 +17,12 @@ import {
   Clock,
   ArrowUpRight,
   ArrowDownRight,
-  Building2,
   CheckCircle2,
   XCircle,
   AlertCircle,
   Lock,
   Banknote,
+  Building,
   RefreshCw,
 } from "lucide-react";
 
@@ -29,6 +36,12 @@ interface FinanceData {
   payouts: { id: number; amount: number; bank: string; date: string; status: "Completed" | "Pending" | "Failed" }[];
   expenseBreakdown: { label: string; value: number; color: string }[];
   profitMarginData: { month: string; margin: number }[];
+  virtualAccount?: {
+    status: string;
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+  } | null;
   kpis: {
     totalRevenue: string;
     revenueTrend: string;
@@ -310,7 +323,11 @@ function StatusBadge({ status }: { status: "Completed" | "Pending" | "Failed" })
 /* ------------------------------------------------------------------ */
 
 export default function FinancePage() {
-  const [userPlan] = useState<"FREE" | "STARTER" | "PRO">("FREE");
+  const router = useRouter();
+  const { merchant } = useAuth();
+  const plan = String((merchant as any)?.plan || "").trim().toLowerCase();
+  const userPlan: "FREE" | "STARTER" | "PRO" =
+    plan === "starter" ? "STARTER" : plan === "pro" ? "PRO" : "FREE";
 
   const { data, error, isLoading, mutate } = useSWR<FinanceData>(
     '/api/finance/overview',
@@ -324,6 +341,7 @@ export default function FinancePage() {
   const expenseBreakdown = data?.expenseBreakdown || [];
   const profitMarginData = data?.profitMarginData || [];
   const finKpis = data?.kpis;
+  const virtualAccount = data?.virtualAccount ?? null;
 
   // Error state
   if (error) {
@@ -335,13 +353,13 @@ export default function FinancePage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load financial data</h3>
           <p className="text-sm text-gray-500 mb-4">There was a problem fetching your finance data. Please try again.</p>
-          <button
+          <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -377,12 +395,10 @@ export default function FinancePage() {
   if (!data || (revenueData.length === 0 && transactions.length === 0)) {
     return (
       <div className="min-h-screen space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Finance</h1>
-            <p className="text-sm text-gray-500 mt-1">Manage your revenue, payouts, and financial health</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Finance"
+          subtitle="Manage your revenue, payouts, and financial health"
+        />
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
             <DollarSign className="w-7 h-7 text-gray-400" />
@@ -403,24 +419,174 @@ export default function FinancePage() {
 
   return (
     <div className="min-h-screen space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Finance</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your revenue, payouts, and financial health</p>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/finance/transactions"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Transactions</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/finance/activity"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Activity</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/finance/payouts"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Payouts</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/finance/wallet"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Wallet</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/finance/accounts"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Accounts</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/finance/statements"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Statements</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/finance/refunds"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Refunds</span>
+                  <ArrowUpRight size={16} className="text-gray-400" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Available</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {finKpis?.availableBalance ?? "--"}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Pending payouts</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {finKpis?.pendingPayouts ?? "--"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Finance"
+          subtitle="Manage your revenue, payouts, and financial health"
+          actions={
+            <>
+              <Button
+                onClick={() => mutate()}
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </Button>
+              <Button
+                onClick={() => router.push("/dashboard/finance/payouts")}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm"
+              >
+                <Banknote size={16} />
+                Request Payout
+              </Button>
+            </>
+          }
+        />
+
+      {/* Wallet + Dedicated Virtual Account */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">Wallet</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Your available balance, pending balance, and dedicated virtual account.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => router.push("/dashboard/finance/wallet")}
+              className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 h-9 rounded-xl font-semibold"
+            >
+              View wallet
+            </Button>
+            <Button
+              onClick={() => router.push("/dashboard/finance/payouts")}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 h-9 rounded-xl font-semibold"
+            >
+              Withdraw
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => mutate()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
-          >
-            <RefreshCw size={16} />
-            Refresh
-          </button>
-          <button className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
-            <Banknote size={16} />
-            Request Payout
-          </button>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <AccountCard
+            title="Wallet balance"
+            subtitle="Available and pending balances"
+            primaryValue={finKpis?.availableBalance ?? "--"}
+            secondaryValue={`Pending: ${finKpis?.pendingPayouts ?? "--"}`}
+            primaryAction={{ label: "Withdraw", onClick: () => router.push("/dashboard/finance/payouts") }}
+            secondaryAction={{ label: "Wallet", onClick: () => router.push("/dashboard/finance/wallet") }}
+          />
+
+          <div className="lg:col-span-2">
+            <AccountCard
+              title="Dedicated virtual account"
+              badge={virtualAccount ? "Active" : "Not created"}
+              subtitle="Use this account to fund your wallet"
+              primaryValue={virtualAccount?.accountNumber || "—"}
+              secondaryValue={
+                virtualAccount
+                  ? `${virtualAccount.bankName} • ${virtualAccount.accountName}`
+                  : "Complete KYC to create a dedicated account."
+              }
+              lines={virtualAccount ? ["Send money here to fund your wallet"] : []}
+              copyItems={
+                virtualAccount
+                  ? [
+                      { label: "Copy account number", value: virtualAccount.accountNumber },
+                      { label: "Copy account name", value: virtualAccount.accountName },
+                      { label: "Copy bank name", value: virtualAccount.bankName },
+                    ]
+                  : []
+              }
+              primaryAction={{
+                label: virtualAccount ? "View wallet" : "Complete KYC",
+                onClick: () => router.push(virtualAccount ? "/dashboard/finance/wallet" : "/dashboard/settings/kyc"),
+              }}
+              secondaryAction={{ label: "Accounts", onClick: () => router.push("/dashboard/finance/accounts") }}
+            />
+          </div>
         </div>
       </div>
 
@@ -520,7 +686,7 @@ export default function FinancePage() {
                   </td>
                   <td className="py-3.5 px-6">
                     <div className="flex items-center gap-2">
-                      <Building2 size={14} className="text-gray-400" />
+                      <Building size={14} className="text-gray-400" />
                       <span className="text-sm text-gray-700">{payout.bank}</span>
                     </div>
                   </td>
@@ -535,6 +701,25 @@ export default function FinancePage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Affiliate payouts (approval queue) */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">Affiliate payouts</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Approve or reject affiliate payout requests (these are separate from your own withdrawals).
+            </p>
+          </div>
+          <Button
+            onClick={() => router.push("/dashboard/marketing/affiliates")}
+            className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 h-9 rounded-xl font-semibold"
+          >
+            Manage affiliates
+          </Button>
+        </div>
+        <AffiliatePayoutApproval />
       </div>
 
       {/* Financial Charts (Gated) */}
@@ -573,14 +758,15 @@ export default function FinancePage() {
               <p className="text-sm text-gray-500 mb-5">
                 Get detailed expense breakdowns and profit margin trends to make smarter financial decisions.
               </p>
-              <button className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
-                Upgrade to Starter
-                <ArrowUpRight size={14} />
-              </button>
+              <div className="text-sm text-gray-700 font-semibold">
+                Upgrade your plan to unlock analytics.
+              </div>
             </div>
           </div>
         )}
       </div>
+      </PageWithInsights>
     </div>
   );
 }
+

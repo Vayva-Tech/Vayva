@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grant Tracker Service
  * Manages grant applications, deadlines, and reporting
@@ -64,12 +63,12 @@ export class GrantTrackerService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[GRANT_TRACKER] Initializing service...');
+    console.warn('[GRANT_TRACKER] Initializing service...');
     
     // Initialize with sample grants
     this.initializeSampleGrants();
     
-    console.log('[GRANT_TRACKER] Service initialized');
+    console.warn('[GRANT_TRACKER] Service initialized');
   }
 
   private initializeSampleGrants(): void {

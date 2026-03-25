@@ -4,7 +4,7 @@
  * Interactive lesson player with video, quizzes, and progress tracking
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const LESSON_PLAYER_ADDON: AddOnDefinition = {
   id: 'vayva.lesson-player',

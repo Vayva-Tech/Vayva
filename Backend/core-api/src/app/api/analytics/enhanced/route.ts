@@ -154,7 +154,7 @@ async function generateCSVReport(data: any, requestId: string) {
         'Content-Disposition': 'attachment; filename="enhanced-analytics-report.csv"'
       }
     });
-  } catch (error) {
+  } catch {
     throw new Error('Failed to generate CSV report');
   }
 }
@@ -279,7 +279,7 @@ export const POST = withVayvaAPI(
 async function processRevenueForecast(
   storeId: string, 
   parameters: any = {}, 
-  dateRange?: { start: string; end: string }
+  _dateRange?: { start: string; end: string }
 ) {
   // Simulate revenue forecasting using historical data
   const forecastPeriod = parameters.forecastMonths || 3;
@@ -314,7 +314,7 @@ async function processRevenueForecast(
 
 async function processCustomerSegmentation(
   storeId: string, 
-  parameters: any = {}, 
+  _parameters: any = {}, 
   segments?: string[]
 ) {
   // Simulate customer segmentation analysis
@@ -340,7 +340,7 @@ async function processCustomerSegmentation(
 
 async function processPerformanceBenchmark(
   storeId: string, 
-  parameters: any = {}
+  _parameters: any = {}
 ) {
   // Simulate performance benchmarking against industry standards
   const metrics = ['revenue_per_employee', 'customer_acquisition_cost', 'conversion_rate'];
@@ -367,7 +367,7 @@ async function processPerformanceBenchmark(
 
 async function processTrendAnalysis(
   storeId: string, 
-  parameters: any = {}, 
+  _parameters: any = {}, 
   dateRange?: { start: string; end: string }
 ) {
   // Simulate trend analysis
@@ -393,7 +393,7 @@ async function processTrendAnalysis(
 
 async function processCompetitiveIntelligence(
   storeId: string, 
-  parameters: any = {}
+  _parameters: any = {}
 ) {
   // Simulate competitive intelligence analysis
   const competitors = ['competitor_a', 'competitor_b', 'competitor_c'];

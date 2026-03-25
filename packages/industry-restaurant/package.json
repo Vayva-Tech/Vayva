@@ -25,6 +25,14 @@
     "./types": {
       "import": "./src/types/index.ts",
       "types": "./src/types/index.ts"
+    },
+    "./types/kitchen-types": {
+      "import": "./src/types/kitchen-types.ts",
+      "types": "./src/types/kitchen-types.ts"
+    },
+    "./types/eighty-six": {
+      "import": "./src/types/eighty-six.ts",
+      "types": "./src/types/eighty-six.ts"
     }
   },
   "scripts": {
@@ -41,10 +49,16 @@
     "@vayva/schemas": "workspace:*",
     "@vayva/ai-agent": "workspace:*",
     "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:*",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "typescript": "^5.9.3",
     "vitest": "^1.6.0"
   }

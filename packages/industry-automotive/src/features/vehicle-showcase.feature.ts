@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Vehicle Showcase Feature
  * Manages vehicle display, filtering, and comparison functionality

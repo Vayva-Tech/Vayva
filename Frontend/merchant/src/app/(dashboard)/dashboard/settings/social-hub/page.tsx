@@ -1,7 +1,5 @@
-// @ts-nocheck
 "use client";
-
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { 
   Gear, 
   Plug, 
@@ -24,6 +22,7 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { Button, Input } from "@vayva/ui";
 import { toast } from "sonner";
+import { logger } from "@vayva/shared";
 import { apiJson } from "@/lib/api-client-shared";
 
 interface SocialPlatform {
@@ -42,57 +41,158 @@ interface SocialPlatform {
   };
 }
 
-export default function SocialMediaHub() {
-  const [platforms, setPlatforms] = useState<SocialPlatform[]>([
+function buildDefaultPlatforms(): SocialPlatform[] {
+  return [
     {
-      id: 'whatsapp',
-      name: 'WhatsApp Business',
-      description: 'Primary customer messaging platform',
+      id: "whatsapp",
+      name: "WhatsApp Business",
+      description: "Primary customer messaging platform",
       icon: <WhatsappLogo className="w-5 h-5" />,
-      connected: true,
-      accountName: '+234 801 234 5678',
-      stats: { messages: 1247, conversions: 89, engagement: 76 }
+      connected: false,
     },
     {
-      id: 'telegram',
-      name: 'Telegram Bot',
-      description: 'Bot-powered customer support',
+      id: "telegram",
+      name: "Telegram Bot",
+      description: "Bot-powered customer support",
       icon: <TelegramLogo className="w-5 h-5" />,
-      connected: false
+      connected: false,
     },
     {
-      id: 'discord',
-      name: 'Discord Server',
-      description: 'Community engagement and support',
+      id: "discord",
+      name: "Discord Server",
+      description: "Community engagement and support",
       icon: <DiscordLogo className="w-5 h-5" />,
-      connected: false
+      connected: false,
     },
     {
-      id: 'instagram',
-      name: 'Instagram Business',
-      description: 'Social commerce integration',
+      id: "instagram",
+      name: "Instagram Business",
+      description: "Social commerce integration",
       icon: <InstagramLogo className="w-5 h-5" />,
-      connected: false
+      connected: false,
     },
     {
-      id: 'twitter',
-      name: 'Twitter/X',
-      description: 'Announcements and customer service',
+      id: "twitter",
+      name: "Twitter/X",
+      description: "Announcements and customer service",
       icon: <TwitterLogo className="w-5 h-5" />,
-      connected: false
+      connected: false,
     },
     {
-      id: 'reddit',
-      name: 'Reddit',
-      description: 'Content marketing and discussions',
+      id: "reddit",
+      name: "Reddit",
+      description: "Content marketing and discussions",
       icon: <RedditLogo className="w-5 h-5" />,
-      connected: false
-    }
-  ]);
+      connected: false,
+    },
+  ];
+}
+
+function mergePlatformsFromApi(
+  base: SocialPlatform[],
+  data: {
+    connections: Array<{
+      platform: string;
+      accountName: string | null;
+      status: string;
+    }>;
+    stats: Array<{
+      platform: string;
+      messages: number;
+      conversions: number;
+      engagement: number;
+    }>;
+  },
+): SocialPlatform[] {
+  const statByPlatform = Object.fromEntries(data.stats.map((s) => [s.platform, s]));
+  return base.map((p) => {
+    const conn = data.connections.find((c) => c.platform === p.id);
+    const st = statByPlatform[p.id];
+    const connected = conn?.status === "CONNECTED";
+    return {
+      ...p,
+      connected,
+      accountName: conn?.accountName ?? undefined,
+      stats: st
+        ? {
+            messages: st.messages,
+            conversions: st.conversions,
+            engagement: st.engagement,
+          }
+        : undefined,
+    };
+  });
+}
+
+export default function SocialMediaHub() {
+  const [platforms, setPlatforms] = useState<SocialPlatform[]>(() => buildDefaultPlatforms());
 
   const [showTokenInput, setShowTokenInput] = useState<string | null>(null);
   const [tokenInputs, setTokenInputs] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [hydrating, setHydrating] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiJson<{
+          success?: boolean;
+          data?: {
+            connections: Array<{
+              platform: string;
+              accountName: string | null;
+              status: string;
+            }>;
+            stats: Array<{
+              platform: string;
+              messages: number;
+              conversions: number;
+              engagement: number;
+            }>;
+          };
+        }>("/api/social-connections");
+        if (cancelled || res?.success === false || !res.data) return;
+        setPlatforms(mergePlatformsFromApi(buildDefaultPlatforms(), res.data));
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.error("[SocialHub] Failed to load connections:", { error: msg });
+        toast.error("Could not load social connections");
+      } finally {
+        if (!cancelled) setHydrating(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const refreshPlatforms = useCallback(async () => {
+    try {
+      const res = await apiJson<{
+        success?: boolean;
+        data?: {
+          connections: Array<{
+            platform: string;
+            accountName: string | null;
+            status: string;
+          }>;
+          stats: Array<{
+            platform: string;
+            messages: number;
+            conversions: number;
+            engagement: number;
+          }>;
+        };
+      }>("/api/social-connections");
+      if (res?.data && res.success !== false) {
+        setPlatforms(mergePlatformsFromApi(buildDefaultPlatforms(), res.data));
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error("[SocialHub] refresh failed:", { error: msg });
+    }
+  }, []);
 
   const connectPlatform = async (platformId: string) => {
     const token = tokenInputs[platformId];
@@ -103,21 +203,17 @@ export default function SocialMediaHub() {
 
     setLoading(true);
     try {
-      await apiJson('/api/social-connections', {
-        method: 'POST',
+      await apiJson("/api/social-connections", {
+        method: "POST",
         body: JSON.stringify({
           platform: platformId,
-          token: token
-        })
+          token: token,
+        }),
       });
 
-      setPlatforms(prev => prev.map(p => 
-        p.id === platformId 
-          ? { ...p, connected: true, accountName: 'Connected Account' }
-          : p
-      ));
-      
-      setTokenInputs(prev => ({ ...prev, [platformId]: '' }));
+      await refreshPlatforms();
+
+      setTokenInputs((prev) => ({ ...prev, [platformId]: "" }));
       setShowTokenInput(null);
       toast.success(`${platformId} connected successfully!`);
     } catch (error) {
@@ -133,15 +229,11 @@ export default function SocialMediaHub() {
     setLoading(true);
     try {
       await apiJson(`/api/social-connections/${platformId}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
-      setPlatforms(prev => prev.map(p => 
-        p.id === platformId 
-          ? { ...p, connected: false, accountName: undefined }
-          : p
-      ));
-      
+      await refreshPlatforms();
+
       toast.success(`${platformId} disconnected successfully`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -239,7 +331,7 @@ export default function SocialMediaHub() {
                     placeholder={`Enter ${platform.name} API token`}
                     className="pr-10"
                   />
-                  <button
+                  <Button
                     type="button"
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={() => {
@@ -252,7 +344,7 @@ export default function SocialMediaHub() {
                     }}
                   >
                     <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -280,8 +372,16 @@ export default function SocialMediaHub() {
     </div>
   );
 
+  if (hydrating) {
+    return (
+      <div className="max-w-6xl flex min-h-[320px] items-center justify-center">
+        <div className="text-center text-gray-600">Loading social connections…</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="max-w-6xl">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">

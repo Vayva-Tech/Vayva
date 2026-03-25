@@ -1,14 +1,9 @@
-// @ts-nocheck
 /**
  * Healthcare Industry Engine
  * Main orchestrator for all healthcare-specific features
  */
 
-import {
-  DashboardEngine,
-  type DashboardEngineConfig,
-  type DataResolver,
-} from '@vayva/industry-core';
+import { DashboardEngine, type DashboardEngineConfig } from '@vayva/industry-core';
 
 import {
   AppointmentService,

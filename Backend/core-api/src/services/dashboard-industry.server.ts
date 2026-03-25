@@ -3,11 +3,11 @@ import { INDUSTRY_CONFIG } from "@/config/industry";
 import { getIndustryDashboardDefinition } from "@/config/industry-dashboard-definitions";
 import {
   computeSuggestedActions,
-  type BusinessStateForActions,
+  type BusinessStateForActions
 } from "@/services/dashboard-actions";
 import {
   computeDashboardAlerts,
-  type MetricValues,
+  type MetricValues
 } from "@/services/dashboard-alerts";
 import type { IndustrySlug } from "@/lib/templates/types";
 

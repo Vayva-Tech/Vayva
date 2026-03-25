@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const query = searchParams.toString();
     const result = await apiJson(
       `${process.env.BACKEND_API_URL}/api/education/assignments${query ? `?${query}` : ""}`,
-      { headers: { "x-store-id": storeId } }
+      { headers: auth.headers }
     );
     return NextResponse.json(result);
   } catch (error) {
@@ -20,13 +25,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json();
     const result = await apiJson(
       `${process.env.BACKEND_API_URL}/api/education/assignments`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-store-id": storeId },
+        headers: { ...auth.headers },
         body: JSON.stringify(body),
       }
     );
@@ -39,7 +48,11 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const body = await request.json();
@@ -47,7 +60,7 @@ export async function PUT(request: NextRequest) {
       `${process.env.BACKEND_API_URL}/api/education/assignments${id ? `?id=${id}` : ""}`,
       {
         method: "PUT",
-        headers: { "Content-Type": "application/json", "x-store-id": storeId },
+        headers: { ...auth.headers },
         body: JSON.stringify(body),
       }
     );
@@ -60,14 +73,18 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const result = await apiJson(
       `${process.env.BACKEND_API_URL}/api/education/assignments${id ? `?id=${id}` : ""}`,
       {
         method: "DELETE",
-        headers: { "x-store-id": storeId },
+        headers: auth.headers,
       }
     );
     return NextResponse.json(result);

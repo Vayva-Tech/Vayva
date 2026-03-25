@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Vehicle Gallery Service
  * Manages vehicle inventory display, filtering, and showcase features
@@ -77,9 +76,9 @@ export class VehicleGalleryService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[VEHICLE_GALLERY] Initializing service...');
+    console.warn('[VEHICLE_GALLERY] Initializing service...');
     // In production, load vehicles from database
-    console.log('[VEHICLE_GALLERY] Service initialized');
+    console.warn('[VEHICLE_GALLERY] Service initialized');
   }
 
   /**

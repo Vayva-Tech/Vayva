@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { useState, useEffect } from "react";
 import { Button, Input, Label } from "@vayva/ui";
 import { toast } from "sonner";
@@ -19,6 +17,8 @@ import {
   QrCode,
   ChartBar as BarChart3,
 } from "@phosphor-icons/react/dist/ssr";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface Location {
   id: string;
@@ -78,26 +78,60 @@ export default function InventoryLocationsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg">
-            <Warehouse className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight">Inventory Locations</h1>
-            <p className="text-gray-500">Manage stock across multiple locations</p>
-          </div>
-        </div>
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-vayva-green text-white hover:bg-vayva-green/90 font-bold"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Location
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-vayva-green text-white hover:bg-vayva-green/90 font-bold justify-between"
+                >
+                  <span>Add location</span>
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Locations</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {stats.totalLocations}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Pending transfers</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {stats.pendingTransfers}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Inventory Locations"
+          subtitle="Manage stock across multiple locations"
+          actions={
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-vayva-green text-white hover:bg-vayva-green/90 font-bold"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Location
+            </Button>
+          }
+        />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -169,6 +203,7 @@ export default function InventoryLocationsPage() {
           onCreated={fetchData}
         />
       )}
+      </PageWithInsights>
     </div>
   );
 }
@@ -300,7 +335,7 @@ function LocationRow({
           </Button>
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] z-10">
-              <button
+              <Button
                 onClick={() => {
                   handleEdit();
                   setMenuOpen(false);
@@ -308,8 +343,8 @@ function LocationRow({
                 className="w-full px-3 py-2 text-sm text-left hover:bg-white flex items-center gap-2"
               >
                 <Edit className="w-4 h-4" /> Edit
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   setShowDeleteConfirm(true);
                   setMenuOpen(false);
@@ -317,7 +352,7 @@ function LocationRow({
                 className="w-full px-3 py-2 text-sm text-left hover:bg-white flex items-center gap-2 text-status-danger"
               >
                 <Trash className="w-4 h-4" /> Delete
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -328,7 +363,7 @@ function LocationRow({
         <CreateLocationModal
           locationToEdit={location}
           onClose={() => setShowEditModal(false)}
-          onUpdated={onUpdate}
+          onCreated={onUpdate}
         />
       )}
 
@@ -451,9 +486,11 @@ function TransferStatusBadge({
 function CreateLocationModal({
   onClose,
   onCreated,
+  locationToEdit,
 }: {
   onClose: () => void;
   onCreated: () => void;
+  locationToEdit?: Location;
 }) {
   const [form, setForm] = useState<{
     name: string;
@@ -461,24 +498,32 @@ function CreateLocationModal({
     address: string;
     city: string;
     state: string;
-  }>({
-    name: "",
-    type: "warehouse",
-    address: "",
-    city: "",
-    state: "",
-  });
+  }>(() => ({
+    name: locationToEdit?.name ?? "",
+    type: locationToEdit?.type ?? "warehouse",
+    address: locationToEdit?.address ?? "",
+    city: locationToEdit?.city ?? "",
+    state: locationToEdit?.state ?? "",
+  }));
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiJson("/api/inventory/locations", {
-        method: "POST",
-        body: JSON.stringify(form),
-      });
-      toast.success("Location created successfully");
+      if (locationToEdit) {
+        await apiJson(`/api/inventory/locations/${locationToEdit.id}`, {
+          method: "PATCH",
+          body: JSON.stringify(form),
+        });
+        toast.success("Location updated successfully");
+      } else {
+        await apiJson("/api/inventory/locations", {
+          method: "POST",
+          body: JSON.stringify(form),
+        });
+        toast.success("Location created successfully");
+      }
       onCreated();
       onClose();
     } catch {
@@ -492,8 +537,14 @@ function CreateLocationModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl border border-gray-200 shadow-xl max-w-lg w-full">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold">Add Inventory Location</h2>
-          <p className="text-sm text-gray-700">Create a new warehouse or store</p>
+          <h2 className="text-xl font-bold">
+            {locationToEdit ? "Edit Inventory Location" : "Add Inventory Location"}
+          </h2>
+          <p className="text-sm text-gray-700">
+            {locationToEdit
+              ? "Update warehouse or store details"
+              : "Create a new warehouse or store"}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">

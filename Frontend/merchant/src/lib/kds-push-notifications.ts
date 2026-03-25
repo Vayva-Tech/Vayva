@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Push Notifications Service for KDS
  * 
@@ -20,7 +19,7 @@ interface PushNotification {
   requireInteraction?: boolean;
   timestamp: number;
   type: 'rush' | '86-critical' | 'staff' | 'equipment' | 'milestone';
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 class KDSPushNotificationService {
@@ -59,7 +58,7 @@ class KDSPushNotificationService {
     try {
       this.subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey),
+        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
       });
 
       // Send subscription to backend
@@ -90,21 +89,20 @@ class KDSPushNotificationService {
       return;
     }
 
-    const options: NotificationOptions = {
+    const options = {
       body: notification.body,
       icon: notification.icon || '/icons/kds-icon-192.png',
       badge: notification.badge || '/icons/kds-badge-96.png',
       tag: notification.tag || notification.id,
       requireInteraction: notification.requireInteraction ?? false,
-      timestamp: notification.timestamp,
       data: notification.data,
-      actions: notification.type === 'rush' 
+      actions: notification.type === 'rush'
         ? [
             { action: 'view', title: 'View KDS' },
-            { action: 'dismiss', title: 'Dismiss' }
+            { action: 'dismiss', title: 'Dismiss' },
           ]
         : [],
-    };
+    } as NotificationOptions;
 
     new Notification(notification.title, options);
   }

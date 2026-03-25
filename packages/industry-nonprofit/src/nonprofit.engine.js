@@ -40,7 +40,7 @@ export class NonprofitEngine {
       this.status.servicesReady = true;
       this.status.initialized = true;
       
-      console.log(`[NONPROFIT_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
+      console.warn(`[NONPROFIT_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
     } catch (error) {
       console.error('[NONPROFIT_ENGINE] Initialization failed:', error);
       throw error;

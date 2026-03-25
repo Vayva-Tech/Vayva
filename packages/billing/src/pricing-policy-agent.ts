@@ -1,4 +1,4 @@
-import type { PlanTier, UsageMetric } from '@/lib/access-control/tier-limits';
+import type { PlanTier, TierLimits, UsageMetric } from '@/lib/access-control/tier-limits';
 import { TIER_LIMITS, TIER_TRIAL_PERIODS, canAccessIndustryDashboards, canUseAI, getAITokenQuota } from '@/lib/access-control/tier-limits';
 import { logger } from '../logger';
 
@@ -102,8 +102,11 @@ export class PricingPolicyAgent implements PricingPolicy {
    */
   canUseFeature(tier: PlanTier, feature: string): boolean {
     const limits = TIER_LIMITS[tier];
-    // @ts-ignore - dynamic property access
-    return limits[feature]?.enabled ?? false;
+    if (!Object.prototype.hasOwnProperty.call(limits, feature)) {
+      return false;
+    }
+    const limit = limits[feature as keyof TierLimits];
+    return limit?.enabled ?? false;
   }
 
   /**
@@ -125,7 +128,6 @@ export class PricingPolicyAgent implements PricingPolicy {
       return 0;
     }
 
-    // @ts-ignore - dynamic property access
     const limit = TIER_LIMITS[tier][tierFeature];
     return limit.quota || (typeof limit.maxItems === 'number' ? limit.maxItems : 0);
   }

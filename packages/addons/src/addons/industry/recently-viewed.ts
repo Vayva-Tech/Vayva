@@ -4,7 +4,7 @@
  * Display products customers have recently viewed
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const RECENTLY_VIEWED_ADDON: AddOnDefinition = {
   id: 'vayva.recently-viewed',

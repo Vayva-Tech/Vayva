@@ -5,7 +5,7 @@
  * and manages cleanup to prevent memory leaks.
  */
 
-import { AddOnPermission, PermissionManager } from './permissions';
+import { PermissionManager } from './permissions';
 
 export type LifecycleState =
   | 'installing'   // Initial installation in progress

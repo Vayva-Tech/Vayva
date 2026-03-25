@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Project Management Dashboard
  * Task tracking, team collaboration, and project oversight
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -144,7 +143,7 @@ export default function ProjectManagement() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch project metrics
-  const { data: metrics, isLoading: metricsLoading } = useSWR<ProjectMetrics>(
+  const { data: metrics, isLoading: metricsLoading } = useSWR<ProjectMetrics | null>(
     '/api/projects/metrics',
     async (url: string) => {
       try {
@@ -211,7 +210,7 @@ export default function ProjectManagement() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -222,7 +221,7 @@ export default function ProjectManagement() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -325,7 +324,7 @@ export default function ProjectManagement() {
       )}
       
       {activeTab === 'analytics' && (
-        <AnalyticsView metrics={metrics} loading={metricsLoading} />
+        <AnalyticsView metrics={metrics ?? null} loading={metricsLoading} />
       )}
     </div>
   );
@@ -464,7 +463,7 @@ function TasksView({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
       {/* Status Filter */}
       <div className="flex gap-2">
         {statusOptions.map(option => (
-          <button
+          <Button
             key={option.id}
             onClick={() => setStatusFilter(option.id)}
             className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
@@ -474,7 +473,7 @@ function TasksView({ tasks, loading }: { tasks: Task[]; loading: boolean }) {
             }`}
           >
             {option.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -697,15 +696,15 @@ function AnalyticsView({ metrics, loading }: { metrics: ProjectMetrics | null; l
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+            <Button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
               New Project
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Assign Tasks
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Generate Report
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>

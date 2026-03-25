@@ -6,7 +6,7 @@ import {
   standardHeaders,
   logger,
   BaseError,
-  PaymentStatus,
+  PaymentStatus
 } from "@vayva/shared";
 import { getTenantFromHost } from "@/lib/tenant";
 import { withStorefrontAPI } from "@/lib/api-handler";

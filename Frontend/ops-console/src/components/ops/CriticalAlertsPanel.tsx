@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { AlertTriangle, X, Bell, Info, CheckCircle, AlertCircle } from "lucide-react";
-import { cn } from "@vayva/ui";
-
+import { cn, Button } from "@vayva/ui";
 interface Alert {
   id: string;
   type: "critical" | "warning" | "info" | "success";
@@ -77,7 +76,7 @@ export function CriticalAlertsPanel({
 
     eventSource.onopen = () => {
       setIsConnected(true);
-      console.log("[SSE] Connected to alerts stream");
+      console.warn("[SSE] Connected to alerts stream");
     };
 
     eventSource.onmessage = (event) => {
@@ -167,12 +166,12 @@ export function CriticalAlertsPanel({
             )}
             title={isConnected ? "Connected" : "Disconnected"}
           />
-          <button
+          <Button
             onClick={() => setShowPanel(false)}
             className="p-1 hover:bg-gray-200 rounded-lg transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -203,12 +202,12 @@ export function CriticalAlertsPanel({
                     <h4 className="font-semibold text-sm text-gray-900">
                       {alert.title}
                     </h4>
-                    <button
+                    <Button
                       onClick={() => removeAlert(alert.id)}
                       className="flex-shrink-0 p-1 hover:bg-black/5 rounded transition-colors"
                     >
                       <X className="w-3 h-3 text-gray-400" />
-                    </button>
+                    </Button>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">
                     {alert.message}
@@ -218,12 +217,12 @@ export function CriticalAlertsPanel({
                       {new Date(alert.timestamp).toLocaleTimeString()}
                     </span>
                     {!alert.acknowledged && alert.type === "critical" && (
-                      <button
+                      <Button
                         onClick={() => acknowledgeAlert(alert.id)}
                         className="text-xs font-medium text-red-600 hover:text-red-700 underline"
                       >
                         Acknowledge
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -235,12 +234,12 @@ export function CriticalAlertsPanel({
 
       {/* Footer */}
       <div className="p-3 border-t border-gray-200 bg-gray-50">
-        <button
+        <Button
           onClick={() => setAlerts([])}
           className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
         >
           Clear all alerts
-        </button>
+        </Button>
       </div>
     </div>
   );

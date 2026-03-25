@@ -1,4 +1,3 @@
-// @ts-nocheck
 // SaaS Industry Dashboard Exports
 
 export { SaaSDashboard } from './SaaSDashboard';

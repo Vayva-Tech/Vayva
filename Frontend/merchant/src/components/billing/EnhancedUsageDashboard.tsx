@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -11,6 +10,7 @@ import { AIFeaturePaywall } from "./AIFeaturePaywall";
 
 interface UsageStat {
   metric: string;
+  label?: string;
   used: number;
   limit: number;
   percentage: number;
@@ -62,7 +62,7 @@ const METRIC_ICONS: Record<string, string> = {
 };
 
 function UsageProgress({
-  label,
+  label: labelProp,
   used,
   limit,
   percentage,
@@ -74,6 +74,7 @@ function UsageProgress({
   metric,
   onPurchaseAddon,
 }: UsageStat & { onPurchaseAddon?: () => void }) {
+  const label = labelProp ?? METRIC_LABELS[metric] ?? metric;
   const isOverLimit = percentage >= 100;
   const isWarning = percentage >= 80 && !isOverLimit;
   const projectedOverLimit = projected > limit;
@@ -204,12 +205,12 @@ export function EnhancedUsageDashboard() {
 
   const handlePurchaseAddon = async (metric: string) => {
     try {
-      const result = await apiJson("/api/billing/purchase-addon", {
+      const result = await apiJson<{ success?: boolean }>("/api/billing/purchase-addon", {
         method: "POST",
         body: JSON.stringify({ metric, quantity: 1 })
       });
       
-      if (result.success) {
+      if (result?.success) {
         toast.success("Addon purchased successfully!");
         fetchUsageData(); // Refresh data
       }

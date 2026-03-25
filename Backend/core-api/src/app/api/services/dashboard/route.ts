@@ -69,7 +69,7 @@ export const GET = withVayvaAPI(
       ]);
       
       // Calculate booking statistics
-      const confirmedBookings = bookings.filter(b => b.status === "confirmed");
+      const _confirmedBookings = bookings.filter(b => b.status === "confirmed");
       const cancelledBookings = bookings.filter(b => b.status === "cancelled");
       const noShows = bookings.filter(b => b.status === "no_show");
       const pendingBookings = bookings.filter(b => b.status === "pending");

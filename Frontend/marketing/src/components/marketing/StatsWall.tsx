@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import * as motion from "framer-motion/client";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 import {
   IconBolt as Lightning,
   IconShieldCheck as ShieldCheck,
@@ -105,10 +106,37 @@ function AnimatedCounter({ value, suffix, prefix = "" }: { value: number; suffix
   );
 }
 
+function StatCard({ stat, index }: { stat: StatItem; index: number }): React.JSX.Element {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="relative group"
+    >
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 text-center h-full">
+        <div
+          className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} mb-4`}
+        >
+          <stat.icon className="w-6 h-6 text-white" />
+        </div>
+
+        <div className="text-2xl sm:text-3xl md:text-4xl text-slate-900 mb-1">
+          <AnimatedCounter value={stat.value} suffix={stat.suffix} prefix={stat.prefix} />
+        </div>
+
+        <p className="font-semibold text-slate-900 text-sm sm:text-base">{stat.label}</p>
+        <p className="text-xs text-slate-500 mt-1">{stat.sublabel}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 export function StatsWall(): React.JSX.Element {
   return (
-    <section className="py-20 px-4 relative overflow-hidden bg-slate-50/50">
-      <div className="max-w-[1600px] mx-auto px-6 relative">
+    <section className="py-16 sm:py-20 px-4 relative w-full min-w-0 overflow-x-hidden bg-slate-50/50">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 relative min-w-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -118,41 +146,28 @@ export function StatsWall(): React.JSX.Element {
           <span className="inline-block px-4 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-semibold mb-4">
             Early Access
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3">
             Built for serious merchants
           </h2>
-          <p className="text-slate-600 max-w-xl mx-auto">
+          <p className="text-slate-600 max-w-xl mx-auto text-sm sm:text-base px-1">
             Join the beta and help shape the future of African commerce
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <p className="text-center text-sm text-slate-500 sm:hidden mb-2">Swipe for stats</p>
+        <div className="sm:hidden -mx-1">
+          <MarketingSnapRow ariaLabel="Platform stats" hint="Swipe for stats" showDots dotCount={STATS.length}>
+            {STATS.map((stat, index) => (
+              <MarketingSnapItem key={stat.label}>
+                <StatCard stat={stat} index={index} />
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
+        </div>
+
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {STATS.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="relative group"
-            >
-              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 text-center">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} mb-4`}>
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-
-                <div className="text-3xl md:text-4xl text-slate-900 mb-1">
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix} prefix={stat.prefix} />
-                </div>
-
-                <p className="font-semibold text-slate-900">
-                  {stat.label}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  {stat.sublabel}
-                </p>
-              </div>
-            </motion.div>
+            <StatCard key={stat.label} stat={stat} index={index} />
           ))}
         </div>
 

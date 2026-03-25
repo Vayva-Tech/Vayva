@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -24,7 +23,11 @@ interface OverviewData {
   completedAppointments: number;
   currentClients: number;
   stylistsOnDuty: number;
+  totalStylists?: number;
   productSales: number;
+  walkins?: number;
+  noShows?: number;
+  lowStockCount?: number;
   revenueGrowth?: number;
   appointmentsGrowth?: number;
   clientsGrowth?: number;

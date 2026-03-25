@@ -1,7 +1,6 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
-export interface SizeCurveData {
+export interface ProductSizeCurveRow {
   size: string;
   salesCount: number;
   returnCount: number;
@@ -14,7 +13,7 @@ export class SizeCurveService {
   /**
    * Calculate size curve for a product
    */
-  async calculateSizeCurve(productId: string): Promise<SizeCurveData[]> {
+  async calculateSizeCurve(productId: string): Promise<ProductSizeCurveRow[]> {
     // Get order items for this product
     const orderItems = await prisma.orderItem.findMany({
       where: { productId },

@@ -1,14 +1,12 @@
-// @ts-nocheck
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { useOnboarding } from "../OnboardingContext";
 import { Button, cn } from "@vayva/ui";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
 import { IndustrySlug } from "@/lib/templates/types";
 import {
-  Storefront as Store,
   Palette,
   SkipForward,
   CheckCircle,
@@ -23,6 +21,8 @@ import {
   Building
 } from "@phosphor-icons/react/ssr";
 
+type IndustryIconComponent = ComponentType<{ className?: string }>;
+
 type Template = {
   id: string;
   name: string;
@@ -36,7 +36,7 @@ type TemplatesResponse = {
   error?: string;
 };
 
-const INDUSTRY_ICONS: Record<string, any> = {
+const INDUSTRY_ICONS: Record<string, IndustryIconComponent> = {
   retail: ShoppingBag,
   fashion: ShoppingBag,
   food: Utensils,
@@ -171,7 +171,7 @@ export default function PublishStep() {
               const isRecommended = template.industry === industrySlug;
               
               return (
-                <button
+                <Button
                   key={template.id}
                   type="button"
                   onClick={() => handleSelectTemplate(template.id)}
@@ -201,7 +201,7 @@ export default function PublishStep() {
                       <CheckCircle className="w-6 h-6 text-vayva-green flex-shrink-0" />
                     )}
                   </div>
-                </button>
+                </Button>
               );
             })}
           </div>

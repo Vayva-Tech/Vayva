@@ -6,7 +6,7 @@ import {
   Spinner as Loader2,
   ArrowCounterClockwise as RefreshCw,
   ShieldCheck,
-  WarningCircle as AlertCircle,
+  WarningCircle as AlertCircle
 } from "@phosphor-icons/react/ssr";
 import { Button } from "@vayva/ui";
 import { useRouter } from "next/navigation";

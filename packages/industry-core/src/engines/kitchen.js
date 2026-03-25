@@ -10,7 +10,7 @@ class KitchenEngine {
   }
   
   async initialize() {
-    console.log('[KITCHEN_ENGINE] Initialized');
+    console.warn('[KITCHEN_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

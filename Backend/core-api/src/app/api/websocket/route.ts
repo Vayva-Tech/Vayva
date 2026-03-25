@@ -100,7 +100,7 @@ export const GET = withVayvaAPI(
  * POST endpoint - Configure WebSocket subscriptions and publish test events
  */
 export const POST = withVayvaAPI(
-  PERMISSIONS.STORE_MANAGE,
+  PERMISSIONS.SETTINGS_MANAGE,
   async (req: NextRequest, { storeId, user, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
@@ -230,7 +230,7 @@ export const POST = withVayvaAPI(
  * PUT endpoint - Update WebSocket settings
  */
 export const PUT = withVayvaAPI(
-  PERMISSIONS.STORE_ADMIN,
+  PERMISSIONS.SETTINGS_MANAGE,
   async (req: NextRequest, { storeId, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
@@ -303,7 +303,7 @@ export const PUT = withVayvaAPI(
  * DELETE endpoint - Reset WebSocket connections or clear statistics
  */
 export const DELETE = withVayvaAPI(
-  PERMISSIONS.STORE_ADMIN,
+  PERMISSIONS.SETTINGS_MANAGE,
   async (req: NextRequest, { storeId, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {

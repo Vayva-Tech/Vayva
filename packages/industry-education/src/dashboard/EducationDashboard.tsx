@@ -1,21 +1,20 @@
-// @ts-nocheck
 // ============================================================================
 // Education Industry Dashboard Main Component
 // ============================================================================
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React from 'react';
 import type { 
   UniversalDashboardProps,
   IndustrySlug 
 } from '@vayva/industry-core';
-import { 
+import {
   useUniversalDashboard,
   UniversalMetricCard,
   UniversalSectionHeader,
-  UniversalChartContainer
-} from '@vayva/ui';
+  UniversalChartContainer,
+} from './education-dashboard-primitives';
 import { 
   BookOpen,
   Users,
@@ -96,13 +95,13 @@ export function EducationDashboard({
             Track courses, student progress, and learning outcomes
           </p>
         </div>
-        <button
+        <Button
           onClick={refresh}
           disabled={isValidating}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
         >
           {isValidating ? 'Refreshing...' : 'Refresh Data'}
-        </button>
+        </Button>
       </div>
 
       {/* Key Metrics Grid */}
@@ -150,35 +149,151 @@ export function EducationDashboard({
 
       {/* Course Progress & Student Engagement */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <CourseProgressSection 
+        <CourseProgressSection
           courses={[
-            { id: '1', name: 'React Fundamentals', progress: 78, students: 342, completionRate: 82 },
-            { id: '2', name: 'Advanced TypeScript', progress: 65, students: 218, completionRate: 71 },
-            { id: '3', name: 'Node.js Backend Dev', progress: 54, students: 189, completionRate: 65 },
-            { id: '4', name: 'UI/UX Design Basics', progress: 89, students: 456, completionRate: 91 }
+            {
+              id: '1',
+              title: 'React Fundamentals',
+              instructorId: 'i1',
+              category: 'Development',
+              price: 0,
+              maxStudents: 500,
+              enrolledStudents: 342,
+              status: 'published',
+              progress: 78,
+              students: 342,
+              completionRate: 82,
+              revenue: 0,
+              rating: 0,
+              reviewCount: 0,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+            {
+              id: '2',
+              title: 'Advanced TypeScript',
+              instructorId: 'i1',
+              category: 'Development',
+              price: 0,
+              maxStudents: 400,
+              enrolledStudents: 218,
+              status: 'published',
+              progress: 65,
+              students: 218,
+              completionRate: 71,
+              revenue: 0,
+              rating: 0,
+              reviewCount: 0,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+            {
+              id: '3',
+              title: 'Node.js Backend Dev',
+              instructorId: 'i2',
+              category: 'Development',
+              price: 0,
+              maxStudents: 350,
+              enrolledStudents: 189,
+              status: 'published',
+              progress: 54,
+              students: 189,
+              completionRate: 65,
+              revenue: 0,
+              rating: 0,
+              reviewCount: 0,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+            {
+              id: '4',
+              title: 'UI/UX Design Basics',
+              instructorId: 'i3',
+              category: 'Design',
+              price: 0,
+              maxStudents: 600,
+              enrolledStudents: 456,
+              status: 'published',
+              progress: 89,
+              students: 456,
+              completionRate: 91,
+              revenue: 0,
+              rating: 0,
+              reviewCount: 0,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
           ]}
           loading={loading}
         />
         
-        <StudentEngagementSection 
+        <StudentEngagementSection
           data={{
             overallScore: 76,
             videoViews: 84,
             quizAttempts: 72,
+            forumPosts: 45,
             assignmentsCompleted: 68,
             forumActivity: 45,
-            loginFrequency: { daily: 42, weekly: 35, monthly: 18, rarely: 5 }
+            loginFrequency: { daily: 42, weekly: 35, monthly: 18, rarely: 5 },
+            discussionForums: {
+              activeThreads: 12,
+              postsToday: 8,
+              avgResponseTime: 2.1,
+            },
           }}
           loading={loading}
         />
       </div>
 
       {/* Assignment Grading Queue */}
-      <AssignmentQueueSection 
+      <AssignmentQueueSection
         assignments={[
-          { id: '1', title: 'React Components Quiz', course: 'React Fundamentals', submissions: 89, pendingGrading: 23, dueDate: '2026-03-15' },
-          { id: '2', title: 'TypeScript Project', course: 'Advanced TypeScript', submissions: 45, pendingGrading: 18, dueDate: '2026-03-18' },
-          { id: '3', title: 'API Design Assignment', course: 'Node.js Backend Dev', submissions: 67, pendingGrading: 31, dueDate: '2026-03-20' }
+          {
+            id: '1',
+            title: 'React Components Quiz',
+            courseId: 'c1',
+            course: 'React Fundamentals',
+            type: 'quiz',
+            dueDate: new Date('2026-03-15'),
+            totalPoints: 100,
+            submissions: 89,
+            submissionsCount: 89,
+            gradedCount: 66,
+            pendingGrading: 23,
+            status: 'published',
+            createdAt: new Date(),
+          },
+          {
+            id: '2',
+            title: 'TypeScript Project',
+            courseId: 'c2',
+            course: 'Advanced TypeScript',
+            type: 'assignment',
+            dueDate: new Date('2026-03-18'),
+            totalPoints: 100,
+            submissions: 45,
+            submissionsCount: 45,
+            gradedCount: 27,
+            pendingGrading: 18,
+            status: 'published',
+            createdAt: new Date(),
+          },
+          {
+            id: '3',
+            title: 'API Design Assignment',
+            courseId: 'c3',
+            course: 'Node.js Backend Dev',
+            type: 'assignment',
+            dueDate: new Date('2026-03-20'),
+            totalPoints: 100,
+            submissions: 67,
+            submissionsCount: 67,
+            gradedCount: 36,
+            pendingGrading: 31,
+            status: 'published',
+            createdAt: new Date(),
+          },
         ]}
         totalPending={72}
         overdue={12}
@@ -187,19 +302,71 @@ export function EducationDashboard({
 
       {/* Instructor Performance & Certificates */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <InstructorPerformanceSection 
+        <InstructorPerformanceSection
           instructors={[
-            { id: '1', name: 'Dr. Sarah Chen', courses: 4, students: 892, rating: 4.8, completionRate: 87, revenue: 45200 },
-            { id: '2', name: 'Prof. James Wilson', courses: 3, students: 654, rating: 4.6, completionRate: 82, revenue: 32800 },
-            { id: '3', name: 'Dr. Emily Rodriguez', courses: 5, students: 1023, rating: 4.9, completionRate: 91, revenue: 58400 }
+            {
+              id: '1',
+              name: 'Dr. Sarah Chen',
+              email: 'sarah@example.com',
+              courses: 4,
+              coursesCount: 4,
+              students: 892,
+              totalStudents: 892,
+              rating: 4.8,
+              averageRating: 4.8,
+              reviewCount: 120,
+              completionRate: 87,
+              totalRevenue: 45200,
+              revenue: 45200,
+              responseTime: 4,
+              joinedAt: new Date(),
+              isVerified: true,
+            },
+            {
+              id: '2',
+              name: 'Prof. James Wilson',
+              email: 'james@example.com',
+              courses: 3,
+              coursesCount: 3,
+              students: 654,
+              totalStudents: 654,
+              rating: 4.6,
+              averageRating: 4.6,
+              reviewCount: 88,
+              completionRate: 82,
+              totalRevenue: 32800,
+              revenue: 32800,
+              responseTime: 5,
+              joinedAt: new Date(),
+              isVerified: true,
+            },
+            {
+              id: '3',
+              name: 'Dr. Emily Rodriguez',
+              email: 'emily@example.com',
+              courses: 5,
+              coursesCount: 5,
+              students: 1023,
+              totalStudents: 1023,
+              rating: 4.9,
+              averageRating: 4.9,
+              reviewCount: 200,
+              completionRate: 91,
+              totalRevenue: 58400,
+              revenue: 58400,
+              responseTime: 3,
+              joinedAt: new Date(),
+              isVerified: true,
+            },
           ]}
           loading={loading}
         />
         
-        <CertificateIssuanceSection 
+        <CertificateIssuanceSection
           certificates={{
             issuedThisMonth: 234,
             pendingIssuance: 45,
+            total: 1847,
             totalCertificates: 1847,
             recentCertificates: [
               { id: '1', studentName: 'Alex Johnson', course: 'React Fundamentals', issuedAt: '2026-03-10' },
@@ -224,12 +391,80 @@ export function EducationDashboard({
           loading={loading}
         />
         
-        <AtRiskStudentsSection 
+        <AtRiskStudentsSection
           students={[
-            { id: '1', name: 'John Doe', progress: 32, lastActive: '2026-03-01', courses: 3, riskLevel: 'high' },
-            { id: '2', name: 'Jane Smith', progress: 45, lastActive: '2026-03-05', courses: 2, riskLevel: 'medium' },
-            { id: '3', name: 'Bob Wilson', progress: 28, lastActive: '2026-02-28', courses: 4, riskLevel: 'high' },
-            { id: '4', name: 'Alice Brown', progress: 52, lastActive: '2026-03-08', courses: 2, riskLevel: 'medium' }
+            {
+              id: '1',
+              name: 'John Doe',
+              email: '',
+              enrollmentCount: 3,
+              completedCourses: 0,
+              inProgressCourses: 3,
+              overallProgress: 32,
+              progress: 32,
+              totalLearningTime: 0,
+              lastActiveAt: new Date('2026-03-01'),
+              lastActive: new Date('2026-03-01'),
+              enrolledAt: new Date(),
+              certificatesEarned: 0,
+              atRisk: true,
+              courses: 3,
+              riskLevel: 'high',
+            },
+            {
+              id: '2',
+              name: 'Jane Smith',
+              email: '',
+              enrollmentCount: 2,
+              completedCourses: 0,
+              inProgressCourses: 2,
+              overallProgress: 45,
+              progress: 45,
+              totalLearningTime: 0,
+              lastActiveAt: new Date('2026-03-05'),
+              lastActive: new Date('2026-03-05'),
+              enrolledAt: new Date(),
+              certificatesEarned: 0,
+              atRisk: true,
+              courses: 2,
+              riskLevel: 'medium',
+            },
+            {
+              id: '3',
+              name: 'Bob Wilson',
+              email: '',
+              enrollmentCount: 4,
+              completedCourses: 0,
+              inProgressCourses: 4,
+              overallProgress: 28,
+              progress: 28,
+              totalLearningTime: 0,
+              lastActiveAt: new Date('2026-02-28'),
+              lastActive: new Date('2026-02-28'),
+              enrolledAt: new Date(),
+              certificatesEarned: 0,
+              atRisk: true,
+              courses: 4,
+              riskLevel: 'high',
+            },
+            {
+              id: '4',
+              name: 'Alice Brown',
+              email: '',
+              enrollmentCount: 2,
+              completedCourses: 0,
+              inProgressCourses: 2,
+              overallProgress: 52,
+              progress: 52,
+              totalLearningTime: 0,
+              lastActiveAt: new Date('2026-03-08'),
+              lastActive: new Date('2026-03-08'),
+              enrolledAt: new Date(),
+              certificatesEarned: 0,
+              atRisk: true,
+              courses: 2,
+              riskLevel: 'medium',
+            },
           ]}
           totalAtRisk={47}
           loading={loading}
@@ -273,17 +508,24 @@ function CourseProgressSection({ courses, loading }: CourseProgressProps) {
           <div key={course.id} className="space-y-2">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="font-medium text-gray-900">{course.name}</h3>
-                <p className="text-sm text-gray-500">{course.students.toLocaleString()} students</p>
+                <h3 className="font-medium text-gray-900">
+                  {course.name ?? course.title}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {(course.students ?? course.enrolledStudents).toLocaleString()}{' '}
+                  students
+                </p>
               </div>
               <span className="text-sm font-medium text-gray-900">
-                {formatPercentage(course.completionRate)}
+                {formatPercentage(course.completionRate ?? course.progress)}
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className={`h-2 rounded-full ${getProgressColor(course.progress)}`}
-                style={{ width: `${course.progress}%` }}
+                style={{
+                  width: `${course.progress}%`,
+                }}
               />
             </div>
           </div>
@@ -384,13 +626,21 @@ function AssignmentQueueSection({ assignments, totalPending, overdue, loading }:
               <div key={assignment.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium text-gray-900">{assignment.title}</p>
-                  <p className="text-sm text-gray-500">{assignment.course}</p>
+                  <p className="text-sm text-gray-500">
+                    {assignment.course ?? assignment.courseTitle ?? assignment.courseId}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">
-                    {assignment.pendingGrading}/{assignment.submissions}
+                    {assignment.pendingGrading}/
+                    {assignment.submissions ?? assignment.submissionsCount}
                   </p>
-                  <p className="text-xs text-gray-500">Due: {assignment.dueDate}</p>
+                  <p className="text-xs text-gray-500">
+                    Due:{' '}
+                    {assignment.dueDate instanceof Date
+                      ? assignment.dueDate.toLocaleDateString()
+                      : String(assignment.dueDate)}
+                  </p>
                 </div>
               </div>
             ))}
@@ -433,16 +683,20 @@ function InstructorPerformanceSection({ instructors, loading }: InstructorPerfor
               <tr key={instructor.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm">
                   <p className="font-medium text-gray-900">{instructor.name}</p>
-                  <p className="text-gray-500">{instructor.courses} courses • {instructor.students.toLocaleString()} students</p>
+                  <p className="text-gray-500">
+                    {instructor.courses ?? instructor.coursesCount} courses •{' '}
+                    {(instructor.students ?? instructor.totalStudents).toLocaleString()}{' '}
+                    students
+                  </p>
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
-                  ⭐ {instructor.rating}
+                  ⭐ {instructor.rating ?? instructor.averageRating}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
                   {formatPercentage(instructor.completionRate)}
                 </td>
                 <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                  {formatCurrency(instructor.revenue)}
+                  {formatCurrency(instructor.revenue ?? instructor.totalRevenue)}
                 </td>
               </tr>
             ))}
@@ -474,7 +728,13 @@ function CertificateIssuanceSection({ certificates, loading }: CertificateIssuan
           </div>
           <div className="text-center">
             <p className="text-sm text-gray-600">Total</p>
-            <p className="text-2xl font-bold text-gray-900">{certificates.totalCertificates.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {(
+                certificates.totalCertificates ??
+                certificates.total ??
+                0
+              ).toLocaleString()}
+            </p>
           </div>
         </div>
         
@@ -571,7 +831,14 @@ function AtRiskStudentsSection({ students, totalAtRisk, loading }: AtRiskStudent
               <div key={student.id} className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-100">
                 <div>
                   <p className="font-medium text-red-900">{student.name}</p>
-                  <p className="text-sm text-red-700">{student.progress}% progress • Last active: {student.lastActive}</p>
+                  <p className="text-sm text-red-700">
+                    {student.progress}% progress • Last active:{' '}
+                    {String(
+                      student.lastActive ??
+                        student.lastActiveAt ??
+                        ''
+                    )}
+                  </p>
                 </div>
                 <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-200 text-red-800">
                   High Risk

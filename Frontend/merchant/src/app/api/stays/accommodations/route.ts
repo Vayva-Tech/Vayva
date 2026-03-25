@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { apiJson } from "@/lib/api-client-shared";
@@ -21,18 +22,16 @@ const accommodationSchema = z.object({
  * GET /api/stays/accommodations
  * List accommodations for a store
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-    const isActive = searchParams.get("isActive");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const storeId = auth.user.storeId;
+    const { searchParams } = new URL(request.url);
+    const isActive = searchParams.get("isActive");
 
     // Call backend API to fetch accommodations
     const result = await apiJson<{
@@ -52,10 +51,10 @@ export async function GET(request: Request): Promise<Response> {
         createdAt: Date;
       }>;
     }>(
-      `${process.env.BACKEND_API_URL}/api/stays/accommodations?storeId=${storeId}&isActive=${isActive || ''}`,
+      `${process.env.BACKEND_API_URL}/api/stays/accommodations?storeId=${encodeURIComponent(storeId)}&isActive=${isActive || ''}`,
       {
-        headers: {},
-      }
+        headers: auth.headers,
+      },
     );
     
     return NextResponse.json(result);

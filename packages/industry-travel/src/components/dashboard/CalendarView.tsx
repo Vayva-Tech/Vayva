@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent , cn } from '@vayva/ui';
+import { Card, CardContent, cn, Button } from "@vayva/ui";
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CalendarViewProps {
@@ -75,21 +74,21 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         <CardContent className="p-6">
           {/* Month Navigation */}
           <div className="flex items-center justify-between mb-4">
-            <button 
+            <Button 
               onClick={() => navigateMonth('prev')}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
               <ChevronLeft className="w-5 h-5" />
-            </button>
+            </Button>
             <h3 className="text-lg font-semibold">
               {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
             </h3>
-            <button 
+            <Button 
               onClick={() => navigateMonth('next')}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
               <ChevronRight className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {/* Calendar Grid */}
@@ -145,12 +144,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
             </div>
             
             <div className="flex space-x-2">
-              <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+              <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                 Date Selection
-              </button>
-              <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+              </Button>
+              <Button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                 Seasonal Pricing
-              </button>
+              </Button>
             </div>
           </div>
         </CardContent>

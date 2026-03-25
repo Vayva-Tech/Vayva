@@ -12,7 +12,7 @@ class FashionInventoryController extends BaseIndustryController {
     return this.handleOperation(
       context,
       async () => {
-        const params = this.getQueryParams(req, {
+        const _params = this.getQueryParams(req, {
           groupBy: "size",
         });
 
@@ -46,7 +46,7 @@ class FashionInventoryController extends BaseIndustryController {
     return this.handleOperation(
       context,
       async () => {
-        const params = this.getQueryParams(req, {
+        const _params = this.getQueryParams(req, {
           categoryId: null,
         });
 
@@ -116,7 +116,7 @@ class FashionInventoryController extends BaseIndustryController {
     return this.handleOperation(
       context,
       async () => {
-        const params = this.getQueryParams(req, {
+        const _params = this.getQueryParams(req, {
           severity: "all",
         });
 

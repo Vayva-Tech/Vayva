@@ -1,7 +1,7 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 import React, { useState } from 'react';
-import { GlassPanel , DonutChart , ProgressBar } from '@vayva/ui/components/fashion';
+import { GlassPanel , DonutChart , ProgressBar } from '@vayva/ui/fashion';
 import type { SizeCurveData, SizeDistribution } from '../types';
 
 export interface SizeCurveAnalysisProps {
@@ -57,7 +57,7 @@ export const SizeCurveAnalysis: React.FC<SizeCurveAnalysisProps> = ({
           {/* Category Tabs */}
           <div className="flex gap-2 mb-4 overflow-x-auto">
             {categories.map((category) => (
-              <button
+              <Button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
@@ -67,7 +67,7 @@ export const SizeCurveAnalysis: React.FC<SizeCurveAnalysisProps> = ({
                 }`}
               >
                 {category}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -85,9 +85,9 @@ export const SizeCurveAnalysis: React.FC<SizeCurveAnalysisProps> = ({
             ))}
           </div>
 
-          <button className="mt-4 text-xs text-rose-400 hover:text-rose-300 transition-colors">
+          <Button className="mt-4 text-xs text-rose-400 hover:text-rose-300 transition-colors">
             View Size Guide →
-          </button>
+          </Button>
         </div>
       </div>
     </GlassPanel>
@@ -95,3 +95,4 @@ export const SizeCurveAnalysis: React.FC<SizeCurveAnalysisProps> = ({
 };
 
 export default SizeCurveAnalysis;
+

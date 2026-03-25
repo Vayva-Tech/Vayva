@@ -1,16 +1,12 @@
-// @ts-nocheck
 // Analytics Components Index
 // Export all UI components for analytics and reporting
 
-export { AnalyticsDashboard } from './AnalyticsDashboard';
-export { ROASTracker } from './marketing/ROASTracker';
-export type { ROASData, ROASTrackerProps } from './marketing/ROASTracker';
+export { AnalyticsDashboard } from "./AnalyticsDashboard";
+export { ROASTracker } from "./marketing/ROASTracker";
+export type { ROASTrackerProps } from "./marketing/ROASTracker";
 
-export { FinanceAnalytics } from './finance/FinanceAnalytics';
-export type { RevenueMetrics, RevenueBreakdown } from './finance/FinanceAnalytics';
+export { CohortAnalysis } from "./analytics/CohortAnalysis";
+export type { CohortAnalysisProps } from "./analytics/CohortAnalysis";
 
-export { CohortAnalysis } from './analytics/CohortAnalysis';
-export type { CohortData, CohortAnalysisProps } from './analytics/CohortAnalysis';
-
-export { ABTesting } from './analytics/ABTesting';
-export type { ABTest, ABTestProps } from './analytics/ABTesting';
+export { ABTesting } from "./analytics/ABTesting";
+export type { ABTestProps } from "./analytics/ABTesting";

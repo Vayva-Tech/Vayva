@@ -1,5 +1,6 @@
 import { prisma } from "@vayva/db";
 import { logger } from "@/lib/logger";
+import { getAiPackage } from "@/lib/ai/ai-packages";
 
 interface LogUsageParams {
   storeId: string;
@@ -124,9 +125,12 @@ export class AiUsageService {
         },
       };
     }
-    // 3. Calculate dynamic limit: Plan Limit + All Addon Packs
+    // 3. Calculate dynamic limit: Included Messages + Add-on packs
+    // We do NOT rely on AiPlan.monthlyRequestLimit for packaging, because packaging
+    // must remain stable even if DB plan records drift.
+    const pkg = getAiPackage(sub.planKey);
     const planLimit =
-      sub.planKey === "STARTER" ? 20 : sub.plan.monthlyRequestLimit;
+      sub.status === "TRIAL_ACTIVE" ? 20 : pkg.includedMessagesPerMonth;
     const addonMessages = sub.addonPurchases.reduce(
       (sum, addon) => sum + addon.messagesAdded,
       0,

@@ -516,21 +516,21 @@ export class SmartRestockService {
 
   private async sendNotifications(alert: Record<string, unknown>): Promise<void> {
     const channels = (alert.notifyChannels as string[]) || [];
-    const notifyUsers = (alert.notifyUsers as string[]) || [];
+    const _notifyUsers = (alert.notifyUsers as string[]) || [];
 
     for (const channel of channels) {
       switch (channel) {
         case "email":
           // Queue email notification
-          console.log(`[Restock] Sending email for alert ${alert.id}`);
+          console.warn(`[Restock] Sending email for alert ${alert.id}`);
           break;
         case "slack":
           // Send Slack webhook
-          console.log(`[Restock] Sending Slack for alert ${alert.id}`);
+          console.warn(`[Restock] Sending Slack for alert ${alert.id}`);
           break;
         case "webhook":
           // Send to configured webhook
-          console.log(`[Restock] Sending webhook for alert ${alert.id}`);
+          console.warn(`[Restock] Sending webhook for alert ${alert.id}`);
           break;
       }
     }
@@ -561,7 +561,7 @@ export class SmartRestockService {
       },
     });
 
-    console.log(`[Restock] Created auto purchase order for ${suggestion.productName}`);
+    console.warn(`[Restock] Created auto purchase order for ${suggestion.productName}`);
   }
 
   private urgencyWeight(urgency: string): number {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Automated Marketing Campaign Builder
  * 
@@ -74,9 +73,7 @@ import {
   Save,
   Send,
 } from "lucide-react";
-import { MarketingService } from "@/services/marketing.service";
-import { NotificationService } from "@/services/notification.service";
-import { AnalyticsService } from "@/services/analytics.service";
+import { apiJson } from "@/lib/api-client-shared";
 import { logger } from "@vayva/shared";
 
 // Types
@@ -172,10 +169,15 @@ export function CampaignBuilder() {
   // Fetch campaigns
   const fetchCampaigns = async () => {
     try {
-      const campaignData = await MarketingService.getCampaigns("current-store-id");
-      setCampaigns(campaignData as Campaign[]);
-    } catch (error) {
-      logger.error("Failed to fetch campaigns:", error);
+      const data = await apiJson<{ campaigns?: Campaign[] }>(
+        "/api/merchant/marketing/campaigns",
+      );
+      setCampaigns(data.campaigns ?? []);
+    } catch (error: unknown) {
+      logger.error("Failed to fetch campaigns:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      setCampaigns([]);
     }
   };
 
@@ -191,7 +193,7 @@ export function CampaignBuilder() {
     const newCampaign: Campaign = {
       id: `camp_${Date.now()}`,
       name: `${template.name} Campaign`,
-      type: template.type,
+      type: template.type as Campaign["type"],
       status: "draft",
       trigger: {
         event: getTriggerEventForType(template.type),
@@ -350,12 +352,15 @@ export function CampaignBuilder() {
         });
       } else {
         // Create new
-        await MarketingService.createCampaign("current-store-id", {
-          name: selectedCampaign.name,
-          type: selectedCampaign.type as unknown,
-          audience: selectedCampaign.audience?.segment || "all",
-          content: JSON.stringify(selectedCampaign.steps),
-          scheduledFor: undefined,
+        await apiJson("/api/merchant/marketing/campaigns", {
+          method: "POST",
+          body: JSON.stringify({
+            name: selectedCampaign.name,
+            type: selectedCampaign.type,
+            audience: selectedCampaign.audience?.segment || "all",
+            content: JSON.stringify(selectedCampaign.steps),
+            scheduledFor: undefined,
+          }),
         });
 
         toast({
@@ -741,7 +746,11 @@ export function CampaignBuilder() {
             <div className="flex justify-between items-center">
               <CardTitle>Campaign Flow</CardTitle>
               <div className="flex gap-2">
-                <Select onValueChange={(value: unknown) => addStep(value)}>
+                <Select
+                  onValueChange={(value) =>
+                    addStep(value as CampaignStep["type"])
+                  }
+                >
                   <SelectTrigger className="w-[200px]">
                     <Plus className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Add Step" />

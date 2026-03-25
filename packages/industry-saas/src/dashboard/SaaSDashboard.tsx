@@ -1,21 +1,16 @@
-// @ts-nocheck
 // ============================================================================
 // SaaS Industry Dashboard Main Component
 // ============================================================================
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React from 'react';
-import type { 
-  UniversalDashboardProps,
-  IndustrySlug 
-} from '@vayva/industry-core';
-import { 
-  useUniversalDashboard,
+import type { IndustrySlug, UniversalDashboardProps } from '@vayva/industry-core';
+import {
   UniversalMetricCard,
   UniversalSectionHeader,
-  UniversalChartContainer
-} from '@vayva/ui';
+  useUniversalDashboard,
+} from './saas-dashboard-primitives';
 import { 
   TrendingUp,
   Users,
@@ -60,18 +55,10 @@ export function SaaSDashboard({
   userId,
   businessId,
   className = '',
-  onConfigChange,
+  onConfigChange: _onConfigChange,
   onError
 }: UniversalDashboardProps) {
-  const {
-    data: dashboardData,
-    config,
-    loading,
-    error,
-    lastUpdated,
-    refresh,
-    isValidating
-  } = useUniversalDashboard({
+  const { loading, error, refresh, isValidating } = useUniversalDashboard({
     industry: industry as IndustrySlug,
     variant,
     userId,
@@ -97,13 +84,13 @@ export function SaaSDashboard({
             Track MRR, tenant health, churn, and growth metrics
           </p>
         </div>
-        <button
+        <Button
           onClick={refresh}
           disabled={isValidating}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
         >
           {isValidating ? 'Refreshing...' : 'Refresh Data'}
-        </button>
+        </Button>
       </div>
 
       {/* Key Metrics Grid */}

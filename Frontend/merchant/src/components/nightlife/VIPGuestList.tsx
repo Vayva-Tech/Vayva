@@ -1,10 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "@vayva/ui";
 import { toast } from "sonner";
-import { UserStar, Check, Message, Clock } from "@phosphor-icons/react";
+import { Check } from "@phosphor-icons/react";
 import type { VIPGuest } from "@/types/nightlife";
 import { apiJson } from "@/lib/api-client-shared";
 

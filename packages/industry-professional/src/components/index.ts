@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Professional Services Components
  * UI components for professional services

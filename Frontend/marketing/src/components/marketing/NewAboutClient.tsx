@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@vayva/ui";
@@ -15,13 +15,14 @@ import {
   IconMessageCircle as MessageCircle,
 } from "@tabler/icons-react";
 import { aboutContent } from "@/data/marketing-content";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
-// Growth timeline visualization component
+// Growth timeline visualization component (desktop alternating layout)
 function GrowthTimeline(): React.JSX.Element {
   const iconMap = [Zap, Users, MessageCircle, TrendingUp];
 
   return (
-    <div className="relative py-12">
+    <div className="relative py-12 hidden md:block">
       {/* Timeline line */}
       <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-200 via-emerald-400 to-emerald-600" />
       
@@ -59,6 +60,19 @@ function GrowthTimeline(): React.JSX.Element {
   );
 }
 
+function GrowthTimelineMobile(): React.JSX.Element {
+  return (
+    <ul className="md:hidden space-y-4 border-l-2 border-emerald-200 pl-5 py-2">
+      {aboutContent.timeline.map((milestone) => (
+        <li key={milestone.year}>
+          <p className="text-xs font-bold text-emerald-600">{milestone.year}</p>
+          <p className="text-sm text-slate-700 font-medium leading-snug">{milestone.event}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 // Values card with icon
 function ValueCard({ value, index }: { value: typeof aboutContent.values[number]; index: number }): React.JSX.Element {
   const iconMap = {
@@ -74,30 +88,29 @@ function ValueCard({ value, index }: { value: typeof aboutContent.values[number]
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
-      className="relative group"
+      className="group rounded-[28px] border border-slate-200/80 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
     >
-      <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[28px] border-2 border-emerald-200/60" />
-      <div className="relative p-8 bg-white/90 backdrop-blur rounded-[28px] border-2 border-slate-900/10 shadow-[0_20px_50px_rgba(15,23,42,0.1)] hover:-translate-y-1 transition-all">
         <div className="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-600 border border-emerald-200 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
           <Icon className="w-7 h-7" />
         </div>
         <h3 className="text-xl font-semibold text-slate-900 mb-4">{value.title}</h3>
         <p className="text-slate-600 leading-relaxed">{value.description}</p>
-      </div>
     </motion.div>
   );
 }
 
 export function NewAboutClient(): React.JSX.Element {
+  const [storyExpanded, setStoryExpanded] = useState(false);
+
   return (
-    <div className="relative overflow-hidden text-slate-900">
+    <div className="relative w-full min-w-0 overflow-x-hidden text-slate-900">
       {/* Hero */}
       <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto px-6 text-center">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-slate-900 leading-tight"
+            className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-slate-900 leading-tight"
           >
             {aboutContent.heroTitle}{" "}
             <span className="text-emerald-600">{aboutContent.heroHighlight}</span>
@@ -106,16 +119,25 @@ export function NewAboutClient(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed"
+            className="mt-5 sm:mt-6 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed"
           >
-            {aboutContent.heroDescription}
+            {aboutContent.heroDescription.length > 140 ? (
+              <>
+                <span className="md:hidden">
+                  {aboutContent.heroDescription.slice(0, 140).trim()}…
+                </span>
+                <span className="hidden md:inline">{aboutContent.heroDescription}</span>
+              </>
+            ) : (
+              aboutContent.heroDescription
+            )}
           </motion.p>
         </div>
       </section>
 
       {/* Stats */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 border-y border-slate-200/60">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {aboutContent.stats.map((stat, index) => (
               <motion.div
@@ -136,7 +158,7 @@ export function NewAboutClient(): React.JSX.Element {
 
       {/* Story */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Content */}
             <motion.div
@@ -147,9 +169,26 @@ export function NewAboutClient(): React.JSX.Element {
             >
               <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900">{aboutContent.storyTitle}</h2>
               <div className="space-y-4 text-slate-600 leading-relaxed">
-                {aboutContent.storyParagraphs.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
+                {aboutContent.storyParagraphs.map((paragraph, i) => (
+                  <p
+                    key={paragraph}
+                    className={
+                      i > 0 && !storyExpanded ? "hidden md:block" : undefined
+                    }
+                  >
+                    {paragraph}
+                  </p>
                 ))}
+                {aboutContent.storyParagraphs.length > 1 ? (
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setStoryExpanded((e) => !e)}
+                    className="md:hidden text-sm font-semibold text-emerald-600 h-auto p-0"
+                  >
+                    {storyExpanded ? "Show less" : "Show more"}
+                  </Button>
+                ) : null}
                 <p className="font-medium text-slate-900">{aboutContent.storyQuote}</p>
               </div>
             </motion.div>
@@ -180,7 +219,7 @@ export function NewAboutClient(): React.JSX.Element {
 
       {/* Mission */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto px-6 text-center">
+        <div className="max-w-[1400px] mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -198,34 +237,55 @@ export function NewAboutClient(): React.JSX.Element {
 
       {/* Growth Timeline */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900">Our Journey</h2>
-            <p className="mt-4 text-slate-600">From first lines of code to ₦2.5B processed</p>
+            <p className="mt-4 text-slate-600">
+              <span className="md:hidden">Key milestones from first code to today.</span>
+              <span className="hidden md:inline">From first lines of code to ₦2.5B processed</span>
+            </p>
           </div>
           <GrowthTimeline />
+          <GrowthTimelineMobile />
         </div>
       </section>
 
       {/* Values */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900">How we build</h2>
-            <p className="mt-4 text-slate-600">The principles that guide every decision</p>
+            <p className="mt-4 text-slate-600">
+              <span className="md:hidden">Swipe for our three principles.</span>
+              <span className="hidden md:inline">The principles that guide every decision</span>
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="hidden md:grid md:grid-cols-3 gap-8">
             {aboutContent.values.map((value, index) => (
               <ValueCard key={value.title} value={value} index={index} />
             ))}
+          </div>
+          <div className="md:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Company values"
+              hint="Swipe for each value"
+              showDots
+              dotCount={aboutContent.values.length}
+            >
+              {aboutContent.values.map((value, index) => (
+                <MarketingSnapItem key={value.title}>
+                  <ValueCard value={value} index={index} />
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
           </div>
         </div>
       </section>
 
       {/* Investors / Backing */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 border-y border-slate-200/60">
-        <div className="max-w-[1600px] mx-auto px-6 text-center">
+        <div className="max-w-[1400px] mx-auto px-6 text-center">
           <p className="text-sm text-slate-500 mb-8">Backed by industry leaders</p>
           <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12 opacity-60">
             {aboutContent.backing.map((partner) => (
@@ -239,7 +299,7 @@ export function NewAboutClient(): React.JSX.Element {
 
       {/* CTA */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto px-6 text-center">
+        <div className="max-w-[1400px] mx-auto px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 mb-4">
             {aboutContent.ctaTitle}
           </h2>

@@ -17,17 +17,19 @@ import { BackButton } from "@/components/ui/BackButton";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/FileUpload";
 
-type BlogFormProps = {
-  initialData?: {
-    title: string;
-    slug: string;
-    excerpt?: string | null;
-    content?: string | null;
-    featuredImage?: string | null;
-    status: string;
-    metaTitle?: string | null;
-    metaDesc?: string | null;
-  };
+export type BlogFormInitialData = {
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  content?: string | null;
+  featuredImage?: string | null;
+  status: string;
+  metaTitle?: string | null;
+  metaDesc?: string | null;
+};
+
+export type BlogFormProps = {
+  initialData?: BlogFormInitialData;
   action: (formData: FormData) => Promise<{ success: boolean; id?: string }>;
   submitLabel: string;
 };

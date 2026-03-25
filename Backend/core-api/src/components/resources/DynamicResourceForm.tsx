@@ -20,8 +20,14 @@ import { validateResource } from "@/lib/validations/resource-validator";
 type PrimaryObject = string;
 type _FieldKey = string;
 import { logger } from "@vayva/shared";
-import { Button, Card, Input, Label, Textarea } from "@vayva/ui"; // Assuming Select exists or using standard
-import { toast } from "sonner";
+import {
+  Button,
+  Card,
+  Input,
+  Label,
+  Textarea } from "@vayva/ui"; // Assuming Select exists or using standard
+import { toast
+} from "sonner";
 import { VariantManager } from "@/components/products/VariantManager";
 import { InventoryHistory } from "@/components/products/InventoryHistory";
 import { FileUpload } from "@/components/ui/FileUpload";

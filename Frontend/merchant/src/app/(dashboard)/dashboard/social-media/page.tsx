@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 /**
@@ -66,60 +65,71 @@ export default function SocialMediaDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
-      // In real implementation:
-      // const response = await apiJson<SocialDashboardData>('/api/social-connections');
-      // setDashboardData(response.data);
-      
-      // Simulate API response
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+
+      const result = await apiJson<{
+        success?: boolean;
+        data?: {
+          connections: Array<{
+            id: string;
+            platform: string;
+            accountName: string | null;
+            status: string;
+            createdAt: string;
+            lastActive: string | null;
+          }>;
+          stats: Array<{
+            platform: string;
+            messages: number;
+            conversions: number;
+            engagement: number;
+          }>;
+          summary: { totalConnected: number; totalPlatforms: number };
+        };
+      }>("/api/social-connections");
+
+      const raw = result?.data;
+      if (result?.success === false || !raw) {
+        throw new Error("Invalid social connections response");
+      }
+
+      const stats: SocialStats[] = raw.stats.map((s) => ({
+        platform: s.platform,
+        messages: s.messages,
+        conversions: s.conversions,
+        engagement: s.engagement,
+        growth: 0,
+      }));
+
+      const connections: SocialConnection[] = raw.connections.map((c) => ({
+        id: c.id,
+        platform: c.platform,
+        accountName: c.accountName ?? "",
+        status:
+          c.status === "CONNECTED"
+            ? "CONNECTED"
+            : c.status === "ERROR"
+              ? "ERROR"
+              : "DISCONNECTED",
+        createdAt: c.createdAt,
+        lastActive: c.lastActive ?? c.createdAt,
+      }));
+
+      const totalMessages = stats.reduce((a, s) => a + s.messages, 0);
+      const totalConversions = stats.reduce((a, s) => a + s.conversions, 0);
+
       setDashboardData({
-        connections: [
-          {
-            id: '1',
-            platform: 'telegram',
-            accountName: 'MyStoreBot',
-            status: 'CONNECTED',
-            createdAt: new Date().toISOString(),
-            lastActive: new Date().toISOString()
-          },
-          {
-            id: '2',
-            platform: 'discord',
-            accountName: 'StoreCommunity',
-            status: 'DISCONNECTED',
-            createdAt: new Date().toISOString(),
-            lastActive: new Date(Date.now() - 86400000).toISOString()
-          }
-        ],
-        stats: [
-          {
-            platform: 'telegram',
-            messages: 1247,
-            conversions: 89,
-            engagement: 76,
-            growth: 12
-          },
-          {
-            platform: 'discord',
-            messages: 0,
-            conversions: 0,
-            engagement: 0,
-            growth: 0
-          }
-        ],
+        connections,
+        stats,
         summary: {
-          totalConnected: 1,
-          totalPlatforms: 2,
-          totalMessages: 1247,
-          totalConversions: 89
-        }
+          ...raw.summary,
+          totalMessages,
+          totalConversions,
+        },
       });
-      
     } catch (error) {
-      toast.error('Failed to load dashboard data');
-      console.error('Dashboard load error:', error);
+      toast.error("Failed to load dashboard data");
+      console.error("Dashboard load error:", error);
+      setDashboardData(null);
     } finally {
       setLoading(false);
     }
@@ -209,7 +219,7 @@ export default function SocialMediaDashboard() {
       <div className="border-b border-gray-100">
         <nav className="flex space-x-8">
           {(['overview', 'integrations', 'analytics'] as const).map((tab) => (
-            <button
+            <Button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
@@ -219,7 +229,7 @@ export default function SocialMediaDashboard() {
               }`}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </nav>
       </div>

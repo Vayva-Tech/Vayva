@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Creative Industry Dashboard Component
  * Design studio, creative agency, and artistic portfolio management
@@ -17,8 +16,8 @@ export function CreativeDashboard({
 }: IndustryDashboardProps) {
   return (
     <UniversalProDashboard
-      industry="creative"
-      variant="creative-pro"
+      industry="creative_portfolio"
+      variant="pro"
       userId={userId}
       businessId={businessId}
       designCategory={designCategory}

@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { Server as SocketIOServer } from "socket.io";
-import { logger } from "@/lib/logger";
+import { ErrorCategory, logger } from "@/lib/logger";
 
 interface ChatMessage {
   id: string;
@@ -30,7 +29,8 @@ export function setupWebSocket(io: SocketIOServer) {
     logger.info("[WS_CONNECTED]", { socketId: socket.id });
 
     // Join store room
-    socket.on("join_store", (data: { storeId: string; userId: string; userType: "agent" | "customer" }) => {
+    socket.on("join_store", (raw: unknown) => {
+      const data = raw as { storeId: string; userId: string; userType: "agent" | "customer" };
       const { storeId, userId, userType } = data;
       
       socket.join(`store:${storeId}`);
@@ -70,14 +70,15 @@ export function setupWebSocket(io: SocketIOServer) {
     });
 
     // Send message
-    socket.on("send_message", (data: { 
-      roomId: string; 
-      storeId: string; 
-      message: string; 
-      senderId: string; 
-      senderName: string;
-      senderType: "customer" | "support";
-    }) => {
+    socket.on("send_message", (raw: unknown) => {
+      const data = raw as {
+        roomId: string;
+        storeId: string;
+        message: string;
+        senderId: string;
+        senderName: string;
+        senderType: "customer" | "support";
+      };
       const { roomId, storeId, message, senderId, senderName, senderType } = data;
       
       const chatMessage: ChatMessage = {
@@ -107,21 +108,24 @@ export function setupWebSocket(io: SocketIOServer) {
     });
 
     // Typing indicator
-    socket.on("typing_start", (data: { roomId: string; userId: string }) => {
+    socket.on("typing_start", (raw: unknown) => {
+      const data = raw as { roomId: string; userId: string };
       socket.to(`room:${data.roomId}`).emit("user_typing", {
         userId: data.userId,
         timestamp: new Date().toISOString(),
       });
     });
 
-    socket.on("typing_stop", (data: { roomId: string; userId: string }) => {
+    socket.on("typing_stop", (raw: unknown) => {
+      const data = raw as { roomId: string; userId: string };
       socket.to(`room:${data.roomId}`).emit("user_stopped_typing", {
         userId: data.userId,
       });
     });
 
     // Read receipts
-    socket.on("mark_read", (data: { roomId: string; messageId: string }) => {
+    socket.on("mark_read", (raw: unknown) => {
+      const data = raw as { roomId: string; messageId: string };
       socket.to(`room:${data.roomId}`).emit("message_read", {
         messageId: data.messageId,
         readAt: new Date().toISOString(),
@@ -129,11 +133,12 @@ export function setupWebSocket(io: SocketIOServer) {
     });
 
     // Agent actions
-    socket.on("agent_action", (data: { 
-      roomId: string; 
-      action: "assign" | "transfer" | "close"; 
-      agentId?: string;
-    }) => {
+    socket.on("agent_action", (raw: unknown) => {
+      const data = raw as {
+        roomId: string;
+        action: "assign" | "transfer" | "close";
+        agentId?: string;
+      };
       io.to(`room:${data.roomId}`).emit("agent_action", {
         action: data.action,
         agentId: data.agentId,
@@ -154,8 +159,8 @@ export function setupWebSocket(io: SocketIOServer) {
     });
 
     // Error handling
-    socket.on("error", (error: Error) => {
-      logger.error("[WS_ERROR]", error);
+    socket.on("error", (err: unknown) => {
+      logger.error("[WS_ERROR]", ErrorCategory.NETWORK, err);
     });
   });
 

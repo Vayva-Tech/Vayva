@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import {
   Globe,
@@ -152,10 +152,10 @@ export default function MultiChannelPage() {
               <p className="text-xs text-gray-500 mt-0.5">Stock levels synchronized across all channels</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
+          <Button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
             <RefreshCw className="w-4 h-4" />
             Sync Now
-          </button>
+          </Button>
         </div>
 
         <div className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl">
@@ -208,3 +208,4 @@ export default function MultiChannelPage() {
     </div>
   );
 }
+

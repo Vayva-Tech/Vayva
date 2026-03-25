@@ -7,6 +7,18 @@ const LOG_LEVELS = {
 const CURRENT_LOG_LEVEL = process.env.LOG_LEVEL
     ? process.env.LOG_LEVEL.toLowerCase()
     : "info";
+function writeLine(line, streamName) {
+    try {
+        const p = typeof process !== "undefined" ? process : undefined;
+        const stream = streamName === "stderr" ? p === null || p === void 0 ? void 0 : p.stderr : p === null || p === void 0 ? void 0 : p.stdout;
+        if (stream && typeof stream.write === "function") {
+            stream.write(`${line}\n`);
+        }
+    }
+    catch {
+        // no-op in non-node runtimes
+    }
+}
 export function log(level, msg, fields) {
     // Skip logging if below current log level
     if (LOG_LEVELS[level] < LOG_LEVELS[CURRENT_LOG_LEVEL]) {
@@ -19,20 +31,12 @@ export function log(level, msg, fields) {
         message: msg,
         ...fields,
     };
-    switch (level) {
-        case "debug":
-            console.debug(JSON.stringify(logEntry));
-            break;
-        case "info":
-            console.info(JSON.stringify(logEntry));
-            break;
-        case "warn":
-            console.warn(JSON.stringify(logEntry));
-            break;
-        case "error":
-            console.error(JSON.stringify(logEntry));
-            break;
+    const line = JSON.stringify(logEntry);
+    if (level === "warn" || level === "error") {
+        writeLine(line, "stderr");
+        return;
     }
+    writeLine(line, "stdout");
 }
 export const logger = {
     debug: (msg, fields) => log("debug", msg, fields),

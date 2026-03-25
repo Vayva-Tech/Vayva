@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Education Industry Dashboard Components
 // ============================================================================
@@ -26,6 +25,7 @@ export interface CertificateData {
   issuedThisMonth: number;
   pendingIssuance: number;
   total: number;
+  totalCertificates?: number;
   recentCertificates: Array<{
     id: string;
     studentName: string;

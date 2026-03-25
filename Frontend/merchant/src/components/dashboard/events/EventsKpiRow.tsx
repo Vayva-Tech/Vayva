@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
 import { TrendingUp, Ticket, Users, Handshake, Percent } from "lucide-react";
-import { formatCurrency } from "@vayva/ui";
+import { formatCurrency } from "@/lib/utils";
 
 interface Metric {
   value: number;
@@ -13,7 +12,7 @@ interface Metric {
   totalValue?: number;
 }
 
-interface Metrics {
+export interface Metrics {
   revenue?: Metric;
   ticketsSold?: Metric;
   attendees?: Metric;

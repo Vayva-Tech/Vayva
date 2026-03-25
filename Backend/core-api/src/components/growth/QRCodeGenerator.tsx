@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Button, Card } from "@vayva/ui";
 import {
   DownloadSimple as Download,
-  ShareNetwork as Share2,
+  ShareNetwork as Share2
 } from "@phosphor-icons/react/ssr";
 import { toast } from "sonner";
 

@@ -1,15 +1,13 @@
-// @ts-nocheck
 "use client";
-
 import React, { useState } from "react";
 import { logger } from "@vayva/shared";
 import { toast } from "sonner";
-import { Shield, ShieldCheck, DeviceMobile as Smartphone, LockKey, Key, DeviceMobile as MobileDevice } from "@phosphor-icons/react";
+import { Shield, ShieldCheck, DeviceMobile as Smartphone, LockKey, Key, DeviceMobile as MobileDevice, Spinner as Loader2 } from "@phosphor-icons/react";
 import { Button, Input } from "@vayva/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { apiJson } from "@/lib/api-client-shared";
 import { MFASetupModal } from "@/components/mfa/MFASetupModal";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function SecurityPage() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -72,20 +70,11 @@ export default function SecurityPage() {
       {/* Page Header */}
       <div className="mb-8">
         <BackButton href="/dashboard/settings" />
-        <Breadcrumbs
-          items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Settings", href: "/dashboard/settings" },
-            { label: "Security" },
-          ]}
-        />
         <div className="mt-4">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Security Settings
-          </h1>
-          <p className="text-gray-500">
-            Manage your password and authentication settings.
-          </p>
+          <PageHeader
+            title="Security Settings"
+            subtitle="Manage your password and authentication settings."
+          />
         </div>
       </div>
 

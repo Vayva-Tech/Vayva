@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/properties - Get all properties for the merchant
 export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
@@ -23,9 +28,7 @@ export async function GET(request: NextRequest) {
     const result = await apiJson(
       `${process.env.BACKEND_API_URL}/api/properties?${queryParams}`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
+        headers: auth.headers,
       }
     );
 
@@ -34,7 +37,6 @@ export async function GET(request: NextRequest) {
     handleApiError(error, {
       endpoint: '/api/properties',
       operation: 'GET_PROPERTIES',
-      storeId,
     });
     return NextResponse.json(
       { error: 'Failed to complete operation' },

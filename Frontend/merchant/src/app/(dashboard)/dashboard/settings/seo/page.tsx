@@ -1,7 +1,7 @@
 import { SeoSettingsForm } from "@/components/settings/SeoSettingsForm";
 import { requireAuth } from "@/lib/session.server";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { cookies } from "next/headers";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 async function getCookieHeader(): Promise<string> {
   const cookieStore = await cookies();
@@ -43,16 +43,10 @@ export default async function SeoSettingsPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <Breadcrumbs />
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Social & SEO Settings
-        </h1>
-        <p className="text-gray-500">
-          Control how your store appears on Google, Facebook, Twitter, and
-          WhatsApp.
-        </p>
-      </div>
+      <PageHeader
+        title="Social & SEO Settings"
+        subtitle="Control how your store appears on Google, Facebook, Twitter, and WhatsApp."
+      />
 
       <SeoSettingsForm initialData={store} />
     </div>

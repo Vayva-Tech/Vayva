@@ -8,7 +8,7 @@
  * - Special occasion notes
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const TABLE_BOOKING_ADDON: AddOnDefinition = {
   id: 'vayva.restaurant.table-booking',

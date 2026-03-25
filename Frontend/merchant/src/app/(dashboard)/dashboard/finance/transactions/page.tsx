@@ -1,14 +1,26 @@
-// @ts-nocheck
 "use client";
-
 import { logger, formatCurrency } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ArrowUpRight, ArrowDownLeft, ArrowsClockwise as RefreshCcw, Download, Funnel as Filter, MagnifyingGlass as Search, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, TrendUp } from "@phosphor-icons/react";
+import { ArrowUpRight, ArrowDownLeft, ArrowsClockwise as RefreshCcw, Download, Funnel as Filter, MagnifyingGlass as Search, CurrencyDollar as DollarSign, ClockCounterClockwise, CheckCircle, TrendUp, X, Copy } from "@phosphor-icons/react";
 import { Button, Input, Select } from "@vayva/ui";
 import { MobileTransactionCard } from "@/components/transactions/MobileTransactionCard";
 import { Transaction, TransactionsResponse } from "@/types/finance";
 import { apiJson } from "@/lib/api-client-shared";
+
+function isCreditType(type: Transaction["type"]) {
+  return type === "CHARGE";
+}
+
+function TypeBadge({ type }: { type: Transaction["type"] }) {
+  const label =
+    type === "CHARGE" ? "Charge" : type === "REFUND" ? "Refund" : "Payout";
+  return (
+    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-800">
+      {label}
+    </span>
+  );
+}
 
 export default function TransactionsPage() {
   const [loading, setLoading] = useState(true);
@@ -135,8 +147,8 @@ export default function TransactionsPage() {
   // Calculate metrics
   const totalTransactions = transactions.length;
   const totalVolume = transactions.reduce((sum, t) => sum + t.amount, 0);
-  const credits = transactions.filter(t => t.type === 'credit').length;
-  const debits = transactions.filter(t => t.type === 'debit').length;
+  const credits = transactions.filter((t) => isCreditType(t.type)).length;
+  const debits = transactions.filter((t) => !isCreditType(t.type)).length;
   const avgTransaction = totalTransactions > 0 ? totalVolume / totalTransactions : 0;
 
   if (loading) {
@@ -245,7 +257,7 @@ export default function TransactionsPage() {
             <option value="month">This Month</option>
           </select>
         </div>
-        <button
+        <Button
           onClick={() => {
             setStatusFilter('all');
             setTypeFilter('all');
@@ -256,7 +268,7 @@ export default function TransactionsPage() {
         >
           <RefreshCcw size={16} className="inline mr-1" />
           Reset Filters
-        </button>
+        </Button>
       </div>
 
       {/* Transactions Table */}
@@ -291,11 +303,19 @@ export default function TransactionsPage() {
                       {new Date(tx.date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        tx.type === 'credit' ? "bg-green-50 text-green-600" : "bg-blue-50 text-blue-600"
-                      }`}>
-                        {tx.type === 'credit' && <ArrowUpRight size={12} className="mr-1" />}
-                        {tx.type === 'debit' && <ArrowDownLeft size={12} className="mr-1" />}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          isCreditType(tx.type)
+                            ? "bg-green-50 text-green-600"
+                            : "bg-blue-50 text-blue-600"
+                        }`}
+                      >
+                        {isCreditType(tx.type) && (
+                          <ArrowUpRight size={12} className="mr-1" />
+                        )}
+                        {!isCreditType(tx.type) && (
+                          <ArrowDownLeft size={12} className="mr-1" />
+                        )}
                         {tx.type}
                       </span>
                     </td>
@@ -319,12 +339,12 @@ export default function TransactionsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
+                      <Button
                         onClick={() => setSelectedTransaction(tx)}
                         className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         View Details
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -422,7 +442,7 @@ export default function TransactionsPage() {
                       className="h-8 px-3 text-xs"
                       aria-label="Copy reference to clipboard"
                     >
-                      <Icon name="Copy" className="h-3 w-3 mr-1" />
+                      <Copy className="h-3 w-3 mr-1" />
                       Copy
                     </Button>
                   </div>

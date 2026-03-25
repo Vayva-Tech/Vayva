@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const alertType = searchParams.get('type') || 'all';
+    const _alertType = searchParams.get('type') || 'all';
     const threshold = parseInt(searchParams.get('threshold') || '5');
 
     const now = new Date();

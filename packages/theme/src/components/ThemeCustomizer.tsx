@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { Button } from "@vayva/ui";
+import React, { useState } from 'react';
 import { industryThemes, ThemePreset, applyTheme, getCurrentTheme } from '../industry-themes';
 
 interface ThemeCustomizerProps {
@@ -10,11 +11,9 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
   onThemeChange,
   className = ''
 }) => {
-  const [currentTheme, setCurrentTheme] = useState<string>('');
-
-  useEffect(() => {
-    setCurrentTheme(getCurrentTheme() || 'corporate');
-  }, []);
+  const [currentTheme, setCurrentTheme] = useState<string>(() =>
+    typeof window !== 'undefined' ? getCurrentTheme() || 'corporate' : 'corporate',
+  );
 
   const handleThemeChange = (themeId: string) => {
     setCurrentTheme(themeId);
@@ -33,7 +32,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {Object.values(industryThemes).map((theme) => (
-              <button
+              <Button
                 key={theme.id}
                 onClick={() => handleThemeChange(theme.id)}
                 className={`p-4 rounded-lg border-2 transition-all ${
@@ -52,7 +51,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
                     <div className="text-xs text-gray-500">{theme.description}</div>
                   </div>
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -75,7 +74,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
             <p className="text-sm text-muted-foreground mb-3">
               This is how your theme will look with the selected color scheme and typography.
             </p>
-            <button
+            <Button
               className="px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
               style={{ 
                 backgroundColor: industryThemes[currentTheme]?.colors.primary,
@@ -83,7 +82,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
               }}
             >
               Sample Button
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -113,7 +112,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   return (
     <div className={`flex flex-wrap gap-2 ${className}`}>
       {Object.values(industryThemes).map((theme) => (
-        <button
+        <Button
           key={theme.id}
           onClick={() => onThemeChange(theme.id)}
           className={`${sizeClasses[size]} rounded-lg border-2 transition-all ${
@@ -132,7 +131,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
               {theme.name}
             </span>
           </div>
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -209,7 +208,7 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({
         />
         
         <div className="flex space-x-2">
-          <button
+          <Button
             className="px-3 py-1.5 rounded text-xs font-medium"
             style={{ 
               backgroundColor: theme.colors.primary,
@@ -217,8 +216,8 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({
             }}
           >
             Primary
-          </button>
-          <button
+          </Button>
+          <Button
             className="px-3 py-1.5 rounded text-xs font-medium border"
             style={{ 
               borderColor: theme.colors.secondary,
@@ -226,7 +225,7 @@ export const ThemePreview: React.FC<ThemePreviewProps> = ({
             }}
           >
             Secondary
-          </button>
+          </Button>
         </div>
       </div>
     </div>

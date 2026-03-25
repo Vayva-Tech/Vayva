@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Retail Industry Features
  * Re-export all feature modules

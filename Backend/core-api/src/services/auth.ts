@@ -3,7 +3,7 @@ import {
   LoginRequest,
   RegisterRequest,
   AuthResponseData,
-  AuthMeResponse,
+  AuthMeResponse
 } from "@vayva/shared";
 
 interface OtpAugmentedError extends Error {

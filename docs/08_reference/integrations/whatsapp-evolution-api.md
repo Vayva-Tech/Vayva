@@ -11,9 +11,11 @@
 
 ## Overview
 
-Vayva uses **Evolution API** as a self-hosted WhatsApp Business gateway. Evolution API wraps the WhatsApp Web protocol and exposes a REST interface for sending messages, managing connections (instances), and receiving inbound events via webhooks.
+Vayva uses **Evolution API** as a self-hosted WhatsApp gateway **hosted by Vayva on our VPS**. Evolution API wraps the WhatsApp Web protocol and exposes a REST interface for sending messages, managing connections (instances), and receiving inbound events via webhooks.
 
 The integration enables the Vayva AI agent to communicate with merchants over WhatsApp — sending order alerts, answering merchant questions, and delivering automated reports — without requiring Meta's official Cloud API approval.
+
+**Important:** Vayva does **not** use Meta’s official WhatsApp Cloud API today. This integration is **Evolution API only**.
 
 **Production gateway:** `http://163.245.209.202:8080`
 
@@ -30,7 +32,7 @@ These are set in `turbo.json`'s `globalPassThroughEnv` and must be present in th
 
 ---
 
-## Instance Management
+## Instance Management (how merchants “connect WhatsApp”)
 
 Evolution API organises WhatsApp connections as **instances**. Each instance represents one WhatsApp number connected to the gateway.
 
@@ -48,14 +50,14 @@ Body: {
 
 `instanceName` is used as the identifier for all subsequent calls. The `token` field doubles as a per-instance auth token (currently set equal to the instance name for simplicity).
 
-### Connecting (fetching QR code)
+### Connecting (QR code)
 
 ```
 GET /instance/connect/<instanceName>
 Headers: { apikey: <EVOLUTION_API_KEY> }
 ```
 
-Returns a QR code payload that the merchant scans with their WhatsApp mobile app to authenticate the session.
+Returns a QR code payload that the merchant scans with their WhatsApp mobile app to authenticate the session. **This is the primary merchant setup step** — they don’t need Meta/WhatsApp Cloud API credentials.
 
 ### Pairing by phone number (alternative to QR)
 
@@ -215,7 +217,7 @@ WhatsApp Business accounts have per-number messaging limits that scale with acco
 | Tier 2 | 10,000 conversations |
 | Tier 3 | 100,000 conversations |
 
-A "conversation" in WhatsApp's model is a 24-hour session opened by the first message in either direction. Limits apply to business-initiated conversations; customer-initiated conversations in response to a merchant message do not count against the business-initiated quota.
+A "conversation" in WhatsApp's model is a 24-hour session opened by the first message in either direction. Even when using Evolution API, WhatsApp can still enforce product limits and anti-spam rules at the account/number level.
 
 ### Application-level best practices
 

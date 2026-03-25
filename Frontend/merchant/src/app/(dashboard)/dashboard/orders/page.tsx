@@ -1,9 +1,11 @@
-// @ts-nocheck
 "use client";
+import { Button } from "@vayva/ui";
 
 import { useState, useMemo } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 import {
   Search,
   Package,
@@ -319,13 +321,13 @@ export default function OrdersPage() {
             <p className="text-sm text-gray-500 mt-1 max-w-sm">
               Something went wrong while fetching your orders. Please try again.
             </p>
-            <button
+            <Button
               onClick={() => { mutateOrders(); mutateKpis(); }}
               className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 shadow-sm transition-colors"
             >
               <RefreshCw size={16} />
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -340,10 +342,10 @@ export default function OrdersPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Orders</h1>
           </div>
-          <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 shadow-sm transition-colors self-start sm:self-auto">
+          <Button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 shadow-sm transition-colors self-start sm:self-auto">
             <Plus size={16} />
             New Order
-          </button>
+          </Button>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
           <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
@@ -369,50 +371,116 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen space-y-6 pb-10">
-      {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Orders</h1>
-          <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
-            {summary.totalOrders}
-          </span>
-        </div>
-        <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 shadow-sm transition-colors self-start sm:self-auto">
-          <Plus size={16} />
-          New Order
-        </button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/products/new"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Add product</span>
+                  <ArrowUpDown className="w-4 h-4 text-gray-400 rotate-90" />
+                </Link>
+                <Link
+                  href="/dashboard/analytics"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>View analytics</span>
+                  <ArrowUpDown className="w-4 h-4 text-gray-400 rotate-90" />
+                </Link>
+              </div>
+            </div>
 
-      {/* ── Summary Cards ─────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryCard
-          icon={<ShoppingCart size={20} />}
-          iconBg="bg-green-100 text-green-600"
-          label="Total Orders"
-          value={summary.totalOrders.toLocaleString()}
-          accent="border-l-green-500"
-        />
-        <SummaryCard
-          icon={<Clock size={20} />}
-          iconBg="bg-amber-100 text-amber-600"
-          label="Pending"
-          value={summary.pending.toString()}
-          accent="border-l-amber-500"
-        />
-        <SummaryCard
-          icon={<Package size={20} />}
-          iconBg="bg-blue-100 text-blue-600"
-          label="Processing"
-          value={summary.processing.toString()}
-          accent="border-l-blue-500"
-        />
-        <SummaryCard
-          icon={<DollarSign size={20} />}
-          iconBg="bg-emerald-100 text-emerald-600"
-          label="Revenue Today"
-          value={typeof summary.revenueToday === 'string' ? summary.revenueToday : formatNaira(summary.revenueToday)}
-          accent="border-l-emerald-500"
-        />
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Pending</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {summary.pending}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Processing</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {summary.processing}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+      {/* ── Header ────────────────────────────────────────────────────────── */}
+      <PageHeader
+        title={
+          <span className="inline-flex items-center gap-3">
+            <span>Orders</span>
+            <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
+              {summary.totalOrders}
+            </span>
+          </span>
+        }
+        actions={
+          <Button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 shadow-sm transition-colors">
+            <Plus size={16} />
+            New Order
+          </Button>
+        }
+      />
+
+      {/* ── Summary Cards (horizontal snap on mobile) ───────────────────── */}
+      <div
+        className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible snap-x snap-mandatory md:snap-none"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        <div className="max-md:snap-center shrink-0 w-[min(17rem,calc(100vw-3rem))] md:w-auto md:shrink">
+          <SummaryCard
+            icon={<ShoppingCart size={20} />}
+            iconBg="bg-green-100 text-green-600"
+            label="Total Orders"
+            value={summary.totalOrders.toLocaleString()}
+            accent="border-l-green-500"
+          />
+        </div>
+        <div className="max-md:snap-center shrink-0 w-[min(17rem,calc(100vw-3rem))] md:w-auto md:shrink">
+          <SummaryCard
+            icon={<Clock size={20} />}
+            iconBg="bg-amber-100 text-amber-600"
+            label="Pending"
+            value={summary.pending.toString()}
+            accent="border-l-amber-500"
+          />
+        </div>
+        <div className="max-md:snap-center shrink-0 w-[min(17rem,calc(100vw-3rem))] md:w-auto md:shrink">
+          <SummaryCard
+            icon={<Package size={20} />}
+            iconBg="bg-blue-100 text-blue-600"
+            label="Processing"
+            value={summary.processing.toString()}
+            accent="border-l-blue-500"
+          />
+        </div>
+        <div className="max-md:snap-center shrink-0 w-[min(17rem,calc(100vw-3rem))] md:w-auto md:shrink">
+          <SummaryCard
+            icon={<DollarSign size={20} />}
+            iconBg="bg-emerald-100 text-emerald-600"
+            label="Revenue Today"
+            value={
+              typeof summary.revenueToday === "string"
+                ? summary.revenueToday
+                : formatNaira(summary.revenueToday)
+            }
+            accent="border-l-emerald-500"
+          />
+        </div>
       </div>
 
       {/* ── Filter / Search Bar ───────────────────────────────────────────── */}
@@ -479,7 +547,7 @@ export default function OrdersPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-2 py-1.5">
         <div className="flex items-center gap-1 overflow-x-auto">
           {tabs.map((tab) => (
-            <button
+            <Button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
@@ -498,7 +566,7 @@ export default function OrdersPage() {
               >
                 {tab.count}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -510,27 +578,27 @@ export default function OrdersPage() {
             {selectedOrders.size} order{selectedOrders.size > 1 ? "s" : ""} selected
           </p>
           <div className="flex items-center gap-2">
-            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-green-200 text-sm text-green-700 font-medium hover:bg-green-50 transition-colors">
+            <Button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-green-200 text-sm text-green-700 font-medium hover:bg-green-50 transition-colors">
               <CheckCircle2 size={14} />
               Mark Delivered
-            </button>
-            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-green-200 text-sm text-green-700 font-medium hover:bg-green-50 transition-colors">
+            </Button>
+            <Button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-green-200 text-sm text-green-700 font-medium hover:bg-green-50 transition-colors">
               <Download size={14} />
               Export
-            </button>
-            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-red-200 text-sm text-red-600 font-medium hover:bg-red-50 transition-colors">
+            </Button>
+            <Button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-red-200 text-sm text-red-600 font-medium hover:bg-red-50 transition-colors">
               <Trash2 size={14} />
               Delete
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {/* ── Orders Table ──────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="max-md:bg-transparent max-md:border-0 max-md:shadow-none md:bg-white md:rounded-2xl md:shadow-sm md:border md:border-gray-100 md:overflow-hidden">
         {/* Empty state */}
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
             <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
               <Package size={28} className="text-gray-400" />
             </div>
@@ -541,10 +609,91 @@ export default function OrdersPage() {
           </div>
         )}
 
-        {/* Table */}
+        {/* Mobile: card list */}
+        {filtered.length > 0 && (
+          <div className="md:hidden flex flex-col gap-3">
+            {paginated.map((order) => {
+              const sc = STATUS_CONFIG[order.status];
+              const pc = PAYMENT_CONFIG[order.payment];
+              const isSelected = selectedOrders.has(order.id);
+              return (
+                <div
+                  key={order.id}
+                  className={`rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors ${
+                    isSelected ? "ring-2 ring-green-500/30 bg-green-50/40" : ""
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(order.id)}
+                        aria-label={`Select order ${order.id}`}
+                        className="w-4 h-4 mt-0.5 rounded border-gray-300 text-green-500 focus:ring-green-500/20 shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                          Order
+                        </p>
+                        <p className="text-sm font-bold text-gray-900 truncate">
+                          {order.id}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      className="shrink-0 min-w-[44px] min-h-[44px] rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 flex items-center justify-center"
+                      title="View order"
+                      aria-label={`View order ${order.id}`}
+                    >
+                      <Eye size={18} />
+                    </Button>
+                  </div>
+                  <div className="mt-3 flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${order.avatarBg}`}
+                    >
+                      {order.initials}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {order.customer}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {order.itemCount} item{order.itemCount > 1 ? "s" : ""} ·{" "}
+                        {formatDate(order.date)}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-gray-900">
+                        {formatNaira(order.total)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${sc.bg} ${sc.text}`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+                      {sc.label}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${pc.bg} ${pc.text}`}
+                    >
+                      {pc.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Desktop: table */}
         {filtered.length > 0 && (
           <>
-            <div className="overflow-x-auto">
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50/50">
@@ -646,12 +795,12 @@ export default function OrdersPage() {
 
                         {/* Actions */}
                         <td className="px-4 py-4 text-right">
-                          <button
+                          <Button
                             className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors opacity-0 group-hover:opacity-100"
                             title="View order"
                           >
                             <Eye size={16} />
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     );
@@ -661,7 +810,7 @@ export default function OrdersPage() {
             </div>
 
             {/* ── Pagination ────────────────────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50/40">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-4 md:px-6 mt-3 md:mt-0 rounded-2xl border border-gray-100 bg-gray-50/80 md:rounded-none md:border-x-0 md:border-b-0 md:border-t md:border-gray-100 md:bg-gray-50/40">
               <p className="text-sm text-gray-500">
                 Showing{" "}
                 <span className="font-medium text-gray-700">
@@ -675,14 +824,14 @@ export default function OrdersPage() {
                 <span className="font-medium text-gray-700">{filtered.length}</span>
               </p>
               <div className="flex items-center gap-1.5">
-                <button
+                <Button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft size={14} />
                   Prev
-                </button>
+                </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
                   .map((p, idx, arr) => {
@@ -692,7 +841,7 @@ export default function OrdersPage() {
                         {showEllipsis && (
                           <span className="px-1.5 text-gray-400 text-sm select-none">...</span>
                         )}
-                        <button
+                        <Button
                           onClick={() => setCurrentPage(p)}
                           className={`min-w-[32px] h-8 rounded-lg text-sm font-medium transition-colors ${
                             currentPage === p
@@ -701,23 +850,24 @@ export default function OrdersPage() {
                           }`}
                         >
                           {p}
-                        </button>
+                        </Button>
                       </span>
                     );
                   })}
-                <button
+                <Button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                   <ChevronRight size={14} />
-                </button>
+                </Button>
               </div>
             </div>
           </>
         )}
       </div>
+      </PageWithInsights>
     </div>
   );
 }
@@ -751,3 +901,4 @@ function SummaryCard({
     </div>
   );
 }
+

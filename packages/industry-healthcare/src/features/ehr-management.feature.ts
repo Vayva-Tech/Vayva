@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * EHR Management Feature Module
  */

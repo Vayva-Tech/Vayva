@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma , ReturnStatus } from "@vayva/db";
+import { prisma, prismaDelegates, ReturnStatus } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
 import { logger } from "@vayva/shared";
 
@@ -21,14 +21,18 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status") || "PENDING";
 
     // Get return requests first
-    const returns = await prisma.returnRequest.findMany({
+    const returns = await prismaDelegates.returnRequest.findMany({
       where: { status: status as ReturnStatus },
       orderBy: { createdAt: "desc" },
       take: 100,
     });
 
     // Get store info separately for each merchantId
-    const merchantIds = [...new Set(returns.map((r: any) => r.merchantId))];
+    const merchantIds = [
+      ...new Set(
+        returns.map((r: { merchantId: string }) => r.merchantId),
+      ),
+    ] as string[];
     const stores = await prisma.store.findMany({
       where: { id: { in: merchantIds } },
       select: { id: true, name: true },
@@ -36,7 +40,7 @@ export async function GET(req: NextRequest) {
     const storeMap = new Map(stores.map((s: any) => [s.id, s]));
 
     // Get order info separately
-    const orderIds = returns.map((r: any) => r.orderId);
+    const orderIds = returns.map((r: { orderId: string }) => r.orderId);
     const orders = await prisma.order.findMany({
       where: { id: { in: orderIds } },
       select: { id: true, orderNumber: true, storeId: true, customerEmail: true },
@@ -62,9 +66,15 @@ export async function GET(req: NextRequest) {
 
     // Stats
     const [pending, approved, rejected] = await Promise.all([
-      prisma.returnRequest.count({ where: { status: "PENDING" as ReturnStatus } }),
-      prisma.returnRequest.count({ where: { status: "APPROVED" as ReturnStatus } }),
-      prisma.returnRequest.count({ where: { status: "REJECTED" as ReturnStatus } }),
+      prismaDelegates.returnRequest.count({
+        where: { status: "PENDING" as ReturnStatus },
+      }),
+      prismaDelegates.returnRequest.count({
+        where: { status: "APPROVED" as ReturnStatus },
+      }),
+      prismaDelegates.returnRequest.count({
+        where: { status: "REJECTED" as ReturnStatus },
+      }),
     ]);
 
     return NextResponse.json({

@@ -10,12 +10,12 @@
 
 // Cloudflare Worker global types
 declare type ExecutionContext = {
-  waitUntil(promise: Promise<any>): void;
+  waitUntil(promise: Promise<unknown>): void;
   passThroughOnException(): void;
 };
 
 declare type KVNamespace = {
-  get(key: string, type?: 'text' | 'json' | 'arrayBuffer' | 'stream'): Promise<string | any>;
+  get(key: string, type?: 'text' | 'json' | 'arrayBuffer' | 'stream'): Promise<string | unknown>;
   put(key: string, value: string | ReadableStream | ArrayBuffer, options?: {
     expiration?: number;
     expirationTtl?: number;
@@ -249,8 +249,8 @@ async function handleImageOptimization(
  */
 async function handleStaticRequest(
   request: Request,
-  env: Env,
-  url: URL
+  _env: Env,
+  _url: URL
 ): Promise<Response> {
   // Forward to origin with caching
   const response = await fetch(request);
@@ -369,14 +369,14 @@ async function logAnalytics(
 ): Promise<void> {
   try {
     const url = new URL(request.url);
-    const data = {
+    const _data = {
       pathname: url.pathname,
       method: request.method,
       status: response.status,
       duration,
       cache: response.headers.get("X-Cache") || "unknown",
       timestamp: new Date().toISOString(),
-      cf: (request as any).cf || {},
+      cf: (request as unknown).cf || {},
     };
 
     env.ANALYTICS.writeDataPoint({

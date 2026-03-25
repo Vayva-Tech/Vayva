@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Treatment Recommendation AI Service
  * 
@@ -6,8 +5,7 @@
  * for healthcare practitioners
  */
 
-import { BaseAIService } from '@vayva/ai-agent';
-import type { TreatmentRecommendation } from '@vayva/ai-agent';
+import { BaseAIService, type TreatmentRecommendation } from '@vayva/ai-agent';
 
 export interface TreatmentRecommendationInput {
   /** Diagnosis or condition */
@@ -196,6 +194,15 @@ IMPORTANT: Consider drug-drug interactions, contraindications, and patient-speci
     }
   }
 
+  protected defaultOutput(input: TreatmentRecommendationInput): TreatmentRecommendation {
+    return {
+      condition: input.diagnosis,
+      treatments: [],
+      patientConsiderations: ['Configure a clinical AI provider for treatment suggestions'],
+      followUp: { timeframe: 'As clinically indicated', actions: ['Consult specialist'] },
+    };
+  }
+
   /**
    * Get first-line treatment recommendations
    */
@@ -243,7 +250,7 @@ IMPORTANT: Consider drug-drug interactions, contraindications, and patient-speci
 
     result.treatments.forEach(treatment => {
       if (treatment.name.toLowerCase() === proposedTreatment.toLowerCase()) {
-        contraindications.push(...treatment.contraindications);
+        contraindications.push(...(treatment.contraindications ?? []));
         
         // Look for alternatives in the same response
         result.treatments

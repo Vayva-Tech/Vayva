@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { prisma } from "@vayva/db";
 import { logger } from "../logger";
 
@@ -146,7 +145,9 @@ export class AiUsageService {
     const now = new Date();
     if (
       sub.status === "TRIAL_EXPIRED_GRACE" ||
-      (sub.planKey === "STARTER" && sub.trialExpiresAt < now)
+      (sub.planKey === "STARTER" &&
+        sub.trialExpiresAt != null &&
+        sub.trialExpiresAt < now)
     ) {
       return {
         allowed: false,
@@ -164,7 +165,8 @@ export class AiUsageService {
     const planLimit =
       sub.planKey === "STARTER" ? 20 : sub.plan.monthlyRequestLimit;
     const addonMessages = sub.addonPurchases.reduce(
-      (sum: number, addon) => sum + Number(addon.messagesAdded),
+      (sum, addon) =>
+        sum + Number((addon as { creditsAdded?: number }).creditsAdded ?? 0),
       0,
     );
     const totalLimit = planLimit + addonMessages;

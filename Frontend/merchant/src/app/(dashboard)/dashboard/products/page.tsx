@@ -1,9 +1,11 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState, useMemo } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 import {
   Search,
   Plus,
@@ -240,13 +242,13 @@ export default function ProductsPage() {
             <p className="text-sm text-gray-500 mt-1 max-w-sm">
               Something went wrong while fetching your products. Please try again.
             </p>
-            <button
+            <Button
               onClick={() => mutate()}
               className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 shadow-sm transition-colors"
             >
               <RefreshCw size={16} />
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -280,10 +282,10 @@ export default function ProductsPage() {
                 <Plus size={16} />
                 Add Product
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors">
+              <Button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors">
                 <Upload size={15} />
                 Import
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -293,29 +295,77 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen space-y-6 pb-10">
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/products/new"
+                  className="inline-flex items-center justify-between rounded-xl bg-green-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-600 transition-colors"
+                >
+                  <span>Add product</span>
+                  <Plus size={16} />
+                </Link>
+                <Link
+                  href="/dashboard/analytics"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Catalog analytics</span>
+                  <ArrowUpDown className="w-4 h-4 text-gray-400 rotate-90" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Active</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {activeProducts}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Out of stock</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {outOfStockProducts}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
       {/* ── Page Header ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Products</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {totalProducts} product{totalProducts !== 1 ? "s" : ""} in your catalog
-          </p>
-        </div>
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors">
-            <Upload size={15} />
-            Import
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors">
-            <Download size={15} />
-            Export
-          </button>
-          <Link href="/dashboard/products/new" className="inline-flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-600 transition-colors">
-            <Plus size={16} />
-            Add Product
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        title="Products"
+        subtitle={`${totalProducts} product${totalProducts !== 1 ? "s" : ""} in your catalog`}
+        actions={
+          <>
+            <Button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors">
+              <Upload size={15} />
+              Import
+            </Button>
+            <Button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors">
+              <Download size={15} />
+              Export
+            </Button>
+            <Link
+              href="/dashboard/products/new"
+              className="inline-flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-600 transition-colors"
+            >
+              <Plus size={16} />
+              Add Product
+            </Link>
+          </>
+        }
+      />
 
       {/* ── Summary Cards ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -353,7 +403,7 @@ export default function ProductsPage() {
       {/* ── View Toggle ─────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-          <button
+          <Button
             onClick={() => setViewMode("grid")}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               viewMode === "grid"
@@ -363,8 +413,8 @@ export default function ProductsPage() {
           >
             <LayoutGrid size={15} />
             Grid View
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setViewMode("list")}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               viewMode === "list"
@@ -374,7 +424,7 @@ export default function ProductsPage() {
           >
             <List size={15} />
             List View
-          </button>
+          </Button>
         </div>
         <p className="text-sm text-gray-500">
           Showing <span className="font-medium text-gray-700">{filtered.length}</span> products
@@ -466,15 +516,15 @@ export default function ProductsPage() {
                       isHovered ? "opacity-100" : "opacity-0"
                     }`}
                   >
-                    <button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Edit" aria-label={`Edit ${product.name}`}>
+                    <Button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Edit" aria-label={`Edit ${product.name}`}>
                       <Pencil size={16} />
-                    </button>
-                    <button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Duplicate" aria-label={`Duplicate ${product.name}`}>
+                    </Button>
+                    <Button className="p-2 rounded-xl bg-white/90 text-gray-700 hover:bg-white transition-colors" title="Duplicate" aria-label={`Duplicate ${product.name}`}>
                       <Copy size={16} />
-                    </button>
-                    <button className="p-2 rounded-xl bg-white/90 text-red-600 hover:bg-white transition-colors" title="Delete" aria-label={`Delete ${product.name}`}>
+                    </Button>
+                    <Button className="p-2 rounded-xl bg-white/90 text-red-600 hover:bg-white transition-colors" title="Delete" aria-label={`Delete ${product.name}`}>
                       <Trash2 size={16} />
-                    </button>
+                    </Button>
                   </div>
                   {/* Status Badge */}
                   <div className="absolute top-3 left-3">
@@ -508,8 +558,88 @@ export default function ProductsPage() {
 
       {/* ── Products List View ──────────────────────────────────────────── */}
       {viewMode === "list" && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="max-md:bg-transparent max-md:border-0 max-md:shadow-none md:bg-white md:rounded-2xl md:shadow-sm md:border md:border-gray-100 md:overflow-hidden">
+          <div className="md:hidden flex flex-col gap-3">
+            {paginated.map((product) => {
+              const sc = STATUS_CONFIG[product.status];
+              return (
+                <div
+                  key={product.id}
+                  className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`w-12 h-12 rounded-xl ${product.color} flex items-center justify-center shrink-0`}
+                    >
+                      <Package size={18} className="text-white/70" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-900 leading-snug">
+                        {product.name}
+                      </p>
+                      <p className="text-xs text-gray-400 font-mono mt-0.5">
+                        {product.sku}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${sc.bg} ${sc.text}`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+                          {sc.label}
+                        </span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+                          {product.category}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                    <div>
+                      <p className="text-xs text-gray-500">Price</p>
+                      <p className="text-base font-bold text-gray-900">
+                        {formatNaira(product.price)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">Stock</p>
+                      <p
+                        className={`text-sm font-semibold ${product.stock === 0 ? "text-red-500" : product.stock <= 5 ? "text-amber-500" : "text-gray-800"}`}
+                      >
+                        {product.stock === 0 ? "Out" : product.stock}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        type="button"
+                        className="min-w-[44px] min-h-[44px] rounded-xl text-gray-500 hover:bg-gray-100 flex items-center justify-center"
+                        title="Edit"
+                        aria-label={`Edit ${product.name}`}
+                      >
+                        <Pencil size={18} />
+                      </Button>
+                      <Button
+                        type="button"
+                        className="min-w-[44px] min-h-[44px] rounded-xl text-gray-500 hover:bg-gray-100 flex items-center justify-center"
+                        title="Duplicate"
+                        aria-label={`Duplicate ${product.name}`}
+                      >
+                        <Copy size={18} />
+                      </Button>
+                      <Button
+                        type="button"
+                        className="min-w-[44px] min-h-[44px] rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 flex items-center justify-center"
+                        title="Delete"
+                        aria-label={`Delete ${product.name}`}
+                      >
+                        <Trash2 size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-100">
@@ -570,15 +700,15 @@ export default function ProductsPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Edit">
+                          <Button className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="Edit">
                             <Pencil size={16} />
-                          </button>
-                          <button className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Duplicate">
+                          </Button>
+                          <Button className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Duplicate">
                             <Copy size={16} />
-                          </button>
-                          <button className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
+                          </Button>
+                          <Button className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
                             <Trash2 size={16} />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -622,14 +752,14 @@ export default function ProductsPage() {
               <span className="font-medium text-gray-700">{filtered.length}</span> products
             </p>
             <div className="flex items-center gap-1.5">
-              <button
+              <Button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={14} />
                 Prev
-              </button>
+              </Button>
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
                 .map((p, idx, arr) => {
@@ -639,7 +769,7 @@ export default function ProductsPage() {
                       {showEllipsis && (
                         <span className="px-1.5 text-gray-400 text-sm select-none">...</span>
                       )}
-                      <button
+                      <Button
                         onClick={() => setCurrentPage(p)}
                         className={`min-w-[32px] h-8 rounded-lg text-sm font-medium transition-colors ${
                           currentPage === p
@@ -648,22 +778,23 @@ export default function ProductsPage() {
                         }`}
                       >
                         {p}
-                      </button>
+                      </Button>
                     </span>
                   );
                 })}
-              <button
+              <Button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Next
                 <ChevronRight size={14} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
+      </PageWithInsights>
     </div>
   );
 }
@@ -702,3 +833,4 @@ function SummaryCard({
     </div>
   );
 }
+

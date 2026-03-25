@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -161,7 +162,7 @@ export function AudioAlertManager({ storeId, enabled = true }: AudioAlertManager
   }, []);
 
   return (
-    <button
+    <Button
       onClick={toggleMute}
       className={`p-2 rounded-lg transition-colors ${
         isMuted 
@@ -175,7 +176,7 @@ export function AudioAlertManager({ storeId, enabled = true }: AudioAlertManager
       ) : (
         <Volume2 className="h-5 w-5" />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -191,3 +192,4 @@ export function useAudioAlert() {
 
   return { triggerAlert };
 }
+

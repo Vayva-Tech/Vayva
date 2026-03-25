@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
@@ -85,7 +84,7 @@ export function SettingsShell({
   actions,
   children,
 }: SettingsShellProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <PageShell title={title} description={description} actions={actions}>

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import { useState, useEffect } from "react";
 import {
@@ -128,12 +129,12 @@ export function OnboardingTutorial() {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Close / Skip */}
-        <button
+        <Button
           onClick={handleSkip}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
         >
           <X className="w-5 h-5" />
-        </button>
+        </Button>
 
         {/* Icon header */}
         <div className={`${step.color} px-8 pt-10 pb-8 text-white`}>
@@ -169,30 +170,31 @@ export function OnboardingTutorial() {
 
           {/* Navigation */}
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={handleSkip}
               className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
             >
               Skip
-            </button>
+            </Button>
             {currentStep > 0 && (
-              <button
+              <Button
                 onClick={handlePrev}
                 className="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg flex items-center gap-1"
               >
                 <ChevronLeft className="w-4 h-4" /> Back
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={handleNext}
               className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg flex items-center gap-1 transition-colors"
             >
               {isLast ? "Get Started" : "Next"}
               {!isLast && <ChevronRight className="w-4 h-4" />}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
     </div>
   );
 }
+

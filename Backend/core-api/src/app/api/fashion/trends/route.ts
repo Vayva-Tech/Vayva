@@ -26,7 +26,7 @@ export const GET = withVayvaAPI(
       startDate.setDate(startDate.getDate() - days);
       
       // Build where clause for orders
-      const orderWhere: any = {
+      const _orderWhere: any = {
         storeId,
         createdAt: {
           gte: startDate,

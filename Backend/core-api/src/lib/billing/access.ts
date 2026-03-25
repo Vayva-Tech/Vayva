@@ -5,7 +5,7 @@
  * Uses credit system for metering usage.
  */
 
-import { prisma } from "@vayva/db";
+import { prisma, type SubscriptionPlan } from "@vayva/db";
 import { CreditManager } from "@/lib/credits/credit-manager";
 
 export async function checkFeatureAccess(
@@ -16,7 +16,6 @@ export async function checkFeatureAccess(
     where: { id: storeId },
     include: {
       aiSubscription: true,
-      creditAllocation: true,
     },
   });
   
@@ -24,7 +23,7 @@ export async function checkFeatureAccess(
     throw new Error("Store not found");
   }
   
-  const plan = (store.plan as string) || null;
+  const plan: SubscriptionPlan = store.plan;
   const creditManager = new CreditManager();
 
   // ============================================================================
@@ -41,38 +40,18 @@ export async function checkFeatureAccess(
   }
 
   // ============================================================================
-  // 2. NO ACTIVE SUBSCRIPTION CHECK
+  // 2. SUBSCRIPTION / TRIAL CHECK (platform schema)
   // ============================================================================
-  if (!plan && store.trialEndDate) {
-    if (new Date() > store.trialEndDate && !store.trialExpired) {
-      // Mark as expired
-      await prisma.store.update({
-        where: { id: storeId },
-        data: { trialExpired: true },
-      });
-
-      return {
-        allowed: false,
-        reason: "trial_expired",
-        message: "Your trial has expired. Please subscribe to continue.",
-      };
-    }
-
-    // If already expired
-    if (store.trialExpired) {
-      return {
-        allowed: false,
-        reason: "trial_expired",
-        message: "Your trial has ended. Subscribe to restore access.",
-      };
-    }
-  }
-
-  if (!plan) {
+  const billingSub = await prisma.subscription.findUnique({ where: { storeId } });
+  if (
+    billingSub?.trialEndsAt &&
+    billingSub.status === "TRIALING" &&
+    new Date() > billingSub.trialEndsAt
+  ) {
     return {
       allowed: false,
-      reason: "no_subscription",
-      message: "An active subscription is required. Please choose a plan.",
+      reason: "trial_expired",
+      message: "Your trial has expired. Please subscribe to continue.",
     };
   }
 
@@ -80,9 +59,9 @@ export async function checkFeatureAccess(
   // 3. FEATURE-SPECIFIC GATING
   // ============================================================================
 
-  // AUTOPILOT - PRO and PRO_PLUS
+  // AUTOPILOT - PRO
   if (feature === "autopilot" || feature === "autopilot_run") {
-    if (!["PRO", "PRO_PLUS"].includes(plan)) {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -91,9 +70,9 @@ export async function checkFeatureAccess(
     }
   }
 
-  // INDUSTRY DASHBOARDS - PRO and PRO_PLUS
+  // INDUSTRY DASHBOARDS - PRO
   if (feature === "industry_dashboards" || feature === "industry_specific_dashboard") {
-    if (!["PRO", "PRO_PLUS"].includes(plan)) {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -102,9 +81,9 @@ export async function checkFeatureAccess(
     }
   }
 
-  // MERGED INDUSTRY DASHBOARD - PRO_PLUS ONLY
+  // MERGED INDUSTRY DASHBOARD - PRO (PRO_PLUS removed from platform plans)
   if (feature === "merged_industry_dashboard") {
-    if (plan !== "PRO_PLUS") {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -113,9 +92,9 @@ export async function checkFeatureAccess(
     }
   }
 
-  // VISUAL WORKFLOW BUILDER - PRO_PLUS ONLY
+  // VISUAL WORKFLOW BUILDER - PRO (PRO_PLUS removed from platform plans)
   if (feature === "visual_workflow_builder") {
-    if (plan !== "PRO_PLUS") {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -124,9 +103,9 @@ export async function checkFeatureAccess(
     }
   }
 
-  // CUSTOM DOMAIN - PRO and PRO_PLUS
+  // CUSTOM DOMAIN - PRO
   if (feature === "custom_domain") {
-    if (!["PRO", "PRO_PLUS"].includes(plan)) {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -135,10 +114,10 @@ export async function checkFeatureAccess(
     }
   }
 
-  // DASHBOARD METRICS - Tiered widget limits (STARTER=6, PRO=10, PRO_PLUS=50)
+  // DASHBOARD METRICS - Tiered widget limits (STARTER=6, PRO=10)
   if (feature === "dashboard_metrics") {
-    const widgetLimits: Record<string, number> = { STARTER: 6, PRO: 10, PRO_PLUS: 50 };
-    const maxWidgets = widgetLimits[plan] || 6;
+    const widgetLimits: Record<SubscriptionPlan, number> = { FREE: 0, STARTER: 6, PRO: 10 };
+    const maxWidgets = widgetLimits[plan] ?? 0;
     return {
       allowed: true,
       reason: "widget_limit",
@@ -156,9 +135,9 @@ export async function checkFeatureAccess(
     // All subscribed plans (STARTER, PRO, PRO_PLUS) have access
   }
 
-  // PREDICTIVE INSIGHTS - PRO and PRO_PLUS
+  // PREDICTIVE INSIGHTS - PRO
   if (feature === "predictive_insights") {
-    if (!["PRO", "PRO_PLUS"].includes(plan)) {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -167,9 +146,9 @@ export async function checkFeatureAccess(
     }
   }
 
-  // CUSTOM LAYOUTS - PRO and PRO_PLUS
+  // CUSTOM LAYOUTS - PRO
   if (feature === "custom_layouts") {
-    if (!["PRO", "PRO_PLUS"].includes(plan)) {
+    if (plan !== "PRO") {
       return {
         allowed: false,
         reason: "plan_restriction",
@@ -180,9 +159,9 @@ export async function checkFeatureAccess(
 
   // TEMPLATE CHANGING - Tiered template limits
   if (feature === "template_change") {
+    const ownedCount = await prisma.templateProject.count({ where: { storeId } });
     if (plan === "STARTER") {
       // 1 template included, can buy extras at ₦5,000 each
-      const ownedCount = store.ownedTemplates?.length || 0;
       if (ownedCount >= 1) {
         return { allowed: true, reason: "requires_payment" };
       }
@@ -191,17 +170,7 @@ export async function checkFeatureAccess(
 
     if (plan === "PRO") {
       // Can own 2 templates free, pay for 3rd+
-      const ownedCount = store.ownedTemplates?.length || 0;
       if (ownedCount >= 2) {
-        return { allowed: true, reason: "requires_payment" };
-      }
-      return { allowed: true };
-    }
-
-    if (plan === "PRO_PLUS") {
-      // Can own 5 templates free, pay for 6th+
-      const ownedCount = store.ownedTemplates?.length || 0;
-      if (ownedCount >= 5) {
         return { allowed: true, reason: "requires_payment" };
       }
       return { allowed: true };
@@ -257,7 +226,7 @@ export async function checkFeatureAccess(
 /**
  * Count WhatsApp AI messages sent this month
  */
-async function getWhatsAppMessageCount(storeId: string) {
+async function _getWhatsAppMessageCount(storeId: string) {
   return prisma.notification.count({
     where: {
       storeId,

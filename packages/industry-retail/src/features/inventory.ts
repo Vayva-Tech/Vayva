@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Retail Inventory Management
 
 export interface InventoryAlertConfig {

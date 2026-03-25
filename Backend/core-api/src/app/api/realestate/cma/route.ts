@@ -48,7 +48,7 @@ export const POST = withVayvaAPI(
   async (request, { storeId, user }) => {
     try {
       const body = await request.json();
-      const { propertyId, config, notes } = body;
+      const { propertyId, _config, notes } = body;
 
       if (!propertyId) {
         return NextResponse.json(

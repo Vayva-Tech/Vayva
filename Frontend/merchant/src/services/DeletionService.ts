@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { prisma } from "@vayva/db";
+import { prisma, type PayoutStatus } from "@vayva/db";
 import { addDays, format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import { logger } from "@vayva/shared";
@@ -20,14 +19,14 @@ export class DeletionService {
             return { success: false, error: "Cannot delete account yet.", blockers };
         }
 
-        const store = await prisma.store?.findUnique({
+        const store = await prisma.store.findUnique({
             where: { id: storeId },
             select: { name: true }
         });
 
         const scheduledFor = addDays(new Date(), 7);
         const confirmationToken = uuidv4();
-        await prisma.accountDeletionRequest?.create({
+        await prisma.accountDeletionRequest.create({
             data: {
                 storeId,
                 requestedByUserId: userId,
@@ -38,7 +37,7 @@ export class DeletionService {
             },
         });
 
-        const user = await prisma.user?.findUnique({ where: { id: userId } });
+        const user = await prisma.user.findUnique({ where: { id: userId } });
         if (user?.email) {
             try {
                 await sendAccountDeletionScheduled(user.email, {
@@ -56,13 +55,13 @@ export class DeletionService {
     }
 
     static async cancelDeletion(storeId: string) {
-        const activeRequest = await prisma.accountDeletionRequest?.findFirst({
+        const activeRequest = await prisma.accountDeletionRequest.findFirst({
             where: { storeId, status: "SCHEDULED" },
         });
         if (!activeRequest) {
             return { success: false, error: "No active deletion request found." };
         }
-        await prisma.accountDeletionRequest?.update({
+        await prisma.accountDeletionRequest.update({
             where: { id: activeRequest.id },
             data: { status: "CANCELED" },
         });
@@ -70,32 +69,36 @@ export class DeletionService {
     }
 
     static async getStatus(storeId: string) {
-        return await prisma.accountDeletionRequest?.findFirst({
+        return await prisma.accountDeletionRequest.findFirst({
             where: { storeId, status: "SCHEDULED" },
             orderBy: { createdAt: "desc" },
         });
     }
 
     static async executeDeletion(requestId: string) {
-        const request = await prisma.accountDeletionRequest?.findUnique({
+        const request = await prisma.accountDeletionRequest.findUnique({
             where: { id: requestId },
             include: { store: true },
         });
-        if (!request || (request as any).status !== "SCHEDULED") return;
+        if (!request || request.status !== "SCHEDULED") return;
 
         await prisma.$transaction([
-            prisma.store?.update({
+            prisma.store.update({
                 where: { id: request.storeId },
                 data: { isLive: false },
             }),
-            prisma.accountDeletionRequest?.update({
+            prisma.accountDeletionRequest.update({
                 where: { id: request.id },
                 data: { status: "EXECUTED" },
             }),
         ]);
 
-        const owner = await prisma.user?.findFirst({
-            where: { memberships: { some: { storeId: request.storeId, role: "OWNER" as any } } }
+        const owner = await prisma.user.findFirst({
+            where: {
+                memberships: {
+                    some: { storeId: request.storeId, role_enum: "OWNER" },
+                },
+            },
         });
         if (owner?.email) {
             try {
@@ -114,19 +117,19 @@ export class DeletionService {
     static async invalidateStoreSessions(storeId: string) {
         try {
             const redis = getRedis();
-            const memberships = await prisma.membership?.findMany({
+            const memberships = await prisma.membership.findMany({
                 where: { storeId },
                 select: { userId: true }
             });
 
-            const userIds = memberships.map(m => m.userId) as any;
+            const userIds = memberships.map((m) => m.userId);
             const pipeline = redis.pipeline();
             for (const userId of userIds) {
                 pipeline.set(`session:invalidate:${userId}`, storeId, "EX", 86400);
             }
             await pipeline.exec();
 
-            await prisma.user?.updateMany({
+            await prisma.user.updateMany({
                 where: { id: { in: userIds } },
                 data: { sessionVersion: { increment: 1 } }
             });
@@ -139,8 +142,9 @@ export class DeletionService {
 
     static async checkBlockers(storeId: string) {
         const blockers: string[] = [];
-        const pendingPayouts = await prisma.payout?.count({
-            where: { storeId, status: { in: ["PENDING" as any, "PROCESSING" as any] } },
+        const pendingStatuses: PayoutStatus[] = ["PENDING"];
+        const pendingPayouts = await prisma.payout.count({
+            where: { storeId, status: { in: pendingStatuses } },
         });
         if (pendingPayouts > 0) blockers.push("You have pending payouts processing.");
         return blockers;

@@ -208,60 +208,93 @@ export class FoodService {
     };
   }
 
-  async checkInReservation(id: string): Promise<Reservation> {
-    const reservation = await prisma.reservation?.update({
-      where: { id },
+  async checkInReservation(storeId: string, id: string): Promise<Reservation> {
+    const updateResult = await prisma.reservation?.updateMany({
+      where: { id, storeId },
       data: { status: 'completed', arrivedAt: new Date() },
     });
 
-    // Update dining history
+    if (!updateResult || updateResult.count === 0) {
+      throw new Error('Reservation not found');
+    }
+
+    const reservation = await prisma.reservation?.findFirst({
+      where: { id, storeId },
+    });
+
+    if (!reservation) {
+      throw new Error('Reservation not found');
+    }
+
     await this.updateDiningHistory(reservation.storeId, reservation.customerId);
 
-    return {
-      id: reservation.id,
-      storeId: reservation.storeId,
-      customerId: reservation.customerId,
-      customerName: reservation.customerName,
-      customerPhone: reservation.customerPhone,
-      partySize: reservation.partySize,
-      date: reservation.date,
-      time: reservation.time,
-      tableId: reservation.tableId ?? undefined,
-      status: (reservation as any).status as ReservationStatus,
-      specialRequests: reservation.specialRequests ?? undefined,
-      dietaryRestrictions: reservation.dietaryRestrictions,
-      arrivedAt: reservation.arrivedAt ?? undefined,
-      noShow: reservation.noShow,
-      depositAmount: Number(reservation.depositAmount),
-      createdAt: reservation.createdAt,
-      updatedAt: reservation.updatedAt,
-    };
+    return this.mapReservationRow(reservation);
   }
 
-  async cancelReservation(id: string): Promise<Reservation> {
-    const reservation = await prisma.reservation?.update({
-      where: { id },
+  async cancelReservation(storeId: string, id: string): Promise<Reservation> {
+    const updateResult = await prisma.reservation?.updateMany({
+      where: { id, storeId },
       data: { status: 'cancelled', cancelledAt: new Date() },
     });
 
+    if (!updateResult || updateResult.count === 0) {
+      throw new Error('Reservation not found');
+    }
+
+    const reservation = await prisma.reservation?.findFirst({
+      where: { id, storeId },
+    });
+
+    if (!reservation) {
+      throw new Error('Reservation not found');
+    }
+
+    return this.mapReservationRow(reservation);
+  }
+
+  private mapReservationRow(r: Record<string, unknown>): Reservation {
+    const row = r as {
+      id: string;
+      storeId: string;
+      customerId: string;
+      customerName: string;
+      customerPhone: string;
+      partySize: number;
+      date: Date;
+      time: string;
+      tableId: string | null;
+      status: string;
+      specialRequests: string | null;
+      dietaryRestrictions: string[];
+      arrivedAt: Date | null;
+      completedAt: Date | null;
+      cancelledAt: Date | null;
+      noShow: boolean;
+      depositAmount: unknown;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+
     return {
-      id: reservation.id,
-      storeId: reservation.storeId,
-      customerId: reservation.customerId,
-      customerName: reservation.customerName,
-      customerPhone: reservation.customerPhone,
-      partySize: reservation.partySize,
-      date: reservation.date,
-      time: reservation.time,
-      tableId: reservation.tableId ?? undefined,
-      status: (reservation as any).status as ReservationStatus,
-      specialRequests: reservation.specialRequests ?? undefined,
-      dietaryRestrictions: reservation.dietaryRestrictions,
-      cancelledAt: reservation.cancelledAt ?? undefined,
-      noShow: reservation.noShow,
-      depositAmount: Number(reservation.depositAmount),
-      createdAt: reservation.createdAt,
-      updatedAt: reservation.updatedAt,
+      id: row.id,
+      storeId: row.storeId,
+      customerId: row.customerId,
+      customerName: row.customerName,
+      customerPhone: row.customerPhone,
+      partySize: row.partySize,
+      date: row.date,
+      time: row.time,
+      tableId: row.tableId ?? undefined,
+      status: row.status as ReservationStatus,
+      specialRequests: row.specialRequests ?? undefined,
+      dietaryRestrictions: row.dietaryRestrictions,
+      arrivedAt: row.arrivedAt ?? undefined,
+      completedAt: row.completedAt ?? undefined,
+      cancelledAt: row.cancelledAt ?? undefined,
+      noShow: row.noShow,
+      depositAmount: Number(row.depositAmount),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     };
   }
 

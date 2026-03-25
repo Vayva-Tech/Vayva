@@ -8,7 +8,7 @@
  * - Heart button on product cards
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const WISHLIST_ADDON: AddOnDefinition = {
   id: 'vayva.wishlist',
@@ -180,7 +180,7 @@ export const WISHLIST_ADDON: AddOnDefinition = {
   },
   
   highlights: [
-    'Save unlimited products',
+    'Save items to a wishlist',
     'Share wishlists via link',
     'Move items to cart',
     'Works without login',

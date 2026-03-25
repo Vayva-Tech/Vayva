@@ -1,14 +1,16 @@
-import { NextResponse } from "next/server";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export const runtime = "nodejs";
 
-export async function GET(req: Request) {
+/**
+ * Public-by-reference: Paystack return may land before cookies are readable.
+ * Trust model matches public checkout verify — backend validates `reference` / Paystack.
+ */
+export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const reference = searchParams.get("reference");
+    const reference = req.nextUrl.searchParams.get("reference");
     
     if (!reference) {
       return NextResponse.json({ error: "Reference required" }, { status: 400 });
@@ -20,10 +22,10 @@ export async function GET(req: Request) {
       message?: string;
       switch?: { id: string; status: string };
     }>(
-      `${process.env.BACKEND_API_URL}/api/billing/template-switch/verify?reference=${reference}`,
+      `${process.env.BACKEND_API_URL}/api/billing/template-switch/verify?reference=${encodeURIComponent(reference)}`,
       {
-        headers: {},
-      }
+        headers: { "Content-Type": "application/json" },
+      },
     );
     
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });

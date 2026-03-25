@@ -94,7 +94,7 @@ export const GET = withVayvaAPI(
 );
 
 // Generate sales report
-async function generateSalesReport(storeId: string, startDate: Date, endDate: Date) {
+async function _generateSalesReport(storeId: string, startDate: Date, endDate: Date) {
   const orders = await prisma.groceryOrder.findMany({
     where: {
       storeId,
@@ -154,7 +154,7 @@ async function generateSalesReport(storeId: string, startDate: Date, endDate: Da
 }
 
 // Generate inventory report
-async function generateInventoryReport(storeId: string, startDate: Date, endDate: Date) {
+async function _generateInventoryReport(storeId: string, startDate: Date, endDate: Date) {
   const products = await prisma.groceryProduct.findMany({
     where: { storeId },
     include: {
@@ -206,7 +206,7 @@ async function generateInventoryReport(storeId: string, startDate: Date, endDate
 }
 
 // Generate order report
-async function generateOrderReport(storeId: string, startDate: Date, endDate: Date) {
+async function _generateOrderReport(storeId: string, startDate: Date, endDate: Date) {
   const orders = await prisma.groceryOrder.findMany({
     where: {
       storeId,
@@ -264,7 +264,7 @@ async function generateOrderReport(storeId: string, startDate: Date, endDate: Da
 }
 
 // Generate customer report
-async function generateCustomerReport(storeId: string, startDate: Date, endDate: Date) {
+async function _generateCustomerReport(storeId: string, startDate: Date, endDate: Date) {
   const customers = await prisma.user.findMany({
     where: { storeId },
     include: {
@@ -312,7 +312,7 @@ async function generateCustomerReport(storeId: string, startDate: Date, endDate:
 }
 
 // Generate inventory recommendations
-function generateInventoryRecommendations(lowStock: any[], outOfStock: any[]): string[] {
+function _generateInventoryRecommendations(lowStock: any[], outOfStock: any[]): string[] {
   const recommendations: string[] = [];
   
   if (outOfStock.length > 0) {
@@ -330,7 +330,7 @@ function generateInventoryRecommendations(lowStock: any[], outOfStock: any[]): s
 }
 
 // Convert data to CSV format
-function convertToCSV(data: any): string {
+function _convertToCSV(data: any): string {
   if (!data.detailed) return "No detailed data available";
   
   const headers = Object.keys(data.detailed[0]);

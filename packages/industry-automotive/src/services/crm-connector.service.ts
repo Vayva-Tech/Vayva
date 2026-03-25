@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CRM Connector Service
  * Integrates with CRM systems for customer management and follow-ups
@@ -91,8 +90,8 @@ export class CRMConnectorService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[CRM_CONNECTOR] Initializing service...');
-    console.log('[CRM_CONNECTOR] Service initialized');
+    console.warn('[CRM_CONNECTOR] Initializing service...');
+    console.warn('[CRM_CONNECTOR] Service initialized');
   }
 
   /**

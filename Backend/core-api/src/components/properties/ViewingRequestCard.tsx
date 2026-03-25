@@ -8,7 +8,7 @@ import {
   User,
   Phone,
   Envelope as Mail,
-  Clock,
+  Clock
 } from "@phosphor-icons/react/ssr";
 import { logger } from "@vayva/shared";
 import React, { useState } from "react";

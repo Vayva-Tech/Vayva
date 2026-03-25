@@ -1,10 +1,13 @@
-// @ts-nocheck
-import { getServerSession } from 'next-auth';
-import { NextResponse } from 'next/server';
-import { authOptions } from '@/lib/auth';
-import { apiJson } from '@/lib/api-client-shared';
-import { handleApiError } from '@/lib/api-error-handler';
-import { z } from 'zod';
+import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "@/lib/auth";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
+import { handleApiError } from "@/lib/api-error-handler";
+import { fashionService } from "@/services/fashion.service";
+import { z } from "zod";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
 const measurementsSchema = z
   .object({
@@ -23,7 +26,7 @@ const sizePreferenceSchema = z
   .object({
     brand: z.string().min(1),
     size: z.string().min(1),
-    fits: z.enum(['too_small', 'tight', 'well', 'loose', 'too_big']),
+    fits: z.enum(["too_small", "tight", "well", "loose", "too_big"]),
   })
   .strict();
 
@@ -43,46 +46,48 @@ const updateSizeProfileSchema = z
   .strict();
 
 // GET /api/fashion/size-profile?customerId=xxx
-export async function GET(req: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const customerId = searchParams.get('customerId');
+    const { searchParams } = new URL(request.url);
+    const customerId = searchParams.get("customerId");
 
     if (!customerId) {
-      return NextResponse.json({ error: 'Missing customerId' }, { status: 400 });
+      return NextResponse.json({ error: "Missing customerId" }, { status: 400 });
     }
 
-    // Fetch size profile via backend API
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/fashion/size-profile?customerId=${customerId}`);
+    }>(
+      `${backendBase()}/api/fashion/size-profile?customerId=${encodeURIComponent(customerId)}`,
+      { headers: auth.headers }
+    );
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch size profile');
+      throw new Error(result.error || "Failed to fetch size profile");
     }
 
-    if (!result.data) {
-      return NextResponse.json({ error: 'Size profile not found' }, { status: 404 });
+    if (result.data == null) {
+      return NextResponse.json({ error: "Size profile not found" }, { status: 404 });
     }
 
     return NextResponse.json({ profile: result.data });
   } catch (error: unknown) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/fashion/size-profile',
-        operation: 'FETCH_SIZE_PROFILE',
-      }
-    );
+    handleApiError(error, {
+      endpoint: "/api/fashion/size-profile",
+      operation: "FETCH_SIZE_PROFILE",
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch size profile', message: error instanceof Error ? error.message : String(error) },
+      {
+        error: "Failed to fetch size profile",
+        message: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
@@ -92,21 +97,22 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const sessionStoreId = session?.user?.storeId;
+    if (!session?.user || !sessionStoreId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body: unknown = await req.json();
 
     const parsed = createSizeProfileSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid input', details: parsed.error.format() },
+        { error: "Invalid input", details: parsed.error.issues },
         { status: 400 }
       );
     }
 
-    const profile = await fashionService.createSizeProfile({
+    const profile = await fashionService.createSizeProfile(sessionStoreId, {
       customerId: parsed.data.customerId,
       measurements: parsed.data.measurements,
       sizePreferences: parsed.data.sizePreferences,
@@ -114,10 +120,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ profile }, { status: 201 });
   } catch (_error: unknown) {
-    return NextResponse.json(
-      { error: 'Failed to create size profile' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create size profile" }, { status: 500 });
   }
 }
 
@@ -125,34 +128,36 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const sessionStoreId = session?.user?.storeId;
+    if (!session?.user || !sessionStoreId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }
 
-    const body = await req.json();
+    const body: unknown = await req.json();
 
     const parsed = updateSizeProfileSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid input', details: parsed.error.format() },
+        { error: "Invalid input", details: parsed.error.issues },
         { status: 400 }
       );
     }
 
-    const profile = await fashionService.updateSizeProfile(id, parsed.data);
+    const profile = await fashionService.updateSizeProfile(
+      sessionStoreId,
+      id,
+      parsed.data
+    );
 
     return NextResponse.json({ profile });
   } catch (_error: unknown) {
-    return NextResponse.json(
-      { error: 'Failed to update size profile' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update size profile" }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { useSettings } from '../hooks/use-settings.js';
@@ -233,12 +234,12 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
               <label className="text-sm font-medium">Cross-Industry Benchmarking</label>
               <p className="text-xs text-gray-500">Compare your performance against anonymized industry peers</p>
             </div>
-            <button
+            <Button
               onClick={toggleBenchmarking}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${ai.dataSharing.enableBenchmarking ? 'bg-blue-600' : 'bg-gray-200'}`}
             >
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ai.dataSharing.enableBenchmarking ? 'translate-x-6' : 'translate-x-1'}`} />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -255,12 +256,12 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
               <label className="text-sm font-medium">Auto-Refresh</label>
               <p className="text-xs text-gray-500">Automatically update dashboard data</p>
             </div>
-            <button
+            <Button
               onClick={toggleAutoRefresh}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${dashboard.refreshInterval > 0 ? 'bg-green-600' : 'bg-gray-200'}`}
             >
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${dashboard.refreshInterval > 0 ? 'translate-x-6' : 'translate-x-1'}`} />
-            </button>
+            </Button>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Refresh Interval</label>
@@ -287,12 +288,12 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
               <label className="text-sm font-medium">Lock Layout</label>
               <p className="text-xs text-gray-500">Prevent accidental changes to widget positions</p>
             </div>
-            <button
+            <Button
               onClick={unlockLayout}
               className="px-4 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700"
             >
               Unlocked
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -318,12 +319,12 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-xl font-bold">Settings</h2>
-          <button
+          <Button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -335,7 +336,7 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
               { id: 'dashboard', label: 'Dashboard', icon: '📊' },
               { id: 'notifications', label: 'Notifications', icon: '🔔' },
             ].map((tab) => (
-              <button
+              <Button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
@@ -346,7 +347,7 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.label}
-              </button>
+              </Button>
             ))}
           </nav>
         </div>
@@ -367,22 +368,23 @@ export function SettingsPanel({ initialTab = 'business', onClose }: SettingsPane
             </span>
           )}
           <div className="flex space-x-3 ml-auto">
-            <button
+            <Button
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={saving}
               className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
     </div>
   );
 }
+

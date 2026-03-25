@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Menu Engineering AI Service
  * 
@@ -39,7 +38,7 @@ export interface MenuEngineeringInput {
   };
 }
 
-export class MenuEngineeringService extends BaseAIService<MenuEngineeringInput, {
+export type MenuEngineeringAIOutput = {
   itemClassification: Array<{
     itemId: string;
     name: string;
@@ -65,11 +64,13 @@ export class MenuEngineeringService extends BaseAIService<MenuEngineeringInput, 
     priority: 'high' | 'medium' | 'low';
   }>;
   optimalLayout: {
-    primePosition: string[]; // Item IDs for high-profit, high-popularity
-    secondaryPosition: string[]; // Items to promote
-    tertiaryPosition: string[]; // Lower priority items
+    primePosition: string[];
+    secondaryPosition: string[];
+    tertiaryPosition: string[];
   };
-}> {
+};
+
+export class AIMenuEngineeringService extends BaseAIService<MenuEngineeringInput, MenuEngineeringAIOutput> {
   constructor() {
     super({
       model: 'culinary-analyst',
@@ -77,6 +78,31 @@ export class MenuEngineeringService extends BaseAIService<MenuEngineeringInput, 
       requireHumanValidation: false, // Menu analysis is advisory
       confidenceThreshold: 0.75,
     });
+  }
+
+  async initialize(): Promise<void> {
+    // Hook for engine orchestration
+  }
+
+  protected defaultOutput(_input: MenuEngineeringInput): MenuEngineeringAIOutput {
+    return {
+      itemClassification: [],
+      menuAnalysis: {
+        averageContributionMargin: 0,
+        averageFoodCostPercent: 0,
+        totalSales: 0,
+        starCount: 0,
+        plowhorseCount: 0,
+        puzzleCount: 0,
+        dogCount: 0,
+      },
+      recommendations: [],
+      optimalLayout: {
+        primePosition: [],
+        secondaryPosition: [],
+        tertiaryPosition: [],
+      },
+    };
   }
 
   protected async buildPrompt(input: MenuEngineeringInput): Promise<string> {
@@ -147,7 +173,10 @@ Consider psychological pricing, visual hierarchy, and customer behavior patterns
     return prompt;
   }
 
-  protected async parseResponse(rawResponse: string, input: MenuEngineeringInput): Promise<any> {
+  protected async parseResponse(
+    rawResponse: string,
+    input: MenuEngineeringInput
+  ): Promise<MenuEngineeringAIOutput> {
     try {
       const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
@@ -168,22 +197,23 @@ Consider psychological pricing, visual hierarchy, and customer behavior patterns
       // Add validation rules
       this.addValidationRule({
         id: 'classifies_all_items',
-        validate: (data) => data.itemClassification.length === input.menuItems.length,
+        validate: (data: MenuEngineeringAIOutput) =>
+          data.itemClassification.length === input.menuItems.length,
         errorMessage: 'Not all menu items classified',
         isCritical: true,
       });
 
       this.addValidationRule({
         id: 'has_recommendations',
-        validate: (data) => data.recommendations.length > 0,
+        validate: (data: MenuEngineeringAIOutput) => data.recommendations.length > 0,
         errorMessage: 'No recommendations provided',
         isCritical: false,
       });
 
       this.addValidationRule({
         id: 'valid_categories',
-        validate: (data) => 
-          data.itemClassification.every(item => 
+        validate: (data: MenuEngineeringAIOutput) =>
+          data.itemClassification.every((item) =>
             ['star', 'plowhorse', 'puzzle', 'dog'].includes(item.category)
           ),
         errorMessage: 'Invalid menu engineering category',
@@ -199,7 +229,7 @@ Consider psychological pricing, visual hierarchy, and customer behavior patterns
           secondaryPosition: [],
           tertiaryPosition: [],
         },
-      };
+      } as MenuEngineeringAIOutput;
     } catch (error) {
       console.error('[MenuEngineering] Failed to parse response:', error);
       throw error;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Trust Accounting Feature Module
  */

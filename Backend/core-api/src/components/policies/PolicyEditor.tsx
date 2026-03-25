@@ -2,13 +2,15 @@
 
 import { logger } from "@vayva/shared";
 import React, { useState, useEffect } from "react";
-import { Button } from "@vayva/ui"; // Assuming these exist
-import { getLegalDocument } from "@vayva/content";
+import {
+  Button } from "@vayva/ui"; // Assuming these exist
+import { getLegalDocument
+} from "@vayva/content";
 import {
   Spinner as Loader2,
   FloppyDisk as Save,
   Globe,
-  ArrowCounterClockwise as RefreshCcw,
+  ArrowCounterClockwise as RefreshCcw
 } from "@phosphor-icons/react/ssr";
 
 import { buildLiveStorefrontUrl } from "@/lib/storefront/urls";

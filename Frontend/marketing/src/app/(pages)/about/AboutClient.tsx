@@ -11,6 +11,7 @@ import {
 import * as motion from "framer-motion/client";
 import { PremiumButton } from "@/components/marketing/PremiumButton";
 import { APP_URL } from "@/lib/constants";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 const VALUES = [
   {
@@ -41,10 +42,10 @@ const VALUES = [
 
 export function AboutClient(): React.JSX.Element {
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative w-full min-w-0 overflow-x-hidden">
       {/* Hero */}
       <section className="pt-20 pb-16 px-4 text-center bg-white">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -59,7 +60,7 @@ export function AboutClient(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-[1.1]"
+            className="text-4xl sm:text-5xl md:text-7xl font-bold mb-8 tracking-tight leading-[1.1] px-1"
           >
             Built for African
             <br />
@@ -71,11 +72,15 @@ export function AboutClient(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed"
+            className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed px-1"
           >
-            The all-in-one platform that gives every merchant the powerful
-            technology they deserve — designed from the ground up for how
-            African business actually works.
+            <span className="md:hidden">
+              Commerce tools built for how African businesses actually sell and scale.
+            </span>
+            <span className="hidden md:inline">
+              The all-in-one platform that gives every merchant the powerful technology they deserve —
+              designed from the ground up for how African business actually works.
+            </span>
           </motion.p>
         </div>
       </section>
@@ -158,7 +163,8 @@ export function AboutClient(): React.JSX.Element {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
+          <p className="text-center text-sm text-slate-500 sm:hidden mb-4">Swipe through our values.</p>
+          <div className="hidden sm:grid sm:grid-cols-2 gap-6">
             {VALUES.map((value, i) => (
               <motion.div
                 key={value.title}
@@ -180,20 +186,40 @@ export function AboutClient(): React.JSX.Element {
               </motion.div>
             ))}
           </div>
+          <div className="sm:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Company values"
+              hint="Swipe for each value"
+              showDots
+              dotCount={VALUES.length}
+            >
+              {VALUES.map((value) => (
+                <MarketingSnapItem key={value.title}>
+                  <div className="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm h-full">
+                    <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mb-5">
+                      <value.icon className="text-green-500" size={24} />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{value.title}</h3>
+                    <p className="text-slate-600 leading-relaxed text-sm">{value.description}</p>
+                  </div>
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
+          </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-24 px-4 text-center bg-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-50/50 via-transparent to-transparent opacity-50" />
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="relative rounded-2xl border border-slate-200 bg-white p-12 shadow-sm">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
               Ready to grow your business?
             </h2>
             <p className="text-slate-600 mb-10 text-lg max-w-xl mx-auto">
-              Join thousands of merchants across Africa who are building their
-              future with Vayva.
+              Join merchants across Africa who are building their future with
+              Vayva.
             </p>
             <Link href={`${APP_URL}/signup`}>
               <PremiumButton className="px-16 py-8 text-xl rounded-2xl">

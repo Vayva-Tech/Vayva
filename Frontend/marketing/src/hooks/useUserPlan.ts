@@ -42,7 +42,7 @@ export function useUserPlan(): UseUserPlanReturn {
             } else {
               setPlan("free");
             }
-          } catch (err) {
+          } catch {
             // Fallback to free tier on error
             setPlan("free");
           }

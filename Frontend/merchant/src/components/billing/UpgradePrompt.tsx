@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { Lock, Crown, ArrowRight, X } from 'lucide-react';
@@ -115,9 +115,9 @@ function BannerContent({
       </a>
 
       {onClose && (
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-gray-200 transition-colors">
+        <Button onClick={onClose} className="p-1 rounded-lg hover:bg-gray-200 transition-colors">
           <X className="w-4 h-4 text-gray-400" />
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -158,12 +158,12 @@ export function UpgradePrompt({
           onClick={onClose ?? (() => setIsOpen(false))}
         />
         <div className="relative z-10 w-full max-w-md mx-4">
-          <button
+          <Button
             onClick={onClose ?? (() => setIsOpen(false))}
             className="absolute -top-2 -right-2 p-1.5 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors z-20"
           >
             <X className="w-4 h-4 text-gray-500" />
-          </button>
+          </Button>
           <InlineContent
             currentPlan={currentPlan}
             requiredPlan={requiredPlan}
@@ -185,3 +185,4 @@ export function UpgradePrompt({
     />
   );
 }
+

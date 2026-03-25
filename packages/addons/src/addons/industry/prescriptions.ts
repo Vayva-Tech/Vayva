@@ -4,7 +4,7 @@
  * Digital prescription management and pharmacy integration
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PRESCRIPTIONS_ADDON: AddOnDefinition = {
   id: 'vayva.prescriptions',

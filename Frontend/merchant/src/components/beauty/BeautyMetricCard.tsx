@@ -1,7 +1,7 @@
-// @ts-nocheck
 "use client";
 
-import { Card, Badge, cn } from "@vayva/ui";
+import { Card, Badge, Icon, cn } from "@vayva/ui";
+import { SparklineChart } from "./SparklineChart";
 import { TrendChart } from "@vayva/industry-core";
 
 interface BeautyMetricCardProps {
@@ -33,7 +33,7 @@ export function BeautyMetricCard({
         <>
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500 text-sm font-medium">{title}</span>
-            <Badge variant="secondary" className="bg-white/5 text-white border-white/10">
+            <Badge variant="outline" className="bg-white/5 text-white border-white/10">
               <Icon name={icon} className="w-3 h-3" />
             </Badge>
           </div>

@@ -1,7 +1,7 @@
 import {
   PaystackTransactionInitialize,
   PaystackTransactionVerify,
-  PaystackAccountResolve,
+  PaystackAccountResolve
 } from "@/types/billing";
 import { Paystack } from "@vayva/payments";
 

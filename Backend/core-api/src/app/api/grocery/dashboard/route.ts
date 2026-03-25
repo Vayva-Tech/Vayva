@@ -22,7 +22,7 @@ export const GET = withVayvaAPI(
       const [
         salesMetrics,
         transactions,
-        departments,
+        _departments,
         stockAlerts,
         onlineOrders,
         customerMetrics,

@@ -1,4 +1,4 @@
-import { prisma, DispatchJobStatus } from "@vayva/db";
+import { prisma, DispatchJobStatus as _DispatchJobStatus } from "@vayva/db";
 import { getDeliveryProvider } from "./DeliveryProvider";
 // Helper to bypass strict typing issues with generated client temporarily
 const db = prisma;

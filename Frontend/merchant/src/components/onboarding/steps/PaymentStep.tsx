@@ -194,7 +194,7 @@ export default function PaymentStep() {
                 className="h-12 rounded-xl border-gray-100 focus:border-vayva-green focus:ring-vayva-green/20 pr-10"
               />
               {selectedBankCode && (
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setSelectedBankCode("");
@@ -205,7 +205,7 @@ export default function PaymentStep() {
                   aria-label="Clear bank selection"
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </Button>
               )}
               {!selectedBankCode && (
                 <CaretDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />

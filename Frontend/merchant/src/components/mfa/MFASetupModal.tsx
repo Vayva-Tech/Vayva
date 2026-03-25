@@ -124,12 +124,12 @@ export function MFASetupModal({ isOpen, onClose, onEnabled }: MFASetupModalProps
               {step === "setup" && "Scan QR Code"}
               {step === "verify" && "MFA Enabled!"}
             </h2>
-            <button
+            <Button
               onClick={handleClose}
               className="text-gray-400 hover:text-gray-900 transition-colors"
             >
               <Icon name="X" size={20} />
-            </button>
+            </Button>
           </div>
 
           {/* Content */}

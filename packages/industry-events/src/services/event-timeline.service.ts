@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Timeline Service
  * Manages event schedules, milestones, and day-of timelines
@@ -65,9 +64,9 @@ export class EventTimelineService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[EVENT_TIMELINE] Initializing service...');
+    console.warn('[EVENT_TIMELINE] Initializing service...');
     this.initializeSampleData();
-    console.log('[EVENT_TIMELINE] Service initialized');
+    console.warn('[EVENT_TIMELINE] Service initialized');
   }
 
   private initializeSampleData(): void {

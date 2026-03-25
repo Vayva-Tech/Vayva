@@ -2,13 +2,18 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "outDir": "dist",
+        "rootDir": "src",
         "paths": {
-            "@vayva/redis": ["packages/infra/redis-adapter/src/index.ts"],
-            "bullmq": ["node_modules/.pnpm/bullmq@5.69.3/node_modules/bullmq"],
-            "bullmq/*": ["node_modules/.pnpm/bullmq@5.69.3/node_modules/bullmq/*"]
+            "bullmq": ["packages/shared/utils/node_modules/bullmq"],
+            "bullmq/*": ["packages/shared/utils/node_modules/bullmq/*"],
+            "ioredis": ["packages/shared/utils/node_modules/ioredis"],
+            "ioredis/*": ["packages/shared/utils/node_modules/ioredis/*"]
         }
     },
-    "include": [
-        "src"
+    "include": ["src"],
+    "exclude": [
+        "node_modules",
+        "src/__tests__",
+        "src/logger-unified.ts"
     ]
 }

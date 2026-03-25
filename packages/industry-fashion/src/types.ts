@@ -1,16 +1,6 @@
-// @ts-nocheck
 export type IndustrySlug = 'fashion' | 'restaurant' | 'realestate' | 'healthcare' | 'electronics' | 'beauty' | 'events' | 'b2b' | 'grocery' | 'retail';
 
 export const FASHION_INDUSTRY: IndustrySlug = 'fashion';
-
-export interface DashboardEngineConfig {
-  industry: IndustrySlug;
-  widgets: WidgetDefinition[];
-  layouts: LayoutPreset[];
-  kpiCards: KPICardDefinition[];
-  alertRules: AlertRule[];
-  actions: QuickAction[];
-}
 
 export interface WidgetDefinition {
   id: string;

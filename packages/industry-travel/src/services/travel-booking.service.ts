@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Travel Booking Service
  * Manages travel reservations, itineraries, and booking workflows
@@ -64,9 +63,9 @@ export class TravelBookingService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[TRAVEL_BOOKING] Initializing service...');
+    console.warn('[TRAVEL_BOOKING] Initializing service...');
     this.initializeSampleData();
-    console.log('[TRAVEL_BOOKING] Service initialized');
+    console.warn('[TRAVEL_BOOKING] Service initialized');
   }
 
   private initializeSampleData(): void {
@@ -135,10 +134,18 @@ export class TravelBookingService {
   }
 
   createItinerary(itineraryData: Partial<Itinerary>): Itinerary {
+    const startDate = itineraryData.startDate ?? new Date();
+    const endDate = itineraryData.endDate ?? startDate;
     const itinerary: Itinerary = {
       ...itineraryData,
       id: itineraryData.id || `itin_${Date.now()}`,
+      customerId: itineraryData.customerId ?? 'unknown',
+      destination: itineraryData.destination ?? '',
+      title: itineraryData.title ?? 'Untitled',
+      startDate,
+      endDate,
       bookings: itineraryData.bookings || [],
+      notes: itineraryData.notes,
     };
 
     this.itineraries.set(itinerary.id, itinerary);

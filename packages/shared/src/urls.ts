@@ -7,13 +7,13 @@ function must(name: string) {
     }
     
     switch (name) {
-      case "MARKETING_ORIGIN": return "https://vayva.ng";
+      case "MARKETING_ORIGIN": return "https://www.vayva.ng";
       case "MERCHANT_ORIGIN": return "https://merchant.vayva.ng";
       case "OPS_ORIGIN": return "https://ops.vayva.ng";
       case "STOREFRONT_ROOT_DOMAIN": return "vayva.ng";
       case "API_ORIGIN": return "https://api.vayva.ng";
       case "PAYMENTS_ORIGIN": return "https://payments.vayva.ng";
-      case "PUBLIC_ASSETS_BASE_URL": return "https://vayva.ng";
+      case "PUBLIC_ASSETS_BASE_URL": return "https://www.vayva.ng";
       // Legacy fallbacks
       case "MARKETING_BASE_URL": return "https://vayva.ng";
       case "MERCHANT_BASE_URL": return "https://merchant.vayva.ng";
@@ -41,7 +41,6 @@ export const urls = {
   paymentsBase: () => process.env.PAYMENTS_ORIGIN || must("PAYMENTS_ORIGIN"),
 
   // External Service Base URLs
-  youverifyBase: () => process.env.YOUVERIFY_BASE_URL || "https://api.youverify.co",
   webstudioBase: () => process.env.WEBSTUDIO_BASE_URL || "https://apps.webstudio.is",
   resendBase: () => "https://api.resend.com",
   metaBase: () => "https://graph.facebook.com/v17.0",

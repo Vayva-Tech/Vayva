@@ -1,11 +1,15 @@
 import { Metadata } from "next";
-import { headers } from "next/headers";
+import { urls } from "@vayva/shared";
 
 /**
  * SEO Utilities for Marketing Site
- * 
+ *
  * Provides dynamic meta tags, structured data, and sitemap generation
  */
+
+function marketingSiteOrigin(): string {
+  return urls.marketingBase();
+}
 
 interface SEOMetadata {
   title: string;
@@ -29,6 +33,7 @@ export function generateSEOMetadata({
 }: SEOMetadata): Metadata {
   const baseTitle = "Vayva - E-commerce Platform for Nigerian Merchants";
   const fullTitle = title === baseTitle ? title : `${title} | Vayva`;
+  const origin = marketingSiteOrigin();
 
   return {
     title: fullTitle,
@@ -46,7 +51,7 @@ export function generateSEOMetadata({
       description,
       type: "website",
       locale: "en_NG",
-      url: canonical || "https://vayva.ng",
+      url: canonical || origin,
       siteName: "Vayva",
       images: [
         {
@@ -164,7 +169,7 @@ export function generateLocalBusinessSchema(merchant: {
  * Generate JSON-LD for breadcrumb navigation
  */
 export function generateBreadcrumbSchema(
-  items: { name: string; url: string }[]
+  items: { name: string; url: string }[],
 ): string {
   const schema = {
     "@context": "https://schema.org",
@@ -185,7 +190,7 @@ export function generateBreadcrumbSchema(
  * Call this from /app/sitemap.ts or /app/sitemap.xml/route.ts
  */
 export async function generateSitemap(): Promise<string> {
-  const baseUrl = "https://vayva.ng";
+  const baseUrl = marketingSiteOrigin();
   const currentDate = new Date().toISOString();
 
   // Static routes
@@ -198,20 +203,20 @@ export async function generateSitemap(): Promise<string> {
   ];
 
   // Generate XML
-  const urls = staticRoutes
+  const urlEntries = staticRoutes
     .map(
       (route) => `  <url>
     <loc>${baseUrl}${route.url}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>${route.changefreq}</changefreq>
     <priority>${route.priority}</priority>
-  </url>`
+  </url>`,
     )
     .join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls}
+${urlEntries}
 </urlset>`;
 }
 
@@ -219,11 +224,12 @@ ${urls}
  * Generate robots.txt content
  */
 export function generateRobotsTxt(): string {
+  const sitemapUrl = `${marketingSiteOrigin()}/sitemap.xml`;
   return `User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://vayva.ng/sitemap.xml
+Sitemap: ${sitemapUrl}
 
 # Crawl rate
 Crawl-delay: 10
@@ -242,7 +248,7 @@ Disallow: /static/
  */
 export function trackPageView(
   page: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): void {
   if (typeof window === "undefined") return;
 
@@ -271,7 +277,7 @@ export function trackPageView(
  */
 export function trackEvent(
   event: string,
-  properties?: Record<string, unknown>
+  properties?: Record<string, unknown>,
 ): void {
   if (typeof window === "undefined") return;
 

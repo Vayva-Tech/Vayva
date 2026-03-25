@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
+import useSWR from "swr";
 import {
   Card,
   CardContent,
@@ -9,9 +11,10 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button, EmptyState } from "@vayva/ui";
-import { Wallet, House as Building2, Copy } from "@phosphor-icons/react/ssr";
+import { Wallet } from "@phosphor-icons/react/ssr";
 import WalletGuard from "@/components/wallet/WalletGuard";
 import { WithdrawFundsTrigger } from "@/components/wallet/WithdrawFundsTrigger";
+import { AccountCard } from "@/components/finance/AccountCard";
 
 interface WalletClientProps {
   balance: number;
@@ -24,7 +27,33 @@ interface WalletClientProps {
   } | null;
 }
 
+type ActivityItem = {
+  id: string;
+  kind: "CHARGE" | "WITHDRAWAL" | "REFUND" | "AFFILIATE_PAYOUT";
+  reference: string;
+  amount: number;
+  currency: string;
+  status: string;
+  date: string;
+  direction: "in" | "out";
+  counterparty?: string;
+};
+
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json();
+  });
+
 export function WalletClient({ balance, pending, wallet }: WalletClientProps) {
+  const router = useRouter();
+  const { data: activityData, isLoading: activityLoading } = useSWR<{ data: ActivityItem[] }>(
+    "/api/finance/activity?limit=10",
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 },
+  );
+  const activity = Array.isArray(activityData?.data) ? activityData?.data : [];
+
   // Format currency
   const formatter = new Intl.NumberFormat("en-NG", {
     style: "currency",
@@ -45,7 +74,9 @@ export function WalletClient({ balance, pending, wallet }: WalletClientProps) {
             Wallet & Payouts
           </h2>
           <div className="flex items-center space-x-2">
-            <Button variant="outline">History</Button>
+            <Button variant="outline" onClick={() => router.push("/dashboard/finance/transactions")}>
+              History
+            </Button>
             <WithdrawFundsTrigger />
           </div>
         </div>
@@ -68,57 +99,90 @@ export function WalletClient({ balance, pending, wallet }: WalletClientProps) {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Virtual Account
-              </CardTitle>
-              <Building2 className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              {wallet && wallet.vaStatus === "CREATED" ? (
-                <div className="space-y-1">
-                  <div className="text-xl font-bold flex items-center gap-2">
-                    {wallet.vaAccountNumber}
-                    <Copy className="h-3 w-3 cursor-pointer text-gray-500" />
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    {wallet.vaBankName} • {wallet.vaAccountName}
-                  </p>
-                  <p className="text-xs text-green-600 mt-2 bg-green-500/10 p-1 rounded inline-block">
-                    Send money here to fund wallet
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm text-gray-500">
-                    No active account. Complete KYC.
-                  </span>
-                  <Button size="sm" variant="secondary">
-                    Setup Account
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <AccountCard
+            title="Dedicated virtual account"
+            badge={wallet && (wallet.vaStatus === "CREATED" || wallet.vaStatus === "ACTIVE") ? "Active" : "Not created"}
+            subtitle="Use this account to fund your wallet"
+            primaryValue={wallet?.vaAccountNumber || "—"}
+            secondaryValue={
+              wallet && (wallet.vaStatus === "CREATED" || wallet.vaStatus === "ACTIVE")
+                ? `${wallet.vaBankName} • ${wallet.vaAccountName}`
+                : "Complete KYC to create a dedicated account."
+            }
+            lines={wallet && (wallet.vaStatus === "CREATED" || wallet.vaStatus === "ACTIVE") ? ["Send money here to fund your wallet"] : []}
+            copyItems={
+              wallet && (wallet.vaStatus === "CREATED" || wallet.vaStatus === "ACTIVE")
+                ? [
+                    { label: "Copy account number", value: wallet.vaAccountNumber },
+                    { label: "Copy account name", value: wallet.vaAccountName },
+                    { label: "Copy bank name", value: wallet.vaBankName },
+                  ]
+                : []
+            }
+            primaryAction={{
+              label: wallet && (wallet.vaStatus === "CREATED" || wallet.vaStatus === "ACTIVE") ? "Accounts" : "Complete KYC",
+              onClick: () =>
+                router.push(
+                  wallet && (wallet.vaStatus === "CREATED" || wallet.vaStatus === "ACTIVE")
+                    ? "/dashboard/finance/accounts"
+                    : "/dashboard/settings/kyc",
+                ),
+            }}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-1">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
-              <CardDescription>
-                Your recent inflows and payouts.
-              </CardDescription>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <CardTitle>Recent activity</CardTitle>
+                  <CardDescription>Your recent inflows and outflows.</CardDescription>
+                </div>
+                <Button variant="outline" onClick={() => router.push("/dashboard/finance/activity")}>
+                  View all
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              {/* Standardized Empty State */}
-              <EmptyState
-                title="No recent transactions"
-                icon="AlertCircle"
-                description="Your recent inflows and payouts will appear here."
-                // No action needed for history
-              />
+              {activityLoading ? (
+                <div className="py-8 text-sm text-gray-500">Loading…</div>
+              ) : activity.length === 0 ? (
+                <EmptyState
+                  title="No activity yet"
+                  icon="AlertCircle"
+                  description="Your inflows and withdrawals will appear here."
+                />
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {activity.map((it) => (
+                    <div key={`${it.kind}-${it.id}`} className="py-3 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-gray-900 truncate">
+                          {it.kind === "CHARGE"
+                            ? "Incoming payment"
+                            : it.kind === "WITHDRAWAL"
+                              ? "Withdrawal"
+                              : it.kind === "REFUND"
+                                ? "Refund"
+                                : "Affiliate payout"}
+                        </div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {new Date(it.date).toLocaleString("en-NG")}
+                          {it.counterparty ? ` • ${it.counterparty}` : ""}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-sm font-bold ${it.direction === "in" ? "text-green-700" : "text-gray-900"}`}>
+                          {it.direction === "in" ? "+" : "-"}
+                          ₦{Number(it.amount || 0).toLocaleString("en-NG")}
+                        </div>
+                        <div className="text-[11px] text-gray-500">{(it.status || "").replace(/_/g, " ")}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

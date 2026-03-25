@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wellness Industry Engine
  * Main orchestrator for all wellness-specific features

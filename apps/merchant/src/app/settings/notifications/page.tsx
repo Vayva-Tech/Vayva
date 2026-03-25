@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState, useEffect } from 'react';
 import { GlassPanel } from '@vayva/ui/components/fashion';
@@ -113,7 +114,7 @@ const NotificationSettingsPage = () => {
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 p-1 rounded-lg w-fit">
           {tabs.map(tab => (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={cn(
@@ -125,7 +126,7 @@ const NotificationSettingsPage = () => {
             >
               <span>{tab.icon}</span>
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -306,7 +307,7 @@ const NotificationSettingsPage = () => {
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['event', 'threshold', 'schedule'] as const).map(type => (
-                        <button
+                        <Button
                           key={type}
                           onClick={() => setNewRule({...newRule, triggerType: type})}
                           className={cn(
@@ -317,7 +318,7 @@ const NotificationSettingsPage = () => {
                           )}
                         >
                           {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>

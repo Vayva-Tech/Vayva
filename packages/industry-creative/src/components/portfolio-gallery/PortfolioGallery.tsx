@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 
@@ -48,12 +48,12 @@ export function PortfolioGallery({ businessId, onViewItem, onUploadItem }: Portf
     <div className="portfolio-gallery max-w-7xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Portfolio Gallery</h2>
-        <button
+        <Button
           onClick={onUploadItem}
           className="px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
         >
           + Upload Work
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -84,3 +84,4 @@ export function PortfolioGallery({ businessId, onViewItem, onUploadItem }: Portf
     </div>
   );
 }
+

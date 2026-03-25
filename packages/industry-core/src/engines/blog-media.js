@@ -10,7 +10,7 @@ class BlogMediaEngine {
   }
   
   async initialize() {
-    console.log('[BLOG_MEDIA_ENGINE] Initialized');
+    console.warn('[BLOG_MEDIA_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

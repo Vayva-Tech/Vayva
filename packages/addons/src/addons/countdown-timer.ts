@@ -4,7 +4,7 @@
  * Urgency-building countdown for sales and events
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const COUNTDOWN_TIMER_ADDON: AddOnDefinition = {
   id: 'vayva.countdown-timer',

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Inventory Allocator Service
  * Manages inventory allocation for wholesale orders

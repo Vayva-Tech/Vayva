@@ -1,0 +1,39 @@
+{
+  "extends": "../tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": "../..",
+    "paths": {
+      "@vayva/db": ["infra/db/src/client.ts"],
+      "@vayva/industry-core": ["packages/industry-core/src/index.ts"],
+      "@vayva/industry-fashion/*": ["packages/industry-fashion/src/*"],
+      "@/components/*": [
+        "Frontend/merchant/src/components/*",
+        "Frontend/ops-console/src/components/*"
+      ],
+      "@/lib/*": [
+        "Frontend/merchant/src/lib/*",
+        "Frontend/marketing/src/lib/*"
+      ],
+      "@/hooks/*": [
+        "Frontend/merchant/src/hooks/*",
+        "Frontend/ops-console/src/hooks/*"
+      ],
+      "@/context/*": [
+        "Frontend/merchant/src/context/*",
+        "Frontend/marketing/src/context/*"
+      ],
+      "@/config/*": ["Frontend/merchant/src/config/*"],
+      "@/services/*": [
+        "Frontend/merchant/src/services/*",
+        "Frontend/storefront/src/services/*"
+      ],
+      "@/types/*": ["Frontend/merchant/src/types/*"],
+      "@/utils/*": ["Frontend/merchant/src/utils/*"],
+      "@/components/ui/*": ["Frontend/merchant/src/components/ui/*"],
+      "@/components/vayva-ui/*": ["Frontend/merchant/src/components/vayva-ui/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "@vayva/ui";
+import { cn, Button } from "@vayva/ui";
 import { Funnel, X } from "@phosphor-icons/react/ssr";
 
 interface FilterOption {
@@ -40,13 +40,13 @@ export function OpsFilters({
         <Funnel className="w-4 h-4" />
         Filters
         {hasActiveFilters && (
-          <button
+          <Button
             onClick={onReset}
             className="ml-auto text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
           >
             <X className="w-3 h-3" />
             Clear all
-          </button>
+          </Button>
         )}
       </div>
 

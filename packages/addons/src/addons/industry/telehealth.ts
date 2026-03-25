@@ -4,7 +4,7 @@
  * Video consultations and virtual appointments
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const TELEHEALTH_ADDON: AddOnDefinition = {
   id: 'vayva.telehealth',

@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -7,17 +7,20 @@ import { handleApiError } from "@/lib/api-error-handler";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-
+    if (!id) {
+      return NextResponse.json({ error: "Customer id required" }, { status: 400 });
+    }
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Call backend API to fetch customer
     const result = await apiJson<{
       success: boolean;
       data?: { id: string; firstName: string; lastName: string; email?: string; phone?: string };
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/customers/${id}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
     });
     
     return NextResponse.json(result);
@@ -37,19 +40,22 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = await request.json();
-    
+    if (!id) {
+      return NextResponse.json({ error: "Customer id required" }, { status: 400 });
+    }
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body: unknown = await request.json();
+
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/customers/${id}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-store-id': storeId,
-      },
+      headers: auth.headers,
       body: JSON.stringify(body),
     });
     
@@ -70,16 +76,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-
+    if (!id) {
+      return NextResponse.json({ error: "Customer id required" }, { status: 400 });
+    }
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const result = await apiJson<{
       success: boolean;
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/customers/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'x-store-id': storeId,
-      },
+      method: "DELETE",
+      headers: auth.headers,
     });
     
     return NextResponse.json(result);

@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { GlassPanel } from '@vayva/ui/components/fashion';
@@ -101,7 +102,7 @@ const InventorySettingsPage = () => {
                   className="flex items-center justify-between p-3 bg-white/3 rounded-lg border border-white/8"
                 >
                   <span className="text-sm text-white">{email}</span>
-                  <button className="text-xs text-rose-400 hover:text-rose-300">Remove</button>
+                  <Button className="text-xs text-rose-400 hover:text-rose-300">Remove</Button>
                 </div>
               ))}
             </div>
@@ -121,3 +122,4 @@ const InventorySettingsPage = () => {
 };
 
 export default InventorySettingsPage;
+

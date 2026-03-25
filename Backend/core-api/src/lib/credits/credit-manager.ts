@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@vayva/db";
+import { readStarterFirstMonthFreeEnabled } from "@/lib/feature-flags/read-starter-first-month-free";
 
 export interface CreditCheckResult {
   allowed: boolean;
@@ -49,32 +50,29 @@ export class CreditManager {
    * Check if store has enough credits for an action
    */
   async checkCredits(storeId: string, cost: number): Promise<CreditCheckResult> {
-    const allocation = await prisma.creditAllocation.findUnique({
+    const sub = await prisma.merchantAiSubscription.findUnique({
       where: { storeId },
+      include: { plan: true },
     });
 
-    if (!allocation) {
-      return { 
-        allowed: false, 
-        remaining: 0, 
-        reason: 'no_allocation',
-        message: 'Credit allocation not found. Please contact support.'
+    if (!sub) {
+      return {
+        allowed: false,
+        remaining: 0,
+        reason: "no_subscription",
+        message: "AI subscription not found for store.",
       };
     }
 
-    const remaining = allocation.monthlyCredits - allocation.usedCredits;
-    
+    const remaining = sub.plan.monthlyRequestLimit - sub.monthRequestsUsed;
     if (remaining >= cost) {
-      return { 
-        allowed: true, 
-        remaining: remaining - cost 
-      };
+      return { allowed: true, remaining: remaining - cost };
     }
 
     return {
       allowed: false,
       remaining,
-      reason: 'insufficient_credits',
+      reason: "insufficient_credits",
       message: `You need ${cost} credits but have only ${remaining} remaining this month.`,
     };
   }
@@ -98,23 +96,13 @@ export class CreditManager {
       };
     }
 
-    // Update allocation
-    await prisma.creditAllocation.update({
-      where: { storeId },
-      data: { 
-        usedCredits: { increment: cost },
-        updatedAt: new Date()
-      },
-    });
+    void feature;
+    void description;
 
-    // Log usage
-    await prisma.creditUsageLog.create({
-      data: {
-        storeId,
-        amount: cost,
-        feature,
-        description,
-      },
+    // Update AI subscription usage counters
+    await prisma.merchantAiSubscription.update({
+      where: { storeId },
+      data: { monthRequestsUsed: { increment: cost } },
     });
 
     return { 
@@ -131,59 +119,29 @@ export class CreditManager {
     plan: string,
     resetDate?: Date
   ): Promise<void> {
-    const monthlyCredits = this.getMonthlyCreditsForPlan(plan);
-    const nextReset = resetDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // +30 days
-
-    const existing = await prisma.creditAllocation.findUnique({
-      where: { storeId },
-    });
-
-    if (existing) {
-      await prisma.creditAllocation.update({
-        where: { storeId },
-        data: {
-          plan: plan.toUpperCase(),
-          monthlyCredits,
-          usedCredits: 0,
-          resetDate: nextReset,
-        },
-      });
-    } else {
-      await prisma.creditAllocation.create({
-        data: {
-          storeId,
-          plan: plan.toUpperCase(),
-          monthlyCredits,
-          usedCredits: 0,
-          resetDate: nextReset,
-        },
-      });
-    }
+    void resetDate;
+    // Credits are derived from `merchantAiSubscription.plan` + usage counters.
+    // Allocation initialization is handled when provisioning/upgrading AI subscription.
+    void storeId;
+    void plan;
   }
 
   /**
    * Reset credits on monthly renewal
    */
   async resetMonthlyCredits(storeId: string): Promise<number> {
-    const allocation = await prisma.creditAllocation.findUnique({
+    const sub = await prisma.merchantAiSubscription.findUnique({
       where: { storeId },
+      include: { plan: true },
+    });
+    if (!sub) return 0;
+
+    await prisma.merchantAiSubscription.update({
+      where: { storeId },
+      data: { monthRequestsUsed: 0 },
     });
 
-    if (!allocation) {
-      return 0;
-    }
-
-    const newResetDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // +30 days
-    
-    await prisma.creditAllocation.update({
-      where: { storeId },
-      data: {
-        usedCredits: 0,
-        resetDate: newResetDate,
-      },
-    });
-
-    return allocation.monthlyCredits;
+    return sub.plan.monthlyRequestLimit;
   }
 
   /**
@@ -196,22 +154,19 @@ export class CreditManager {
     resetDate: Date | null;
     plan: string;
   } | null> {
-    const allocation = await prisma.creditAllocation.findUnique({
+    const sub = await prisma.merchantAiSubscription.findUnique({
       where: { storeId },
+      include: { plan: true },
     });
+    if (!sub) return null;
 
-    if (!allocation) {
-      return null;
-    }
-
-    const remaining = allocation.monthlyCredits - allocation.usedCredits;
-
+    const remaining = sub.plan.monthlyRequestLimit - sub.monthRequestsUsed;
     return {
-      monthlyCredits: allocation.monthlyCredits,
-      usedCredits: allocation.usedCredits,
+      monthlyCredits: sub.plan.monthlyRequestLimit,
+      usedCredits: sub.monthRequestsUsed,
       remainingCredits: remaining,
-      resetDate: allocation.resetDate,
-      plan: allocation.plan,
+      resetDate: null,
+      plan: sub.planKey,
     };
   }
 
@@ -228,94 +183,50 @@ export class CreditManager {
     description: string;
     createdAt: Date;
   }>> {
-    const logs = await prisma.creditUsageLog.findMany({
-      where: { storeId },
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      select: {
-        id: true,
-        amount: true,
-        feature: true,
-        description: true,
-        createdAt: true,
-      },
-    });
-
-    return logs;
+    void storeId;
+    void limit;
+    // No dedicated credit usage log model exists in the platform schema.
+    return [];
   }
 
   /**
    * Auto-reset expired allocations (cron job helper)
    */
   async autoResetExpiredAllocations(): Promise<number> {
-    const now = new Date();
-    const expired = await prisma.creditAllocation.findMany({
-      where: {
-        resetDate: {
-          lt: now,
-        },
-      },
-    });
-
-    let resetCount = 0;
-    for (const allocation of expired) {
-      await this.resetMonthlyCredits(allocation.storeId);
-      resetCount++;
-    }
-
-    return resetCount;
+    // Monthly resets are performed by `ai-usage.service` (scheduled) against merchantAiSubscription.
+    return 0;
   }
 
   /**
    * Initialize trial for a store
    */
   async initializeTrial(storeId: string): Promise<TrialStatus> {
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
+    const existing = await prisma.merchantAiSubscription.findUnique({
+      where: { storeId },
     });
-
-    if (!store) {
-      throw new Error(`Store ${storeId} not found`);
+    if (!existing) throw new Error(`AI subscription for ${storeId} not found`);
+    if (existing.trialExpiresAt && existing.trialExpiresAt > new Date()) {
+      return await this.getTrialStatus(storeId);
     }
 
-    // Check if trial already exists
-    if (store.trialStartDate) {
-      return this.getTrialStatus(storeId);
-    }
+    const starterExtended = await readStarterFirstMonthFreeEnabled();
+    const trialDays = starterExtended ? 30 : 7;
 
     const now = new Date();
     const endDate = new Date(now);
-    endDate.setDate(endDate.getDate() + 14); // 14 days trial
+    endDate.setDate(endDate.getDate() + trialDays);
 
-    await prisma.store.update({
-      where: { id: storeId },
-      data: {
-        trialStartDate: now,
-        trialEndDate: endDate,
-        trialExpired: false,
-      },
-    });
-
-    // Create credit allocation for FREE plan (0 credits)
-    await prisma.creditAllocation.upsert({
+    await prisma.merchantAiSubscription.update({
       where: { storeId },
-      update: {
-        plan: 'FREE',
-        monthlyCredits: 0,
-        resetDate: endDate,
-      },
-      create: {
-        storeId,
-        plan: 'FREE',
-        monthlyCredits: 0,
-        usedCredits: 0,
-        resetDate: endDate,
+      data: {
+        trialStartedAt: now,
+        trialExpiresAt: endDate,
       },
     });
 
     return {
       isActive: true,
-      daysRemaining: 14,
+      daysRemaining: trialDays,
       startDate: now,
       endDate,
       expired: false,
@@ -325,12 +236,13 @@ export class CreditManager {
   /**
    * Get trial status for a store
    */
-  getTrialStatus(storeId: string): TrialStatus {
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
+  async getTrialStatus(storeId: string): Promise<TrialStatus> {
+    const sub = await prisma.merchantAiSubscription.findUnique({
+      where: { storeId },
+      select: { trialStartedAt: true, trialExpiresAt: true },
     });
 
-    if (!store || !store.trialStartDate || !store.trialEndDate) {
+    if (!sub || !sub.trialStartedAt || !sub.trialExpiresAt) {
       return {
         isActive: false,
         daysRemaining: 0,
@@ -341,22 +253,14 @@ export class CreditManager {
     }
 
     const now = new Date();
-    const endDate = store.trialEndDate;
-    const isExpired = store.trialExpired || now > endDate;
+    const endDate = sub.trialExpiresAt;
+    const isExpired = now > endDate;
 
     if (isExpired) {
-      // Mark as expired if not already marked
-      if (!store.trialExpired) {
-        await prisma.store.update({
-          where: { id: storeId },
-          data: { trialExpired: true },
-        });
-      }
-
       return {
         isActive: false,
         daysRemaining: 0,
-        startDate: store.trialStartDate,
+        startDate: sub.trialStartedAt,
         endDate,
         expired: true,
       };
@@ -369,7 +273,7 @@ export class CreditManager {
     return {
       isActive: true,
       daysRemaining,
-      startDate: store.trialStartDate,
+      startDate: sub.trialStartedAt,
       endDate,
       expired: false,
     };
@@ -387,9 +291,9 @@ export class CreditManager {
    * Expire trial manually (for upgrade flows)
    */
   async expireTrial(storeId: string): Promise<void> {
-    await prisma.store.update({
-      where: { id: storeId },
-      data: { trialExpired: true },
+    await prisma.merchantAiSubscription.update({
+      where: { storeId },
+      data: { trialExpiresAt: new Date() },
     });
   }
 
@@ -400,35 +304,12 @@ export class CreditManager {
     storeId: string,
     plan: 'STARTER' | 'PRO'
   ): Promise<void> {
-    const credits = this.getMonthlyCreditsForPlan(plan);
-    const now = new Date();
-    
-    // Calculate next reset date (30 days from now)
-    const resetDate = new Date(now);
-    resetDate.setDate(resetDate.getDate() + 30);
-
-    await prisma.store.update({
-      where: { id: storeId },
-      data: {
-        plan,
-        trialExpired: true, // End trial when upgrading
-      },
-    });
-
-    await prisma.creditAllocation.upsert({
+    await prisma.merchantAiSubscription.update({
       where: { storeId },
-      update: {
-        plan,
-        monthlyCredits: credits,
-        usedCredits: 0, // Reset usage on upgrade
-        resetDate,
-      },
-      create: {
-        storeId,
-        plan,
-        monthlyCredits: credits,
-        usedCredits: 0,
-        resetDate,
+      data: {
+        planKey: plan,
+        monthRequestsUsed: 0,
+        trialExpiresAt: new Date(),
       },
     });
   }

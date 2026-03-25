@@ -50,7 +50,7 @@ export const GET = withVayvaAPI(
         );
       }
 
-      const { page, limit, period, startDate, endDate, category, goalId } = parseResult.data;
+      const { page, limit, _period, startDate, endDate, category, goalId } = parseResult.data;
       const skip = (page - 1) * limit;
 
       const where: any = { storeId };
@@ -229,7 +229,7 @@ export const POST = withVayvaAPI(
 );
 
 // Calculate expected progress percentage based on timeline
-function calculateExpectedProgress(startDate: Date, endDate: Date, currentProgress: number): number {
+function _calculateExpectedProgress(startDate: Date, endDate: Date, _currentProgress: number): number {
   const totalTime = endDate.getTime() - startDate.getTime();
   const elapsed = Date.now() - startDate.getTime();
   

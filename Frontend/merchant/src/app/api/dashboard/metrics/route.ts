@@ -3,14 +3,16 @@ import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { getRedisClient } from "@/lib/redis";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { searchParams } = new URL(request.url);
       const metric = searchParams.get("metric");
 
-      const cacheKey = `dashboard:metrics:${storeId}:${metric || "all"}`;
+      const cacheKey = `dashboard:metrics:${auth.user.storeId}:${metric || "all"}`;
       
       const redis = await getRedisClient();
       const cached = await redis.get(cacheKey);
@@ -19,12 +21,10 @@ export async function GET(request: NextRequest) {
       }
 
       const queryParams = new URLSearchParams();
-      if (metric) queryParams.set("metric", metric);// Call backend API
-      const result = await apiJson(`${process.env.BACKEND_API_URL}/api/endpoint`,
+      if (metric) queryParams.set("metric", metric);
+      const result = await apiJson(`${buildBackendUrl("/api/dashboard/metrics")}${queryParams.size ? `?${queryParams.toString()}` : ""}`,
       {
-          headers: {
-            "x-store-id": storeId,
-          },
+          headers: auth.headers,
         }
       );
       

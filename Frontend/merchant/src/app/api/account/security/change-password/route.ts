@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json().catch(() => ({})) as {
       currentPassword?: string;
       newPassword?: string;
@@ -26,9 +31,7 @@ export async function POST(request: NextRequest) {
 
     const result = await apiJson<{ success: boolean }>(`${process.env.BACKEND_API_URL}/api/account/security/change-password`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
     });
     

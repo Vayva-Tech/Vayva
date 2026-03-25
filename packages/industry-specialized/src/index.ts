@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Specialized Industry Package Index
  */

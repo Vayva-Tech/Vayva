@@ -68,9 +68,9 @@ export const LegalPageLayout: React.FC<LegalPageLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen text-slate-900">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden text-slate-900">
       {/* Top Navigation / Back Link */}
-      <div className="max-w-[1280px] mx-auto px-6 pt-12 print:hidden">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pt-10 sm:pt-12 print:hidden min-w-0">
         {backLink && (
           <div className="relative inline-flex mb-8">
             <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-full border-2 border-emerald-200/60" />
@@ -89,7 +89,7 @@ export const LegalPageLayout: React.FC<LegalPageLayoutProps> = ({
         )}
       </div>
 
-      <div className="max-w-[1280px] mx-auto px-6 pb-24 lg:flex lg:gap-20 items-start">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 pb-20 sm:pb-24 lg:flex lg:gap-20 items-start min-w-0">
         {/* Sidebar TOC - Desktop */}
         <aside className="hidden lg:block w-[280px] sticky top-24 shrink-0 overflow-y-auto max-h-[calc(100vh-120px)] print:hidden">
           <div className="relative">
@@ -139,18 +139,18 @@ export const LegalPageLayout: React.FC<LegalPageLayoutProps> = ({
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 max-w-[850px]">
-          <header className="mb-20">
+        <main className="flex-1 max-w-[850px] min-w-0">
+          <header className="mb-12 sm:mb-20">
             {lastUpdated && (
               <div className="inline-block px-3 py-1 bg-white/80 backdrop-blur rounded-full text-[10px] font-bold text-slate-500 mb-6 uppercase tracking-wider border border-slate-200">
                 Last Updated: {lastUpdated}
               </div>
             )}
-            <h1 className="text-5xl md:text-6xl font-semibold text-slate-900 mb-8 tracking-tight font-space-grotesk">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 mb-6 sm:mb-8 tracking-tight font-space-grotesk">
               {title}
             </h1>
             {summary && (
-              <p className="text-xl text-slate-600 leading-relaxed font-medium">
+              <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed font-medium">
                 {summary}
               </p>
             )}

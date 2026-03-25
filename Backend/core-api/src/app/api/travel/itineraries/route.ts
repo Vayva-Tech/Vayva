@@ -197,8 +197,8 @@ export const POST = withVayvaAPI(
       }
 
       // Fetch complete itinerary with activities
-      const completeItinerary = await prisma.travelItinerary.findUnique({
-        where: { id: itinerary.id },
+      const completeItinerary = await prisma.travelItinerary.findFirst({
+        where: { id: itinerary.id, storeId },
         include: {
           customer: {
             select: {

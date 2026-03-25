@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,7 +20,8 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 // ============================================================
 // Types
@@ -283,7 +282,9 @@ function ApiKeySetupForm({
 export default function IntegrationDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const integrationId = params.id as string;
+  const rawId = params?.id;
+  const integrationId =
+    typeof rawId === "string" ? rawId : Array.isArray(rawId) ? rawId[0] : "";
 
   const [connected, setConnected] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
@@ -335,56 +336,187 @@ export default function IntegrationDetailPage() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <Breadcrumbs />
-
-      {/* Back */}
-      <Link
-        href="/dashboard/integrations"
-        className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Marketplace
-      </Link>
-
-      <div className="grid grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="col-span-2 space-y-6">
-          {/* Header */}
-          <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 flex-shrink-0">
-              {integration.logo}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {integration.name}
-                </h1>
-                {connected && (
-                  <Badge className="bg-green-100 text-green-700 flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" />
-                    Connected
-                  </Badge>
+    <div className="space-y-6">
+      <PageWithInsights
+        insights={
+          <div className="space-y-4">
+            {/* Connect Card */}
+            <Card>
+              <CardContent className="p-5">
+                {!connected ? (
+                  <>
+                    {!showSetup ? (
+                      <>
+                        <Button className="w-full mb-3" onClick={handleConnect}>
+                          <Plug className="h-4 w-4 mr-2" />
+                          {integration.setupType === "oauth"
+                            ? "Connect with OAuth"
+                            : "Connect Integration"}
+                        </Button>
+                        {integration.setupType === "oauth" && (
+                          <p className="text-xs text-gray-500 text-center">
+                            You'll be redirected to {integration.developer.name} to authorize
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="font-semibold text-gray-900 mb-3 text-sm">
+                          Enter your credentials
+                        </h3>
+                        <ApiKeySetupForm
+                          integrationId={integration.id}
+                          onSuccess={() => {
+                            setConnected(true);
+                            setShowSetup(false);
+                          }}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => setShowSetup(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 mb-3 p-3 bg-green-50 rounded-lg">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-sm font-medium text-green-700">Connected</span>
+                    </div>
+                    <div className="space-y-2">
+                      <Button variant="outline" size="sm" className="w-full">
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Sync Now
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-red-600 hover:text-red-700"
+                        onClick={handleDisconnect}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Disconnect
+                      </Button>
+                    </div>
+                  </>
                 )}
-              </div>
-              <p className="text-gray-700 text-sm mb-2">
-                by {integration.developer.name} · {integration.category}
-              </p>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  {integration.rating} ({integration.reviewCount} reviews)
-                </span>
-                <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  {integration.installCount.toLocaleString()} installed
-                </span>
-                <Badge className={pricingColors[integration.pricing]}>
-                  {pricingLabels[integration.pricing]}
+              </CardContent>
+            </Card>
+
+            {/* Info Card */}
+            <Card>
+              <CardContent className="p-5 space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Developer</p>
+                  <p className="text-sm text-gray-900 font-medium">
+                    {integration.developer.name}
+                  </p>
+                </div>
+                {integration.developer.website && (
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Website</p>
+                    <a
+                      href={integration.developer.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-brand-primary hover:underline flex items-center gap-1"
+                    >
+                      <Globe className="h-3 w-3" />
+                      {integration.developer.website.replace("https://", "")}
+                    </a>
+                  </div>
+                )}
+                {integration.documentationUrl && (
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a
+                      href={integration.documentationUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Documentation
+                    </a>
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Requirements */}
+            {integration.requirements.length > 0 && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Requirements</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-1.5">
+                    {integration.requirements.map((req) => (
+                      <div
+                        key={req}
+                        className="flex items-start gap-2 text-xs text-gray-700"
+                      >
+                        <AlertCircle className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
+                        {req}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        }
+      >
+        <PageHeader
+          title={integration.name}
+          subtitle={`${integration.developer.name} · ${integration.category}`}
+          actions={
+            <Link
+              href="/dashboard/integrations"
+              className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Marketplace
+            </Link>
+          }
+        />
+
+        <div className="space-y-6">
+        {/* Main Content */}
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 flex-shrink-0">
+            {integration.logo}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-1">
+              <h2 className="text-xl font-bold text-gray-900">
+                {integration.name}
+              </h2>
+              {connected && (
+                <Badge className="bg-green-100 text-green-700 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Connected
                 </Badge>
-              </div>
+              )}
+            </div>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <span className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                {integration.rating} ({integration.reviewCount} reviews)
+              </span>
+              <span className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                {integration.installCount.toLocaleString()} installed
+              </span>
+              <Badge className={pricingColors[integration.pricing]}>
+                {pricingLabels[integration.pricing]}
+              </Badge>
             </div>
           </div>
+        </div>
 
           {/* Description */}
           <Card>
@@ -437,138 +569,7 @@ export default function IntegrationDetailPage() {
             </Card>
           )}
         </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Connect Card */}
-          <Card>
-            <CardContent className="p-5">
-              {!connected ? (
-                <>
-                  {!showSetup ? (
-                    <>
-                      <Button className="w-full mb-3" onClick={handleConnect}>
-                        <Plug className="h-4 w-4 mr-2" />
-                        {integration.setupType === "oauth"
-                          ? "Connect with OAuth"
-                          : "Connect Integration"}
-                      </Button>
-                      {integration.setupType === "oauth" && (
-                        <p className="text-xs text-gray-500 text-center">
-                          You'll be redirected to {integration.developer.name} to authorize
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="font-semibold text-gray-900 mb-3 text-sm">
-                        Enter your credentials
-                      </h3>
-                      <ApiKeySetupForm
-                        integrationId={integration.id}
-                        onSuccess={() => {
-                          setConnected(true);
-                          setShowSetup(false);
-                        }}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full mt-2"
-                        onClick={() => setShowSetup(false)}
-                      >
-                        Cancel
-                      </Button>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 mb-3 p-3 bg-green-50 rounded-lg">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm font-medium text-green-700">Connected</span>
-                  </div>
-                  <div className="space-y-2">
-                    <Button variant="outline" size="sm" className="w-full">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Sync Now
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-red-600 hover:text-red-700"
-                      onClick={handleDisconnect}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Disconnect
-                    </Button>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Info Card */}
-          <Card>
-            <CardContent className="p-5 space-y-3">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Developer</p>
-                <p className="text-sm text-gray-900 font-medium">
-                  {integration.developer.name}
-                </p>
-              </div>
-              {integration.developer.website && (
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Website</p>
-                  <a
-                    href={integration.developer.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-brand-primary hover:underline flex items-center gap-1"
-                  >
-                    <Globe className="h-3 w-3" />
-                    {integration.developer.website.replace("https://", "")}
-                  </a>
-                </div>
-              )}
-              {integration.documentationUrl && (
-                <Button variant="outline" size="sm" className="w-full" asChild>
-                  <a
-                    href={integration.documentationUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Documentation
-                  </a>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Requirements */}
-          {integration.requirements.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Requirements</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1.5">
-                  {integration.requirements.map((req) => (
-                    <div
-                      key={req}
-                      className="flex items-start gap-2 text-xs text-gray-700"
-                    >
-                      <AlertCircle className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" />
-                      {req}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
+      </PageWithInsights>
     </div>
   );
 }

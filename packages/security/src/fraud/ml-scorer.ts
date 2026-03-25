@@ -11,7 +11,8 @@
  * - Real-time scoring with sub-5ms latency
  */
 
-import { prisma } from '@vayva/db';
+import { Prisma, prisma as _prisma } from '@vayva/db';
+import { prismaDelegates } from '../prisma-delegates';
 
 // ============================================================================
 // Types
@@ -197,13 +198,15 @@ export class MLRiskScorer {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     // Fetch historical data in parallel
+    type FraudCheckHistoryRow = { amount: unknown; checkedAt: Date };
+
     const [
-      historicalChecks,
+      historicalChecksRaw,
       recentChecks1h,
       recentChecks24h,
       recentChecks7d,
     ] = await Promise.all([
-      prisma.fraudCheck.findMany({
+      prismaDelegates.fraudCheck.findMany({
         where: {
           storeId,
           OR: [
@@ -215,27 +218,34 @@ export class MLRiskScorer {
         orderBy: { checkedAt: 'desc' },
         take: 100,
       }).catch(() => []),
-      prisma.fraudCheck.count({
+      prismaDelegates.fraudCheck.count({
         where: { storeId, ipAddress: data.ipAddress, checkedAt: { gte: oneHourAgo } },
       }).catch(() => 0),
-      prisma.fraudCheck.count({
+      prismaDelegates.fraudCheck.count({
         where: {
           storeId,
           OR: [{ email: data.email }, { ipAddress: data.ipAddress }],
           checkedAt: { gte: oneDayAgo },
         },
       }).catch(() => 0),
-      prisma.fraudCheck.count({
+      prismaDelegates.fraudCheck.count({
         where: { storeId, email: data.email, checkedAt: { gte: sevenDaysAgo } },
       }).catch(() => 0),
     ]);
 
+    const historicalChecks = historicalChecksRaw as FraudCheckHistoryRow[];
+
     // Compute amount statistics
-    const amounts = historicalChecks.map((c) => c.amount);
-    const avgAmount = amounts.length > 0 ? amounts.reduce((a, b) => a + b, 0) / amounts.length : 0;
-    const stdDev = amounts.length > 1
-      ? Math.sqrt(amounts.reduce((sum, a) => sum + Math.pow(a - avgAmount, 2), 0) / amounts.length)
-      : avgAmount * 0.3;
+    const amounts = historicalChecks.map((c) => Number(c.amount));
+    const avgAmount =
+      amounts.length > 0 ? amounts.reduce((a: number, b: number) => a + b, 0) / amounts.length : 0;
+    const stdDev =
+      amounts.length > 1
+        ? Math.sqrt(
+            amounts.reduce((sum: number, a: number) => sum + Math.pow(a - avgAmount, 2), 0) /
+              amounts.length
+          )
+        : avgAmount * 0.3;
     const amountDeviationRatio = stdDev > 0 ? (data.amount - avgAmount) / stdDev : 0;
 
     // Last transaction date
@@ -245,18 +255,18 @@ export class MLRiskScorer {
       : 999;
 
     // Amount in last windows
-    const amountLast1h = (await prisma.fraudCheck.aggregate({
+    const amountLast1h = (await prismaDelegates.fraudCheck.aggregate({
       where: { storeId, ipAddress: data.ipAddress, checkedAt: { gte: oneHourAgo } },
       _sum: { amount: true },
     }).catch(() => ({ _sum: { amount: null } })))._sum.amount || 0;
 
-    const amountLast24h = (await prisma.fraudCheck.aggregate({
+    const amountLast24h = (await prismaDelegates.fraudCheck.aggregate({
       where: { storeId, email: data.email, checkedAt: { gte: oneDayAgo } },
       _sum: { amount: true },
     }).catch(() => ({ _sum: { amount: null } })))._sum.amount || 0;
 
     // Unique countries in 24h
-    const countriesUsed = await prisma.fraudCheck.groupBy({
+    const countriesUsed = await prismaDelegates.fraudCheck.groupBy({
       by: ['billingCountry'],
       where: { storeId, email: data.email, checkedAt: { gte: oneDayAgo } },
     }).catch(() => []);
@@ -267,12 +277,12 @@ export class MLRiskScorer {
     const emailDomainRisk = isDisposableEmail ? 0.9 : this.computeEmailDomainRisk(emailDomain);
 
     // Device analysis
-    const devicesForEmail = await prisma.fraudCheck.groupBy({
+    const devicesForEmail = await prismaDelegates.fraudCheck.groupBy({
       by: ['deviceFingerprint'],
       where: { storeId, email: data.email, checkedAt: { gte: sevenDaysAgo } },
     }).catch(() => []);
 
-    const emailsForDevice = await prisma.fraudCheck.groupBy({
+    const emailsForDevice = await prismaDelegates.fraudCheck.groupBy({
       by: ['email'],
       where: {
         storeId,
@@ -543,12 +553,12 @@ export class MLRiskScorer {
     }
   ): Promise<void> {
     // Store feedback for batch retraining
-    await prisma.fraudModelFeedback.create({
+    await prismaDelegates.fraudModelFeedback.create({
       data: {
         storeId,
         originalScore: feedbackData.originalScore,
         actualOutcome: feedbackData.actualOutcome,
-        features: feedbackData.features as unknown as Record<string, unknown>,
+        features: feedbackData.features as unknown as Prisma.InputJsonValue,
         modelVersion: this.MODEL_VERSION,
         createdAt: new Date(),
       },

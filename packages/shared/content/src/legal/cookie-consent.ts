@@ -246,11 +246,12 @@ export function loadThirdPartyScripts(consent: CookieConsentState): void {
     gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
     gaScript.async = true;
     document.head.appendChild(gaScript);
-    
-    window.dataLayer = window.dataLayer || [];
-    function gtag(...args: any[]) {
-      window.dataLayer.push(args);
-    }
+
+    const w = window as Window & { dataLayer?: unknown[] };
+    const dataLayer = (w.dataLayer ??= []);
+    const gtag = (...args: unknown[]): void => {
+      dataLayer.push(args);
+    };
     gtag('js', new Date());
     gtag('config', 'GA_MEASUREMENT_ID', {
       anonymize_ip: true, // GDPR requirement

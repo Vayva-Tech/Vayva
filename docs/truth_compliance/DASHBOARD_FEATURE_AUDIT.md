@@ -497,8 +497,7 @@ const filteredMetrics = allMetrics.filter(m => allowedMetrics.includes(m.key));
 - ✅ Marketplace publishing requires paid plan
 
 **Files:**
-- `packages/addons/registry.ts` - Full addon definitions
-- `packages/addons/mount-points.tsx` - Integration points
+- `packages/addons/src/` — types (`src/types.ts`), registry (`src/registry.ts`, `src/registry/`), addon defs (`src/addons/`), mount points (`src/mount-points/`)
 - `Frontend/merchant/src/app/(dashboard)/dashboard/addons/page.tsx`
 - `Frontend/merchant/src/components/addons/AddOnGate.tsx` - Gating component
 

@@ -5,7 +5,7 @@
  * with iframe fallback for untrusted third-party add-ons.
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface SandboxConfig {
   /** Unique add-on instance ID */
@@ -151,7 +151,7 @@ export class AddOnSandbox {
   }
 
   private async loadAddOnModule(
-    shadowRoot: ShadowRoot,
+    _shadowRoot: ShadowRoot,
     container: HTMLElement
   ): Promise<void> {
     // For internal add-ons, dynamically import the module

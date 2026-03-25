@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@vayva/db": "workspace:*",
+        "@vayva/emails": "workspace:*",
         "date-fns": "^4.1.0"
     },
     "devDependencies": {

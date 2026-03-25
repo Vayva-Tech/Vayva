@@ -1,11 +1,8 @@
 /**
  * Unified Template Gallery
  * =======================
- * This registry combines ALL templates available to merchants:
- * - 30 merchant templates (from templates-registry.ts)
- * - 24 standalone demo templates (from /templates/)
- * 
- * Total: 54 templates across 15 categories
+ * Single source of truth for storefront templates shown to merchants.
+ * Preview assets live under `/template-gallery/` in app public dirs.
  */
 
 export interface TemplateGalleryItem {
@@ -39,7 +36,7 @@ export interface TemplateGalleryItem {
   // Technical specs
   routes: string[];
   layoutKey: string;
-  componentProps?: Record<string, any>;
+  componentProps?: Record<string, unknown>;
   
   // Onboarding flow
   onboardingProfile: {

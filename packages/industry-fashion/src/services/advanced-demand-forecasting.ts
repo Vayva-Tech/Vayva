@@ -1,7 +1,6 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
-export interface DemandForecast {
+export interface AdvancedDemandForecastEntry {
   productId: string;
   productName: string;
   currentStock: number;
@@ -35,7 +34,7 @@ export class AdvancedDemandForecastingService {
   /**
    * Generate demand forecast for all products in a store
    */
-  async generateDemandForecast(storeId: string): Promise<DemandForecast[]> {
+  async generateDemandForecast(storeId: string): Promise<AdvancedDemandForecastEntry[]> {
     const products = await prisma.product.findMany({
       where: { storeId },
       include: {
@@ -49,7 +48,7 @@ export class AdvancedDemandForecastingService {
       },
     });
 
-    const forecasts: DemandForecast[] = [];
+    const forecasts: AdvancedDemandForecastEntry[] = [];
 
     for (const product of products) {
       const salesHistory = this.buildSalesTimeSeries(product.orderItems);
@@ -66,8 +65,9 @@ export class AdvancedDemandForecastingService {
 
       // Calculate total inventory
       const currentStock = product.variants.reduce(
-        (sum, v) => sum + (v.inventoryCount || 0),
-        0
+        (sum: number, v: { inventoryCount?: number | null }) =>
+          sum + (v.inventoryCount || 0),
+        0,
       );
 
       // Determine recommended action

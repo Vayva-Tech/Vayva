@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { GlassPanel, ProgressBar } from '@vayva/ui/components/fashion';
@@ -54,7 +55,7 @@ const CollectionsSettingsPage = () => {
                     { value: 'list', label: 'List', icon: '☰' },
                     { value: 'masonry', label: 'Masonry', icon: '⊞' },
                   ].map((option) => (
-                    <button
+                    <Button
                       key={option.value}
                       onClick={() => setDefaultView(option.value)}
                       className={`px-4 py-3 rounded-lg border transition-all flex items-center justify-center gap-2 ${
@@ -65,7 +66,7 @@ const CollectionsSettingsPage = () => {
                     >
                       <span>{option.icon}</span>
                       <span className="text-sm">{option.label}</span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -181,3 +182,4 @@ const CollectionsSettingsPage = () => {
 };
 
 export default CollectionsSettingsPage;
+

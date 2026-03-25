@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @vayva/industry-retail - Unified Retail Industry Package
  * 

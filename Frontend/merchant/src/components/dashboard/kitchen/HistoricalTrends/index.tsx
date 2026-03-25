@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Clock, BarChart3, Calendar } from 'lucide-react';
@@ -89,7 +90,7 @@ export function HistoricalTrends({
 
           <div className="flex bg-gray-100 rounded-lg p-1">
             {(['7d', '30d', '90d'] as const).map((range) => (
-              <button
+              <Button
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
@@ -99,7 +100,7 @@ export function HistoricalTrends({
                 }`}
               >
                 {range}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -224,3 +225,4 @@ export function HistoricalTrends({
     </div>
   );
 }
+

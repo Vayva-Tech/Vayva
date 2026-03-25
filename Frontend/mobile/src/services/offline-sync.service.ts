@@ -24,7 +24,7 @@ export interface QueuedAction {
   id: string;
   type: 'create' | 'update' | 'delete';
   entity: string;
-  data: any;
+  data: unknown;
   timestamp: Date;
   retryCount: number;
 }
@@ -36,8 +36,8 @@ export interface SyncResult {
   conflicts: Array<{
     entity: string;
     id: string;
-    localVersion: any;
-    remoteVersion: any;
+    localVersion: unknown;
+    remoteVersion: unknown;
   }>;
 }
 
@@ -70,14 +70,14 @@ class OfflineSyncService {
       const wasOnline = this.isOnline;
       this.isOnline = state.isConnected ?? false;
 
-      console.log('[OFFLINE_SYNC] Network status:', {
+      console.warn('[OFFLINE_SYNC] Network status:', {
         isConnected: this.isOnline,
         type: state.type,
       });
 
       // Trigger sync when coming back online
       if (!wasOnline && this.isOnline) {
-        console.log('[OFFLINE_SYNC] Back online, triggering sync...');
+        console.warn('[OFFLINE_SYNC] Back online, triggering sync...');
         this.syncPendingActions();
       }
     });
@@ -91,7 +91,7 @@ class OfflineSyncService {
       const stored = await AsyncStorage.getItem('@vayva:action-queue');
       if (stored) {
         this.actionQueue = JSON.parse(stored);
-        console.log(`[OFFLINE_SYNC] Loaded ${this.actionQueue.length} queued actions`);
+        console.warn(`[OFFLINE_SYNC] Loaded ${this.actionQueue.length} queued actions`);
       }
     } catch (error) {
       console.error('[OFFLINE_SYNC] Failed to load queue:', error);
@@ -135,7 +135,7 @@ class OfflineSyncService {
     this.actionQueue.push(queuedAction);
     await this.saveQueuedActions();
 
-    console.log(`[OFFLINE_SYNC] Queued ${action.type} action for ${action.entity}`);
+    console.warn(`[OFFLINE_SYNC] Queued ${action.type} action for ${action.entity}`);
 
     // If online, try to sync immediately
     if (this.isOnline && !this.syncInProgress) {
@@ -150,12 +150,12 @@ class OfflineSyncService {
    */
   async syncPendingActions(): Promise<SyncResult> {
     if (this.syncInProgress) {
-      console.log('[OFFLINE_SYNC] Sync already in progress');
+      console.warn('[OFFLINE_SYNC] Sync already in progress');
       return { success: false, synced: 0, failed: 0, conflicts: [] };
     }
 
     if (!this.isOnline) {
-      console.log('[OFFLINE_SYNC] Cannot sync - offline');
+      console.warn('[OFFLINE_SYNC] Cannot sync - offline');
       return { success: false, synced: 0, failed: 0, conflicts: [] };
     }
 
@@ -168,7 +168,7 @@ class OfflineSyncService {
     };
 
     try {
-      console.log(`[OFFLINE_SYNC] Starting sync of ${this.actionQueue.length} actions`);
+      console.warn(`[OFFLINE_SYNC] Starting sync of ${this.actionQueue.length} actions`);
 
       // Process actions in order
       const actionsToProcess = [...this.actionQueue];
@@ -180,16 +180,25 @@ class OfflineSyncService {
           
           // Remove from queue on success
           this.actionQueue = this.actionQueue.filter(a => a.id !== action.id);
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error(`[OFFLINE_SYNC] Failed to sync ${action.id}:`, error);
-          
-          if (error.status === 409) {
+
+          const status =
+            typeof error === "object" && error !== null && "status" in error
+              ? (error as { status?: unknown }).status
+              : undefined;
+
+          if (status === 409) {
             // Conflict detected
+            const actionData = action.data as Record<string, unknown>;
             result.conflicts.push({
               entity: action.entity,
-              id: action.data.id,
-              localVersion: action.data,
-              remoteVersion: error.remoteData,
+              id: String(actionData.id ?? ""),
+              localVersion: actionData,
+              remoteVersion:
+                typeof error === "object" && error !== null && "remoteData" in error
+                  ? (error as { remoteData?: unknown }).remoteData
+                  : undefined,
             });
           } else if (action.retryCount < this.MAX_RETRIES) {
             // Retry later
@@ -204,7 +213,7 @@ class OfflineSyncService {
 
       await this.saveQueuedActions();
       
-      console.log(`[OFFLINE_SYNC] Sync complete: ${result.synced} synced, ${result.failed} failed`);
+      console.warn(`[OFFLINE_SYNC] Sync complete: ${result.synced} synced, ${result.failed} failed`);
     } catch (error) {
       console.error('[OFFLINE_SYNC] Sync failed:', error);
       result.success = false;
@@ -233,7 +242,7 @@ class OfflineSyncService {
         break;
         
       case 'update':
-        response = await fetch(`${endpoint}/${action.data.id}`, {
+        response = await fetch(`${endpoint}/${String((action.data as Record<string, unknown>).id ?? "")}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(action.data),
@@ -241,7 +250,7 @@ class OfflineSyncService {
         break;
         
       case 'delete':
-        response = await fetch(`${endpoint}/${action.data.id}`, {
+        response = await fetch(`${endpoint}/${String((action.data as Record<string, unknown>).id ?? "")}`, {
           method: 'DELETE',
         });
         break;
@@ -251,7 +260,10 @@ class OfflineSyncService {
     }
 
     if (!response.ok) {
-      const error = new Error('Sync failed') as any;
+      const error = new Error("Sync failed") as Error & {
+        status?: number;
+        remoteData?: unknown;
+      };
       error.status = response.status;
       
       if (response.status === 409) {
@@ -285,11 +297,11 @@ class OfflineSyncService {
    */
   startBackgroundSync(): void {
     if (this.syncInterval) {
-      console.log('[OFFLINE_SYNC] Background sync already running');
+      console.warn('[OFFLINE_SYNC] Background sync already running');
       return;
     }
 
-    console.log('[OFFLINE_SYNC] Starting background sync every 5 minutes');
+    console.warn('[OFFLINE_SYNC] Starting background sync every 5 minutes');
     
     this.syncInterval = setInterval(() => {
       if (this.isOnline && !this.syncInProgress) {
@@ -305,7 +317,7 @@ class OfflineSyncService {
     if (this.syncInterval) {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
-      console.log('[OFFLINE_SYNC] Background sync stopped');
+      console.warn('[OFFLINE_SYNC] Background sync stopped');
     }
   }
 
@@ -315,7 +327,7 @@ class OfflineSyncService {
   async clearQueue(): Promise<void> {
     this.actionQueue = [];
     await this.saveQueuedActions();
-    console.log('[OFFLINE_SYNC] Queue cleared');
+    console.warn('[OFFLINE_SYNC] Queue cleared');
   }
 
   /**

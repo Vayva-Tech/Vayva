@@ -115,7 +115,7 @@ class PerformanceController extends BaseIndustryController {
     return this.handleOperation(
       context,
       async () => {
-        const params = this.getQueryParams(req, {
+        const _params = this.getQueryParams(req, {
           startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
           endDate: new Date().toISOString(),
         });

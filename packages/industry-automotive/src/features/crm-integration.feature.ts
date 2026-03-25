@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CRM Integration Feature
  * Manages customer relationships and lead tracking

@@ -102,7 +102,7 @@ export class CashManagementService {
       note: "Opening float",
     });
 
-    console.log(`[CashMgmt] Session opened: ${session.id} with float ₦${parsed.openingFloat / 100}`);
+    console.warn(`[CashMgmt] Session opened: ${session.id} with float ₦${parsed.openingFloat / 100}`);
     return this.mapSession(session);
   }
 

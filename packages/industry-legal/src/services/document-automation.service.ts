@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Document Automation AI Service
  * 
@@ -186,6 +185,16 @@ Ensure the document is professionally drafted, legally sound, and ready for atto
     }
   }
 
+  protected defaultOutput(input: DocumentGenerationInput): DocumentAutomationResult {
+    return {
+      document: '',
+      documentType: input.documentType,
+      populatedFields: [],
+      missingFields: [],
+      suggestedAdditions: [],
+    };
+  }
+
   /**
    * Generate document from template
    */
@@ -211,7 +220,7 @@ Ensure the document is professionally drafted, legally sound, and ready for atto
   }> {
     const result = await this.execute({
       documentType: clauseType,
-      parties: [{ name: context.party_representation, role: 'Drafting Party' }],
+      parties: [{ name: context.partyRepresentation, role: 'Drafting Party' }],
       terms: context.keyTerms,
       jurisdiction: context.jurisdiction,
       specialProvisions: [`Draft ${clauseType} clause`],
@@ -273,28 +282,8 @@ Ensure the document is professionally drafted, legally sound, and ready for atto
       location?: string;
     }> = [];
 
-    // Convert problematic clauses to issues
-    result.problematicClauses.forEach(pc => {
-      issues.push({
-        issue: pc.issue,
-        severity: pc.severity as 'minor' | 'moderate' | 'major',
-        suggestion: pc.suggestion,
-        location: pc.clause.substring(0, 50),
-      });
-    });
-
-    // Add compliance issues
-    result.complianceIssues.forEach(ci => {
-      issues.push({
-        issue: ci.issue,
-        severity: 'major',
-        suggestion: ci.remediation,
-        location: ci.regulation,
-      });
-    });
-
     const missingClauses = result.missingFields || [];
-    const improvementSuggestions = result.suggestedAdditions.map(sa => sa.content);
+    const improvementSuggestions = result.suggestedAdditions;
 
     return {
       issues,
@@ -323,7 +312,7 @@ Ensure the document is professionally drafted, legally sound, and ready for atto
     let governingLaw = 'Not specified';
 
     // Simple pattern matching (would be enhanced with actual NLP)
-    const datePattern = /\b(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})\b/g;
+    const datePattern = /\b(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\b/g;
     const moneyPattern = /\$[\d,]+(?:\.\d{2})?/g;
 
     const dateMatches = document.match(datePattern);

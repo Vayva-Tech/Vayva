@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Student Progress Tracking Feature
  * 
@@ -30,7 +29,7 @@ export async function getStudentProgress(
   }
 
   // Fetch students with enrollment data
-  const students = await prisma.user.findMany({
+  const students = await (prisma as any).user.findMany({
     where,
     include: {
       enrollments: {
@@ -132,7 +131,14 @@ export async function getStudentProgress(
  * Identify at-risk students based on progress and activity
  */
 export function identifyAtRiskStudents(students: Student[]): Student[] {
-  return students.filter((student) => identifyAtRiskStudent(student.enrollments || []));
+  return students.filter((student) => {
+    if (student.atRisk) return true;
+    if (student.overallProgress < 60) return true;
+    const daysSinceActive = Math.floor(
+      (Date.now() - student.lastActiveAt.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return daysSinceActive > 7;
+  });
 }
 
 /**
@@ -148,7 +154,7 @@ export async function updateStudentProgress(
     lastAccessedAt?: Date;
   }
 ): Promise<void> {
-  await prisma.enrollment.update({
+  await (prisma as any).enrollment.update({
     where: { id: enrollmentId },
     data: {
       progress: data.progress,

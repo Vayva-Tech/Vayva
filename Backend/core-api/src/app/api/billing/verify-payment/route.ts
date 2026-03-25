@@ -107,7 +107,7 @@ export const POST = withVayvaAPI(
           create: {
             storeId,
             reference,
-            provider: "PAYSTACK",
+            provider: "paystack",
             amount,
             currency,
             status: "SUCCESS",

@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 
@@ -175,7 +175,7 @@ export function InsuranceVerification({
           </div>
 
           <div className="mt-6 flex gap-3">
-            <button
+            <Button
               onClick={handleVerify}
               disabled={loading || !formData.insuranceProvider || !formData.policyNumber || !formData.patientDOB}
               className="px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -191,8 +191,8 @@ export function InsuranceVerification({
               ) : (
                 'Verify Eligibility'
               )}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setFormData({
                 insuranceProvider: '',
                 policyNumber: '',
@@ -203,7 +203,7 @@ export function InsuranceVerification({
               className="px-6 py-2.5 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 transition-colors"
             >
               Clear
-            </button>
+            </Button>
           </div>
         </div>
       ) : eligibilityResult ? (
@@ -222,12 +222,12 @@ export function InsuranceVerification({
                   Coverage Type: <strong>{eligibilityResult.coverageType}</strong>
                 </p>
               </div>
-              <button
+              <Button
                 onClick={handleReset}
                 className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-md text-sm font-medium transition-colors"
               >
                 Verify Another
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -302,21 +302,22 @@ export function InsuranceVerification({
           )}
 
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={handleReset}
               className="flex-1 px-6 py-2.5 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 transition-colors"
             >
               Verify Another Patient
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => window.print()}
               className="flex-1 px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
             >
               Print Verification
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
     </div>
   );
 }
+

@@ -1,8 +1,11 @@
 import {
   MerchantContext,
   OnboardingStatus,
-  SubscriptionPlan,
+  SubscriptionPlan
 } from "@vayva/shared";
+import type { IndustrySlug } from "@vayva/industry-core";
+
+export type { IndustrySlug };
 
 export type PrimaryObject =
   | "product"
@@ -16,28 +19,6 @@ export type PrimaryObject =
   | "menu_item"
   | "digital_asset"
   | string;
-
-export type IndustrySlug =
-  | "retail"
-  | "fashion"
-  | "electronics"
-  | "beauty"
-  | "grocery"
-  | "food"
-  | "services"
-  | "digital"
-  | "events"
-  | "b2b"
-  | "real_estate"
-  | "automotive"
-  | "travel_hospitality"
-  | "blog_media"
-  | "creative_portfolio"
-  | "nonprofit"
-  | "education"
-  | "marketplace"
-  | "one_product"
-  | "nightlife";
 
 export interface IndustryConfig {
   displayName: string;
@@ -62,6 +43,8 @@ export interface IndustryConfig {
     enrollments?: boolean;
     viewings?: boolean;
     testDrives?: boolean;
+    /** Industry-specific flags beyond the core set (synced with merchant INDUSTRY_CONFIG). */
+    [key: string]: boolean | undefined;
   };
   aiTools?: string[];
 }

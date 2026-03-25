@@ -8,7 +8,7 @@
  * - Multiple agent support
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const WHATSAPP_ADDON: AddOnDefinition = {
   id: 'vayva.whatsapp',

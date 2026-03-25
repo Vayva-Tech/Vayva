@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * KPI Metrics Component
  * Shows the 5 key performance indicators for nightlife

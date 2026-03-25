@@ -1,4 +1,40 @@
-// @ts-nocheck
+export {};
+
+declare global {
+  interface Window {
+    vayvaCopyLink?: (btn: HTMLButtonElement) => void;
+    vayvaRequestWithdraw?: (affiliateId: string, storeId: string) => void;
+  }
+}
+
+interface AffiliateReferralRow {
+  id: string;
+  createdAt: string;
+  customerName?: string;
+  orderAmount?: number;
+  commission: number;
+  status: string;
+}
+
+interface AffiliateDashboardPayload {
+  affiliate: {
+    id: string;
+    name: string;
+    storeName: string;
+    referralLink: string;
+    minimumPayout: number;
+  };
+  referrals: AffiliateReferralRow[];
+  earnings: unknown;
+  stats: {
+    totalEarnings: number;
+    pendingEarnings: number;
+    paidEarnings: number;
+    totalReferrals: number;
+    availableBalance: number;
+  };
+}
+
 /**
  * Vayva Affiliate Dashboard Widget
  * 
@@ -19,7 +55,7 @@
   function initDashboard() {
     const container = document.getElementById('vayva-affiliate-dashboard');
     
-    if (!container) {
+    if (!(container instanceof HTMLElement)) {
       console.error('[Vayva] Affiliate dashboard container not found');
       return;
     }
@@ -57,14 +93,16 @@
     // Fetch affiliate data
     fetchAffiliateData(storeId, affiliateId)
       .then(data => {
-        renderDashboard(container, data, theme);
+        renderDashboard(container, data, theme, storeId);
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         console.error('[Vayva] Error loading dashboard:', error);
+        const message =
+          error instanceof Error ? error.message : 'Failed to load affiliate data';
         container.innerHTML = `
           <div style="padding: 40px; text-align: center; color: #ef4444;">
             <p style="font-size: 16px; margin-bottom: 8px;"><strong>Error Loading Dashboard</strong></p>
-            <p>${error.message || 'Failed to load affiliate data'}</p>
+            <p>${message}</p>
           </div>
         `;
       });
@@ -73,22 +111,37 @@
   /**
    * Fetch affiliate data from API
    */
-  async function fetchAffiliateData(storeId, affiliateId) {
+  async function fetchAffiliateData(
+    storeId: string,
+    affiliateId: string,
+  ): Promise<AffiliateDashboardPayload> {
     const response = await fetch(`${VAYVA_API_BASE}/api/embedded/affiliates/${affiliateId}?storeId=${storeId}`);
     
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to fetch data');
+      const errorBody: unknown = await response.json();
+      const msg =
+        typeof errorBody === 'object' &&
+        errorBody !== null &&
+        'error' in errorBody &&
+        typeof (errorBody as { error: unknown }).error === 'string'
+          ? (errorBody as { error: string }).error
+          : 'Failed to fetch data';
+      throw new Error(msg);
     }
 
-    return response.json();
+    return response.json() as Promise<AffiliateDashboardPayload>;
   }
 
   /**
    * Render the dashboard UI
    */
-  function renderDashboard(container, data, theme) {
-    const { affiliate, referrals, earnings, stats } = data;
+  function renderDashboard(
+    container: HTMLElement,
+    data: AffiliateDashboardPayload,
+    theme: string,
+    storeId: string,
+  ) {
+    const { affiliate, referrals, stats } = data;
     
     const html = `
       <style>
@@ -321,7 +374,7 @@
               </tr>
             </thead>
             <tbody>
-              ${referrals.length > 0 ? referrals.map(ref => `
+              ${referrals.length > 0 ? referrals.map((ref: AffiliateReferralRow) => `
                 <tr>
                   <td>${new Date(ref.createdAt).toLocaleDateString()}</td>
                   <td>${ref.customerName || 'Customer #' + ref.id.substring(0, 8)}</td>
@@ -368,8 +421,9 @@
   }
 
   // Expose global functions
-  window.vayvaCopyLink = function(btn) {
+  window.vayvaCopyLink = function(btn: HTMLButtonElement) {
     const input = btn.previousElementSibling;
+    if (!(input instanceof HTMLInputElement)) return;
     input.select();
     document.execCommand('copy');
     
@@ -383,7 +437,7 @@
     }, 2000);
   };
 
-  window.vayvaRequestWithdraw = function(affiliateId, storeId) {
+  window.vayvaRequestWithdraw = function(affiliateId: string, storeId: string) {
     if (!confirm('Are you sure you want to request withdrawal? Funds will arrive in your account within 24 hours.')) {
       return;
     }
@@ -394,14 +448,23 @@
       body: JSON.stringify({ affiliateId, storeId })
     })
     .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        alert('✓ Withdrawal request submitted! You will receive ₦' + data.amount.toLocaleString() + ' within 24 hours.');
+    .then((raw: unknown) => {
+      const data = raw as {
+        success?: boolean;
+        amount?: number;
+        error?: string;
+      };
+      if (data.success && typeof data.amount === 'number') {
+        alert(
+          '✓ Withdrawal request submitted! You will receive ₦' +
+            data.amount.toLocaleString() +
+            ' within 24 hours.',
+        );
       } else {
         alert('Error: ' + (data.error || 'Failed to process withdrawal'));
       }
     })
-    .catch(err => {
+    .catch(() => {
       alert('Error processing withdrawal. Please try again.');
     });
   };

@@ -39,9 +39,7 @@ export function DeleteAccountCard() {
         body: JSON.stringify({ reason }),
       });
 
-      // Force sign out or redirect (implementation depends on auth provider)
-      // For now, redirect to public home
-      window.location.href = "/";
+      window.location.href = "/signin";
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
       logger.error("[DELETE_ACCOUNT_ERROR]", {

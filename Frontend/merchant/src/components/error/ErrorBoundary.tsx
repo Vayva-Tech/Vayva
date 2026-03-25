@@ -134,12 +134,12 @@ export function SectionErrorBoundary({
             <Warning className="w-5 h-5 text-red-500" />
             <p className="text-sm">
               {title} failed to load.{" "}
-              <button
+              <Button
                 onClick={() => window.location.reload()}
                 className="underline hover:no-underline text-red-500"
               >
                 Refresh
-              </button>
+              </Button>
             </p>
           </div>
         </div>

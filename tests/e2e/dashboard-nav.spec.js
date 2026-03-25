@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { DASHBOARD_ROUTES } from "../routes";
-import { createAuthenticatedMerchantContext, cleanupTestUsers, } from "../helpers";
+import { createAuthenticatedMerchantContext, cleanupTestUsers } from "../helpers";
 test.describe("Dashboard Navigation Guard", () => {
     test.afterAll(async () => {
         await cleanupTestUsers();

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Guest List Manager Feature
  */

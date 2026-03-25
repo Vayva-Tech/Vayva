@@ -1,3 +1,4 @@
+import { Button } from "@vayva/ui";
 /**
  * Retail Dashboard Components - Usage Examples
  * 
@@ -329,9 +330,9 @@ export function LoadingAndErrorHandlingExample() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center text-red-500">
           <p>Failed to load dashboard data</p>
-          <button className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md">
+          <Button className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md">
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );

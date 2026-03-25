@@ -1,13 +1,71 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface ImageSequenceScrollProps {
   images: string[];
   className?: string;
   height?: string;
+}
+
+function SequenceFrame({
+  src,
+  index,
+  imageIndex,
+  prefersReducedMotion,
+}: {
+  src: string;
+  index: number;
+  imageIndex: MotionValue<number>;
+  prefersReducedMotion: boolean;
+}) {
+  const opacity = useTransform(
+    imageIndex,
+    [index - 0.5, index, index + 0.5],
+    [0, 1, 0]
+  );
+
+  return (
+    <motion.img
+      src={src}
+      alt={`Frame ${index + 1}`}
+      className="absolute w-full h-full object-cover"
+      style={{
+        opacity: prefersReducedMotion ? (index === 0 ? 1 : 0) : opacity,
+      }}
+    />
+  );
+}
+
+function SequenceDot({
+  index,
+  imageIndex,
+  prefersReducedMotion,
+}: {
+  index: number;
+  imageIndex: MotionValue<number>;
+  prefersReducedMotion: boolean;
+}) {
+  const backgroundColor = useTransform(
+    imageIndex,
+    [index - 0.5, index, index + 0.5],
+    ['rgba(255,255,255,0.5)', 'white', 'rgba(255,255,255,0.5)']
+  );
+
+  return (
+    <motion.div
+      className="w-2 h-2 rounded-full bg-white/50"
+      style={{
+        backgroundColor: prefersReducedMotion
+          ? index === 0
+            ? 'white'
+            : 'rgba(255,255,255,0.5)'
+          : backgroundColor,
+      }}
+    />
+  );
 }
 
 /**
@@ -27,11 +85,10 @@ export function ImageSequenceScroll({
     offset: ['start start', 'end end']
   });
 
-  // Calculate which image to show based on scroll progress
   const imageIndex = useTransform(
     scrollYProgress,
     [0, 1],
-    [0, images.length - 1]
+    [0, Math.max(0, images.length - 1)]
   );
 
   return (
@@ -42,38 +99,22 @@ export function ImageSequenceScroll({
     >
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         {images.map((src, index) => (
-          <motion.img
+          <SequenceFrame
             key={src}
             src={src}
-            alt={`Frame ${index + 1}`}
-            className="absolute w-full h-full object-cover"
-            style={{
-              opacity: prefersReducedMotion 
-                ? index === 0 ? 1 : 0 
-                : useTransform(
-                    imageIndex,
-                    [index - 0.5, index, index + 0.5],
-                    [0, 1, 0]
-                  ),
-            }}
+            index={index}
+            imageIndex={imageIndex}
+            prefersReducedMotion={prefersReducedMotion}
           />
         ))}
         
-        {/* Progress indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
           {images.map((_, index) => (
-            <motion.div
+            <SequenceDot
               key={index}
-              className="w-2 h-2 rounded-full bg-white/50"
-              style={{
-                backgroundColor: prefersReducedMotion 
-                  ? index === 0 ? 'white' : 'rgba(255,255,255,0.5)'
-                  : useTransform(
-                      imageIndex,
-                      [index - 0.5, index, index + 0.5],
-                      ['rgba(255,255,255,0.5)', 'white', 'rgba(255,255,255,0.5)']
-                    ),
-              }}
+              index={index}
+              imageIndex={imageIndex}
+              prefersReducedMotion={prefersReducedMotion}
             />
           ))}
         </div>

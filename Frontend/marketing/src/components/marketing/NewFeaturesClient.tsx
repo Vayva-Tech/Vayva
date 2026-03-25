@@ -10,6 +10,7 @@ import {
   featureShowcase,
   featureWorkflowSteps,
 } from "@/data/marketing-content";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 // Device frame wrapper — declared outside component to prevent recreation on each render
 function DeviceFrame({ children, type }: { children: React.ReactNode; type: "phone" | "desktop" }) {
@@ -127,9 +128,9 @@ function FeatureDemo({ type }: { type: string }): React.JSX.Element {
                         <span>₦47,500</span>
                       </div>
                     </div>
-                    <button className="mt-2 w-full bg-emerald-600 text-white text-xs py-2 rounded-lg">
+                    <Button type="button" className="mt-2 w-full bg-emerald-600 text-white text-xs py-2 rounded-lg h-auto hover:bg-emerald-700 hover:text-white">
                       Pay Now →
-                    </button>
+                    </Button>
                   </div>
                 </motion.div>
               )}
@@ -139,10 +140,13 @@ function FeatureDemo({ type }: { type: string }): React.JSX.Element {
           {/* Step indicators */}
           <div className="absolute bottom-16 left-4 right-4 flex gap-2">
             {[0, 1, 2].map(i => (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 key={i}
                 onClick={() => setActiveStep(i)}
-                className={`flex-1 h-1 rounded-full transition-all ${activeStep === i ? "bg-emerald-500" : "bg-slate-300"}`}
+                className={`flex-1 h-1 min-h-0 p-0 rounded-full transition-all ${activeStep === i ? "bg-emerald-500 hover:bg-emerald-500" : "bg-slate-300 hover:bg-slate-400"}`}
+                aria-label={`Step ${i + 1}`}
               />
             ))}
           </div>
@@ -361,11 +365,11 @@ function FeatureDemo({ type }: { type: string }): React.JSX.Element {
                 <p className="text-sm font-medium text-slate-900">Kwik Delivery</p>
                 <p className="text-xs text-slate-500">Abdul • +234 801 234 5678</p>
               </div>
-              <button className="p-2 bg-emerald-100 rounded-full">
+              <Button type="button" variant="ghost" className="p-2 bg-emerald-100 rounded-full h-auto hover:bg-emerald-200" aria-label="Call rider">
                 <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -381,16 +385,16 @@ export function NewFeaturesClient(): React.JSX.Element {
   const [activeFeature, setActiveFeature] = useState(0);
 
   return (
-    <div className="relative text-slate-900">
+    <div className="relative w-full min-w-0 overflow-x-hidden text-slate-900">
       <section className="relative overflow-hidden border-b border-slate-200/70">
-        <div className="relative max-w-[1600px] mx-auto px-6 py-24 text-center">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center min-w-0">
           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-700">
             Vayva platform features
           </span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-6 text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight"
+            className="mt-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight px-1"
           >
             Everything you need to run high-performing commerce.
           </motion.h1>
@@ -398,9 +402,12 @@ export function NewFeaturesClient(): React.JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-6 text-lg text-slate-600"
+            className="mt-6 text-base sm:text-lg text-slate-600 px-1"
           >
-            Capture orders, collect payments, fulfill delivery, and drive growth with a single command center.
+            <span className="md:hidden">Orders, payments, delivery, and growth in one place.</span>
+            <span className="hidden md:inline">
+              Capture orders, collect payments, fulfill delivery, and drive growth with a single command center.
+            </span>
           </motion.p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href={`${APP_URL}/signup`}>
@@ -418,8 +425,8 @@ export function NewFeaturesClient(): React.JSX.Element {
       </section>
 
       <section className="py-20">
-        <div className="max-w-[1600px] mx-auto px-6 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-start">
-          <div className="space-y-4">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex flex-col gap-10 lg:grid lg:grid-cols-[1fr_1.1fr] lg:gap-12 items-start min-w-0">
+          <div className="order-2 lg:order-1 space-y-4 w-full min-w-0">
             {featureShowcase.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -453,7 +460,7 @@ export function NewFeaturesClient(): React.JSX.Element {
               </motion.div>
             ))}
           </div>
-          <div className="lg:sticky lg:top-24">
+          <div className="order-1 lg:order-2 w-full min-w-0 lg:sticky lg:top-24">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeFeature}
@@ -470,7 +477,7 @@ export function NewFeaturesClient(): React.JSX.Element {
       </section>
 
       <section className="py-20">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold">How it works</p>
@@ -480,7 +487,7 @@ export function NewFeaturesClient(): React.JSX.Element {
               Full workflow →
             </Link>
           </div>
-          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="mt-10 hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featureWorkflowSteps.map((item) => (
               <div key={item.step} className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-6">
                 <span className="text-xs font-semibold text-emerald-600">{item.step}</span>
@@ -489,17 +496,35 @@ export function NewFeaturesClient(): React.JSX.Element {
               </div>
             ))}
           </div>
+          <div className="mt-10 sm:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Workflow steps"
+              hint="Swipe each step"
+              showDots
+              dotCount={featureWorkflowSteps.length}
+            >
+              {featureWorkflowSteps.map((item) => (
+                <MarketingSnapItem key={item.step}>
+                  <div className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-6 h-full">
+                    <span className="text-xs font-semibold text-emerald-600">{item.step}</span>
+                    <h3 className="mt-3 text-lg font-semibold text-slate-900">{item.title}</h3>
+                    <p className="mt-3 text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                  </div>
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
+          </div>
         </div>
       </section>
 
       <section className="py-20">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto">
             <p className="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold">Infrastructure</p>
             <h2 className="mt-4 text-3xl font-semibold">Built for serious commerce operations.</h2>
             <p className="mt-4 text-lg text-slate-600">Scale with confidence on a platform designed for high-volume Nigeria-first businesses.</p>
           </div>
-          <div className="mt-12 grid md:grid-cols-2 gap-6">
+          <div className="mt-12 hidden md:grid md:grid-cols-2 gap-6">
             {featureInfrastructure.map((item) => (
               <div key={item.title} className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-8">
                 <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
@@ -507,11 +532,28 @@ export function NewFeaturesClient(): React.JSX.Element {
               </div>
             ))}
           </div>
+          <div className="mt-12 md:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Platform infrastructure"
+              hint="Swipe for more"
+              showDots
+              dotCount={featureInfrastructure.length}
+            >
+              {featureInfrastructure.map((item) => (
+                <MarketingSnapItem key={item.title}>
+                  <div className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-6 h-full">
+                    <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                    <p className="mt-3 text-sm text-slate-600 leading-relaxed">{item.description}</p>
+                  </div>
+                </MarketingSnapItem>
+              ))}
+            </MarketingSnapRow>
+          </div>
         </div>
       </section>
 
       <section className="py-24">
-        <div className="max-w-[1600px] mx-auto px-6 text-center text-slate-900">
+        <div className="max-w-[1400px] mx-auto px-6 text-center text-slate-900">
           <h2 className="text-3xl md:text-4xl font-semibold">Bring every channel into one platform.</h2>
           <p className="mt-4 text-lg text-slate-600">
             Start free, or talk to the team about a custom rollout for multi-location brands.

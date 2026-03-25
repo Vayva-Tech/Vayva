@@ -17,7 +17,7 @@ export const POST = withVayvaAPI(
   async (request: NextRequest, { params }: RouteParams) => {
     try {
       const { id } = await params;
-      const storeId = request.headers.get("x-store-id") || "default";
+      const _storeId = request.headers.get("x-store-id") || "default";
       const user = request.headers.get("x-user-id");
 
       const writeOff = await prisma.writeOff.update({

@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 /**
@@ -6,17 +5,16 @@
  * Provides feature availability checking and quota management
  */
 
-import { useState, useEffect } from 'react';
-import { useStore } from '@/providers/store-provider';
-import { 
-  PlanTier, 
-  TierLimits, 
-  TIER_LIMITS, 
-  isFeatureAvailable, 
-  getMaxItems, 
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import {
+  PlanTier,
+  TierLimits,
+  isFeatureAvailable,
+  getMaxItems,
   hasExceededQuota,
-  getRemainingQuota
-} from './tier-limits';
+  getRemainingQuota,
+} from '@/lib/access-control/tier-limits';
 
 interface UseAccessControlReturn {
   currentTier: PlanTier;
@@ -29,20 +27,27 @@ interface UseAccessControlReturn {
 }
 
 export function useAccessControl(): UseAccessControlReturn {
-  const { store } = useStore();
-  const [currentTier, setCurrentTier] = useState<PlanTier>('FREE');
+  const { merchant } = useAuth();
+  const [currentTier, setCurrentTier] = useState<PlanTier>("STARTER");
 
   useEffect(() => {
-    if (store?.subscription?.plan) {
-      // Normalize plan key to our tier system
-      const planKey = store.subscription.plan.key.toUpperCase();
-      if (planKey === 'FREE' || planKey === 'STARTER' || planKey === 'PRO') {
-        setCurrentTier(planKey as PlanTier);
-      } else {
-        setCurrentTier('FREE'); // Fallback
-      }
+    const raw = typeof merchant?.plan === "string" ? merchant.plan : "";
+    const planKey = raw.toUpperCase().replace(/\s+/g, "_");
+    if (planKey === "PRO_PLUS" || planKey === "PRO+") {
+      setCurrentTier("PRO_PLUS");
+    } else if (planKey === "PRO" || planKey === "PROFESSIONAL" || planKey === "PREMIUM") {
+      setCurrentTier("PRO");
+    } else if (
+      planKey === "STARTER" ||
+      planKey === "FREE" ||
+      planKey === "TRIAL" ||
+      !planKey
+    ) {
+      setCurrentTier("STARTER");
+    } else {
+      setCurrentTier("STARTER");
     }
-  }, [store?.subscription?.plan]);
+  }, [merchant?.plan]);
 
   const upgradeUrl = '/dashboard/billing';
 
@@ -56,7 +61,7 @@ export function useAccessControl(): UseAccessControlReturn {
       hasExceededQuota(currentTier, feature, currentUsage),
     getRemainingQuota: (feature: keyof TierLimits, currentUsage: number) => 
       getRemainingQuota(currentTier, feature, currentUsage),
-    canUpgrade: currentTier !== 'PRO',
+    canUpgrade: currentTier !== "PRO_PLUS",
     upgradeUrl
   };
 }

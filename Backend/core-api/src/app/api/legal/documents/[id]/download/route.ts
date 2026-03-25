@@ -1,4 +1,4 @@
-import { NextRequest , NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/with-vayva-api";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma } from "@/lib/prisma";

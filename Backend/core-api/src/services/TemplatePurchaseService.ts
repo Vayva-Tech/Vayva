@@ -1,6 +1,6 @@
 import { PaystackService } from "./PaystackService";
 import { logger } from "@vayva/shared";
-import { prisma } from "@/lib/db";
+import { prisma as _prisma, prismaDelegates } from "@/lib/db";
 
 export interface TemplatePurchaseRequest {
   merchantId: string;
@@ -28,7 +28,7 @@ export const TemplatePurchaseService = {
       const reference = `TMP_${Date.now()}_${merchantId.slice(0, 8)}`;
 
       // Create pending purchase record in database
-      const purchaseRecord = await prisma.templatePurchase.create({
+      const purchaseRecord = await prismaDelegates.templatePurchase.create({
         data: {
           merchantId,
           templateId,
@@ -38,6 +38,14 @@ export const TemplatePurchaseService = {
           initiatedAt: new Date(),
         },
       });
+
+      const transaction = await PaystackService.initializeTransaction(
+        email,
+        amount,
+        reference,
+        callbackUrl,
+        { merchantId, templateId, templatePurchaseId: purchaseRecord.id },
+      );
 
       logger.info('[TEMPLATE_PURCHASE_INIT]', {
         purchaseId: purchaseRecord.id,
@@ -78,7 +86,7 @@ export const TemplatePurchaseService = {
 
       if (verification.status !== "success") {
         // Update purchase status to failed
-        await prisma.templatePurchase.update({
+        await prismaDelegates.templatePurchase.update({
           where: { reference },
           data: { status: 'FAILED', completedAt: new Date() },
         });
@@ -90,7 +98,7 @@ export const TemplatePurchaseService = {
       }
 
       // Get purchase record from database
-      const purchase = await prisma.templatePurchase.findUnique({
+      const purchase = await prismaDelegates.templatePurchase.findUnique({
         where: { reference },
       });
 
@@ -105,7 +113,7 @@ export const TemplatePurchaseService = {
       await this.applyTemplateToStore(purchase.merchantId, purchase.templateId);
 
       // Update purchase status to completed
-      await prisma.templatePurchase.update({
+      await prismaDelegates.templatePurchase.update({
         where: { reference },
         data: { 
           status: 'COMPLETED', 
@@ -151,10 +159,10 @@ export const TemplatePurchaseService = {
   /**
    * Apply purchased template to merchant's store
    */
-  private async applyTemplateToStore(merchantId: string, templateId: string): Promise<void> {
+  async applyTemplateToStore(merchantId: string, templateId: string): Promise<void> {
     try {
       // Get template data
-      const template = await prisma.template.findUnique({
+      const template = await prismaDelegates.template.findUnique({
         where: { id: templateId },
       });
 
@@ -163,16 +171,16 @@ export const TemplatePurchaseService = {
       }
 
       // Update merchant's current template
-      await prisma.merchantSettings.upsert({
+      await prismaDelegates.merchantSettings.upsert({
         where: { merchantId },
         update: { 
           currentTemplateId: templateId,
-          templateCustomizations: template.config as any,
+          templateCustomizations: (template as { config?: unknown }).config as unknown,
         },
         create: {
           merchantId,
           currentTemplateId: templateId,
-          templateCustomizations: template.config as any,
+          templateCustomizations: (template as { config?: unknown }).config as unknown,
         },
       });
 
@@ -181,7 +189,11 @@ export const TemplatePurchaseService = {
         templateId,
       });
     } catch (error) {
-      logger.error('[TEMPLATE_APPLY_ERROR]', error);
+      logger.error("[TEMPLATE_APPLY_ERROR]", {
+        error: error instanceof Error ? error.message : "Unknown error",
+        merchantId,
+        templateId,
+      });
       throw error;
     }
   },

@@ -1,4 +1,28 @@
-// @ts-nocheck
+export {};
+
+declare global {
+  interface Window {
+    vayvaShowReviewForm?: () => void;
+    vayvaSetRating?: (rating: number) => void;
+    vayvaSubmitReview?: (event: Event, storeId: string, productId: string) => void;
+  }
+}
+
+interface ReviewRow {
+  customerName: string;
+  createdAt: string;
+  rating: number;
+  title?: string;
+  content: string;
+}
+
+interface ReviewsPayload {
+  error?: string;
+  averageRating: number;
+  totalReviews: number;
+  reviews: ReviewRow[];
+}
+
 /**
  * Vayva Review & Testimonial Collector Widget
  * 
@@ -15,7 +39,7 @@
   function initReviewWidget() {
     const container = document.getElementById('vayva-review-widget');
     
-    if (!container) return;
+    if (!(container instanceof HTMLElement)) return;
 
     const storeId = container.getAttribute('data-store-id');
     const productId = container.getAttribute('data-product-id');
@@ -35,27 +59,54 @@
     renderReviewWidget(container, storeId, productId, theme, displayMode);
   }
 
-  function renderReviewWidget(container, storeId, productId, theme, displayMode) {
+  function renderReviewWidget(
+    container: HTMLElement,
+    storeId: string,
+    productId: string | null,
+    theme: string,
+    displayMode: string,
+  ) {
     // Fetch reviews and average rating
     fetch(`${VAYVA_API_BASE}/api/embedded/reviews?storeId=${storeId}${productId ? '&productId=' + productId : ''}`)
       .then(res => res.json())
-      .then(data => {
-        if (data.error) throw new Error(data.error);
-        displayReviews(container, data, theme, displayMode, productId);
+      .then((data: unknown) => {
+        const payload = data as ReviewsPayload;
+        if (payload.error) throw new Error(payload.error);
+        displayReviews(container, payload, theme, displayMode, productId, storeId);
       })
       .catch(err => {
         console.error('[Vayva] Failed to load reviews:', err);
-        // Still show form even if reviews fail to load
         if (displayMode !== 'reviews-only') {
-          displayReviewForm(container, storeId, productId, theme);
+          displayReviews(
+            container,
+            { averageRating: 0, totalReviews: 0, reviews: [] },
+            theme,
+            'form-only',
+            productId,
+            storeId,
+          );
+        } else {
+          container.innerHTML = `
+        <div style="padding: 40px; text-align: center; color: #ef4444;">
+          <p><strong>Could not load reviews</strong></p>
+          <p style="font-size: 14px; color: #6b7280;">Please try again later.</p>
+        </div>
+      `;
         }
       });
   }
 
-  function displayReviews(container, data, theme, displayMode, productId) {
+  function displayReviews(
+    container: HTMLElement,
+    data: ReviewsPayload,
+    theme: string,
+    displayMode: string,
+    productId: string | null,
+    storeId: string,
+  ) {
     const { averageRating, totalReviews, reviews } = data;
 
-    let html = `
+    const html = `
       <style>
         .vayva-reviews-container {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -317,7 +368,7 @@
         
         ${displayMode !== 'form-only' && reviews.length > 0 ? `
         <div class="vayva-reviews-list">
-          ${reviews.map(review => `
+          ${reviews.map((review: ReviewRow) => `
             <div class="vayva-review-card">
               <div class="vayva-review-header">
                 <div class="vayva-reviewer-name">${review.customerName}</div>
@@ -349,8 +400,8 @@
     }
   };
 
-  window.vayvaSetRating = function(rating) {
-    const buttons = document.querySelectorAll('.vayva-star-btn');
+  window.vayvaSetRating = function(rating: number) {
+    const buttons = Array.from(document.querySelectorAll('.vayva-star-btn'));
     buttons.forEach((btn, index) => {
       if (index < rating) {
         btn.classList.add('active');
@@ -358,18 +409,23 @@
         btn.classList.remove('active');
       }
     });
-    buttons[rating - 1].dataset.selected = 'true';
+    const target = buttons[rating - 1];
+    if (target instanceof HTMLElement) target.dataset.selected = 'true';
   };
 
-  window.vayvaSubmitReview = async function(event, storeId, productId) {
+  window.vayvaSubmitReview = async function(
+    event: Event,
+    storeId: string,
+    productId: string,
+  ) {
     event.preventDefault();
-    
+
     const form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
     const formData = new FormData(form);
-    
-    // Get selected rating
+
     const selectedRating = document.querySelector('.vayva-star-btn[data-selected="true"]');
-    if (!selectedRating) {
+    if (!(selectedRating instanceof HTMLElement) || !selectedRating.dataset.rating) {
       alert('Please select a star rating');
       return;
     }
@@ -377,7 +433,7 @@
     const reviewData = {
       storeId,
       productId: productId || null,
-      rating: parseInt(selectedRating.dataset.rating),
+      rating: parseInt(selectedRating.dataset.rating, 10),
       customerName: formData.get('name'),
       customerEmail: formData.get('email'),
       title: formData.get('title'),
@@ -391,18 +447,32 @@
         body: JSON.stringify(reviewData)
       });
 
-      const result = await response.json();
+      const result: unknown = await response.json();
+      const ok =
+        typeof result === 'object' &&
+        result !== null &&
+        'success' in result &&
+        (result as { success: boolean }).success;
 
-      if (result.success) {
-        // Hide form and show success message
-        form.parentElement.classList.add('vayva-hidden');
+      if (ok) {
+        form.parentElement?.classList.add('vayva-hidden');
         const successMsg = document.getElementById('vayva-success-message');
         if (successMsg) successMsg.classList.remove('vayva-hidden');
       } else {
-        throw new Error(result.error || 'Failed to submit review');
+        const errMsg =
+          typeof result === 'object' &&
+          result !== null &&
+          'error' in result &&
+          typeof (result as { error: unknown }).error === 'string'
+            ? (result as { error: string }).error
+            : 'Failed to submit review';
+        throw new Error(errMsg);
       }
-    } catch (err) {
-      alert('Error submitting review: ' + err.message);
+    } catch (err: unknown) {
+      alert(
+        'Error submitting review: ' +
+          (err instanceof Error ? err.message : String(err)),
+      );
     }
   };
 

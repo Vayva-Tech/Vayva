@@ -1,19 +1,19 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * Price Tier Calculator Component
  */
 
 import React, { useState } from 'react';
 
-interface TieredPriceResult {
+export interface TieredPriceResult {
   finalPrice: number;
   appliedDiscount: number;
   tierName: string;
   savings: number;
 }
 
-interface PriceTierCalculatorProps {
+export interface PriceTierCalculatorProps {
   productId?: string;
   basePrice?: number;
   tiers?: Array<{
@@ -77,12 +77,12 @@ export const PriceTierCalculator: React.FC<PriceTierCalculatorProps> = ({
           />
         </div>
 
-        <button
+        <Button
           onClick={calculatePrice}
           className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           Calculate Price
-        </button>
+        </Button>
 
         {result && (
           <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
@@ -122,3 +122,4 @@ export const PriceTierCalculator: React.FC<PriceTierCalculatorProps> = ({
     </div>
   );
 };
+

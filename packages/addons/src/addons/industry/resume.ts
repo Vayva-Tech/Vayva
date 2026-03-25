@@ -4,7 +4,7 @@
  * Digital resume with experience and education timeline
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const RESUME_ADDON: AddOnDefinition = {
   id: 'vayva.resume',

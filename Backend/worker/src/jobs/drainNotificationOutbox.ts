@@ -29,7 +29,7 @@ export async function drainNotificationOutbox(batchSize = 25) {
   for (const notification of candidates) {
     // Claim atomically
     const claimed = await prisma.notificationOutbox.updateMany({
-      where: { id: notification.id, status: { in: ["QUEUED", "FAILED"] as any } },
+      where: { id: notification.id, status: { in: ["QUEUED", "FAILED"] as const } },
       data: {
         status: "SENDING",
         attempts: { increment: 1 },

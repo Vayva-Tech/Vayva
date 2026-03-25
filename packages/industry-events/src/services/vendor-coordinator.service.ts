@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Vendor Coordinator Service
  * Manages vendor relationships, contracts, and coordination
@@ -69,8 +68,8 @@ export class VendorCoordinatorService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[VENDOR_COORDINATOR] Initializing service...');
-    console.log('[VENDOR_COORDINATOR] Service initialized');
+    console.warn('[VENDOR_COORDINATOR] Initializing service...');
+    console.warn('[VENDOR_COORDINATOR] Service initialized');
   }
 
   /**

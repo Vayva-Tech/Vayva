@@ -7,6 +7,13 @@ import { useStore } from "@/context/StoreContext";
 import { TrackingService } from "@/services/tracking.service";
 import { TrackingInfo } from "@/types/tracking";
 import { MapPin, Package, Truck, CheckCircle, Clock, AlertCircle, ExternalLink } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const LiveMap = dynamic(
+  async () =>
+    (await import("@/components/tracking/LiveMap")).LiveMap,
+  { ssr: false },
+);
 
 interface TrackingPageProps {
   params: Promise<{ code: string }>;
@@ -14,7 +21,7 @@ interface TrackingPageProps {
 
 export default function TrackingPage({ params }: TrackingPageProps): React.JSX.Element {
   const { store } = useStore();
-  const [trackingCode, setTrackingCode] = useState("");
+  const [_trackingCode, setTrackingCode] = useState("");
   const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -165,6 +172,51 @@ export default function TrackingPage({ params }: TrackingPageProps): React.JSX.E
 
                 <p className="text-gray-600">{trackingInfo.statusDescription}</p>
 
+                {/* Payment / COD */}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="text-xs text-gray-500">Product</div>
+                    <div className="font-semibold text-gray-900">
+                      {trackingInfo.order.paymentStatus === "SUCCESS"
+                        ? "Paid"
+                        : trackingInfo.payment?.cod
+                          ? "Pay on delivery"
+                          : trackingInfo.order.paymentStatus || "Pending"}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Subtotal: ₦{trackingInfo.order.subtotal.toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="text-xs text-gray-500">Delivery</div>
+                    <div className="font-semibold text-gray-900">
+                      {trackingInfo.payment?.cod?.includesDelivery
+                        ? "COD (included)"
+                        : trackingInfo.order.shippingTotal > 0
+                          ? "Prepaid/Configured"
+                          : "Free/Pickup"}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Delivery fee: ₦{trackingInfo.order.shippingTotal.toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="text-xs text-gray-500">Collect on delivery</div>
+                    <div className="font-semibold text-gray-900">
+                      {trackingInfo.payment?.cod
+                        ? `₦${(trackingInfo.payment.cod.amount ?? trackingInfo.order.total).toLocaleString()}`
+                        : "₦0"}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {trackingInfo.payment?.cod
+                        ? trackingInfo.payment.cod.includesDelivery
+                          ? "Includes delivery"
+                          : "Product only"
+                        : "No cash collection"}
+                    </div>
+                  </div>
+                </div>
+
                 {/* External Tracking Link */}
                 {trackingInfo.externalTrackingUrl && (
                   <a
@@ -193,6 +245,34 @@ export default function TrackingPage({ params }: TrackingPageProps): React.JSX.E
                 </div>
               </div>
             </div>
+
+            {/* Live Map */}
+            {trackingInfo.live && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <h3 className="font-bold">Live tracking</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Last sync:{" "}
+                      {trackingInfo.live.lastSyncAt
+                        ? new Date(trackingInfo.live.lastSyncAt).toLocaleString()
+                        : new Date(trackingInfo.lastUpdated).toLocaleString()}
+                    </p>
+                  </div>
+                  {trackingInfo.live.rider?.name && (
+                    <div className="text-sm text-gray-700">
+                      Rider: <span className="font-semibold">{trackingInfo.live.rider.name}</span>
+                    </div>
+                  )}
+                </div>
+
+                <LiveMap
+                  rider={trackingInfo.live.rider?.location || null}
+                  pickup={trackingInfo.live.pickup?.location || null}
+                  delivery={trackingInfo.live.delivery?.location || null}
+                />
+              </div>
+            )}
 
             {/* Delivery Details */}
             <div className="grid md:grid-cols-2 gap-6">

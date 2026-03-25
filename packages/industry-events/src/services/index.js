@@ -8,7 +8,7 @@ export class EventTimelineBuilderService {
   }
   
   async initialize() {
-    console.log('[EVENT_TIMELINE_BUILDER_SERVICE] Initialized');
+    console.warn('[EVENT_TIMELINE_BUILDER_SERVICE] Initialized');
   }
   
   async createTimeline(eventData) {
@@ -35,7 +35,7 @@ export class VendorCoordinatorService {
   }
   
   async initialize() {
-    console.log('[VENDOR_COORDINATOR_SERVICE] Initialized');
+    console.warn('[VENDOR_COORDINATOR_SERVICE] Initialized');
   }
   
   async addVendor(vendorData) {
@@ -48,7 +48,7 @@ export class VendorCoordinatorService {
     return vendor;
   }
   
-  async getVendors(filters = {}) {
+  async getVendors(_filters = {}) {
     return this.vendors;
   }
 }
@@ -59,7 +59,7 @@ export class SeatingChartDesignerService {
   }
   
   async initialize() {
-    console.log('[SEATING_CHART_DESIGNER_SERVICE] Initialized');
+    console.warn('[SEATING_CHART_DESIGNER_SERVICE] Initialized');
   }
   
   async createSeatingChart(chartData) {
@@ -83,7 +83,7 @@ export class GuestListManagerService {
   }
   
   async initialize() {
-    console.log('[GUEST_LIST_MANAGER_SERVICE] Initialized');
+    console.warn('[GUEST_LIST_MANAGER_SERVICE] Initialized');
   }
   
   async addGuest(guestData) {
@@ -96,7 +96,7 @@ export class GuestListManagerService {
     return guest;
   }
   
-  async getGuests(filters = {}) {
+  async getGuests(_filters = {}) {
     return this.guests;
   }
   

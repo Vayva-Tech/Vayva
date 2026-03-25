@@ -1,12 +1,17 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/realestate/leads/pipeline - Get lead pipeline statistics
 export async function GET(request: NextRequest) {
+  let storeId: string | undefined;
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const agentId = searchParams.get("agentId");
     const type = searchParams.get("type");
@@ -18,23 +23,34 @@ export async function GET(request: NextRequest) {
     const result = await apiJson<{
       success: boolean;
       data?: {
-        summary: { totalLeads: number; convertedLeads: number; conversionRate: number; newLeadsLast7Days: number; contactedLast7Days: number };
+        summary: {
+          totalLeads: number;
+          convertedLeads: number;
+          conversionRate: number;
+          newLeadsLast7Days: number;
+          contactedLast7Days: number;
+        };
         byStatus: Record<string, { count: number; percentage: number }>;
-        detailedPipeline: Array<{ stage: string; count: number; leads: any[]; totalBudget: number; avgBudget: number }>;
+        detailedPipeline: Array<{
+          stage: string;
+          count: number;
+          leads: unknown[];
+          totalBudget: number;
+          avgBudget: number;
+        }>;
         stages: string[];
       };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/realestate/leads/pipeline?${queryParams.toString()}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+    }>(`${buildBackendUrl("/api/realestate/leads/pipeline")}?${queryParams.toString()}`, {
+      headers: auth.headers,
     });
 
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, {
       endpoint: "/api/realestate/leads/pipeline",
       operation: "GET_LEAD_PIPELINE",
+      storeId,
     });
     return NextResponse.json(
       { error: "Failed to fetch lead pipeline" },

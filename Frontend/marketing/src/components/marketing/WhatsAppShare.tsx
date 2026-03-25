@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { urls } from "@vayva/shared";
 import { IconBrandWhatsapp as WhatsappLogo, IconShare as ShareNetwork } from "@tabler/icons-react";
 
 interface WhatsAppShareProps {
@@ -12,7 +13,7 @@ interface WhatsAppShareProps {
 }
 
 export function WhatsAppShareButton({
-  url = "https://vayva.ng",
+  url = urls.marketingBase(),
   title = "Check out Vayva",
   description = "Turns WhatsApp into a real business! Accept Paystack payments, manage orders, get daily payouts in Naira.",
   className = "",
@@ -70,8 +71,9 @@ export function ShareTestimonial({
   merchantName: string;
   quote: string;
 }): React.JSX.Element {
+  const site = urls.marketingBase();
   const shareText = encodeURIComponent(
-    `"${quote}" — ${merchantName} using Vayva to sell on WhatsApp 💚\n\nStart your own WhatsApp store: https://vayva.ng`
+    `"${quote}" — ${merchantName} using Vayva to sell on WhatsApp 💚\n\nStart your own WhatsApp store: ${site}`,
   );
   const whatsappUrl = `https://wa.me/?text=${shareText}`;
 

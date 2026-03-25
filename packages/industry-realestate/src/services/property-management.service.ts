@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Property Management Service
  * Manages real estate listings, showings, and client interactions

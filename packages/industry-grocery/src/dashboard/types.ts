@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Dashboard Type Definitions
  */

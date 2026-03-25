@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nightlife Dashboard Hook
  * Fetches all nightlife dashboard data
@@ -78,7 +77,10 @@ export function useNightlifeDashboard() {
           throw new Error('Failed to fetch nightlife dashboard');
         }
         
-        const result = await response.json();
+        const result = (await response.json()) as { data?: NightlifeDashboardData };
+        if (!result.data) {
+          throw new Error('Invalid nightlife dashboard payload');
+        }
         setData(result.data);
         
         setError(null);

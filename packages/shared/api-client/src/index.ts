@@ -26,18 +26,39 @@ class ApiClient {
       ...(options.headers || {}),
     };
 
-    const response = await fetch(url, options);
+    const controller = new AbortController();
+    const timeoutMs = 10_000;
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-    if (!response.ok) {
-      const errorData: ApiResponse<T> = await response.json().catch(() => ({
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal });
+
+      if (!response.ok) {
+        const errorData: ApiResponse<T> = await response.json().catch(() => ({
+          success: false,
+          error: { code: "UNKNOWN_ERROR", message: "Unknown error" },
+        }));
+
+        return errorData;
+      }
+
+      return response.json();
+    } catch (error) {
+      const isAbort =
+        typeof error === "object" &&
+        error !== null &&
+        "name" in error &&
+        (error as { name?: string }).name === "AbortError";
+      return {
         success: false,
-        error: { code: "UNKNOWN_ERROR", message: "Unknown error" },
-      }));
-
-      return errorData;
+        error: {
+          code: isAbort ? "TIMEOUT" : "NETWORK_ERROR",
+          message: isAbort ? "Request timed out" : "Network error",
+        },
+      } as ApiResponse<T>;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    return response.json();
   }
 
   async get<T>(

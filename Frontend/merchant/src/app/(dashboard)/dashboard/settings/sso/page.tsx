@@ -14,8 +14,8 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { Button, Input } from "@vayva/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface IdentityProvider {
   id: string;
@@ -144,26 +144,12 @@ export default function SSOSettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-      <div>
+      <div className="flex items-center gap-4">
         <BackButton />
-        <Breadcrumbs
-          items={[
-            { label: "Settings", href: "/dashboard/settings" },
-            { label: "SSO & Provisioning" },
-          ]}
+        <PageHeader
+          title="SSO & User Provisioning"
+          subtitle="Configure SAML 2.0 Single Sign-On and SCIM automated provisioning"
         />
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-blue-50 rounded-lg">
-          <ShieldCheck size={24} className="text-blue-600" weight="duotone" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">SSO & User Provisioning</h1>
-          <p className="text-gray-500 text-sm">
-            Configure SAML 2.0 Single Sign-On and SCIM automated provisioning
-          </p>
-        </div>
       </div>
 
       {/* Identity Providers Section */}

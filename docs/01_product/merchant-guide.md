@@ -76,7 +76,7 @@ For each product, you can configure:
 | SEO | Custom title and description for search engines |
 | Inventory | Stock quantity, SKU, barcode |
 
-**Limits by plan:** STARTER supports up to 500 products, PRO up to 1,000, PRO_PLUS unlimited.
+**Limits by plan:** STARTER supports up to 100 products, PRO up to 300, PRO+ up to 500.
 
 ### Product Collections
 

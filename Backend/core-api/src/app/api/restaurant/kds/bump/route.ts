@@ -62,7 +62,7 @@ export const POST = withVayvaAPI(
       }
       
       // Bump (prioritize) the tickets
-      const bumpedTickets = await db.kitchenTicket.updateMany({
+      const _bumpedTickets = await db.kitchenTicket.updateMany({
         where: {
           id: { in: validatedData.ticketIds },
           storeId,

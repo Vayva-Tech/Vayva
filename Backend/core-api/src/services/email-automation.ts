@@ -13,7 +13,7 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY || '');
 
-interface EmailOptions {
+interface _EmailOptions {
   to: string;
   subject: string;
   html: string;
@@ -68,7 +68,7 @@ export async function sendClientReport(
         text,
       });
 
-      console.log(`Report sent to ${clientEmail}`);
+      console.warn(`Report sent to ${clientEmail}`);
       return { success: true };
     } catch (error) {
       console.error('Failed to send report:', error);
@@ -117,7 +117,7 @@ export async function sendMilestoneNotification(
       html,
     });
 
-    console.log(`Milestone notification sent to ${clientEmail}`);
+    console.warn(`Milestone notification sent to ${clientEmail}`);
     return { success: true };
   } catch (error) {
     console.error('Failed to send milestone notification:', error);
@@ -194,7 +194,7 @@ export async function sendInvoiceReminder(
       html,
     });
 
-    console.log(`Invoice reminder sent to ${clientEmail}`);
+    console.warn(`Invoice reminder sent to ${clientEmail}`);
     return { success: true };
   } catch (error) {
     console.error('Failed to send invoice reminder:', error);
@@ -263,7 +263,7 @@ function generateReportHTML(data: ReportData): string {
 
           <div class="section">
             <h2>📊 Highlights</h2>
-            ${data.highlights.map((highlight, index) => `
+            ${data.highlights.map((highlight, _index) => `
               <div class="highlight-item">✓ ${highlight}</div>
             `).join('')}
           </div>
@@ -328,11 +328,11 @@ async function sendWithRetry<T>(
 
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
-      const result = await sendFn();
+      const _result = await sendFn();
       
       // Log successful send after retries
       if (attempt > 0) {
-        console.log(`Email sent successfully on attempt ${attempt + 1}`);
+        console.warn(`Email sent successfully on attempt ${attempt + 1}`);
       }
       
       return { success: true };
@@ -347,7 +347,7 @@ async function sendWithRetry<T>(
       // Don't wait after the last attempt
       if (attempt < config.maxRetries) {
         const delay = calculateExponentialDelay(attempt, config);
-        console.log(`Retrying in ${delay}ms...`);
+        console.warn(`Retrying in ${delay}ms...`);
         await sleep(delay);
       }
     }
@@ -403,7 +403,7 @@ async function logFailedEmail(type: string, error: string): Promise<void> {
     //     metadata: { attempts: DEFAULT_RETRY_CONFIG.maxRetries + 1 },
     //   },
     // });
-    console.log('Logged failed email to database:', { type, error });
+    console.warn('Logged failed email to database:', { type, error });
   } catch (logError) {
     console.error('Failed to log email failure to database:', logError);
   }

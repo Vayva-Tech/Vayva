@@ -8,7 +8,7 @@ import {
   logger,
   standardHeaders,
   BadRequestError,
-  ForbiddenError,
+  ForbiddenError
 } from "@vayva/shared";
 import { rateLimit } from "@vayva/shared/rateLimit";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";

@@ -1,8 +1,8 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 import { KPICard } from '../components/KPICard';
 import { SizeCurveAnalysis } from '../components/SizeCurveAnalysis';
 import { CollectionHealthMatrix } from '../components/CollectionHealthMatrix';
@@ -11,7 +11,16 @@ import { InventoryVariantHeatmap } from '../components/InventoryVariantHeatmap';
 import { TrendForecastingWidget } from '../components/TrendForecastingWidget';
 import { RecentActivityFeed } from '../components/RecentActivityFeed';
 import { AIInsightsPanel } from '../components/AIInsightsPanel';
-import type { FashionKPI, SizeCurveData, CollectionHealth, Lookbook, InventoryVariant, TrendData, ActivityItem, AIRecommendation } from '../types';
+import type {
+  FashionKPI,
+  SizeCurveData,
+  CollectionHealth,
+  Lookbook,
+  InventoryVariant,
+  TrendData,
+} from "../types";
+import type { ActivityItem } from "./RecentActivityFeed";
+import type { AIRecommendation } from "./AIInsightsPanel";
 
 export interface FashionDashboardProps {
   kpis: FashionKPI[];
@@ -49,12 +58,12 @@ export const FashionDashboard: React.FC<FashionDashboardProps> = ({
               <p className="text-sm text-white/60">Last updated: 2 minutes ago</p>
             </div>
             <div className="flex gap-3">
-              <button className="px-4 py-2 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-lg transition-colors">
+              <Button className="px-4 py-2 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-lg transition-colors">
                 + New Collection
-              </button>
-              <button className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-colors border border-white/10">
+              </Button>
+              <Button className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-colors border border-white/10">
                 📊 Export Report
-              </button>
+              </Button>
             </div>
           </div>
         </GlassPanel>
@@ -111,3 +120,4 @@ export const FashionDashboard: React.FC<FashionDashboardProps> = ({
 };
 
 export default FashionDashboard;
+

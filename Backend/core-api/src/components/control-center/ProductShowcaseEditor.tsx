@@ -8,7 +8,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import {
   Spinner as Loader2,
   MagnifyingGlass as Search,
-  X,
+  X
 } from "@phosphor-icons/react/ssr";
 
 interface Product {

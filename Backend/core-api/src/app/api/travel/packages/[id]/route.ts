@@ -24,93 +24,91 @@ const PackageUpdateSchema = z.object({
   status: z.enum(["active", "inactive", "archived"]).optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.PRODUCTS_VIEW,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    const travelPackage = await prisma.travelPackage.findFirst({
-      where: { id, storeId },
-      include: {
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            contactEmail: true,
-            rating: true,
-            reviews: {
-              select: {
-                rating: true,
-                comment: true,
-              },
-              take: 5,
-            },
-          },
-        },
-        bookings: {
-          select: {
-            id: true,
-            status: true,
-            travelDate: true,
-            totalPrice: true,
-            customer: {
-              select: {
-                firstName: true,
-                lastName: true,
+      const travelPackage = await prisma.travelPackage.findFirst({
+        where: { id, storeId },
+        include: {
+          supplier: {
+            select: {
+              id: true,
+              name: true,
+              contactEmail: true,
+              rating: true,
+              reviews: {
+                select: {
+                  rating: true,
+                  comment: true,
+                },
+                take: 5,
               },
             },
           },
-          take: 10,
-          orderBy: { createdAt: "desc" },
-        },
-        _count: {
-          select: {
-            bookings: true,
+          bookings: {
+            where: { storeId },
+            select: {
+              id: true,
+              status: true,
+              travelDate: true,
+              totalPrice: true,
+              customer: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+            take: 10,
+            orderBy: { createdAt: "desc" },
+          },
+          _count: {
+            select: {
+              bookings: { where: { storeId } },
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!travelPackage) {
+      if (!travelPackage) {
+        return NextResponse.json(
+          { error: "Package not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      const packageWithParsedData = {
+        ...travelPackage,
+        includes: JSON.parse(travelPackage.includes || "[]"),
+        excludes: JSON.parse(travelPackage.excludes || "[]"),
+        highlights: JSON.parse(travelPackage.highlights || "[]"),
+      };
+
       return NextResponse.json(
-        { error: "Package not found" },
-        { status: 404, headers: standardHeaders(requestId) }
+        { data: packageWithParsedData },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: packageId } = await params;
+      logger.error("[TRAVEL_PACKAGE_GET]", { error, packageId });
+      return NextResponse.json(
+        { error: "Failed to fetch package" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-
-    // Parse JSON fields
-    const packageWithParsedData = {
-      ...travelPackage,
-      includes: JSON.parse(travelPackage.includes || "[]"),
-      excludes: JSON.parse(travelPackage.excludes || "[]"),
-      highlights: JSON.parse(travelPackage.highlights || "[]"),
-    };
-
-    return NextResponse.json(
-      { data: packageWithParsedData },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[TRAVEL_PACKAGE_GET]", { error, packageId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch package" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+  },
+);
 
 export const PUT = withVayvaAPI(
   PERMISSIONS.PRODUCTS_MANAGE,
-  async (req: NextRequest, { params, storeId, user, correlationId }: APIContext & { params: { id: string } }) => {
+  async (req: NextRequest, { params, storeId, user, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
-      const { id } = params;
+      const { id } = await params;
       const json = await req.json().catch(() => ({}));
       const parseResult = PackageUpdateSchema.safeParse(json);
 
@@ -120,13 +118,12 @@ export const PUT = withVayvaAPI(
             error: "Invalid package data",
             details: parseResult.error.flatten(),
           },
-          { status: 400, headers: standardHeaders(requestId) }
+          { status: 400, headers: standardHeaders(requestId) },
         );
       }
 
       const body = parseResult.data;
 
-      // Check if package exists
       const existingPackage = await prisma.travelPackage.findFirst({
         where: { id, storeId },
       });
@@ -134,34 +131,35 @@ export const PUT = withVayvaAPI(
       if (!existingPackage) {
         return NextResponse.json(
           { error: "Package not found" },
-          { status: 404, headers: standardHeaders(requestId) }
+          { status: 404, headers: standardHeaders(requestId) },
         );
       }
 
-      // Verify supplier exists if provided
       if (body.supplierId) {
         const supplier = await prisma.travelSupplier.findFirst({
           where: { id: body.supplierId, storeId },
         });
-        
+
         if (!supplier) {
           return NextResponse.json(
             { error: "Supplier not found" },
-            { status: 404, headers: standardHeaders(requestId) }
+            { status: 404, headers: standardHeaders(requestId) },
           );
         }
       }
 
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
       if (body.name) updateData.name = body.name;
-      if (body.description !== undefined) updateData.description = body.description;
+      if (body.description !== undefined)
+        updateData.description = body.description;
       if (body.destination) updateData.destination = body.destination;
       if (body.duration) updateData.duration = body.duration;
       if (body.price) updateData.price = body.price;
       if (body.currency) updateData.currency = body.currency;
       if (body.includes) updateData.includes = JSON.stringify(body.includes);
       if (body.excludes) updateData.excludes = JSON.stringify(body.excludes);
-      if (body.highlights) updateData.highlights = JSON.stringify(body.highlights);
+      if (body.highlights)
+        updateData.highlights = JSON.stringify(body.highlights);
       if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl;
       if (body.supplierId) updateData.supplierId = body.supplierId;
       if (body.startDate) updateData.startDate = new Date(body.startDate);
@@ -170,9 +168,20 @@ export const PUT = withVayvaAPI(
       if (body.minTravelers) updateData.minTravelers = body.minTravelers;
       if (body.status) updateData.status = body.status;
 
-      const travelPackage = await prisma.travelPackage.update({
-        where: { id },
+      const upd = await prisma.travelPackage.updateMany({
+        where: { id, storeId },
         data: updateData,
+      });
+
+      if (upd.count === 0) {
+        return NextResponse.json(
+          { error: "Package not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      const travelPackage = await prisma.travelPackage.findFirst({
+        where: { id, storeId },
         include: {
           supplier: {
             select: {
@@ -188,11 +197,17 @@ export const PUT = withVayvaAPI(
         headers: standardHeaders(requestId),
       });
     } catch (error: unknown) {
-      logger.error("[TRAVEL_PACKAGE_PUT]", { error, packageId: params.id, storeId, userId: user?.id });
+      const { id: packageId } = await params;
+      logger.error("[TRAVEL_PACKAGE_PUT]", {
+        error,
+        packageId,
+        storeId,
+        userId: user?.id,
+      });
       return NextResponse.json(
         { error: "Failed to update package" },
-        { status: 500, headers: standardHeaders(requestId) }
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-  }
+  },
 );

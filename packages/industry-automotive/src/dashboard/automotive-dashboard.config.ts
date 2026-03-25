@@ -1,5 +1,4 @@
-// @ts-nocheck
-import type { DashboardEngineConfig, WidgetDefinition } from '../types';
+import type { DashboardEngineConfig, WidgetDefinition } from '@vayva/industry-core';
 
 const TOTAL_INVENTORY: WidgetDefinition = {
   id: 'total-inventory',
@@ -34,7 +33,7 @@ const TEST_DRIVE_CONVERSION: WidgetDefinition = {
   title: 'Test Drive Conversion',
   industry: 'automotive',
   dataSource: { type: 'analytics', query: 'testDrives.conversionRate' },
-  visualization: { type: 'gauge', options: { min: 0, max: 100, unit: '%' } },
+  config: { visualization: { type: 'gauge', options: { min: 0, max: 100, unit: '%' } } },
   refreshInterval: 3600,
 };
 
@@ -44,7 +43,7 @@ const REVENUE_TREND: WidgetDefinition = {
   title: 'Revenue Trend',
   industry: 'automotive',
   dataSource: { type: 'analytics', query: 'revenue.monthly' },
-  visualization: { type: 'line', options: { currency: true } },
+  config: { visualization: { type: 'line', options: { currency: true } } },
   refreshInterval: 3600,
 };
 
@@ -54,7 +53,7 @@ const TOP_SELLING_MAKES: WidgetDefinition = {
   title: 'Top Selling Makes',
   industry: 'automotive',
   dataSource: { type: 'analytics', query: 'vehicles.topMakes' },
-  visualization: { type: 'bar' },
+  config: { visualization: { type: 'bar' } },
   refreshInterval: 3600,
 };
 
@@ -64,7 +63,7 @@ const INVENTORY_BY_CONDITION: WidgetDefinition = {
   title: 'Inventory by Condition',
   industry: 'automotive',
   dataSource: { type: 'analytics', query: 'vehicles.byCondition' },
-  visualization: { type: 'donut' },
+  config: { visualization: { type: 'donut' } },
   refreshInterval: 3600,
 };
 
@@ -77,7 +76,6 @@ const TODAYS_SCHEDULE: WidgetDefinition = {
   refreshInterval: 60,
 };
 
-// New Enhanced Widgets
 const SERVICE_APPOINTMENTS: WidgetDefinition = {
   id: 'service-appointments',
   type: 'kpi-card',
@@ -111,16 +109,37 @@ const SALES_FORECAST: WidgetDefinition = {
   title: 'Sales Forecast',
   industry: 'automotive',
   dataSource: { type: 'analytics', query: 'sales.forecast' },
-  visualization: { type: 'line', options: { currency: true } },
+  config: { visualization: { type: 'line', options: { currency: true } } },
   refreshInterval: 3600,
 };
 
 export const AUTOMOTIVE_DASHBOARD_CONFIG: DashboardEngineConfig = {
   industry: 'automotive',
+  title: 'Automotive',
+  subtitle: 'Dealership operations and inventory',
+  primaryObjectLabel: 'Vehicle',
+  defaultTimeHorizon: 'month',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
+  failureModes: [],
   widgets: [
-    TOTAL_INVENTORY, VEHICLES_SOLD, MONTHLY_REVENUE, TEST_DRIVE_CONVERSION,
-    REVENUE_TREND, TOP_SELLING_MAKES, INVENTORY_BY_CONDITION, TODAYS_SCHEDULE,
-    SERVICE_APPOINTMENTS, FINANCING_APPLICATIONS, TRADE_IN_EVALUATIONS, SALES_FORECAST,
+    TOTAL_INVENTORY,
+    VEHICLES_SOLD,
+    MONTHLY_REVENUE,
+    TEST_DRIVE_CONVERSION,
+    REVENUE_TREND,
+    TOP_SELLING_MAKES,
+    INVENTORY_BY_CONDITION,
+    TODAYS_SCHEDULE,
+    SERVICE_APPOINTMENTS,
+    FINANCING_APPLICATIONS,
+    TRADE_IN_EVALUATIONS,
+    SALES_FORECAST,
   ],
   layouts: [
     {
@@ -196,18 +215,42 @@ export const AUTOMOTIVE_DASHBOARD_CONFIG: DashboardEngineConfig = {
     { id: 'financing-applications', label: 'Pending Finances', format: 'number' },
   ],
   alertRules: [
-    { id: 'low-inventory', condition: 'vehicles.available < threshold', threshold: 10, action: 'notify:procurement' },
-    { id: 'aging-inventory', condition: 'vehicles.daysInLot > threshold', threshold: 60, action: 'notify:sales' },
-    { id: 'service-capacity', condition: 'service.appointmentsToday > threshold', threshold: 15, action: 'notify:service' },
-    { id: 'financing-backlog', condition: 'financing.pending > threshold', threshold: 20, action: 'notify:finance' },
+    {
+      id: 'low-inventory',
+      name: 'Low inventory',
+      condition: { metric: 'vehicles.available', operator: 'lt', value: 10 },
+      severity: 'warning',
+      message: 'Vehicle count is below the configured threshold.',
+    },
+    {
+      id: 'aging-inventory',
+      name: 'Aging inventory',
+      condition: { metric: 'vehicles.daysInLot', operator: 'gt', value: 60 },
+      severity: 'info',
+      message: 'Some units have been on the lot longer than target.',
+    },
+    {
+      id: 'service-capacity',
+      name: 'Service capacity',
+      condition: { metric: 'service.appointmentsToday', operator: 'gt', value: 15 },
+      severity: 'warning',
+      message: 'Service appointments exceed comfortable daily capacity.',
+    },
+    {
+      id: 'financing-backlog',
+      name: 'Financing backlog',
+      condition: { metric: 'financing.pending', operator: 'gt', value: 20 },
+      severity: 'warning',
+      message: 'Pending financing applications need attention.',
+    },
   ],
   actions: [
-    { id: 'add-vehicle', label: 'Add Vehicle', icon: 'car', action: 'navigate:/inventory/add' },
-    { id: 'schedule-test-drive', label: 'Test Drive', icon: 'calendar', action: 'navigate:/test-drives/new' },
-    { id: 'view-inventory', label: 'Inventory', icon: 'list', action: 'navigate:/inventory' },
-    { id: 'service-scheduling', label: 'Service Appointments', icon: 'wrench', action: 'navigate:/service/schedule' },
-    { id: 'financing-apps', label: 'Financing', icon: 'dollar-sign', action: 'navigate:/financing' },
-    { id: 'trade-in-eval', label: 'Trade-In Eval', icon: 'refresh-cw', action: 'navigate:/trade-in/evaluate' },
+    { id: 'add-vehicle', label: 'Add Vehicle', icon: 'car', href: '/inventory/add' },
+    { id: 'schedule-test-drive', label: 'Test Drive', icon: 'calendar', href: '/test-drives/new' },
+    { id: 'view-inventory', label: 'Inventory', icon: 'list', href: '/inventory' },
+    { id: 'service-scheduling', label: 'Service Appointments', icon: 'wrench', href: '/service/schedule' },
+    { id: 'financing-apps', label: 'Financing', icon: 'dollar-sign', href: '/financing' },
+    { id: 'trade-in-eval', label: 'Trade-In Eval', icon: 'refresh-cw', href: '/trade-in/evaluate' },
   ],
 };
 
@@ -224,7 +267,6 @@ export function getAutomotiveDashboardConfig(role?: 'sales' | 'service' | 'finan
         layouts: [AUTOMOTIVE_DASHBOARD_CONFIG.layouts[2]],
       };
     case 'finance':
-      // Custom finance-focused layout would go here
       return AUTOMOTIVE_DASHBOARD_CONFIG;
     default:
       return AUTOMOTIVE_DASHBOARD_CONFIG;

@@ -42,7 +42,7 @@ export const GET = withVayvaAPI(
       });
 
       // Calculate inventory turnover (simplified)
-      const totalInventoryValue = inventoryItems.reduce((sum, item) => 
+      const _totalInventoryValue = inventoryItems.reduce((sum, item) => 
         sum + (item.currentStock * 10), 0); // Assuming $10 average cost
       
       // Simplified turnover calculation - would need actual COGS data

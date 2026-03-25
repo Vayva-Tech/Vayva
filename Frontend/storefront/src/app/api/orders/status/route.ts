@@ -7,7 +7,7 @@ import {
   PaymentStatus,
   standardHeaders,
   logger,
-  BaseError,
+  BaseError
 } from "@vayva/shared";
 import { withStorefrontAPI } from "@/lib/api-handler";
 

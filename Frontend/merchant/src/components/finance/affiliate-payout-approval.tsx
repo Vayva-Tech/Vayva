@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle, Banknote } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface PendingPayout {
   id: string;
@@ -24,11 +25,7 @@ interface PendingPayout {
   requestedAt: string;
 }
 
-interface AffiliatePayoutApprovalProps {
-  storeId: string;
-}
-
-export function AffiliatePayoutApproval({ storeId }: AffiliatePayoutApprovalProps) {
+export function AffiliatePayoutApproval() {
   const [pendingPayouts, setPendingPayouts] = useState<PendingPayout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
@@ -36,16 +33,17 @@ export function AffiliatePayoutApproval({ storeId }: AffiliatePayoutApprovalProp
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Fetch pending payouts
   useEffect(() => {
-    fetchPendingPayouts();
-  }, [storeId]);
+    void fetchPendingPayouts();
+  }, []);
 
   const fetchPendingPayouts = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/affiliate/payout/approvals?storeId=${storeId}`);
+      const response = await fetch(`/api/affiliate/payout/approvals`);
       const data = await response.json();
 
       if (data.success) {
@@ -72,12 +70,13 @@ export function AffiliatePayoutApproval({ storeId }: AffiliatePayoutApprovalProp
   const handleApprove = async (payout: PendingPayout) => {
     try {
       setIsProcessing(payout.id);
+      const approvedBy = user?.email || user?.id || "unknown";
       const response = await fetch("/api/affiliate/payout/approvals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           payoutId: payout.id,
-          approvedBy: "admin", // Should come from auth context
+          approvedBy,
         }),
       });
 
@@ -114,12 +113,13 @@ export function AffiliatePayoutApproval({ storeId }: AffiliatePayoutApprovalProp
 
     try {
       setIsProcessing(selectedPayout.id);
+      const rejectedBy = user?.email || user?.id || "unknown";
       const response = await fetch("/api/affiliate/payout/approvals", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           payoutId: selectedPayout.id,
-          rejectedBy: "admin", // Should come from auth context
+          rejectedBy,
           reason: rejectionReason,
         }),
       });

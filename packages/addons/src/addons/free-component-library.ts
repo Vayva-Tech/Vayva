@@ -8,7 +8,7 @@
  * Designed to enhance any website with beautiful interactions.
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const FREE_COMPONENT_LIBRARY_ADDON: AddOnDefinition = {
   id: 'vayva.free-component-library',

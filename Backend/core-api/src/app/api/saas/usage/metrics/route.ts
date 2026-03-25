@@ -33,7 +33,7 @@ export const GET = withVayvaAPI(
   async (request: NextRequest, { storeId }: APIContext) => {
     try {
       const now = new Date();
-      const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+      const _startOfDay = new Date(now.setHours(0, 0, 0, 0));
 
       // Get usage metrics from the last 24 hours
       const usageMetrics = await prisma.saaSUsageMetric.findMany({

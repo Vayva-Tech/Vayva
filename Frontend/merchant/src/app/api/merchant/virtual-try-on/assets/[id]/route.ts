@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders, buildBackendUrl } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { z } from "zod";
@@ -27,26 +27,35 @@ const updateAssetSchema = z.object({
 });
 
 // GET /api/merchant/virtual-try-on/assets/[id]
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-
+    if (!id) {
+      return NextResponse.json({ error: "ID required" }, { status: 400 });
+    }
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/virtual-try-on/assets/${id}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+    }>(buildBackendUrl(`/api/merchant/virtual-try-on/assets/${id}`), {
+      headers: auth.headers,
     });
 
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, {
       endpoint: "/api/merchant/virtual-try-on/assets/[id]",
       operation: "GET_VTO_ASSET",
+      storeId,
     });
     return NextResponse.json(
       { error: "Failed to fetch virtual try-on asset" },
@@ -56,38 +65,47 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // PATCH /api/merchant/virtual-try-on/assets/[id] - Update asset
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = await request.json();
+    if (!id) {
+      return NextResponse.json({ error: "ID required" }, { status: 400 });
+    }
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
+    const body: unknown = await request.json();
     const validation = updateAssetSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: validation.error.errors },
+        { error: "Invalid input", details: validation.error.flatten() },
         { status: 400 }
       );
     }
 
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/virtual-try-on/assets/${id}`, {
+    }>(buildBackendUrl(`/api/merchant/virtual-try-on/assets/${id}`), {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
       body: JSON.stringify(validation.data),
     });
 
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, {
       endpoint: "/api/merchant/virtual-try-on/assets/[id]",
       operation: "UPDATE_VTO_ASSET",
+      storeId,
     });
     return NextResponse.json(
       { error: "Failed to update virtual try-on asset" },
@@ -97,26 +115,35 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 // DELETE /api/merchant/virtual-try-on/assets/[id] - Delete asset
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  let storeId: string | undefined;
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-
+    if (!id) {
+      return NextResponse.json({ error: "ID required" }, { status: 400 });
+    }
+    const auth = await buildBackendAuthHeaders(_request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    storeId = auth.user.storeId;
     const result = await apiJson<{
       success: boolean;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/merchant/virtual-try-on/assets/${id}`, {
+    }>(buildBackendUrl(`/api/merchant/virtual-try-on/assets/${id}`), {
       method: "DELETE",
-      headers: {
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
     });
 
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, {
       endpoint: "/api/merchant/virtual-try-on/assets/[id]",
       operation: "DELETE_VTO_ASSET",
+      storeId,
     });
     return NextResponse.json(
       { error: "Failed to delete virtual try-on asset" },

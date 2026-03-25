@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Industry Types
  * Type definitions for grocery-specific features

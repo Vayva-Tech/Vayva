@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Fashion Dashboard Components
 export { FashionDashboard } from './FashionDashboard';
 export type { FashionDashboardProps } from './FashionDashboard';

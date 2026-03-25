@@ -28,7 +28,7 @@ export const GET = withVayvaAPI(
         period: searchParams.get("period"),
         includeRecommendations: searchParams.get("includeRecommendations"),
         includeCacheStats: searchParams.get("includeCacheStats"),
-        includeIndexSuggestions: searchResult.get("includeIndexSuggestions")
+        includeIndexSuggestions: searchParams.get("includeIndexSuggestions")
       });
 
       logger.info("[PERFORMANCE_DASHBOARD_REQUEST]", {
@@ -41,7 +41,7 @@ export const GET = withVayvaAPI(
       const dashboard = performanceOptimizer.getPerformanceDashboard(storeId);
 
       // Enhance with additional data based on query parameters
-      const enhancedDashboard: any = { ...dashboard };
+      const enhancedDashboard: any = { ...(dashboard as any) };
 
       if (parseResult.includeCacheStats) {
         enhancedDashboard.cacheDetails = await getCacheStatistics();
@@ -90,7 +90,7 @@ export const GET = withVayvaAPI(
  * POST endpoint - Run performance analysis and optimization
  */
 export const POST = withVayvaAPI(
-  PERMISSIONS.STORE_MANAGE,
+  PERMISSIONS.SETTINGS_MANAGE,
   async (req: NextRequest, { storeId, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
@@ -186,7 +186,7 @@ export const POST = withVayvaAPI(
  * PUT endpoint - Update performance monitoring configuration
  */
 export const PUT = withVayvaAPI(
-  PERMISSIONS.STORE_ADMIN,
+  PERMISSIONS.SETTINGS_MANAGE,
   async (req: NextRequest, { storeId, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
@@ -334,7 +334,17 @@ async function analyzeDatabaseQueries(
   depth: string
 ): Promise<any> {
   // Simulate database query analysis
-  const analysis = {
+  const analysis: {
+    totalQueriesAnalyzed: number;
+    slowQueries: Array<{
+      query: string;
+      executionTime: number;
+      frequency: number;
+      optimization: string;
+    }>;
+    recommendations: string[];
+    queryPatterns?: Array<{ pattern: string; occurrence: number }>;
+  } = {
     totalQueriesAnalyzed: 156,
     slowQueries: [
       {
@@ -359,7 +369,7 @@ async function analyzeDatabaseQueries(
   };
 
   if (depth === 'detailed' || depth === 'comprehensive') {
-    analysis['queryPatterns'] = [
+    analysis.queryPatterns = [
       { pattern: "ORDER BY created_at DESC LIMIT ?", occurrence: 65 },
       { pattern: "JOIN customers ON orders.customer_id = customers.id", occurrence: 42 }
     ];
@@ -371,7 +381,7 @@ async function analyzeDatabaseQueries(
 async function optimizeEndpoints(
   storeId: string,
   targets: string[] | undefined,
-  depth: string
+  _depth: string
 ): Promise<any> {
   // Simulate endpoint optimization
   return {
@@ -391,8 +401,8 @@ async function optimizeEndpoints(
 }
 
 async function generateOptimizationRecommendations(
-  storeId: string,
-  depth: string
+  _storeId: string,
+  _depth: string
 ): Promise<any> {
   // Generate comprehensive recommendations
   return {
@@ -416,7 +426,7 @@ async function generateOptimizationRecommendations(
 
 async function runFullPerformanceAudit(
   storeId: string,
-  depth: string
+  _depth: string
 ): Promise<any> {
   // Run comprehensive performance audit
   return {
@@ -450,7 +460,7 @@ async function analyzeFrontendPerformance(): Promise<any> {
   };
 }
 
-async function analyzeBackendPerformance(storeId: string): Promise<any> {
+async function analyzeBackendPerformance(_storeId: string): Promise<any> {
   return {
     averageResponseTime: "245ms",
     errorRate: "0.8%",
@@ -463,7 +473,7 @@ async function analyzeBackendPerformance(storeId: string): Promise<any> {
   };
 }
 
-async function analyzeDatabasePerformance(storeId: string): Promise<any> {
+async function analyzeDatabasePerformance(_storeId: string): Promise<any> {
   return {
     connectionPool: "85% utilized",
     slowQueryLog: "12 slow queries in last hour",

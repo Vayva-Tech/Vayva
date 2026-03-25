@@ -166,7 +166,7 @@ function formatLabResult(testName: string, result: string, unit: string | null):
 }
 
 function getReferenceRange(testName: string, patient: any): { normal: string | null, critical: string | null } {
-  const age = new Date().getFullYear() - patient.dateOfBirth.getFullYear();
+  const _age = new Date().getFullYear() - patient.dateOfBirth.getFullYear();
   const isMale = patient.gender === "male";
 
   // Simplified reference ranges

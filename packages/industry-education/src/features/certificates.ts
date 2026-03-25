@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Certificate Management Feature
  * 
@@ -32,7 +31,7 @@ export async function getCertificates(
     where.courseId = courseId;
   }
 
-  const certificates = await prisma.certificate.findMany({
+  const certificates = await (prisma as any).certificate.findMany({
     where,
     include: {
       student: {
@@ -67,7 +66,7 @@ export async function generateCertificate(
   templateId?: string
 ): Promise<GenerateCertificateResponse['data']> {
   // Verify student completed the course
-  const enrollment = await prisma.enrollment.findFirst({
+  const enrollment = await (prisma as any).enrollment.findFirst({
     where: {
       studentId,
       courseId,
@@ -80,7 +79,7 @@ export async function generateCertificate(
   }
 
   // Check if certificate already exists
-  const existingCertificate = await prisma.certificate.findFirst({
+  const existingCertificate = await (prisma as any).certificate.findFirst({
     where: {
       studentId,
       courseId,
@@ -96,7 +95,7 @@ export async function generateCertificate(
   const verificationCode = generateVerificationCode();
 
   // Create certificate
-  const certificate = await prisma.certificate.create({
+  const certificate = await (prisma as any).certificate.create({
     data: {
       storeId,
       studentId,
@@ -138,7 +137,7 @@ export async function verifyCertificate(
   prisma: PrismaClient,
   verificationCode: string
 ): Promise<{ valid: boolean; certificate?: Certificate }> {
-  const certificate = await prisma.certificate.findUnique({
+  const certificate = await (prisma as any).certificate.findUnique({
     where: { verificationCode },
     include: {
       student: {
@@ -175,7 +174,7 @@ export async function bulkGenerateCertificates(
   templateId?: string
 ): Promise<number> {
   // Find all completed enrollments without certificates
-  const completedEnrollments = await prisma.enrollment.findMany({
+  const completedEnrollments = await (prisma as any).enrollment.findMany({
     where: {
       storeId,
       courseId,
@@ -187,7 +186,7 @@ export async function bulkGenerateCertificates(
   });
 
   // Filter out students who already have certificates
-  const existingCertificates = await prisma.certificate.findMany({
+  const existingCertificates = await (prisma as any).certificate.findMany({
     where: {
       storeId,
       courseId,
@@ -198,11 +197,11 @@ export async function bulkGenerateCertificates(
   });
 
   const existingStudentIds = new Set(
-    existingCertificates.map((c) => c.studentId)
+    existingCertificates.map((c: { studentId: string }) => c.studentId)
   );
 
   const eligibleEnrollments = completedEnrollments.filter(
-    (e) => !existingStudentIds.has(e.studentId)
+    (e: { studentId: string }) => !existingStudentIds.has(e.studentId)
   );
 
   // Generate certificates for eligible students

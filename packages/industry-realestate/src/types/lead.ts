@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real Estate Lead Scoring Types
  * Lead management and AI-powered scoring

@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 
@@ -29,12 +29,12 @@ export function BillingInterface({ businessId, matterId, onCreateInvoice }: Bill
     <div className="billing-interface max-w-7xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Billing & Invoices</h2>
-        <button
+        <Button
           onClick={() => onCreateInvoice?.({})}
           className="px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
         >
           + New Invoice
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -83,3 +83,4 @@ export function BillingInterface({ businessId, matterId, onCreateInvoice }: Bill
     </div>
   );
 }
+

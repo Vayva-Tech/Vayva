@@ -1,10 +1,18 @@
 {
-  "extends": "@vayva/tsconfig/base.json",
+  "extends": "../tsconfig/base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
     "jsx": "react-jsx"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/services/_legacy-application-service.ts",
+    "src/services/_legacy-booking-service.ts",
+    "src/services/_legacy-case-service.ts",
+    "src/services/_legacy-core-service.ts",
+    "src/services/_legacy-quote-service.ts"
+  ]
 }

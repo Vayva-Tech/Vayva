@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 
@@ -117,13 +117,13 @@ export function TreatmentPlanBuilder({
               {patientId ? `Patient: ${patientId}` : 'Create comprehensive care plans'}
             </p>
           </div>
-          <button
+          <Button
             onClick={handleSave}
             disabled={saving}
             className="px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save Plan'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export function TreatmentPlanBuilder({
             { id: 'interventions', label: 'Interventions' },
             { id: 'schedule', label: 'Follow-up' },
           ].map((tab) => (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`
@@ -149,7 +149,7 @@ export function TreatmentPlanBuilder({
               `}
             >
               {tab.label}
-            </button>
+            </Button>
           ))}
         </nav>
       </div>
@@ -206,12 +206,12 @@ export function TreatmentPlanBuilder({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Treatment Goals</h3>
-            <button
+            <Button
               onClick={handleAddGoal}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
             >
               + Add Goal
-            </button>
+            </Button>
           </div>
 
           {planData.goals.length === 0 ? (
@@ -242,7 +242,7 @@ export function TreatmentPlanBuilder({
                         <option value="discontinued">Discontinued</option>
                       </select>
                     </div>
-                    <button className="text-red-600 hover:text-red-700 text-sm">Remove</button>
+                    <Button className="text-red-600 hover:text-red-700 text-sm">Remove</Button>
                   </div>
 
                   <div className="space-y-4">
@@ -301,12 +301,12 @@ export function TreatmentPlanBuilder({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Treatment Interventions</h3>
-            <button
+            <Button
               onClick={handleAddIntervention}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
             >
               + Add Intervention
-            </button>
+            </Button>
           </div>
 
           {planData.interventions.length === 0 ? (
@@ -338,7 +338,7 @@ export function TreatmentPlanBuilder({
                         <option value="other">Other</option>
                       </select>
                     </div>
-                    <button className="text-red-600 hover:text-red-700 text-sm">Remove</button>
+                    <Button className="text-red-600 hover:text-red-700 text-sm">Remove</Button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -450,3 +450,4 @@ export function TreatmentPlanBuilder({
     </div>
   );
 }
+

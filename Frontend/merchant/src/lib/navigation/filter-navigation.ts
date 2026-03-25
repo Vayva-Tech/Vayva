@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useIndustryAccess } from '@/hooks/use-industry-access';
 import type { PlanTier } from '@/lib/access-control/tier-limits';
 
@@ -17,9 +16,17 @@ export interface NavItem {
   separator?: boolean;
 }
 
+/** Tier + feature flags needed to filter nav (hooks must not run inside static helpers). */
+export interface NavigationAccessSnapshot {
+  /** Includes FREE from session gating though PlanTier is often narrower in types. */
+  currentTier: PlanTier | 'FREE';
+  canAccessIndustryDashboards: boolean;
+  canUseAI: boolean;
+}
+
 /**
  * Navigation Filtering Service
- * 
+ *
  * Filters navigation items based on user's subscription tier and feature access
  */
 
@@ -27,13 +34,14 @@ export class NavigationFilter {
   /**
    * Filter navigation items based on user's tier and feature access
    */
-  static filterNavigation(items: NavItem[]): NavItem[] {
-    const { currentTier, canAccessIndustryDashboards, canUseAI } = useIndustryAccess();
-    
-    const tierHierarchy: Record<PlanTier, number> = {
-      'FREE': 0,
-      'STARTER': 1,
-      'PRO': 2
+  static filterNavigation(items: NavItem[], access: NavigationAccessSnapshot): NavItem[] {
+    const { currentTier, canAccessIndustryDashboards, canUseAI } = access;
+
+    const tierHierarchy: Record<PlanTier | 'FREE', number> = {
+      FREE: 0,
+      STARTER: 1,
+      PRO: 2,
+      PRO_PLUS: 3,
     };
 
     const currentTierLevel = tierHierarchy[currentTier];
@@ -84,11 +92,13 @@ export class NavigationFilter {
   /**
    * Add upgrade badges to restricted items
    */
-  static addUpgradeBadges(items: NavItem[], currentTier: PlanTier): NavItem[] {
-    const getNextTier = (tier: PlanTier): PlanTier | null => {
-      const tierOrder: PlanTier[] = ['FREE', 'STARTER', 'PRO'];
+  static addUpgradeBadges(items: NavItem[], currentTier: PlanTier | 'FREE'): NavItem[] {
+    const getNextTier = (tier: PlanTier | 'FREE'): PlanTier | null => {
+      const tierOrder: Array<PlanTier | 'FREE'> = ['FREE', 'STARTER', 'PRO', 'PRO_PLUS'];
       const currentIndex = tierOrder.indexOf(tier);
-      return currentIndex < tierOrder.length - 1 ? tierOrder[currentIndex + 1] : null;
+      if (currentIndex < 0 || currentIndex >= tierOrder.length - 1) return null;
+      const next = tierOrder[currentIndex + 1];
+      return next === 'FREE' ? null : next;
     };
 
     const processItem = (item: NavItem): NavItem => {
@@ -120,9 +130,11 @@ export class NavigationFilter {
   /**
    * Get available industry dashboard routes for current tier
    */
-  static getAvailableIndustries(currentTier: PlanTier): string[] {
-    const { canAccessIndustryDashboards } = useIndustryAccess();
-    
+  static getAvailableIndustries(
+    _currentTier: PlanTier | 'FREE',
+    canAccessIndustryDashboards: boolean,
+  ): string[] {
+    void _currentTier;
     if (!canAccessIndustryDashboards) {
       return []; // Free users get no industry dashboards
     }
@@ -143,7 +155,7 @@ export class NavigationFilter {
   /**
    * Generate tier-specific navigation configuration
    */
-  static getTierNavigationConfig(currentTier: PlanTier): NavItem[] {
+  static getTierNavigationConfig(currentTier: PlanTier | 'FREE'): NavItem[] {
     const baseNavigation: NavItem[] = [
       {
         id: 'dashboard',
@@ -178,8 +190,8 @@ export class NavigationFilter {
     ];
 
     // Add tier-specific items
-    const tierSpecificItems: Record<PlanTier, NavItem[]> = {
-      'FREE': [
+    const tierSpecificItems: Record<PlanTier | 'FREE', NavItem[]> = {
+      FREE: [
         {
           id: 'upgrade-cta',
           title: 'Upgrade to Starter',
@@ -188,7 +200,7 @@ export class NavigationFilter {
           badge: '14-day trial'
         }
       ],
-      'STARTER': [
+      STARTER: [
         {
           id: 'industry-dashboards',
           title: 'Industry Dashboards',
@@ -213,7 +225,7 @@ export class NavigationFilter {
           badge: 'Get unlimited access'
         }
       ],
-      'PRO': [
+      PRO: [
         {
           id: 'industry-dashboards',
           title: 'Industry Dashboards',
@@ -242,7 +254,37 @@ export class NavigationFilter {
           icon: 'Code',
           requiredTier: 'PRO'
         }
-      ]
+      ],
+      PRO_PLUS: [
+        {
+          id: 'industry-dashboards',
+          title: 'Industry Dashboards',
+          href: '/dashboard/industries',
+          icon: 'Building2',
+          feature: 'industryDashboards'
+        },
+        {
+          id: 'ai-tools',
+          title: 'AI Tools',
+          href: '/dashboard/ai',
+          icon: 'Brain',
+          feature: 'aiFeatures'
+        },
+        {
+          id: 'advanced-analytics',
+          title: 'Advanced Analytics',
+          href: '/dashboard/advanced-analytics',
+          icon: 'ChartLine',
+          requiredTier: 'PRO'
+        },
+        {
+          id: 'api-access',
+          title: 'API Access',
+          href: '/dashboard/api',
+          icon: 'Code',
+          requiredTier: 'PRO'
+        }
+      ],
     };
 
     return [...baseNavigation, ...tierSpecificItems[currentTier]];
@@ -251,16 +293,20 @@ export class NavigationFilter {
 
 // Export hook for easy usage
 export function useFilteredNavigation(baseNavigation: NavItem[]): NavItem[] {
-  const { currentTier } = useIndustryAccess();
-  
-  const filtered = NavigationFilter.filterNavigation(baseNavigation);
-  return NavigationFilter.addUpgradeBadges(filtered, currentTier);
+  const access = useIndustryAccess();
+
+  const filtered = NavigationFilter.filterNavigation(baseNavigation, {
+    currentTier: access.currentTier,
+    canAccessIndustryDashboards: access.canAccessIndustryDashboards,
+    canUseAI: access.canUseAI,
+  });
+  return NavigationFilter.addUpgradeBadges(filtered, access.currentTier);
 }
 
 // Export utility functions
 export function useAvailableIndustries(): string[] {
-  const { currentTier } = useIndustryAccess();
-  return NavigationFilter.getAvailableIndustries(currentTier);
+  const { currentTier, canAccessIndustryDashboards } = useIndustryAccess();
+  return NavigationFilter.getAvailableIndustries(currentTier, canAccessIndustryDashboards);
 }
 
 export function useTierNavigation(): NavItem[] {

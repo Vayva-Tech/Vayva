@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState } from "react";
@@ -20,6 +19,13 @@ import {
   Users,
 } from "lucide-react";
 import type { IndustrySlug } from '@vayva/industry-core';
+import type { DesignCategory } from "@/components/vayva-ui/VayvaThemeProvider";
+import { getDesignCategoryForIndustry } from "@/config/industry-design-categories";
+import {
+  getMetricCardClasses,
+  getSectionHeaderClasses,
+  getSectionTitleClasses,
+} from "@/lib/utils/design-category";
 import {
   getIndustryConfig,
   getAdaptiveHeaderTitle,
@@ -253,12 +259,12 @@ export function UniversalProDashboardV2({
           </div>
           <h3 className="text-lg font-semibold text-red-800 mb-1">Unable to load dashboard</h3>
           <p className="text-red-600 mb-4">We're having trouble loading your dashboard data. Please try again.</p>
-          <button 
+          <Button 
             onClick={() => window.location.reload()} 
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Reload Page
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -323,15 +329,15 @@ export function UniversalProDashboardV2({
               icon={CheckSquare}
               designCategory={designCategory}
               action={
-                <button className="w-6 h-6 rounded-lg hover:bg-opacity-20 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Add task">
+                <Button className="w-6 h-6 rounded-lg hover:bg-opacity-20 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Add task">
                   <Plus size={14} className="opacity-70" />
-                </button>
+                </Button>
               }
             />
 
             {/* Tabs */}
             <div className="flex gap-2 mb-4">
-              <button
+              <Button
                 onClick={() => setActiveTab("today")}
                 className={cn(
                   "px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500",
@@ -343,8 +349,8 @@ export function UniversalProDashboardV2({
                 role="tab"
               >
                 Today
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveTab("tomorrow")}
                 className={cn(
                   "px-3 py-1.5 text-xs font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500",
@@ -356,7 +362,7 @@ export function UniversalProDashboardV2({
                 role="tab"
               >
                 Tomorrow
-              </button>
+              </Button>
             </div>
 
             {/* Task List - Could be made more industry-specific */}
@@ -383,9 +389,9 @@ export function UniversalProDashboardV2({
               title="AI Assistant"
               icon={Bot}
               action={
-                <button className="w-6 h-6 rounded-lg hover:bg-white-hover flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Configure AI">
+                <Button className="w-6 h-6 rounded-lg hover:bg-white-hover flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="Configure AI">
                   <Icon name="Sparkles" size={14} className="text-green-500" />
-                </button>
+                </Button>
               }
             />
 
@@ -509,9 +515,9 @@ export function UniversalProDashboardV2({
           <Card className={cn("p-5", getMetricCardClasses(designCategory))}>
             <div className="flex items-center justify-between mb-4">
               <h3 className={cn("font-semibold", getSectionTitleClasses(designCategory))}>Orders Overview</h3>
-              <button className="p-1 hover:bg-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="View all orders">
+              <Button className="p-1 hover:bg-opacity-20 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" aria-label="View all orders">
                 <ArrowUpRight size={16} className="opacity-70" />
-              </button>
+              </Button>
             </div>
             <div className="flex items-center gap-8">
               {/* Donut Chart */}

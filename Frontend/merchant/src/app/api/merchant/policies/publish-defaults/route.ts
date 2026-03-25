@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@vayva/db";
 import { generatePolicyFromTemplate, sanitizeMarkdown, validatePolicyContent } from "@vayva/policies";
@@ -24,7 +25,11 @@ interface StoreSettings {
 
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const store = await prisma.store.findUnique({
       where: { id: storeId },
       select: { id: true, name: true, slug: true, settings: true },

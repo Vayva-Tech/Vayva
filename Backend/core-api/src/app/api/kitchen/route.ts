@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI, type APIContext } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
+import { prisma as _prisma } from "@vayva/db";
 import { logger, standardHeaders } from "@vayva/shared";
-import { z } from "zod";
+import { z as _z } from "zod";
 
 // Main kitchen route - serves as entry point and overview
 export const GET = withVayvaAPI(

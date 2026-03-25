@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AI Revenue & Analytics API
  * ===========================
@@ -10,6 +9,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@vayva/db';
 import { logger } from '@/lib/logger';
+
+function numKobo(value: bigint | number | null | undefined): number {
+  if (value == null) return 0;
+  return typeof value === 'bigint' ? Number(value) : value;
+}
+
+function groupByCount(row: { _count: number | Record<string, number> }): number {
+  const c = row._count;
+  if (typeof c === 'number') return c;
+  if (c && typeof c === 'object' && '_all' in c && typeof c._all === 'number') {
+    return c._all;
+  }
+  return 0;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -66,13 +79,19 @@ async function handleGetAnalytics(
     },
     _sum: {
       priceKobo: true,
-      messagesAdded: true,
+      creditsAdded: true,
     },
     _count: true,
   });
 
-  const totalRevenueKobo = revenueData.reduce((sum, r) => sum + Number(r._sum.priceKobo), 0);
-  const totalCreditsSold = revenueData.reduce((sum, r) => sum + (r._sum.messagesAdded || 0), 0);
+  const totalRevenueKobo = revenueData.reduce(
+    (sum, r) => sum + numKobo(r._sum?.priceKobo),
+    0,
+  );
+  const totalCreditsSold = revenueData.reduce(
+    (sum, r) => sum + (r._sum?.creditsAdded ?? 0),
+    0,
+  );
 
   // 2. COSTS: OpenRouter API usage costs (from aiUsageEvents)
   const costData = await prisma.aiUsageEvent.aggregate({
@@ -91,7 +110,7 @@ async function handleGetAnalytics(
     },
   });
 
-  const totalCostKobo = Number(costData._sum.costEstimateKobo || 0n);
+  const totalCostKobo = numKobo(costData._sum.costEstimateKobo);
   const totalRequests = costData._count.id;
   const totalTokens = (costData._sum.inputTokens || 0) + (costData._sum.outputTokens || 0);
   const totalCreditsConsumed = costData._sum.creditsUsed || 0;
@@ -120,7 +139,7 @@ async function handleGetAnalytics(
     date: day.date.toISOString().split('T')[0],
     tokens: day._sum.tokensCount || 0,
     requests: day._sum.requestsCount || 0,
-    costKobo: Number(day._sum.costKobo || 0n),
+    costKobo: numKobo(day._sum.costKobo),
   }));
 
   // 5. TOP SPENDING MERCHANTS
@@ -154,7 +173,7 @@ async function handleGetAnalytics(
         storeName: store?.name || 'Unknown',
         planKey: store?.subscription?.planKey || 'unknown',
         creditsUsed: merchant._sum.creditsUsed || 0,
-        costToServeKobo: Number(merchant._sum.costEstimateKobo || 0n),
+        costToServeKobo: numKobo(merchant._sum.costEstimateKobo),
       };
     })
   );
@@ -186,9 +205,13 @@ async function handleGetAnalytics(
     model: m.model.split('/').pop() || m.model,
     requests: m._count.id,
     avgTokensPerRequest: Math.round(((m._sum.inputTokens || 0) + (m._sum.outputTokens || 0)) / m._count.id),
-    totalCostKobo: Number(m._sum.costEstimateKobo || 0n),
+    totalCostKobo: numKobo(m._sum.costEstimateKobo),
     totalCredits: m._sum.creditsUsed || 0,
-    marginPercent: calculateModelMargin(m.model, m._sum.creditsUsed || 0, Number(m._sum.costEstimateKobo || 0n)),
+    marginPercent: calculateModelMargin(
+      m.model,
+      m._sum.creditsUsed || 0,
+      numKobo(m._sum.costEstimateKobo),
+    ),
   }));
 
   return res.status(200).json({
@@ -203,12 +226,12 @@ async function handleGetAnalytics(
         totalKobo: totalRevenueKobo,
         totalNaira: (totalRevenueKobo / 100).toFixed(2),
         creditsSold: totalCreditsSold,
-        transactions: revenueData.reduce((sum, r) => sum + (r._count || 0), 0),
-        breakdown: revenueData.map(r => ({
+        transactions: revenueData.reduce((sum, r) => sum + groupByCount(r), 0),
+        breakdown: revenueData.map((r) => ({
           packType: r.packType,
-          revenueKobo: Number(r._sum.priceKobo),
-          creditsSold: r._sum.messagesAdded || 0,
-          count: r._count,
+          revenueKobo: numKobo(r._sum?.priceKobo),
+          creditsSold: r._sum?.creditsAdded ?? 0,
+          count: groupByCount(r),
         })),
       },
       costs: {

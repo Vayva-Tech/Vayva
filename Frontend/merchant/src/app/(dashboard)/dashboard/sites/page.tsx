@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { SiteCard } from "@/components/wix-style/SiteCard";
 import { SkeletonGrid } from "@/components/wix-style/SkeletonCard";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHeader } from "@/components/wix-style/PageHeader";
 import { Button, Icon, cn } from "@vayva/ui";
 import { toast } from "sonner";
@@ -54,7 +53,7 @@ export default function SitesPage() {
 
   if (loading) {
     return (
-      <div className="space-y-10 max-w-6xl mx-auto pb-20">
+      <div className="space-y-10 max-w-6xl pb-20">
         <div className="space-y-4">
           <div className="h-10 w-48 bg-white animate-pulse rounded-xl" />
           <div className="h-4 w-96 bg-white animate-pulse rounded-lg" />
@@ -79,8 +78,7 @@ export default function SitesPage() {
   }
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-20">
-      <Breadcrumbs />
+    <div className="space-y-10 max-w-6xl pb-20">
       <BackButton
         href="/dashboard"
         label="Back to Dashboard"

@@ -187,7 +187,7 @@ export const POST = withVayvaAPI(
       }
 
       // Perform the transfer using a transaction
-      const result = await prisma.$transaction(async (tx) => {
+      const _result = await prisma.$transaction(async (tx) => {
         // Decrease stock in source location
         const updatedFrom = await tx.inventoryItem.update({
           where: { id: fromStock.id },

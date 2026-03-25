@@ -1,11 +1,10 @@
-// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   TravelPackage,
   TravelBooking,
   BookingStatus,
   TravelProductType,
-  Itinerary,
+  Itinerary
 } from '../types';
 
 export interface PackageFilters {
@@ -111,6 +110,16 @@ export class TravelBookingService {
       where,
       orderBy: { createdAt: 'desc' },
     }) as Promise<TravelBooking[]>;
+  }
+
+  /**
+   * Get a single booking by id
+   */
+  async getBookingById(bookingId: string): Promise<TravelBooking | null> {
+    const booking = await this.db.travelBooking.findUnique({
+      where: { id: bookingId },
+    });
+    return (booking as TravelBooking | null) ?? null;
   }
 
   /**

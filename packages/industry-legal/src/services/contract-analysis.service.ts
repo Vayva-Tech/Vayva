@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Contract Analysis AI Service
  * 
@@ -175,6 +174,17 @@ Analyze from the perspective of protecting your client's interests while ensurin
       console.error('[ContractAnalysis] Failed to parse response:', error);
       throw new Error(`Failed to parse contract analysis: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  protected defaultOutput(input: ContractAnalysisInput): ContractAnalysisResult {
+    return {
+      contractType: input.contractType ?? 'General Contract',
+      overallRisk: 'unknown',
+      clauseAnalysis: [],
+      keyObligations: [],
+      problematicClauses: [],
+      complianceIssues: [],
+    };
   }
 
   /**

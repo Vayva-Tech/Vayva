@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Vehicle } from '../types';
 
 export interface FinancingScenarioParams {
@@ -242,7 +241,7 @@ export class DigitalRetailService {
       {
         title: 'Overview',
         content: `${vehicle.year} ${vehicle.make} ${vehicle.model}\n${vehicle.description || 'Premium vehicle in excellent condition.'}`,
-        media: vehicle.images.slice(0, 3).map(img => img.url),
+        media: vehicle.images.slice(0, 3).map((img: { url: string }) => img.url),
       },
       {
         title: 'Specifications',

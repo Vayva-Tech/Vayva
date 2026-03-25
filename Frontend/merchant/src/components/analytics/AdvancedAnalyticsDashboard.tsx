@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Advanced Analytics Dashboard Components
  * Implements customer segmentation, cohort analysis, and marketing attribution
@@ -67,6 +67,15 @@ interface AnalyticsOverview {
   revenueAttribution: number;
 }
 
+const EMPTY_ANALYTICS_OVERVIEW: AnalyticsOverview = {
+  totalCustomers: 0,
+  activeCustomers: 0,
+  customerGrowth: 0,
+  avgLifetimeValue: 0,
+  churnRate: 0,
+  revenueAttribution: 0,
+};
+
 // Main Analytics Dashboard Component
 export default function AdvancedAnalyticsDashboard() {
   const { store } = useStore();
@@ -84,7 +93,7 @@ export default function AdvancedAnalyticsDashboard() {
       } catch (error) {
         console.error('Failed to fetch analytics overview:', error);
         toast.error('Failed to load analytics data');
-        return null;
+        return EMPTY_ANALYTICS_OVERVIEW;
       }
     }
   );
@@ -108,7 +117,7 @@ export default function AdvancedAnalyticsDashboard() {
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex gap-2">
           {tabs.map((tab) => (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -119,7 +128,7 @@ export default function AdvancedAnalyticsDashboard() {
             >
               {tab.icon}
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
         
@@ -135,15 +144,15 @@ export default function AdvancedAnalyticsDashboard() {
             <option value="1y">Last Year</option>
           </select>
           
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
+          <Button className="flex items-center gap-2 px-4 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors">
             <Download className="h-4 w-4" />
             Export
-          </button>
+          </Button>
           
-          <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+          <Button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
             <RefreshCw className="h-4 w-4" />
             Refresh
-          </button>
+          </Button>
         </div>
       </div>
 

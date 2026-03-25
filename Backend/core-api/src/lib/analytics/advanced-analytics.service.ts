@@ -1,8 +1,22 @@
-import { prisma } from "@vayva/db";
+import { prismaDelegates } from "@vayva/db";
 import { logger } from "@vayva/shared";
 
 // Advanced analytics service for enhanced business intelligence
 export class AdvancedAnalyticsService {
+  private static asSnapshot(value: unknown): {
+    revenue: number;
+    orders: number;
+    customers: number;
+    avgOrderValue: number;
+  } {
+    const v = value as Partial<Record<string, unknown>>;
+    return {
+      revenue: typeof v.revenue === "number" ? v.revenue : 0,
+      orders: typeof v.orders === "number" ? v.orders : 0,
+      customers: typeof v.customers === "number" ? v.customers : 0,
+      avgOrderValue: typeof v.avgOrderValue === "number" ? v.avgOrderValue : 0,
+    };
+  }
   /**
    * Generate comprehensive business intelligence report
    */
@@ -178,14 +192,14 @@ export class AdvancedAnalyticsService {
   // Individual industry metric fetchers
   private static async fetchTravelMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [bookings, revenue, customers] = await Promise.all([
-      prisma.travelBooking.count({
+      prismaDelegates.travelBooking.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.travelBooking.aggregate({
+      prismaDelegates.travelBooking.aggregate({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } },
         _sum: { totalAmount: true }
       }),
-      prisma.travelCustomer.count({
+      prismaDelegates.travelCustomer.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -202,14 +216,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchNonprofitMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [donations, revenue, donors] = await Promise.all([
-      prisma.nonprofitDonation.count({
+      prismaDelegates.nonprofitDonation.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.nonprofitDonation.aggregate({
+      prismaDelegates.nonprofitDonation.aggregate({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } },
         _sum: { amount: true }
       }),
-      prisma.nonprofitDonor.count({
+      prismaDelegates.nonprofitDonor.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -226,14 +240,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchWellnessMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [bookings, revenue, members] = await Promise.all([
-      prisma.wellnessClassBooking.count({
+      prismaDelegates.wellnessClassBooking.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.wellnessClassBooking.aggregate({
+      prismaDelegates.wellnessClassBooking.aggregate({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } },
         _sum: { amount: true }
       }),
-      prisma.wellnessMember.count({
+      prismaDelegates.wellnessMember.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -250,14 +264,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchGroceryMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [orders, revenue, customers] = await Promise.all([
-      prisma.groceryOrder.count({
+      prismaDelegates.groceryOrder.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.groceryOrder.aggregate({
+      prismaDelegates.groceryOrder.aggregate({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } },
         _sum: { totalAmount: true }
       }),
-      prisma.groceryCustomer.count({
+      prismaDelegates.groceryCustomer.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -273,15 +287,15 @@ export class AdvancedAnalyticsService {
   }
 
   private static async fetchKitchenMetrics(storeId: string, startDate: Date, endDate: Date) {
-    const [orders, revenue, stations] = await Promise.all([
-      prisma.kitchenOrder.count({
+    const [orders, revenue, _stations] = await Promise.all([
+      prismaDelegates.kitchenOrder.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.kitchenOrder.aggregate({
+      prismaDelegates.kitchenOrder.aggregate({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } },
         _sum: { totalAmount: true }
       }),
-      prisma.kitchenStation.count({
+      prismaDelegates.kitchenStation.count({
         where: { storeId }
       })
     ]);
@@ -298,14 +312,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchWholesaleMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [orders, revenue, customers] = await Promise.all([
-      prisma.wholesaleOrder.count({
+      prismaDelegates.wholesaleOrder.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.wholesaleOrder.aggregate({
+      prismaDelegates.wholesaleOrder.aggregate({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } },
         _sum: { totalAmount: true }
       }),
-      prisma.wholesaleCustomer.count({
+      prismaDelegates.wholesaleCustomer.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -322,14 +336,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchCreativeMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [projects, revenue, clients] = await Promise.all([
-      prisma.creativeProject.count({
+      prismaDelegates.creativeProject.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.creativeInvoice.aggregate({
+      prismaDelegates.creativeInvoice.aggregate({
         where: { storeId, invoiceDate: { gte: startDate, lte: endDate } },
         _sum: { totalAmount: true }
       }),
-      prisma.creativeClient.count({
+      prismaDelegates.creativeClient.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -346,14 +360,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchProfessionalMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [cases, revenue, clients] = await Promise.all([
-      prisma.professionalCase.count({
+      prismaDelegates.professionalCase.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.professionalTimesheet.aggregate({
+      prismaDelegates.professionalTimesheet.aggregate({
         where: { storeId, date: { gte: startDate, lte: endDate }, billable: true },
         _sum: { hours: true }
       }),
-      prisma.professionalClient.count({
+      prismaDelegates.professionalClient.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -373,14 +387,14 @@ export class AdvancedAnalyticsService {
 
   private static async fetchLegalMetrics(storeId: string, startDate: Date, endDate: Date) {
     const [cases, revenue, clients] = await Promise.all([
-      prisma.legalCase.count({
+      prismaDelegates.legalCase.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       }),
-      prisma.legalTimesheet.aggregate({
+      prismaDelegates.legalTimesheet.aggregate({
         where: { storeId, date: { gte: startDate, lte: endDate }, billable: true },
         _sum: { hours: true }
       }),
-      prisma.legalClient.count({
+      prismaDelegates.legalClient.count({
         where: { storeId, createdAt: { gte: startDate, lte: endDate } }
       })
     ]);
@@ -401,38 +415,47 @@ export class AdvancedAnalyticsService {
   /**
    * Calculate trend between current and comparison periods
    */
-  private static calculateTrend(current: any, comparison: any) {
+  private static calculateTrend(current: unknown, comparison: unknown) {
     const calculateChange = (currentVal: number, comparisonVal: number) => {
       if (comparisonVal === 0) return currentVal > 0 ? 100 : 0;
       return ((currentVal - comparisonVal) / comparisonVal) * 100;
     };
 
+    const c = this.asSnapshot(current);
+    const p = this.asSnapshot(comparison);
     return {
-      revenueChange: calculateChange(current.revenue, comparison.revenue),
-      orderChange: calculateChange(current.orders, comparison.orders),
-      customerChange: calculateChange(current.customers, comparison.customers),
-      avgOrderValueChange: calculateChange(current.avgOrderValue, comparison.avgOrderValue)
+      revenueChange: calculateChange(c.revenue, p.revenue),
+      orderChange: calculateChange(c.orders, p.orders),
+      customerChange: calculateChange(c.customers, p.customers),
+      avgOrderValueChange: calculateChange(c.avgOrderValue, p.avgOrderValue)
     };
   }
 
   /**
    * Calculate advanced metrics from industry data
    */
-  private static calculateAdvancedMetrics(industryData: any[], period: string) {
+  private static calculateAdvancedMetrics(industryData: unknown[], _period: string) {
     // Overall totals
-    const totalRevenue = industryData.reduce((sum, industry) => sum + industry.current.revenue, 0);
-    const totalOrders = industryData.reduce((sum, industry) => sum + industry.current.orders, 0);
-    const totalCustomers = industryData.reduce((sum, industry) => sum + industry.current.customers, 0);
+    const rows = industryData as Array<{
+      industry: string;
+      current: ReturnType<typeof AdvancedAnalyticsService.asSnapshot>;
+      trend?: Record<string, unknown>;
+    }>;
+    const totalRevenue = rows.reduce((sum, industry) => sum + industry.current.revenue, 0);
+    const totalOrders = rows.reduce((sum, industry) => sum + industry.current.orders, 0);
+    const totalCustomers = rows.reduce((sum, industry) => sum + industry.current.customers, 0);
     
     // Industry breakdown
-    const industryBreakdown = industryData.map(industry => ({
-      industry: industry.industry,
-      revenue: industry.current.revenue,
-      revenueShare: totalRevenue > 0 ? (industry.current.revenue / totalRevenue) * 100 : 0,
-      orders: industry.current.orders,
-      customers: industry.current.customers,
-      trend: industry.trend
-    })).sort((a, b) => b.revenue - a.revenue);
+    const industryBreakdown = rows
+      .map((industry) => ({
+        industry: industry.industry,
+        revenue: industry.current.revenue,
+        revenueShare: totalRevenue > 0 ? (industry.current.revenue / totalRevenue) * 100 : 0,
+        orders: industry.current.orders,
+        customers: industry.current.customers,
+        trend: industry.trend as unknown,
+      }))
+      .sort((a, b) => b.revenue - a.revenue);
 
     // KPI Dashboard
     const kpiDashboard = {
@@ -448,9 +471,9 @@ export class AdvancedAnalyticsService {
 
     // Trends analysis
     const trends = {
-      revenueTrend: this.analyzeTrend(industryData, 'revenue'),
-      orderTrend: this.analyzeTrend(industryData, 'orders'),
-      customerTrend: this.analyzeTrend(industryData, 'customers')
+      revenueTrend: this.analyzeTrend(rows, 'revenue'),
+      orderTrend: this.analyzeTrend(rows, 'orders'),
+      customerTrend: this.analyzeTrend(rows, 'customers')
     };
 
     return {
@@ -469,10 +492,16 @@ export class AdvancedAnalyticsService {
   /**
    * Analyze trends across industries
    */
-  private static analyzeTrend(industryData: any[], metric: string) {
+  private static analyzeTrend(
+    industryData: Array<{ trend?: Record<string, unknown> }>,
+    metric: string,
+  ) {
     const changes = industryData
-      .filter(industry => industry.trend)
-      .map(industry => industry.trend[`${metric}Change`] || 0);
+      .filter((industry) => industry.trend)
+      .map((industry) => {
+        const v = industry.trend?.[`${metric}Change`];
+        return typeof v === "number" ? v : 0;
+      });
     
     if (changes.length === 0) return { direction: 'stable', average: 0 };
     
@@ -485,7 +514,18 @@ export class AdvancedAnalyticsService {
   /**
    * Generate predictive insights using basic trend analysis
    */
-  private static async generatePredictiveInsights(storeId: string, metrics: any, period: string) {
+  private static async generatePredictiveInsights(
+    storeId: string,
+    metrics: {
+      trends: { revenueTrend: { direction: string } };
+      industryBreakdown: Array<{
+        industry: string;
+        revenueShare: number;
+        trend?: unknown;
+      }>;
+    },
+    _period: string,
+  ) {
     const predictions = [];
     const recommendations = [];
 
@@ -514,12 +554,20 @@ export class AdvancedAnalyticsService {
     }
 
     // Performance recommendations
-    metrics.industryBreakdown.forEach(industry => {
-      if (industry.trend && industry.trend.revenueChange < -10) {
+    metrics.industryBreakdown.forEach((industry) => {
+      const trend =
+        typeof industry.trend === "object" && industry.trend !== null
+          ? (industry.trend as Record<string, unknown>)
+          : {};
+      const revenueChange =
+        typeof trend.revenueChange === "number"
+          ? (trend.revenueChange as number)
+          : 0;
+      if (revenueChange < -10) {
         recommendations.push({
           action: `Investigate ${industry.industry} decline`,
           priority: 'high',
-          rationale: `Revenue declined ${Math.abs(Math.round(industry.trend.revenueChange))}%`
+          rationale: `Revenue declined ${Math.abs(Math.round(revenueChange))}%`
         });
       }
     });

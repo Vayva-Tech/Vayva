@@ -4,7 +4,7 @@
  * AI-powered symptom assessment tool
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const SYMPTOM_CHECKER_ADDON: AddOnDefinition = {
   id: 'vayva.symptom-checker',

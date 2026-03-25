@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Legal Industry Dashboard
  * Case management, document handling, and legal practice analytics
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -134,7 +133,7 @@ export default function LegalDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch legal metrics
-  const { data: metrics, isLoading: metricsLoading } = useSWR<LegalMetrics>(
+  const { data: metrics, isLoading: metricsLoading } = useSWR<LegalMetrics | null>(
     '/api/legal/metrics',
     async (url: string) => {
       try {
@@ -214,7 +213,7 @@ export default function LegalDashboard() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -225,7 +224,7 @@ export default function LegalDashboard() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -328,11 +327,11 @@ export default function LegalDashboard() {
       )}
       
       {activeTab === 'billing' && (
-        <BillingView metrics={metrics} />
+        <BillingView metrics={metrics ?? null} />
       )}
       
       {activeTab === 'analytics' && (
-        <AnalyticsView metrics={metrics} loading={metricsLoading} />
+        <AnalyticsView metrics={metrics ?? null} loading={metricsLoading} />
       )}
     </div>
   );
@@ -512,7 +511,7 @@ function DocumentsView() {
       {/* Document Type Filter */}
       <div className="flex gap-2">
         {documentTypes.map(type => (
-          <button
+          <Button
             key={type.id}
             onClick={() => setDocTypeFilter(type.id)}
             className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
@@ -522,17 +521,17 @@ function DocumentsView() {
             }`}
           >
             {type.label}
-          </button>
+          </Button>
         ))}
       </div>
 
       <ThemedCard industry={store?.industrySlug || 'default'}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-semibold">Recent Documents</h3>
-          <button className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+          <Button className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
             <Plus className="h-4 w-4" />
             Upload Document
-          </button>
+          </Button>
         </div>
         
         <div className="space-y-3">
@@ -617,15 +616,15 @@ function BillingView({ metrics }: { metrics: LegalMetrics | null }) {
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+            <Button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
               Create Invoice
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Send Payment Reminder
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Generate Reports
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>
@@ -729,15 +728,15 @@ function AnalyticsView({ metrics, loading }: { metrics: LegalMetrics | null; loa
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+            <Button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
               New Case
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Add Client
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Generate Report
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>

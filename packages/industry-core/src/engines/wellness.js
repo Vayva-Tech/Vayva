@@ -10,7 +10,7 @@ class WellnessEngine {
   }
   
   async initialize() {
-    console.log('[WELLNESS_ENGINE] Initialized');
+    console.warn('[WELLNESS_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

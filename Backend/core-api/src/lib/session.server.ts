@@ -3,6 +3,7 @@ import { prisma } from "@vayva/db";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession, type Session } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import { authOptions } from "@/lib/auth";
 import { logger } from "@vayva/shared";
 import { COOKIE_NAME } from "./session";
@@ -92,46 +93,46 @@ export async function getSessionUser() {
 }
 
 export async function getSessionUserFromRequest(req: NextRequest) {
-  // 1. Check for Bearer token (API/External)
+  // 1. Bearer JWT (API / BFF). If the header is present but not our JWT (e.g. opaque session token), fall through to cookie + NextAuth.
   const authHeader = req.headers.get("authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
     const decoded = verifyToken(token);
-    if (!decoded || typeof decoded === "string" || !decoded.sub) return null;
+    if (decoded && typeof decoded !== "string" && decoded.sub) {
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.sub },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          sessionVersion: true,
+        },
+      });
 
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.sub },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        sessionVersion: true,
-      },
-    });
+      if (user) {
+        const membership = await prisma.membership.findFirst({
+          where: { userId: user.id },
+          include: { store: true },
+        });
 
-    if (!user) return null;
-
-    const membership = await prisma.membership.findFirst({
-      where: { userId: user.id },
-      include: { store: true },
-    });
-
-    if (!membership) return null;
-
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      storeId: membership.storeId,
-      storeName: membership.store?.name,
-      role: membership.role_enum,
-      sessionVersion: user.sessionVersion,
-    };
+        if (membership) {
+          return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            storeId: membership.storeId,
+            storeName: membership.store?.name,
+            role: membership.role_enum,
+            sessionVersion: user.sessionVersion,
+          };
+        }
+      }
+    }
   }
 
-  // 2. Fallback to Cookie (Same-origin API)
+  // 2. Cookie JWT (Same-origin API)
   const token = req.cookies.get(COOKIE_NAME);
   if (!token) return null;
 
@@ -170,6 +171,41 @@ export async function getSessionUserFromRequest(req: NextRequest) {
   };
 }
 
+function merchantNextAuthSessionCookieName(): string {
+  return process.env.NODE_ENV === "production"
+    ? "__Secure-vayva-merchant-session"
+    : "next-auth.merchant-session";
+}
+
+async function userFromDbById(userId: string) {
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      sessionVersion: true,
+    },
+  });
+  if (!dbUser) return null;
+  const membership = await prisma.membership.findFirst({
+    where: { userId: dbUser.id },
+    include: { store: true },
+  });
+  if (!membership) return null;
+  return {
+    id: dbUser.id,
+    email: dbUser.email,
+    firstName: dbUser.firstName,
+    lastName: dbUser.lastName,
+    storeId: membership.storeId,
+    storeName: membership.store?.name,
+    role: membership.role_enum,
+    sessionVersion: dbUser.sessionVersion,
+  };
+}
+
 /**
  * Enhanced session fetcher that also works with NextAuth
  */
@@ -177,7 +213,32 @@ export async function requireAuthFromRequest(req: NextRequest) {
   const user = await getSessionUserFromRequest(req);
   if (user) return user;
 
-  // NextAuth check
+  // NextAuth JWT in cookie on this request (works for merchant BFF forwarding Cookie header)
+  const nextAuthSecret = process.env.NEXTAUTH_SECRET;
+  if (nextAuthSecret) {
+    const secureCookie = process.env.NODE_ENV === "production";
+    try {
+      const naJwt = await getToken({
+        req,
+        secret: nextAuthSecret,
+        cookieName: merchantNextAuthSessionCookieName(),
+        secureCookie,
+      });
+      if (
+        naJwt &&
+        typeof naJwt.sub === "string" &&
+        naJwt.sub.length > 0 &&
+        !naJwt.error
+      ) {
+        const fromNa = await userFromDbById(naJwt.sub);
+        if (fromNa) return fromNa;
+      }
+    } catch {
+      // getToken can throw on malformed cookies; fall through to getServerSession
+    }
+  }
+
+  // NextAuth check (cookies() / async context)
   const session = (await getServerSession(authOptions)) as Session | null;
   const sessionUser = session?.user as unknown;
   if (
@@ -188,32 +249,8 @@ export async function requireAuthFromRequest(req: NextRequest) {
   ) {
     const id = (sessionUser as { id?: unknown }).id;
     if (typeof id === "string") {
-      const dbUser = await prisma.user.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          sessionVersion: true,
-        },
-      });
-      if (!dbUser) return null;
-      const membership = await prisma.membership.findFirst({
-        where: { userId: dbUser.id },
-        include: { store: true },
-      });
-      if (!membership) return null;
-      return {
-        id: dbUser.id,
-        email: dbUser.email,
-        firstName: dbUser.firstName,
-        lastName: dbUser.lastName,
-        storeId: membership.storeId,
-        storeName: membership.store?.name,
-        role: membership.role_enum,
-        sessionVersion: dbUser.sessionVersion,
-      };
+      const fromSession = await userFromDbById(id);
+      if (fromSession) return fromSession;
     }
   }
 

@@ -7,7 +7,7 @@ import {
   IconMapPin as MapPin,
   IconBuildingStore as Store,
 } from "@tabler/icons-react";
-import Image from "next/image";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 interface Testimonial {
   name: string;
@@ -127,11 +127,11 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
 
 export function MerchantTestimonials(): React.JSX.Element {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section className="py-24 px-4 relative w-full min-w-0 overflow-x-hidden">
       {/* Background Decoration */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
 
-      <div className="max-w-[1760px] mx-auto relative">
+      <div className="container-wide relative min-w-0">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -142,7 +142,7 @@ export function MerchantTestimonials(): React.JSX.Element {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 mb-6">
             <Star className="w-4 h-4 text-primary fill-primary" />
             <span className="text-xs font-bold text-primary uppercase tracking-wider">
-              Trusted by 500+ Nigerian Merchants
+              Trusted by merchants across Nigeria
             </span>
           </div>
 
@@ -150,39 +150,34 @@ export function MerchantTestimonials(): React.JSX.Element {
             Real Merchants, <span className="text-primary">Real Results</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From Lagos to Kano, see how Nigerian entrepreneurs are transforming their WhatsApp businesses with Vayva.
+            <span className="md:hidden">
+              Swipe for stories from merchants using Vayva across Nigeria.
+            </span>
+            <span className="hidden md:inline">
+              From Lagos to Kano, see how Nigerian entrepreneurs are transforming their WhatsApp businesses with Vayva.
+            </span>
           </p>
         </motion.div>
 
-        {/* Stats Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
-        >
-          {[
-            { value: "500+", label: "Active Merchants" },
-            { value: "₦2.5B+", label: "GMV Processed" },
-            { value: "98%", label: "WhatsApp Open Rate" },
-            { value: "4.8/5", label: "Average Rating" },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className="bg-background/70 backdrop-blur-xl rounded-2xl p-4 border border-border/60 text-center"
-            >
-              <div className="text-2xl md:text-3xl font-black text-primary">{stat.value}</div>
-              <div className="text-xs text-muted-foreground">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Testimonials: desktop grid */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TESTIMONIALS.map((testimonial, index) => (
             <TestimonialCard key={testimonial.initials} testimonial={testimonial} index={index} />
           ))}
+        </div>
+        <div className="md:hidden -mx-1 pb-2">
+          <MarketingSnapRow
+            ariaLabel="Merchant testimonials"
+            hint="Swipe for more stories"
+            showDots
+            dotCount={TESTIMONIALS.length}
+          >
+            {TESTIMONIALS.map((testimonial, index) => (
+              <MarketingSnapItem key={testimonial.initials}>
+                <TestimonialCard testimonial={testimonial} index={index} />
+              </MarketingSnapItem>
+            ))}
+          </MarketingSnapRow>
         </div>
 
         {/* Trust Badges */}
@@ -197,7 +192,7 @@ export function MerchantTestimonials(): React.JSX.Element {
             <svg className="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
-            Paystack Verified
+            Payments via Paystack
           </span>
           <span className="flex items-center gap-2 text-sm">
             <svg className="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="currentColor">

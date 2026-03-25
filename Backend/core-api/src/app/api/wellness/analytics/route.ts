@@ -11,7 +11,7 @@ export const GET = withVayvaAPI(
     try {
       const { searchParams } = new URL(req.url);
       const period = searchParams.get('period') || 'month'; // day, week, month, quarter, year
-      const comparePeriod = searchParams.get('compare') === 'true';
+      const _comparePeriod = searchParams.get('compare') === 'true';
       
       // Calculate date ranges
       const now = new Date();
@@ -124,7 +124,7 @@ export const GET = withVayvaAPI(
 );
 
 // Revenue analytics
-async function getRevenueAnalytics(storeId: string, startDate: Date, endDate: Date, compStart: Date, compEnd: Date) {
+async function _getRevenueAnalytics(storeId: string, startDate: Date, endDate: Date, compStart: Date, compEnd: Date) {
   const [currentRevenue, previousRevenue] = await Promise.all([
     prisma.wellnessMembership.aggregate({
       where: {
@@ -151,7 +151,7 @@ async function getRevenueAnalytics(storeId: string, startDate: Date, endDate: Da
 }
 
 // Membership analytics
-async function getMembershipAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getMembershipAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const [activeCount, newCount, revenue] = await Promise.all([
     prisma.wellnessMembership.count({
       where: { storeId, status: "active" },
@@ -180,7 +180,7 @@ async function getMembershipAnalytics(storeId: string, startDate: Date, endDate:
 }
 
 // Session analytics
-async function getSessionAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getSessionAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const sessions = await prisma.wellnessSession.findMany({
     where: {
       storeId,
@@ -207,7 +207,7 @@ async function getSessionAnalytics(storeId: string, startDate: Date, endDate: Da
 }
 
 // Appointment analytics
-async function getAppointmentAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getAppointmentAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const appointments = await prisma.wellnessAppointment.findMany({
     where: {
       storeId,
@@ -231,7 +231,7 @@ async function getAppointmentAnalytics(storeId: string, startDate: Date, endDate
 }
 
 // Instructor analytics
-async function getInstructorAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getInstructorAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const instructors = await prisma.wellnessInstructor.findMany({
     where: { storeId, status: "active" },
     include: {
@@ -261,7 +261,7 @@ async function getInstructorAnalytics(storeId: string, startDate: Date, endDate:
 }
 
 // Equipment analytics
-async function getEquipmentAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getEquipmentAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const [total, maintenanceCount] = await Promise.all([
     prisma.wellnessEquipment.count({ where: { storeId } }),
     prisma.wellnessEquipmentMaintenance.count({
@@ -280,7 +280,7 @@ async function getEquipmentAnalytics(storeId: string, startDate: Date, endDate: 
 }
 
 // Review analytics
-async function getReviewAnalytics(storeId: string, startDate: Date, endDate: Date) {
+async function _getReviewAnalytics(storeId: string, startDate: Date, endDate: Date) {
   const reviews = await prisma.wellnessReview.findMany({
     where: {
       storeId,
@@ -308,7 +308,7 @@ async function getReviewAnalytics(storeId: string, startDate: Date, endDate: Dat
 }
 
 // Generate trends data
-async function generateTrends(storeId: string, period: string) {
+async function _generateTrends(_storeId: string, _period: string) {
   // Mock trend data - would connect to actual time-series data
   return {
     revenue: [12500, 13200, 14100, 13800, 15200],
@@ -319,7 +319,7 @@ async function generateTrends(storeId: string, period: string) {
 }
 
 // Generate business insights
-function generateInsights(revenue: any, memberships: any, sessions: any, appointments: any, instructors: any): string[] {
+function _generateInsights(revenue: any, memberships: any, sessions: any, appointments: any, instructors: any): string[] {
   const insights: string[] = [];
   
   if (revenue.changePercent > 10) {

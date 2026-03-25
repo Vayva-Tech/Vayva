@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Reviews & Ratings Add-On Components
@@ -12,7 +13,7 @@
  * - PhotoReviewsGrid: Grid of photo reviews
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star,
@@ -20,15 +21,9 @@ import {
   ThumbsDown,
   Check,
   AlertCircle,
-  Image as ImageIcon,
   X,
-  ChevronDown,
-  ChevronUp,
-  Filter,
   Flag,
-  MoreHorizontal,
   Camera,
-  Upload
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -167,7 +162,7 @@ export function StarRatingInput({
     <div className={cn('flex flex-col items-center gap-2', className)}>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
-          <button
+          <Button
             key={star}
             type="button"
             onMouseEnter={() => setHoverValue(star)}
@@ -184,7 +179,7 @@ export function StarRatingInput({
                 currentValue >= star && 'fill-current'
               )} 
             />
-          </button>
+          </Button>
         ))}
       </div>
       {label && (
@@ -270,7 +265,7 @@ interface ReviewCardProps {
 
 export function ReviewCard({ 
   review, 
-  showProductInfo = false,
+  showProductInfo: _showProductInfo = false,
   onHelpful,
   onReport,
   className 
@@ -320,13 +315,13 @@ export function ReviewCard({
         </div>
         
         {onReport && (
-          <button
+          <Button
             onClick={() => onReport(review.id)}
             className="p-1 text-muted-foreground hover:text-foreground"
             aria-label="Report review"
           >
             <Flag className="w-4 h-4" />
-          </button>
+          </Button>
         )}
       </div>
 
@@ -340,31 +335,34 @@ export function ReviewCard({
       </p>
       
       {shouldTruncate && (
-        <button
+        <Button
           onClick={() => setExpanded(!expanded)}
           className="text-sm text-primary hover:underline"
         >
           {expanded ? 'Show less' : 'Read more'}
-        </button>
+        </Button>
       )}
 
       {/* Images */}
       {review.images && review.images.length > 0 && (
         <div className="flex gap-2">
-          {review.images.slice(0, 4).map((image, index) => (
-            <button
+          {(review.images ?? []).slice(0, 4).map((image, index) => {
+            const imgs = review.images ?? [];
+            return (
+            <Button
               key={index}
               onClick={() => setShowImages(true)}
               className="relative w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0"
             >
               <img src={image} alt="" className="w-full h-full object-cover" />
-              {index === 3 && review.images.length > 4 && (
+              {index === 3 && imgs.length > 4 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-sm font-medium">
-                  +{review.images.length - 4}
+                  +{imgs.length - 4}
                 </div>
               )}
-            </button>
-          ))}
+            </Button>
+            );
+          })}
         </div>
       )}
 
@@ -381,20 +379,20 @@ export function ReviewCard({
           {review.helpful} people found this helpful
         </span>
         <div className="flex items-center gap-1">
-          <button
+          <Button
             onClick={() => onHelpful?.(review.id, true)}
             className="p-1.5 hover:bg-accent rounded transition-colors"
             aria-label="Mark as helpful"
           >
             <ThumbsUp className="w-4 h-4" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => onHelpful?.(review.id, false)}
             className="p-1.5 hover:bg-accent rounded transition-colors"
             aria-label="Mark as unhelpful"
           >
             <ThumbsDown className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -494,8 +492,8 @@ export function ReviewList({
       {/* Filters & Sort */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
-          {filterButtons.map(({ id, label, count }) => (
-            <button
+          {filterButtons.map(({ id, label }) => (
+            <Button
               key={id}
               onClick={() => setFilter(id)}
               className={cn(
@@ -506,7 +504,7 @@ export function ReviewList({
               )}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -542,12 +540,12 @@ export function ReviewList({
       {/* Load More */}
       {hasMore && onLoadMore && (
         <div className="text-center">
-          <button
+          <Button
             onClick={onLoadMore}
             className="px-6 py-3 border rounded-lg font-medium hover:bg-accent transition-colors"
           >
             Load More Reviews
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -565,7 +563,7 @@ interface ReviewFormProps {
   className?: string;
 }
 
-export function ReviewForm({ productId, variants, onSubmit, className }: ReviewFormProps) {
+export function ReviewForm({ productId, variants: _variants, onSubmit, className }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -689,13 +687,13 @@ export function ReviewForm({ productId, variants, onSubmit, className }: ReviewF
           {images.map((image, index) => (
             <div key={index} className="relative w-20 h-20 rounded-lg overflow-hidden">
               <img src={image} alt="" className="w-full h-full object-cover" />
-              <button
+              <Button
                 type="button"
                 onClick={() => removeImage(index)}
                 className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"
               >
                 <X className="w-3 h-3" />
-              </button>
+              </Button>
             </div>
           ))}
           {images.length < 5 && (
@@ -716,12 +714,12 @@ export function ReviewForm({ productId, variants, onSubmit, className }: ReviewF
       </div>
 
       {/* Submit */}
-      <button
+      <Button
         type="submit"
         className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
       >
         Submit Review
-      </button>
+      </Button>
     </form>
   );
 }
@@ -750,7 +748,7 @@ export function PhotoReviewsGrid({ reviews, onPhotoClick, className }: PhotoRevi
       
       <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
         {allPhotos.slice(0, 12).map(({ review, photo, index }, i) => (
-          <button
+          <Button
             key={`${review.id}-${index}`}
             onClick={() => onPhotoClick?.(review, index)}
             className="relative aspect-square rounded-lg overflow-hidden bg-muted group"
@@ -762,7 +760,7 @@ export function PhotoReviewsGrid({ reviews, onPhotoClick, className }: PhotoRevi
               </div>
             )}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -784,12 +782,12 @@ function ImageLightbox({ images, onClose }: { images: string[]; onClose: () => v
       className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
       onClick={onClose}
     >
-      <button
+      <Button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full z-10"
       >
         <X className="w-6 h-6" />
-      </button>
+      </Button>
 
       <div className="relative w-full h-full flex items-center justify-center p-4">
         <motion.img
@@ -804,7 +802,7 @@ function ImageLightbox({ images, onClose }: { images: string[]; onClose: () => v
 
         {images.length > 1 && (
           <>
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 setCurrentIndex(prev => (prev > 0 ? prev - 1 : images.length - 1));
@@ -812,8 +810,8 @@ function ImageLightbox({ images, onClose }: { images: string[]; onClose: () => v
               className="absolute left-4 p-3 bg-white/10 rounded-full text-white"
             >
               ←
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 setCurrentIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
@@ -821,7 +819,7 @@ function ImageLightbox({ images, onClose }: { images: string[]; onClose: () => v
               className="absolute right-4 p-3 bg-white/10 rounded-full text-white"
             >
               →
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -829,7 +827,7 @@ function ImageLightbox({ images, onClose }: { images: string[]; onClose: () => v
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
           {images.map((_, index) => (
-            <button
+            <Button
               key={index}
               onClick={(e) => {
                 e.stopPropagation();
@@ -846,3 +844,4 @@ function ImageLightbox({ images, onClose }: { images: string[]; onClose: () => v
     </motion.div>
   );
 }
+

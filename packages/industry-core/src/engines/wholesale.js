@@ -10,7 +10,7 @@ class WholesaleEngine {
   }
   
   async initialize() {
-    console.log('[WHOLESALE_ENGINE] Initialized');
+    console.warn('[WHOLESALE_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

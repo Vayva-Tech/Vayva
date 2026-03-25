@@ -1,7 +1,12 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { apiJson } from "@/lib/api-client-shared";
+import { toast } from "sonner";
+import Link from "next/link";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 import {
   Truck,
   Package,
@@ -30,90 +35,40 @@ interface Shipment {
   eta: string;
 }
 
-// ─── Mock Data ──────────────────────────────────────────────────────────────
+interface ApiShipmentRow {
+  id: string;
+  orderId: string;
+  orderNumber?: string;
+  status: string;
+  provider?: string;
+  trackingCode?: string | null;
+  trackingUrl?: string | null;
+  courierName?: string | null;
+  recipientName?: string | null;
+  updatedAt?: string;
+}
 
-const SHIPMENTS: Shipment[] = [
-  {
-    id: "1",
-    trackingId: "GIG-NG-20260318-4921",
-    orderId: "ORD-7842",
-    customer: "Adebayo Ogundimu",
-    carrier: "GIG Logistics",
-    status: "In Transit",
-    shipDate: "2026-03-18",
-    eta: "2026-03-23",
-  },
-  {
-    id: "2",
-    trackingId: "DHL-NG-20260317-3384",
-    orderId: "ORD-7843",
-    customer: "Chidinma Okafor",
-    carrier: "DHL",
-    status: "Delivered",
-    shipDate: "2026-03-15",
-    eta: "2026-03-17",
-  },
-  {
-    id: "3",
-    trackingId: "GIGL-NG-20260319-1157",
-    orderId: "ORD-7844",
-    customer: "Emeka Nwosu",
-    carrier: "GIGL",
-    status: "Processing",
-    shipDate: "2026-03-19",
-    eta: "2026-03-24",
-  },
-  {
-    id: "4",
-    trackingId: "KWK-NG-20260320-6693",
-    orderId: "ORD-7845",
-    customer: "Fatima Abdullahi",
-    carrier: "Kwik",
-    status: "In Transit",
-    shipDate: "2026-03-20",
-    eta: "2026-03-23",
-  },
-  {
-    id: "5",
-    trackingId: "GIG-NG-20260316-0821",
-    orderId: "ORD-7846",
-    customer: "Olumide Akinwale",
-    carrier: "GIG Logistics",
-    status: "Delivered",
-    shipDate: "2026-03-14",
-    eta: "2026-03-16",
-  },
-  {
-    id: "6",
-    trackingId: "DHL-NG-20260312-5574",
-    orderId: "ORD-7847",
-    customer: "Ngozi Eze",
-    carrier: "DHL",
-    status: "Delivered",
-    shipDate: "2026-03-10",
-    eta: "2026-03-12",
-  },
-  {
-    id: "7",
-    trackingId: "GIGL-NG-20260321-7830",
-    orderId: "ORD-7848",
-    customer: "Ibrahim Musa",
-    carrier: "GIGL",
-    status: "Failed",
-    shipDate: "2026-03-19",
-    eta: "2026-03-21",
-  },
-  {
-    id: "8",
-    trackingId: "KWK-NG-20260320-2290",
-    orderId: "ORD-7849",
-    customer: "Aisha Bello",
-    carrier: "Kwik",
-    status: "Failed",
-    shipDate: "2026-03-18",
-    eta: "2026-03-20",
-  },
-];
+function mapDispatchToUiStatus(raw: string): Shipment["status"] {
+  const s = raw.toUpperCase();
+  if (s === "IN_TRANSIT") return "In Transit";
+  if (s === "DELIVERED") return "Delivered";
+  if (s === "FAILED" || s === "EXCEPTION") return "Failed";
+  return "Processing";
+}
+
+function mapApiShipment(row: ApiShipmentRow): Shipment {
+  const updated = row.updatedAt ? new Date(row.updatedAt).toISOString().slice(0, 10) : "";
+  return {
+    id: row.id,
+    trackingId: row.trackingCode?.trim() || "—",
+    orderId: row.orderNumber || row.orderId,
+    customer: row.recipientName?.trim() || "—",
+    carrier: (row.courierName || row.provider || "—").toString(),
+    status: mapDispatchToUiStatus(row.status),
+    shipDate: updated,
+    eta: "—",
+  };
+}
 
 // ─── Status Config ──────────────────────────────────────────────────────────
 
@@ -139,7 +94,10 @@ function StatusBadge({ status }: { status: Shipment["status"] }) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-NG", {
+  if (!dateStr || dateStr === "—") return "—";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-NG", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -151,9 +109,32 @@ function formatDate(dateStr: string) {
 export default function ShipmentsPage() {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [loadState, setLoadState] = useState<"loading" | "error" | "ready">("loading");
+
+  const loadShipments = useCallback(async () => {
+    try {
+      setLoadState("loading");
+      const res = await apiJson<{
+        success?: boolean;
+        data?: ApiShipmentRow[];
+      }>("/api/fulfillment/shipments");
+      const rows = res?.data ?? [];
+      setShipments(rows.map(mapApiShipment));
+      setLoadState("ready");
+    } catch {
+      toast.error("Could not load shipments");
+      setShipments([]);
+      setLoadState("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadShipments();
+  }, [loadShipments]);
 
   const filtered = useMemo(() => {
-    let items = SHIPMENTS;
+    let items = shipments;
     if (filter !== "All") {
       items = items.filter((s) => s.status === filter);
     }
@@ -164,42 +145,42 @@ export default function ShipmentsPage() {
           s.trackingId.toLowerCase().includes(q) ||
           s.orderId.toLowerCase().includes(q) ||
           s.customer.toLowerCase().includes(q) ||
-          s.carrier.toLowerCase().includes(q)
+          s.carrier.toLowerCase().includes(q),
       );
     }
     return items;
-  }, [filter, search]);
+  }, [filter, search, shipments]);
 
-  const totalShipments = SHIPMENTS.length;
-  const inTransit = SHIPMENTS.filter((s) => s.status === "In Transit").length;
-  const delivered = SHIPMENTS.filter((s) => s.status === "Delivered").length;
-  const failed = SHIPMENTS.filter((s) => s.status === "Failed").length;
+  const totalShipments = shipments.length;
+  const inTransit = shipments.filter((s) => s.status === "In Transit").length;
+  const delivered = shipments.filter((s) => s.status === "Delivered").length;
+  const failed = shipments.filter((s) => s.status === "Failed").length;
 
   const stats = [
     {
       label: "Total Shipments",
-      value: 156,
+      value: totalShipments,
       icon: <Package className="w-5 h-5" />,
       iconBg: "bg-green-50",
       iconColor: "text-green-600",
     },
     {
       label: "In Transit",
-      value: 23,
+      value: inTransit,
       icon: <Truck className="w-5 h-5" />,
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
     },
     {
       label: "Delivered",
-      value: 128,
+      value: delivered,
       icon: <CheckCircle className="w-5 h-5" />,
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-600",
     },
     {
       label: "Failed",
-      value: 5,
+      value: failed,
       icon: <XCircle className="w-5 h-5" />,
       iconBg: "bg-red-50",
       iconColor: "text-red-600",
@@ -208,17 +189,63 @@ export default function ShipmentsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Shipments</h1>
-          <p className="text-sm text-gray-500 mt-1">Track and manage all outbound deliveries</p>
-        </div>
-        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
-          <Plus className="w-4 h-4" />
-          Create Shipment
-        </button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/orders"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>View orders</span>
+                  <ExternalLink className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/fulfillment/shipments"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>All shipments</span>
+                  <ExternalLink className="w-4 h-4 text-gray-400" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">In transit</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {inTransit}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Delivered</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {delivered}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Shipments"
+          subtitle="Track and manage all outbound deliveries"
+          actions={
+            <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
+              <Plus className="w-4 h-4" />
+              Create Shipment
+            </Button>
+          }
+        />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -256,7 +283,7 @@ export default function ShipmentsPage() {
           <div className="flex items-center gap-1 p-1 bg-gray-50 rounded-xl border border-gray-100">
             <Filter className="w-3.5 h-3.5 text-gray-400 ml-2 mr-1" />
             {FILTER_TABS.map((tab) => (
-              <button
+              <Button
                 key={tab}
                 onClick={() => setFilter(tab)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
@@ -266,7 +293,7 @@ export default function ShipmentsPage() {
                 }`}
               >
                 {tab}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -274,13 +301,28 @@ export default function ShipmentsPage() {
 
       {/* Shipment Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {filtered.length === 0 ? (
+        {loadState === "loading" ? (
+          <div className="py-20 text-center text-sm text-gray-500">Loading shipments…</div>
+        ) : filtered.length === 0 ? (
           <div className="py-20 text-center">
             <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
               <Truck className="w-7 h-7 text-gray-300" />
             </div>
             <h3 className="text-sm font-semibold text-gray-900 mb-1">No shipments found</h3>
-            <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
+            <p className="text-sm text-gray-500">
+              {loadState === "error"
+                ? "We could not load shipment data. Try again."
+                : "Try adjusting your filters or search query"}
+            </p>
+            {loadState === "error" && (
+              <Button
+                type="button"
+                onClick={() => void loadShipments()}
+                className="mt-4 text-sm font-semibold text-green-600 hover:text-green-700"
+              >
+                Retry
+              </Button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -321,13 +363,13 @@ export default function ShipmentsPage() {
                         <code className="text-xs text-gray-700 bg-gray-50 px-2 py-1 rounded-md font-mono font-medium">
                           {shipment.trackingId}
                         </code>
-                        <button
+                        <Button
                           onClick={() => navigator.clipboard.writeText(shipment.trackingId)}
                           className="p-1 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-all"
                           title="Copy tracking ID"
                         >
                           <Copy className="w-3 h-3" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -350,18 +392,18 @@ export default function ShipmentsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button
+                        <Button
                           className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
                           title="View details"
                         >
                           <Eye className="w-4 h-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
                           title="Track shipment"
                         >
                           <ExternalLink className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -375,22 +417,24 @@ export default function ShipmentsPage() {
           <div className="px-6 py-3.5 border-t border-gray-100 bg-gray-50/40 flex items-center justify-between">
             <p className="text-xs text-gray-500">
               Showing <span className="font-semibold text-gray-700">{filtered.length}</span> of{" "}
-              <span className="font-semibold text-gray-700">{SHIPMENTS.length}</span> shipments
+              <span className="font-semibold text-gray-700">{shipments.length}</span> shipments
             </p>
             <div className="flex items-center gap-1">
-              <button className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+              <Button className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
                 Previous
-              </button>
-              <button className="px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-lg">
+              </Button>
+              <Button className="px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-lg">
                 1
-              </button>
-              <button className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+              </Button>
+              <Button className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         )}
       </div>
+      </PageWithInsights>
     </div>
   );
 }
+

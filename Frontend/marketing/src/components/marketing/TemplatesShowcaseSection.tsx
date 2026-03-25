@@ -14,27 +14,13 @@ import {
   Smartphone,
   ShoppingBag,
   Calendar,
-  Car,
   Heart,
-  Briefcase,
   GraduationCap,
   Ticket,
   Home,
   Utensils,
-  Dumbbell,
-  Music,
-  Camera,
-  Truck,
-  Leaf,
-  Baby,
-  Dog,
   Wrench,
-  Wine,
-  Shirt,
   Laptop,
-  Hammer,
-  Building2,
-  Landmark,
 } from "lucide-react";
 
 // Template categories with their counts and descriptions
@@ -167,7 +153,7 @@ const SETUP_FEATURES = [
 
 // Stats to highlight
 const TEMPLATE_STATS = [
-  { value: "4+", label: "Templates", subtext: "4 free, upgrade for more" },
+  { value: "1→5", label: "Templates", subtext: "By plan, library beyond" },
   { value: "Visual", label: "Editor", subtext: "Drag-and-drop" },
   { value: "0", label: "Code Required", subtext: "Easy customization" },
   { value: "<5min", label: "Setup Time", subtext: "From template to live" },
@@ -177,10 +163,10 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
   const [activeCategory, setActiveCategory] = React.useState(TEMPLATE_CATEGORIES[0].id);
 
   return (
-    <div className="relative">
+    <div className="relative w-full min-w-0 overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-slate-200/70 bg-gradient-to-b from-slate-50 to-white">
-        <div className="relative max-w-[1600px] mx-auto px-6 py-20 lg:py-28 text-center">
+      <section className="relative overflow-x-hidden border-b border-slate-200/70 bg-gradient-to-b from-slate-50 to-white">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-16 sm:py-20 lg:py-28 text-center min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -210,7 +196,7 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
             className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto"
           >
             Choose from professionally designed templates for your business.
-            Starter includes 4 templates; upgrade to unlock more designs.
+            Starter includes 1 included storefront design; Pro and Pro+ include 2 and 5—with more templates available from the library.
             Each template is mobile-ready and fully customizable with our visual editor.
           </motion.p>
 
@@ -252,7 +238,7 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
 
       {/* Template Categories */}
       <section id="categories" className="py-20 bg-white">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-center mb-12">
             <p className="text-sm font-semibold text-emerald-600 uppercase tracking-wider mb-2">
               Template Library
@@ -265,12 +251,14 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
           {/* Category Tabs */}
           <div className="flex flex-wrap justify-center gap-3 mb-12">
             {TEMPLATE_CATEGORIES.map((category) => (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all h-auto ${
                   activeCategory === category.id
-                    ? "bg-slate-900 text-white"
+                    ? "bg-slate-900 text-white hover:bg-slate-900 hover:text-white"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
@@ -281,7 +269,7 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
                 }`}>
                   {category.count}
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -342,7 +330,7 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
 
       {/* Easy Setup Features */}
       <section className="py-20 bg-slate-50 border-y border-slate-200/70">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="text-center mb-12">
             <p className="text-sm font-semibold text-emerald-600 uppercase tracking-wider mb-2">
               Easy Design Setup
@@ -379,7 +367,7 @@ export function TemplatesShowcaseSection(): React.JSX.Element {
 
       {/* CTA Section */}
       <section className="py-20">
-        <div className="max-w-[1600px] mx-auto px-6">
+        <div className="max-w-[1400px] mx-auto px-6">
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-12 lg:p-16 text-center text-white">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               Ready to launch your storefront?

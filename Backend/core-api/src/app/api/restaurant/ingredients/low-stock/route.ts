@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     }
 
     // Get ingredients where current stock is below threshold
-    const lowStockIngredients = await prisma.inventoryItem.findMany({
+    const _lowStockIngredients = await prisma.inventoryItem.findMany({
       where: {
         businessId,
         deletedAt: null,

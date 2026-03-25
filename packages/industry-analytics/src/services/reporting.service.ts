@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Reporting Service
  * Handles report generation, scheduling, and export functionality

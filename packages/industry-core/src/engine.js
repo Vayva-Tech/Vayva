@@ -11,7 +11,7 @@ export class DashboardEngine {
 
   setConfig(config) {
     this.config = config;
-    console.log('[DASHBOARD_ENGINE] Configuration set:', config.title);
+    console.warn('[DASHBOARD_ENGINE] Configuration set:', config.title);
   }
 
   getConfig() {
@@ -24,7 +24,7 @@ export class DashboardEngine {
       metadata,
       type
     });
-    console.log(`[DASHBOARD_ENGINE] Registered widget: ${type}`);
+    console.warn(`[DASHBOARD_ENGINE] Registered widget: ${type}`);
   }
 
   getWidget(type) {
@@ -33,7 +33,7 @@ export class DashboardEngine {
 
   registerDataResolver(type, resolver) {
     this.dataResolvers.set(type, resolver);
-    console.log(`[DASHBOARD_ENGINE] Registered data resolver: ${type}`);
+    console.warn(`[DASHBOARD_ENGINE] Registered data resolver: ${type}`);
   }
 
   async resolveData(dataSource, context = {}) {
@@ -73,7 +73,7 @@ export class DashboardEngine {
     return alerts;
   }
 
-  evaluateCondition(condition, data) {
+  evaluateCondition(condition, _data) {
     // Simple condition evaluation
     // In a real implementation, this would be more sophisticated
     try {
@@ -85,7 +85,7 @@ export class DashboardEngine {
     }
   }
 
-  getSuggestedActions(currentState) {
+  getSuggestedActions(_currentState) {
     // Return suggested actions based on current state
     return [
       {
@@ -115,7 +115,7 @@ export class DashboardEngine {
   }
 
   async initialize() {
-    console.log('[DASHBOARD_ENGINE] Initializing...');
+    console.warn('[DASHBOARD_ENGINE] Initializing...');
     
     // Register default widgets
     this.registerDefaultWidgets();
@@ -123,12 +123,12 @@ export class DashboardEngine {
     // Register default data resolvers
     this.registerDefaultDataResolvers();
     
-    console.log('[DASHBOARD_ENGINE] Initialization complete');
+    console.warn('[DASHBOARD_ENGINE] Initialization complete');
   }
 
   registerDefaultWidgets() {
     // Register common widget types
-    console.log('[DASHBOARD_ENGINE] Registering default widgets');
+    console.warn('[DASHBOARD_ENGINE] Registering default widgets');
   }
 
   registerDefaultDataResolvers() {
@@ -156,8 +156,8 @@ export class DashboardEngine {
 }
 
 // Data Resolver Interface
-class DataResolver {
-  async resolve(config, context) {
+export class DataResolver {
+  async resolve(_config, _context) {
     throw new Error('resolve method must be implemented');
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nonprofit Industry Engine
  * Main orchestrator for nonprofit features
@@ -66,7 +65,7 @@ export class NonprofitEngine {
       }
 
       this.registerDataResolvers();
-      console.log('[NONPROFIT_ENGINE] Initialized successfully');
+      console.warn('[NONPROFIT_ENGINE] Initialized successfully');
     } catch (error) {
       console.error('[NONPROFIT_ENGINE] Initialization failed:', error);
       throw error;

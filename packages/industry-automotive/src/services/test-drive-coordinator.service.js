@@ -11,7 +11,7 @@ export class TestDriveCoordinatorService {
 
   async initialize() {
     // Initialize service
-    console.log('[TEST_DRIVE_COORDINATOR_SERVICE] Initialized');
+    console.warn('[TEST_DRIVE_COORDINATOR_SERVICE] Initialized');
   }
 
   async scheduleTestDrive(testDrive) {

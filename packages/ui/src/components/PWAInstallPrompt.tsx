@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DownloadSimple as Download } from "@phosphor-icons/react/dist/ssr/DownloadSimple";
 import { X } from "@phosphor-icons/react/dist/ssr/X";
 import { Button } from "./Button";

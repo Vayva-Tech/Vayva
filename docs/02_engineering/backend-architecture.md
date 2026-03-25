@@ -17,7 +17,7 @@ Vayva is a multi-tenant AI-commerce SaaS platform targeting the Nigerian market.
 | Database         | PostgreSQL via Prisma ORM                            |
 | Auth             | NextAuth.js (Credentials provider, JWT strategy)     |
 | Payments         | Paystack (NGN-native)                                |
-| AI               | OpenRouter (GPT-4o Mini primary), Groq (Llama 3.3)  |
+| AI               | OpenRouter (Gemini 2.5 Flash multimodal)            |
 | WhatsApp         | Evolution API (self-hosted gateway)                  |
 | Cache            | Redis (rate limiting, dashboard cache)               |
 | File Storage     | Uploads via platform storage service                 |
@@ -238,14 +238,15 @@ The `Wallet` model tracks per-store balances in kobo with:
 
 ## AI Services
 
+For USD + NGN pricing scenarios and mapping credits to token budgets, see:
+- `docs/08_reference/ai-pricing-and-credits.md`
+
 ### Architecture
 
 ```
 OpenRouter API  <--  OpenRouterClient  <--  AI Route Handlers
                                         |
-Groq API        <--  GroqClient        <--  Autopilot Engine
-                                        |
-                    AICreditService    <--  Credit deduction on every call
+                    AICreditService     <--  Credit deduction on every call
 ```
 
 ### OpenRouter Integration
@@ -260,12 +261,9 @@ Groq API        <--  GroqClient        <--  Autopilot Engine
 
 ### AI Models
 
-| Model                              | Role              | Cost (NGN/1K tokens) |
-|------------------------------------|-------------------|----------------------|
-| `openai/gpt-4o-mini`              | Primary (95%)      | 0.24                 |
-| `meta-llama/llama-3.3-70b-instruct` | Autopilot (Groq) | 0.34                 |
-| `anthropic/claude-3-sonnet`       | Complex reasoning   | 2.40                 |
-| `mistralai/mistral-large`         | Code generation     | 1.60                 |
+| Model                     | Role                      |
+|--------------------------|---------------------------|
+| `google/gemini-2.5-flash`| Primary (chat/vision/voice/autopilot) |
 
 ### Credit System
 
@@ -277,10 +275,11 @@ Groq API        <--  GroqClient        <--  Autopilot Engine
 - PRO_PLUS: 25,000 credits
 
 **Credit consumption formula:**
-- `Credits = ActualCost / 0.9` (targeting ~70% profit margin)
-- GPT-4o Mini: ~0.24 credits per 1,000 tokens
-- Image generation: 10 credits per image
-- Tool calls: 0.5 credits per call
+- `1 credit = ₦3 of AI usage value`
+- Credits charged are based on provider cost + target margin (see `AICreditService.calculateCreditConsumption`)
+
+For cost examples (USD + NGN @ ₦1,600/$) and “what 5,000 credits buys”, see:
+- `docs/08_reference/ai-pricing-and-credits.md`
 
 **Top-up packages (multi-currency):**
 - Small: 3,000 credits -- NGN 3,000 / $7
@@ -296,7 +295,7 @@ Low credit alert triggers at 200 credits remaining (with 24-hour cooldown).
 Exports:
 - `SalesAgent` -- Conversational sales AI for WhatsApp/web
 - `VoiceProcessor` -- Voice note transcription
-- `DeepSeekClient`, `GroqClient` -- Alternative AI providers
+- `OpenRouterClient` -- OpenRouter completion client
 - `DataGovernanceService` -- AI data governance and consent
 - `NotificationService` -- AI-triggered notifications
 - ML modules (no external API needed): `SentimentAnalyzer`, `SalesForecaster`, `RecommendationEngine`, `IntentClassifier`, `SimpleEmbedding`

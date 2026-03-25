@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Travel Booking Dashboard Component
  */
@@ -16,8 +15,8 @@ export interface TravelBookingDashboardProps {
 export const TravelBookingDashboard: React.FC<TravelBookingDashboardProps> = ({
   bookings,
   itineraries,
-  onCreateBooking,
-  onUpdateStatus,
+  onCreateBooking: _onCreateBooking,
+  onUpdateStatus: _onUpdateStatus,
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Transaction Timeline Manager
  * Manages transaction milestones and timeline

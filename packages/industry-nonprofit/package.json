@@ -11,17 +11,19 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@vayva/ai-agent": "workspace:*",
+    "@vayva/db": "workspace:*",
     "@vayva/industry-core": "workspace:*",
     "@vayva/schemas": "workspace:*",
-    "@vayva/db": "workspace:*",
     "@vayva/shared": "workspace:*",
-    "@vayva/ai-agent": "workspace:*",
+    "@vayva/ui": "workspace:^",
     "lucide-react": "^0.460.0",
+    "react": "19.2.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.30",
-    "@types/react": "^18.2.0",
+    "@types/react": "19.2.7",
     "typescript": "^5.9.3",
     "vitest": "^1.6.0"
   },

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 
 export async function GET() {
     return NextResponse.json({ error: "Gone", message: "Moved to /api/notifications" }, { 

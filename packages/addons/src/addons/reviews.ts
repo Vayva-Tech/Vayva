@@ -9,7 +9,7 @@
  * - Star ratings and text reviews
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const REVIEWS_ADDON: AddOnDefinition = {
   id: 'vayva.reviews',

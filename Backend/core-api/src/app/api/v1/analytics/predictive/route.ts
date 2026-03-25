@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { predictiveAnalytics, InsightType } from '@vayva/analytics';
+import { predictiveAnalytics, InsightType as _InsightType } from '@vayva/analytics';
 import { requireAuth } from '@/lib/auth';
 
 /**

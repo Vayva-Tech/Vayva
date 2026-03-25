@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { GlassPanel } from '@vayva/ui/components/fashion';
@@ -43,7 +44,7 @@ const VisualMerchSettingsPage = () => {
                     { value: '1:1', label: 'Square', icon: '⬜' },
                     { value: '9:16', label: 'Story', icon: '📲' },
                   ].map((option) => (
-                    <button
+                    <Button
                       key={option.value}
                       onClick={() => setAspectRatio(option.value)}
                       className={`px-4 py-3 rounded-lg border transition-all flex flex-col items-center gap-2 ${
@@ -54,7 +55,7 @@ const VisualMerchSettingsPage = () => {
                     >
                       <span className="text-2xl">{option.icon}</span>
                       <span className="text-xs">{option.label}</span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -136,12 +137,12 @@ const VisualMerchSettingsPage = () => {
                     <span className="text-4xl opacity-50">👗</span>
                   </div>
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button className="p-2 bg-white/20 rounded-full hover:bg-white/30">
+                    <Button className="p-2 bg-white/20 rounded-full hover:bg-white/30">
                       ✏️
-                    </button>
-                    <button className="p-2 bg-white/20 rounded-full hover:bg-white/30">
+                    </Button>
+                    <Button className="p-2 bg-white/20 rounded-full hover:bg-white/30">
                       🗑️
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -162,3 +163,4 @@ const VisualMerchSettingsPage = () => {
 };
 
 export default VisualMerchSettingsPage;
+

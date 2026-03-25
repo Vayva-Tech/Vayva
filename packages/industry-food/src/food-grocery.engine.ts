@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Food/Grocery Industry Engine
  */
 
 import { DashboardEngine, type DashboardEngineConfig } from '@vayva/industry-core';
-import { FOOD_GROCERY_DASHBOARD_CONFIG } from './dashboard/index';
+import { FOOD_GROCERY_DASHBOARD_CONFIG } from './dashboard';
 import { RecipeOptimizationService, type RecipeOptimizationInput } from './services/recipe-optimization.service';
 import { AIMenuEngineeringService, type MenuEngineeringInput } from './services/menu-engineering-ai.service';
 import { InventoryPredictionService, type InventoryPredictionInput } from './services/inventory-prediction.service';
@@ -123,6 +122,8 @@ export class FoodGroceryEngine {
     this.dashboardEngine.registerDataResolver('realtime', { resolve: async (c, ctx) => ({ widgetId: c.channel || 'realtime', data: { channel: c.channel, storeId: ctx.storeId }, cachedAt: new Date() }) });
   }
 }
+
+export type FoodGroceryEngineStatus = ReturnType<FoodGroceryEngine['getStatus']>;
 
 export class FoodGroceryEngineFactory {
   static create(config?: FoodGroceryEngineConfig): FoodGroceryEngine { return new FoodGroceryEngine(config); }

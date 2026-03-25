@@ -1,13 +1,14 @@
 import { MetadataRoute } from "next";
-import { APP_URL } from "@/lib/constants";
+import { urls } from "@vayva/shared";
 
 export default function robots(): MetadataRoute.Robots {
+  const origin = urls.marketingBase().replace(/\/$/, "");
   return {
     rules: {
       userAgent: "*",
       allow: "/",
       disallow: ["/api/", "/dashboard/", "/ops-console/", "/merchant/"],
     },
-    sitemap: `${APP_URL}/sitemap.xml`,
+    sitemap: `${origin}/sitemap.xml`,
   };
 }

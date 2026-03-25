@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -135,7 +134,7 @@ export default function TeamCollaboration() {
           <ScrollArea className="h-[calc(100vh-350px)]">
             <div className="space-y-2">
               {channels.map((channel) => (
-                <button
+                <Button
                   key={channel.id}
                   onClick={() => setActiveChannel(channel.id)}
                   className={`w-full p-3 rounded-lg text-left transition-colors ${
@@ -166,7 +165,7 @@ export default function TeamCollaboration() {
                       {channel.lastMessage}
                     </p>
                   )}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -177,7 +176,7 @@ export default function TeamCollaboration() {
               </h3>
               <div className="space-y-2">
                 {teamMembers.map((member) => (
-                  <button
+                  <Button
                     key={member.id}
                     className="w-full p-2 rounded-lg hover:bg-green-50 flex items-center gap-3"
                   >
@@ -191,7 +190,7 @@ export default function TeamCollaboration() {
                       <p className="text-sm font-medium">{member.name}</p>
                       <p className="text-xs text-gray-500">{member.role}</p>
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -303,3 +302,4 @@ export default function TeamCollaboration() {
     </div>
   );
 }
+

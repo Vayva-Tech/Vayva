@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@vayva/ui";
 import { PLANS, type PlanKey } from "@/config/pricing";
+import { APP_URL } from "@/lib/constants";
 
 function isPlanKey(value: string | null): value is PlanKey {
-  return value === "free" || value === "starter" || value === "pro";
+  return value === "starter" || value === "pro" || value === "pro_plus";
 }
 
 export default function CheckoutConfirmPage(): React.JSX.Element {
@@ -23,12 +24,12 @@ export default function CheckoutConfirmPage(): React.JSX.Element {
     return PLANS.find((p) => p.key === planKey) || null;
   }, [planKey]);
 
-  const merchantOrigin = "https://merchant.vayva.ng";
+  const merchantOrigin = APP_URL;
 
   if (status !== "success") {
     return (
-      <div className="min-h-screen bg-white text-slate-900">
-        <div className="relative overflow-hidden border-b border-slate-200/70">
+      <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white text-slate-900">
+        <div className="relative overflow-x-hidden border-b border-slate-200/70">
           <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-200/30 blur-3xl" />
           <div className="absolute right-6 -top-8 h-56 w-56 rounded-full bg-violet-200/30 blur-3xl" />
           <div className="relative max-w-[900px] mx-auto px-6 py-16">
@@ -60,15 +61,17 @@ export default function CheckoutConfirmPage(): React.JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <div className="relative overflow-hidden border-b border-slate-200/70">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white text-slate-900">
+      <div className="relative overflow-x-hidden border-b border-slate-200/70">
         <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-200/30 blur-3xl" />
         <div className="absolute right-6 -top-8 h-56 w-56 rounded-full bg-violet-200/30 blur-3xl" />
         <div className="relative max-w-[900px] mx-auto px-6 py-16">
           <h1 className="text-3xl md:text-4xl font-black tracking-tight">Payment successful</h1>
           <p className="mt-3 text-slate-600">
             We created your Vayva Merchant account{storeName ? ` for ${storeName}` : ""}.
-            Next, verify your email to access your dashboard.
+            Verify your email with the code we sent you—you&apos;ll be signed in after verification.
+            You did not pick a password at checkout; use{" "}
+            <strong>Reset password</strong> on the merchant app anytime to set one for future sign-ins.
           </p>
         </div>
       </div>
@@ -92,17 +95,21 @@ export default function CheckoutConfirmPage(): React.JSX.Element {
             </a>
 
             <a
-              href={`${merchantOrigin}/signin?email=${encodeURIComponent(email)}`}
+              href={`${merchantOrigin}/forgot-password?email=${encodeURIComponent(email)}`}
               className="inline-flex"
             >
               <Button variant="outline" className="h-12 rounded-xl">
-                Sign in
+                Set or reset password
               </Button>
             </a>
           </div>
 
           <div className="mt-6 text-xs text-slate-500">
-            Didn’t receive the OTP? Use “Resend code” on the verification screen.
+            Didn’t receive the OTP? Use “Resend code” on the verification screen. Already verified? Open{" "}
+            <a className="underline text-slate-700" href={`${merchantOrigin}/signin`}>
+              Sign in
+            </a>{" "}
+            and use reset password if you need a password.
           </div>
         </div>
       </div>

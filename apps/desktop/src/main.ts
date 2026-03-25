@@ -4,7 +4,7 @@ import Store from 'electron-store';
 import { Database } from './db/database';
 
 // Initialize store for app settings
-const store = new Store();
+const _store = new Store();
 
 // Initialize database
 let db: Database;
@@ -69,7 +69,7 @@ function createWindow(): void {
 }
 
 function createMenu(): void {
-  const template: any[] = [
+  const template: unknown[] = [
     {
       label: 'File',
       submenu: [
@@ -154,7 +154,7 @@ ipcMain.handle('get-app-version', () => {
 });
 
 ipcMain.handle('get-app-path', (_event, name: string) => {
-  return app.getPath(name as any);
+  return app.getPath(name as unknown);
 });
 
 ipcMain.handle('open-external', (_event, url: string) => {
@@ -172,14 +172,14 @@ ipcMain.handle('select-directory', async () => {
   return result;
 });
 
-ipcMain.handle('save-file', async (_event, options: any) => {
+ipcMain.handle('save-file', async (_event, options: unknown) => {
   if (!mainWindow) return { canceled: true };
   
   const result = await dialog.showSaveDialog(mainWindow, options);
   return result;
 });
 
-ipcMain.handle('open-file', async (_event, options: any) => {
+ipcMain.handle('open-file', async (_event, options: unknown) => {
   if (!mainWindow) return { canceled: true };
   
   const result = await dialog.showOpenDialog(mainWindow, options);
@@ -199,7 +199,7 @@ ipcMain.handle('db-init', async () => {
   }
 });
 
-ipcMain.handle('db-execute', async (_event, query: string, params?: any[]) => {
+ipcMain.handle('db-execute', async (_event, query: string, params?: unknown[]) => {
   try {
     return await db.execute(query, params);
   } catch (error) {
@@ -208,7 +208,7 @@ ipcMain.handle('db-execute', async (_event, query: string, params?: any[]) => {
   }
 });
 
-ipcMain.handle('db-query', async (_event, query: string, params?: any[]) => {
+ipcMain.handle('db-query', async (_event, query: string, params?: unknown[]) => {
   try {
     return await db.query(query, params);
   } catch (error) {

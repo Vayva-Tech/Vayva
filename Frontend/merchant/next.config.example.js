@@ -4,8 +4,8 @@
  * Copy this pattern to your next.config.js file
  */
 
-const { withServiceWorker } from './src/lib/with-service-worker';
-const { withBundleAnalyzer } from './src/lib/with-bundle-analyzer';
+const { withServiceWorker } = require('./src/lib/with-service-worker');
+const { withBundleAnalyzer } = require('./src/lib/with-bundle-analyzer');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

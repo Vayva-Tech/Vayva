@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React, { useState } from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 
 export interface ThemeConfig {
   id: string;
@@ -86,7 +86,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Theme Customizer</h2>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => setActiveTab('presets')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeTab === 'presets'
@@ -95,8 +95,8 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
             }`}
           >
             Presets
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setActiveTab('advanced')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeTab === 'advanced'
@@ -105,14 +105,14 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
             }`}
           >
             Advanced
-          </button>
+          </Button>
         </div>
       </div>
 
       {activeTab === 'presets' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {presets.map((preset) => (
-            <button
+            <Button
               key={preset.id}
               onClick={() => handlePresetSelect(preset)}
               className={`relative p-4 rounded-xl border-2 transition-all text-left ${
@@ -155,7 +155,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
                   <span className="text-white text-xs">✓</span>
                 </div>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -220,7 +220,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
             </label>
             <div className="grid grid-cols-5 gap-3">
               {(['none', 'sm', 'md', 'lg', 'xl'] as const).map((radius) => (
-                <button
+                <Button
                   key={radius}
                   onClick={() => onThemeChange?.({ ...currentTheme!, borderRadius: radius })}
                   className={`px-4 py-3 rounded-lg border transition-all capitalize ${
@@ -230,7 +230,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
                   }`}
                 >
                   {radius}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

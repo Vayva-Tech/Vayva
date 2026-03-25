@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Restaurant Industry Engine
  * Main orchestrator for all restaurant-specific features
@@ -116,10 +115,7 @@ export class RestaurantEngine {
 
       // Initialize Menu Engineering if config provided
       if (this.restaurantConfig.menuEngineering) {
-        this.menuEngineeringService = new MenuEngineeringService(
-          this.recipeCostingService,
-          this.restaurantConfig.menuEngineering
-        );
+        this.menuEngineeringService = new MenuEngineeringService(this.restaurantConfig.menuEngineering);
         await this.menuEngineeringService.initialize();
       }
     }
@@ -137,10 +133,7 @@ export class RestaurantEngine {
 
       // Initialize Prediction Engine if config provided
       if (this.restaurantConfig.prediction) {
-        this.predictionEngine = new TableTurnPredictionEngine(
-          this.tableTurnService,
-          this.restaurantConfig.prediction
-        );
+        this.predictionEngine = new TableTurnPredictionEngine(this.restaurantConfig.prediction);
         await this.predictionEngine.initialize();
       }
     }
@@ -314,6 +307,9 @@ export class RestaurantEngine {
         'eighty-six': this.isFeatureAvailable('eighty-six'),
         'table-turns': this.isFeatureAvailable('table-turns'),
         prediction: this.isFeatureAvailable('prediction'),
+        'ai-labor-forecasting': this.isFeatureAvailable('ai-labor-forecasting'),
+        'ai-reservation-no-show': this.isFeatureAvailable('ai-reservation-no-show'),
+        'ai-customer-preferences': this.isFeatureAvailable('ai-customer-preferences'),
       },
       timestamp: new Date(),
     };
@@ -475,20 +471,39 @@ export class RestaurantEngineFactory {
 export function createDefaultRestaurantConfig(): RestaurantEngineConfig {
   return {
     kds: {
-      pollingInterval: 5000,
-      maxOrdersInQueue: 50,
+      displayMode: 'queue',
+      colorCoding: true,
+      soundAlerts: true,
+      bumpBar: true,
+      prepTimeTracking: true,
+      stations: [{ id: 'line', name: 'Main line', categories: ['mains'], displayOrder: 0 }],
     },
     recipeCosting: {
-      enableAutoCalculation: true,
-      autoCalculateInterval: 3600000, // 1 hour
+      ingredientPriceTracking: true,
+      yieldCalculations: true,
+      menuEngineering: true,
+      marginAlerts: true,
+      targetFoodCostPercentage: 30,
+      laborCostPerHour: 20,
     },
     eightySix: {
-      enableAutoDetection: true,
-      lowStockThreshold: 0,
+      auto86: true,
+      thresholdQuantity: 5,
+      thresholdPercentage: 20,
+      channelSync: ['pos', 'kds'],
+      staffNotification: true,
+      notificationChannels: ['push'],
+      autoRestockEstimate: true,
+      restockLeadTimeMinutes: 60,
     },
     tableTurns: {
-      enablePredictions: true,
-      predictionWindowHours: 24,
+      predictionModel: 'rule_based',
+      seatingOptimization: true,
+      waitlistIntegration: true,
+      notificationChannels: ['app'],
+      autoNotifyWhenReady: true,
+      readyNotificationLeadTime: 10,
+      tableResetTimeMinutes: 15,
     },
   };
 }

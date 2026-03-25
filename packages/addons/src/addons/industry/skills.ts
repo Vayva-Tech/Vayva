@@ -4,7 +4,7 @@
  * Skills showcase with progress bars and endorsements
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const SKILLS_ADDON: AddOnDefinition = {
   id: 'vayva.skills',

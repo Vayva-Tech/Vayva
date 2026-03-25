@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Shopping Cart Add-On Components
@@ -90,7 +91,7 @@ interface CartProviderProps {
   storeId: string;
 }
 
-export function CartProvider({ children, config = {}, storeId }: CartProviderProps) {
+export function CartProvider({ children, config: _config = {}, storeId }: CartProviderProps) {
   const [state, setState] = useState<CartState>({
     items: [],
     isOpen: false,
@@ -100,19 +101,21 @@ export function CartProvider({ children, config = {}, storeId }: CartProviderPro
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem(`cart_${storeId}`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setState(prev => ({
-          ...prev,
-          items: parsed.items || [],
-          savedForLater: parsed.savedForLater || [],
-        }));
-      } catch {
-        // Invalid cart data, ignore
+    queueMicrotask(() => {
+      const saved = localStorage.getItem(`cart_${storeId}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setState(prev => ({
+            ...prev,
+            items: parsed.items || [],
+            savedForLater: parsed.savedForLater || [],
+          }));
+        } catch {
+          // Invalid cart data, ignore
+        }
       }
-    }
+    });
   }, [storeId]);
 
   // Save cart to localStorage when it changes
@@ -268,7 +271,7 @@ export function CartIcon({ className, iconColor = 'currentColor', showCount = tr
   const { itemCount, toggleCart } = useCart();
 
   return (
-    <button
+    <Button
       onClick={toggleCart}
       className={cn(
         'relative p-2 rounded-lg hover:bg-accent transition-colors',
@@ -290,7 +293,7 @@ export function CartIcon({ className, iconColor = 'currentColor', showCount = tr
           {itemCount > 99 ? '99+' : itemCount}
         </motion.span>
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -365,13 +368,13 @@ export function CartDrawer({
                   <ShoppingBag className="w-5 h-5" />
                   <h2 className="font-semibold">Your Cart ({items.length})</h2>
                 </div>
-                <button 
+                <Button 
                   onClick={closeCart}
                   className="p-2 hover:bg-accent rounded-lg transition-colors"
                   aria-label="Close cart"
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
               {/* Free Shipping Progress */}
@@ -449,18 +452,18 @@ export function CartDrawer({
                   </div>
                   
                   <div className="flex gap-3">
-                    <button
+                    <Button
                       onClick={closeCart}
                       className="flex-1 py-3 px-4 border rounded-lg font-medium hover:bg-accent transition-colors"
                     >
                       Continue Shopping
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                     >
                       Checkout
                       <ArrowRight className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -517,43 +520,43 @@ function CartItemRow({
         {/* Quantity Controls */}
         <div className="flex items-center gap-2 mt-2">
           <div className="flex items-center border rounded-lg">
-            <button
+            <Button
               onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
               disabled={item.quantity <= 1}
               className="p-1.5 hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
             >
               <Minus className="w-4 h-4" />
-            </button>
+            </Button>
             <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
-            <button
+            <Button
               onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
               disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false}
               className="p-1.5 hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Increase quantity"
             >
               <Plus className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-1 ml-auto">
             {onSaveForLater && (
-              <button
+              <Button
                 onClick={() => onSaveForLater(item.id)}
                 className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Save for later"
               >
                 <Heart className="w-4 h-4" />
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={() => onRemove(item.id)}
               className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
               aria-label="Remove item"
             >
               <Trash2 className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -589,19 +592,19 @@ function SavedItemRow({
         <p className="text-sm text-muted-foreground">₦{item.price.toLocaleString()}</p>
         
         <div className="flex items-center gap-2 mt-2">
-          <button
+          <Button
             onClick={() => onMoveToCart(item.id)}
             className="text-xs text-primary hover:underline"
           >
             Move to Cart
-          </button>
+          </Button>
           <span className="text-muted-foreground">·</span>
-          <button
+          <Button
             onClick={() => onRemove(item.id)}
             className="text-xs text-muted-foreground hover:text-destructive"
           >
             Remove
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -622,12 +625,12 @@ function EmptyCart({ onClose }: { onClose: () => void }) {
       <p className="text-muted-foreground text-center mb-6">
         Looks like you haven&apos;t added anything to your cart yet.
       </p>
-      <button
+      <Button
         onClick={onClose}
         className="py-2 px-6 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
       >
         Start Shopping
-      </button>
+      </Button>
     </div>
   );
 }
@@ -656,7 +659,7 @@ export function AddToCartButton({
   className,
   showQuantity = true,
 }: AddToCartButtonProps) {
-  const { addItem, openCart } = useCart();
+  const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -677,7 +680,7 @@ export function AddToCartButton({
 
   if (variant === 'icon') {
     return (
-      <button
+      <Button
         onClick={handleAdd}
         className={cn(
           'p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all',
@@ -687,7 +690,7 @@ export function AddToCartButton({
         aria-label="Add to cart"
       >
         {isAdded ? <ShoppingBag className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-      </button>
+      </Button>
     );
   }
 
@@ -695,25 +698,25 @@ export function AddToCartButton({
     <div className={cn('flex items-center gap-2', className)}>
       {showQuantity && (
         <div className="flex items-center border rounded-lg">
-          <button
+          <Button
             onClick={() => setQuantity(q => Math.max(1, q - 1))}
             className="p-2 hover:bg-accent"
             aria-label="Decrease quantity"
           >
             <Minus className="w-4 h-4" />
-          </button>
+          </Button>
           <span className="w-10 text-center font-medium">{quantity}</span>
-          <button
+          <Button
             onClick={() => setQuantity(q => q + 1)}
             className="p-2 hover:bg-accent"
             aria-label="Increase quantity"
           >
             <Plus className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       )}
       
-      <button
+      <Button
         onClick={handleAdd}
         disabled={isAdded}
         className={cn(
@@ -734,7 +737,7 @@ export function AddToCartButton({
             Add to Cart
           </>
         )}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -809,7 +812,7 @@ export function ProductPurchaseSection({ product, className }: ProductPurchaseSe
           </label>
           <div className="flex flex-wrap gap-2">
             {variant.options.map((option) => (
-              <button
+              <Button
                 key={option}
                 onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: option }))}
                 className={cn(
@@ -820,7 +823,7 @@ export function ProductPurchaseSection({ product, className }: ProductPurchaseSe
                 )}
               >
                 {option}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -842,29 +845,29 @@ export function ProductPurchaseSection({ product, className }: ProductPurchaseSe
       {/* Quantity & Add to Cart */}
       <div className="flex items-center gap-3 pt-2">
         <div className="flex items-center border rounded-lg">
-          <button
+          <Button
             onClick={() => setQuantity(q => Math.max(1, q - 1))}
             className="p-3 hover:bg-accent"
           >
             <Minus className="w-4 h-4" />
-          </button>
+          </Button>
           <span className="w-12 text-center font-medium">{quantity}</span>
-          <button
+          <Button
             onClick={() => setQuantity(q => Math.min(product.maxQuantity || 99, q + 1))}
             className="p-3 hover:bg-accent"
           >
             <Plus className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
-        <button
+        <Button
           onClick={handleAddToCart}
           disabled={product.inStock === false}
           className="flex-1 py-3 px-6 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <ShoppingCart className="w-5 h-5" />
           Add to Cart
-        </button>
+        </Button>
       </div>
 
       {/* Trust Badges */}
@@ -919,3 +922,4 @@ export function FloatingCartButton({ className }: FloatingCartButtonProps) {
     </motion.button>
   );
 }
+

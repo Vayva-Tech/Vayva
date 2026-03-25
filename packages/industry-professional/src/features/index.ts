@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Professional Services Features
  * Business logic and feature modules

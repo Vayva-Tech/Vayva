@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 import { Icon } from '@/components/ui/icon';
@@ -14,7 +14,7 @@ export function TopPerformingPosts({ posts, categories }: TopPerformingPostsProp
     <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-gray-900">Top Performing Posts</h3>
-        <button className="text-sm text-green-600-primary hover:underline">View All</button>
+        <Button className="text-sm text-green-600-primary hover:underline">View All</Button>
       </div>
 
       <div className="space-y-3">
@@ -73,3 +73,4 @@ export function TopPerformingPosts({ posts, categories }: TopPerformingPostsProp
     </div>
   );
 }
+

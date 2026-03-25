@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 import { useOpsQuery } from "@/hooks/useOpsQuery";
@@ -94,12 +95,12 @@ export default function RevenueAnalyticsPage(): React.JSX.Element {
       title="Revenue Analytics"
       description="MRR, ARR, and revenue forecasting"
       headerActions={
-        <button
+        <Button
           onClick={() => refetch()}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowsClockwise className={`h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
-        </button>
+        </Button>
       }
     >
       {/* Key Metrics */}
@@ -395,3 +396,4 @@ export default function RevenueAnalyticsPage(): React.JSX.Element {
     </OpsPageShell>
   );
 }
+

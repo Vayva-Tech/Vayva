@@ -46,7 +46,7 @@ export class EventsEngine {
       this.status.servicesReady = true;
       this.status.initialized = true;
       
-      console.log(`[EVENTS_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
+      console.warn(`[EVENTS_ENGINE] Initialized with ${this.status.activeFeatures.length} features`);
     } catch (error) {
       console.error('[EVENTS_ENGINE] Initialization failed:', error);
       throw error;

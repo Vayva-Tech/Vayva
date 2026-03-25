@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState, useRef, useEffect } from 'react';
 
@@ -66,7 +66,7 @@ export function MultiSelectDropdown({
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
       <div>
-        <button
+        <Button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -79,7 +79,7 @@ export function MultiSelectDropdown({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
             </svg>
           </span>
-        </button>
+        </Button>
       </div>
 
       {isOpen && (
@@ -126,7 +126,7 @@ export function MultiSelectDropdown({
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                   >
                     {option.label}
-                    <button
+                    <Button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -138,7 +138,7 @@ export function MultiSelectDropdown({
                       <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
                         <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
                       </svg>
-                    </button>
+                    </Button>
                   </span>
                 ))}
               </div>

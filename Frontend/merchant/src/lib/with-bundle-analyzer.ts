@@ -1,6 +1,8 @@
-// @ts-nocheck
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import type { NextConfig } from 'next';
+
+type NextWebpackConfig = Parameters<NonNullable<NextConfig['webpack']>>[0];
+type NextWebpackContext = Parameters<NonNullable<NextConfig['webpack']>>[1];
 
 interface WithBundleAnalyzerOptions {
   analyzerMode?: 'server' | 'static' | 'disabled';
@@ -30,7 +32,7 @@ export function withBundleAnalyzer(
 
   return {
     ...nextConfig,
-    webpack: (config, context) => {
+    webpack: (config: NextWebpackConfig, context: NextWebpackContext) => {
       const { dev, isServer } = context;
 
       // Only run bundle analysis in production builds

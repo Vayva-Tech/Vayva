@@ -1,17 +1,10 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
 import { Button, Input, Label, Card, CardContent } from "@vayva/ui";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
-import { Truck, Wallet, MapPin, Clock, NairaSign as Currency } from "@phosphor-icons/react/ssr";
-
-interface QuoteGeneratorProps {
-  pickupAddress?: string;
-  deliveryAddress?: string;
-  onQuoteGenerated?: (quote: any) => void;
-}
+import { Truck, Wallet, MapPin, Clock, CurrencyCircleDollar as Currency } from "@phosphor-icons/react/ssr";
 
 interface Quote {
   provider: "kwik" | "custom";
@@ -20,6 +13,12 @@ interface Quote {
   estimatedTime: string;
   distance?: number;
   notes?: string;
+}
+
+interface QuoteGeneratorProps {
+  pickupAddress?: string;
+  deliveryAddress?: string;
+  onQuoteGenerated?: (quote: Quote) => void;
 }
 
 export function QuoteGenerator({ 
@@ -116,7 +115,7 @@ export function QuoteGenerator({
 
           {/* Delivery Method Selection */}
           <div className="grid grid-cols-2 gap-3">
-            <button
+            <Button
               type="button"
               onClick={() => setDeliveryMethod("kwik")}
               className={`p-4 rounded-xl border-2 transition-all ${
@@ -130,9 +129,9 @@ export function QuoteGenerator({
                 <p className="text-sm font-semibold text-gray-900">Kwik Delivery</p>
                 <p className="text-xs text-gray-400">Automated quote</p>
               </div>
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
               onClick={() => setDeliveryMethod("custom")}
               className={`p-4 rounded-xl border-2 transition-all ${
@@ -146,7 +145,7 @@ export function QuoteGenerator({
                 <p className="text-sm font-semibold text-gray-900">Custom Delivery</p>
                 <p className="text-xs text-gray-400">Manual pricing</p>
               </div>
-            </button>
+            </Button>
           </div>
 
           {/* Address Inputs */}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useState } from 'react';
@@ -9,6 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Calendar, Clock } from 'lucide-react';
 
 export default function DeadlineRulesSettingsPage() {
+  const [excludeWeekends, setExcludeWeekends] = useState(true);
+  const [excludeCourtHolidays, setExcludeCourtHolidays] = useState(true);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -30,14 +32,20 @@ export default function DeadlineRulesSettingsPage() {
               <Label>Exclude Weekends</Label>
               <p className="text-sm text-gray-700">Skip Saturday and Sunday in deadline calculations</p>
             </div>
-            <Switch defaultChecked />
+            <Switch
+              checked={excludeWeekends}
+              onCheckedChange={setExcludeWeekends}
+            />
           </div>
           <div className="flex items-center justify-between">
             <div>
               <Label>Exclude Court Holidays</Label>
               <p className="text-sm text-gray-700">Skip federal and state court holidays</p>
             </div>
-            <Switch defaultChecked />
+            <Switch
+              checked={excludeCourtHolidays}
+              onCheckedChange={setExcludeCourtHolidays}
+            />
           </div>
         </div>
       </Card>

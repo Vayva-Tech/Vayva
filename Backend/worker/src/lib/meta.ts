@@ -23,10 +23,10 @@ export class MetaProvider {
 
   async sendMessage(options: SendMessageOptions) {
     if (!this.apiToken || !this.phoneNumberId) {
-      logger.warn("[MetaProvider] Missing credentials, simulating send.", {
-        app: "worker",
-      });
-      return { providerMessageId: `sim_${Date.now()}` };
+      throw new Error(
+        "Meta WhatsApp Cloud API is deprecated in Vayva. " +
+          "Configure EVOLUTION_API_URL + EVOLUTION_API_KEY instead.",
+      );
     }
 
     const url = `https://graph.facebook.com/${this.version}/${this.phoneNumberId}/messages`;

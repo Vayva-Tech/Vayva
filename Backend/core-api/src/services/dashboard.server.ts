@@ -7,7 +7,7 @@ import { startOfDay, subDays, format } from "date-fns";
 import {
   OverviewMetrics,
   AnalyticInsight,
-  ChartDataItem,
+  ChartDataItem
 } from "@/types/analytics";
 
 interface DashboardStoreInfo {

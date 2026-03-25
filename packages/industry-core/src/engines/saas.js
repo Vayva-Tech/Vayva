@@ -10,7 +10,7 @@ class SaaSEngine {
   }
   
   async initialize() {
-    console.log('[SAAS_ENGINE] Initialized');
+    console.warn('[SAAS_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

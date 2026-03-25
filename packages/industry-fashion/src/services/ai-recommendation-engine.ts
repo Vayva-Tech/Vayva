@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
 export interface AIRecommendation {
   id: string;
@@ -43,9 +42,12 @@ export class AIRecommendationEngine {
     });
 
     // Analyze each variant
-    variants.forEach((variant) => {
+    variants.forEach((variant: any) => {
       const currentStock = variant.inventoryCount || 0;
-      const dailySales = variant.product.orderItems.reduce((sum, item) => sum + item.quantity, 0) / 30;
+      const dailySales = variant.product.orderItems.reduce(
+        (sum: number, item: any) => sum + item.quantity,
+        0,
+      ) / 30;
       const daysUntilStockout = dailySales > 0 ? currentStock / dailySales : Infinity;
 
       // High priority: Fast-moving items about to stock out
@@ -109,8 +111,11 @@ export class AIRecommendationEngine {
       },
     });
 
-    topProducts.forEach((product) => {
-      const totalUnits = product.orderItems.reduce((sum, item) => sum + item.quantity, 0);
+    topProducts.forEach((product: any) => {
+      const totalUnits = product.orderItems.reduce(
+        (sum: number, item: any) => sum + item.quantity,
+        0,
+      );
       const avgPrice = Number(product.price);
       const conversionRate = totalUnits / 1000; // TODO: Use actual session data
 
@@ -199,7 +204,7 @@ export class AIRecommendationEngine {
     });
 
     const sizeDemand = new Map<string, number>();
-    orders.forEach((item) => {
+    orders.forEach((item: any) => {
       const size = item.productVariant?.size || 'M';
       sizeDemand.set(size, (sizeDemand.get(size) || 0) + item.quantity);
     });

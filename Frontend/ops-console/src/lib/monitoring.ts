@@ -84,10 +84,10 @@ export class MonitoringService {
     alert: AlertConfig,
     metric: MetricValue
   ): Promise<void> {
-    console.log(`🚨 ALERT TRIGGERED: ${alert.name}`);
-    console.log(`   Metric: ${metric.name} = ${metric.value}`);
-    console.log(`   Threshold: ${alert.operator} ${alert.threshold}`);
-    console.log(`   Severity: ${alert.severity}`);
+    console.warn(`🚨 ALERT TRIGGERED: ${alert.name}`);
+    console.warn(`   Metric: ${metric.name} = ${metric.value}`);
+    console.warn(`   Threshold: ${alert.operator} ${alert.threshold}`);
+    console.warn(`   Severity: ${alert.severity}`);
 
     // Update last alert time
     this.lastAlertTime.set(alert.id, new Date());
@@ -172,11 +172,11 @@ export class MonitoringService {
    * Get NPS response rate
    */
   private async getNPSResponseRate(): Promise<MetricValue> {
-    const total = await prisma.npsSurvey.count({
+    const total = await prisma.nPSSurvey.count({
       where: { sentAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
     });
 
-    const responded = await prisma.npsSurvey.count({
+    const responded = await prisma.nPSSurvey.count({
       where: { 
         respondedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
         status: 'responded'
@@ -312,7 +312,7 @@ export class MonitoringService {
    * Send email alert
    */
   private async sendEmailAlert(alert: AlertConfig, metricValue: number): Promise<void> {
-    console.log(`📧 Sending email alert: ${alert.name}`);
+    console.warn(`📧 Sending email alert: ${alert.name}`);
     // Implementation would use @vayva/emails or similar service
   }
 
@@ -320,7 +320,7 @@ export class MonitoringService {
    * Send Slack alert
    */
   private async sendSlackAlert(alert: AlertConfig, metricValue: number): Promise<void> {
-    console.log(`💬 Sending Slack alert: ${alert.name}`);
+    console.warn(`💬 Sending Slack alert: ${alert.name}`);
     
     if (!process.env.SLACK_WEBHOOK_URL) {
       console.warn('SLACK_WEBHOOK_URL not configured');
@@ -352,7 +352,7 @@ export class MonitoringService {
    * Send webhook alert
    */
   private async sendWebhookAlert(alert: AlertConfig, metricValue: number): Promise<void> {
-    console.log(`🔗 Sending webhook alert: ${alert.name}`);
+    console.warn(`🔗 Sending webhook alert: ${alert.name}`);
     // Implementation would call custom webhook URL
   }
 
@@ -360,7 +360,7 @@ export class MonitoringService {
    * Start continuous monitoring loop
    */
   startMonitoring(intervalMinutes: number = 5): void {
-    console.log(`👁️ Starting monitoring service (interval: ${intervalMinutes}m)`);
+    console.warn(`👁️ Starting monitoring service (interval: ${intervalMinutes}m)`);
     
     setInterval(() => {
       this.checkAlerts().catch(console.error);

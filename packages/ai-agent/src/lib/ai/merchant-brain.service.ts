@@ -454,6 +454,202 @@ export class MerchantBrainService {
     }
 
     /**
+     * Tool: Fetch tracking info for a shipment (by tracking code, order ref/number, or phone).
+     * This is what the customer-facing AI uses to answer "where is my order/rider?"
+     * Returns only non-sensitive fields.
+     */
+    static async getTrackingInfo(storeId: string, input: { trackingCode?: string; orderRef?: string; phoneE164?: string }) {
+        try {
+            const trackingCode = (input?.trackingCode || "").trim();
+            const orderRef = (input?.orderRef || "").trim();
+            const phoneE164 = (input?.phoneE164 || "").trim();
+            if (!trackingCode && !orderRef && !phoneE164)
+                return { ok: false, error: "IDENTIFIER_REQUIRED" };
+
+            const maybeNumber = orderRef ? Number(orderRef) : NaN;
+            const shipment = await prisma.shipment.findFirst({
+                where: {
+                    storeId,
+                    ...(trackingCode ? { trackingCode } : {}),
+                    ...(phoneE164 ? { recipientPhone: phoneE164 } : {}),
+                    ...(orderRef ? {
+                        order: {
+                            is: {
+                                OR: [
+                                    { refCode: orderRef },
+                                    ...(Number.isFinite(maybeNumber) ? [{ orderNumber: maybeNumber }] : []),
+                                ],
+                            },
+                        },
+                    } : {}),
+                },
+                include: {
+                    store: { select: { slug: true, settings: true } },
+                    order: {
+                        select: {
+                            refCode: true,
+                            orderNumber: true,
+                            total: true,
+                            shippingTotal: true,
+                            paymentStatus: true,
+                            createdAt: true,
+                        },
+                    },
+                    trackingEvents: {
+                        orderBy: { createdAt: "desc" },
+                        take: 10,
+                        select: {
+                            status: true,
+                            locationText: true,
+                            description: true,
+                            occurredAt: true,
+                        },
+                    },
+                },
+                orderBy: { updatedAt: "desc" },
+            });
+
+            if (!shipment) {
+                return { ok: false, error: "NOT_FOUND" };
+            }
+
+            // Best-effort parse notes for COD meta stored at dispatch time
+            const notesMeta = (() => {
+                if (!shipment.notes)
+                    return {};
+                try {
+                    const parsed = JSON.parse(shipment.notes) as unknown;
+                    return isRecord(parsed) ? parsed : {};
+                }
+                catch {
+                    return {};
+                }
+            })();
+
+            const cod = (() => {
+                const n = notesMeta as UnknownRecord;
+                const c = n.cod;
+                if (!isRecord(c))
+                    return null;
+                return {
+                    enabled: Boolean(c.enabled),
+                    amount: typeof c.amount === "number"
+                        ? c.amount
+                        : typeof c.amount === "string"
+                            ? Number(c.amount)
+                            : null,
+                    includesDelivery: Boolean(c.includesDelivery),
+                };
+            })();
+
+            const timeline = shipment.trackingEvents.map((e) => ({
+                status: e.status,
+                note: e.description,
+                location: e.locationText,
+                timestamp: e.occurredAt.toISOString(),
+            }));
+
+            const trackingUrl = shipment.trackingUrl || null;
+
+            const storeSettings = isRecord(shipment.store?.settings) ? shipment.store.settings : {};
+            const customDomain = typeof (storeSettings as UnknownRecord).customDomain === "string"
+                ? String((storeSettings as UnknownRecord).customDomain)
+                : "";
+
+            const root = process.env.STOREFRONT_ROOT_DOMAIN || "vayva.ng";
+            const storeSlug = shipment.store?.slug || "";
+            const merchantBase = customDomain
+                ? (customDomain.startsWith("http") ? customDomain : `https://${customDomain}`)
+                : (storeSlug ? `https://${storeSlug}.${root}` : "");
+            const merchantTrackingUrl = shipment.trackingCode && merchantBase
+                ? `${merchantBase}/order/track?code=${encodeURIComponent(shipment.trackingCode)}`
+                : null;
+
+            const live = await (async () => {
+                if (shipment.provider !== "KWIK")
+                    return null;
+                const n = notesMeta as UnknownRecord;
+                const uniqueOrderId = typeof n.unique_order_id === "string" ? n.unique_order_id : "";
+                const customerId = typeof n.customer_id === "number"
+                    ? n.customer_id
+                    : typeof n.customer_id === "string"
+                        ? Number(n.customer_id)
+                        : NaN;
+                if (!uniqueOrderId || !Number.isFinite(customerId))
+                    return null;
+
+                const base = process.env.KWIK_PUBLIC_STATUS_BASE_URL || "https://staging-api-test.kwik.delivery";
+                const url = new URL("/getJobStatus", base);
+                url.searchParams.set("unique_order_id", uniqueOrderId);
+                url.searchParams.set("customer_id", String(customerId));
+
+                try {
+                    const res = await fetch(url.toString(), { method: "GET", headers: { "Accept": "application/json" }, cache: "no-store" });
+                    if (!res.ok)
+                        return null;
+                    const data: any = await res.json();
+                    const rider = data?.data?.fleet || data?.data?.agent || data?.fleet;
+                    const pickup = data?.data?.pickup || data?.pickup;
+                    const delivery = data?.data?.delivery || data?.delivery;
+                    const toPoint = (obj: any) => {
+                        const lat = obj?.latitude ?? obj?.lat ?? obj?.job_lat ?? obj?.job_latitude;
+                        const lng = obj?.longitude ?? obj?.lng ?? obj?.job_lng ?? obj?.job_longitude;
+                        const nLat = typeof lat === "string" ? Number(lat) : lat;
+                        const nLng = typeof lng === "string" ? Number(lng) : lng;
+                        if (typeof nLat !== "number" || typeof nLng !== "number")
+                            return null;
+                        if (!Number.isFinite(nLat) || !Number.isFinite(nLng))
+                            return null;
+                        return { lat: nLat, lng: nLng };
+                    };
+                    return {
+                        rider: rider ? { name: rider?.name ?? null, location: toPoint(rider) } : null,
+                        pickup: pickup ? { location: toPoint(pickup) } : null,
+                        delivery: delivery ? { location: toPoint(delivery) } : null,
+                        lastSyncAt: new Date().toISOString(),
+                    };
+                }
+                catch {
+                    return null;
+                }
+            })();
+
+            return {
+                ok: true,
+                tracking: {
+                    code: shipment.trackingCode,
+                    provider: shipment.provider,
+                    status: shipment.status,
+                    externalTrackingUrl: trackingUrl,
+                    merchantTrackingUrl,
+                    order: {
+                        refCode: shipment.order?.refCode,
+                        orderNumber: shipment.order?.orderNumber,
+                        total: shipment.order?.total,
+                        shippingTotal: shipment.order?.shippingTotal,
+                        paymentStatus: shipment.order?.paymentStatus,
+                        createdAt: shipment.order?.createdAt?.toISOString?.() ?? null,
+                    },
+                    payment: { cod },
+                    live,
+                    timeline,
+                    recipient: {
+                        name: shipment.recipientName || null,
+                        phoneMasked: shipment.recipientPhone
+                            ? `****${String(shipment.recipientPhone).slice(-4)}`
+                            : null,
+                        city: shipment.addressCity || null,
+                    },
+                },
+            };
+        }
+        catch (error: unknown) {
+            logger.error("[MerchantBrain] Tracking lookup failed", { storeId, input, error });
+            return { ok: false, error: "TRACKING_LOOKUP_FAILED" };
+        }
+    }
+
+    /**
      * Tool: Get active promotions for a store
      */
     static async getActivePromotions(storeId: string) {

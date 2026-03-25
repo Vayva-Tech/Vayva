@@ -195,7 +195,7 @@ export async function getExpenses(
 export async function updateExpenseStatus(
   expenseId: string,
   status: ExpenseStatus,
-  updatedBy: string
+  _updatedBy: string
 ): Promise<ExpenseWithLedger> {
   try {
     const expense = await (prisma as unknown as { expense: { update: (args: unknown) => Promise<ExpenseWithLedger> } }).expense.update({

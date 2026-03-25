@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Customer Preference AI Service
  * 
@@ -7,7 +6,34 @@
 
 import { BaseAIService } from '@vayva/ai-agent';
 
-export class CustomerPreferenceService extends BaseAIService<any, any> {
+export type CustomerPreferenceInput = {
+  customerId: string;
+  visitHistory: Array<{
+    date: string;
+    itemsOrdered: string[];
+    spend: number;
+    partySize: number;
+    occasion?: string;
+  }>;
+};
+
+export type CustomerPreferenceOutput = {
+  favoriteItems: string[];
+  averageSpend: number;
+  visitFrequency: string;
+  preferredTimes: string[];
+  dietaryRestrictions: string[];
+  personalizedOffers: Array<{
+    offer: string;
+    relevance: number;
+    optimalTiming: string;
+  }>;
+};
+
+export class CustomerPreferenceService extends BaseAIService<
+  CustomerPreferenceInput,
+  CustomerPreferenceOutput
+> {
   constructor() {
     super({
       model: 'restaurant-optimizer',
@@ -17,37 +43,7 @@ export class CustomerPreferenceService extends BaseAIService<any, any> {
     });
   }
 
-  protected async buildPrompt(input: any): Promise<string> {
-    return `Analyze customer dining preferences and provide personalized recommendations...`;
-  }
-
-  protected async parseResponse(rawResponse: string, input: any): Promise<any> {
-    const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No valid JSON');
-    return JSON.parse(jsonMatch[0]);
-  }
-
-  async analyzeCustomerPreferences(
-    customerId: string,
-    visitHistory: Array<{
-      date: string;
-      itemsOrdered: string[];
-      spend: number;
-      partySize: number;
-      occasion?: string;
-    }>
-  ): Promise<{
-    favoriteItems: string[];
-    averageSpend: number;
-    visitFrequency: string;
-    preferredTimes: string[];
-    dietaryRestrictions: string[];
-    personalizedOffers: Array<{
-      offer: string;
-      relevance: number;
-      optimalTiming: string;
-    }>;
-  }> {
+  protected defaultOutput(_input: CustomerPreferenceInput): CustomerPreferenceOutput {
     return {
       favoriteItems: [],
       averageSpend: 0,
@@ -56,5 +52,25 @@ export class CustomerPreferenceService extends BaseAIService<any, any> {
       dietaryRestrictions: [],
       personalizedOffers: [],
     };
+  }
+
+  protected async buildPrompt(_input: CustomerPreferenceInput): Promise<string> {
+    return `Analyze customer dining preferences and provide personalized recommendations...`;
+  }
+
+  protected async parseResponse(
+    rawResponse: string,
+    _input: CustomerPreferenceInput
+  ): Promise<CustomerPreferenceOutput> {
+    const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No valid JSON');
+    return JSON.parse(jsonMatch[0]) as CustomerPreferenceOutput;
+  }
+
+  async analyzeCustomerPreferences(
+    customerId: string,
+    visitHistory: CustomerPreferenceInput['visitHistory']
+  ): Promise<CustomerPreferenceOutput> {
+    return this.execute({ customerId, visitHistory });
   }
 }

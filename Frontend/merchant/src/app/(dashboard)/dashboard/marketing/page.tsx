@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import useSWR from "swr";
@@ -226,7 +226,7 @@ export default function MarketingPage() {
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
   const { data, error, isLoading, mutate } = useSWR<CampaignsData>(
-    '/api/campaigns',
+    '/api/marketing/overview',
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 30000 }
   );
@@ -246,13 +246,13 @@ export default function MarketingPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load campaigns</h3>
           <p className="text-sm text-gray-500 mb-4">There was a problem fetching your marketing data. Please try again.</p>
-          <button
+          <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -296,10 +296,10 @@ export default function MarketingPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">No campaigns yet</h3>
           <p className="text-sm text-gray-500 max-w-sm mb-4">Create your first marketing campaign to grow your store</p>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
+          <Button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
             <Plus className="w-4 h-4" />
             Create Campaign
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -318,17 +318,17 @@ export default function MarketingPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button
+          <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
           >
             <RefreshCw size={16} />
             Refresh
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-600 transition-colors">
+          </Button>
+          <Button className="inline-flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-600 transition-colors">
             <Plus size={16} />
             Create Campaign
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -396,10 +396,10 @@ export default function MarketingPage() {
               Manage your running and planned campaigns
             </p>
           </div>
-          <button className="text-sm font-medium text-green-600 hover:text-green-700 flex items-center gap-1">
+          <Button className="text-sm font-medium text-green-600 hover:text-green-700 flex items-center gap-1">
             View All
             <ChevronRight size={14} />
-          </button>
+          </Button>
         </div>
 
         {/* Table header */}
@@ -465,7 +465,7 @@ export default function MarketingPage() {
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
-              <button
+              <Button
                 key={action.title}
                 onClick={() => setSelectedAction(action.title)}
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-left hover:border-green-200 hover:shadow-md transition-all group"
@@ -488,7 +488,7 @@ export default function MarketingPage() {
                     className="group-hover:translate-x-0.5 transition-transform"
                   />
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -535,3 +535,4 @@ export default function MarketingPage() {
     </div>
   );
 }
+

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -11,6 +10,8 @@ import { AIFeaturePaywall } from "./AIFeaturePaywall";
 
 interface UsageStat {
   metric: string;
+  /** Display label; falls back to METRIC_LABELS[metric] when omitted */
+  label?: string;
   used: number;
   limit: number;
   percentage: number;
@@ -62,14 +63,16 @@ const METRIC_ICONS: Record<string, string> = {
 };
 
 function UsageProgress({
-  label,
+  label: labelProp,
   used,
   limit,
   percentage,
   projected,
   overage,
   overageCost,
+  metric,
 }: UsageStat) {
+  const label = labelProp ?? METRIC_LABELS[metric] ?? metric;
   const isOverLimit = percentage >= 100;
   const isWarning = percentage >= 80 && !isOverLimit;
   const projectedOverLimit = projected > limit;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Education Industry Service
  * 
@@ -269,19 +268,19 @@ export class EducationDashboardService {
    */
   generateAlerts(data: EducationDashboardData): EducationAlert[] {
     const alerts: EducationAlert[] = [];
-    
-    // At-risk students alert
-    if (data.students.atRiskCount > 5) {
+
+    if (data.atRiskStudents.length > 5) {
+      const n = data.atRiskStudents.length;
       alerts.push({
         id: 'at_risk_students',
         type: 'critical',
         category: 'student',
         title: 'High At-Risk Student Count',
-        message: `${data.students.atRiskCount} students are at risk of failing`,
+        message: `${n} students are at risk of failing`,
         affectedEntity: {
           type: 'student',
           id: 'multiple',
-          name: `${data.students.atRiskCount} students`,
+          name: `${n} students`,
         },
         suggestedAction: {
           title: 'View At-Risk List',
@@ -291,16 +290,14 @@ export class EducationDashboardService {
         createdAt: new Date(),
       });
     }
-    
-    // Low completion rate alert
-    const avgCompletion = data.courses.topPerformers.reduce((acc, c) => acc + c.completionRate, 0) / data.courses.topPerformers.length;
-    if (avgCompletion < 60) {
+
+    if (data.overview.averageCompletionRate < 60) {
       alerts.push({
         id: 'low_completion',
         type: 'warning',
         category: 'course',
         title: 'Low Completion Rate',
-        message: `Average completion rate is ${avgCompletion.toFixed(1)}%`,
+        message: `Overall completion rate is ${data.overview.averageCompletionRate.toFixed(1)}%`,
         suggestedAction: {
           title: 'Review Courses',
           href: '/dashboard/courses',
@@ -309,15 +306,15 @@ export class EducationDashboardService {
         createdAt: new Date(),
       });
     }
-    
-    // Pending grading alert
-    if (data.assignments.totalPending > 20) {
+
+    const pendingGrading = data.pendingSubmissions.length;
+    if (pendingGrading > 20) {
       alerts.push({
         id: 'pending_grading',
         type: 'warning',
         category: 'assignment',
         title: 'Large Grading Queue',
-        message: `${data.assignments.totalPending} assignments awaiting grading`,
+        message: `${pendingGrading} assignments awaiting grading`,
         suggestedAction: {
           title: 'Start Grading',
           href: '/dashboard/assignments',
@@ -326,7 +323,7 @@ export class EducationDashboardService {
         createdAt: new Date(),
       });
     }
-    
+
     return alerts;
   }
   
@@ -335,9 +332,8 @@ export class EducationDashboardService {
    */
   generateSuggestedActions(data: EducationDashboardData): EducationSuggestedAction[] {
     const actions: EducationSuggestedAction[] = [];
-    
-    // Intervention for at-risk students
-    if (data.students.atRiskCount > 0) {
+
+    if (data.atRiskStudents.length > 0) {
       actions.push({
         id: 'intervene_at_risk',
         title: 'Intervene with at-risk students',
@@ -348,9 +344,10 @@ export class EducationDashboardService {
         estimatedImpact: 'Improve completion rate by 8-12%',
       });
     }
-    
-    // Review low-completion courses
-    const lowCompletionCourses = data.courses.topPerformers.filter(c => c.completionRate < 70);
+
+    const lowCompletionCourses = data.courseAnalytics.filter(
+      (c) => c.completionRate < 70
+    );
     if (lowCompletionCourses.length > 0) {
       actions.push({
         id: 'review_courses',
@@ -362,9 +359,8 @@ export class EducationDashboardService {
         estimatedImpact: 'Increase student satisfaction and retention',
       });
     }
-    
-    // Grade pending assignments
-    if (data.assignments.totalPending > 10) {
+
+    if (data.pendingSubmissions.length > 10) {
       actions.push({
         id: 'grade_assignments',
         title: 'Grade pending assignments',
@@ -375,7 +371,7 @@ export class EducationDashboardService {
         estimatedImpact: 'Improve student feedback loop',
       });
     }
-    
+
     return actions;
   }
 }

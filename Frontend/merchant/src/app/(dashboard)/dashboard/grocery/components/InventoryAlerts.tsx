@@ -1,3 +1,4 @@
+import { Button } from "@vayva/ui";
 /**
  * Inventory Alerts Component
  */
@@ -56,9 +57,9 @@ export function InventoryAlerts({ alerts, ordersToPlace = 8, estimatedValue = 12
               </div>
             </div>
             {alert.action && (
-              <button className="text-xs bg-white px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50">
+              <Button className="text-xs bg-white px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-50">
                 {alert.action}
-              </button>
+              </Button>
             )}
           </div>
         ))}

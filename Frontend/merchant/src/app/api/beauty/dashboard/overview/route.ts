@@ -1,23 +1,39 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { apiJson } from "@/lib/api-client-shared";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { prisma } from "@vayva/db";
+import type { Prisma } from "@vayva/db";
+
+function isWalkIn(metadata: Prisma.JsonValue | null | undefined): boolean {
+  if (metadata === null || metadata === undefined || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return false;
+  }
+  const rec = metadata as Record<string, unknown>;
+  return rec.walkIn === true;
+}
+
 /**
  * GET /api/beauty/dashboard/overview
  * Returns comprehensive overview data for the beauty salon dashboard
  */
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get("date") || new Date().toISOString().split("T")[0];
-    
+
     const startOfDay = new Date(`${dateParam}T00:00:00.000Z`);
     const endOfDay = new Date(`${dateParam}T23:59:59.999Z`);
 
-    const appointmentsToday = await prisma.booking?.findMany({
+    const appointmentsToday = await prisma.booking.findMany({
       where: {
         storeId,
         startsAt: {
@@ -43,57 +59,50 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-    }) || [];
+    });
 
     const revenueToday = appointmentsToday.reduce((sum, apt) => {
       return sum + (Number(apt.service?.price) || 0);
     }, 0);
 
     const totalAppointments = appointmentsToday.length;
-    const completedAppointments = appointmentsToday.filter(
-      (apt) => apt.status === "COMPLETED"
-    ).length;
-    const cancelledAppointments = appointmentsToday.filter(
-      (apt) => apt.status === "CANCELLED"
-    ).length;
-    const noShows = appointmentsToday.filter(
-      (apt) => apt.status === "NO_SHOW"
-    ).length;
+    const completedAppointments = appointmentsToday.filter((apt) => apt.status === "COMPLETED").length;
+    const cancelledAppointments = appointmentsToday.filter((apt) => apt.status === "CANCELLED").length;
+    const noShows = appointmentsToday.filter((apt) => apt.status === "NO_SHOW").length;
 
     const now = new Date();
     const currentClients = appointmentsToday.filter((apt) => {
       const aptStart = new Date(apt.startsAt);
       const aptEnd = new Date(apt.endsAt || aptStart.getTime() + 60 * 60 * 1000);
-      return apt.status === "IN_PROGRESS" || (now >= aptStart && now <= aptEnd);
+      const inWindow = now >= aptStart && now <= aptEnd;
+      return apt.status === "CONFIRMED" && inWindow;
     }).length;
 
-    const walkinsToday = appointmentsToday.filter(
-      (apt) => (apt.metadata as any)?.walkIn === true
-    ).length;
+    const walkinsToday = appointmentsToday.filter((apt) => isWalkIn(apt.metadata)).length;
 
-    const productSales = await prisma.order?.findMany({
+    const productSales = await prisma.order.findMany({
       where: {
         storeId,
         createdAt: {
           gte: startOfDay,
           lte: endOfDay,
         },
-        orderType: "RETAIL",
+        status: "PAID",
       },
       select: {
-        totalPrice: true,
+        total: true,
       },
-    }) || [];
+    });
 
     const productRevenue = productSales.reduce((sum, order) => {
-      return sum + (Number(order.totalPrice) || 0);
+      return sum + (Number(order.total) || 0);
     }, 0);
 
     const serviceCount: Record<string, { count: number; revenue: number }> = {};
     appointmentsToday.forEach((apt) => {
       const serviceId = apt.serviceId;
       if (!serviceId) return;
-      
+
       if (!serviceCount[serviceId]) {
         serviceCount[serviceId] = { count: 0, revenue: 0 };
       }
@@ -104,51 +113,33 @@ export async function GET(request: NextRequest) {
     const topServices = Object.entries(serviceCount)
       .map(([serviceId, data]) => ({
         serviceId,
-        serviceName: appointmentsToday.find((apt) => apt.serviceId === serviceId)?.service?.title || "Unknown",
+        serviceName:
+          appointmentsToday.find((apt) => apt.serviceId === serviceId)?.service?.title || "Unknown",
         count: data.count,
         revenue: data.revenue,
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    const stylists = await prisma.user?.findMany({
+    const stylistRoles = await prisma.membership.findMany({
       where: {
         storeId,
-        role: "STYLIST",
+        status: "ACTIVE",
       },
-      include: {
-        bookings: {
-          where: {
-            startsAt: {
-              gte: startOfDay,
-              lte: endOfDay,
-            },
-          },
-        },
-      },
-    }) || [];
+      select: { id: true },
+    });
 
-    const onDutyStylists = stylists.filter((stylist) => {
-      const hasBookingToday = stylist.bookings && stylist.bookings.length > 0;
-      return hasBookingToday;
-    }).length;
+    const totalStylists = stylistRoles.length;
+    const onDutyStylists =
+      totalAppointments > 0 && totalStylists > 0 ? Math.min(totalStylists, totalAppointments) : 0;
 
-    const lowStockProducts = await prisma.product?.findMany({
-      where: {
-        storeId,
-        productType: "RETAIL",
-        inventoryTracking: true,
-      },
-      select: {
-        id: true,
-        title: true,
-        stockQuantity: true,
-        lowStockThreshold: true,
-      },
-    }) || [];
+    const inventoryRows = await prisma.inventoryItem.findMany({
+      where: { product: { storeId } },
+      select: { available: true, reorderPoint: true },
+    });
 
-    const lowStockCount = lowStockProducts.filter(
-      (p) => (p.stockQuantity || 0) <= (p.lowStockThreshold || 5)
+    const lowStockCount = inventoryRows.filter(
+      (row) => row.available <= (row.reorderPoint ?? 5)
     ).length;
 
     return NextResponse.json({
@@ -164,7 +155,7 @@ export async function GET(request: NextRequest) {
         productSales: productRevenue,
         topServices,
         stylistsOnDuty: onDutyStylists,
-        totalStylists: stylists.length,
+        totalStylists: stylistRoles.length,
         lowStockCount,
       },
     });

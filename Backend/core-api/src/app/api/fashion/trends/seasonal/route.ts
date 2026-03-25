@@ -29,7 +29,7 @@ export const GET = withVayvaAPI(
       };
       
       // If no specific season, get all seasons
-      const dateRanges = season ? [seasons[season]] : Object.values(seasons);
+      const _dateRanges = season ? [seasons[season]] : Object.values(seasons);
       
       const seasonalData: any[] = [];
       

@@ -10,7 +10,7 @@ const PII_REGEX = {
 
 type UnknownRecord = Record<string, unknown>;
 
-function isRecord(value: unknown): value is UnknownRecord {
+function _isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null;
 }
 
@@ -24,8 +24,8 @@ interface ChatCompletionOptions {
   temperature?: number;
   maxTokens?: number;
   jsonMode?: boolean;
-  tools?: any[];
-  tool_choice?: any;
+  tools?: unknown[];
+  tool_choice?: unknown;
   storeId?: string;
   requestId?: string;
 }
@@ -35,7 +35,7 @@ interface ChatCompletionResponse {
   choices: Array<{
     message: {
       content: string;
-      tool_calls?: any[];
+      tool_calls?: unknown[];
     };
   }>;
   usage: {
@@ -107,10 +107,11 @@ export class OpenRouterClient {
       // 1. Sanitize user messages
       const safeMessages: ChatCompletionMessage[] = Array.isArray(messages)
         ? messages
-            .filter((m): m is ChatCompletionMessage =>
-              typeof m === "object" && m !== null && 
-              typeof (m as any).content === "string"
-            )
+            .filter((m): m is ChatCompletionMessage => {
+              if (typeof m !== "object" || m === null) return false;
+              const r = m as Record<string, unknown>;
+              return typeof r.role === "string" && typeof r.content === "string";
+            })
             .map((m) => ({
               ...m,
               content: this.sanitizeInput(m.content)
@@ -126,9 +127,9 @@ export class OpenRouterClient {
         messages: safeMessages,
         temperature: options.temperature ?? 0.7,
         max_tokens: options.maxTokens ?? 1024,
-        ...(options.jsonMode && { response_format: { type: "json_object" } }),
-        ...(options.tools && { tools: options.tools }),
-        ...(options.tool_choice && { tool_choice: options.tool_choice })
+        ...(options.jsonMode ? { response_format: { type: "json_object" } } : {}),
+        ...(options.tools ? { tools: options.tools } : {}),
+        ...(options.tool_choice ? { tool_choice: options.tool_choice } : {}),
       };
 
       // 4. Call OpenRouter API with Timeout

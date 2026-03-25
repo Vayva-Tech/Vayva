@@ -147,7 +147,7 @@ export default function OnboardingLayout({
         const isClickable = isCompleted;
 
         return (
-          <button
+          <Button
             key={step.id}
             type="button"
             className={cn(
@@ -282,7 +282,7 @@ export default function OnboardingLayout({
                 {step.description}
               </p>
             </div>
-          </button>
+          </Button>
         );
       })}
     </div>

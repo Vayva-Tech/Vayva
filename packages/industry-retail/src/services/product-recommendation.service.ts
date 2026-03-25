@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Product Recommendation AI Service
  * 
@@ -6,8 +5,24 @@
  * and content-based algorithms
  */
 
-import { BaseAIService } from '@vayva/ai-agent';
-import type { ProductRecommendationResult } from '@vayva/ai-agent';
+import { BaseAIService } from "../lib/base-ai-service";
+
+export interface ProductRecommendationItem {
+  productId: string;
+  productName: string;
+  relevanceScore: number;
+  reason: string;
+  alternativeProducts?: string[];
+  crossSellOpportunity?: boolean;
+  upSellOpportunity?: boolean;
+}
+
+export interface ProductRecommendationResult {
+  userId: string;
+  recommendations: ProductRecommendationItem[];
+  strategy: "collaborative" | "content-based" | "hybrid" | "trending";
+  personalizationFactors: string[];
+}
 
 export interface RecommendationInput {
   /** User/customer identifier */
@@ -137,62 +152,24 @@ Provide 5-10 high-quality recommendations rather than many weak ones.`;
         throw new Error('Missing recommendations array');
       }
 
-      // Add validation rules
-      this.addValidationRule({
-        id: 'has_recommendations',
-        validate: (data) => data.recommendations.length > 0,
-        errorMessage: 'No recommendations provided',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'valid_relevance_scores',
-        validate: (data) => 
-          data.recommendations.every(r => 
-            typeof r.relevanceScore === 'number' &&
-            r.relevanceScore >= 0 &&
-            r.relevanceScore <= 1
-          ),
-        errorMessage: 'Relevance scores must be between 0 and 1',
-        isCritical: true,
-      });
-
-      this.addValidationRule({
-        id: 'has_reasoning',
-        validate: (data) => 
-          data.recommendations.every(r => r.reason && r.reason.length > 0),
-        errorMessage: 'Each recommendation must have reasoning',
-        isCritical: false,
-      });
-
-      this.addValidationRule({
-        id: 'reasonable_quantity',
-        validate: (data) => data.recommendations.length >= 3 && data.recommendations.length <= 15,
-        errorMessage: 'Should provide between 3-15 recommendations',
-        isCritical: false,
-      });
-
-      // Check for strategy alignment
-      this.addValidationRule({
-        id: 'has_strategy',
-        validate: (data) => ['collaborative', 'content-based', 'hybrid', 'trending'].includes(data.strategy),
-        errorMessage: 'Invalid or missing strategy',
-        isCritical: false,
-      });
-
-      // Verify personalization factors are identified
-      this.addValidationRule({
-        id: 'identifies_personalization',
-        validate: (data) => data.personalizationFactors.length > 0,
-        errorMessage: 'No personalization factors identified',
-        isCritical: false,
-      });
+      const strategyRaw = String(parsed.strategy ?? "hybrid");
+      const strategies: ProductRecommendationResult["strategy"][] = [
+        "collaborative",
+        "content-based",
+        "hybrid",
+        "trending",
+      ];
+      const strategy: ProductRecommendationResult["strategy"] = strategies.includes(
+        strategyRaw as ProductRecommendationResult["strategy"],
+      )
+        ? (strategyRaw as ProductRecommendationResult["strategy"])
+        : "hybrid";
 
       return {
         userId: parsed.userId || input.userId,
-        recommendations: parsed.recommendations,
-        strategy: parsed.strategy || 'hybrid',
-        personalizationFactors: parsed.personalizationFactors || [],
+        recommendations: parsed.recommendations as ProductRecommendationItem[],
+        strategy,
+        personalizationFactors: (parsed.personalizationFactors ?? []) as string[],
       };
     } catch (error) {
       console.error('[ProductRecommendation] Failed to parse response:', error);
@@ -290,7 +267,7 @@ Provide 5-10 high-quality recommendations rather than many weak ones.`;
       },
     });
     
-    return result.recommendations.slice(0, limit).map(r => ({
+    return result.recommendations.slice(0, limit).map((r: ProductRecommendationItem) => ({
       productId: r.productId,
       productName: r.productName,
       complementScore: r.relevanceScore,

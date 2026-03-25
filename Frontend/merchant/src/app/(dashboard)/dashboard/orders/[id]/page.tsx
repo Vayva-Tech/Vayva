@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Button, cn, StatusChip, Card, Skeleton } from "@vayva/ui";
 import {
   Truck,
@@ -17,6 +16,7 @@ import {
   ChatCircleText as MessageSquare,
 } from "@phosphor-icons/react/ssr";
 import { PrepTimeCard } from "@/components/orders/PrepTimeCard";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface OrderItem {
   id: string;
@@ -159,7 +159,7 @@ export default function OrderDetailPage() {
   if (!order) return null;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8 pb-20">
+    <div className="max-w-6xl space-y-8 pb-20">
       {/* Live region for screen reader announcements */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {shipping && <p>Processing shipping order...</p>}
@@ -178,7 +178,6 @@ export default function OrderDetailPage() {
         </div>
       )}
 
-      <Breadcrumbs />
       {/* Risk Banner */}
       {order.riskLevel && order.riskLevel !== "LOW" && (
         <div
@@ -226,17 +225,15 @@ export default function OrderDetailPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-start gap-4">
           <BackButton className="bg-white  border border-gray-100 shadow-sm" />
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                Order #{order.orderNumber || order.id?.slice(0, 8)}
-              </h1>
-              <StatusChip status={order.fulfillmentStatus} />
-            </div>
-            <p className="text-gray-500 font-medium font-inter mt-1">
-              Placed on {formatDate(order.createdAt)}
-            </p>
-          </div>
+          <PageHeader
+            title={
+              <span className="flex items-center gap-3">
+                <span>Order #{order.orderNumber || order.id?.slice(0, 8)}</span>
+                <StatusChip status={order.fulfillmentStatus} />
+              </span>
+            }
+            subtitle={`Placed on ${formatDate(order.createdAt)}`}
+          />
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="font-bold border-gray-200">

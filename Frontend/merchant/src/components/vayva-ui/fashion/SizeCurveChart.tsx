@@ -1,11 +1,10 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
-import { VayvaCard, VayvaCardHeader, VayvaCardTitle, VayvaCardContent } from './VayvaCard';
+import { VayvaCard, VayvaCardHeader, VayvaCardTitle, VayvaCardContent } from '../VayvaCard';
 import { cn } from '@/lib/utils';
 
-interface SizeCurveData {
+export interface SizeCurveData {
   size: string;
   inventory: number;
   sales: number;

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useVayvaTheme } from '@/components/vayva-ui/VayvaThemeProvider';
 import type { DesignCategory } from '@/components/vayva-ui/VayvaThemeProvider';
 
-interface UniversalMetricCardProps {
+export interface UniversalMetricCardProps {
   title: string;
   value: string | number;
   change?: {
@@ -47,7 +47,8 @@ export function UniversalMetricCard({
 
   // Get styling classes based on design category
   const getCardClasses = () => {
-    const baseClasses = "p-5 border-gray-100 hover:shadow-md transition-shadow duration-200 rounded-xl";
+    const baseClasses =
+      "group p-5 border-gray-100 hover:shadow-md transition-shadow duration-200 rounded-2xl";
     
     switch (designCategory) {
       case 'glass':
@@ -128,10 +129,18 @@ export function UniversalMetricCard({
           case 'bold':
             return cn(baseClasses, "bg-gray-100 text-gray-700 border-2 border-gray-300");
           default:
-            return cn(baseClasses, "bg-white text-gray-500 group-hover:bg-white");
+            return cn(baseClasses, "bg-gray-50 text-gray-600 group-hover:bg-gray-100");
         }
     }
   };
+
+  const sparkValue = (() => {
+    const v = change?.value ?? 0;
+    if (!Number.isFinite(v)) return 0;
+    return Math.max(0, Math.min(100, Math.round(Math.abs(v))));
+  })();
+
+  const showSpark = Boolean(change) || Boolean(trend);
 
   const getChangeClasses = () => {
     if (!change) return "";
@@ -188,20 +197,42 @@ export function UniversalMetricCard({
       } : undefined}
     >
       <div className="space-y-3">
-        <p className={getTitleClasses()}>
-          {title}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className={getTitleClasses()}>
+            {title}
+          </p>
+          {Icon ? (
+            <div className={getIconContainerClasses()} aria-hidden="true">
+              {Icon}
+            </div>
+          ) : null}
+        </div>
+
         <p className={getValueClasses()}>
           {value}
         </p>
-        {(change || trend) && (
-          <p className={getChangeClasses()}>
-            {change 
-              ? `${change.isPositive ? '↗' : '↘'} ${Math.abs(change.value)}%${change.label ? ` ${change.label}` : ''}`
-              : `${trend === 'up' ? '↗' : '↘'} ${trend}`
-            }
-          </p>
-        )}
+
+        {(change || trend) ? (
+          <div className="flex items-center justify-between gap-3">
+            <p className={getChangeClasses()}>
+              {change 
+                ? `${change.isPositive ? '↗' : '↘'} ${Math.abs(change.value)}%${change.label ? ` ${change.label}` : ''}`
+                : `${trend === 'up' ? '↗' : '↘'} ${trend}`
+              }
+            </p>
+            {showSpark ? (
+              <div className="h-1.5 w-20 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className={cn(
+                    "h-full rounded-full",
+                    change?.isPositive ? "bg-green-500/70" : "bg-red-500/60"
+                  )}
+                  style={{ width: `${Math.max(8, sparkValue)}%` }}
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </Card>
   );

@@ -14,7 +14,7 @@ class WasteTrackingController extends BaseIndustryController {
       context,
       async () => {
         const body = await this.parseBody(req);
-        const { itemId, itemName, category, reason, quantity, unit, cost, notes } = body;
+        const { itemId, itemName, category, reason, quantity, unit, cost, _notes } = body;
 
         if (!itemId || !itemName || !category || !reason || !quantity || !cost) {
           throw new Error("Missing required fields");

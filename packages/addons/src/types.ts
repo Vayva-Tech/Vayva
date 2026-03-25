@@ -34,15 +34,133 @@ export const ADDON_CATEGORIES = [
   { slug: 'operations', label: 'Operations' },
 ] as const;
 
+// ============================================================================
+// MOUNT POINTS — storefront / dashboard injection sites
+// ============================================================================
+
+export type MountPointId =
+  | 'header-right'
+  | 'header-nav'
+  | 'header-left'
+  | 'product-card'
+  | 'product-detail'
+  | 'product-grid-actions'
+  | 'category-sidebar'
+  | 'category-header'
+  | 'page-sidebar'
+  | 'page-footer'
+  | 'footer-widgets'
+  | 'floating-button'
+  | 'checkout-summary'
+  | 'checkout-header'
+  | 'post-content'
+  | 'post-sidebar'
+  | 'hero-section'
+  | 'below-fold'
+  | 'dashboard-sidebar'
+  | 'dashboard-home-widgets'
+  | 'dashboard-analytics';
+
+export const MOUNT_POINTS: Record<
+  MountPointId,
+  { label: string; description: string; maxComponents?: number }
+> = {
+  'header-right': {
+    label: 'Header Right',
+    description: 'Top-right of header (cart, notifications, profile)',
+    maxComponents: 3,
+  },
+  'header-nav': { label: 'Header Navigation', description: 'Main navigation menu items' },
+  'header-left': { label: 'Header Left', description: 'Top-left of header (logo area)' },
+  'product-card': {
+    label: 'Product Card',
+    description: 'Inside product card (wishlist, quick-add)',
+    maxComponents: 2,
+  },
+  'product-detail': {
+    label: 'Product Detail',
+    description: 'Product detail page sections',
+    maxComponents: 5,
+  },
+  'product-grid-actions': {
+    label: 'Product Grid Actions',
+    description: 'Actions above product grid (filters, sort)',
+    maxComponents: 3,
+  },
+  'category-sidebar': {
+    label: 'Category Sidebar',
+    description: 'Sidebar on category pages',
+    maxComponents: 4,
+  },
+  'category-header': { label: 'Category Header', description: 'Header area of category pages' },
+  'page-sidebar': {
+    label: 'Page Sidebar',
+    description: 'General page sidebar',
+    maxComponents: 4,
+  },
+  'page-footer': { label: 'Page Footer', description: 'Above the main footer' },
+  'footer-widgets': {
+    label: 'Footer Widgets',
+    description: 'Footer widget areas',
+    maxComponents: 4,
+  },
+  'floating-button': {
+    label: 'Floating Button',
+    description: 'Fixed position floating button',
+    maxComponents: 2,
+  },
+  'checkout-summary': { label: 'Checkout Summary', description: 'Checkout summary sidebar' },
+  'checkout-header': { label: 'Checkout Header', description: 'Checkout page header' },
+  'post-content': { label: 'Post Content', description: 'Inside blog post content' },
+  'post-sidebar': {
+    label: 'Post Sidebar',
+    description: 'Blog post sidebar',
+    maxComponents: 3,
+  },
+  'hero-section': {
+    label: 'Hero Section',
+    description: 'Homepage hero section overlays',
+    maxComponents: 2,
+  },
+  'below-fold': { label: 'Below Fold', description: 'Below the homepage fold' },
+  'dashboard-sidebar': {
+    label: 'Dashboard Sidebar',
+    description: 'Merchant dashboard sidebar sections',
+    maxComponents: 5,
+  },
+  'dashboard-home-widgets': {
+    label: 'Dashboard Widgets',
+    description: 'Merchant dashboard home widgets',
+    maxComponents: 6,
+  },
+  'dashboard-analytics': {
+    label: 'Analytics Widgets',
+    description: 'Analytics dashboard widgets',
+    maxComponents: 4,
+  },
+};
+
 export interface AddOnConfigSchema {
-  fields: Array<{
+  /** Preferred declarative fields for merchant UI. */
+  fields?: Array<{
     key: string;
     label: string;
-    type: 'string' | 'number' | 'boolean' | 'select' | 'multiselect' | 'color' | 'image' | 'richtext' | 'json';
+    type:
+      | 'string'
+      | 'number'
+      | 'boolean'
+      | 'select'
+      | 'multiselect'
+      | 'color'
+      | 'image'
+      | 'richtext'
+      | 'json';
     description?: string;
     required?: boolean;
     defaultValue?: unknown;
     options?: Array<{ label: string; value: string }>;
+    min?: number;
+    max?: number;
     validation?: {
       min?: number;
       max?: number;
@@ -56,6 +174,9 @@ export interface AddOnConfigSchema {
     description?: string;
     fields: string[];
   }>;
+  /** Legacy JSON-schema style blobs used by some add-on definitions. */
+  type?: string;
+  properties?: Record<string, unknown>;
 }
 
 export interface AddOnDefinition {
@@ -77,11 +198,13 @@ export interface AddOnDefinition {
   previewImages?: {
     thumbnail: string;
     screenshots: string[];
+    demoVideo?: string;
   };
   author?: {
     name: string;
     isOfficial: boolean;
     isVerified?: boolean;
+    url?: string;
   };
   pricing?: {
     type: 'free' | 'one-time' | 'subscription';
@@ -109,11 +232,16 @@ export interface AddOnDefinition {
   installTimeEstimate?: number;
   docs?: {
     setup?: string;
+    api?: string;
+    faq?: string;
+    support?: string;
   };
   defaultConfig?: Record<string, unknown>;
   configRequired?: boolean;
   // Legacy fields for backward compatibility
   installationType?: 'automatic' | 'manual' | 'hybrid';
+  /** Pre-selected in template gallery / onboarding */
+  isDefault?: boolean;
   canUninstall?: boolean;
   conflictsWith?: string[];
   versionHistory?: { version: string; date: string; changes: string[] }[];

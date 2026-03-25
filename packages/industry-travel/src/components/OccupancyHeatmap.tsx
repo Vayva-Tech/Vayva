@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 /**
  * OccupancyHeatmap Widget
@@ -8,8 +7,7 @@
  */
 
 import { useMemo } from 'react';
-import { BaseWidget } from '@vayva/industry-core';
-import type { WidgetDefinition } from '@vayva/industry-core';
+import { BaseWidget, type WidgetDefinition } from '@vayva/industry-core';
 
 export interface OccupancyDay {
   date: string; // ISO date string
@@ -76,9 +74,9 @@ export function OccupancyHeatmapWidget({
   isLoading,
   error,
   occupancyData = [],
-  viewMode = 'month',
-  showADR = true,
-  showRevenue = false,
+  viewMode: _viewMode = 'month',
+  showADR: _showADR = true,
+  showRevenue: _showRevenue = false,
   thresholdConfig = { low: 50, medium: 75, high: 90 },
   onDateClick,
 }: OccupancyHeatmapWidgetProps) {

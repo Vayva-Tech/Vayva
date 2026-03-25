@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Industry Engine
  * Main orchestrator for all grocery-specific features

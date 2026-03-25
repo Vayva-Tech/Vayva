@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Nonprofit Industry UI Components
  */

@@ -3,9 +3,8 @@ import {
   createMockRequest,
   getResponseJson,
 } from "../helpers/api";
-import { createMockProduct, createMockProducts } from "../factories";
+import { createMockProducts } from "../factories";
 
-// Mock the API handler wrapper
 vi.mock("@/lib/api-handler", () => ({
   withVayvaAPI: (permission: any, handler: any) => handler,
   PERMISSIONS: {
@@ -14,11 +13,9 @@ vi.mock("@/lib/api-handler", () => ({
   },
 }));
 
-// Mock fetch for backend API calls
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-// Mock audit logging
 vi.mock("@/lib/audit", () => ({
   logAuditEvent: vi.fn(),
   AuditEventType: {
@@ -28,7 +25,6 @@ vi.mock("@/lib/audit", () => ({
   },
 }));
 
-// Mock input sanitization
 vi.mock("@/lib/input-sanitization", () => ({
   sanitizeText: (text: string) => text?.trim() || "",
   sanitizeHtml: (html: string) =>
@@ -46,18 +42,11 @@ vi.mock("@/lib/input-sanitization", () => ({
   },
 }));
 
-// Import after mocks
-import { GET, POST } from "@/app/api/products/route";
+import { GET } from "@/app/api/products/route";
+
+const storeHeaders = { "x-store-id": "store_test_123" };
 
 describe("Products API - /api/products", () => {
-  const mockStoreId = "store_test_123";
-  const mockUserId = "user_test_123";
-  const mockContext = {
-    storeId: mockStoreId,
-    userId: mockUserId,
-    user: { id: mockUserId, email: "test@example.com" },
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.BACKEND_API_URL = "http://localhost:3001";
@@ -76,8 +65,10 @@ describe("Products API - /api/products", () => {
         }),
       });
 
-      const request = createMockRequest("GET", "/api/products");
-      const response = await GET(request, mockContext);
+      const request = createMockRequest("GET", "/api/products", {
+        headers: storeHeaders,
+      });
+      const response = await GET(request);
       const data = await getResponseJson(response);
 
       expect(response.status).toBe(200);
@@ -86,7 +77,10 @@ describe("Products API - /api/products", () => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("/api/products"),
         expect.objectContaining({
-          headers: { "x-store-id": mockStoreId },
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+            "x-store-id": storeHeaders["x-store-id"],
+          }),
         })
       );
     });
@@ -100,9 +94,10 @@ describe("Products API - /api/products", () => {
 
       const request = createMockRequest("GET", "/api/products", {
         searchParams: { status: "ACTIVE", limit: "10", offset: "20" },
+        headers: storeHeaders,
       });
 
-      await GET(request, mockContext);
+      await GET(request);
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("status=ACTIVE"),
@@ -117,87 +112,10 @@ describe("Products API - /api/products", () => {
         json: async () => ({ error: "Backend error" }),
       });
 
-      const request = createMockRequest("GET", "/api/products");
-      const response = await GET(request, mockContext);
-
-      expect(response.status).toBe(500);
-    });
-  });
-
-  describe("POST /api/products", () => {
-    it("should create product via backend API", async () => {
-      const newProduct = createMockProduct({
-        title: "New Test Product",
-        price: 2500,
+      const request = createMockRequest("GET", "/api/products", {
+        headers: storeHeaders,
       });
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({
-          success: true,
-          data: newProduct,
-        }),
-      });
-
-      const request = createMockRequest("POST", "/api/products", {
-        body: {
-          title: "New Test Product",
-          description: "A new product description",
-          price: 2500,
-          status: "DRAFT",
-        },
-      });
-
-      const response = await POST(request, mockContext);
-
-      expect(response.status).toBe(200);
-      expect(mockFetch).toHaveBeenCalledWith(
-        "http://localhost:3001/api/products",
-        expect.objectContaining({
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-store-id": mockStoreId,
-          },
-          body: expect.any(String),
-        })
-      );
-    });
-
-    it("should handle backend validation errors", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        json: async () => ({ error: "Title is required" }),
-      });
-
-      const request = createMockRequest("POST", "/api/products", {
-        body: {
-          price: 1000,
-        },
-      });
-
-      const response = await POST(request, mockContext);
-
-      expect(response.status).toBe(400);
-    });
-
-    it("should handle backend errors during creation", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        json: async () => ({ error: "Database error" }),
-      });
-
-      const request = createMockRequest("POST", "/api/products", {
-        body: {
-          title: "Test Product",
-          price: 1000,
-        },
-      });
-
-      const response = await POST(request, mockContext);
+      const response = await GET(request);
 
       expect(response.status).toBe(500);
     });

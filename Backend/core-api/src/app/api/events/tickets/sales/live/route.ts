@@ -71,7 +71,7 @@ export const GET = withVayvaAPI(
 
       // Calculate sales velocity (tickets per hour)
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      const salesLastHour = sales.filter((s) => s.createdAt >= oneHourAgo).length;
+      const _salesLastHour = sales.filter((s) => s.createdAt >= oneHourAgo).length;
       const ticketsSoldLastHour = sales
         .filter((s) => s.createdAt >= oneHourAgo)
         .reduce((sum, s) => sum + (s.lineItems[0]?.quantity || 1), 0);

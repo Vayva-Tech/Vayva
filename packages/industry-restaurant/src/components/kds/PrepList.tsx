@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { KDSService } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from '@vayva/ui';
+import { CardTitle } from '../restaurant-ui';
 import { 
   ClipboardList,
   Clock,
@@ -31,6 +31,12 @@ interface PrepListProps {
 export function PrepList({ kdsService }: PrepListProps) {
   const [prepTasks, setPrepTasks] = useState<PrepTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    const t = window.setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => window.clearInterval(t);
+  }, []);
 
   useEffect(() => {
     const fetchPrepTasks = async () => {
@@ -130,9 +136,11 @@ export function PrepList({ kdsService }: PrepListProps) {
   const incompleteTasks = prepTasks.filter(task => task.completed < task.quantity);
   const completedTasks = prepTasks.filter(task => task.completed >= task.quantity);
 
-  const urgentTasks = incompleteTasks.filter(task => 
-    task.priority === 'high' && task.deadline && 
-    task.deadline.getTime() - Date.now() < 3600000 // Less than 1 hour
+  const urgentTasks = incompleteTasks.filter(
+    (task) =>
+      task.priority === 'high' &&
+      task.deadline &&
+      task.deadline.getTime() - nowMs < 3600000
   );
 
   if (loading) {
@@ -165,7 +173,7 @@ export function PrepList({ kdsService }: PrepListProps) {
           <CardTitle className="flex items-center gap-2 text-cyan-400">
             <ClipboardList className="h-5 w-5" />
             Prep List
-            <Badge variant="secondary" className="ml-auto bg-cyan-500/20 text-cyan-300">
+            <Badge variant="outline" className="ml-auto bg-cyan-500/20 text-cyan-300">
               {incompleteTasks.length} pending
             </Badge>
           </CardTitle>

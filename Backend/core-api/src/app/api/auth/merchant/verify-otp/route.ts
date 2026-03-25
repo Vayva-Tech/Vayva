@@ -6,8 +6,8 @@ import { checkRateLimitCustom, RateLimitError } from "@/lib/ratelimit";
 import { apiError, ApiErrorCode, BusinessType } from "@vayva/shared";
 import {
   formatPhoneNumber,
-  isValidPhoneNumber,
-  OTPMethod,
+  isValidPhoneNumber as _isValidPhoneNumber,
+  OTPMethod
 } from "@/lib/whatsapp-otp";
 
 function isRecord(value: unknown): value is Record<string, unknown> {

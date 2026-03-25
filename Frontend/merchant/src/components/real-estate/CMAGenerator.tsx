@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useState, useEffect } from "react";
 
@@ -58,9 +59,9 @@ export const CMAGenerator: React.FC = () => {
     <div className="glass-panel p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold">CMA Generator</h3>
-        <button className="btn-gradient text-sm">
+        <Button className="btn-gradient text-sm">
           + Generate New CMA
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-3">
@@ -86,15 +87,15 @@ export const CMAGenerator: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                  <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                     View
-                  </button>
-                  <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                  </Button>
+                  <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                     Edit
-                  </button>
-                  <button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
+                  </Button>
+                  <Button className="glass-card px-3 py-1 text-xs hover:text-white transition-colors">
                     Export
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -105,20 +106,21 @@ export const CMAGenerator: React.FC = () => {
       <div className="mt-4">
         <h4 className="text-sm font-semibold mb-2 text-[var(--re-text-secondary)]">CMA Templates</h4>
         <div className="flex gap-2">
-          <button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
+          <Button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
             Standard
-          </button>
-          <button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
+          </Button>
+          <Button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
             Luxury
-          </button>
-          <button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
+          </Button>
+          <Button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
             Investment
-          </button>
-          <button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
+          </Button>
+          <Button className="glass-card px-3 py-1 text-xs hover:border-[var(--re-accent-primary)] transition-colors">
             New Construction
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 };
+

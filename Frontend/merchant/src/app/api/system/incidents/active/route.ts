@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 
 export async function GET() {

@@ -44,8 +44,12 @@ export interface IndustryNotificationConfig {
 class PushNotificationService {
   private static instance: PushNotificationService;
   private pushToken: string | null = null;
-  private notificationListener: any = null;
-  private responseListener: any = null;
+  private notificationListener: ReturnType<
+    typeof Notifications.addNotificationReceivedListener
+  > | null = null;
+  private responseListener: ReturnType<
+    typeof Notifications.addNotificationResponseReceivedListener
+  > | null = null;
 
   private constructor() {}
 
@@ -61,7 +65,7 @@ class PushNotificationService {
    */
   async requestPermissions(): Promise<boolean> {
     if (!Device.isDevice) {
-      console.log('[PUSH] Physical device required for push notifications');
+      console.warn('[PUSH] Physical device required for push notifications');
       return false;
     }
 
@@ -74,7 +78,7 @@ class PushNotificationService {
     }
 
     if (finalStatus !== 'granted') {
-      console.log('[PUSH] Permission not granted');
+      console.warn('[PUSH] Permission not granted');
       return false;
     }
 
@@ -99,7 +103,7 @@ class PushNotificationService {
       });
 
       this.pushToken = tokenData.data;
-      console.log('[PUSH] Registered with token:', this.pushToken);
+      console.warn('[PUSH] Registered with token:', this.pushToken);
 
       // Configure Android-specific settings
       if (Platform.OS === 'android') {
@@ -127,15 +131,17 @@ class PushNotificationService {
   ): void {
     // Handle notification received while app is foregrounded
     this.notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      console.log('[PUSH] Notification received:', notification);
+      console.warn('[PUSH] Notification received:', notification);
       onNotificationReceived(notification);
     });
 
     // Handle user tapping on notification
-    this.responseListener = Notifications.addNotificationResponseListener(response => {
-      console.log('[PUSH] Notification response:', response);
-      onNotificationResponse(response);
-    });
+    this.responseListener = Notifications.addNotificationResponseReceivedListener(
+      (response: Notifications.NotificationResponse) => {
+        console.warn("[PUSH] Notification response:", response);
+        onNotificationResponse(response);
+      },
+    );
   }
 
   /**
@@ -156,7 +162,7 @@ class PushNotificationService {
   async scheduleLocalNotification(options: {
     title: string;
     body: string;
-    data?: any;
+    data?: unknown;
     seconds?: number;
     categoryId?: string;
   }): Promise<void> {
@@ -164,11 +170,16 @@ class PushNotificationService {
       content: {
         title: options.title,
         body: options.body,
-        data: options.data,
+        data: options.data as Record<string, unknown> | undefined,
         sound: true,
         priority: Notifications.AndroidNotificationPriority.HIGH,
       },
-      trigger: options.seconds ? { seconds: options.seconds } : null,
+      trigger: options.seconds
+        ? {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: options.seconds,
+          }
+        : null,
     });
   }
 
@@ -178,14 +189,14 @@ class PushNotificationService {
   async sendLocalNotification(options: {
     title: string;
     body: string;
-    data?: any;
+    data?: unknown;
     categoryId?: string;
   }): Promise<void> {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: options.title,
         body: options.body,
-        data: options.data,
+        data: options.data as Record<string, unknown> | undefined,
         sound: true,
       },
       trigger: null, // Immediate
@@ -379,7 +390,7 @@ class PushNotificationService {
       });
     }
 
-    console.log(`[PUSH] Set up ${config.channels.length} channels for ${industry}`);
+    console.warn(`[PUSH] Set up ${config.channels.length} channels for ${industry}`);
   }
 
   /**

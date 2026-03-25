@@ -11,8 +11,10 @@ export function MarketingShell({
   className = "",
 }: MarketingShellProps): React.JSX.Element {
   return (
-    <div className={`min-h-screen font-sans text-text-primary bg-emerald-blur ${className}`}>
-      <div className="relative w-full">{children}</div>
+    <div
+      className={`min-h-screen overflow-x-hidden font-sans text-text-primary bg-emerald-blur ${className}`}
+    >
+      <div className="relative w-full min-w-0">{children}</div>
       <ScrollToTop />
     </div>
   );

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wholesale Price Tiers Service
  * Manages tiered pricing based on customer type and quantity

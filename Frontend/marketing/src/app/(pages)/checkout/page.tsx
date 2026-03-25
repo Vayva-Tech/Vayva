@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label } from "@vayva/ui";
-import { PLANS, formatNGN, type PlanKey } from "@/config/pricing";
+import {
+  PLANS,
+  formatNGN,
+  type PlanKey,
+  type BillingCycle,
+  getCheckoutDueNgn,
+  QUARTERLY_DISCOUNT_PERCENT,
+} from "@/config/pricing";
+import { trackEvent } from "@/lib/analytics";
+import { APP_URL } from "@/lib/constants";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 
 type InitResponse =
   | { success: true; data: { access_code: string; reference: string } }
@@ -15,7 +25,7 @@ type VerifyResponse =
   | { success: false; error: string };
 
 function isPlanKey(value: string | null): value is PlanKey {
-  return value === "free" || value === "starter" || value === "pro";
+  return value === "starter" || value === "pro" || value === "pro_plus";
 }
 
 function loadPaystackScript(): Promise<void> {
@@ -35,11 +45,13 @@ function loadPaystackScript(): Promise<void> {
 
 export default function CheckoutPage(): React.JSX.Element {
   const searchParams = useSearchParams();
+  const { starterFirstMonthFree } = useMarketingOffer();
   const planParam = searchParams.get("plan");
 
   const [planKey, setPlanKey] = useState<PlanKey>(
     isPlanKey(planParam) ? planParam : "starter",
   );
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [storeName, setStoreName] = useState("");
@@ -47,12 +59,33 @@ export default function CheckoutPage(): React.JSX.Element {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const cycle = searchParams.get("cycle");
+    if (cycle === "quarterly") setBillingCycle("quarterly");
+  }, [searchParams]);
+
   const plan = useMemo(() => PLANS.find((p) => p.key === planKey)!, [planKey]);
+
+  const dueToday = useMemo(
+    () => getCheckoutDueNgn(planKey, billingCycle, starterFirstMonthFree),
+    [planKey, billingCycle, starterFirstMonthFree],
+  );
+
+  const isStarterMonthlyFree =
+    starterFirstMonthFree && planKey === "starter" && billingCycle === "monthly";
+
+  const quarterlySavingsVsMonthly = useMemo(() => {
+    if (billingCycle !== "quarterly") return 0;
+    return plan.monthlyAmount * 3 - dueToday;
+  }, [plan.monthlyAmount, billingCycle, dueToday]);
 
   const handleProceed = async () => {
     setError(null);
 
-    // Free plan removed — all plans require checkout
+    if (isStarterMonthlyFree) {
+      setError("Starter monthly is free for your first month—use “Create merchant account” below (no Paystack charge).");
+      return;
+    }
 
     if (!agreed) {
       setError("Please agree to the Terms and Privacy Policy.");
@@ -85,7 +118,13 @@ export default function CheckoutPage(): React.JSX.Element {
       const initRes = await fetch("/api/public/checkout/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planKey, email, phone, storeName }),
+        body: JSON.stringify({
+          planKey,
+          billingCycle,
+          email,
+          phone,
+          storeName,
+        }),
       });
       const initJson = (await initRes.json()) as InitResponse;
       if (!initRes.ok || !initJson.success) {
@@ -93,6 +132,11 @@ export default function CheckoutPage(): React.JSX.Element {
       }
 
       await loadPaystackScript();
+
+      trackEvent("checkout_paystack_open", {
+        plan_key: planKey,
+        billing_cycle: billingCycle,
+      });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const PaystackPop = (window as unknown as Record<string, unknown>).PaystackPop as undefined | {
@@ -110,10 +154,16 @@ export default function CheckoutPage(): React.JSX.Element {
         access_code: initJson.data.access_code,
         ref: initJson.data.reference,
         metadata: {
+          billingCycle,
           custom_fields: [
             { display_name: "Business", variable_name: "storeName", value: storeName },
             { display_name: "Phone", variable_name: "phone", value: phone },
             { display_name: "Plan", variable_name: "planKey", value: planKey },
+            {
+              display_name: "Billing",
+              variable_name: "billingCycle",
+              value: billingCycle,
+            },
           ],
         },
         callback: async (response: { reference: string }) => {
@@ -154,26 +204,52 @@ export default function CheckoutPage(): React.JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white text-slate-900">
       <div className="relative overflow-hidden border-b border-slate-200/70">
-        <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-200/30 blur-3xl" />
-        <div className="absolute right-6 -top-8 h-56 w-56 rounded-full bg-violet-200/30 blur-3xl" />
-        <div className="relative max-w-[1200px] mx-auto px-6 py-14">
+        <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-200/20 blur-3xl" />
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <h1 className="text-3xl md:text-4xl font-black tracking-tight">Checkout</h1>
-          <p className="mt-2 text-slate-600">
-            Pay for your Vayva subscription now. We’ll create your merchant account immediately after payment.
+          <p className="mt-2 text-slate-600 max-w-2xl">
+            <span className="md:hidden">
+              {starterFirstMonthFree
+                ? "Pay for paid plans here, or start Starter monthly free via merchant signup."
+                : "Pay for Starter, Pro, or Pro+ here. Starter includes a 7-day trial via merchant signup."}
+            </span>
+            <span className="hidden md:inline">
+              {starterFirstMonthFree ? (
+                <>
+                  Pay for quarterly Starter, Pro, or Pro+ here. Starter billed monthly is free for your first month—create
+                  your account on the merchant app (no Paystack charge).
+                </>
+              ) : (
+                <>
+                  Pay for Starter, Pro, or Pro+ at checkout. Starter includes a 7-day trial—create your account on the
+                  merchant app.
+                </>
+              )}
+            </span>
           </p>
         </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-6 py-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-8">
-        <section className="rounded-[28px] border-2 border-slate-900/10 bg-white/90 backdrop-blur p-8 shadow-[0_26px_60px_rgba(15,23,42,0.08)]">
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
-            <div className="font-semibold">Your payment is safe with us</div>
-            <div className="mt-1 text-emerald-800/80">
-              Card details are handled securely by Paystack. Vayva never stores your card information.
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8 sm:py-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-6 lg:gap-8 min-w-0">
+        <section className="rounded-[28px] border-2 border-slate-900/10 bg-white/90 backdrop-blur p-5 sm:p-8 shadow-[0_26px_60px_rgba(15,23,42,0.08)] min-w-0">
+          {isStarterMonthlyFree ? (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+              <div className="font-semibold">Starter: first month free</div>
+              <div className="mt-1 text-emerald-800/80">
+                We can&apos;t charge ₦0 through Paystack. Create your merchant account below to get about 30 days of
+                Starter access with no card. After that, Starter bills monthly unless you cancel.
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+              <div className="font-semibold">Your payment is safe with us</div>
+              <div className="mt-1 text-emerald-800/80">
+                Card details are handled securely by Paystack. Vayva never stores your card information.
+              </div>
+            </div>
+          )}
 
           <div className="mt-6">
             <div className="text-sm font-semibold text-slate-800">Payment method</div>
@@ -201,16 +277,56 @@ export default function CheckoutPage(): React.JSX.Element {
                 </select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="storeName">Business name</Label>
-                <Input
-                  id="storeName"
-                  value={storeName}
-                  onChange={(e) => setStoreName(e.target.value)}
-                  placeholder="e.g. Ada’s Kitchen"
-                  className="h-12 rounded-xl"
-                  disabled={loading}
-                />
+                <Label>Billing</Label>
+                <div
+                  role="group"
+                  aria-label="Billing cycle"
+                  className="flex rounded-xl border border-slate-200 bg-slate-50 p-1"
+                >
+                  {(
+                    [
+                      { key: "monthly" as const, label: "Monthly" },
+                      {
+                        key: "quarterly" as const,
+                        label: `Quarterly (−${QUARTERLY_DISCOUNT_PERCENT}%)`,
+                      },
+                    ] as const
+                  ).map(({ key, label }) => (
+                    <Button
+                      key={key}
+                      type="button"
+                      variant="ghost"
+                      disabled={loading}
+                      aria-pressed={billingCycle === key}
+                      onClick={() => setBillingCycle(key)}
+                      className={`flex-1 min-h-[44px] h-auto rounded-lg px-2 py-2.5 text-xs font-semibold transition-colors ${
+                        billingCycle === key
+                          ? "bg-white text-slate-900 shadow-sm hover:bg-white"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-transparent"
+                      }`}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+                {billingCycle === "quarterly" && quarterlySavingsVsMonthly > 0 && (
+                  <p className="text-xs text-emerald-700">
+                    Save {formatNGN(quarterlySavingsVsMonthly)} vs three separate monthly payments.
+                  </p>
+                )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="storeName">Business name</Label>
+              <Input
+                id="storeName"
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
+                placeholder="e.g. Ada’s Kitchen"
+                className="h-12 rounded-xl"
+                disabled={loading}
+              />
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -248,11 +364,11 @@ export default function CheckoutPage(): React.JSX.Element {
               />
               <span>
                 I agree to the{" "}
-                <Link className="underline" href="/legal/terms-of-service">
+                <Link className="underline" href="/legal/terms">
                   Terms
                 </Link>
                 {" "}and{" "}
-                <Link className="underline" href="/legal/privacy-policy">
+                <Link className="underline" href="/legal/privacy">
                   Privacy Policy
                 </Link>
                 .
@@ -265,39 +381,71 @@ export default function CheckoutPage(): React.JSX.Element {
               </div>
             )}
 
-            <Button
-              className="h-12 rounded-xl bg-slate-900 text-white hover:bg-slate-800"
-              disabled={loading}
-              onClick={handleProceed}
-            >
-              {loading ? "Preparing payment..." : "Proceed"}
-            </Button>
+            {isStarterMonthlyFree ? (
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  className="h-12 w-full rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                  disabled={!agreed}
+                  onClick={() => {
+                    if (!agreed) {
+                      setError("Please agree to the Terms and Privacy Policy.");
+                      return;
+                    }
+                    window.location.href = `${APP_URL}/signup`;
+                  }}
+                >
+                  Create merchant account — first month free
+                </Button>
+                <p className="text-xs text-slate-500">
+                  Prefer to prepay and save? Switch billing to <strong>Quarterly</strong> above, then pay securely with
+                  Paystack.
+                </p>
+              </div>
+            ) : (
+              <Button
+                className="h-12 rounded-xl bg-slate-900 text-white hover:bg-slate-800"
+                disabled={loading}
+                onClick={handleProceed}
+              >
+                {loading ? "Preparing payment..." : "Proceed to payment"}
+              </Button>
+            )}
 
             <div className="text-xs text-slate-500">
               Already have an account?{" "}
-              <a className="underline" href="https://merchant.vayva.ng/signin">
+              <a className="underline" href={`${APP_URL}/signin`}>
                 Sign in
               </a>
             </div>
           </div>
         </section>
 
-        <aside className="rounded-[28px] border-2 border-slate-900/10 bg-white/90 backdrop-blur p-8 shadow-[0_26px_60px_rgba(15,23,42,0.08)]">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center">1</span>
-              Details
-            </span>
-            <span className="h-px flex-1 mx-3 bg-slate-200" />
-            <span className="inline-flex items-center gap-2">
-              <span className="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center">2</span>
-              Payment
-            </span>
-            <span className="h-px flex-1 mx-3 bg-slate-200" />
-            <span className="inline-flex items-center gap-2">
-              <span className="h-6 w-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center">3</span>
-              Confirmation
-            </span>
+        <aside className="rounded-[28px] border-2 border-slate-900/10 bg-white/90 backdrop-blur p-5 sm:p-8 shadow-[0_26px_60px_rgba(15,23,42,0.08)] min-w-0">
+          <div
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-xs font-semibold text-slate-500"
+            aria-label="Checkout steps"
+          >
+            <div className="flex items-center gap-2">
+              <span className="h-6 w-6 shrink-0 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px]">
+                1
+              </span>
+              <span>Details</span>
+            </div>
+            <div className="hidden sm:block h-px flex-1 min-w-[8px] bg-slate-200 mx-2" aria-hidden />
+            <div className="flex items-center gap-2">
+              <span className="h-6 w-6 shrink-0 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px]">
+                2
+              </span>
+              <span>Payment</span>
+            </div>
+            <div className="hidden sm:block h-px flex-1 min-w-[8px] bg-slate-200 mx-2" aria-hidden />
+            <div className="flex items-center gap-2">
+              <span className="h-6 w-6 shrink-0 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">
+                3
+              </span>
+              <span>Confirmation</span>
+            </div>
           </div>
 
           <div className="mt-8">
@@ -308,7 +456,9 @@ export default function CheckoutPage(): React.JSX.Element {
                   <div className="font-semibold">{plan.name}</div>
                   <div className="mt-1 text-xs text-slate-500">{plan.tagline}</div>
                 </div>
-                <div className="font-semibold">{formatNGN(plan.monthlyAmount)}</div>
+                <div className="font-semibold">
+                  {isStarterMonthlyFree ? "₦0 (use signup)" : formatNGN(dueToday)}
+                </div>
               </div>
               <ul className="mt-4 space-y-2 text-xs text-slate-600">
                 {plan.bullets.slice(0, 4).map((b) => (
@@ -325,21 +475,31 @@ export default function CheckoutPage(): React.JSX.Element {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-semibold text-slate-900">Order summary</div>
-                <div className="mt-1 text-xs text-slate-600">Billed monthly</div>
+                <div className="mt-1 text-xs text-slate-600">
+                  {billingCycle === "quarterly"
+                    ? `Quarterly (3 months, ${QUARTERLY_DISCOUNT_PERCENT}% off vs monthly × 3)`
+                    : "Billed monthly"}
+                </div>
               </div>
               <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900">
                 {plan.name}
               </span>
             </div>
 
-            <div className="mt-6 text-sm">
+              <div className="mt-6 text-sm">
+              {billingCycle === "quarterly" && (
+                <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
+                  <span>Monthly × 3 (list)</span>
+                  <span className="line-through">{formatNGN(plan.monthlyAmount * 3)}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-slate-700">
-                <span>Plan</span>
-                <span>{formatNGN(plan.monthlyAmount)}</span>
+                <span>{billingCycle === "quarterly" ? "Due today (quarter)" : "Plan"}</span>
+                <span>{isStarterMonthlyFree ? "₦0" : formatNGN(dueToday)}</span>
               </div>
               <div className="mt-4 border-t border-slate-200 pt-4 flex items-center justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatNGN(plan.monthlyAmount)}</span>
+                <span>Total due at Paystack</span>
+                <span>{isStarterMonthlyFree ? "₦0 (signup)" : formatNGN(dueToday)}</span>
               </div>
             </div>
           </div>

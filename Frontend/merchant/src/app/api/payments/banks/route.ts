@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { apiJson } from "@/lib/api-client-shared";

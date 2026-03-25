@@ -10,7 +10,7 @@ class LegalEngine {
   }
   
   async initialize() {
-    console.log('[LEGAL_ENGINE] Initialized');
+    console.warn('[LEGAL_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

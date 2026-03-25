@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -19,6 +20,10 @@ const TemplateSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const includeSystem = searchParams.get("includeSystem") !== "false";
@@ -33,7 +38,10 @@ export async function GET(request: NextRequest) {
       success: boolean;
       data?: any[];
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/templates?${queryParams.toString()}`);
+    }>(`${process.env.BACKEND_API_URL}/api/templates?${queryParams.toString()}`, {
+      headers: auth.headers,
+      cache: "no-store",
+    });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch templates');
@@ -61,6 +69,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const validated = TemplateSchema.parse(body);
 
@@ -70,9 +82,7 @@ export async function POST(request: NextRequest) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/templates`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(validated),
     });
 

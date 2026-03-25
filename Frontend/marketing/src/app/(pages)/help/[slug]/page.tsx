@@ -28,7 +28,7 @@ export default function HelpArticlePage(): React.JSX.Element {
 
   return (
     <div className="relative pt-32 pb-24 px-4">
-      <div className="max-w-[1600px] mx-auto px-6">
+      <div className="max-w-[1400px] mx-auto px-6">
         <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground font-medium">
           <Link
             href="/help"
@@ -51,9 +51,7 @@ export default function HelpArticlePage(): React.JSX.Element {
             {article.summary}
           </p>
 
-          <div className="relative">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[32px] border-2 border-emerald-200/60" />
-            <div className="relative p-8 bg-white/90 rounded-3xl border-2 border-slate-900/10 text-foreground/80 leading-relaxed space-y-6 shadow-[0_22px_55px_rgba(15,23,42,0.12)]">
+          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 text-foreground/80 leading-relaxed space-y-6 shadow-sm">
             {/* 
                           In a real app, this would use a markdown renderer like react-markdown.
                           For now, we'll split by double newline to simulate paragraphs/headers.
@@ -92,7 +90,6 @@ export default function HelpArticlePage(): React.JSX.Element {
               return <p key={i}>{clean}</p>;
             })}
           </div>
-          </div>
         </article>
 
         <div className="mt-16 pt-12 border-t border-border flex flex-col md:flex-row items-center justify-between gap-8">
@@ -116,9 +113,7 @@ export default function HelpArticlePage(): React.JSX.Element {
 
         {/* Sticky Contact Bar */}
         <div className="mt-24">
-          <div className="relative">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[30px] border-2 border-emerald-200/60" />
-            <div className="relative p-8 bg-white/90 rounded-3xl border-2 border-slate-900/10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_20px_50px_rgba(15,23,42,0.12)]">
+          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
               <div>
                 <h4 className="font-bold text-foreground">Still Stuck?</h4>
                 <p className="text-sm text-muted-foreground">
@@ -131,7 +126,6 @@ export default function HelpArticlePage(): React.JSX.Element {
               >
                 Talk to Support
               </a>
-            </div>
           </div>
         </div>
       </div>

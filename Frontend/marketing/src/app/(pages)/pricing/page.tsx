@@ -1,12 +1,10 @@
 import React from "react";
 import { NewPricingClient } from "@/components/marketing/NewPricingClient";
 import Script from "next/script";
+import { readStarterFirstMonthFreeEnabled } from "@/lib/read-starter-first-month-free";
+import { getPricingPrimaryFaq } from "@/config/pricing";
 
-const FAQ_DATA = [
-  {
-    q: "How does the 7-day trial work?",
-    a: "You get full access to all features for 7 days. No credit card required. If you don't subscribe after the trial, your account will be paused.",
-  },
+const PRICING_SEO_FAQ_REST: { q: string; a: string }[] = [
   {
     q: "What payment methods can my customers use?",
     a: "Your customers can pay with Visa, Mastercard, Verve cards, bank transfers, USSD, and mobile money. International customers can pay with dollar cards. All powered by Paystack.",
@@ -29,11 +27,11 @@ const FAQ_DATA = [
   },
 ];
 
-function generateFaqSchema() {
+function generateFaqSchema(faqs: { q: string; a: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQ_DATA.map((faq) => ({
+    mainEntity: faqs.map((faq) => ({
       "@type": "Question",
       name: faq.q,
       acceptedAnswer: {
@@ -49,13 +47,17 @@ export const metadata = {
   description: "Simple, transparent pricing. Start free, upgrade when you're ready. No hidden fees, no surprises.",
 };
 
-export default function PricingPage(): React.JSX.Element {
+export default async function PricingPage(): Promise<React.JSX.Element> {
+  const starterFirstMonthFree = await readStarterFirstMonthFreeEnabled();
+  const primary = getPricingPrimaryFaq(starterFirstMonthFree);
+  const faqData = [{ q: primary.question, a: primary.answer }, ...PRICING_SEO_FAQ_REST];
+
   return (
     <div className="relative overflow-hidden">
       <Script
         id="faq-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(generateFaqSchema()) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(generateFaqSchema(faqData)) }}
       />
       <NewPricingClient />
     </div>

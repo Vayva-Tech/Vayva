@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AI-Powered Product Recommendations Engine
  * 
@@ -43,10 +42,38 @@ import {
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ProductService } from "@/services/product.service";
-import { OrderService } from "@/services/order.service";
-import { CustomerService } from "@/services/customer.service";
 import { logger } from "@vayva/shared";
+
+/** Minimal product shape for demo recommendations until merchant product APIs are wired. */
+interface RecProduct {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+}
+
+async function loadRecommendationDataset(): Promise<{
+  products: RecProduct[];
+  orders: unknown[];
+  customers: unknown[];
+}> {
+  return {
+    products: [
+      { id: "p1", name: "Studio Headphones", category: "audio", price: 19900 },
+      { id: "p2", name: "USB-C Hub", category: "accessories", price: 8900 },
+      { id: "p3", name: "Desk Lamp", category: "home", price: 4500 },
+      { id: "p4", name: "Wireless Mouse", category: "accessories", price: 6500 },
+      { id: "p5", name: "Monitor Stand", category: "home", price: 12000 },
+      { id: "p6", name: "Webcam HD", category: "audio", price: 15000 },
+      { id: "p7", name: "Keyboard Mechanical", category: "accessories", price: 22000 },
+      { id: "p8", name: "Laptop Sleeve", category: "accessories", price: 3500 },
+      { id: "p9", name: "Noise Panel", category: "home", price: 8000 },
+      { id: "p10", name: "Mic Arm", category: "audio", price: 7500 },
+    ],
+    orders: [],
+    customers: [],
+  };
+}
 import {
   Sparkles,
   ShoppingCart as _ShoppingCart,
@@ -129,11 +156,7 @@ export function AIRecommendationEngine() {
   // Fetch data
   const fetchData = async () => {
     try {
-      const [products, orders, customers] = await Promise.all([
-        ProductService.getProducts("current-store-id"),
-        OrderService.getOrders("current-store-id"),
-        CustomerService.getCustomers("current-store-id"),
-      ]);
+      const { products, orders, customers } = await loadRecommendationDataset();
 
       // Generate recommendations (simulated AI)
       const recs = generateRecommendations(products, orders, customers);
@@ -144,7 +167,9 @@ export function AIRecommendationEngine() {
       setModels(models_data);
       setPlacements(placements_data);
     } catch (error) {
-      logger.error("Failed to fetch recommendation data:", error);
+      logger.error("Failed to fetch recommendation data", {
+        message: error instanceof Error ? error.message : String(error),
+      });
       toast({
         title: "Error",
         description: "Failed to load recommendations",
@@ -161,7 +186,7 @@ export function AIRecommendationEngine() {
 
   // Generate recommendations using collaborative filtering (simulated)
   const generateRecommendations = (
-    products: unknown[],
+    products: RecProduct[],
     _orders: unknown[],
     _customers: unknown[]
   ): Recommendation[] => {
@@ -697,7 +722,7 @@ return (
                         </div>
                         <div className="space-y-1">
                           <p className="font-medium text-sm line-clamp-2">
-                            {rec.product?.name || "Product"}
+                            {(rec.product as RecProduct | undefined)?.name || "Product"}
                           </p>
                           <p className="text-xs text-gray-500">
                             {rec.reason}
@@ -743,7 +768,7 @@ return (
                       Turn on AI-powered recommendations across your store
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch checked onCheckedChange={() => undefined} />
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -753,7 +778,7 @@ return (
                       Update recommendations based on user behavior in real-time
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch checked onCheckedChange={() => undefined} />
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -763,7 +788,7 @@ return (
                       Automatically retrain models every 24 hours with new data
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch checked onCheckedChange={() => undefined} />
                 </div>
               </div>
 
@@ -822,7 +847,7 @@ return (
                       Remove personally identifiable information from training data
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch checked onCheckedChange={() => undefined} />
                 </div>
 
                 <div className="flex items-center justify-between">

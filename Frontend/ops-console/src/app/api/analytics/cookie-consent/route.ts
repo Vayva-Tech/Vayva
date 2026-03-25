@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment -- prisma/schema drift for CookieConsentEvent; tracked for unify */
 /**
  * COOKIE CONSENT ANALYTICS API
  * 
@@ -6,7 +7,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@vayva/db';
+import { prisma, prismaDelegates } from '@vayva/db';
+import { OpsAuthService } from '@/lib/ops-auth';
+import { opsApiAuthErrorResponse } from '@/lib/ops-api-auth';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -87,6 +90,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const { user } = await OpsAuthService.requireSession();
+    try {
+      OpsAuthService.requireRole(user, 'OPERATOR');
+    } catch (roleErr) {
+      const r = opsApiAuthErrorResponse(roleErr);
+      if (r) return r;
+      throw roleErr;
+    }
+
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
@@ -98,26 +110,26 @@ export async function GET(request: NextRequest) {
     if (endDate) dateFilter.lte = new Date(endDate);
 
     // Get total counts
-    const totalEvents = await prisma.cookieConsentEvent.count({
+    const totalEvents = await prismaDelegates.cookieConsentEvent.count({
       where: dateFilter ? { timestamp: dateFilter } : {},
     });
 
     // Get counts by choice
-    const acceptCount = await prisma.cookieConsentEvent.count({
+    const acceptCount = await prismaDelegates.cookieConsentEvent.count({
       where: {
         choice: 'accept',
         ...(dateFilter && { timestamp: dateFilter }),
       },
     });
 
-    const rejectCount = await prisma.cookieConsentEvent.count({
+    const rejectCount = await prismaDelegates.cookieConsentEvent.count({
       where: {
         choice: 'reject',
         ...(dateFilter && { timestamp: dateFilter }),
       },
     });
 
-    const customizeCount = await prisma.cookieConsentEvent.count({
+    const customizeCount = await prismaDelegates.cookieConsentEvent.count({
       where: {
         choice: 'customize',
         ...(dateFilter && { timestamp: dateFilter }),
@@ -159,6 +171,8 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    const authRes = opsApiAuthErrorResponse(error);
+    if (authRes) return authRes;
     console.error('Analytics fetch error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },
@@ -202,7 +216,7 @@ async function getTrendData(groupBy: string, dateFilter: any) {
   const startDate = dateFilter?.gte || new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   
   // This is a simplified version - in production, use raw SQL or Prisma groupBy
-  const events = await prisma.cookieConsentEvent.findMany({
+  const events = await prismaDelegates.cookieConsentEvent.findMany({
     where: {
       timestamp: {
         gte: startDate,
@@ -218,7 +232,7 @@ async function getTrendData(groupBy: string, dateFilter: any) {
 
   // Group by day
   const grouped: any = {};
-  events.forEach(event => {
+  events.forEach((event: { choice: string; timestamp: Date }) => {
     const date = event.timestamp.toISOString().split('T')[0];
     if (!grouped[date]) {
       grouped[date] = { accept: 0, reject: 0, customize: 0 };

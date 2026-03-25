@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState, useEffect } from 'react';
 
@@ -148,19 +148,19 @@ export function HIPAAComplianceTracker({
             <p className="text-gray-600 mt-1">Monitor compliance metrics and audit trails</p>
           </div>
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={onViewAuditLogs}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
             >
               View All Logs
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleRunCheck}
               disabled={loading}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
               {loading ? 'Running...' : 'Run Compliance Check'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -221,12 +221,12 @@ export function HIPAAComplianceTracker({
       <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Recent Audit Activity</h3>
-          <button
+          <Button
             onClick={onViewAuditLogs}
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
           >
             View All →
-          </button>
+          </Button>
         </div>
 
         <div className="overflow-x-auto">
@@ -314,3 +314,4 @@ export function HIPAAComplianceTracker({
     </div>
   );
 }
+

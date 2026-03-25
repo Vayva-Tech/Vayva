@@ -32,7 +32,7 @@ export function useRealTimeDashboard({
   enabled = true
 }: UseRealTimeDashboardOptions) {
   // Fetch base dashboard data with industry-specific endpoint
-  const { data: baseData, error, isLoading, mutate } = useSWR(
+  const { data: baseData, error: swrError, isLoading, mutate } = useSWR(
     enabled ? [`/dashboard/universal`, userId, businessId, industry] : null,
     async ([endpoint, uid, bid, ind]) => {
       const url = `${API_BASE_URL}${endpoint}?userId=${uid}&businessId=${bid}&industry=${ind}&range=month`;
@@ -162,8 +162,8 @@ export function useRealTimeDashboard({
     
     // Connection status
     isLoading,
-    isError: !!error,
-    error,
+    isError: !!swrError,
+    error: swrError,
     wsConnected,
     retryCount,
     

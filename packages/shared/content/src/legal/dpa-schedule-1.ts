@@ -60,7 +60,7 @@ export const dpaSchedule1 = {
         "• Newsletter subscribers and marketing contacts",
         "• Support ticket submitters",
         "",
-        **"PLATFORM USERS & VISITORS:**",
+        "**PLATFORM USERS & VISITORS:**",
         "• Vayva website visitors (marketing site, blog, documentation)",
         "• Trial users exploring platform features",
         "• Job applicants submitting applications",
@@ -179,7 +179,7 @@ export const dpaSchedule1 = {
       content: [
         "**ACCOUNT ONBOARDING:**",
         "• Collect identity and business verification data",
-        "• Perform KYC/AML checks via YouVerify (NIN) and Paystack (BVN)",
+        "• Perform KYC/AML checks via Paystack (BVN) and manual review (as required)",
         "• Validate CAC registration documents",
         "• Screen against sanctions lists (UN, EU, OFAC)",
         "• Risk scoring and due diligence assessment",

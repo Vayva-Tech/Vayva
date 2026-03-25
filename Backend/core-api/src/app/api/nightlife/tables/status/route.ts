@@ -11,7 +11,7 @@ export async function GET(request: Request): Promise<Response> {
     const { searchParams } = new URL(request.url);
     const venueId = searchParams.get('venueId');
     const date = searchParams.get('date');
-    const eventId = searchParams.get('eventId');
+    const _eventId = searchParams.get('eventId');
 
     if (!venueId) {
       return NextResponse.json(

@@ -34,6 +34,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface ScheduledReport {
   id: string;
@@ -171,22 +172,21 @@ export default function ScheduledReportsAdmin() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Calendar className="h-8 w-8 text-green-600" />
-            Scheduled Reports
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Manage automated client report delivery
-          </p>
-        </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Schedule Report
-        </Button>
-      </div>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <Calendar className="h-6 w-6 text-green-600" />
+            <span>Scheduled Reports</span>
+          </span>
+        }
+        subtitle="Manage automated client report delivery"
+        actions={
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Schedule Report
+          </Button>
+        }
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

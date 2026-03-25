@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Button, Input, Label, Select } from "@vayva/ui";
-import { Lightbulb, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Button, Input, Label } from "@vayva/ui";
+import { Send, CheckCircle, AlertCircle } from "lucide-react";
 
 interface IndustryFeatureRequestProps {
   industry: string;
@@ -104,37 +104,38 @@ export function IndustryFeatureRequest({ industry }: IndustryFeatureRequestProps
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="relative"
+      className="rounded-[28px] border border-slate-200/80 bg-white p-6 sm:p-8 shadow-sm min-w-0"
     >
-      <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[28px] border-2 border-emerald-200/60" />
-      <div className="relative rounded-[28px] border-2 border-slate-900/10 bg-white/90 backdrop-blur p-8 shadow-[0_20px_50px_rgba(15,23,42,0.1)]">
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Left side - Text content */}
-          <div>
-            <h3 className="text-3xl font-bold text-slate-900 mb-2">
-              Need something for your industry or location?
-            </h3>
-            <h4 className="text-3xl font-bold text-emerald-600 mb-4 pb-2 border-b-2 border-emerald-200 inline-block">
-              We'll build it.
-            </h4>
-            <p className="text-slate-600 mb-4 leading-relaxed">
-              Every industry and region has unique challenges. Tell us what your business needs, and our team will research, design, and build it. From fashion boutiques needing size charts to food vendors wanting kitchen displays—we listen, then we deliver.
-            </p>
-            <p className="text-slate-600 leading-relaxed">
-              This is how we've built tools for agriculture exports, event ticketing, salon appointments, and auto parts inventory. Your request could be next.
-            </p>
-            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mt-6">Built with you, for you</p>
-          </div>
+      <div className="grid md:grid-cols-2 gap-8 min-w-0">
+        {/* Left side - Text content */}
+        <div className="min-w-0">
+          <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+            Need something for your industry or location?
+          </h3>
+          <h4 className="text-2xl sm:text-3xl font-bold text-emerald-600 mb-4 pb-2 border-b-2 border-emerald-200 inline-block">
+            We&apos;ll build it.
+          </h4>
+          <p className="text-slate-600 mb-4 leading-relaxed text-sm sm:text-base">
+            Every industry and region has unique challenges. Tell us what your business needs, and our team will
+            research, design, and build it. From fashion boutiques needing size charts to food vendors wanting
+            kitchen displays—we listen, then we deliver.
+          </p>
+          <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
+            This is how we&apos;ve built tools for agriculture exports, event ticketing, salon appointments, and auto
+            parts inventory. Your request could be next.
+          </p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mt-6">Built with you, for you</p>
+        </div>
 
-          {/* Right side - Form */}
-          <div>
+        {/* Right side - Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 min-w-0">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-sm">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
           )}
-          
+
           <div>
             <Label htmlFor="feature-email" className="text-slate-700 font-semibold">Email address*</Label>
             <Input
@@ -213,8 +214,7 @@ export function IndustryFeatureRequest({ industry }: IndustryFeatureRequestProps
               </span>
             )}
           </Button>
-          </div>
-        </div>
+        </form>
       </div>
     </motion.div>
   );

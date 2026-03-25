@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
 import { Award, Trophy, Medal } from "lucide-react";
-import { formatCurrency } from "@vayva/ui";
+import { formatCurrency } from "@/lib/utils";
 
 interface SponsorShowcaseProps {
   data?: {
@@ -49,13 +48,13 @@ export function SponsorShowcase({ data }: SponsorShowcaseProps) {
 
       {/* By Tier */}
       <div className="space-y-3">
-        {byTier?.platinum?.length > 0 && (
+        {(byTier?.platinum?.length ?? 0) > 0 && (
           <div className="p-3 bg-gradient-to-r from-gray-100 to-gray-50 border-2 border-gray-400 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Award className="w-4 h-4 text-gray-600" />
               <p className="text-xs font-black text-gray-900 uppercase">Platinum</p>
             </div>
-            {byTier.platinum.map((sponsor) => (
+            {byTier?.platinum?.map((sponsor) => (
               <div key={sponsor.id}>
                 <p className="font-bold text-gray-900">{sponsor.name}</p>
                 <p className="text-xs text-gray-600">Booth #{sponsor.boothNumber || "N/A"}</p>
@@ -64,13 +63,13 @@ export function SponsorShowcase({ data }: SponsorShowcaseProps) {
           </div>
         )}
 
-        {byTier?.gold?.length > 0 && (
+        {(byTier?.gold?.length ?? 0) > 0 && (
           <div className="p-3 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="w-4 h-4 text-yellow-600" />
               <p className="text-xs font-black text-yellow-900 uppercase">Gold</p>
             </div>
-            {byTier.gold.map((sponsor) => (
+            {byTier?.gold?.map((sponsor) => (
               <div key={sponsor.id}>
                 <p className="font-bold text-gray-900">{sponsor.name}</p>
                 <p className="text-xs text-gray-600">Booth #{sponsor.boothNumber || "N/A"}</p>
@@ -79,13 +78,13 @@ export function SponsorShowcase({ data }: SponsorShowcaseProps) {
           </div>
         )}
 
-        {byTier?.bronze?.length > 0 && (
+        {(byTier?.bronze?.length ?? 0) > 0 && (
           <div className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-400 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Medal className="w-4 h-4 text-orange-600" />
               <p className="text-xs font-black text-amber-900 uppercase">Bronze</p>
             </div>
-            {byTier.bronze.map((sponsor) => (
+            {byTier?.bronze?.map((sponsor) => (
               <div key={sponsor.id}>
                 <p className="font-bold text-gray-900">{sponsor.name}</p>
                 <p className="text-xs text-gray-600">Booth #{sponsor.boothNumber || "N/A"}</p>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs , router } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { View, Text, useColorScheme, TouchableOpacity } from "react-native";
 import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -80,7 +80,7 @@ const MVP_FALLBACK_TABS: MobileNavTab[] = [
 
 function toMvpTabs(input: MobileNavTab[] | null): MobileNavTab[] {
   const list = Array.isArray(input) && input.length ? input : MVP_FALLBACK_TABS;
-  const filtered = list.filter((t) => MVP_ORDER.includes(screenNameFromHref(t.href) as any));
+  const filtered = list.filter((t) => MVP_ORDER.includes(screenNameFromHref(t.href) as unknown));
   const byName = new Map(filtered.map((t) => [screenNameFromHref(t.href), t] as const));
   return MVP_ORDER.map((name) => byName.get(name)).filter(Boolean) as MobileNavTab[];
 }
@@ -143,7 +143,7 @@ export default function TabLayout(): React.JSX.Element {
 
   return (
     <TabsAny
-      tabBar={(props: any) => {
+      tabBar={(props: unknown) => {
         const bottom = Math.max(insets.bottom, 8) + 10;
         const state = props?.state;
         const descriptors = props?.descriptors;
@@ -158,7 +158,7 @@ export default function TabLayout(): React.JSX.Element {
         const leftRoutes = routes.slice(0, 2);
         const rightRoutes = routes.slice(2);
 
-        const renderTab = (route: any) => {
+        const renderTab = (route: unknown) => {
           const key = route?.key;
           const name = route?.name;
           const descriptor = descriptors?.[key];

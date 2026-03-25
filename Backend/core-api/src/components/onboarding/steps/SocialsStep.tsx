@@ -19,7 +19,7 @@ import {
   X,
   QrCode,
   ArrowCounterClockwise as RefreshCw,
-  Shield,
+  Shield
 } from "@phosphor-icons/react/ssr";
 import { useOnboarding } from "@/components/onboarding/OnboardingContext";
 

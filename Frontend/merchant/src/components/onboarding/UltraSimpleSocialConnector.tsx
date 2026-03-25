@@ -208,14 +208,14 @@ export function UltraSimpleSocialConnector() {
                 <h3 className="text-2xl font-black text-white">
                   Connect {showSetup === 'telegram' ? 'Telegram' : 'Discord'}
                 </h3>
-                <button
+                <Button
                   onClick={() => setShowSetup(null)}
                   className="text-white/80 hover:text-white"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </button>
+                </Button>
               </div>
             </div>
             

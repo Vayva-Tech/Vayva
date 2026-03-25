@@ -1,9 +1,9 @@
-// @ts-nocheck
 /**
  * System Health Monitoring Service
  * Monitors API health, performance, and system stability
  */
 
+import React from 'react';
 import { logger } from '@vayva/shared';
 
 interface HealthCheckResult {
@@ -284,8 +284,10 @@ class SystemHealthMonitor {
     this.checkInterval = setInterval(async () => {
       try {
         await this.performHealthCheck();
-      } catch (error) {
-        logger.error('[HEALTH_MONITOR] Monitoring error:', error);
+      } catch (error: unknown) {
+        logger.error('[HEALTH_MONITOR] Monitoring error:', {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }, intervalMs);
     

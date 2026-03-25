@@ -7,7 +7,7 @@ import {
   BadRequestError,
   NotFoundError,
   logger,
-  BaseError,
+  BaseError
 } from "@vayva/shared";
 
 export const dynamic = "force-dynamic";

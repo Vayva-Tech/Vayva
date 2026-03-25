@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Recipe Costing Engine
  * 
@@ -9,10 +8,10 @@
  * - Price optimization suggestions
  */
 
-import { Recipe, MenuItem } from '../types';
+import type { MenuItem, MenuRecipe } from '../types';
 
 export class RecipeCostingService {
-  private recipes: Map<string, Recipe>;
+  private recipes: Map<string, MenuRecipe>;
   private ingredients: Map<string, { id: string; name: string; costPerUnit: number; unit: string }>;
 
   constructor() {
@@ -54,21 +53,21 @@ export class RecipeCostingService {
   /**
    * Create or update recipe
    */
-  setRecipe(recipe: Recipe): void {
+  setRecipe(recipe: MenuRecipe): void {
     this.recipes.set(recipe.id, recipe);
   }
 
   /**
    * Get recipe by ID
    */
-  getRecipe(recipeId: string): Recipe | undefined {
+  getRecipe(recipeId: string): MenuRecipe | undefined {
     return this.recipes.get(recipeId);
   }
 
   /**
    * Get all recipes
    */
-  getAllRecipes(): Recipe[] {
+  getAllRecipes(): MenuRecipe[] {
     return Array.from(this.recipes.values());
   }
 
@@ -79,7 +78,7 @@ export class RecipeCostingService {
   /**
    * Calculate recipe cost
    */
-  calculateRecipeCost(recipe: Recipe): {
+  calculateRecipeCost(recipe: MenuRecipe): {
     totalCost: number;
     costPerPortion: number;
     breakdown: Array<{ name: string; cost: number; percentage: number }>;
@@ -171,7 +170,15 @@ export class RecipeCostingService {
    */
   getLowMarginItems(items: MenuItem[], thresholdPercentage: number = 30): Array<{
     item: MenuItem;
-    marginAnalysis: ReturnType<typeof this.analyzeMenuItemMargin>;
+    marginAnalysis: {
+      revenue: number;
+      cost: number;
+      margin: number;
+      marginPercentage: number;
+      foodCostPercentage: number;
+      isProfitable: boolean;
+      targetMet: boolean;
+    };
     suggestion: string;
   }> {
     return items
@@ -338,13 +345,13 @@ export class RecipeCostingService {
    * Identify recipes at risk due to ingredient cost increases
    */
   identifyAtRiskRecipes(thresholdPercentage: number = 10): Array<{
-    recipe: Recipe;
+    recipe: MenuRecipe;
     currentCost: number;
     projectedCost: number;
     impact: string;
   }> {
     const atRisk: Array<{
-      recipe: Recipe;
+      recipe: MenuRecipe;
       currentCost: number;
       projectedCost: number;
       impact: string;

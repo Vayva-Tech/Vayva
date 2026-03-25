@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const result = await apiJson<{
       success: boolean;
       data?: any;
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/designer/stats`, {
-      headers: { "x-store-id": storeId },
+      headers: auth.headers,
     });
 
     if (!result.success) {

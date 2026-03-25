@@ -9,6 +9,14 @@
     "dependencies": {
         "zod": "^3.25.76"
     },
+    "peerDependencies": {
+        "@vayva/db": "workspace:*"
+    },
+    "peerDependenciesMeta": {
+        "@vayva/db": {
+            "optional": true
+        }
+    },
     "devDependencies": {
         "typescript": "^5.9.3"
     }

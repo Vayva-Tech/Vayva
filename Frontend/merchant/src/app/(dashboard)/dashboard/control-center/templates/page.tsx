@@ -24,7 +24,7 @@ export default async function TemplateSelectionPage() {
     },
   });
 
-  const currentTemplateId = store?.currentSystemTemplateKey;
+  const currentTemplateId = store?.currentTemplateId;
 
   return (
     <DashboardPageShell

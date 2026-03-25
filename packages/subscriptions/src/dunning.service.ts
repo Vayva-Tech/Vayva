@@ -90,7 +90,7 @@ export class DunningService {
       data: { status: "paused" },
     });
 
-    console.log(
+    console.warn(
       `[Dunning] Initiated for subscription ${subscriptionId}. Next attempt: ${nextAttemptAt}`
     );
 
@@ -231,7 +231,7 @@ export class DunningService {
       if (result.finalStatus === "cancelled" || result.finalStatus === "paused") stats.exhausted++;
     }
 
-    console.log(`[Dunning] Processed ${stats.processed} retries. Recovered: ${stats.recovered}`);
+    console.warn(`[Dunning] Processed ${stats.processed} retries. Recovered: ${stats.recovered}`);
     return stats;
   }
 
@@ -284,10 +284,10 @@ export class DunningService {
   private async attemptCharge(
     subscriptionId: string,
     amount: number,
-    paymentMethod: unknown
+    _paymentMethod: unknown
   ): Promise<{ success: boolean; error?: string; transactionId?: string }> {
     // Integrate with actual payment provider (Paystack/Stripe)
-    console.log(`[Dunning] Attempting charge for ${subscriptionId}: ₦${amount / 100}`);
+    console.warn(`[Dunning] Attempting charge for ${subscriptionId}: ₦${amount / 100}`);
     // Mock: 30% success rate on retries
     const success = Math.random() > 0.7;
     return success
@@ -372,7 +372,7 @@ export class DunningService {
             billingUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
           });
           
-          console.log(`[Dunning] Sent payment failed email to ${ownerEmail}`);
+          console.warn(`[Dunning] Sent payment failed email to ${ownerEmail}`);
           break;
         }
 
@@ -385,7 +385,7 @@ export class DunningService {
             currency,
           });
           
-          console.log(`[Dunning] Sent payment recovered email to ${ownerEmail}`);
+          console.warn(`[Dunning] Sent payment recovered email to ${ownerEmail}`);
           break;
         }
 
@@ -396,7 +396,7 @@ export class DunningService {
             reactivationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing/reactivate`,
           });
           
-          console.log(`[Dunning] Sent subscription ended email to ${ownerEmail}`);
+          console.warn(`[Dunning] Sent subscription ended email to ${ownerEmail}`);
           break;
         }
 

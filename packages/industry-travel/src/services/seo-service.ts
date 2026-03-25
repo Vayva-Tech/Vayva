@@ -1,7 +1,6 @@
-// @ts-nocheck
-import { 
-  TravelProperty, 
-  TravelRoom
+import {
+  TravelProperty,
+  TravelRoom as _TravelRoom
 } from '../types';
 
 export interface SEOOptimizationOptions {
@@ -275,7 +274,7 @@ export class SEOService {
   /**
    * Track SEO performance metrics
    */
-  async getSEOMetrics(propertyId: string): Promise<any> {
+  async getSEOMetrics(_propertyId: string): Promise<any> {
     // Mock implementation
     return {
       organicTraffic: Math.floor(Math.random() * 10000) + 1000,
@@ -366,7 +365,7 @@ export class SEOService {
     return suggestions;
   }
 
-  private generateContentSuggestions(property: TravelProperty, options: SEOOptimizationOptions): string[] {
+  private generateContentSuggestions(property: TravelProperty, _options: SEOOptimizationOptions): string[] {
     return [
       `Highlight unique features of ${property.name}`,
       `Mention proximity to popular attractions`,
@@ -473,7 +472,7 @@ export class SEOService {
     return xmlHeader + urlEntries + xmlFooter;
   }
 
-  private async optimizeSingleImage(path: string, options: ImageOptimizationOptions): Promise<OptimizedImage> {
+  private async optimizeSingleImage(path: string, _options: ImageOptimizationOptions): Promise<OptimizedImage> {
     // Mock implementation - in real scenario, this would use image processing libraries
     return {
       originalPath: path,

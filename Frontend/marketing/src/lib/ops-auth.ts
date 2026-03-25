@@ -29,7 +29,7 @@ export function withOpsAuth(
   };
 }
 
-export function requireOpsRole(role: string) {
+export function requireOpsRole(_role: string) {
   return (handler: (req: NextRequest, ctx: OpsAuthContext) => Promise<NextResponse>) => {
     return async (req: NextRequest, ctx: OpsAuthContext) => {
       if (!ctx.user) {
@@ -40,8 +40,15 @@ export function requireOpsRole(role: string) {
   };
 }
 
-export function isOpsUser(user: any): user is OpsUser {
-  return user && typeof user.id === 'string' && typeof user.email === 'string';
+export function isOpsUser(user: unknown): user is OpsUser {
+  return (
+    !!user &&
+    typeof user === "object" &&
+    "id" in user &&
+    "email" in user &&
+    typeof (user as OpsUser).id === "string" &&
+    typeof (user as OpsUser).email === "string"
+  );
 }
 
 export const opsAuth = {

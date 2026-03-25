@@ -151,13 +151,13 @@ export function FeedbackForm({ triggerLabel = "Give feedback", onClose }: Feedba
           <form onSubmit={handleSubmit} className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold">Share your feedback</h3>
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-900"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             {/* Rating */}
@@ -167,7 +167,7 @@ export function FeedbackForm({ triggerLabel = "Give feedback", onClose }: Feedba
               </label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <button
+                  <Button
                     key={star}
                     type="button"
                     onClick={() => setRating(star)}
@@ -180,7 +180,7 @@ export function FeedbackForm({ triggerLabel = "Give feedback", onClose }: Feedba
                           : "text-gray-300"
                       }`}
                     />
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -345,7 +345,7 @@ export function PostActionFeedback({ action, isOpen, onClose }: PostActionFeedba
         {/* Rating */}
         <div className="flex gap-1 justify-center mb-4">
           {[1, 2, 3, 4, 5].map((star) => (
-            <button
+            <Button
               key={star}
               onClick={() => setRating(star)}
               className="p-1 hover:scale-110 transition-transform"
@@ -357,7 +357,7 @@ export function PostActionFeedback({ action, isOpen, onClose }: PostActionFeedba
                     : "text-gray-300"
                 }`}
               />
-            </button>
+            </Button>
           ))}
         </div>
 

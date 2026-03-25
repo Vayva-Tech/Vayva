@@ -1,9 +1,10 @@
-// @ts-nocheck
-import { 
-  TravelProperty, 
+import {
+  TravelProperty as _TravelProperty,
   TravelBooking,
   TravelReview as ReviewType
 } from '../types';
+
+export type Review = ReviewType;
 
 export interface ReviewSubmission {
   bookingId: string;
@@ -325,67 +326,67 @@ export class ReviewService {
   }
 
   // Private helper methods
-  private async getBookingById(bookingId: string): Promise<TravelBooking | null> {
+  private async getBookingById(_bookingId: string): Promise<TravelBooking | null> {
     // Mock implementation
     return null;
   }
 
-  private async getReviewByBookingId(bookingId: string): Promise<ReviewType | null> {
+  private async getReviewByBookingId(_bookingId: string): Promise<ReviewType | null> {
     // Mock implementation
     return null;
   }
 
-  private async getReviewById(reviewId: string): Promise<ReviewType | null> {
+  private async getReviewById(_reviewId: string): Promise<ReviewType | null> {
     // Mock implementation
     return null;
   }
 
-  private async getApprovedReviews(propertyId: string): Promise<ReviewType[]> {
+  private async getApprovedReviews(_propertyId: string): Promise<ReviewType[]> {
     // Mock implementation
     return [];
   }
 
-  private async getAllReviews(propertyId: string): Promise<ReviewType[]> {
+  private async getAllReviews(_propertyId: string): Promise<ReviewType[]> {
     // Mock implementation
     return [];
   }
 
   private async saveReview(review: ReviewType): Promise<void> {
     // Mock implementation
-    console.log('Saving review:', review.id);
+    console.warn('Saving review:', review.id);
   }
 
   private async updateReview(review: ReviewType): Promise<void> {
     // Mock implementation
-    console.log('Updating review:', review.id);
+    console.warn('Updating review:', review.id);
   }
 
-  private async fetchReviewsFromDatabase(filters: ReviewFilters, limit?: number): Promise<ReviewType[]> {
+  private async fetchReviewsFromDatabase(_filters: ReviewFilters, _limit?: number): Promise<ReviewType[]> {
     // Mock implementation
     return [];
   }
 
   private async sendReviewNotification(review: ReviewType): Promise<void> {
     // Mock implementation
-    console.log('Sending review notification for:', review.id);
+    console.warn('Sending review notification for:', review.id);
   }
 
-  private async sendRejectionNotification(review: ReviewType, reason?: string): Promise<void> {
+  private async sendRejectionNotification(review: ReviewType, _reason?: string): Promise<void> {
     // Mock implementation
-    console.log('Sending rejection notification for:', review.id);
+    console.warn('Sending rejection notification for:', review.id);
   }
 
   private async sendResponseNotification(review: ReviewType): Promise<void> {
     // Mock implementation
-    console.log('Sending response notification for:', review.id);
+    console.warn('Sending response notification for:', review.id);
   }
 
-  private async addFlagRecord(reviewId: string, reason: string, userId: string): Promise<void> {
+  private async addFlagRecord(reviewId: string, _reason: string, _userId: string): Promise<void> {
     // Mock implementation
-    console.log('Adding flag record for review:', reviewId);
+    console.warn('Adding flag record for review:', reviewId);
   }
 
-  private async getFlagCount(reviewId: string): Promise<number> {
+  private async getFlagCount(_reviewId: string): Promise<number> {
     // Mock implementation
     return 0;
   }

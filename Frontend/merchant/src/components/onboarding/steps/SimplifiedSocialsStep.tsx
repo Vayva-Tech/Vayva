@@ -1,10 +1,10 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Simplified Socials Step using Enhanced Connection Manager
  */
 
 import { useOnboarding } from "../OnboardingContext";
-import { EnhancedSocialConnectionManager } from "./EnhancedSocialConnectionManager";
+import { SocialConnectionManager as EnhancedSocialConnectionManager } from "../EnhancedSocialConnectionManager";
 
 export default function SimplifiedSocialsStep() {
   const { nextStep, prevStep, isSaving } = useOnboarding();
@@ -18,13 +18,13 @@ export default function SimplifiedSocialsStep() {
       
       {/* Navigation */}
       <div className="flex gap-3 pt-4">
-        <button
+        <Button
           onClick={prevStep}
           disabled={isSaving}
           className="px-6 py-3 border-2 border-gray-100 rounded-2xl font-bold text-gray-500 hover:bg-gray-50 transition-all"
         >
           Back
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 /**
  * Advanced Analytics Dashboard with AI Insights
@@ -12,6 +11,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAnalyticsEngine } from '../hooks/useAnalyticsEngine';
+import type { ForecastResult } from '../services/ai-predictive-analytics.service';
+import type { BenchmarkReport } from '../services/cross-industry-benchmarking.service';
+import { AIPredictiveAnalyticsService } from '../services/ai-predictive-analytics.service';
+import { CrossIndustryBenchmarkingService } from '../services/cross-industry-benchmarking.service';
 
 interface AdvancedAnalyticsDashboardProps {
   businessId: string;
@@ -59,7 +62,10 @@ export function AdvancedAnalyticsDashboard({
 
         // Load benchmarking data
         if (showBenchmarking) {
-          const benchmarkService = engine.getService('cross-industry-benchmarking');
+          const benchmarkService =
+            engine.getService<CrossIndustryBenchmarkingService>(
+              'cross-industry-benchmarking'
+            );
           const report = await benchmarkService?.generateBenchmarkReport(
             businessId,
             industry,
@@ -68,7 +74,7 @@ export function AdvancedAnalyticsDashboard({
 
           if (report) {
             setBenchmarkData(
-              report.metrics.map((m) => ({
+              report.metrics.map((m: BenchmarkReport['metrics'][number]) => ({
                 metricName: m.metricName,
                 businessValue: m.businessValue,
                 industryAverage: m.industryAverage,
@@ -81,7 +87,10 @@ export function AdvancedAnalyticsDashboard({
 
         // Load forecasting data
         if (showForecasting) {
-          const predictiveService = engine.getService('ai-predictive-analytics');
+          const predictiveService =
+            engine.getService<AIPredictiveAnalyticsService>(
+              'ai-predictive-analytics'
+            );
           
           const forecasts = await Promise.all(
             metrics.map(async (metric) => {
@@ -94,33 +103,34 @@ export function AdvancedAnalyticsDashboard({
             })
           );
 
+          const validForecasts = forecasts.filter(
+            (f): f is ForecastResult => f !== undefined
+          );
           setForecastData(
-            forecasts.filter((f): f is NonNullable<typeof f> => f !== undefined).map((f) => ({
+            validForecasts.map((f) => ({
               metric: f.metric,
               trend: f.trend.direction,
-              predictions: f.forecast.map((pred) => ({
-                date: pred.timestamp.split('T')[0],
-                value: pred.predictedValue,
-              })),
+              predictions: f.forecast.map(
+                (pred: ForecastResult['forecast'][number]) => ({
+                  date: pred.timestamp.split('T')[0],
+                  value: pred.predictedValue,
+                })
+              ),
               confidence: f.forecast[0]?.confidenceInterval.confidence || 0.95,
             }))
           );
 
-          // Extract AI insights
-          const allInsights = forecasts
-            ?.filter((f): f is NonNullable<typeof f> => f !== undefined)
-            .flatMap((f) => f.insights) || [];
+          const allInsights = validForecasts.flatMap((f) => f.insights);
           setAiInsights(allInsights);
 
-          // Extract anomalies
-          const allAnomalies = forecasts
-            ?.filter((f): f is NonNullable<typeof f> => f !== undefined)
-            .flatMap((f) =>
-              (f.anomalies || []).map((a) => ({
+          const allAnomalies = validForecasts.flatMap((f) =>
+            (f.anomalies || []).map(
+              (a: NonNullable<ForecastResult['anomalies']>[number]) => ({
                 metric: f.metric,
                 explanation: a.explanation || `Unusual ${f.metric} detected`,
-              }))
-            ) || [];
+              })
+            )
+          );
           setAnomalies(allAnomalies);
         }
       } catch (error) {

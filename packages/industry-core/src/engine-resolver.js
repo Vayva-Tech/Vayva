@@ -42,7 +42,7 @@ class DefaultEngine {
   }
   
   async initialize() {
-    console.log('[ENGINE_RESOLVER] Default engine initialized');
+    console.warn('[ENGINE_RESOLVER] Default engine initialized');
   }
   
   getDashboardConfig() {

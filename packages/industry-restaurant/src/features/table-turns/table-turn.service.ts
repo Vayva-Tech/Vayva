@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Table Turn Service
  * Manages table status, reservations, and turn optimization
@@ -6,7 +5,7 @@
 
 import {
   type TableTurnConfig,
-  type Table,
+  type TableTurnTable,
   type TableReservation,
   type TableStatus,
   type WaitlistEntry,
@@ -34,7 +33,7 @@ export interface UpdateTableStatusRequest {
 
 export class TableTurnService {
   private config: TableTurnConfig;
-  private tables: Map<string, Table> = new Map();
+  private tables: Map<string, TableTurnTable> = new Map();
   private reservations: Map<string, TableReservation> = new Map();
   private waitlist: Map<string, WaitlistEntry> = new Map();
   private notifications: TableNotification[] = [];
@@ -55,7 +54,7 @@ export class TableTurnService {
   /**
    * Register a table
    */
-  registerTable(table: Table): void {
+  registerTable(table: TableTurnTable): void {
     this.tables.set(table.id, table);
     if (!this.historicalTurnTimes.has(table.id)) {
       this.historicalTurnTimes.set(table.id, []);
@@ -178,7 +177,7 @@ export class TableTurnService {
   /**
    * Mark table as available (after cleaning)
    */
-  async clearTable(tableId: string): Promise<Table | undefined> {
+  async clearTable(tableId: string): Promise<TableTurnTable | undefined> {
     const table = this.tables.get(tableId);
     if (!table) return undefined;
 
@@ -268,7 +267,7 @@ export class TableTurnService {
   /**
    * Get available tables
    */
-  getAvailableTables(partySize?: number, section?: string): Table[] {
+  getAvailableTables(partySize?: number, section?: string): TableTurnTable[] {
     return Array.from(this.tables.values())
       .filter(table => {
         if (table.status !== 'available') return false;
@@ -282,14 +281,14 @@ export class TableTurnService {
   /**
    * Get table by ID
    */
-  getTable(tableId: string): Table | undefined {
+  getTable(tableId: string): TableTurnTable | undefined {
     return this.tables.get(tableId);
   }
 
   /**
    * Get all tables
    */
-  getAllTables(): Table[] {
+  getAllTables(): TableTurnTable[] {
     return Array.from(this.tables.values());
   }
 
@@ -376,7 +375,7 @@ export class TableTurnService {
   /**
    * Find best table for party
    */
-  findBestTable(partySize: number, preferences: TablePreference[] = []): Table | undefined {
+  findBestTable(partySize: number, preferences: TablePreference[] = []): TableTurnTable | undefined {
     const available = this.getAvailableTables(partySize);
     if (available.length === 0) return undefined;
 
@@ -490,7 +489,7 @@ export class TableTurnService {
     }
   }
 
-  private findSuitablePartyForTable(table: Table): WaitlistEntry | undefined {
+  private findSuitablePartyForTable(table: TableTurnTable): WaitlistEntry | undefined {
     const waiting = this.getWaitlist();
 
     for (const entry of waiting) {
@@ -516,7 +515,7 @@ export class TableTurnService {
     return undefined;
   }
 
-  private async notifyWaitlistParty(entry: WaitlistEntry, table: Table): Promise<void> {
+  private async notifyWaitlistParty(entry: WaitlistEntry, table: TableTurnTable): Promise<void> {
     entry.status = 'notified';
     entry.notifiedAt = new Date();
 

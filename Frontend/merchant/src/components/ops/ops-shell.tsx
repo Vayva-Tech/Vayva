@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
@@ -28,7 +27,7 @@ export function OpsShell({
   description,
   actions,
 }: OpsShellProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <div className="min-h-screen bg-[#142210] flex text-white font-sans selection:bg-red-500/30">

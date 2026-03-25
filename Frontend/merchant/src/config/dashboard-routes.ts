@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Enhanced Dashboard Routing Configuration
  * Centralized routing for all pro dashboard experiences
@@ -184,6 +183,14 @@ export const DASHBOARD_ROUTES: DashboardRoute[] = [
     icon: 'CreditCard',
     category: 'settings'
   },
+  {
+    id: "ai-usage",
+    path: "/dashboard/ai-usage",
+    title: "AI Usage & Top-ups",
+    description: "View AI message balance and buy top-up packs",
+    icon: "Zap",
+    category: "settings",
+  },
   
   // Meal Kit Management
   {
@@ -194,12 +201,22 @@ export const DASHBOARD_ROUTES: DashboardRoute[] = [
     icon: 'Utensils',
     category: 'business',
     industrySpecific: true,
-    availableIndustries: ['meal_kit']
-  }
+    availableIndustries: ["food", "meal-kit"],
+  },
+  {
+    id: "desktop-app",
+    path: "/beta/desktop-app",
+    title: "Native apps (beta)",
+    description: "Waitlist for desktop and mobile merchant apps",
+    icon: "Monitor",
+    category: "settings",
+  },
 ];
 
 // Industry-specific route adaptations
-export const INDUSTRY_ROUTE_ADAPTATIONS: Record<IndustrySlug, Partial<Record<string, string>>> = {
+export const INDUSTRY_ROUTE_ADAPTATIONS: Partial<
+  Record<IndustrySlug, Partial<Record<string, string>>>
+> = {
   retail: {
     'products': 'Products',
     'orders': 'Orders'
@@ -225,8 +242,14 @@ export const INDUSTRY_ROUTE_ADAPTATIONS: Record<IndustrySlug, Partial<Record<str
     'orders': 'Sales'
   },
   food: {
-    'products': 'Menu Items',
-    'orders': 'Orders'
+    'products': 'Meal Plans',
+    'orders': 'Subscriptions',
+    'meal-kit': 'Meal Kit Manager',
+  },
+  "meal-kit": {
+    products: "Meal plans",
+    orders: "Subscriptions",
+    "meal-kit": "Meal Kit Manager",
   },
   beauty: {
     'products': 'Services',
@@ -236,11 +259,6 @@ export const INDUSTRY_ROUTE_ADAPTATIONS: Record<IndustrySlug, Partial<Record<str
     'products': 'Events',
     'orders': 'Registrations'
   },
-  meal_kit: {
-    'products': 'Meal Plans',
-    'orders': 'Subscriptions',
-    'meal-kit': 'Meal Kit Manager'
-  }
 };
 
 // Get adapted route titles for specific industries

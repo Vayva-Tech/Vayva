@@ -1,7 +1,8 @@
 "use client";
-// @ts-nocheck
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { apiJson } from "@/lib/api-client-shared";
+import { toast } from "sonner";
 import {
   Settings,
   Globe,
@@ -18,15 +19,6 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
-
-// ── Mock Data ────────────────────────────────────────────────────────────────
-
-const STORE_STATUS = {
-  name: "Aduke Fashion House",
-  url: "adukefashion.vayva.store",
-  status: "Live" as "Live" | "Maintenance",
-  uptimePercentage: 99.97,
-};
 
 const QUICK_ACTIONS = [
   {
@@ -67,52 +59,87 @@ const QUICK_ACTIONS = [
   },
 ];
 
-const RECENT_ACTIVITY = [
-  {
-    id: "1",
-    action: "Template changed to 'Lagos Modern'",
-    timestamp: "2 hours ago",
-    icon: Layout,
-  },
-  {
-    id: "2",
-    action: "Product 'Ankara Maxi Dress' published",
-    timestamp: "4 hours ago",
-    icon: Package,
-  },
-  {
-    id: "3",
-    action: "Custom domain verified: adukefashion.ng",
-    timestamp: "Yesterday",
-    icon: ShieldCheck,
-  },
-  {
-    id: "4",
-    action: "Shipping zone added: Lagos Mainland",
-    timestamp: "Yesterday",
-    icon: Truck,
-  },
-  {
-    id: "5",
-    action: "SEO meta tags updated for homepage",
-    timestamp: "2 days ago",
-    icon: FileText,
-  },
-];
-
 // ── Page Component ───────────────────────────────────────────────────────────
 
+type ActivityRow = {
+  id: string;
+  action: string;
+  timestamp: string;
+  icon: typeof Layout;
+};
+
 export default function ControlCenterPage() {
+  const [storeStatus, setStoreStatus] = useState<{
+    name: string;
+    url: string;
+    status: "Live" | "Maintenance";
+    uptimePercentage: number | null;
+  }>({
+    name: "Your store",
+    url: "—",
+    status: "Live",
+    uptimePercentage: null,
+  });
+  const [recentActivity, setRecentActivity] = useState<ActivityRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      const me = await apiJson<Record<string, unknown>>("/api/me");
+      const name =
+        (me.storeName as string) ||
+        (me.businessName as string) ||
+        (me.name as string) ||
+        "Your store";
+      const slug = (me.slug as string) || "";
+      const isLive = me.isLive !== false && me.storefrontLive !== false;
+      setStoreStatus({
+        name,
+        url: slug ? `${slug}.vayva.store` : "—",
+        status: isLive ? "Live" : "Maintenance",
+        uptimePercentage: null,
+      });
+
+      const rawActivity = await apiJson<
+        Array<{
+          id: string;
+          type?: string;
+          message?: string;
+          time?: string;
+        }>
+      >("/api/dashboard/activity?limit=15");
+
+      const list = Array.isArray(rawActivity) ? rawActivity : [];
+      const iconFor = (t: string | undefined) => {
+        if (t === "PAYOUT") return CreditCard;
+        if (t === "TICKET") return MessageCircle;
+        if (t === "ORDER") return Package;
+        return FileText;
+      };
+      setRecentActivity(
+        list.map((a) => ({
+          id: a.id,
+          action: a.message ?? "Activity",
+          timestamp: a.time ?? "",
+          icon: iconFor(a.type),
+        })),
+      );
+    } catch {
+      toast.error("Could not load control center data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const STORE_STATUS = storeStatus;
+
   return (
     <div className="space-y-6 pb-10">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Control Center</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Manage your store settings and configurations
-        </p>
-      </div>
-
       {/* Store Status Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -153,14 +180,20 @@ export default function ControlCenterPage() {
             <p className="text-xs font-medium text-gray-500 mb-1">Uptime</p>
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-gray-900">
-                {STORE_STATUS.uptimePercentage}%
+                {STORE_STATUS.uptimePercentage != null
+                  ? `${STORE_STATUS.uptimePercentage}%`
+                  : "—"}
               </p>
-              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-green-500 rounded-full"
-                  style={{ width: `${STORE_STATUS.uptimePercentage}%` }}
-                />
-              </div>
+              {STORE_STATUS.uptimePercentage != null ? (
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full"
+                    style={{ width: `${STORE_STATUS.uptimePercentage}%` }}
+                  />
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400">Not tracked</p>
+              )}
             </div>
           </div>
         </div>
@@ -208,7 +241,13 @@ export default function ControlCenterPage() {
         </div>
 
         <div className="space-y-1">
-          {RECENT_ACTIVITY.map((item) => {
+          {loading ? (
+            <p className="text-sm text-gray-500 py-4">Loading activity…</p>
+          ) : null}
+          {!loading && recentActivity.length === 0 ? (
+            <p className="text-sm text-gray-500 py-4">No recent activity yet.</p>
+          ) : null}
+          {recentActivity.map((item) => {
             const Icon = item.icon;
             return (
               <div

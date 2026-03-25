@@ -93,14 +93,14 @@ export function checkRateLimit(
 /**
  * Create rate limiting middleware
  */
-export function withRateLimit<T extends (...args: any[]) => any>(
+export function withRateLimit<T extends (...args: unknown[]) => unknown>(
   handler: T,
   options?: {
     tierField?: string;
     customLimits?: Partial<RateLimitConfig>;
   }
 ) {
-  return async (request: NextRequest, ...rest: any[]) => {
+  return async (request: NextRequest, ...rest: unknown[]) => {
     try {
       // Extract user ID from request (adjust based on your auth)
       const userId = request.headers.get('x-user-id');
@@ -112,7 +112,7 @@ export function withRateLimit<T extends (...args: any[]) => any>(
         return handler(request, ...rest);
       }
       
-      const limits = options?.customLimits 
+      const _limits = options?.customLimits 
         ? { ...DEFAULT_LIMITS, ...options.customLimits }
         : DEFAULT_LIMITS;
       

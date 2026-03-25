@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { logger } from "@/lib/logger";
+import { logger as _logger } from "@/lib/logger";
 
 /**
  * Industry-specific validation schemas
@@ -118,7 +118,7 @@ export const GiftCardSchema = z.object({
  * Validation utility functions
  */
 export class IndustryValidator {
-  static validate(schema: z.ZodSchema, data: any) {
+  static validate(schema: z.ZodSchema, data: unknown) {
     try {
       return schema.parse(data);
     } catch (error) {
@@ -146,7 +146,7 @@ export class IndustryValidator {
   }
 
   static validateQueryParams(searchParams: URLSearchParams, schema: z.ZodSchema) {
-    const params: Record<string, any> = {};
+    const params: Record<string, unknown> = {};
     
     for (const [key, value] of searchParams.entries()) {
       // Convert to appropriate types
@@ -167,10 +167,11 @@ export class IndustryValidator {
     return str.trim().substring(0, maxLength);
   }
 
-  static sanitizeNumber(num: any, min: number = 0, max: number = Number.MAX_SAFE_INTEGER): number {
+  static sanitizeNumber(num: unknown, min: number = 0, max: number = Number.MAX_SAFE_INTEGER): number {
     const parsed = typeof num === "string" ? parseFloat(num) : num;
-    if (isNaN(parsed)) return min;
-    return Math.min(Math.max(parsed, min), max);
+    const n = typeof parsed === "number" ? parsed : Number(parsed);
+    if (Number.isNaN(n)) return min;
+    return Math.min(Math.max(n, min), max);
   }
 }
 
@@ -215,7 +216,7 @@ export class IndustryUtils {
   }
 
   static isValidPhoneNumber(phone: string): boolean {
-    return /^[\+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-\(\)]/g, ""));
+    return /^\+?[1-9]\d{0,15}$/.test(phone.replace(/[\s\-()]/g, ""));
   }
 
   static isValidEmail(email: string): boolean {

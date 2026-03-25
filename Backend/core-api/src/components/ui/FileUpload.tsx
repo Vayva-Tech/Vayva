@@ -7,7 +7,7 @@ import {
   CloudArrowUp as UploadCloud,
   X,
   File as FileIcon,
-  Spinner as Loader2,
+  Spinner as Loader2
 } from "@phosphor-icons/react/ssr";
 import { toast } from "sonner";
 

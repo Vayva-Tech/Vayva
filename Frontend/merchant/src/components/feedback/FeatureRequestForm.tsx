@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
 
-import { useState, useRef, FormEvent } from "react";
+import React, { useState, useRef, FormEvent } from "react";
 import { Button, Input, Textarea, Select } from "@vayva/ui";
 import { Lightbulb, Paperclip, X, Check, PaperPlaneTilt as Send, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 import { apiJson } from "@/lib/api-client-shared";
@@ -205,7 +204,7 @@ export function FeatureRequestForm({
             </label>
             <div className="grid grid-cols-2 gap-3">
               {requestTypes.map((type) => (
-                <button
+                <Button
                   key={type.value}
                   type="button"
                   onClick={() => setRequestType(type.value as any)}
@@ -221,7 +220,7 @@ export function FeatureRequestForm({
                   <div className="text-xs text-gray-500">
                     {type.description}
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           </div>

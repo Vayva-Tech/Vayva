@@ -4,7 +4,7 @@
  * Secure patient portal for healthcare providers
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PATIENT_PORTAL_ADDON: AddOnDefinition = {
   id: 'vayva.patient-portal',

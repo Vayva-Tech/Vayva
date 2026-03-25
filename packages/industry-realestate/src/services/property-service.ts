@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Property Service
  * Business logic for property operations

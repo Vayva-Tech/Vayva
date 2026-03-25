@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,7 +7,7 @@ import {
   MagnifyingGlass as Search, 
   CheckCircle, 
   Package, 
-  UtensilsCrossed, 
+  ForkKnife as UtensilsCrossed, 
   Scissors,
   House,
   FileText,
@@ -22,25 +21,26 @@ import {
   ShoppingCart,
   BookOpen,
   Stethoscope,
-  Building2,
+  Buildings as Building2,
   Users,
   Newspaper,
   Folder,
   Stack,
   Storefront,
-  Dumbbell,
-  Bot
+  Barbell as Dumbbell,
+  Robot as Bot
 } from "@phosphor-icons/react/ssr";
 import { 
-  INDUSTRY_OVERRIDES, 
   getAllIndustrySlugs,
-  getIndustryDisplayNames
+  getIndustryDisplayNames,
+  getIndustryConfig,
 } from "@/config/industry-archetypes";
 import { 
   INDUSTRY_DESIGN_CATEGORIES,
   DESIGN_CATEGORY_LABELS
 } from "@/config/industry-design-categories";
 import { applyDesignCategory } from "@/lib/theme-utils";
+import type { IndustrySlug } from "@/lib/templates/types";
 
 // Industry icon mapping
 const INDUSTRY_ICONS: Record<string, React.ComponentType<any>> = {
@@ -81,18 +81,21 @@ export default function IndustryStep() {
   const { state, updateData, nextStep, prevStep, isSaving } = useOnboarding();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(
-    state.business?.industrySlug || null
+    state.business?.industry ?? state.industrySlug ?? null
   );
 
   // Get all industries sorted by priority
   const industries = getAllIndustrySlugs()
-    .map(slug => ({
-      slug,
-      config: INDUSTRY_OVERRIDES[slug],
-      displayName: INDUSTRY_OVERRIDES[slug]?.displayName || slug,
-      description: INDUSTRY_OVERRIDES[slug]?.description || "",
-      designCategory: INDUSTRY_DESIGN_CATEGORIES[slug],
-    }))
+    .map((slug) => {
+      const config = getIndustryConfig(slug);
+      return {
+        slug,
+        config,
+        displayName: config.displayName || config.name || slug,
+        description: config.description || "",
+        designCategory: INDUSTRY_DESIGN_CATEGORIES[slug] ?? "signature",
+      };
+    })
     .filter(industry => 
       industry.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       industry.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -121,8 +124,9 @@ export default function IndustryStep() {
       const industryData = {
         business: {
           ...state.business,
-          industrySlug: selectedIndustry,
-        }
+          industry: selectedIndustry,
+        },
+        industrySlug: selectedIndustry as IndustrySlug,
       };
       
       updateData(industryData);
@@ -196,7 +200,7 @@ export default function IndustryStep() {
           const isSelected = selectedIndustry === industry.slug;
           
           return (
-            <button
+            <Button
               key={industry.slug}
               onClick={() => setSelectedIndustry(industry.slug)}
               className={`
@@ -243,7 +247,7 @@ export default function IndustryStep() {
                   {DESIGN_CATEGORY_LABELS[industry.designCategory as keyof typeof DESIGN_CATEGORY_LABELS]}
                 </span>
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>

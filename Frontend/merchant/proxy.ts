@@ -67,7 +67,6 @@ const getTenantMap = async () => {
 export async function proxy(request: NextRequest) {
   const hostname = request.headers.get("host") || "";
   const path = request.nextUrl.pathname;
-  const query = Object.fromEntries(request.nextUrl.searchParams) as Record<string, string>;
 
   // Preflight requests must not be redirected (browsers treat redirected preflights as failures).
   if (request.method === "OPTIONS") {

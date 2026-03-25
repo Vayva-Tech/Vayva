@@ -1,4 +1,27 @@
-// @ts-nocheck
+export {};
+
+declare global {
+  interface Window {
+    vayvaClaimReward?: (rewardId: string, customerId: string, storeId: string) => void;
+    vayvaViewAllRewards?: (storeId: string, customerId: string) => void;
+  }
+}
+
+interface LoyaltyReward {
+  id: string;
+  icon: string;
+  name: string;
+  points: number;
+}
+
+interface LoyaltyPayload {
+  error?: string;
+  customer: { name: string; points: number };
+  tier: { name: string; nextTier: string; progressPercentage: number };
+  pointsToNextTier: number;
+  rewards: LoyaltyReward[];
+}
+
 /**
  * Vayva Loyalty Points Widget
  * 
@@ -15,7 +38,7 @@
   function initLoyaltyWidget() {
     const container = document.getElementById('vayva-loyalty-widget');
     
-    if (!container) return;
+    if (!(container instanceof HTMLElement)) return;
 
     const storeId = container.getAttribute('data-store-id');
     const customerId = container.getAttribute('data-customer-id');
@@ -34,13 +57,19 @@
     renderLoyaltyWidget(container, storeId, customerId, theme);
   }
 
-  function renderLoyaltyWidget(container, storeId, customerId, theme) {
+  function renderLoyaltyWidget(
+    container: HTMLElement,
+    storeId: string,
+    customerId: string,
+    theme: string,
+  ) {
     // Fetch loyalty data
     fetch(`${VAYVA_API_BASE}/api/embedded/loyalty?storeId=${storeId}&customerId=${customerId}`)
       .then(res => res.json())
-      .then(data => {
-        if (data.error) throw new Error(data.error);
-        displayWidget(container, data, theme);
+      .then((data: unknown) => {
+        const payload = data as LoyaltyPayload;
+        if (payload.error) throw new Error(payload.error);
+        displayWidget(container, payload, theme, storeId, customerId);
       })
       .catch(err => {
         container.innerHTML = `
@@ -51,7 +80,13 @@
       });
   }
 
-  function displayWidget(container, data, theme) {
+  function displayWidget(
+    container: HTMLElement,
+    data: LoyaltyPayload,
+    theme: string,
+    storeId: string,
+    customerId: string,
+  ) {
     const { customer, tier, pointsToNextTier, rewards } = data;
 
     container.innerHTML = `
@@ -283,7 +318,7 @@
         <div class="vayva-rewards-section">
           <div class="vayva-rewards-title">Available Rewards</div>
           <div class="vayva-rewards-grid">
-            ${rewards.map(reward => `
+            ${rewards.map((reward: LoyaltyReward) => `
               <div class="vayva-reward-card" onclick="window.vayvaClaimReward('${reward.id}', '${customerId}', '${storeId}')">
                 <div class="vayva-reward-icon">${reward.icon}</div>
                 <div class="vayva-reward-name">${reward.name}</div>

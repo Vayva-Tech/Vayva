@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { LegalDocument, LegalSection } from "@vayva/content";
+import type React from "react";
+import type { LegalDocument, LegalSection } from "@vayva/content";
 import { cn } from "../../utils";
 
 interface LegalContentRendererProps {

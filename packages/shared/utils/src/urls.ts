@@ -8,7 +8,7 @@ function must(name: string) {
 
     switch (name) {
       case "MARKETING_ORIGIN":
-        return "https://vayva.ng";
+        return "https://www.vayva.ng";
       case "MERCHANT_ORIGIN":
         return "https://merchant.vayva.ng";
       case "OPS_ORIGIN":
@@ -23,7 +23,7 @@ function must(name: string) {
         return "https://vayva.ng";
       // Legacy fallbacks
       case "MARKETING_BASE_URL":
-        return "https://vayva.ng";
+        return "https://www.vayva.ng";
       case "MERCHANT_BASE_URL":
         return "https://merchant.vayva.ng";
       case "OPS_BASE_URL":
@@ -58,8 +58,6 @@ export const urls = {
   paymentsBase: () => process.env.PAYMENTS_ORIGIN || must("PAYMENTS_ORIGIN"),
 
   // External Service Base URLs
-  youverifyBase: () =>
-    process.env.YOUVERIFY_BASE_URL || "https://api.youverify.co",
   webstudioBase: () =>
     process.env.WEBSTUDIO_BASE_URL || "https://apps.webstudio.is",
   resendBase: () => "https://api.resend.com",

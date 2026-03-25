@@ -28,7 +28,9 @@ export const POST = withVayvaAPI(
       }
 
       const addOn = await prisma.storeAddOn.findUnique({
-        where: { storeId_addOnId: { storeId, addOnId: extensionId } },
+        where: {
+          storeId_extensionId: { storeId, extensionId },
+        },
       });
 
       if (!addOn) {

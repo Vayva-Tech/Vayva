@@ -3,6 +3,8 @@
  * Handles NPS survey sending, response collection, and follow-up actions
  */
 
+import { AppRole } from '@vayva/db';
+import type { NPSSurvey as NPSSurveyRow } from '@vayva/db';
 import { prisma } from '../lib/prisma';
 import { NpsSurvey, NpsMetrics, NpsCategory, categorizeNps, NpsSurveyJobData, NpsResponseJobData } from '../lib/types';
 import { NPS_CONFIG } from '../lib/constants';
@@ -28,10 +30,17 @@ export class NpsSystem {
     // Get store with owner
     const store = await prisma.store.findUnique({
       where: { id: storeId },
-      include: { owner: true },
+      include: {
+        memberships: {
+          where: { role_enum: AppRole.OWNER, status: 'ACTIVE' },
+          take: 1,
+          include: { user: true },
+        },
+      },
     });
 
-    if (!store || !store.owner?.phone) {
+    const owner = store?.memberships[0]?.user;
+    if (!store || !owner?.phone) {
       logger.warn(`Cannot send NPS survey: store or phone not found`, { storeId });
       return null;
     }
@@ -59,20 +68,20 @@ export class NpsSystem {
     };
 
     // Save to database
-    await prisma.npsSurvey.create({
+    await prisma.nPSSurvey.create({
       data: {
         id: survey.id,
         storeId,
         status: 'sent',
         sentAt: survey.sentAt,
-        surveyType,
+        metadata: { surveyType },
       },
     });
 
     // Send WhatsApp message
     if (this.whatsappSender) {
-      const message = this.buildSurveyMessage(store.owner.firstName || 'there');
-      await this.whatsappSender(store.owner.phone, message);
+      const message = this.buildSurveyMessage(owner.firstName || 'there');
+      await this.whatsappSender(owner.phone, message);
 
       logger.info(`NPS survey sent`, { storeId, surveyId: survey.id });
     } else {
@@ -117,11 +126,11 @@ export class NpsSystem {
       feedback: message,
     };
 
-    await prisma.npsSurvey.update({
+    await prisma.nPSSurvey.update({
       where: { id: activeSurvey.id },
       data: {
         status: 'responded',
-        respondedAt,
+        respondedAt: receivedAt,
         score,
         feedback: message,
       },
@@ -139,7 +148,7 @@ export class NpsSystem {
    * Check if we should send a survey to this store
    */
   private async shouldSendSurvey(storeId: string): Promise<boolean> {
-    const lastSurvey = await prisma.npsSurvey.findFirst({
+    const lastSurvey = await prisma.nPSSurvey.findFirst({
       where: { storeId },
       orderBy: { sentAt: 'desc' },
     });
@@ -158,7 +167,7 @@ export class NpsSystem {
   private async getActiveSurvey(storeId: string): Promise<NpsSurvey | null> {
     const expiryDate = subDays(new Date(), NPS_CONFIG.SURVEY_EXPIRY_DAYS);
 
-    const survey = await prisma.npsSurvey.findFirst({
+    const survey = await prisma.nPSSurvey.findFirst({
       where: {
         storeId,
         status: 'sent',
@@ -254,14 +263,14 @@ Your feedback helps us improve. Thanks! 🙏`;
   async getMetrics(storeId?: string): Promise<NpsMetrics> {
     const where = storeId ? { storeId } : {};
 
-    const surveys = await prisma.npsSurvey.findMany({
+    const surveys = await prisma.nPSSurvey.findMany({
       where: {
         ...where,
         status: 'responded',
       },
     });
 
-    const totalSent = await prisma.npsSurvey.count({
+    const totalSent = await prisma.nPSSurvey.count({
       where: { ...where, status: { in: ['sent', 'responded'] } },
     });
 
@@ -280,10 +289,12 @@ Your feedback helps us improve. Thanks! 🙏`;
       };
     }
 
-    const scores = surveys.map(s => s.score!).filter((s): s is number => s !== null);
-    const promoters = scores.filter(s => s >= 9).length;
-    const passives = scores.filter(s => s >= 7 && s <= 8).length;
-    const detractors = scores.filter(s => s <= 6).length;
+    const scores = surveys
+      .map((row: NPSSurveyRow) => row.score)
+      .filter((n): n is number => n !== null && n !== undefined);
+    const promoters = scores.filter(n => n >= 9).length;
+    const passives = scores.filter(n => n >= 7 && n <= 8).length;
+    const detractors = scores.filter(n => n <= 6).length;
 
     const averageScore = scores.reduce((a, b) => a + b, 0) / scores.length;
     const npsScore = Math.round(((promoters - detractors) / scores.length) * 100);
@@ -306,7 +317,13 @@ Your feedback helps us improve. Thanks! 🙏`;
   async scheduleSurveysForAll(): Promise<{ scheduled: number; skipped: number }> {
     const stores = await prisma.store.findMany({
       where: { deletedAt: null },
-      include: { owner: true },
+      include: {
+        memberships: {
+          where: { role_enum: AppRole.OWNER, status: 'ACTIVE' },
+          take: 1,
+          include: { user: true },
+        },
+      },
     });
 
     let scheduled = 0;
@@ -320,7 +337,8 @@ Your feedback helps us improve. Thanks! 🙏`;
 
     for (const store of stores) {
       const shouldSend = await this.shouldSendSurvey(store.id);
-      if (shouldSend && store.owner?.phone) {
+      const owner = store.memberships[0]?.user;
+      if (shouldSend && owner?.phone) {
         await queue.add(`nps_${store.id}`, {
           storeId: store.id,
           surveyType: 'scheduled',
@@ -344,21 +362,24 @@ Your feedback helps us improve. Thanks! 🙏`;
    * Get survey history for a store
    */
   async getSurveyHistory(storeId: string): Promise<NpsSurvey[]> {
-    const surveys = await prisma.npsSurvey.findMany({
+    const surveys = await prisma.nPSSurvey.findMany({
       where: { storeId },
       orderBy: { sentAt: 'desc' },
     });
 
-    return surveys.map(s => ({
-      id: s.id,
-      storeId: s.storeId,
-      status: s.status as NpsSurvey['status'],
-      sentAt: s.sentAt,
-      respondedAt: s.respondedAt ?? undefined,
-      score: s.score ?? undefined,
-      feedback: s.feedback ?? undefined,
-      followUpAction: s.followUpAction ?? undefined,
-    }));
+    return surveys.map((s: NPSSurveyRow) => {
+      const meta = s.metadata as { followUpAction?: string; surveyType?: string } | null;
+      return {
+        id: s.id,
+        storeId: s.storeId,
+        status: s.status as NpsSurvey['status'],
+        sentAt: s.sentAt,
+        respondedAt: s.respondedAt ?? undefined,
+        score: s.score ?? undefined,
+        feedback: s.feedback ?? undefined,
+        followUpAction: meta?.followUpAction,
+      };
+    });
   }
 
   /**
@@ -367,7 +388,7 @@ Your feedback helps us improve. Thanks! 🙏`;
   async expireOldSurveys(): Promise<number> {
     const expiryDate = subDays(new Date(), NPS_CONFIG.SURVEY_EXPIRY_DAYS);
 
-    const result = await prisma.npsSurvey.updateMany({
+    const result = await prisma.nPSSurvey.updateMany({
       where: {
         status: 'sent',
         sentAt: { lt: expiryDate },

@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 
@@ -53,14 +53,15 @@ export function ClientPortal({ businessId, clientId, onViewMatter, onSendMessage
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
             placeholder="Type your message to your attorney..."
           />
-          <button
+          <Button
             onClick={handleSend}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Send Message
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
+

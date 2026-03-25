@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Seating Chart Designer Service
  * Manages seating arrangements and table assignments
@@ -70,8 +69,8 @@ export class SeatingChartDesignerService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[SEATING_DESIGNER] Initializing service...');
-    console.log('[SEATING_DESIGNER] Service initialized');
+    console.warn('[SEATING_DESIGNER] Initializing service...');
+    console.warn('[SEATING_DESIGNER] Service initialized');
   }
 
   /**

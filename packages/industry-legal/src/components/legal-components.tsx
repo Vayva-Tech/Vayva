@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * Legal Components
  * Phase 3: Law Firm Practice Management UI Components
@@ -224,10 +224,10 @@ export const DocumentAssemblyWizard: FC<{
           </div>
 
           <div className="wizard-actions">
-            <button onClick={() => setStep('select')}>Back</button>
-            <button onClick={handleGenerate} disabled={generating}>
+            <Button onClick={() => setStep('select')}>Back</Button>
+            <Button onClick={handleGenerate} disabled={generating}>
               {generating ? 'Generating...' : 'Generate Document'}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -241,8 +241,8 @@ export const DocumentAssemblyWizard: FC<{
             <p>Status: Draft</p>
           </div>
           <div className="wizard-actions">
-            <button>Edit</button>
-            <button>Save & Close</button>
+            <Button>Edit</Button>
+            <Button>Save & Close</Button>
           </div>
         </div>
       )}
@@ -295,8 +295,8 @@ export const CourtDeadlineCalendar: FC<{
       <div className="calendar-header">
         <h2>Court Deadlines</h2>
         <div className="view-toggle">
-          <button className={view === 'list' ? 'active' : ''}>List</button>
-          <button className={view === 'calendar' ? 'active' : ''}>Calendar</button>
+          <Button className={view === 'list' ? 'active' : ''}>List</Button>
+          <Button className={view === 'calendar' ? 'active' : ''}>Calendar</Button>
         </div>
       </div>
 
@@ -346,9 +346,9 @@ export const CourtDeadlineCalendar: FC<{
                   </td>
                   <td>
                     {deadline.status === 'pending' && (
-                      <button onClick={() => markComplete(deadline.id)}>
+                      <Button onClick={() => markComplete(deadline.id)}>
                         Mark Complete
-                      </button>
+                      </Button>
                     )}
                   </td>
                 </tr>
@@ -458,20 +458,20 @@ export const ConflictCheckForm: FC<{
                 placeholder={`Party ${index + 1} name`}
               />
               {formData.partiesChecked.length > 1 && (
-                <button type="button" onClick={() => removeParty(index)}>
+                <Button type="button" onClick={() => removeParty(index)}>
                   Remove
-                </button>
+                </Button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addParty} className="add-button">
+          <Button type="button" onClick={addParty} className="add-button">
             + Add Another Party
-          </button>
+          </Button>
         </div>
 
-        <button type="submit" disabled={checking} className="submit-button">
+        <Button type="submit" disabled={checking} className="submit-button">
           {checking ? 'Running Conflicts Check...' : 'Run Conflicts Check'}
-        </button>
+        </Button>
       </form>
 
       {result && (
@@ -575,9 +575,9 @@ export const TrustAccountLedger: FC<{
           </div>
         )}
 
-        <button onClick={runReconciliation} className="reconcile-button">
+        <Button onClick={runReconciliation} className="reconcile-button">
           Run Three-Way Reconciliation
-        </button>
+        </Button>
       </div>
 
       <div className="client-ledgers">
@@ -663,3 +663,4 @@ export const LEGAL_COMPONENTS = {
   MatterBudgetTracker,
   ExpertWitnessManager,
 };
+

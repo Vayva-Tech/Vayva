@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import {
   Plug,
@@ -130,9 +130,9 @@ export default function IntegrationsPage() {
                   </span>
                   <span className="text-xs text-gray-400">Synced {integration.lastSync}</span>
                 </div>
-                <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                <Button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                   <Settings className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -162,10 +162,10 @@ export default function IntegrationsPage() {
                 </div>
               </div>
               <p className="text-xs text-gray-500 mb-4 line-clamp-2">{integration.description}</p>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
+              <Button className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
                 <Plug className="w-4 h-4" />
                 Connect
-              </button>
+              </Button>
             </div>
           ))}
         </div>
@@ -173,3 +173,4 @@ export default function IntegrationsPage() {
     </div>
   );
 }
+

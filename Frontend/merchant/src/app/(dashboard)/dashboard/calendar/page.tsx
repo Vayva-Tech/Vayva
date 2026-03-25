@@ -1,7 +1,9 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { apiJson } from "@/lib/api-client-shared";
+import { toast } from "sonner";
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,33 +17,18 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Mock events with Nigerian context                                  */
-/* ------------------------------------------------------------------ */
-
-const EVENTS = [
-  { id: "1", title: "Chidinma Okafor - Box Braids", date: "2026-03-22", time: "09:00 AM", type: "Booking" },
-  { id: "2", title: "Order #4821 Pickup", date: "2026-03-22", time: "11:00 AM", type: "Order" },
-  { id: "3", title: "Aisha Bello - Bridal Makeup", date: "2026-03-22", time: "01:00 PM", type: "Booking" },
-  { id: "4", title: "Staff Meeting", date: "2026-03-23", time: "08:30 AM", type: "Meeting" },
-  { id: "5", title: "Tunde Bakare - Consultation", date: "2026-03-23", time: "10:00 AM", type: "Booking" },
-  { id: "6", title: "Fabric Delivery from Aba", date: "2026-03-24", time: "02:00 PM", type: "Delivery" },
-  { id: "7", title: "Adaeze Umeh - Lash Extensions", date: "2026-03-24", time: "09:00 AM", type: "Booking" },
-  { id: "8", title: "Order #4835 Dispatch", date: "2026-03-25", time: "10:30 AM", type: "Order" },
-  { id: "9", title: "Ngozi Eze - Silk Press", date: "2026-03-26", time: "11:00 AM", type: "Booking" },
-  { id: "10", title: "Monthly Review Meeting", date: "2026-03-27", time: "04:00 PM", type: "Meeting" },
-  { id: "11", title: "Funke Akindele - Cornrows", date: "2026-03-28", time: "09:30 AM", type: "Booking" },
-  { id: "12", title: "Inventory Restock Delivery", date: "2026-03-30", time: "01:00 PM", type: "Delivery" },
-  { id: "13", title: "Emeka Nwosu - Fade Cut", date: "2026-03-31", time: "10:00 AM", type: "Booking" },
-  { id: "14", title: "Order #4850 Shipped", date: "2026-03-18", time: "03:00 PM", type: "Order" },
-  { id: "15", title: "Kemi Adekunle - Gel Nails", date: "2026-03-15", time: "12:00 PM", type: "Booking" },
-  { id: "16", title: "Supplier Meeting - Lagos", date: "2026-03-10", time: "09:00 AM", type: "Meeting" },
-];
-
-/* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
 type EventType = "Order" | "Booking" | "Meeting" | "Delivery";
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  type: EventType;
+}
 
 const TYPE_CONFIG: Record<EventType, { bg: string; text: string; dot: string; icon: any }> = {
   Order: { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500", icon: ShoppingBag },
@@ -79,13 +66,52 @@ function getMondayOffset(year: number, month: number) {
 /* ------------------------------------------------------------------ */
 
 export default function CalendarPage() {
-  const today = new Date(2026, 2, 22); // March 22, 2026
+  const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [viewMode, setViewMode] = useState<"Month" | "Week" | "Day">("Month");
   const [selectedDate, setSelectedDate] = useState<string>(
-    dateKey(today.getFullYear(), today.getMonth(), today.getDate())
+    dateKey(today.getFullYear(), today.getMonth(), today.getDate()),
   );
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  const loadEvents = useCallback(async () => {
+    try {
+      const start = new Date();
+      start.setMonth(start.getMonth() - 1);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setMonth(end.getMonth() + 4);
+      const res = await apiJson<{
+        data?: Array<{
+          id: string;
+          customerName: string;
+          service: string;
+          date: string;
+          time: string;
+        }>;
+      }>(
+        `/api/bookings?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`,
+      );
+      const rows = res.data ?? [];
+      setEvents(
+        rows.map((b) => ({
+          id: b.id,
+          title: `${b.customerName} — ${b.service}`,
+          date: b.date,
+          time: b.time,
+          type: "Booking" as const,
+        })),
+      );
+    } catch {
+      toast.error("Could not load calendar bookings");
+      setEvents([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadEvents();
+  }, [loadEvents]);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const mondayOffset = getMondayOffset(currentYear, currentMonth);
@@ -93,33 +119,34 @@ export default function CalendarPage() {
 
   // Event lookup by date
   const eventsByDate = useMemo(() => {
-    const map: Record<string, typeof EVENTS> = {};
-    EVENTS.forEach((e) => {
+    const map: Record<string, CalendarEvent[]> = {};
+    events.forEach((e) => {
       if (!map[e.date]) map[e.date] = [];
       map[e.date].push(e);
     });
     return map;
-  }, []);
+  }, [events]);
 
   // Upcoming 5 events from today
   const upcomingEvents = useMemo(() => {
-    return EVENTS.filter((e) => e.date >= todayKey)
+    return events
+      .filter((e) => e.date >= todayKey)
       .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
       .slice(0, 5);
-  }, []);
+  }, [events, todayKey]);
 
   // Highlighted dates for mini calendar
   const highlightedDates = useMemo(() => {
     const set = new Set<number>();
-    EVENTS.forEach((e) => {
+    events.forEach((e) => {
       const parts = e.date.split("-");
-      const y = parseInt(parts[0]);
-      const m = parseInt(parts[1]) - 1;
-      const d = parseInt(parts[2]);
+      const y = parseInt(parts[0]!, 10);
+      const m = parseInt(parts[1]!, 10) - 1;
+      const d = parseInt(parts[2]!, 10);
       if (y === currentYear && m === currentMonth) set.add(d);
     });
     return set;
-  }, [currentYear, currentMonth]);
+  }, [events, currentYear, currentMonth]);
 
   // Calendar grid cells
   const calendarCells: (number | null)[] = [];
@@ -162,7 +189,7 @@ export default function CalendarPage() {
           {/* View toggle */}
           <div className="flex items-center bg-gray-100 rounded-xl p-1">
             {(["Month", "Week", "Day"] as const).map((v) => (
-              <button
+              <Button
                 key={v}
                 onClick={() => setViewMode(v)}
                 className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
@@ -172,26 +199,26 @@ export default function CalendarPage() {
                 }`}
               >
                 {v}
-              </button>
+              </Button>
             ))}
           </div>
 
           {/* Today button */}
-          <button
+          <Button
             onClick={goToToday}
             className="px-3.5 py-2 text-xs font-semibold text-green-600 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
           >
             Today
-          </button>
+          </Button>
 
           {/* Nav arrows */}
           <div className="flex items-center gap-1">
-            <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <Button onClick={prevMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
               <ChevronLeft size={18} className="text-gray-600" />
-            </button>
-            <button onClick={nextMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            </Button>
+            <Button onClick={nextMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
               <ChevronRight size={18} className="text-gray-600" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -230,7 +257,7 @@ export default function CalendarPage() {
               const dayEvents = eventsByDate[key] || [];
 
               return (
-                <button
+                <Button
                   key={key}
                   onClick={() => setSelectedDate(key)}
                   className={`min-h-[96px] p-2 border-b border-r border-gray-50 text-left transition-colors ${
@@ -283,7 +310,7 @@ export default function CalendarPage() {
                       <p className="text-[10px] text-gray-400 px-1.5">+{dayEvents.length - 2} more</p>
                     )}
                   </div>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -370,7 +397,7 @@ export default function CalendarPage() {
                 const isSelected = key === selectedDate;
 
                 return (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => setSelectedDate(key)}
                     className="relative flex items-center justify-center aspect-square"
@@ -389,19 +416,20 @@ export default function CalendarPage() {
                     {hasEvent && !isToday && (
                       <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-green-500" />
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
           </div>
 
           {/* Quick Add Event */}
-          <button className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-2xl shadow-sm transition-colors">
+          <Button className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-2xl shadow-sm transition-colors">
             <Plus size={16} />
             Quick Add Event
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
+

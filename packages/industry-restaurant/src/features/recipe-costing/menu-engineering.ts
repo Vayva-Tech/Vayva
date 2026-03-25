@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Menu Engineering Analysis
  * Classifies menu items into Stars, Puzzles, Plowhorses, and Dogs
@@ -32,6 +31,10 @@ export class MenuEngineeringService {
 
   constructor(config: MenuEngineeringConfig) {
     this.config = config;
+  }
+
+  async initialize(): Promise<void> {
+    // Hook for engine orchestration; analysis stays on-demand.
   }
 
   /**

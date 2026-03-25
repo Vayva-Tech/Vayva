@@ -99,16 +99,86 @@ export async function POST(req: NextRequest) {
       
       // Handle affiliate payout transfers
       if (reference.startsWith("AFF-PAYOUT-")) {
-        await prisma.paymentWebhookEvent.create({
-          data: {
-            provider: "paystack",
-            providerEventId: reference || transferCode || crypto.randomUUID(),
+        const payoutId = reference.replace(/^AFF-PAYOUT-/, "");
+        const providerEventId = reference || transferCode || crypto.randomUUID();
+
+        await prisma.$transaction(async (tx) => {
+          const payout = await tx.payout.findUnique({
+            where: { id: payoutId },
+            select: { id: true, storeId: true, amount: true, currency: true, status: true },
+          });
+
+          // Always persist the event (idempotency via providerEventId unique constraint).
+          await tx.paymentWebhookEvent.create({
+            data: {
+              provider: "paystack",
+              providerEventId,
+              eventType,
+              payload: payload as unknown as Prisma.InputJsonValue,
+              status: "PROCESSING",
+              storeId: payout?.storeId || null,
+            },
+          });
+
+          if (!payout) return;
+
+          const amountKobo = BigInt(Math.round(Number(payout.amount) * 100));
+
+          if (eventType === "transfer.success") {
+            if (payout.status !== "COMPLETED") {
+              await tx.payout.update({
+                where: { id: payout.id },
+                data: {
+                  status: "COMPLETED",
+                  provider: "paystack",
+                  providerPayoutId: transferCode || payout.providerPayoutId,
+                  arrivalDate: new Date(),
+                },
+              });
+
+              await tx.wallet.update({
+                where: { storeId: payout.storeId },
+                data: { pendingKobo: { decrement: amountKobo } },
+              });
+            }
+          } else if (eventType === "transfer.failed") {
+            if (payout.status !== "FAILED") {
+              await tx.payout.update({
+                where: { id: payout.id },
+                data: {
+                  status: "FAILED",
+                  provider: "paystack",
+                  providerPayoutId: transferCode || payout.providerPayoutId,
+                },
+              });
+
+              await tx.wallet.update({
+                where: { storeId: payout.storeId },
+                data: {
+                  pendingKobo: { decrement: amountKobo },
+                  availableKobo: { increment: amountKobo },
+                },
+              });
+            }
+          }
+
+          // Mark event processed.
+          await tx.paymentWebhookEvent.update({
+            where: {
+              provider_providerEventId: {
+                provider: "paystack",
+                providerEventId,
+              },
+            },
+            data: { status: "PROCESSED", processedAt: new Date() },
+          });
+        }).catch((err) => {
+          logger.error("[PAYSTACK_WEBHOOK][AFF_PAYOUT] Failed to process", err, {
+            reference,
             eventType,
-            payload: payload as unknown as Prisma.InputJsonValue,
-            status: "PROCESSED" as WebhookEventStatus,
-          },
+          });
         });
-        
+
         return NextResponse.json({ received: true }, { status: 200 });
       }
       
@@ -120,23 +190,89 @@ export async function POST(req: NextRequest) {
           
           switch (eventType) {
             case "transfer.success":
-              await prisma.withdrawal.update({
-                where: { id: withdrawalId },
-                data: {
-                  status: "COMPLETED",
-                  providerRef: transferCode,
-                },
+              await prisma.$transaction(async (tx) => {
+                const w = await tx.withdrawal.findUnique({
+                  where: { id: withdrawalId },
+                  select: { id: true, storeId: true, amountKobo: true, status: true },
+                });
+                if (!w) return;
+
+                // Idempotent settle: only settle if still processing.
+                if (String(w.status).toUpperCase() === "COMPLETED") return;
+
+                await tx.withdrawal.update({
+                  where: { id: withdrawalId },
+                  data: {
+                    status: "COMPLETED",
+                    providerRef: transferCode,
+                  },
+                });
+
+                // Release pending to settled (funds already deducted from available at request time).
+                await tx.wallet.update({
+                  where: { storeId: w.storeId },
+                  data: {
+                    pendingKobo: { decrement: w.amountKobo },
+                  },
+                });
+
+                await tx.ledgerEntry.create({
+                  data: {
+                    storeId: w.storeId,
+                    referenceType: "PAYOUT",
+                    referenceId: w.id,
+                    direction: "DEBIT",
+                    account: "WALLET_CASH",
+                    amount: Number(w.amountKobo) / 100,
+                    currency: "NGN",
+                    description: "Withdrawal completed",
+                    metadata: { provider: "paystack", transferCode, reference },
+                  },
+                });
               });
               logger.info(`[Paystack Webhook] Wallet withdrawal ${withdrawalId} completed`);
               break;
             
             case "transfer.failed":
-              await prisma.withdrawal.update({
-                where: { id: withdrawalId },
-                data: {
-                  status: "FAILED",
-                  providerRef: transferCode,
-                },
+              await prisma.$transaction(async (tx) => {
+                const w = await tx.withdrawal.findUnique({
+                  where: { id: withdrawalId },
+                  select: { id: true, storeId: true, amountKobo: true, status: true },
+                });
+                if (!w) return;
+
+                if (String(w.status).toUpperCase() === "FAILED") return;
+
+                await tx.withdrawal.update({
+                  where: { id: withdrawalId },
+                  data: {
+                    status: "FAILED",
+                    providerRef: transferCode,
+                  },
+                });
+
+                // Release funds back to available on failure.
+                await tx.wallet.update({
+                  where: { storeId: w.storeId },
+                  data: {
+                    pendingKobo: { decrement: w.amountKobo },
+                    availableKobo: { increment: w.amountKobo },
+                  },
+                });
+
+                await tx.ledgerEntry.create({
+                  data: {
+                    storeId: w.storeId,
+                    referenceType: "PAYOUT",
+                    referenceId: w.id,
+                    direction: "CREDIT",
+                    account: "WALLET_CASH",
+                    amount: Number(w.amountKobo) / 100,
+                    currency: "NGN",
+                    description: "Withdrawal failed - funds released",
+                    metadata: { provider: "paystack", transferCode, reference },
+                  },
+                });
               });
               break;
           }

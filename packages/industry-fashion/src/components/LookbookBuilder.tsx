@@ -1,8 +1,8 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState } from 'react';
-import { GlassPanel, Button } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
+import { Button } from '@vayva/ui';
 
 interface LookbookItem {
   productId: string;
@@ -127,7 +127,7 @@ export const LookbookBuilder: React.FC<LookbookBuilderProps> = ({
             <h3 className="text-lg font-semibold text-white mb-4">Products</h3>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
               {availableProducts.map((product) => (
-                <button
+                <Button
                   key={product.productId}
                   onClick={() => setSelectedProduct(product)}
                   className={`w-full p-3 rounded-lg border transition-all ${
@@ -145,7 +145,7 @@ export const LookbookBuilder: React.FC<LookbookBuilderProps> = ({
                   </div>
                   <div className="text-sm font-medium text-white truncate">{product.name}</div>
                   <div className="text-xs text-white/60">${product.price}</div>
-                </button>
+                </Button>
               ))}
             </div>
           </GlassPanel>
@@ -189,7 +189,7 @@ export const LookbookBuilder: React.FC<LookbookBuilderProps> = ({
                     <option value="grid">Grid</option>
                   </select>
                   <Button
-                    variant="danger"
+                    variant="destructive"
                     size="sm"
                     onClick={() => removePage(currentPage)}
                     disabled={pages.length <= 1}
@@ -240,14 +240,14 @@ export const LookbookBuilder: React.FC<LookbookBuilderProps> = ({
                         <div className="text-xs text-white/60">${item.price}</div>
                       </div>
                       {!isPreviewMode && (
-                        <button
+                        <Button
                           onClick={() => removeFromPage(index)}
                           className="absolute top-2 right-2 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ))}
@@ -273,7 +273,7 @@ export const LookbookBuilder: React.FC<LookbookBuilderProps> = ({
             <GlassPanel variant="elevated" className="p-4">
               <div className="flex gap-2 overflow-x-auto">
                 {pages.map((page, index) => (
-                  <button
+                  <Button
                     key={page.id}
                     onClick={() => setCurrentPage(index)}
                     className={`flex-shrink-0 w-24 h-32 rounded border transition-all ${
@@ -284,7 +284,7 @@ export const LookbookBuilder: React.FC<LookbookBuilderProps> = ({
                   >
                     <div className="text-xs text-white/60 p-2">{page.title}</div>
                     <div className="bg-white/10 mx-2 rounded aspect-[3/4]" />
-                  </button>
+                  </Button>
                 ))}
               </div>
             </GlassPanel>

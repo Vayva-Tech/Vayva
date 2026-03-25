@@ -1,11 +1,11 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * Financing Calculator Component
  * Interactive tool for calculating auto loan payments
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 interface FinancingCalculatorProps {
   vehiclePrice?: number;
@@ -29,13 +29,8 @@ export const FinancingCalculator: React.FC<FinancingCalculatorProps> = ({
   const [tradeInValue, setTradeInValue] = useState(0);
   const [interestRate, setInterestRate] = useState(5.9);
   const [loanTerm, setLoanTerm] = useState(60);
-  const [result, setResult] = useState<CalculationResult | null>(null);
 
-  useEffect(() => {
-    calculatePayment();
-  }, [price, downPayment, tradeInValue, interestRate, loanTerm]);
-
-  const calculatePayment = () => {
+  const result = useMemo((): CalculationResult => {
     const loanAmount = price - downPayment - tradeInValue;
     const monthlyRate = interestRate / 100 / 12;
     const numPayments = loanTerm;
@@ -48,17 +43,18 @@ export const FinancingCalculator: React.FC<FinancingCalculatorProps> = ({
     const totalPayment = monthlyPayment * numPayments;
     const totalInterest = totalPayment - loanAmount;
 
-    const calculationResult = {
+    return {
       monthlyPayment: isNaN(monthlyPayment) ? 0 : monthlyPayment,
       totalInterest: isNaN(totalInterest) ? 0 : totalInterest,
       totalPayment: isNaN(totalPayment) ? 0 : totalPayment,
       apr: interestRate,
       termMonths: loanTerm,
     };
+  }, [price, downPayment, tradeInValue, interestRate, loanTerm]);
 
-    setResult(calculationResult);
-    onCalculateComplete?.(calculationResult);
-  };
+  useEffect(() => {
+    onCalculateComplete?.(result);
+  }, [result, onCalculateComplete]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -160,21 +156,21 @@ export const FinancingCalculator: React.FC<FinancingCalculatorProps> = ({
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Monthly Payment:</span>
               <span className="text-2xl font-bold text-blue-600">
-                {result ? formatCurrency(result.monthlyPayment) : '$0.00'}
+                {formatCurrency(result.monthlyPayment)}
               </span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Total Interest:</span>
               <span className="font-semibold">
-                {result ? formatCurrency(result.totalInterest) : '$0.00'}
+                {formatCurrency(result.totalInterest)}
               </span>
             </div>
 
             <div className="flex justify-between items-center pt-3 border-t">
               <span className="text-gray-600">Total Payment:</span>
               <span className="text-xl font-bold">
-                {result ? formatCurrency(result.totalPayment) : '$0.00'}
+                {formatCurrency(result.totalPayment)}
               </span>
             </div>
           </div>
@@ -184,7 +180,7 @@ export const FinancingCalculator: React.FC<FinancingCalculatorProps> = ({
             <p className="text-sm font-medium text-gray-700 mb-2">Quick Terms:</p>
             <div className="flex flex-wrap gap-2">
               {[36, 48, 60, 72].map(term => (
-                <button
+                <Button
                   key={term}
                   onClick={() => setLoanTerm(term)}
                   className={`px-3 py-1 text-sm rounded-full transition-colors ${
@@ -194,7 +190,7 @@ export const FinancingCalculator: React.FC<FinancingCalculatorProps> = ({
                   }`}
                 >
                   {term} mo
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -209,3 +205,4 @@ export const FinancingCalculator: React.FC<FinancingCalculatorProps> = ({
     </div>
   );
 };
+

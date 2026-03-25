@@ -1,25 +1,33 @@
-// @ts-nocheck
 import { NextResponse, NextRequest } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+
+const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
 // GET /api/analytics/overview - Get dashboard analytics summary
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get("period") || "30d";
+    const range =
+      searchParams.get("range") ?? searchParams.get("period") ?? "7d";
 
     const result = await apiJson<{
-      success: boolean;
-      data?: { revenue?: number; orders?: number; customers?: number; conversionRate?: number };
+      totalSales?: number;
+      totalOrders?: number;
+      activeCustomers?: number;
+      aov?: number;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/analytics/overview?period=${period}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
-    });
-    
+    }>(
+      `${backendBase()}/api/analytics/overview?range=${encodeURIComponent(range)}`,
+      { headers: auth.headers },
+    );
+
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
@@ -28,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(
       { error: "Failed to fetch analytics overview" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

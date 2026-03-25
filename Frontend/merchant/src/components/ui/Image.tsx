@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import NextImage, { type ImageProps as NextImageProps } from 'next/image';
@@ -15,7 +14,7 @@ interface ImageProps extends Omit<NextImageProps, 'loading'> {
    * Loading strategy
    * @default 'lazy'
    */
-  loadingStrategy?: 'lazy' | 'eager' | 'auto';
+  loadingStrategy?: 'lazy' | 'eager';
   
   /**
    * Placeholder style
@@ -48,7 +47,9 @@ export function Image({
   ...props
 }: ImageProps) {
   // Convert loading strategy to Next.js loading prop
-  const loading = priority ? 'eager' : loadingStrategy;
+  const loading: 'lazy' | 'eager' | undefined = priority
+    ? 'eager'
+    : loadingStrategy;
 
   return (
     <div className={`relative overflow-hidden ${className}`} style={{ width, height }}>

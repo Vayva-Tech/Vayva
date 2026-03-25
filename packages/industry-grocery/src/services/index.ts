@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Industry Services
  * Service implementations for grocery-specific features

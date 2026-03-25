@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Recipe Costing types
  * Menu engineering and cost analysis

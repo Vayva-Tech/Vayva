@@ -1,7 +1,5 @@
-// @ts-nocheck
-import { urls } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -14,7 +12,10 @@ interface StoreSettings {
 export async function GET(request: NextRequest) {
   try {
     // Call backend API to fetch account overview
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const result = await apiJson<{
       store: {
         name: string;
@@ -31,9 +32,7 @@ export async function GET(request: NextRequest) {
       recentLogs?: Array<{ id: string; action: string; createdAt: Date }>;
       kyc?: { id: string; status: string };
     }>(`${process.env.BACKEND_API_URL}/api/account/overview`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+      headers: auth.headers,
     });
     
     return NextResponse.json(result);

@@ -1,26 +1,28 @@
-// @ts-nocheck
 /**
- * Kitchen Industry Types
- * 
- * Type definitions for KDS and kitchen operations
+ * Kitchen / KDS types — map to @vayva/industry-restaurant KDS types.
  */
 
-// Re-export from industry-kitchen package
 export type {
-  Ticket,
-  Order,
-  OrderItem,
-  KitchenStation,
-  EightySixItem,
-  Recipe,
-  WasteLog,
-  ShiftHandover,
-} from '@vayva/industry-restaurant/types';
+  KDSOrder,
+  KDSItem,
+  KDSStation,
+  RecipeCost,
+} from "@vayva/industry-restaurant/types";
 
-// Export enums
+export type { EightySixItem } from "@vayva/industry-restaurant/types";
+
+export type { KDSOrder as Ticket } from "@vayva/industry-restaurant/types";
+export type { KDSOrder as Order } from "@vayva/industry-restaurant/types";
+export type { KDSItem as OrderItem } from "@vayva/industry-restaurant/types";
+export type { KDSStation as KitchenStation } from "@vayva/industry-restaurant/types";
+export type { RecipeCost as Recipe } from "@vayva/industry-restaurant/types";
+
+export type WasteLog = Record<string, unknown>;
+export type ShiftHandover = Record<string, unknown>;
+
 export {
   ORDER_STATUS,
   TABLE_STATUS,
   TICKET_STATUS,
   SERVICE_PERIOD,
-} from '@vayva/industry-restaurant/types';
+} from "@vayva/industry-restaurant/types/kitchen-types";

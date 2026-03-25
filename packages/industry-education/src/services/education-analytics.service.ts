@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Education Analytics Service
  * 
@@ -72,7 +71,7 @@ export async function getEducationDashboardData(
     completionRate: {
       value: overview.averageCompletionRate,
       change: calculateCompletionRateChange(prisma, storeId, range),
-      trend: 'stable',
+      trend: 'neutral',
     },
     satisfaction: {
       value: overview.averageSatisfaction,
@@ -86,8 +85,7 @@ export async function getEducationDashboardData(
 
   // Transform student data
   const students = studentProgress.studentProgress
-    .flatMap((sp) => sp.courses)
-    .map((courseProgress, index) => ({
+    .map((sp) => ({
       id: sp.studentId,
       name: sp.studentName,
       email: '',
@@ -95,7 +93,10 @@ export async function getEducationDashboardData(
       completedCourses: sp.courses.filter((c) => c.status === 'completed').length,
       inProgressCourses: sp.courses.filter((c) => c.status === 'active').length,
       overallProgress: sp.overallProgress,
-      totalLearningTime: sp.courses.reduce((sum, c) => sum + (c.timeSpent || 0), 0),
+      totalLearningTime: sp.courses.reduce(
+        (sum, c) => sum + (c.timeSpent || 0),
+        0
+      ),
       lastActiveAt: sp.courses[0]?.lastActivity || new Date(),
       enrolledAt: new Date(),
       certificatesEarned: 0,
@@ -211,8 +212,9 @@ async function getRecentCertificates(
   storeId: string,
   limit: number
 ): Promise<any[]> {
+  const p = prisma as any;
   try {
-    const certificates = await prisma.certificate.findMany({
+    const certificates = await p.certificate.findMany({
       where: { storeId },
       include: {
         student: {
@@ -256,8 +258,9 @@ async function countCertificatesIssued(
   prisma: PrismaClient,
   storeId: string
 ): Promise<number> {
+  const p = prisma as any;
   try {
-    return await prisma.certificate.count({
+    return await p.certificate.count({
       where: { storeId },
     });
   } catch (error) {
@@ -267,11 +270,16 @@ async function countCertificatesIssued(
 }
 
 function calculateTotalEnrollments(courseStats: any): number {
-  return Object.values(courseStats.byStatus).reduce((sum: any) => sum + 0, 0);
+  return Object.values(courseStats.byStatus as Record<string, number>).reduce(
+    (a, b) => a + b,
+    0
+  );
 }
 
 function calculateTotalRevenue(courseStats: any): number {
-  return Object.values(courseStats.revenueByCategory).reduce((sum: any) => sum + 0, 0);
+  return Object.values(
+    courseStats.revenueByCategory as Record<string, number>
+  ).reduce((a, b) => a + b, 0);
 }
 
 function calculateAverageCompletionRate(courseStats: any, studentProgress: any): number {
@@ -287,22 +295,42 @@ function calculateEngagementScore(studentProgress: any): number {
 }
 
 // Placeholder functions for trend calculations
-function calculateRevenueChange(): number {
+function calculateRevenueChange(
+  _prisma: PrismaClient,
+  _storeId: string,
+  _range: 'today' | 'week' | 'month' | 'quarter' | 'year'
+): number {
   return 18.4;
 }
 
-function calculateEnrollmentChange(): number {
+function calculateEnrollmentChange(
+  _prisma: PrismaClient,
+  _storeId: string,
+  _range: 'today' | 'week' | 'month' | 'quarter' | 'year'
+): number {
   return 34.2;
 }
 
-function calculateStudentGrowth(): number {
+function calculateStudentGrowth(
+  _prisma: PrismaClient,
+  _storeId: string,
+  _range: 'today' | 'week' | 'month' | 'quarter' | 'year'
+): number {
   return 22.5;
 }
 
-function calculateCompletionRateChange(): number {
+function calculateCompletionRateChange(
+  _prisma: PrismaClient,
+  _storeId: string,
+  _range: 'today' | 'week' | 'month' | 'quarter' | 'year'
+): number {
   return 12.3;
 }
 
-function calculateSatisfactionChange(): number {
+function calculateSatisfactionChange(
+  _prisma: PrismaClient,
+  _storeId: string,
+  _range: 'today' | 'week' | 'month' | 'quarter' | 'year'
+): number {
   return 8.2;
 }

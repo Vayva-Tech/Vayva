@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -11,6 +12,10 @@ type PaymentType = "order" | "subscription" | "template_purchase" | "unknown";
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const { reference } = z.object({
       reference: z.string().min(1, "Reference is required"),
@@ -32,9 +37,7 @@ export async function POST(request: NextRequest) {
       `${process.env.BACKEND_API_URL}/api/payments/verify`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { ...auth.headers },
         body: JSON.stringify({ reference }),
       }
     );

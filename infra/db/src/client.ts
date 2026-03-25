@@ -219,6 +219,7 @@ export type {
   MarketplaceListing,
   MediaAsset,
   Membership,
+  MerchantWorkflow,
   MerchantAiProfile,
   MerchantAiSubscription,
   MerchantCostDaily,

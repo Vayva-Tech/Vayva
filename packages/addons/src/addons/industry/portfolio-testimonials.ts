@@ -4,7 +4,7 @@
  * Client testimonials and reviews showcase
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PORTFOLIO_TESTIMONIALS_ADDON: AddOnDefinition = {
   id: 'vayva.portfolio-testimonials',

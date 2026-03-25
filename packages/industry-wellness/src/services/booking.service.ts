@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type {
   WellnessService,
   Practitioner,
@@ -62,7 +61,9 @@ export class WellnessBookingService {
 
     // Filter by preferred practitioners if specified
     const filteredPractitioners = params.preferredPractitioners
-      ? practitioners.filter(p => params.preferredPractitioners!.includes(p.id))
+      ? practitioners.filter((p: Practitioner) =>
+          params.preferredPractitioners!.includes(p.id),
+        )
       : practitioners;
 
     const slots: AvailableSlot[] = [];
@@ -74,7 +75,7 @@ export class WellnessBookingService {
         const timeSlot = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
 
         // Check practitioner availability
-        const availablePractitioners = filteredPractitioners.filter(practitioner => {
+        const availablePractitioners = filteredPractitioners.filter((practitioner: Practitioner) => {
           const dayOfWeek = params.date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
           const availability = practitioner.availability[dayOfWeek as keyof typeof practitioner.availability];
 
@@ -122,8 +123,8 @@ export class WellnessBookingService {
     if (!service) throw new Error('Service not found');
 
     // Check for contraindications
-    const contraindications = service.contraindications.filter(condition =>
-      client.healthConditions.includes(condition)
+    const contraindications = service.contraindications.filter((condition: string) =>
+      client.healthConditions.includes(condition),
     );
 
     if (contraindications.length > 0) {
@@ -148,7 +149,9 @@ export class WellnessBookingService {
 
     // Assign practitioner (prefer requested, otherwise first available)
     const assignedPractitioner = data.preferredPractitionerId
-      ? matchingSlot.availablePractitioners.find(p => p.id === data.preferredPractitionerId)
+      ? matchingSlot.availablePractitioners.find(
+          (p: Practitioner) => p.id === data.preferredPractitionerId,
+        )
       : matchingSlot.availablePractitioners[0];
 
     if (!assignedPractitioner) {
@@ -202,8 +205,8 @@ export class WellnessBookingService {
     const recommendations: string[] = [];
 
     // Check contraindications
-    const contraindications = service.contraindications.filter(condition =>
-      client.healthConditions.includes(condition)
+    const contraindications = service.contraindications.filter((condition: string) =>
+      client.healthConditions.includes(condition),
     );
 
     if (contraindications.length > 0) {
@@ -216,8 +219,8 @@ export class WellnessBookingService {
 
     // Check prerequisites
     if (service.prerequisites.length > 0) {
-      const missingPrerequisites = service.prerequisites.filter(prereq =>
-        !this.hasCompletedPrerequisite(clientId, prereq)
+      const missingPrerequisites = service.prerequisites.filter(
+        (prereq: string) => !this.hasCompletedPrerequisite(clientId, prereq),
       );
 
       if (missingPrerequisites.length > 0) {

@@ -10,7 +10,7 @@ class NightlifeEngine {
   }
   
   async initialize() {
-    console.log('[NIGHTLIFE_ENGINE] Initialized');
+    console.warn('[NIGHTLIFE_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

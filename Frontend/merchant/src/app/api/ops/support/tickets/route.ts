@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { logger } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { apiJson } from "@/lib/api-client-shared";
@@ -11,7 +10,7 @@ function verifyInternalAuth(req: NextRequest): boolean {
     logger.error("[INTERNAL_AUTH] INTERNAL_API_SECRET not configured");
     return false;
   }
-  const secret = req.headers?.get("x-internal-secret");
+  const secret = req.headers.get("x-internal-secret");
   return secret === INTERNAL_SECRET;
 }
 
@@ -20,45 +19,45 @@ export const dynamic = "force-dynamic";
 // GET /api/ops/support/tickets - List all support tickets with filters
 export async function GET(req: NextRequest) {
   try {
-    // Verify internal auth from ops-console
     if (!verifyInternalAuth(req)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
+
+    const page = Number.parseInt(searchParams.get("page") || "1", 10);
+    const limit = Number.parseInt(searchParams.get("limit") || "50", 10);
     const status = searchParams.getAll("status");
     const priority = searchParams.getAll("priority");
     const channel = searchParams.getAll("channel");
     const assigneeId = searchParams.get("assigneeId");
-    
-    // Build query params for API call
+
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
     });
-    
-    status.forEach(s => queryParams.append('status', s));
-    priority.forEach(p => queryParams.append('priority', p));
-    channel.forEach(c => queryParams.append('channel', c));
-    if (assigneeId) queryParams.append('assigneeId', assigneeId);
 
-    // Fetch tickets via backend API
+    status.forEach((s) => queryParams.append("status", s));
+    priority.forEach((p) => queryParams.append("priority", p));
+    channel.forEach((c) => queryParams.append("channel", c));
+    if (assigneeId) queryParams.append("assigneeId", assigneeId);
+
     const result = await apiJson<{
       success: boolean;
-      data?: any[];
+      data?: unknown[];
       pagination?: { total?: number; hasMore?: boolean };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/ops/support/tickets?${queryParams.toString()}`, {
-      headers: {
-        'x-internal-secret': INTERNAL_SECRET || '',
+    }>(
+      `${process.env.BACKEND_API_URL}/api/ops/support/tickets?${queryParams.toString()}`,
+      {
+        headers: {
+          "x-internal-secret": INTERNAL_SECRET || "",
+        },
       },
-    });
+    );
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch support tickets');
+      throw new Error(result.error || "Failed to fetch support tickets");
     }
 
     return NextResponse.json({
@@ -66,80 +65,59 @@ export async function GET(req: NextRequest) {
       pagination: result.pagination,
     });
   } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/ops/support/tickets',
-        operation: 'GET_SUPPORT_TICKETS',
-      }
-    );
-    logger.error("[OPS_TICKETS] Failed to fetch support tickets", { error: error instanceof Error ? error.message : String(error) });
+    handleApiError(error, {
+      endpoint: "/api/ops/support/tickets",
+      operation: "GET_SUPPORT_TICKETS",
+    });
+    logger.error("[OPS_TICKETS] Failed to fetch support tickets", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// POST /api/ops/support/tickets - Create internal ticket
+// POST /api/ops/support/tickets - Create ticket (proxied to core-api)
 export async function POST(req: NextRequest) {
   try {
     if (!verifyInternalAuth(req)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { storeId, subject, description, priority = "MEDIUM", category = "GENERAL", createdBy } = body;
+    const body: unknown = await req.json();
 
-    if (!storeId || !subject) {
+    const result = await apiJson<{
+      success: boolean;
+      data?: unknown;
+      ticket?: unknown;
+      error?: string;
+    }>(`${process.env.BACKEND_API_URL}/api/ops/support/tickets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-internal-secret": INTERNAL_SECRET || "",
+      },
+      body: JSON.stringify(body ?? {}),
+    });
+
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Missing required fields: storeId, subject" },
-        { status: 400 }
+        { error: result.error || "Failed to create ticket" },
+        { status: 400 },
       );
     }
 
-    const ticket = await prisma.supportTicket?.create({
-      data: {
-        storeId,
-        subject,
-        description,
-        priority,
-        category,
-        status: "open" as any,
-      },
-      include: {
-        store: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-      },
-    });
-
-    // Log to audit
-    await prisma.auditLog?.create({
-      data: {
-        app: "merchant",
-        action: "OPS_TICKET_CREATED",
-        actorUserId: createdBy || "system",
-        actorEmail: createdBy || "ops@vayva.ng",
-        targetType: "support_ticket" as any,
-        targetId: ticket.id,
-        targetStoreId: storeId,
-        severity: "INFO",
-        requestId: `ops-ticket-create-${ticket.id}`,
-        metadata: { subject, priority, category },
-      },
-    });
-
+    const ticket = result.ticket ?? result.data;
     return NextResponse.json({ ticket }, { status: 201 });
   } catch (error) {
-    logger.error("[OPS_TICKETS_CREATE] Failed to create ticket", { error: error instanceof Error ? error.message : String(error) });
+    logger.error("[OPS_TICKETS_CREATE] Failed to create ticket", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

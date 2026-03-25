@@ -262,7 +262,7 @@ export class SubscriptionBoxService {
   async curateProducts(
     boxId: string,
     preferences: Record<string, string[]>,
-    cycle: number
+    _cycle: number
   ): Promise<string[]> {
     const box = await prisma.subscriptionBox.findUnique({ where: { id: boxId } });
     if (!box) throw new Error("Box not found");
@@ -293,10 +293,9 @@ export class SubscriptionBoxService {
       case "hybrid": {
         // Mix of curated and customer choice
         const curatedCount = Math.floor(contents.length * 0.7);
-        const choiceCount = contents.length - curatedCount;
-        
         selected.push(...contents.slice(0, curatedCount).map((c) => c.productId!));
         break;
+      }
     }
 
     // Add surprise items if configured
@@ -756,21 +755,21 @@ export class SubscriptionBoxService {
   private async processPayment(
     subscriptionId: string,
     amount: number,
-    paymentMethod: Subscription["paymentMethod"]
+    _paymentMethod: Subscription["paymentMethod"]
   ): Promise<{ success: boolean; error?: string; transactionId?: string }> {
     // Integrate with payment provider
-    console.log(`[Subscription] Processing payment for ${subscriptionId}: ₦${amount / 100}`);
+    console.warn(`[Subscription] Processing payment for ${subscriptionId}: ₦${amount / 100}`);
     return { success: true, transactionId: `txn_${Date.now()}` };
   }
 
   private async createFulfillmentOrder(subscription: Record<string, unknown>): Promise<void> {
     // Create order for warehouse fulfillment
-    console.log(`[Subscription] Creating fulfillment order for ${subscription.id}`);
+    console.warn(`[Subscription] Creating fulfillment order for ${subscription.id}`);
   }
 
   private async handlePaymentFailure(subscriptionId: string, error?: string): Promise<void> {
     // Retry logic, notification, etc
-    console.log(`[Subscription] Payment failed for ${subscriptionId}: ${error}`);
+    console.warn(`[Subscription] Payment failed for ${subscriptionId}: ${error}`);
   }
 
   private async updateBoxStats(boxId: string): Promise<void> {

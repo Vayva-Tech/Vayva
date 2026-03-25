@@ -3,6 +3,7 @@
  * Calculates merchant health scores based on engagement, usage, business metrics, support, and billing
  */
 
+import { AppRole, Prisma } from '@vayva/db';
 import { prisma } from '../lib/prisma';
 import {
   HealthScoreResult,
@@ -27,7 +28,7 @@ export class HealthScoreCalculator {
     // Get previous score for trend calculation
     const previousScoreRecord = await prisma.healthScore.findFirst({
       where: { storeId },
-      orderBy: { calculatedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     // Gather all metrics
@@ -95,8 +96,12 @@ export class HealthScoreCalculator {
     const store = await prisma.store.findUnique({
       where: { id: storeId },
       include: {
-        owner: true,
         subscription: true,
+        memberships: {
+          where: { role_enum: AppRole.OWNER, status: 'ACTIVE' },
+          take: 1,
+          include: { user: true },
+        },
       },
     });
 
@@ -176,18 +181,18 @@ export class HealthScoreCalculator {
     const openTickets = await prisma.supportTicket.count({
       where: {
         storeId,
-        status: { in: ['OPEN', 'IN_PROGRESS'] },
+        status: { in: ['open', 'in_progress'] },
       },
     });
 
-    const resolvedTickets = supportTickets30d.filter(t => t.resolvedAt);
+    const resolvedTickets = supportTickets30d.filter(
+      t => t.status === 'resolved' || t.status === 'closed'
+    );
     const avgResolutionTime = resolvedTickets.length > 0
-      ? resolvedTickets.reduce((sum, t) => {
-          if (t.resolvedAt && t.createdAt) {
-            return sum + differenceInHours(t.resolvedAt, t.createdAt);
-          }
-          return sum;
-        }, 0) / resolvedTickets.length
+      ? resolvedTickets.reduce(
+          (sum, t) => sum + differenceInHours(t.updatedAt, t.createdAt),
+          0
+        ) / resolvedTickets.length
       : 0;
 
     // Calculate feature adoption
@@ -209,7 +214,9 @@ export class HealthScoreCalculator {
       supportTickets30d: supportTickets30d.length,
       avgResolutionTime,
       openTickets,
-      subscriptionStatus: this.mapSubscriptionStatus(store.subscription?.status),
+      subscriptionStatus: this.mapSubscriptionStatus(
+        store.subscription?.status != null ? String(store.subscription.status) : undefined
+      ),
       daysToRenewal: store.subscription?.currentPeriodEnd
         ? differenceInDays(new Date(store.subscription.currentPeriodEnd), now)
         : 0,
@@ -540,15 +547,13 @@ export class HealthScoreCalculator {
     const orderCount = await prisma.order.count({ where: { storeId } });
     if (orderCount > 0) features.push('order_management');
 
-    // Check payments (via orders with payments)
-    const paymentCount = await prisma.payment.count({
-      where: { order: { storeId } },
+    const paymentCount = await prisma.paymentTransaction.count({
+      where: { storeId },
     });
     if (paymentCount > 0) features.push('payment_processing');
 
-    // Check delivery
-    const deliveryCount = await prisma.delivery.count({
-      where: { order: { storeId } },
+    const deliveryCount = await prisma.shipment.count({
+      where: { storeId },
     });
     if (deliveryCount > 0) features.push('delivery_integration');
 
@@ -558,11 +563,10 @@ export class HealthScoreCalculator {
     });
     if (analyticsCount) features.push('analytics_dashboard');
 
-    // Check autopilot
-    const autopilotRules = await prisma.autopilotRule.count({
+    const autopilotRuns = await prisma.autopilotRun.count({
       where: { storeId },
     });
-    if (autopilotRules > 0) features.push('autopilot_rules');
+    if (autopilotRuns > 0) features.push('autopilot_rules');
 
     // Check customer segmentation
     const segments = await prisma.customerSegment.count({
@@ -570,9 +574,8 @@ export class HealthScoreCalculator {
     });
     if (segments > 0) features.push('customer_segmentation');
 
-    // Check inventory
     const inventory = await prisma.inventoryItem.count({
-      where: { storeId },
+      where: { inventoryLocation: { storeId } },
     });
     if (inventory > 0) features.push('inventory_management');
 
@@ -582,9 +585,8 @@ export class HealthScoreCalculator {
     });
     if (subscription) features.push('subscription_billing');
 
-    // Check webhooks
-    const webhooks = await prisma.webhook.count({
-      where: { storeId },
+    const webhooks = await prisma.webhookSubscription.count({
+      where: { merchantId: storeId },
     });
     if (webhooks > 0) features.push('webhook_integration');
 
@@ -616,7 +618,7 @@ export class HealthScoreCalculator {
           factors: result.factors,
           metrics,
           trend: result.trend,
-        },
+        } as unknown as Prisma.InputJsonValue,
       },
     });
   }

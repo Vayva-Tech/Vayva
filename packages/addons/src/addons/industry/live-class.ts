@@ -4,7 +4,7 @@
  * Live streaming classes with interactive features
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const LIVE_CLASS_ADDON: AddOnDefinition = {
   id: 'vayva.live-class',

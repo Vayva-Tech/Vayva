@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createAuthenticatedMerchantContext } from "../helpers/auth";
 import { TeamService } from "../../apps/merchant/src/lib/team/teamService";
-import { can, ROLES, PERMISSIONS, } from "../../apps/merchant/src/lib/team/permissions";
+import { can, ROLES, PERMISSIONS } from "../../apps/merchant/src/lib/team/permissions";
 import { prisma } from "@vayva/db";
 test.describe("Team RBAC v2", () => {
     test("Permission Matrix", () => {

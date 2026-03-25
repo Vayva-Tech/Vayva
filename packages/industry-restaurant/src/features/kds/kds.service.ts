@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Kitchen Display System (KDS) Service
  * Manages real-time order queue for kitchen operations

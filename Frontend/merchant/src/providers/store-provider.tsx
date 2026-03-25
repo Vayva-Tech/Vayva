@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
@@ -13,30 +12,47 @@ interface StoreContextType {
 
 export const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
+function parseStoredStore(raw: string): Store | null {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      parsed !== null &&
+      typeof parsed === 'object' &&
+      'id' in parsed &&
+      typeof (parsed as { id: unknown }).id === 'string'
+    ) {
+      return parsed as Store;
+    }
+  } catch {
+    /* ignore corrupt localStorage */
+  }
+  return null;
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [store, setStore] = useState<Store | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load store data from localStorage or API
     const loadStore = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
-        // Try to get store from localStorage first
+
         const savedStore = localStorage.getItem('currentStore');
         if (savedStore) {
-          setStore(JSON.parse(savedStore));
+          const parsed = parseStoredStore(savedStore);
+          if (parsed) {
+            setStore(parsed);
+          }
           setIsLoading(false);
           return;
         }
 
-        // Fallback to API call
         const response = await fetch('/api/current-store');
         if (response.ok) {
-          const storeData = await response.json();
+          const storeData = (await response.json()) as Store;
           setStore(storeData);
           localStorage.setItem('currentStore', JSON.stringify(storeData));
         } else {
@@ -50,7 +66,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    loadStore();
+    void loadStore();
   }, []);
 
   const value = {
@@ -81,23 +97,3 @@ export function useStore() {
   }
   return context;
 }
-
-// Mock store data for development
-export const MOCK_STORE: Store = {
-  id: 'mock-store-1',
-  name: 'Demo Store',
-  slug: 'demo-store',
-  ownerId: 'user-1',
-  plan: 'PRO',
-  stripeCustomerId: null,
-  stripeSubscriptionId: null,
-  settings: {},
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  deletedAt: null,
-  theme: 'default',
-  currency: 'NGN',
-  timezone: 'Africa/Lagos',
-  locale: 'en',
-  status: 'ACTIVE'
-};

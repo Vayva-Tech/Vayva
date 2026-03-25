@@ -11,7 +11,7 @@ import {
   ShoppingCart,
   User,
   Globe,
-  Camera,
+  Camera
 } from "@phosphor-icons/react/ssr";
 
 interface MarketShellProps {

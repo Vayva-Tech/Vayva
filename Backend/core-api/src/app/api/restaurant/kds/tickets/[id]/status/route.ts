@@ -45,9 +45,8 @@ export const PUT = withVayvaAPI(
         );
       }
       
-      // Update ticket status
-      const updatedTicket = await db.kitchenTicket.update({
-        where: { id },
+      const statusWrite = await db.kitchenTicket.updateMany({
+        where: { id, storeId },
         data: {
           status: validatedData.status,
           notes: validatedData.notes,
@@ -55,6 +54,22 @@ export const PUT = withVayvaAPI(
           updatedAt: new Date(),
           updatedBy: user.id,
         },
+      });
+      if (statusWrite.count === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "TICKET_NOT_FOUND",
+              message: "Kitchen ticket not found",
+            },
+          },
+          { status: 404 },
+        );
+      }
+
+      const updatedTicket = await db.kitchenTicket.findUnique({
+        where: { id, storeId },
         include: {
           order: {
             select: {
@@ -67,6 +82,18 @@ export const PUT = withVayvaAPI(
           },
         },
       });
+      if (!updatedTicket) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "TICKET_NOT_FOUND",
+              message: "Kitchen ticket not found",
+            },
+          },
+          { status: 404 },
+        );
+      }
       
       // If ticket is completed, check if all tickets for this order are completed
       if (validatedData.status === "COMPLETED") {
@@ -83,8 +110,8 @@ export const PUT = withVayvaAPI(
         const allCompleted = orderTickets.every(t => t.status === "COMPLETED" || t.status === "CANCELLED");
         
         if (allCompleted) {
-          await db.order.update({
-            where: { id: ticket.orderId },
+          await db.order.updateMany({
+            where: { id: ticket.orderId, storeId },
             data: {
               status: "PREPARED",
               updatedAt: new Date(),

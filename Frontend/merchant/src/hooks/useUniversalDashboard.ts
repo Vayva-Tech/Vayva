@@ -1,14 +1,13 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
+import type { IndustrySlug } from '@/lib/templates/types';
 import type { 
-  IndustrySlug, 
   DashboardVariant, 
   IndustryDashboardData, 
   DashboardError,
-  DashboardDataContext,
-  DashboardDataResponse
+  DashboardDataResponse,
+  AlertSeverity,
 } from '@/config/dashboard-universal-types';
 import { generateDashboardConfig } from '@/config/industry-dashboard-config';
 import { useToast } from '@/hooks/use-toast';
@@ -55,15 +54,6 @@ export function useUniversalDashboard({
   const [error, setError] = React.useState<DashboardError | null>(null);
   const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
   const { toast } = useToast();
-
-  const context: DashboardDataContext = {
-    industry,
-    variant,
-    userId,
-    businessId,
-    timeHorizon: timeHorizon as any,
-    currency
-  };
 
   // Generate initial config
   React.useEffect(() => {
@@ -124,7 +114,7 @@ export function useUniversalDashboard({
       setData(result.data);
       setLastUpdated(new Date(result.lastUpdated));
       
-    } catch (err) {
+    } catch (err: unknown) {
       const dashboardError: DashboardError = {
         code: 'FETCH_ERROR',
         message: err instanceof Error ? err.message : 'Failed to fetch dashboard data',
@@ -181,16 +171,24 @@ export function useUniversalDashboard({
       
       ws.onmessage = (event) => {
         try {
-          const update = JSON.parse(event.data);
-          if (update.type === 'dashboard_update') {
-            // Update specific parts of the dashboard data
-            setData(prevData => {
+          const update: unknown = JSON.parse(String(event.data));
+          if (
+            typeof update === 'object' &&
+            update !== null &&
+            'type' in update &&
+            (update as { type: unknown }).type === 'dashboard_update' &&
+            'data' in update &&
+            typeof (update as { data: unknown }).data === 'object' &&
+            (update as { data: unknown }).data !== null
+          ) {
+            const patch = (update as { data: Record<string, unknown> }).data;
+            setData((prevData) => {
               if (!prevData) return null;
-              
+
               return {
                 ...prevData,
-                ...update.data
-              };
+                ...patch,
+              } as IndustryDashboardData;
             });
             setLastUpdated(new Date());
           }
@@ -234,10 +232,15 @@ export function useDashboardMetrics(
   return React.useMemo(() => {
     if (!dashboardData?.metrics) return [];
     
-    return metricKeys.map(key => ({
-      key,
-      ...dashboardData.metrics[key]
-    })).filter(metric => metric.value !== undefined);
+    return metricKeys
+      .map((key) => {
+        const m = dashboardData.metrics[key];
+        return m ? { key, ...m } : null;
+      })
+      .filter(
+        (metric): metric is { key: string; value: number | string } & Record<string, unknown> =>
+          metric !== null && metric.value !== undefined,
+      );
   }, [dashboardData, metricKeys]);
 }
 
@@ -260,8 +263,11 @@ export function useDashboardAlerts(
     }
     
     return filtered.sort((a, b) => {
-      // Sort by severity (critical > warning > info) then by timestamp
-      const severityOrder = { critical: 3, warning: 2, info: 1 };
+      const severityOrder: Record<AlertSeverity, number> = {
+        critical: 3,
+        warning: 2,
+        info: 1,
+      };
       const severityDiff = severityOrder[b.severity] - severityOrder[a.severity];
       
       if (severityDiff !== 0) return severityDiff;
@@ -290,8 +296,10 @@ export function useDashboardActions(
     }
     
     return filtered.sort((a, b) => {
-      // Sort by priority (critical > high > medium > low) then by condition
-      const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+      const priorityOrder: Record<
+        'critical' | 'high' | 'medium' | 'low',
+        number
+      > = { critical: 4, high: 3, medium: 2, low: 1 };
       const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
       
       if (priorityDiff !== 0) return priorityDiff;
@@ -310,12 +318,26 @@ export function useDashboardTimeSeries(
   timeField: string = 'date'
 ) {
   return React.useMemo(() => {
-    if (!dashboardData?.charts?.[chartKey]) return [];
-    
-    return dashboardData.charts[chartKey].map(item => ({
-      ...item,
-      [timeField]: new Date(item[timeField])
-    })).sort((a, b) => a[timeField].getTime() - b[timeField].getTime());
+    const series = dashboardData?.charts?.[chartKey];
+    if (!series?.length) return [];
+
+    return series
+      .map((item: Record<string, unknown>) => {
+        const raw = item[timeField];
+        const t =
+          raw instanceof Date
+            ? raw
+            : typeof raw === 'string' || typeof raw === 'number'
+              ? new Date(raw)
+              : new Date(NaN);
+        return { ...item, [timeField]: t } as Record<string, unknown> & {
+          [k: string]: Date;
+        };
+      })
+      .sort(
+        (a, b) =>
+          (a[timeField] as Date).getTime() - (b[timeField] as Date).getTime()
+      );
   }, [dashboardData, chartKey, timeField]);
 }
 
@@ -324,9 +346,9 @@ export function useDashboardTimeSeries(
 // ---------------------------------------------------------------------------
 
 class DashboardCache {
-  private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
+  private cache: Map<string, { data: unknown; timestamp: number; ttl: number }> = new Map();
   
-  set(key: string, data: any, ttl: number = 300000) { // 5 minutes default
+  set(key: string, data: unknown, ttl: number = 300000) { // 5 minutes default
     this.cache.set(key, {
       data,
       timestamp: Date.now(),

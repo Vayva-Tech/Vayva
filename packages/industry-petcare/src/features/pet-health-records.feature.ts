@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Pet Health Records Feature
  */

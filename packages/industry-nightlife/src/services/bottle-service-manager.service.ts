@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Bottle Service Manager Service
  * Manages premium bottle service orders and inventory

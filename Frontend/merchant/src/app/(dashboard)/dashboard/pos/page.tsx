@@ -1,5 +1,5 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import {
   Plus,
@@ -120,10 +120,10 @@ export default function POSPage() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Point of Sale</h1>
           <p className="text-sm text-gray-500 mt-1">Manage in-store transactions and sales</p>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
+        <Button className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors">
           <Plus className="w-4 h-4" />
           Quick Sale
-        </button>
+        </Button>
       </div>
 
       {/* Today's Stats */}
@@ -198,13 +198,13 @@ export default function POSPage() {
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
-              <button
+              <Button
                 key={action.label}
                 className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-2xl transition-colors ${action.color}`}
               >
                 <Icon className="w-4 h-4" />
                 {action.label}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -212,3 +212,4 @@ export default function POSPage() {
     </div>
   );
 }
+

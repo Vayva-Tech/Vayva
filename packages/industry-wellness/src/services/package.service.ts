@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type {
   WellnessPackage,
   WellnessClient,
@@ -76,7 +75,8 @@ export class WellnessPackageService {
         paymentMethod: data.paymentMethod,
         status: 'active',
         remainingRedemptions: wellnessPackage.includedServices.reduce(
-          (sum, item) => sum + item.quantity, 0
+          (sum: number, item: { quantity: number }) => sum + item.quantity,
+          0,
         ),
       },
     });
@@ -208,7 +208,7 @@ export class WellnessPackageService {
       orderBy: { purchaseDate: 'desc' },
     });
 
-    return purchases.map(purchase => {
+    return purchases.map((purchase: (typeof purchases)[number]) => {
       const isExpired = new Date() > purchase.expirationDate;
       const isCompleted = purchase.remainingRedemptions === 0;
 
@@ -224,13 +224,15 @@ export class WellnessPackageService {
         totalPrice: purchase.totalPrice,
         remainingRedemptions: purchase.remainingRedemptions,
         status,
-        services: purchase.serviceRedemptions.map(redemption => ({
-          serviceId: redemption.serviceId,
-          serviceName: redemption.wellnessService?.name || 'Unknown Service',
-          totalQuantity: redemption.totalQuantity,
-          remainingQuantity: redemption.remainingQuantity,
-          validityDays: redemption.validityDays,
-        })),
+        services: purchase.serviceRedemptions.map(
+          (redemption: (typeof purchase.serviceRedemptions)[number]) => ({
+            serviceId: redemption.serviceId,
+            serviceName: redemption.wellnessService?.name || 'Unknown Service',
+            totalQuantity: redemption.totalQuantity,
+            remainingQuantity: redemption.remainingQuantity,
+            validityDays: redemption.validityDays,
+          }),
+        ),
       };
     });
   }
@@ -267,11 +269,14 @@ export class WellnessPackageService {
     if (!wellnessPackage) throw new Error('Package not found');
 
     const individualServiceCost = wellnessPackage.includedServices.reduce(
-      (total, included) => {
+      (
+        total: number,
+        included: { quantity: number; wellnessService?: { price: number } | null },
+      ) => {
         const servicePrice = included.wellnessService?.price || 0;
-        return total + (servicePrice * included.quantity);
+        return total + servicePrice * included.quantity;
       },
-      0
+      0,
     );
 
     const savingsAmount = individualServiceCost - wellnessPackage.price;

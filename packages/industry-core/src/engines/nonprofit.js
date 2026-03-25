@@ -10,7 +10,7 @@ class NonprofitEngine {
   }
   
   async initialize() {
-    console.log('[NONPROFIT_ENGINE] Initialized');
+    console.warn('[NONPROFIT_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

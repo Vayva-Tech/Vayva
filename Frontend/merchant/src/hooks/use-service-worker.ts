@@ -1,12 +1,24 @@
-// @ts-nocheck
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface ServiceWorkerRegistrationResult {
   registration: ServiceWorkerRegistration | null;
   error: string | null;
   isSupported: boolean;
+}
+
+interface CacheUpdatedMessage {
+  type: 'CACHE_UPDATED';
+}
+
+function isCacheUpdatedMessage(data: unknown): data is CacheUpdatedMessage {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'type' in data &&
+    (data as { type: unknown }).type === 'CACHE_UPDATED'
+  );
 }
 
 /**
@@ -16,9 +28,9 @@ export function useServiceWorker(): ServiceWorkerRegistrationResult {
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(true);
+  const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
-    // Check if service workers are supported
     if (!('serviceWorker' in navigator)) {
       setIsSupported(false);
       console.warn('Service workers are not supported');
@@ -32,25 +44,23 @@ export function useServiceWorker(): ServiceWorkerRegistrationResult {
         });
 
         setRegistration(reg);
+        registrationRef.current = reg;
 
-        // Handle updates
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
-          
+
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New content available
-                // Dispatch custom event for UI to show update prompt
                 window.dispatchEvent(new CustomEvent('sw-update-available'));
               }
             });
           }
         });
 
-        // Listen for messages from service worker
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data.type === 'CACHE_UPDATED') {
+        navigator.serviceWorker.addEventListener('message', (event: MessageEvent<unknown>) => {
+          if (isCacheUpdatedMessage(event.data)) {
+            // Reserved for cache-updated UI hooks
           }
         });
 
@@ -61,14 +71,7 @@ export function useServiceWorker(): ServiceWorkerRegistrationResult {
       }
     };
 
-    registerSW();
-
-    // Cleanup
-    return () => {
-      if (registration) {
-        registration.removeEventListener('updatefound', () => {});
-      }
-    };
+    void registerSW();
   }, []);
 
   return { registration, error, isSupported };
@@ -121,6 +124,7 @@ export function useServiceWorkerUpdate() {
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.ready;
       if (registration.waiting) {
+        setWaitingWorker(registration.waiting);
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
         window.location.reload();
       }

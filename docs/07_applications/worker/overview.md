@@ -268,7 +268,7 @@ Key environment variables:
 | `EVOLUTION_API_URL` | Evolution API base URL for WhatsApp |
 | `EVOLUTION_API_KEY` | Evolution API authentication key |
 | `PAYSTACK_SECRET_KEY` | Paystack API secret for payment verification |
-| `GROQ_API_KEY_SUPPORT` | Groq API key for AI agent responses |
+| `OPENROUTER_API_KEY` | OpenRouter API key for AI agent responses |
 
 ## Provider Integrations
 

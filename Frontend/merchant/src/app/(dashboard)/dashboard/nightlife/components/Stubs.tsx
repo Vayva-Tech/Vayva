@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Nightlife Dashboard Stub Components
  * Placeholder components for nightlife features
@@ -21,7 +21,8 @@ interface TableReservationsProps {
   reservations: TableReservation[];
 }
 
-export function TableReservations({ tables, reservations }: TableReservationsProps) {
+export function TableReservations({ tables, reservations: _reservations }: TableReservationsProps) {
+  void _reservations;
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available': return 'bg-green-500';
@@ -83,9 +84,9 @@ export function TableReservations({ tables, reservations }: TableReservationsPro
         </div>
       </div>
       
-      <button className="w-full py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors">
+      <Button className="w-full py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors">
         View Full Map
-      </button>
+      </Button>
     </div>
   );
 }
@@ -144,17 +145,17 @@ export function VIPGuestList({ guests }: VIPGuestListProps) {
             
             <div className="mt-3 flex items-center space-x-2">
               {!guest.hasArrived ? (
-                <button className="flex-1 py-1.5 bg-cyan-600 text-white text-sm rounded hover:bg-cyan-700 transition-colors">
+                <Button className="flex-1 py-1.5 bg-cyan-600 text-white text-sm rounded hover:bg-cyan-700 transition-colors">
                   Check In
-                </button>
+                </Button>
               ) : (
-                <button className="flex-1 py-1.5 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition-colors">
+                <Button className="flex-1 py-1.5 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition-colors">
                   Escort to Table
-                </button>
+                </Button>
               )}
-              <button className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition-colors">
+              <Button className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition-colors">
                 Message
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -209,13 +210,13 @@ export function BottleService({ orders, inventory }: BottleServiceProps) {
             <div className="flex items-center justify-between">
               <span className="text-cyan-400 font-bold">${order.totalAmount.toLocaleString()}</span>
               <div className="flex items-center space-x-2">
-                <button className="text-xs bg-gray-700 text-white px-2 py-1 rounded hover:bg-gray-600">
+                <Button className="text-xs bg-gray-700 text-white px-2 py-1 rounded hover:bg-gray-600">
                   Add Mixer
-                </button>
+                </Button>
                 {order.status !== 'delivered' && (
-                  <button className="text-xs bg-cyan-600 text-white px-2 py-1 rounded hover:bg-cyan-700">
+                  <Button className="text-xs bg-cyan-600 text-white px-2 py-1 rounded hover:bg-cyan-700">
                     Complete
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -236,9 +237,9 @@ export function BottleService({ orders, inventory }: BottleServiceProps) {
             </div>
           ))}
         </div>
-        <button className="w-full mt-3 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+        <Button className="w-full mt-3 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
           Restock
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -278,9 +279,9 @@ export function PromoterPerformance({ promoters }: PromoterPerformanceProps) {
         ))}
       </div>
       
-      <button className="w-full mt-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+      <Button className="w-full mt-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
         View All Promoters
-      </button>
+      </Button>
     </div>
   );
 }
@@ -382,9 +383,9 @@ export function SecurityLog({ incidents }: SecurityLogProps) {
         ))}
       </div>
       
-      <button className="w-full mt-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+      <Button className="w-full mt-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
         View Full Log
-      </button>
+      </Button>
     </div>
   );
 }

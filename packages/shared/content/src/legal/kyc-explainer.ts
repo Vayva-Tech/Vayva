@@ -1,4 +1,4 @@
-import { LegalDocument } from "../types";
+import type { LegalDocument } from "../types";
 
 export const kycExplainer: LegalDocument = {
   slug: "kyc-explainer",
@@ -55,8 +55,8 @@ export const kycExplainer: LegalDocument = {
         "You submit verification documents through your Merchant Dashboard under Settings → Verification. Documents are uploaded securely via encrypted connection.",
         "",
         "**STEP 2: AUTOMATED CHECKS (Instant - 5 minutes)**",
-        "• **NIN Verification**: Via YouVerify API - instant validation against NIMC database",
-        "• **BVN Verification**: Via Paystack Identity Check - instant validation against NIBSS database",
+        "• **NIN Verification**: Manual review and/or third-party verification (if enabled for your account)",
+        "• **BVN Verification**: Via Paystack identity checks or bank-linked verification (where available)",
         "• **Liveness Detection**: Facial recognition to match selfie with ID photo",
         "• **Document Authenticity**: AI scans for forgery indicators (font consistency, security features, tampering)",
         "",
@@ -94,7 +94,7 @@ export const kycExplainer: LegalDocument = {
         "**DELAYS MAY OCCUR IF:**",
         "• Documents are unclear, expired, or incomplete",
         "• Name mismatches between documents",
-        "• System outages at verification providers (YouVerify, Paystack, NIBSS)",
+        "• System outages at verification providers (Paystack, NIBSS)",
         "• Public holidays or weekends",
         "",
         "We'll notify you via email if verification takes longer than expected.",
@@ -194,11 +194,11 @@ export const kycExplainer: LegalDocument = {
         "• **Access Controls**: Only authorized compliance team members can view verification documents",
         "• **Audit Logs**: Every document access is logged with user, timestamp, and purpose",
         "• **Retention**: Verification documents stored for 7 years after account closure (AML requirement), then securely deleted",
-        "• **Third-Party Processing**: YouVerify and Paystack are NDPR-compliant, PCI DSS Level 1 certified",
+        "• **Third-Party Processing**: Our payment/verification partners (e.g. Paystack) are NDPR-aligned and use industry-standard security controls",
         "",
         "**WHAT DATA IS SHARED:**",
-        "• **With YouVerify**: Only NIN number and name for verification (we don't receive your full NIN record)",
-        "• **With Paystack**: BVN and name for identity check (Paystack returns pass/fail only, not full BVN details)",
+        "• **With verification partners (if enabled)**: Only the minimum required identifiers to perform verification checks",
+        "• **With Paystack**: BVN and name for identity checks (Paystack typically returns pass/fail signals, not full BVN details)",
         "• **With Banks**: Account name matching for payout verification (no document sharing)",
         "• **With Regulators**: Only when legally required (court order, EFCC request, CBN examination)",
         "",

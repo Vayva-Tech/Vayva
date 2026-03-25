@@ -2,6 +2,10 @@ import { TrackingInfo } from "@/types/tracking";
 import { reportError } from "@vayva/templates/lib/error";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+const STOREFRONT_ROOT_DOMAIN =
+  process.env.NEXT_PUBLIC_STOREFRONT_ROOT_DOMAIN ||
+  process.env.STOREFRONT_ROOT_DOMAIN ||
+  "vayva.ng";
 
 export const TrackingService = {
   /**
@@ -54,7 +58,7 @@ export const TrackingService = {
     if (useMerchantDomain && customDomain) {
       baseUrl = customDomain.startsWith("http") ? customDomain : `https://${customDomain}`;
     } else if (useMerchantDomain && storeSlug) {
-      baseUrl = `https://${storeSlug}.vayva.co`;
+      baseUrl = `https://${storeSlug}.${STOREFRONT_ROOT_DOMAIN}`;
     } else {
       baseUrl = typeof window !== "undefined" 
         ? window.location.origin 

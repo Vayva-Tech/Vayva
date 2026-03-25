@@ -8,7 +8,7 @@ import {
   Clock,
   PencilSimple as Edit2,
   FloppyDisk as Save,
-  X,
+  X
 } from "@phosphor-icons/react/ssr";
 
 interface PrepTimeCardProps {

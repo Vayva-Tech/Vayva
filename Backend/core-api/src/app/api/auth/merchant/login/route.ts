@@ -11,7 +11,7 @@ import {
   formatPhoneNumber,
   isValidPhoneNumber,
   maskPhoneNumber,
-  OTPMethod,
+  OTPMethod
 } from "@/lib/whatsapp-otp";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     // Always require OTP after valid credentials
     const otpIdentifier = isWhatsAppMethod ? user.phone! : user.email;
-    const otpType = isWhatsAppMethod ? "PHONE_VERIFICATION" : "EMAIL_VERIFICATION";
+    const _otpType = isWhatsAppMethod ? "PHONE_VERIFICATION" : "EMAIL_VERIFICATION";
     const otpCode = await createOTP(otpIdentifier, otpMethod);
 
     // In local dev, don't hard-block login if delivery isn't configured.

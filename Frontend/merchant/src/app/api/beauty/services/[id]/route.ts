@@ -1,18 +1,34 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
+
+function backendBase(): string {
+  return process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
+}
 
 /**
  * GET /api/beauty/services/[id]
  * Get specific service details
  */
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    
-    // Call backend API to fetch service details with performance metrics
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await apiJson<{
       success: boolean;
       data: {
@@ -33,14 +49,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         }>;
       };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/beauty-services/${id}`, {
-      headers: {
-        "x-store-id": storeId,
-      },
+    }>(`${backendBase()}/api/beauty-services/${id}`, {
+      headers: auth.headers,
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch service');
+      throw new Error(result.error || "Failed to fetch service");
     }
 
     return NextResponse.json({
@@ -49,13 +63,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/beauty/services/[id]',
-      operation: 'GET_SERVICE',
+      endpoint: "/api/beauty/services/[id]",
+      operation: "GET_SERVICE",
     });
-    return NextResponse.json(
-      { error: 'Failed to fetch service' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch service" }, { status: 500 });
   }
 }
 
@@ -63,26 +74,38 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
  * PUT /api/beauty/services/[id]
  * Update an existing service
  */
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    const body = await request.json();
-    
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body: unknown = await request.json();
+
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: Record<string, unknown>;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/beauty-services/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-store-id': storeId,
-      },
+    }>(`${backendBase()}/api/beauty-services/${id}`, {
+      method: "PUT",
+      headers: auth.headers,
       body: JSON.stringify(body),
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to update service');
+      throw new Error(result.error || "Failed to update service");
     }
 
     return NextResponse.json({
@@ -91,13 +114,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/beauty/services/[id]',
-      operation: 'UPDATE_SERVICE',
+      endpoint: "/api/beauty/services/[id]",
+      operation: "UPDATE_SERVICE",
     });
-    return NextResponse.json(
-      { error: 'Failed to update service' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update service" }, { status: 500 });
   }
 }
 
@@ -105,36 +125,45 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
  * DELETE /api/beauty/services/[id]
  * Delete a service
  */
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!auth.user.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await apiJson<{
       success: boolean;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/beauty-services/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'x-store-id': storeId,
-      },
+    }>(`${backendBase()}/api/beauty-services/${id}`, {
+      method: "DELETE",
+      headers: auth.headers,
     });
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to delete service');
+      throw new Error(result.error || "Failed to delete service");
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Service deleted successfully',
+      message: "Service deleted successfully",
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: '/api/beauty/services/[id]',
-      operation: 'DELETE_SERVICE',
+      endpoint: "/api/beauty/services/[id]",
+      operation: "DELETE_SERVICE",
     });
-    return NextResponse.json(
-      { error: 'Failed to delete service' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete service" }, { status: 500 });
   }
 }

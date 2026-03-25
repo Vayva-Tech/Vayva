@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -43,18 +44,19 @@ const reviewSchema = z.object({
  * GET /api/b2b/credit/applications?storeId=xxx&status=xxx
  * List credit applications
  */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { searchParams } = new URL(request.url);
-    const storeId = searchParams.get("storeId");
-    const status = searchParams.get("status");
-
-    if (!storeId) {
-      return NextResponse.json(
-        { error: "Store ID required" },
-        { status: 400 }
-      );
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
 
     // Fetch credit applications via API
     const queryParams = new URLSearchParams({ storeId });
@@ -74,7 +76,9 @@ export async function GET(request: Request): Promise<Response> {
         };
       };
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/b2b/credit/applications?${queryParams.toString()}`);
+    }>(`${process.env.BACKEND_API_URL}/api/b2b/credit/applications?${queryParams.toString()}`, {
+      headers: auth.headers,
+    });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch credit applications');

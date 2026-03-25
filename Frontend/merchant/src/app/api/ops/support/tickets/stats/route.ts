@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -10,7 +10,7 @@ function verifyInternalAuth(req: NextRequest): boolean {
     logger.error("[INTERNAL_AUTH] INTERNAL_API_SECRET not configured");
     return false;
   }
-  const secret = req.headers?.get("x-internal-secret");
+  const secret = req.headers.get("x-internal-secret");
   return secret === INTERNAL_SECRET;
 }
 
@@ -27,39 +27,39 @@ export async function GET(req: NextRequest) {
     const fromDate = searchParams.get("from");
     const toDate = searchParams.get("to");
 
-    // Build query params for API call
     const queryParams = new URLSearchParams();
-    if (fromDate) queryParams.append('from', fromDate);
-    if (toDate) queryParams.append('to', toDate);
+    if (fromDate) queryParams.append("from", fromDate);
+    if (toDate) queryParams.append("to", toDate);
 
-    // Fetch ticket stats via backend API
     const result = await apiJson<{
       success: boolean;
-      data?: any;
+      data?: unknown;
       error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/ops/support/tickets/stats?${queryParams.toString()}`, {
-      headers: {
-        'x-internal-secret': INTERNAL_SECRET || '',
+    }>(
+      `${process.env.BACKEND_API_URL}/api/ops/support/tickets/stats?${queryParams.toString()}`,
+      {
+        headers: {
+          "x-internal-secret": INTERNAL_SECRET || "",
+        },
       },
-    });
+    );
 
     if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch ticket statistics');
+      throw new Error(result.error || "Failed to fetch ticket statistics");
     }
 
     return NextResponse.json(result.data);
   } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: '/api/ops/support/tickets/stats',
-        operation: 'GET_TICKET_STATS',
-      }
-    );
-    logger.error("[OPS_TICKETS_STATS] Failed to fetch ticket statistics", { error: error instanceof Error ? error.message : String(error) });
+    handleApiError(error, {
+      endpoint: "/api/ops/support/tickets/stats",
+      operation: "GET_TICKET_STATS",
+    });
+    logger.error("[OPS_TICKETS_STATS] Failed to fetch ticket statistics", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

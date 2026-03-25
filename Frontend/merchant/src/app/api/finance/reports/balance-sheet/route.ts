@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 // GET /api/finance/reports/balance-sheet - Generate Balance Sheet report
 export async function GET(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
 
     // Parse as-of date (default to today)
@@ -26,9 +31,7 @@ export async function GET(request: NextRequest) {
     const result = await apiJson(
       `${process?.env?.BACKEND_API_URL}/api/finance/reports/balance-sheet?asOfDate=${asOfDate.toISOString()}`,
       {
-        headers: {
-          "x-store-id": storeId,
-        },
+        headers: auth.headers,
       }
     );
 

@@ -220,7 +220,7 @@ The deployment script (`scripts/deploy-compliance-modules.sh`) provides:
 
 ### Deployment Options
 1. **Vercel Crons:** Add to `vercel.json`
-2. **Kubernetes:** Apply `CronJob` manifest
+2. **Kubernetes:** Apply a `CronJob` manifest in your cluster / GitOps repo
 3. **Traditional:** Add to system crontab
 
 **Status:** ✅ Configured in code, ⏳ Pending production scheduler setup
@@ -319,7 +319,7 @@ export default function RootLayout({ children }) {
    **Estimated Time:** 10 minutes
 
 6. **Enable Cron Job**
-   - Configure in Vercel/Kubernetes
+   - Configure in Vercel, Kubernetes, or host cron
    - Verify first execution
    
    **Owner:** DevOps Lead  

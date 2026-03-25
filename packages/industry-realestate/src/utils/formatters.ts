@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real Estate Formatters
  * Utility functions for formatting real estate data

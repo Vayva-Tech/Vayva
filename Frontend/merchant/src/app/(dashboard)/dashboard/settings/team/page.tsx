@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button, Input, Select } from "@vayva/ui";
@@ -28,7 +26,7 @@ export default function TeamSettingsPage() {
 
   // Auto-open invite modal when ?invite=true is in the URL
   useEffect(() => {
-    if (searchParams.get("invite") === "true") {
+    if (searchParams?.get("invite") === "true") {
       setShowInviteModal(true);
     }
   }, [searchParams]);
@@ -230,13 +228,13 @@ export default function TeamSettingsPage() {
                       {new Date(member.joinedAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
+                      <Button
                         onClick={() => setConfirmRemove({ open: true, userId: member.id })}
                         className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Remove"
                       >
                         <Trash size={16} />
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

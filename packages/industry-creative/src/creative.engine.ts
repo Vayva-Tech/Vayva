@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Creative Industry Engine
  * Main orchestrator for all creative-specific features

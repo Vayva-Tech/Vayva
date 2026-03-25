@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Test Drive Coordinator Service
  * Manages test drive scheduling, customer assignments, and route planning
@@ -88,10 +87,10 @@ export class TestDriveCoordinatorService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[TEST_DRIVE] Initializing coordinator...');
+    console.warn('[TEST_DRIVE] Initializing coordinator...');
     // Initialize schedule for next 30 days
     this.generateSchedule(30);
-    console.log('[TEST_DRIVE] Coordinator initialized');
+    console.warn('[TEST_DRIVE] Coordinator initialized');
   }
 
   /**

@@ -118,12 +118,18 @@ export class AuthService {
   static async verifyOTP(
     email: string,
     code: string,
-    method?: "EMAIL" | "WHATSAPP"
+    method?: "EMAIL" | "WHATSAPP",
+    rememberMe?: boolean,
   ): Promise<VerifyOTPResponse> {
     const res = await fetch("/api/auth/merchant/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code, method: method || "EMAIL" }),
+      body: JSON.stringify({
+        email,
+        code,
+        method: method || "EMAIL",
+        rememberMe: rememberMe === true,
+      }),
     });
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({ error: { message: "Invalid verification code" } }));
@@ -182,7 +188,8 @@ export async function signUp(data: {
 export async function verifyOTP(
   email: string,
   code: string,
-  method?: "EMAIL" | "WHATSAPP"
+  method?: "EMAIL" | "WHATSAPP",
+  rememberMe?: boolean,
 ): Promise<{ success: boolean }> {
-  return AuthService.verifyOTP(email, code, method);
+  return AuthService.verifyOTP(email, code, method, rememberMe);
 }

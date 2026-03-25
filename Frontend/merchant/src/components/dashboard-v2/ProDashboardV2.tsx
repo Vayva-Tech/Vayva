@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import useSWR from "swr";
-import { Icon, cn } from "@vayva/ui";
+import { Icon, cn, Button } from "@vayva/ui";
 import { formatCurrency } from "@vayva/shared";
 import { apiJson } from "@/lib/api-client-shared";
 import { useAuth } from "@/context/AuthContext";
@@ -94,15 +94,15 @@ const fetcher = <T,>(url: string) => apiJson<T>(url);
 
 const WidgetActions = () => (
   <div className="flex items-center gap-1">
-    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+    <Button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
       <Pencil size={14} className="text-gray-400" />
-    </button>
-    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+    </Button>
+    <Button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
       <Maximize2 size={14} className="text-gray-400" />
-    </button>
-    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+    </Button>
+    <Button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
       <MoreHorizontal size={14} className="text-gray-400" />
-    </button>
+    </Button>
   </div>
 );
 
@@ -637,9 +637,9 @@ export function ProDashboardV2() {
             <div className="w-9 h-9 rounded-full bg-green-200 border-2 border-white" />
             <div className="w-9 h-9 rounded-full bg-purple-200 border-2 border-white" />
           </div>
-          <button className="w-9 h-9 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors">
+          <Button className="w-9 h-9 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors">
             <Plus size={14} className="text-gray-400" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -791,7 +791,7 @@ export function ProDashboardV2() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             {tabs.map((tab) => (
-              <button
+              <Button
                 key={tab}
                 className={cn(
                   "pb-3 text-sm font-medium border-b-2 transition-colors",
@@ -802,18 +802,18 @@ export function ProDashboardV2() {
                 onClick={() => setActiveView(tab.toLowerCase())}
               >
                 {tab}
-              </button>
+              </Button>
             ))}
           </div>
           <div className="flex items-center gap-2 pb-3">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+            <Button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
               <LayoutGrid size={14} />
               Widgets
-            </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+            </Button>
+            <Button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
               <Filter size={14} />
               Filter
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -826,7 +826,7 @@ export function ProDashboardV2() {
           const tabKey = tab.toLowerCase();
           const isActive = activeKanbanTab === tabKey;
           return (
-            <button
+            <Button
               key={tab}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
@@ -838,7 +838,7 @@ export function ProDashboardV2() {
             >
               {tab === "Timeline" && <GanttChart size={14} className="inline mr-1.5 -mt-0.5" />}
               {tab}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -862,9 +862,9 @@ export function ProDashboardV2() {
               <Inbox size={16} className="text-gray-500" />
               <span className="text-sm font-medium text-gray-900">Pending</span>
               <span className="text-sm text-gray-400">{orderStatus.pending}</span>
-              <button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
+              <Button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
                 <MoreHorizontal size={14} className="text-gray-400" />
-              </button>
+              </Button>
             </div>
             <div className="space-y-3">
               {isLoading ? (
@@ -889,9 +889,9 @@ export function ProDashboardV2() {
               <Zap size={16} className="text-yellow-500" />
               <span className="text-sm font-medium text-gray-900">Processing</span>
               <span className="text-sm text-gray-400">{orderStatus.processing}</span>
-              <button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
+              <Button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
                 <MoreHorizontal size={14} className="text-gray-400" />
-              </button>
+              </Button>
             </div>
             <div className="space-y-3">
               {isLoading ? (
@@ -913,9 +913,9 @@ export function ProDashboardV2() {
               <CheckCircle size={16} className="text-green-500" />
               <span className="text-sm font-medium text-gray-900">Completed</span>
               <span className="text-sm text-gray-400">{orderStatus.delivered}</span>
-              <button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
+              <Button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
                 <MoreHorizontal size={14} className="text-gray-400" />
-              </button>
+              </Button>
             </div>
             <div className="space-y-3">
               {isLoading ? (
@@ -940,9 +940,9 @@ export function ProDashboardV2() {
               <XCircle size={16} className="text-gray-400" />
               <span className="text-sm font-medium text-gray-900">Cancelled</span>
               <span className="text-sm text-gray-400">{orderStatus.cancelled}</span>
-              <button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
+              <Button className="ml-auto p-1 hover:bg-gray-100 rounded-lg transition-colors">
                 <MoreHorizontal size={14} className="text-gray-400" />
-              </button>
+              </Button>
             </div>
             <div className="space-y-3">
               {isLoading ? (

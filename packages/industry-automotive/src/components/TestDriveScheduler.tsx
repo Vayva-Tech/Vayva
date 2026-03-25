@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * TestDriveScheduler Component
@@ -208,7 +208,7 @@ export function TestDriveSchedulerWidget({
                 date.getMonth() === selectedDate.getMonth();
 
               return (
-                <button
+                <Button
                   key={date.toISOString()}
                   onClick={() => setSelectedDate(date)}
                   className={`flex-shrink-0 px-4 py-3 rounded-xl border-2 transition-all ${
@@ -223,7 +223,7 @@ export function TestDriveSchedulerWidget({
                   <p className="text-lg font-bold text-gray-900">
                     {date.getDate()}
                   </p>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -281,7 +281,7 @@ export function TestDriveSchedulerWidget({
 
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
             {timeSlots.map((slot, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => handleBookSlot(slot)}
                 disabled={!slot.available || isBooking}
@@ -294,7 +294,7 @@ export function TestDriveSchedulerWidget({
                 }`}
               >
                 {slot.time}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -323,12 +323,12 @@ export function TestDriveSchedulerWidget({
                   </div>
 
                   {onCancelTestDrive && td.status === 'scheduled' && (
-                    <button
+                    <Button
                       onClick={() => handleCancel(td.id)}
                       className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   )}
                 </div>
               ))}
@@ -343,3 +343,4 @@ export function TestDriveSchedulerWidget({
 TestDriveSchedulerWidget.displayName = 'TestDriveSchedulerWidget';
 
 export default TestDriveSchedulerWidget;
+

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Services Industry Package
  */

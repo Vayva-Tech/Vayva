@@ -1,6 +1,7 @@
 import { logger } from "@/lib/logger";
 import { prisma } from "@vayva/db";
 import { AICreditService } from "./credit-service";
+import { getAiPackage } from "@/lib/ai/ai-packages";
 
 // Regex to identify potential emails and phone numbers for stripping
 const PII_REGEX = {
@@ -14,31 +15,41 @@ interface ChatCompletionMessage {
   content: string | null;
 }
 
-interface ChatCompletionOptions {
+interface _ChatCompletionOptions {
   model?: string;
   temperature?: number;
   maxTokens?: number;
   jsonMode?: boolean;
-  tools?: any[];
-  tool_choice?: any;
+  tools?: unknown[];
+  tool_choice?: unknown;
   storeId?: string;
   requestId?: string;
+  messageCost?: number;
+}
+
+interface ChatCompletionChoice {
+  message: {
+    role?: string;
+    content: string;
+    tool_calls?: unknown[];
+  };
+  finish_reason?: string;
 }
 
 interface ChatCompletionResponse {
   id: string;
-  choices: Array<{
-    message: {
-      content: string;
-      tool_calls?: any[];
-    };
-  }>;
-  usage: {
+  choices: ChatCompletionChoice[];
+  usage?: {
     prompt_tokens: number;
     completion_tokens: number;
-    total_tokens: number;
+    total_tokens?: number;
   };
   model: string;
+}
+
+/** Map abstract AI credits to kobo for AiUsageEvent.costEstimateKobo (≈1 credit ≈ ₦1). */
+function creditsToCostKobo(credits: number): bigint {
+  return BigInt(Math.max(0, Math.round(credits * 100)));
 }
 
 export class OpenRouterClient {
@@ -68,21 +79,11 @@ export class OpenRouterClient {
 
   /**
    * Get recommended model based on use case
-   * DEFAULT: GPT-4o Mini for all requests (cheapest & best value)
+   * DEFAULT: Gemini 2.5 Flash (high quality multimodal)
    */
   getRecommendedModel(useCase: string = "general"): string {
-    const models = {
-      // PRIMARY MODEL - Used for 95% of requests
-      general: "openai/gpt-4o-mini",
-      
-      // FALLBACK MODELS - Auto-routed for specific complex tasks
-      reasoning: "anthropic/claude-3-sonnet", // Complex business logic
-      realtime: "openai/gpt-4o-mini", // Fast & cheap
-      technical: "mistralai/mistral-large", // Code generation
-      creative: "openai/gpt-4o-mini", // Writing & content
-    };
-
-    return models[useCase as keyof typeof models] || models.general;
+    void useCase;
+    return "google/gemini-2.5-flash";
   }
 
   /**
@@ -106,19 +107,40 @@ export class OpenRouterClient {
 
       // 2. Determine model
       const model = String(options.model || this.getRecommendedModel());
+      const storeId =
+        typeof options.storeId === "string" ? (options.storeId as string) : "";
+
+      // Determine token cap by plan (fallback: safe default).
+      let planMaxTokens: number | undefined;
+      if (storeId && typeof options.maxTokens !== "number") {
+        const sub = await prisma.merchantAiSubscription.findUnique({
+          where: { storeId },
+          select: { planKey: true },
+        });
+        const pkg = getAiPackage(sub?.planKey);
+        planMaxTokens = pkg.caps.chatMaxOutputTokens;
+      }
 
       // 3. Prepare request payload
-      const payload = {
+      const payload: Record<string, unknown> = {
         model,
         messages: safeMessages,
         temperature:
           typeof options.temperature === "number" ? options.temperature : 0.7,
         max_tokens:
-          typeof options.maxTokens === "number" ? options.maxTokens : 1024,
-        ...(options.jsonMode && { response_format: { type: "json_object" } }),
-        ...(options.tools && { tools: options.tools }),
-        ...(options.tool_choice && { tool_choice: options.tool_choice })
+          typeof options.maxTokens === "number"
+            ? options.maxTokens
+            : planMaxTokens ?? 1024,
       };
+      if (options.jsonMode) {
+        payload.response_format = { type: "json_object" };
+      }
+      if (options.tools != null && typeof options.tools === "object") {
+        payload.tools = options.tools;
+      }
+      if (options.tool_choice != null) {
+        payload.tool_choice = options.tool_choice;
+      }
 
       // 4. Call OpenRouter API with Timeout
       const controller = new AbortController();
@@ -144,34 +166,35 @@ export class OpenRouterClient {
 
       const data: ChatCompletionResponse = await response.json();
 
-      // 5. Calculate credits consumed
+      // 5. Deduct message quota and log usage
       const inputTokens = data.usage?.prompt_tokens ?? 0;
       const outputTokens = data.usage?.completion_tokens ?? 0;
       const toolCallsCount = data.choices[0]?.message.tool_calls?.length ?? 0;
-      
-      const creditConsumption = AICreditService.calculateCreditConsumption(
-        data.model,
-        inputTokens,
-        outputTokens,
-        0, // imageCount
-        toolCallsCount
-      );
 
-      // 6. Deduct credits and log usage
+      // Default: 1 AI message per call (message-pack system)
+      const messageCostRaw = (options as { messageCost?: unknown }).messageCost;
+      const messageCost =
+        typeof messageCostRaw === "number"
+          ? Math.max(1, Math.ceil(messageCostRaw))
+          : 1;
+
       if (options.storeId && typeof options.storeId === "string") {
-        // First check if enough credits
         const creditCheck = await AICreditService.deductCredits(
           options.storeId,
-          creditConsumption.creditsUsed,
+          messageCost,
           { requestId: options.requestId as string, skipInsufficientCheck: false }
         );
 
         if (!creditCheck.success || creditCheck.blocked) {
-          logger.warn("[OpenRouterClient] Request blocked due to insufficient credits", {
-            storeId: options.storeId,
-            creditsRequired: creditConsumption.creditsUsed,
-            creditsRemaining: creditCheck.remainingCredits,
-          });
+          logger.warn(
+            "[OpenRouterClient] Request blocked due to insufficient credits",
+            "AI",
+            {
+              storeId: options.storeId,
+              creditsRequired: messageCost,
+              creditsRemaining: creditCheck.remainingCredits,
+            },
+          );
           
           // Still log the event but mark as blocked
           await prisma.aiUsageEvent
@@ -182,34 +205,38 @@ export class OpenRouterClient {
                 inputTokens,
                 outputTokens,
                 toolCallsCount,
-                creditsUsed: 0, // No credits charged for blocked request
+                costEstimateKobo: BigInt(0),
                 success: false,
                 errorType: "INSUFFICIENT_CREDITS",
                 channel: this.context === "MERCHANT" ? "INAPP" : "WHATSAPP",
               },
             })
             .catch((e: unknown) =>
-              logger.warn("[OpenRouterClient] Audit log failed", undefined, {
+              logger.warn("[OpenRouterClient] Audit log failed", "AI", {
                 error: e,
               })
             );
 
           // Return special response for insufficient credits
-          return {
+          const blocked: ChatCompletionResponse = {
             id: "blocked",
-            choices: [{
-              message: {
-                role: "assistant",
-                content: "I'm sorry, but you've run out of AI credits. Please top up your credits to continue using AI features. You can add 1,000 credits for ₦3,000.",
+            choices: [
+              {
+                message: {
+                  role: "assistant",
+                  content:
+                    "I'm sorry, but you've run out of AI credits. Please top up your credits to continue using AI features. You can add 1,000 credits for ₦3,000.",
+                },
+                finish_reason: "stop",
               },
-              finish_reason: "stop",
-            }],
+            ],
             model: data.model,
             usage: data.usage,
-          } as ChatCompletionResponse;
+          };
+          return blocked;
         }
 
-        // Log successful usage with credits
+        // Log successful usage with messages deducted
         await prisma.aiUsageEvent
           .create({
             data: {
@@ -218,14 +245,14 @@ export class OpenRouterClient {
               inputTokens,
               outputTokens,
               toolCallsCount,
-              creditsUsed: creditConsumption.creditsUsed,
+              costEstimateKobo: creditsToCostKobo(messageCost),
               success: true,
               channel: this.context === "MERCHANT" ? "INAPP" : "WHATSAPP",
               requestId: (options.requestId as string) || "",
             },
           })
           .catch((e: unknown) =>
-            logger.warn("[OpenRouterClient] Audit log failed", undefined, {
+            logger.warn("[OpenRouterClient] Audit log failed", "AI", {
               error: e,
             })
           );

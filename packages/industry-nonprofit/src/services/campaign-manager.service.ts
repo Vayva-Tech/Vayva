@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Campaign Manager Service
  * Manages fundraising campaigns and goals
@@ -47,8 +46,8 @@ export class CampaignManagerService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[CAMPAIGN_MGMT] Initializing service...');
-    console.log('[CAMPAIGN_MGMT] Service initialized');
+    console.warn('[CAMPAIGN_MGMT] Initializing service...');
+    console.warn('[CAMPAIGN_MGMT] Service initialized');
   }
 
   createCampaign(data: Partial<Campaign>): Campaign {

@@ -24,8 +24,9 @@ import {
 import { toast } from "sonner";
 import { Spinner as Loader2, Clock } from "@phosphor-icons/react/ssr";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ServiceProductMetadata } from "@/lib/types/service";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 type ServiceFormData = {
   name: string;
@@ -90,22 +91,37 @@ export default function NewServicePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-10">
-      <Breadcrumbs />
-      <BackButton
-        href="/dashboard/services"
-        label="Back to Services"
-        className="mb-4"
-      />
+    <div className="space-y-6">
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Tip
+              </div>
+              <div className="mt-2 text-sm font-semibold text-gray-900">
+                Duration matters
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Add a small buffer time to reduce schedule overruns.
+              </p>
+            </div>
+          </>
+        }
+      >
+        <div className="flex items-center gap-4">
+          <BackButton
+            href="/dashboard/services"
+            label="Back to Services"
+            className="mb-0"
+          />
+          <PageHeader
+            title="Add Service"
+            subtitle="Define a service that customers can book."
+          />
+        </div>
 
-      <div className="space-y-1">
-        <h2 className="text-3xl font-bold tracking-tight">Add Service</h2>
-        <p className="text-gray-500">
-          Define a service that customers can book.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="max-w-2xl">
         <Card>
           <CardHeader>
             <CardTitle>Service Details</CardTitle>
@@ -237,7 +253,8 @@ export default function NewServicePage() {
             </Button>
           </CardFooter>
         </Card>
-      </form>
+        </form>
+      </PageWithInsights>
     </div>
   );
 }

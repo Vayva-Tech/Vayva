@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { formatDate } from "@vayva/shared";
-import { Card } from "@vayva/ui";
+import { Card, Button } from "@vayva/ui";
 import { apiJson } from "@/lib/api-client-shared";
 import {
   Star,
@@ -11,7 +11,6 @@ import {
   ThumbsUp,
   ThumbsDown,
 } from "@phosphor-icons/react";
-import React from "react";
 
 interface Review {
   id: string;
@@ -126,7 +125,7 @@ export default function ReviewsPage() {
       {reviews.length > 0 && (
         <div className="flex items-center gap-6 border-b border-gray-200 pb-3">
           {["ALL", "PENDING", "PUBLISHED", "ARCHIVED"].map((tab) => (
-            <button
+            <Button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`text-sm font-medium border-b-2 pb-3 -mb-3.5 transition-colors ${
@@ -136,7 +135,7 @@ export default function ReviewsPage() {
               }`}
             >
               {tab.charAt(0) + tab.slice(1).toLowerCase()}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -214,20 +213,20 @@ export default function ReviewsPage() {
                     </td>
                     <td className="px-6 py-4 align-top text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
                           onClick={() => handleAction("published", review.id)}
                           className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="Approve"
                         >
                           <Check size={16} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => handleAction("archived", review.id)}
                           className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
                           title="Archive"
                         >
                           <Archive size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>

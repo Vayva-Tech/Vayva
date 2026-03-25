@@ -1,7 +1,6 @@
-// @ts-nocheck
 // Order Engine - Core business logic for order management
 import { apiJson } from "@/lib/api-client-shared";
-import { logger } from "@vayva/shared";
+import { logEngineError } from "@/lib/engines/log-engine-error";
 
 export interface Order {
   id: string;
@@ -81,7 +80,7 @@ export class OrderEngine {
       
       return await apiJson<Order[]>(url);
     } catch (error) {
-      logger.error('[ORDER_ENGINE_GET_ALL]', error);
+      logEngineError('[ORDER_ENGINE_GET_ALL]', error);
       throw error;
     }
   }
@@ -90,7 +89,7 @@ export class OrderEngine {
     try {
       return await apiJson<Order>(`/api/orders/${id}`);
     } catch (error) {
-      logger.error('[ORDER_ENGINE_GET_BY_ID]', error);
+      logEngineError('[ORDER_ENGINE_GET_BY_ID]', error);
       throw error;
     }
   }
@@ -102,7 +101,7 @@ export class OrderEngine {
         body: JSON.stringify({ status }),
       });
     } catch (error) {
-      logger.error('[ORDER_ENGINE_UPDATE_STATUS]', error);
+      logEngineError('[ORDER_ENGINE_UPDATE_STATUS]', error);
       throw error;
     }
   }
@@ -114,7 +113,7 @@ export class OrderEngine {
         body: JSON.stringify(fulfillment),
       });
     } catch (error) {
-      logger.error('[ORDER_ENGINE_UPDATE_FULFILLMENT]', error);
+      logEngineError('[ORDER_ENGINE_UPDATE_FULFILLMENT]', error);
       throw error;
     }
   }
@@ -126,7 +125,7 @@ export class OrderEngine {
         body: JSON.stringify({ note }),
       });
     } catch (error) {
-      logger.error('[ORDER_ENGINE_ADD_NOTE]', error);
+      logEngineError('[ORDER_ENGINE_ADD_NOTE]', error);
       throw error;
     }
   }
@@ -161,7 +160,7 @@ export class OrderEngine {
         body: JSON.stringify(draftOrder),
       });
     } catch (error) {
-      logger.error('[ORDER_ENGINE_CREATE_DRAFT]', error);
+      logEngineError('[ORDER_ENGINE_CREATE_DRAFT]', error);
       throw error;
     }
   }

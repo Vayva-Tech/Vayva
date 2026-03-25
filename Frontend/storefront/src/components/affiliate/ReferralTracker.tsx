@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -39,7 +40,7 @@ export function AffiliateReferralTracker() {
     
     // Don't override an existing referral unless it's a new session with explicit ref param
     if (existingCode && existingCode !== refCode) {
-      console.log("[Affiliate] Existing referral exists:", existingCode);
+      console.warn("[Affiliate] Existing referral exists:", existingCode);
       // Still update if user explicitly clicked a new referral link
     }
 
@@ -86,7 +87,7 @@ function setReferralCookie(code: string): void {
   
   document.cookie = `${REFERRAL_COOKIE_NAME}=${encodeURIComponent(code)}; expires=${expires.toUTCString()}; path=/${secure}${sameSite}`;
   
-  console.log("[Affiliate] Referral cookie set:", code);
+  console.warn("[Affiliate] Referral cookie set:", code);
 }
 
 /**
@@ -179,12 +180,13 @@ export function AffiliateLinkGenerator({
         readOnly
         className="flex-1 px-3 py-2 bg-gray-50 border rounded-md text-sm"
       />
-      <button
+      <Button
         onClick={copyLink}
         className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
       >
         {copied ? "Copied!" : "Copy"}
-      </button>
+      </Button>
     </div>
   );
 }
+

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Table Management Service
  * 
@@ -10,6 +9,8 @@
  */
 
 import { Table, FloorPlan, TABLE_STATUS } from '../types';
+
+type FloorTableStatus = (typeof TABLE_STATUS)[keyof typeof TABLE_STATUS];
 
 export class TableManagementService {
   private tables: Map<string, Table>;
@@ -57,7 +58,7 @@ export class TableManagementService {
   /**
    * Update table status
    */
-  updateTableStatus(tableId: string, status: keyof typeof TABLE_STATUS): Table | null {
+  updateTableStatus(tableId: string, status: FloorTableStatus): Table | null {
     const table = this.tables.get(tableId);
     if (!table) return null;
 
@@ -65,7 +66,7 @@ export class TableManagementService {
     table.status = status;
 
     // Track turnover metrics
-    if (oldStatus === 'SEATED' && status === 'AVAILABLE') {
+    if (oldStatus === TABLE_STATUS.SEATED && status === TABLE_STATUS.AVAILABLE) {
       // Table just turned
       if (table.currentParty) {
         const seatedTime = new Date(table.currentParty.seatedAt).getTime();
@@ -86,7 +87,7 @@ export class TableManagementService {
     const table = this.tables.get(tableId);
     if (!table) return null;
 
-    if (table.status !== 'AVAILABLE') {
+    if (table.status !== TABLE_STATUS.AVAILABLE) {
       throw new Error(`Table ${tableId} is not available`);
     }
 
@@ -94,7 +95,7 @@ export class TableManagementService {
       throw new Error(`Party size ${partySize} exceeds table capacity ${table.capacity}`);
     }
 
-    table.status = 'SEATED';
+    table.status = TABLE_STATUS.SEATED;
     table.currentParty = {
       size: partySize,
       seatedAt: new Date(),
@@ -109,7 +110,7 @@ export class TableManagementService {
    * Release table (make available)
    */
   releaseTable(tableId: string): Table | null {
-    return this.updateTableStatus(tableId, 'AVAILABLE');
+    return this.updateTableStatus(tableId, TABLE_STATUS.AVAILABLE);
   }
 
   // ============================================================================
@@ -121,7 +122,7 @@ export class TableManagementService {
    */
   getAvailableTables(partySize?: number): Table[] {
     let tables = Array.from(this.tables.values()).filter(
-      (t) => t.status === 'AVAILABLE'
+      (t) => t.status === TABLE_STATUS.AVAILABLE
     );
 
     if (partySize) {
@@ -134,7 +135,7 @@ export class TableManagementService {
   /**
    * Get tables by status
    */
-  getTablesByStatus(status: keyof typeof TABLE_STATUS): Table[] {
+  getTablesByStatus(status: FloorTableStatus): Table[] {
     return Array.from(this.tables.values()).filter((t) => t.status === status);
   }
 
@@ -203,17 +204,17 @@ export class TableManagementService {
    * Get tables by section
    */
   getTablesBySection(sectionId: string): Table[] {
-    const floorPlan = Array.from(this.floorPlans.values()).find(
-      (fp) => fp.sections.some((s) => s.id === sectionId)
+    const floorPlan = Array.from(this.floorPlans.values()).find((fp) =>
+      fp.sections.some((sec: { id: string }) => sec.id === sectionId)
     );
 
     if (!floorPlan) return [];
 
-    const section = floorPlan.sections.find((s) => s.id === sectionId);
+    const section = floorPlan.sections.find((sec: { id: string }) => sec.id === sectionId);
     if (!section) return [];
 
     return section.tableIds
-      .map((id) => this.tables.get(id))
+      .map((id: string) => this.tables.get(id))
       .filter((t): t is Table => t !== undefined);
   }
 
@@ -343,7 +344,7 @@ export class TableManagementService {
     combinedTable.combinedTableIds.forEach((id) => {
       const table = this.tables.get(id);
       if (table) {
-      table.status = 'AVAILABLE';
+        table.status = TABLE_STATUS.AVAILABLE;
         this.tables.set(id, table);
       }
     });
@@ -368,7 +369,7 @@ export class TableManagementService {
     turnsCompleted: number;
   } {
     const tablesArray = this.getAllTables();
-    const occupiedTables = this.getTablesByStatus('SEATED').length;
+    const occupiedTables = this.getTablesByStatus(TABLE_STATUS.SEATED).length;
 
     return {
       totalTables: tablesArray.length,

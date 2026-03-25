@@ -2,7 +2,7 @@
 import React from "react";
 
 import { LocaleKey, LOCALES } from "@/data/locales";
-import { CreditCard, Question as HelpCircle, SquaresFour as LayoutDashboard, SignOut as LogOut, MapPin, Faders as SlidersHorizontal } from "@phosphor-icons/react/ssr";
+import { CreditCard, Question as HelpCircle, SquaresFour as LayoutDashboard, SignOut as LogOut, MapPin, Faders as _SlidersHorizontal } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@vayva/ui";

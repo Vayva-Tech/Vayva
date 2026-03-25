@@ -3,8 +3,13 @@
 import React from "react";
 import { HeroSection } from "./sections/HeroSectionNew";
 import { OSLayersSection } from "./sections/OSLayersSection";
+import { getOfferCopy } from "@/config/pricing";
+import { useMarketingOffer } from "@/context/MarketingOfferContext";
 
 export default function SimpleRedesignedLanding(): React.JSX.Element {
+  const { starterFirstMonthFree } = useMarketingOffer();
+  const o = getOfferCopy(starterFirstMonthFree);
+
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-emerald-50/30 to-blue-50/30">
       {/* Hero Section */}
@@ -20,10 +25,10 @@ export default function SimpleRedesignedLanding(): React.JSX.Element {
             Ready to upgrade your business?
           </h2>
           <p className="text-xl text-slate-600 mb-8">
-            Join 2,000+ businesses running on Vayva
+            Businesses across Nigeria run on Vayva
           </p>
           <p className="text-sm text-slate-500">
-            7-day trial • No credit card • Cancel anytime
+            {o.trialBadge} • {o.noCard} • {o.cancelAnytime}
           </p>
         </div>
       </section>

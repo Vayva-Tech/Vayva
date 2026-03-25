@@ -11,13 +11,22 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
+  const storeId = searchParams.get("storeId")?.trim();
+  if (!storeId) {
+    return NextResponse.json(
+      { error: "storeId query parameter is required" },
+      { status: 400 },
+    );
+  }
+
   const minSpend = parseInt(searchParams.get("minSpend") || "0");
   const minOrders = parseInt(searchParams.get("minOrders") || "0");
 
   const customers = await prisma.customer.findMany({
     where: {
+      storeId,
       orders: {
-        some: {},
+        some: { storeId },
       },
     },
     select: {

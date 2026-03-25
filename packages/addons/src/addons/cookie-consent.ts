@@ -4,7 +4,7 @@
  * GDPR-compliant cookie banner with customization
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const COOKIE_CONSENT_ADDON: AddOnDefinition = {
   id: 'vayva.cookie-consent',

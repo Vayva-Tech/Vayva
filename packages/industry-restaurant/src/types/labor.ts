@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Restaurant Labor Optimization Types
  * Demand-based scheduling, labor cost forecasting, shift swapping, and time clock
@@ -32,7 +31,8 @@ export type TimeClockEvent = 'clock_in' | 'clock_out' | 'break_start' | 'break_e
 // Staff Types
 // ============================================================================
 
-export interface StaffMember {
+/** Roster / scheduling staff row; distinct from live-ops `StaffMember` in `kitchen-types`. */
+export interface LaborRosterStaffMember {
   id: string;
   storeId: string;
   firstName: string;
@@ -72,12 +72,12 @@ export interface DayAvailability {
 // Shift Types
 // ============================================================================
 
-export interface Shift {
+export interface LaborRosterShift {
   id: string;
   storeId: string;
   date: string; // ISO date string
   staffId?: string; // null = open shift
-  staff?: Pick<StaffMember, 'id' | 'firstName' | 'lastName' | 'role' | 'hourlyRate'>;
+  staff?: Pick<LaborRosterStaffMember, 'id' | 'firstName' | 'lastName' | 'role' | 'hourlyRate'>;
   role: StaffRole;
   startTime: string; // HH:MM
   endTime: string; // HH:MM
@@ -116,7 +116,7 @@ export interface WeeklySchedule {
   weekStartDate: string; // ISO Monday date
   weekEndDate: string;
   status: 'draft' | 'published' | 'archived';
-  shifts: Shift[];
+  shifts: LaborRosterShift[];
   laborMetrics: LaborMetrics;
   publishedAt?: string;
   publishedBy?: string;
@@ -238,11 +238,11 @@ export interface ShiftSwapRequest {
   id: string;
   storeId: string;
   requestingStaffId: string;
-  requestingStaff?: Pick<StaffMember, 'id' | 'firstName' | 'lastName' | 'role'>;
+  requestingStaff?: Pick<LaborRosterStaffMember, 'id' | 'firstName' | 'lastName' | 'role'>;
   coveringStaffId?: string; // The person taking the shift
-  coveringStaff?: Pick<StaffMember, 'id' | 'firstName' | 'lastName' | 'role'>;
+  coveringStaff?: Pick<LaborRosterStaffMember, 'id' | 'firstName' | 'lastName' | 'role'>;
   shiftId: string;
-  shift?: Pick<Shift, 'id' | 'date' | 'startTime' | 'endTime' | 'role'>;
+  shift?: Pick<LaborRosterShift, 'id' | 'date' | 'startTime' | 'endTime' | 'role'>;
   reason: string;
   status: ShiftSwapStatus;
   reviewedBy?: string;
@@ -252,7 +252,7 @@ export interface ShiftSwapRequest {
   expiresAt: string;
 }
 
-export interface OpenShift extends Omit<Shift, 'staffId' | 'staff'> {
+export interface OpenShift extends Omit<LaborRosterShift, 'staffId' | 'staff'> {
   eligibleStaff: string[]; // Staff IDs who can take this shift
   claimedBy?: string;
   claimedAt?: string;
@@ -266,7 +266,7 @@ export interface TimeClockEntry {
   id: string;
   storeId: string;
   staffId: string;
-  staff?: Pick<StaffMember, 'id' | 'firstName' | 'lastName' | 'role'>;
+  staff?: Pick<LaborRosterStaffMember, 'id' | 'firstName' | 'lastName' | 'role'>;
   shiftId?: string;
   event: TimeClockEvent;
   timestamp: string;
@@ -279,7 +279,7 @@ export interface TimeClockEntry {
 
 export interface TimecardSummary {
   staffId: string;
-  staff?: Pick<StaffMember, 'id' | 'firstName' | 'lastName' | 'role' | 'hourlyRate'>;
+  staff?: Pick<LaborRosterStaffMember, 'id' | 'firstName' | 'lastName' | 'role' | 'hourlyRate'>;
   weekStartDate: string;
   regularHours: number;
   overtimeHours: number;

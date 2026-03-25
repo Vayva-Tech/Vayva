@@ -1,4 +1,5 @@
 import { IndustryConfig, IndustrySlug } from "@/lib/templates/types";
+import { industryAdditions } from "./industry-additions";
 
 // --- WIDGETS ---
 const COMMON_WIDGETS = [
@@ -58,7 +59,7 @@ const BASE_PRODUCT_FORM = {
   variantLabel: "Options",
   validation: { minImages: 1, minDescriptionLength: 20 },
 };
-export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
+const baseIndustryConfig = {
   // --- RETAIL & COMMERCE ---
   retail: {
     displayName: "General Retail",
@@ -150,6 +151,67 @@ export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
   // --- FOOD & RESTAURANT ---
   food: {
     displayName: "Restaurants & Food",
+    primaryObject: "menu_item",
+    modules: [
+      "dashboard",
+      "catalog",
+      "sales",
+      "fulfillment",
+      "finance",
+      "marketing",
+      "settings",
+    ],
+    moduleLabels: {
+      catalog: "Menu Items",
+      sales: "Orders",
+      fulfillment: "Kitchen View",
+    },
+    moduleIcons: { catalog: "UtensilsCrossed", fulfillment: "ChefHat" },
+    moduleRoutes: {
+      catalog: {
+        index: "/dashboard/menu-items",
+        create: "/dashboard/menu-items/new",
+      },
+      fulfillment: { index: "/dashboard/kitchen" },
+    },
+    dashboardWidgets: [
+      {
+        id: "active_orders",
+        title: "Active Orders",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      {
+        id: "revenue_today",
+        title: "Revenue Today",
+        dataSource: "real",
+        type: "stat",
+        w: 1,
+      },
+      ...COMMON_WIDGETS,
+    ],
+    forms: {
+      menu_item: {
+        requiredFields: ["price", "prep_time", "veg_non_veg"],
+        optionalFields: ["calories", "allergens", "spice_level", "ingredients"],
+        variantLabel: "Modifiers",
+        validation: { minImages: 1 },
+      },
+    },
+    onboardingSteps: ["store_profile", "menu_setup", "delivery_settings"],
+    features: { delivery: true },
+    aiTools: [
+      "get_menu",
+      "place_order",
+      "check_order_status",
+      "get_promotions",
+    ],
+  },
+  "meal-kit": {
+    displayName: "Meal kits",
+    description:
+      "Subscription meal boxes, weekly menus, and recurring fulfillment.",
     primaryObject: "menu_item",
     modules: [
       "dashboard",
@@ -933,4 +995,9 @@ export const INDUSTRY_CONFIG: Record<IndustrySlug, IndustryConfig> = {
       "get_upcoming_events",
     ],
   },
-};
+} satisfies Record<string, IndustryConfig>;
+
+export const INDUSTRY_CONFIG = {
+  ...baseIndustryConfig,
+  ...industryAdditions,
+} as unknown as Record<IndustrySlug, IndustryConfig>;

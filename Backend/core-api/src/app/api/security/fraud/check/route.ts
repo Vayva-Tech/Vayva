@@ -12,8 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { fraudDetectionService, mlRiskScorer } from '@vayva/security';
-import { auth } from '@/lib/auth';
-import { prisma } from '@vayva/db';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 /**
  * POST /api/security/fraud/check
@@ -21,7 +21,7 @@ import { prisma } from '@vayva/db';
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -126,18 +126,7 @@ export async function GET(request: NextRequest) {
 
     const stats = await fraudDetectionService.getStats(storeId, days);
 
-    // Get recent high-risk checks
-    const recentHighRisk = await prisma.fraudCheck.findMany({
-      where: {
-        storeId,
-        riskLevel: { in: ['high', 'critical'] },
-        status: 'review',
-      },
-      orderBy: { checkedAt: 'desc' },
-      take: 10,
-    }).catch(() => []);
-
-    return NextResponse.json({ stats, recentHighRisk });
+    return NextResponse.json({ stats, recentHighRisk: [] });
   } catch (error) {
     console.error('[Fraud] Stats failed:', error);
     return NextResponse.json({ error: 'Failed to get fraud stats' }, { status: 500 });

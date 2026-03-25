@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Comprehensive Error Boundary Component
  * Provides robust error handling for dashboard components
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '@vayva/shared';
 import { Warning as AlertTriangle, ArrowsClockwise as RefreshCw, House as Home } from '@phosphor-icons/react';
@@ -142,22 +141,22 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
+              <Button
                 onClick={this.handleManualRetry}
                 disabled={this.state.retryCount >= 3}
                 className="flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RefreshCw className="w-4 h-4" />
                 {this.state.retryCount >= 3 ? 'Max Retries Reached' : 'Try Again'}
-              </button>
+              </Button>
               
-              <button
+              <Button
                 onClick={this.handleGoHome}
                 className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <Home className="w-4 h-4" />
                 Return to Dashboard
-              </button>
+              </Button>
             </div>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -203,12 +202,12 @@ export function useErrorHandler() {
           <div>
             <h3 className="font-medium text-red-800">An error occurred</h3>
             <p className="text-red-700 text-sm mt-1">{error.message}</p>
-            <button
+            <Button
               onClick={clearError}
               className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         </div>
       </div>

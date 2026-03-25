@@ -144,13 +144,13 @@ export const GET = withVayvaAPI(
 );
 
 // Generate monthly timeline data
-async function generateTimelineData(storeId: string, startDate: Date, endDate: Date): Promise<any[]> {
+async function _generateTimelineData(storeId: string, startDate: Date, endDate: Date): Promise<any[]> {
   const months: any[] = [];
   const current = new Date(startDate);
   
   while (current <= endDate) {
     const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
-    const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0);
+    const _monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0);
     
     // In a real implementation, you'd query the database for this month's data
     months.push({
@@ -168,7 +168,7 @@ async function generateTimelineData(storeId: string, startDate: Date, endDate: D
 }
 
 // Generate personalized recommendations
-function generateGrantRecommendations(successRate: number, totalApplications: number, topFunders: any[]): string[] {
+function _generateGrantRecommendations(successRate: number, totalApplications: number, topFunders: any[]): string[] {
   const recommendations: string[] = [];
   
   if (successRate < 30) {

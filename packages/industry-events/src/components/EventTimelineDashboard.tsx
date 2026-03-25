@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 /**
  * Event Timeline Dashboard Component

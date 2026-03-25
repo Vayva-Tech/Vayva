@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Showing Scheduler
  * Manages showing availability and scheduling

@@ -15,7 +15,7 @@ export const GET = withVayvaAPI(
     try {
       const { searchParams } = new URL(req.url);
       const courseId = searchParams.get("courseId") || undefined;
-      const period = (searchParams.get("period") || "month") as 
+      const _period = (searchParams.get("period") || "month") as 
         | "week"
         | "month"
         | "quarter";

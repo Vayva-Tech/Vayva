@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
+import { buildBackendAuthHeaders } from '@/lib/backend-proxy';
 import { authOptions } from '@/lib/auth';
 import { apiJson } from '@/lib/api-client-shared';
 import { handleApiError } from '@/lib/api-error-handler';
@@ -7,6 +8,10 @@ import { handleApiError } from '@/lib/api-error-handler';
 // GET /api/b2b/credit-accounts - List credit accounts
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const session = await getServerSession(authOptions);
     if (!session?.user?.storeId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -49,6 +54,10 @@ export async function GET(request: NextRequest) {
 // POST /api/b2b/credit-accounts - Create credit account
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const session = await getServerSession(authOptions);
     if (!session?.user?.storeId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

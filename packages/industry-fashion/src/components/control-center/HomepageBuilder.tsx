@@ -1,6 +1,6 @@
-// @ts-nocheck
-import React, { useState } from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { Button } from "@vayva/ui";
+import React, { useRef, useState } from 'react';
+import { GlassPanel } from '@vayva/ui/fashion';
 
 export interface SectionConfig {
   id: string;
@@ -24,6 +24,7 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
   onSectionsChange,
 }) => {
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
+  const sectionIdSeqRef = useRef(0);
 
   const availableSections = [
     { type: 'hero', label: 'Hero Banner', icon: '🎯' },
@@ -39,8 +40,9 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
   };
 
   const handleAddSection = (type: SectionConfig['type']) => {
+    sectionIdSeqRef.current += 1;
     const newSection: SectionConfig = {
-      id: `section-${Date.now()}`,
+      id: `section-${sectionIdSeqRef.current}`,
       type,
       title: availableSections.find((s) => s.type === type)?.label,
       enabled: true,
@@ -86,9 +88,9 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
     <GlassPanel variant="elevated" className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Homepage Builder</h2>
-        <button className="px-4 py-2 bg-emerald-400 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors">
+        <Button className="px-4 py-2 bg-emerald-400 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors">
           👁️ Preview
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -97,7 +99,7 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
           <h3 className="text-sm font-medium text-white/80 mb-4">Available Sections</h3>
           <div className="space-y-2">
             {availableSections.map((section) => (
-              <button
+              <Button
                 key={section.type}
                 onClick={() => handleAddSection(section.type as SectionConfig['type'])}
                 className="w-full flex items-center gap-3 p-3 bg-white/3 border border-white/8 hover:border-emerald-400/50 rounded-lg transition-all group"
@@ -106,7 +108,7 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
                   {section.icon}
                 </span>
                 <span className="text-sm text-white/80">{section.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -149,7 +151,7 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
                         onClick={() => handleToggleSection(section.id)}
                         className={`px-3 py-1.5 text-xs rounded transition-colors ${
                           section.enabled
@@ -158,13 +160,13 @@ export const HomepageBuilder: React.FC<HomepageBuilderProps> = ({
                         }`}
                       >
                         {section.enabled ? 'Active' : 'Hidden'}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => handleRemoveSection(section.id)}
                         className="px-3 py-1.5 bg-rose-400/20 hover:bg-rose-400/30 text-rose-400 text-xs rounded transition-colors"
                       >
                         Remove
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))

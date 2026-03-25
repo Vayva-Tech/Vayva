@@ -10,7 +10,7 @@ class TravelEngine {
   }
   
   async initialize() {
-    console.log('[TRAVEL_ENGINE] Initialized');
+    console.warn('[TRAVEL_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

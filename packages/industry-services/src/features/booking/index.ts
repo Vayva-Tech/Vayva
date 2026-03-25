@@ -1,10 +1,7 @@
-// @ts-nocheck
 /**
  * Booking Feature Module
  * Dedicated module for booking functionality
  */
-
-export * from '../../services/booking-service';
 
 export interface BookingFeatureConfig {
   enableReminders: boolean;

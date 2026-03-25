@@ -24,10 +24,15 @@ export const TrendIndicator = memo(function TrendIndicator({
     : 'text-error';
   
   const Icon = isNeutral ? Minus : isPositive ? TrendingUp : TrendingDown;
+  const iconTestId = isNeutral
+    ? "minus-icon"
+    : isPositive
+      ? "trending-up-icon"
+      : "trending-down-icon";
 
   return (
     <div className={`flex items-center gap-1 text-xs font-bold ${colorClass} ${className}`}>
-      <Icon size={14} />
+      <Icon size={14} data-testid={iconTestId} aria-hidden />
       <span>{Math.abs(value).toFixed(1)}%</span>
     </div>
   );

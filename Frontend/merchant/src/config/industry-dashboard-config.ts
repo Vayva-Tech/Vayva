@@ -1,12 +1,11 @@
-// @ts-nocheck
 // ============================================================================
 // INDUSTRY DASHBOARD CONFIGURATION SYSTEM
 // ============================================================================
 // Maps industries to their dashboard configurations and KPI mappings
 // ============================================================================
 
+import type { IndustrySlug } from '@/lib/templates/types';
 import type { 
-  IndustrySlug, 
   UniversalDashboardConfig, 
   DashboardVariant, 
   DashboardMetric,
@@ -21,7 +20,13 @@ import { getDesignCategoryForIndustry, getDefaultPresetForCategory } from './ind
 // Industry KPI Mappings
 // ---------------------------------------------------------------------------
 
-const INDUSTRY_KPI_MAPPINGS: Record<IndustrySlug, Record<string, string>> = {
+const INDUSTRY_KPI_MAPPINGS: Record<string, Record<string, string>> = {
+  analytics: {
+    active_reports: 'active_reports',
+    queries_today: 'queries_today',
+    data_freshness: 'data_freshness_minutes',
+    export_count: 'exports_count'
+  },
   // Retail & E-commerce
   retail: {
     revenue: 'total_sales',
@@ -236,140 +241,44 @@ const INDUSTRY_KPI_MAPPINGS: Record<IndustrySlug, Record<string, string>> = {
     members: 'active_members',
     class_attendance: 'class_attendance_rate',
     member_retention: 'member_retention'
-  }
+  },
+  petcare: {
+    revenue: 'total_bookings_value',
+    appointments: 'appointments_count',
+    customers: 'active_customers',
+    no_show_rate: 'no_show_rate'
+  },
+  wellness: {
+    revenue: 'total_bookings_value',
+    bookings: 'bookings_count',
+    cancellations: 'cancellations_count',
+    customer_retention: 'client_retention'
+  },
+  specialized: {
+    revenue: 'total_sales',
+    orders: 'total_orders',
+    customers: 'active_customers',
+    conversion_rate: 'conversion_rate'
+  },
+  default: {
+    revenue: 'total_sales',
+    orders: 'total_orders',
+    customers: 'active_customers',
+    conversion_rate: 'conversion_rate',
+  },
 };
 
-// ---------------------------------------------------------------------------
-// Plan Tier Feature Gating
-// ---------------------------------------------------------------------------
-
-export interface PlanTierFeatures {
-  kpiCount: number;
-  sections: {
-    primary_object_health: boolean;
-    live_operations: boolean;
-    decision_kpis: boolean;
-    bottlenecks_alerts: boolean;
-    suggested_actions: boolean;
-    financial_charts: boolean;
-    ai_insights: boolean;
-    custom_layouts: boolean;
-  };
-  metrics: string[];
-  refreshInterval: number; // in seconds
-}
-
-export const PLAN_TIER_FEATURES: Record<DashboardVariant, PlanTierFeatures> = {
-  basic: {
-    kpiCount: 4,
-    sections: {
-      primary_object_health: true,
-      live_operations: true,
-      decision_kpis: true,
-      bottlenecks_alerts: true,
-      suggested_actions: true,
-      financial_charts: false,
-      ai_insights: false,
-      custom_layouts: false
-    },
-    metrics: [
-      'revenue',
-      'orders',
-      'customers',
-      'conversion_rate'
-    ],
-    refreshInterval: 300 // 5 minutes
+const INDUSTRY_SECTION_RULES: Record<
+  string,
+  Partial<Record<string, boolean>>
+> = {
+  analytics: {
+    primary_object_health: true,
+    live_operations: true,
+    decision_kpis: true,
+    bottlenecks_alerts: true,
+    suggested_actions: true
   },
-  standard: {
-    kpiCount: 6,
-    sections: {
-      primary_object_health: true,
-      live_operations: true,
-      decision_kpis: true,
-      bottlenecks_alerts: true,
-      suggested_actions: true,
-      financial_charts: true,
-      ai_insights: false,
-      custom_layouts: false
-    },
-    metrics: [
-      'revenue',
-      'orders',
-      'customers',
-      'conversion_rate',
-      'avg_order_value',
-      'customer_lifetime_value'
-    ],
-    refreshInterval: 120 // 2 minutes
-  },
-  advanced: {
-    kpiCount: 8,
-    sections: {
-      primary_object_health: true,
-      live_operations: true,
-      decision_kpis: true,
-      bottlenecks_alerts: true,
-      suggested_actions: true,
-      financial_charts: true,
-      ai_insights: true,
-      custom_layouts: false
-    },
-    metrics: [
-      'revenue',
-      'orders',
-      'customers',
-      'conversion_rate',
-      'avg_order_value',
-      'customer_lifetime_value',
-      'ai_conversions',
-      'operational_efficiency'
-    ],
-    refreshInterval: 60 // 1 minute
-  },
-  pro: {
-    kpiCount: 10,
-    sections: {
-      primary_object_health: true,
-      live_operations: true,
-      decision_kpis: true,
-      bottlenecks_alerts: true,
-      suggested_actions: true,
-      financial_charts: true,
-      ai_insights: true,
-      custom_layouts: true
-    },
-    metrics: [
-      'revenue',
-      'orders',
-      'customers',
-      'conversion_rate',
-      'avg_order_value',
-      'customer_lifetime_value',
-      'ai_conversions',
-      'operational_efficiency',
-      'market_share',
-      'competitive_index'
-    ],
-    refreshInterval: 30 // 30 seconds
-  }
-};
-
-// Helper function to check if a feature is available for a given plan tier
-export function isFeatureAvailable(variant: DashboardVariant, feature: keyof PlanTierFeatures['sections']): boolean {
-  return PLAN_TIER_FEATURES[variant].sections[feature];
-}
-
-// Helper function to get available metrics for a plan tier
-export function getAvailableMetrics(variant: DashboardVariant): string[] {
-  return PLAN_TIER_FEATURES[variant].metrics;
-}
-
-// Helper function to get KPI limit for a plan tier
-export function getKPILimit(variant: DashboardVariant): number {
-  return PLAN_TIER_FEATURES[variant].kpiCount;
-}
-
-const INDUSTRY_SECTION_RULES: Record<IndustrySlug, Partial<Record<string, boolean>>> = {
   retail: {
     primary_object_health: true,
     live_operations: true,
@@ -545,6 +454,27 @@ const INDUSTRY_SECTION_RULES: Record<IndustrySlug, Partial<Record<string, boolea
     bottlenecks_alerts: true,
     suggested_actions: true
   },
+  petcare: {
+    primary_object_health: true,
+    live_operations: true,
+    decision_kpis: true,
+    bottlenecks_alerts: true,
+    suggested_actions: true
+  },
+  wellness: {
+    primary_object_health: true,
+    live_operations: true,
+    decision_kpis: true,
+    bottlenecks_alerts: true,
+    suggested_actions: true
+  },
+  specialized: {
+    primary_object_health: true,
+    live_operations: true,
+    decision_kpis: true,
+    bottlenecks_alerts: true,
+    suggested_actions: true
+  },
   fashion: {
     primary_object_health: true,
     live_operations: true,
@@ -594,13 +524,6 @@ const INDUSTRY_SECTION_RULES: Record<IndustrySlug, Partial<Record<string, boolea
     bottlenecks_alerts: true,
     suggested_actions: true
   },
-  b2b: {
-    primary_object_health: true,
-    live_operations: true,
-    decision_kpis: true,
-    bottlenecks_alerts: true,
-    suggested_actions: true
-  },
   // Default for all other industries
   default: {
     primary_object_health: true,
@@ -630,16 +553,17 @@ export function generateDashboardConfig(
     throw new Error(`No dashboard definition found for industry: ${industry}`);
   }
 
-  // Map industry KPIs to dashboard metrics
-  const kpiMapping = INDUSTRY_KPI_MAPPINGS[industry] || INDUSTRY_KPI_MAPPINGS.default;
-  const metrics: DashboardMetric[] = Object.entries(kpiMapping).slice(0, planConfig.features.maxMetrics).map(([key, dataKey], index) => ({
-    key,
-    label: formatMetricLabel(key),
-    value: 0, // Will be populated with real data
-    format: getMetricFormat(key),
-    icon: getMetricIcon(key),
-    order: index
-  }));
+  const kpiMapping =
+    INDUSTRY_KPI_MAPPINGS[industry] ?? INDUSTRY_KPI_MAPPINGS.default;
+  const metrics: DashboardMetric[] = Object.entries(kpiMapping)
+    .slice(0, planConfig.features.maxMetrics)
+    .map(([key]) => ({
+      key,
+      label: formatMetricLabel(key),
+      value: 0,
+      format: getMetricFormat(key),
+      icon: getMetricIcon(key),
+    }));
 
   // Generate sections based on industry definition
   const sectionRules = INDUSTRY_SECTION_RULES[industry] || INDUSTRY_SECTION_RULES.default;
@@ -657,7 +581,7 @@ export function generateDashboardConfig(
     }));
 
   return {
-    industry,
+    industry: industry as UniversalDashboardConfig['industry'],
     variant,
     designCategory,
     timeHorizon: definition.defaultTimeHorizon,

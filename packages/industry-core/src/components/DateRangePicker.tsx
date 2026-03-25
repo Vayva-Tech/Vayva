@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 
@@ -58,7 +58,7 @@ export function DateRangePicker({
   return (
     <div className={`relative inline-block text-left ${className}`}>
       <div>
-        <button
+        <Button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="inline-flex justify-between w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -67,7 +67,7 @@ export function DateRangePicker({
           <svg className="-mr-1 ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-        </button>
+        </Button>
       </div>
 
       {isOpen && (
@@ -99,35 +99,35 @@ export function DateRangePicker({
                 <label className="block text-sm font-medium text-gray-700 mb-2">Quick Select</label>
                 <div className="grid grid-cols-2 gap-2">
                   {presets.map((preset, index) => (
-                    <button
+                    <Button
                       key={index}
                       type="button"
                       onClick={() => selectPreset(preset.range)}
                       className="px-3 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
                     >
                       {preset.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
             )}
 
             <div className="flex justify-end space-x-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="px-3 py-1 text-sm rounded-md border border-gray-300 hover:bg-gray-50"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={applyRange}
                 disabled={!tempStartDate || !tempEndDate}
                 className="px-3 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Apply
-              </button>
+              </Button>
             </div>
           </div>
         </div>

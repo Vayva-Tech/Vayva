@@ -8,12 +8,9 @@ import { logger } from "@vayva/shared";
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await OpsAuthService.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { user } = await OpsAuthService.requireSession();
 
-    const { secret, qrCodeUrl } = await (OpsAuthService as any).generateMFASecret(session.user?.id);
+    const { secret, qrCodeUrl } = await (OpsAuthService as any).generateMFASecret(user.id);
 
     return NextResponse.json({
       secret,
@@ -21,6 +18,9 @@ export async function POST(req: NextRequest) {
       message: "Scan the QR code with your authenticator app",
     });
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     logger.error("[MFA_SETUP_ERROR]", { error });
     return NextResponse.json(
       { error: "Failed to generate MFA secret" },

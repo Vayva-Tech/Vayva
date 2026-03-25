@@ -19,12 +19,10 @@ import React, {
   useCallback,
   useMemo,
   Suspense,
-  lazy,
-  ComponentType
 } from 'react';
+import type { ComponentType } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, ErrorBoundary as ErrorIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { AlertCircle as ErrorIcon } from 'lucide-react';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -232,7 +230,7 @@ export function AddOnProvider({ storeId, children, fallback }: AddOnProviderProp
 // DYNAMIC COMPONENT LOADER
 // ============================================================================
 
-async function loadAddOnComponents(addOnId: string, version: string): Promise<Record<string, ComponentType<any>>> {
+async function loadAddOnComponents(addOnId: string, _version: string): Promise<Record<string, ComponentType<any>>> {
   // In production, this would load from a CDN or the add-on package
   // For now, we'll use dynamic imports from the local add-ons package
   
@@ -282,13 +280,10 @@ export function MountPoint({
   fallback 
 }: MountPointProps) {
   const { mountPoints, isLoading, getComponent } = useAddOns();
-  const [mountedComponents, setMountedComponents] = useState<MountedComponent[]>([]);
 
-  useEffect(() => {
+  const mountedComponents = useMemo(() => {
     const components = mountPoints.get(id) || [];
-    // Sort by priority (higher first)
-    const sorted = [...components].sort((a, b) => (b.priority || 0) - (a.priority || 0));
-    setMountedComponents(sorted);
+    return [...components].sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }, [mountPoints, id]);
 
   if (isLoading && fallback) {
@@ -325,19 +320,21 @@ interface MountedComponentWrapperProps {
 }
 
 function MountedComponentWrapper({ component, getComponent }: MountedComponentWrapperProps) {
-  const [Component, setComponent] = useState<ComponentType<any> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
+  const { Component, error } = useMemo(() => {
     try {
       const Comp = getComponent(component.addOnId, component.componentName);
       if (Comp) {
-        setComponent(() => Comp);
-      } else {
-        setError(new Error(`Component ${component.componentName} not found`));
+        return { Component: Comp, error: null as Error | null };
       }
+      return {
+        Component: null,
+        error: new Error(`Component ${component.componentName} not found`),
+      };
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to load component'));
+      return {
+        Component: null,
+        error: err instanceof Error ? err : new Error('Failed to load component'),
+      };
     }
   }, [component, getComponent]);
 

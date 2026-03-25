@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from "react";
 import { Button } from "@vayva/ui";
 import Image from "next/image";
-import { Star, Zap, Truck, ShieldCheck, Plus, Minus, } from "lucide-react";
+import { Star, Zap, Truck, ShieldCheck, Plus, Minus } from "lucide-react";
 export const HeroLanding = ({ product, headline, subHeadline, onBuy, }) => {
     const [qty, setQty] = useState(1);
     const [selectedImg, setSelectedImg] = useState(0);

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -131,18 +132,18 @@ export function OnboardingChecklist() {
                 Setup Checklist
               </h3>
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   onClick={() => setIsExpanded(false)}
                   className="p-1 text-gray-400 hover:text-gray-600"
                 >
                   <ChevronDown className="w-4 h-4" />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleDismiss}
                   className="p-1 text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -170,7 +171,7 @@ export function OnboardingChecklist() {
                   key={item.id}
                   className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                 >
-                  <button
+                  <Button
                     onClick={() => toggleItem(item.id)}
                     className="mt-0.5 flex-shrink-0"
                   >
@@ -179,7 +180,7 @@ export function OnboardingChecklist() {
                     ) : (
                       <Circle className="w-5 h-5 text-gray-300" />
                     )}
-                  </button>
+                  </Button>
                   <Link href={item.href} className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <Icon className="w-3.5 h-3.5 text-gray-400" />
@@ -206,17 +207,17 @@ export function OnboardingChecklist() {
 
           {/* Footer */}
           <div className="p-3 border-t border-gray-100">
-            <button
+            <Button
               onClick={handleDismiss}
               className="text-xs text-gray-400 hover:text-gray-600 w-full text-center"
             >
               Dismiss forever
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         /* Collapsed floating button */
-        <button
+        <Button
           onClick={() => setIsExpanded(true)}
           className="flex items-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-all hover:shadow-xl"
         >
@@ -225,8 +226,9 @@ export function OnboardingChecklist() {
             {completedCount}/{totalCount} complete
           </span>
           <ChevronUp className="w-3.5 h-3.5" />
-        </button>
+        </Button>
       )}
     </div>
   );
 }
+

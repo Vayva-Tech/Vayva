@@ -1,0 +1,59 @@
+# Full monorepo test + turbo typecheck (catches drift when PRs use affected-only CI)
+name: CI Nightly (full monorepo)
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: vayva
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: vayva_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.2.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Turbo test + typecheck (all packages)
+        run: pnpm turbo run test typecheck --continue --output-logs=errors-only
+        env:
+          DATABASE_URL: postgresql://vayva:test@localhost:5432/vayva_test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test

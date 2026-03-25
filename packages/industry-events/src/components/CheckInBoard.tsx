@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * CheckInBoard Component
@@ -69,7 +69,7 @@ export function CheckInBoardWidget({
 
     const interval = setInterval(() => {
       // In production, this would poll or use WebSocket
-      console.log('Auto-refreshing check-in data...');
+      console.warn('Auto-refreshing check-in data...');
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
@@ -174,12 +174,12 @@ export function CheckInBoardWidget({
 
                 <div className="flex gap-2">
                   {item.status === 'queued' && onCheckIn && (
-                    <button
+                    <Button
                       onClick={() => handleQuickCheckIn(item.ticketId)}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
                     >
                       Check In
-                    </button>
+                    </Button>
                   )}
                   
                   {item.status === 'checking_in' && (
@@ -226,7 +226,7 @@ export function CheckInBoardWidget({
           </div>
 
           {enableQueueManagement && (
-            <button
+            <Button
               onClick={isScanning ? stopScanner : startScanner}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 isScanning
@@ -235,7 +235,7 @@ export function CheckInBoardWidget({
               }`}
             >
               {isScanning ? 'Stop Scanning' : 'Scan QR Code'}
-            </button>
+            </Button>
           )}
         </div>
 
@@ -269,3 +269,4 @@ export function CheckInBoardWidget({
 CheckInBoardWidget.displayName = 'CheckInBoardWidget';
 
 export default CheckInBoardWidget;
+

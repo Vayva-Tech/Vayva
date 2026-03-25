@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import Link from "next/link";
@@ -11,7 +10,7 @@ import {
   FolderSimple,
   House as Home,
 } from "@phosphor-icons/react/ssr";
-import { cn } from "@vayva/ui";
+import { cn, Button } from "@vayva/ui";
 import { BREADCRUMB_HIERARCHY } from "@/config/breadcrumb-hierarchy";
 
 // ---------------------------------------------------------------------------
@@ -145,14 +144,14 @@ function labelFromSegment(segment: string): string {
 interface BreadcrumbDropdownProps {
   label: string;
   href: string;
-  children: { label: string; href: string }[];
+  items: { label: string; href: string }[];
   currentPath: string;
 }
 
 function BreadcrumbDropdown({
   label,
   href,
-  children,
+  items,
   currentPath,
 }: BreadcrumbDropdownProps) {
   const [open, setOpen] = useState(false);
@@ -196,7 +195,7 @@ function BreadcrumbDropdown({
         <FolderSimple weight="duotone" className="h-3.5 w-3.5 shrink-0 text-amber-500/80" />
         <span>{label}</span>
       </Link>
-      <button
+      <Button
         type="button"
         aria-label={`Show ${label} sub-pages`}
         aria-expanded={open}
@@ -213,11 +212,11 @@ function BreadcrumbDropdown({
             open && "rotate-180",
           )}
         />
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute left-0 top-full mt-1.5 z-50 min-w-[180px] rounded-lg border border-gray-200 bg-white shadow-lg py-1 animate-in fade-in slide-in-from-top-1 duration-150">
-          {children.map((child) => {
+          {items.map((child) => {
             const isActive =
               currentPath === child.href ||
               currentPath.startsWith(child.href + "/");
@@ -262,7 +261,7 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ className }: BreadcrumbsProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const segments = pathname.split("/").filter(Boolean);
 
   // Don't show breadcrumbs on the dashboard root
@@ -279,53 +278,69 @@ export function Breadcrumbs({ className }: BreadcrumbsProps) {
     return { href, label, isLast, isFirst, segment, hierarchy };
   });
 
+  const last = crumbs[crumbs.length - 1];
+
   return (
     <nav
       aria-label="Breadcrumb"
-      className={cn("flex items-center gap-1 text-xs", className)}
+      className={cn("flex items-center gap-1 text-xs min-w-0 flex-1", className)}
     >
-      {crumbs.map((crumb) => (
-        <span key={crumb.href} className="flex items-center gap-1">
-          {/* Separator */}
-          {!crumb.isFirst && (
-            <ChevronRight className="h-3 w-3 text-gray-400 shrink-0 mx-0.5" />
-          )}
-
-          {/* Home segment */}
-          {crumb.isFirst ? (
-            <Link
-              href={crumb.href}
-              className="text-gray-400 hover:text-gray-500 transition-colors flex items-center gap-1"
-            >
-              <Home weight="duotone" className="h-3.5 w-3.5" />
-              <span className="sr-only">{crumb.label}</span>
-            </Link>
-          ) : /* Intermediate segment with dropdown children */
-          !crumb.isLast && crumb.hierarchy ? (
-            <BreadcrumbDropdown
-              label={crumb.label}
-              href={crumb.href}
-              children={crumb.hierarchy.children}
-              currentPath={pathname}
-            />
-          ) : /* Intermediate segment without children */
-          !crumb.isLast ? (
-            <Link
-              href={crumb.href}
-              className="text-gray-400 hover:text-gray-500 transition-colors flex items-center gap-1 truncate max-w-[150px]"
-            >
-              <FolderSimple weight="duotone" className="h-3.5 w-3.5 shrink-0 text-amber-500/80" />
-              <span>{crumb.label}</span>
-            </Link>
-          ) : (
-            /* Current page (last segment) */
-            <span className="text-gray-900 font-medium flex items-center gap-1 truncate max-w-[200px]">
-              <FileIcon weight="duotone" className="h-3.5 w-3.5 shrink-0 text-green-500" />
-              <span>{crumb.label}</span>
-            </span>
-          )}
+      {/* Mobile: current page title only (app-style header) */}
+      {last ? (
+        <span className="md:hidden flex items-center gap-1 min-w-0 flex-1 text-sm font-semibold text-gray-900">
+          <FileIcon
+            weight="duotone"
+            className="h-3.5 w-3.5 shrink-0 text-green-500"
+          />
+          <span className="truncate">{last.label}</span>
         </span>
-      ))}
+      ) : null}
+
+      <div className="hidden md:flex items-center gap-1 flex-wrap min-w-0">
+        {crumbs.map((crumb) => (
+          <span key={crumb.href} className="flex items-center gap-1">
+            {!crumb.isFirst && (
+              <ChevronRight className="h-3 w-3 text-gray-400 shrink-0 mx-0.5" />
+            )}
+
+            {crumb.isFirst ? (
+              <Link
+                href={crumb.href}
+                className="text-gray-400 hover:text-gray-500 transition-colors flex items-center gap-1"
+              >
+                <Home weight="duotone" className="h-3.5 w-3.5" />
+                <span className="sr-only">{crumb.label}</span>
+              </Link>
+            ) : !crumb.isLast && crumb.hierarchy ? (
+              <BreadcrumbDropdown
+                label={crumb.label}
+                href={crumb.href}
+                items={crumb.hierarchy.children}
+                currentPath={pathname || "/"}
+              />
+            ) : !crumb.isLast ? (
+              <Link
+                href={crumb.href}
+                className="text-gray-400 hover:text-gray-500 transition-colors flex items-center gap-1 truncate max-w-[150px]"
+              >
+                <FolderSimple
+                  weight="duotone"
+                  className="h-3.5 w-3.5 shrink-0 text-amber-500/80"
+                />
+                <span>{crumb.label}</span>
+              </Link>
+            ) : (
+              <span className="text-gray-900 font-medium flex items-center gap-1 truncate max-w-[200px]">
+                <FileIcon
+                  weight="duotone"
+                  className="h-3.5 w-3.5 shrink-0 text-green-500"
+                />
+                <span>{crumb.label}</span>
+              </span>
+            )}
+          </span>
+        ))}
+      </div>
     </nav>
   );
 }

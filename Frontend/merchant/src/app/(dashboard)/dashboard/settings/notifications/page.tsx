@@ -15,9 +15,9 @@ import {
 } from "@phosphor-icons/react/ssr";
 import { logger } from "@vayva/shared";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface NotificationPrefs {
   channels: {
@@ -161,20 +161,15 @@ export default function NotificationsPage() {
           className="p-6 md:p-8"
           transition={{ duration: 0.5 }}
         >
-          <Breadcrumbs />
           <div className="flex items-center gap-4 mb-6">
             <BackButton
               href="/dashboard/settings/overview"
               label="Back to Settings"
             />
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-                Notifications
-              </h1>
-              <p className="text-gray-500">
-                Manage how you receive alerts and updates.
-              </p>
-            </div>
+            <PageHeader
+              title="Notifications"
+              subtitle="Manage how you receive alerts and updates."
+            />
           </div>
         </motion.div>
 

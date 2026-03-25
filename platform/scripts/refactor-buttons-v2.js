@@ -7,7 +7,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { _execSync } from 'child_process';
+import { execSync as _execSync } from 'child_process';
 
 const WORKSPACE_ROOT = '/Users/fredrick/Documents/GitHub/Vayva-platform';
 

@@ -22,8 +22,8 @@ export function withRateLimiting(
     const windowKey = `ratelimit:${clientId}:${Math.floor(now / config.interval)}`;
 
     try {
-      const redis = getRedis();
-      
+      const redis = await getRedis();
+
       // Increment request count in current window
       const currentCount = await redis.incr(windowKey);
       
@@ -120,13 +120,13 @@ export const RateLimitPresets = {
  */
 export async function clearRateLimit(clientId: string): Promise<void> {
   try {
-    const redis = getRedis();
+    const redis = await getRedis();
     const pattern = `ratelimit:${clientId}:*`;
     const keys = await redis.keys(pattern);
     
     if (keys.length > 0) {
       await redis.del(...keys);
-      console.log(`Cleared rate limit for ${clientId}`);
+      console.warn(`Cleared rate limit for ${clientId}`);
     }
   } catch (error) {
     console.error('Failed to clear rate limit:', error);
@@ -141,10 +141,10 @@ export async function getRateLimitStatus(
   config: RateLimitConfig
 ): Promise<{ count: number; remaining: number; resetIn: number }> {
   try {
-    const redis = getRedis();
+    const redis = await getRedis();
     const now = Date.now();
     const windowKey = `ratelimit:${clientId}:${Math.floor(now / config.interval)}`;
-    
+
     const [count, ttl] = await Promise.all([
       redis.get(windowKey),
       redis.ttl(windowKey),

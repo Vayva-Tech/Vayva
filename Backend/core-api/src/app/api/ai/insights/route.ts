@@ -9,12 +9,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI, APIContext } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { standardHeaders } from "@vayva/shared";
-import { 
+import {
   generateInsightsReport,
   generateDemandForecast,
-  detectAnomalies,
-  generatePricingRecommendations,
-  predictStockLevels
+  detectAnomalies as _detectAnomalies,
+  generatePricingRecommendations as _generatePricingRecommendations,
+  predictStockLevels as _predictStockLevels
 } from "@/lib/ai/agent";
 import type { AIInsight, PredictiveForecast } from "@/components/dashboard/AIInsightsPanel";
 
@@ -68,7 +68,7 @@ export const GET = withVayvaAPI(
 async function generateAIInsights(
   storeId: string,
   industry: string,
-  timeRange: string
+  _timeRange: string
 ): Promise<AIInsight[]> {
   const insights: AIInsight[] = [];
 
@@ -114,8 +114,8 @@ async function generateAIInsights(
           ? `Potential loss of ₦${(pred.currentStock * pred.avgPrice * 0.3).toFixed(0)}`
           : `Prevent ₦${(pred.predictedDemand * pred.avgPrice * 0.2).toFixed(0)} in lost sales`,
         actions: pred.status === 'overstocked'
-          ? [{ label: 'Create Promotion', action: () => console.log('create promo') }]
-          : [{ label: 'Reorder Now', action: () => console.log('reorder') }],
+          ? [{ label: 'Create Promotion', action: () => console.warn('create promo') }]
+          : [{ label: 'Reorder Now', action: () => console.warn('reorder') }],
         metadata: { productId: pred.productId, type: 'inventory' },
       });
     });
@@ -133,7 +133,7 @@ async function generateAIInsights(
         details: `Detected at ${new Date(anomaly.timestamp).toLocaleString()}`,
         recommendation: `Investigate ${anomaly.metric} performance immediately`,
         predictedImpact: anomaly.impactDescription,
-        actions: [{ label: 'View Details', action: () => console.log('view anomaly') }],
+        actions: [{ label: 'View Details', action: () => console.warn('view anomaly') }],
         metadata: { type: 'anomaly', metric: anomaly.metric },
       });
     });
@@ -164,7 +164,7 @@ async function generateAIInsights(
  */
 async function generatePredictiveForecasts(
   storeId: string,
-  industry: string
+  _industry: string
 ): Promise<PredictiveForecast[]> {
   const forecasts: PredictiveForecast[] = [];
 
@@ -211,7 +211,7 @@ async function generatePredictiveForecasts(
 /**
  * Generate food industry specific insights
  */
-function generateFoodIndustryInsights(storeId: string): AIInsight[] {
+function generateFoodIndustryInsights(_storeId: string): AIInsight[] {
   return [
     {
       id: 'food-peak-time',
@@ -242,7 +242,7 @@ function generateFoodIndustryInsights(storeId: string): AIInsight[] {
 /**
  * Generate services industry insights
  */
-function generateServicesInsights(storeId: string): AIInsight[] {
+function generateServicesInsights(_storeId: string): AIInsight[] {
   return [
     {
       id: 'services-utilization',
@@ -265,7 +265,7 @@ function generateServicesInsights(storeId: string): AIInsight[] {
       impact: 'high',
       category: 'operations',
       recommendation: 'Send reminder confirmations to at-risk customers',
-      actions: [{ label: 'Send Reminders', action: () => console.log('send reminders') }],
+      actions: [{ label: 'Send Reminders', action: () => console.warn('send reminders') }],
       metadata: { type: 'no_show_prediction' },
     },
   ];
@@ -274,7 +274,7 @@ function generateServicesInsights(storeId: string): AIInsight[] {
 /**
  * Generate retail industry insights
  */
-function generateRetailInsights(storeId: string): AIInsight[] {
+function generateRetailInsights(_storeId: string): AIInsight[] {
   return [
     {
       id: 'retail-weekend-surge',
@@ -306,7 +306,7 @@ function generateRetailInsights(storeId: string): AIInsight[] {
 /**
  * Fallback insights when AI models fail
  */
-function generateFallbackInsights(industry: string): AIInsight[] {
+function generateFallbackInsights(_industry: string): AIInsight[] {
   return [
     {
       id: 'fallback-1',

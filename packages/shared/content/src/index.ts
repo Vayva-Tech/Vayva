@@ -23,7 +23,7 @@ import {
   defaultStorePrivacy,
   defaultStoreTerms,
 } from "./templates/store-policies";
-import { LegalRegistry } from "./types";
+import type { LegalRegistry } from "./types";
 
 // Registry
 export const legalRegistry: LegalRegistry = {

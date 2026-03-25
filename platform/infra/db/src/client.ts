@@ -326,6 +326,13 @@ const globalForPrisma = globalThis as unknown as {
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient(); // Removed { adapter }
 
+/**
+ * Runtime access to Prisma models that exist in the full database schema but are not
+ * yet on this generated client. Prefer adding models to the schema and regenerating.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentional escape hatch
+export const prismaDelegates: any = prisma;
+
 // Isolated instances for multi-tenancy
 import { isolatedExtension } from "./extension";
 export const getIsolatedPrisma = (storeId: string) =>

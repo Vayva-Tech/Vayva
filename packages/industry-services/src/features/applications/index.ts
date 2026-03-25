@@ -1,10 +1,7 @@
-// @ts-nocheck
 /**
  * Applications Feature Module
  * Dedicated module for application management functionality
  */
-
-export * from '../../services/application-service';
 
 export interface ApplicationFeatureConfig {
   enableDocumentUpload: boolean;

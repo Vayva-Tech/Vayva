@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Newsletter Add-On Components
@@ -11,20 +12,16 @@
  * - SubscriberCount: Social proof display
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
-  Send,
   X,
   Check,
-  Sparkles,
   Gift,
   Bell,
   AlertCircle,
   Loader2,
-  Heart,
-  Zap,
   ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -225,7 +222,7 @@ export function NewsletterSignup({
               />
             </div>
             
-            <button
+            <Button
               type="submit"
               disabled={state.status === 'loading'}
               className={cn(
@@ -247,7 +244,7 @@ export function NewsletterSignup({
                   <ArrowRight className="w-4 h-4 hidden sm:block" />
                 </>
               )}
-            </button>
+            </Button>
           </div>
 
           {/* Error Message */}
@@ -367,6 +364,8 @@ export function NewsletterPopup({
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }
+
+    return undefined;
   }, [trigger, delayMs, scrollPercentage, showOnce, hasShown, cookieDurationDays]);
 
   const handleClose = () => {
@@ -398,12 +397,12 @@ export function NewsletterPopup({
           >
             <div className="bg-background rounded-2xl shadow-2xl overflow-hidden mx-4">
               {/* Close Button */}
-              <button
+              <Button
                 onClick={handleClose}
                 className="absolute top-4 right-4 p-2 hover:bg-accent rounded-full transition-colors z-10"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
 
               <div className="grid md:grid-cols-5">
                 {/* Image Side */}
@@ -449,7 +448,7 @@ export function NewsletterWidget({
   className 
 }: NewsletterWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribed] = useState(false);
 
   const positionClasses = {
     bottom_right: 'right-4',
@@ -474,12 +473,12 @@ export function NewsletterWidget({
                 <Bell className="w-5 h-5 text-primary" />
                 <span className="font-medium">Stay Updated</span>
               </div>
-              <button
+              <Button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-accent rounded"
               >
                 <X className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
 
             <NewsletterSignup
@@ -621,7 +620,7 @@ export function NewsletterPreferences({
       </div>
 
       <div className="flex items-center justify-between mt-6 pt-6 border-t">
-        <button
+        <Button
           onClick={handleSave}
           className={cn(
             'px-4 py-2 rounded-lg font-medium transition-colors',
@@ -631,14 +630,14 @@ export function NewsletterPreferences({
           )}
         >
           {isSaved ? 'Saved!' : 'Save Preferences'}
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={onUnsubscribe}
           className="text-sm text-destructive hover:underline"
         >
           Unsubscribe from all
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -715,3 +714,4 @@ export function SocialProofNewsletter({
     </div>
   );
 }
+

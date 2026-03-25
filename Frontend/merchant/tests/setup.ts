@@ -1,7 +1,54 @@
 import "@testing-library/jest-dom";
-import { expect, afterEach, beforeAll, afterAll, vi } from "vitest";
+import {
+  expect,
+  afterEach,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  vi,
+} from "vitest";
 import { cleanup } from "@testing-library/react";
 import React from "react";
+
+const { mockSessionUser } = vi.hoisted(() => ({
+  mockSessionUser: {
+    id: "user_test_123",
+    email: "test@example.com",
+    firstName: null as string | null,
+    lastName: null as string | null,
+    storeId: "store_test_123",
+    storeName: "Test Store",
+    role: "owner",
+    sessionVersion: 0,
+  },
+}));
+
+vi.mock("@/lib/session.server", () => ({
+  requireAuthFromRequest: vi.fn(() => Promise.resolve({ ...mockSessionUser })),
+  getSessionUser: vi.fn(),
+  requireAuth: vi.fn(),
+  clearSession: vi.fn(),
+  createSession: vi.fn(),
+}));
+
+export { mockSessionUser };
+
+import { requireAuthFromRequest } from "@/lib/session.server";
+
+beforeEach(() => {
+  vi.mocked(requireAuthFromRequest).mockImplementation(() =>
+    Promise.resolve({ ...mockSessionUser }),
+  );
+});
+
+// Recharts ResponsiveContainer uses ResizeObserver in jsdom
+beforeAll(() => {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
 
 // Cleanup after each test
 afterEach(() => {

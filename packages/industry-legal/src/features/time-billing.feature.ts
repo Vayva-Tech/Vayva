@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Time & Billing Feature Module
  */

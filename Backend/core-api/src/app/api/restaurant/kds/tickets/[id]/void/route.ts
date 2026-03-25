@@ -35,19 +35,28 @@ class TicketVoidController extends BaseIndustryController {
           throw new Error("Ticket not found");
         }
 
-        // Void the ticket
-        const voidedTicket = await prisma.kitchenTicket.update({
-          where: { id: ticketId },
+        const voided = await prisma.kitchenTicket.updateMany({
+          where: { id: ticketId, storeId: context.storeId },
           data: {
             status: "cancelled",
             priority: "voided",
             updatedAt: new Date(),
           },
+        });
+        if (voided.count === 0) {
+          throw new Error("Ticket not found");
+        }
+
+        const voidedTicket = await prisma.kitchenTicket.findUnique({
+          where: { id: ticketId, storeId: context.storeId },
           include: {
             station: true,
             items: true,
           },
         });
+        if (!voidedTicket) {
+          throw new Error("Ticket not found");
+        }
 
         // Log void reason for analytics
         await this.logVoidReason(context.storeId, ticketId, reason, notes);
@@ -67,10 +76,10 @@ class TicketVoidController extends BaseIndustryController {
     storeId: string, 
     ticketId: string, 
     reason: string, 
-    notes?: string
+    _notes?: string
   ) {
     // TODO: Create audit log entry for void tracking
-    console.log(`[VOID_LOG] Store: ${storeId}, Ticket: ${ticketId}, Reason: ${reason}`);
+    console.warn(`[VOID_LOG] Store: ${storeId}, Ticket: ${ticketId}, Reason: ${reason}`);
   }
 }
 

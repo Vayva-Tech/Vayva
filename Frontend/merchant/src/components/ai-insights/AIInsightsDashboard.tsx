@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * AI Insights Dashboard
  * Intelligent recommendations, predictions, and anomaly detection
@@ -21,7 +21,9 @@ import {
   Clock,
   Users,
   ShoppingCart,
-  CurrencyDollar
+  CurrencyDollar,
+  Bell,
+  Info,
 } from '@phosphor-icons/react';
 import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
@@ -82,6 +84,14 @@ interface AISummary {
   insightsGenerated: number;
 }
 
+const EMPTY_AI_SUMMARY: AISummary = {
+  recommendationsCount: 0,
+  activeModels: 0,
+  anomaliesDetected: 0,
+  avgConfidence: 0,
+  insightsGenerated: 0,
+};
+
 // Main AI Insights Dashboard
 export default function AIInsightsDashboard() {
   const { store } = useStore();
@@ -99,7 +109,7 @@ export default function AIInsightsDashboard() {
       } catch (error) {
         console.error('Failed to fetch AI summary:', error);
         toast.error('Failed to load AI insights');
-        return null;
+        return EMPTY_AI_SUMMARY;
       }
     }
   );
@@ -165,7 +175,7 @@ export default function AIInsightsDashboard() {
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex gap-2">
           {tabs.map((tab) => (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -176,7 +186,7 @@ export default function AIInsightsDashboard() {
             >
               {tab.icon}
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
         
@@ -377,9 +387,9 @@ function RecommendationFeed({ recommendations, loading }: { recommendations: AIR
               </span>
             </div>
             
-            <button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
+            <Button className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium">
               {rec.action}
-            </button>
+            </Button>
           </ThemedCard>
         </motion.div>
       ))}
@@ -534,9 +544,9 @@ function AnomalyDetection({ anomalies, loading }: { anomalies: Anomaly[]; loadin
                   {anomaly.severity}
                 </span>
                 {!anomaly.resolved && (
-                  <button className="mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:opacity-90 transition-opacity">
+                  <Button className="mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:opacity-90 transition-opacity">
                     Resolve
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

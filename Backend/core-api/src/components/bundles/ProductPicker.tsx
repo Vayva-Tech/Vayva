@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import {
   MagnifyingGlass as Search,
   Spinner as Loader2,
-  Package,
+  Package
 } from "@phosphor-icons/react/ssr";
 import { Checkbox, Input } from "@vayva/ui";
 

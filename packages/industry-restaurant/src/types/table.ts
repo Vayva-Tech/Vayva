@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Table Management and Turn Optimization types
  */
@@ -18,7 +17,8 @@ export interface TableTurnConfig {
   tableResetTimeMinutes: number;
 }
 
-export interface Table {
+/** Table-turn / reservation flow model; distinct from floor-plan `Table` in `kitchen-types`. */
+export interface TableTurnTable {
   id: string;
   number: string;
   name?: string;
@@ -144,7 +144,7 @@ export interface TableNotification {
 // Widget Props
 export interface TableWidgetProps {
   config: TableTurnConfig;
-  tables: Table[];
+  tables: TableTurnTable[];
   reservations: TableReservation[];
   waitlist: WaitlistEntry[];
   predictions: TableTurnPrediction[];

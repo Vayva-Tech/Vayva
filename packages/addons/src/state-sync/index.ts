@@ -217,7 +217,6 @@ export class StateSync {
   applyExternalChange(change: StateChange): void {
     // Check for conflicts
     if (this.config.options.resolveConflicts) {
-      const currentValue = this.getPathValue(this.state, change.path);
       const lastChange = this.getLastChangeAtPath(change.path);
       
       if (lastChange && lastChange.timestamp > change.timestamp) {

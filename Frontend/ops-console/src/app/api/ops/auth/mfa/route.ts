@@ -8,10 +8,7 @@ import { logger } from "@vayva/shared";
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await OpsAuthService.getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { user } = await OpsAuthService.requireSession();
 
     const { password } = await req.json();
 
@@ -24,10 +21,10 @@ export async function DELETE(req: NextRequest) {
 
     // Verify password before disabling MFA
     const bcrypt = await import("bcryptjs");
-    const isValid = await bcrypt.compare(password, session.user?.password);
+    const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      await OpsAuthService.logEvent(session.user?.id, "OPS_MFA_DISABLE_FAILED", {
+      await OpsAuthService.logEvent(user.id, "OPS_MFA_DISABLE_FAILED", {
         reason: "invalid_password",
       });
       return NextResponse.json(
@@ -36,13 +33,16 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    await (OpsAuthService as any).disableMFA(session.user?.id);
+    await (OpsAuthService as any).disableMFA(user.id);
 
     return NextResponse.json({
       success: true,
       message: "MFA disabled successfully",
     });
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     logger.error("[MFA_DISABLE_ERROR]", { error });
     return NextResponse.json(
       { error: "Failed to disable MFA" },

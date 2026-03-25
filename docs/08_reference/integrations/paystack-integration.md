@@ -19,7 +19,8 @@ Paystack is Vayva's sole payment gateway, chosen for its native Nigerian Naira s
 | Variable | Purpose | Example |
 |----------|---------|---------|
 | `PAYSTACK_SECRET_KEY` | Server-side API authentication | `sk_test_...` or `sk_live_...` |
-| `PAYSTACK_PUBLIC_KEY` | Client-side checkout initialization | `pk_test_...` or `pk_live_...` |
+| `NEXT_PUBLIC_PAYSTACK_KEY` | Client-side checkout initialization (canonical) | `pk_test_...` or `pk_live_...` |
+| `PAYSTACK_PUBLIC_KEY` | Legacy alias (avoid if possible) | `pk_test_...` or `pk_live_...` |
 | `PAYSTACK_LIVE_SECRET_KEY` | Production-only secret key (storefront) | `sk_live_...` |
 
 ### API Base URL
@@ -309,7 +310,7 @@ Access the Paystack dashboard at `https://dashboard.paystack.com` for:
 
 ## Security Considerations
 
-1. **Never expose the secret key** in client-side code. Only `PAYSTACK_PUBLIC_KEY` is used on the frontend.
+1. **Never expose the secret key** in client-side code. Use `NEXT_PUBLIC_PAYSTACK_KEY` on the frontend (with `PAYSTACK_PUBLIC_KEY` as a legacy alias in some apps).
 2. **Always verify webhooks** using the HMAC-SHA512 signature.
 3. **Always verify transactions server-side** after receiving a callback. Never trust client-side payment confirmation alone.
 4. **Use idempotency keys** for all financial operations to prevent duplicates.

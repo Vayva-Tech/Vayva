@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Appointment, AppointmentStatus, AppointmentType, HealthcareAnalytics } from '../types';
 
@@ -26,8 +25,12 @@ export interface TimeSlot {
 export class AppointmentService {
   private db: any;
 
-  constructor(db: any) {
-    this.db = db;
+  constructor(db?: any) {
+    this.db = db ?? null;
+  }
+
+  async initialize(): Promise<void> {
+    // Optional persistence hook; in-memory when db is unset
   }
 
   /**

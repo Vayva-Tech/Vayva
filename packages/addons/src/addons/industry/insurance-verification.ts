@@ -4,7 +4,7 @@
  * Health insurance verification and coverage checking
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const INSURANCE_VERIFICATION_ADDON: AddOnDefinition = {
   id: 'vayva.insurance-verification',

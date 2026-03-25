@@ -21,7 +21,7 @@ export const kycExplainer: LegalDocument = {
     {
       heading: "3. How Verification Works",
       content: [
-        "We may use YouVerify for NIN checks, Paystack for BVN checks, and manual review for CAC through our Ops Console.",
+        "We may use Paystack for BVN checks and manual review for CAC through our Ops Console. Other verification checks may be manual or use third-party providers depending on availability and compliance requirements.",
       ],
     },
     {

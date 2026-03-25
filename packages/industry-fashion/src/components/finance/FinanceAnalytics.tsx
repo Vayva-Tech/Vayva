@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React from 'react';
-import { GlassPanel, SparklineChart } from '@vayva/ui/components/fashion';
+import { GlassPanel, SparklineChart } from '@vayva/ui/fashion';
 
 export interface RevenueMetrics {
   totalRevenue: number;

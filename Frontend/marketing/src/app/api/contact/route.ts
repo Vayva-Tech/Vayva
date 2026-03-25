@@ -139,7 +139,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         errorType: "CONTACT_FORM_SUBMISSION",
         errorMessage: `[Subject: ${body.subject}] from ${body.email}`,
         fingerprint: `contact-${Date.now()}-${Math.random()}`,
-        status: status as any,
+        status: "OPEN",
         diagnostics: {
           name: `${body.firstName} ${body.lastName}`,
           email: body.email,

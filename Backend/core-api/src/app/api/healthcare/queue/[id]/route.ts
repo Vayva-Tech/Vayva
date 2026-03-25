@@ -165,7 +165,7 @@ export const PUT = withVayvaAPI(
         status,
         priority,
         roomNumber,
-        notes,
+        _notes,
       } = body;
 
       // Verify queue entry exists

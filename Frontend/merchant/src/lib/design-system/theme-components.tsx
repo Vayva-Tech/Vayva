@@ -144,18 +144,21 @@ interface ThemedCardProps {
   industry: IndustrySlug | string;
   className?: string;
   animate?: boolean;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 export function ThemedCard({ 
   children, 
   industry, 
   className = '',
-  animate = true 
+  animate = true,
+  onClick,
 }: ThemedCardProps) {
   const colors = getThemeColors(industry);
   
   return (
     <motion.div
+      onClick={onClick}
       className={`rounded-2xl border border-gray-100 bg-white p-6 shadow-sm ${className}`}
       style={{
         borderColor: `${colors.primary}20`,

@@ -37,7 +37,7 @@ export function Logo({
       />
       {showText && (
         <span className={`font-bold tracking-tight text-black ${text}`}>
-          {logoText || "Merchant"}
+          {logoText || "Vayva"}
         </span>
       )}
     </div>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Specialized Services Dashboard Component
  */
@@ -42,7 +41,12 @@ export const SpecializedServicesDashboard: React.FC<SpecializedServicesDashboard
         </div>
         <div className="bg-yellow-50 p-4 rounded-lg">
           <div className="text-sm text-gray-600">Avg Rating</div>
-          <div className="text-xl font-bold text-yellow-600">⭐ {providers.reduce((sum, p) => sum + p.rating, 0) / providers.length.toFixed(1)}</div>
+          <div className="text-xl font-bold text-yellow-600">
+            ⭐{' '}
+            {providers.length > 0
+              ? (providers.reduce((sum, p) => sum + p.rating, 0) / providers.length).toFixed(1)
+              : '0'}
+          </div>
         </div>
       </div>
 

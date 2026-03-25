@@ -22,7 +22,7 @@ interface PaymentMethod {
   isDefault?: boolean;
 }
 
-interface Rating {
+interface _Rating {
   mealId: string;
   rating: number;
   review?: string;

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 import { useOpsQuery } from "@/hooks/useOpsQuery";
@@ -418,12 +419,12 @@ export default function ComprehensiveAnalyticsPage(): React.JSX.Element {
       description="Complete platform insights and metrics"
       headerActions={
         canExport && (
-          <button
+          <Button
             onClick={() => window.open("/api/ops/analytics/export", "_blank")}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
           >
             Export Data
-          </button>
+          </Button>
         )
       }
     >
@@ -677,3 +678,4 @@ export default function ComprehensiveAnalyticsPage(): React.JSX.Element {
     </OpsPageShell>
   );
 }
+

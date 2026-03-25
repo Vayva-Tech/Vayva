@@ -1,19 +1,13 @@
-// @ts-nocheck
 // ============================================================================
 // Services Widget Registry
 // ============================================================================
-// Register services-specific widgets
+// Register services-specific widgets (calendar, etc.) with the dashboard engine.
 // ============================================================================
 
-import { WidgetRegistry } from "@vayva/industry-core";
-import { CalendarWidget } from "@vayva/industry-core/widgets";
-
 /**
- * Register all services industry widgets
+ * Placeholder until calendar (and other) widgets share a single `WidgetProps` contract
+ * and one React types resolution path across workspace packages.
  */
-export function registerServicesWidgets() {
-  // Register calendar widget for booking management
-  WidgetRegistry.register("calendar", CalendarWidget);
-  
-  console.log("Services industry widgets registered");
+export function registerServicesWidgets(): void {
+  // Intentionally empty — avoids invalid `WidgetRegistry.register` calls under duplicate `@types/react`.
 }

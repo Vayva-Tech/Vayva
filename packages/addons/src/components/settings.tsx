@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * Add-on Settings Management UI Components
@@ -12,7 +13,7 @@
  * - AddOnStatusCard: Status display and actions
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
@@ -21,8 +22,6 @@ import {
   RefreshCw,
   AlertCircle,
   Check,
-  ChevronDown,
-  ChevronRight,
   Code,
   Palette,
   Layers,
@@ -30,7 +29,6 @@ import {
   ExternalLink,
   RotateCcw,
   Save,
-  X,
   AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -189,7 +187,7 @@ export function AddOnSettingsPanel({
 
         <div className="flex items-center gap-2">
           {hasChanges && (
-            <button
+            <Button
               onClick={handleSave}
               disabled={isSaving}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
@@ -200,45 +198,45 @@ export function AddOnSettingsPanel({
                 <Save className="w-4 h-4" />
               )}
               Save Changes
-            </button>
+            </Button>
           )}
 
           <div className="relative group">
-            <button className="p-2 hover:bg-accent rounded-lg transition-colors">
+            <Button className="p-2 hover:bg-accent rounded-lg transition-colors">
               <MoreVertical className="w-5 h-5" />
-            </button>
+            </Button>
             <div className="absolute right-0 top-full mt-1 w-48 bg-background rounded-xl shadow-xl border py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-              <button
+              <Button
                 onClick={onToggleStatus}
                 className="w-full px-4 py-2 text-left text-sm hover:bg-accent flex items-center gap-2"
               >
                 <Power className="w-4 h-4" />
                 {isActive ? 'Disable' : 'Enable'}
-              </button>
+              </Button>
               {hasUpdate && (
-                <button
+                <Button
                   onClick={onUpdate}
                   className="w-full px-4 py-2 text-left text-sm hover:bg-accent flex items-center gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Update to v{addOn.latestVersion}
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 onClick={() => setShowResetConfirm(true)}
                 className="w-full px-4 py-2 text-left text-sm hover:bg-accent flex items-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset to Default
-              </button>
+              </Button>
               <hr className="my-1" />
-              <button
+              <Button
                 onClick={() => setShowUninstallConfirm(true)}
                 className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 Uninstall
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -247,7 +245,7 @@ export function AddOnSettingsPanel({
       {/* Tabs */}
       <div className="flex gap-1 p-2 border-b bg-muted/30">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={cn(
@@ -259,7 +257,7 @@ export function AddOnSettingsPanel({
           >
             <tab.icon className="w-4 h-4" />
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -646,7 +644,7 @@ export function AddOnCustomizer({ customCSS, customJS, onChange, className }: Ad
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center gap-2 p-1 bg-muted rounded-lg w-fit">
-        <button
+        <Button
           onClick={() => setActiveEditor('css')}
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
@@ -657,8 +655,8 @@ export function AddOnCustomizer({ customCSS, customJS, onChange, className }: Ad
         >
           <Palette className="w-4 h-4" />
           Custom CSS
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setActiveEditor('js')}
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
@@ -669,7 +667,7 @@ export function AddOnCustomizer({ customCSS, customJS, onChange, className }: Ad
         >
           <Code className="w-4 h-4" />
           Custom JavaScript
-        </button>
+        </Button>
       </div>
 
       <div className="relative">
@@ -731,13 +729,13 @@ function ConfirmationModal({
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="text-muted-foreground mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
-          <button
+          <Button
             onClick={onCancel}
             className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-accent transition-colors"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
             className={cn(
               'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
@@ -747,7 +745,7 @@ function ConfirmationModal({
             )}
           >
             {confirmText}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -798,13 +796,13 @@ export function AddOnStatusCard({ addOn, onConfigure, onToggle, className }: Add
       </div>
 
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={onConfigure}
           className="p-2 hover:bg-accent rounded-lg transition-colors"
         >
           <Settings className="w-4 h-4" />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onToggle}
           className={cn(
             'w-10 h-6 rounded-full transition-colors relative',
@@ -815,8 +813,9 @@ export function AddOnStatusCard({ addOn, onConfigure, onToggle, className }: Add
             'absolute top-1 w-4 h-4 rounded-full bg-white transition-all',
             isActive ? 'left-5' : 'left-1'
           )} />
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
+

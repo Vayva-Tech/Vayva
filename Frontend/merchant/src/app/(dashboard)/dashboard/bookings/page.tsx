@@ -1,7 +1,9 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { apiJson } from "@/lib/api-client-shared";
+import { toast } from "sonner";
 import {
   CalendarDays,
   Clock,
@@ -19,33 +21,21 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
-/*  Mock data                                                          */
-/* ------------------------------------------------------------------ */
-
-const BOOKINGS = [
-  { id: "1", customer: "Chidinma Okafor", service: "Hair Braiding (Box Braids)", date: "2026-03-22", time: "09:00 AM", duration: "2h 30m", amount: 25000, status: "Confirmed" },
-  { id: "2", customer: "Emeka Nwosu", service: "Consultation", date: "2026-03-22", time: "10:00 AM", duration: "45m", amount: 5000, status: "Completed" },
-  { id: "3", customer: "Aisha Bello", service: "Bridal Makeup", date: "2026-03-22", time: "11:30 AM", duration: "1h 30m", amount: 75000, status: "Pending" },
-  { id: "4", customer: "Oluwaseun Adeyemi", service: "Cornrows & Styling", date: "2026-03-22", time: "01:00 PM", duration: "2h", amount: 18000, status: "Confirmed" },
-  { id: "5", customer: "Funke Akindele", service: "Locs Retwist", date: "2026-03-22", time: "02:30 PM", duration: "1h 30m", amount: 15000, status: "Pending" },
-  { id: "6", customer: "Tunde Bakare", service: "Makeup (Glam Look)", date: "2026-03-23", time: "09:30 AM", duration: "1h 15m", amount: 35000, status: "Cancelled" },
-  { id: "7", customer: "Ngozi Eze", service: "Hair Braiding (Knotless)", date: "2026-03-23", time: "11:00 AM", duration: "3h", amount: 30000, status: "Confirmed" },
-  { id: "8", customer: "Yusuf Ibrahim", service: "Consultation", date: "2026-03-23", time: "12:00 PM", duration: "30m", amount: 3500, status: "Completed" },
-];
-
-const TODAY_SCHEDULE = [
-  { time: "09:00 AM", customer: "Chidinma Okafor", service: "Hair Braiding (Box Braids)", duration: "2h 30m", status: "Confirmed" },
-  { time: "10:00 AM", customer: "Emeka Nwosu", service: "Consultation", duration: "45m", status: "Completed" },
-  { time: "11:30 AM", customer: "Aisha Bello", service: "Bridal Makeup", duration: "1h 30m", status: "Pending" },
-  { time: "01:00 PM", customer: "Oluwaseun Adeyemi", service: "Cornrows & Styling", duration: "2h", status: "Confirmed" },
-  { time: "02:30 PM", customer: "Funke Akindele", service: "Locs Retwist", duration: "1h 30m", status: "Pending" },
-];
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
+/*  Types & helpers                                                    */
 /* ------------------------------------------------------------------ */
 
 type Status = "Confirmed" | "Pending" | "Cancelled" | "Completed";
+
+interface BookingRow {
+  id: string;
+  customer: string;
+  service: string;
+  date: string;
+  time: string;
+  duration: string;
+  amount: number;
+  status: Status;
+}
 
 const STATUS_CONFIG: Record<Status, { bg: string; text: string; dot: string; icon: any }> = {
   Confirmed: { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500", icon: CheckCircle2 },
@@ -78,8 +68,88 @@ function getInitials(name: string) {
 export default function BookingsPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("All");
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = BOOKINGS.filter((b) => {
+  const loadBookings = useCallback(async () => {
+    try {
+      setLoading(true);
+      const start = new Date();
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setMonth(end.getMonth() + 2);
+      const res = await apiJson<{
+        success?: boolean;
+        data?: Array<{
+          id: string;
+          customerName: string;
+          service: string;
+          date: string;
+          time: string;
+          duration: string;
+          amount: number;
+          status: Status;
+        }>;
+      }>(
+        `/api/bookings?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`,
+      );
+      const rows = (res.data ?? []).map((b) => ({
+        id: b.id,
+        customer: b.customerName,
+        service: b.service,
+        date: b.date,
+        time: b.time,
+        duration: b.duration,
+        amount: b.amount,
+        status: b.status,
+      }));
+      setBookings(rows);
+    } catch {
+      toast.error("Could not load bookings");
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadBookings();
+  }, [loadBookings]);
+
+  const todayKey = new Date().toISOString().slice(0, 10);
+
+  const todaySchedule = useMemo(() => {
+    return bookings
+      .filter((b) => b.date === todayKey)
+      .sort((a, b) => a.time.localeCompare(b.time))
+      .map((b) => ({
+        time: b.time,
+        customer: b.customer,
+        service: b.service,
+        duration: b.duration,
+        status: b.status,
+      }));
+  }, [bookings, todayKey]);
+
+  const weekStats = useMemo(() => {
+    const now = new Date();
+    const dow = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    const inWeek = bookings.filter((b) => {
+      const d = new Date(b.date + "T12:00:00");
+      return d >= monday && d <= sunday;
+    });
+    const revenue = inWeek.reduce((s, b) => s + b.amount, 0);
+    return { weekCount: inWeek.length, revenue };
+  }, [bookings]);
+
+  const filtered = bookings.filter((b) => {
     const matchStatus = filterStatus === "All" || b.status === filterStatus;
     const matchSearch =
       search === "" ||
@@ -88,10 +158,27 @@ export default function BookingsPage() {
     return matchStatus && matchSearch;
   });
 
+  const todayCount = bookings.filter((b) => b.date === todayKey).length;
+
   const summaryCards = [
-    { label: "Today's Bookings", value: "8", icon: CalendarDays, accent: "bg-green-50 text-green-600" },
-    { label: "This Week", value: "34", icon: Clock, accent: "bg-blue-50 text-blue-600" },
-    { label: "Revenue", value: "\u20A6425K", icon: Banknote, accent: "bg-purple-50 text-purple-600" },
+    {
+      label: "Today's Bookings",
+      value: String(todayCount),
+      icon: CalendarDays,
+      accent: "bg-green-50 text-green-600",
+    },
+    {
+      label: "This Week",
+      value: String(weekStats.weekCount),
+      icon: Clock,
+      accent: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Week Revenue",
+      value: formatNaira(weekStats.revenue),
+      icon: Banknote,
+      accent: "bg-purple-50 text-purple-600",
+    },
   ];
 
   return (
@@ -102,16 +189,20 @@ export default function BookingsPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Bookings</h1>
             <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
-              {BOOKINGS.length}
+              {bookings.length}
             </span>
           </div>
           <p className="text-sm text-gray-500 mt-1">Manage appointments and client schedules</p>
         </div>
-        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+        <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
           <Plus size={16} />
           New Booking
-        </button>
+        </Button>
       </div>
+
+      {loading ? (
+        <div className="text-sm text-gray-500 py-12 text-center">Loading bookings…</div>
+      ) : null}
 
       {/* ── Summary Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -147,7 +238,10 @@ export default function BookingsPage() {
             <div className="absolute left-[63px] top-0 bottom-0 w-px bg-gray-200" />
 
             <div className="space-y-0">
-              {TODAY_SCHEDULE.map((slot, idx) => {
+              {todaySchedule.length === 0 ? (
+                <p className="text-sm text-gray-500 py-6 pl-20">No bookings scheduled for today.</p>
+              ) : null}
+              {todaySchedule.map((slot, idx) => {
                 const statusCfg = STATUS_CONFIG[slot.status as Status];
                 const StatusIcon = statusCfg.icon;
                 return (
@@ -213,7 +307,7 @@ export default function BookingsPage() {
             {/* Status filters */}
             <div className="hidden sm:flex items-center gap-1.5">
               {["All", "Confirmed", "Pending", "Cancelled", "Completed"].map((s) => (
-                <button
+                <Button
                   key={s}
                   onClick={() => setFilterStatus(s)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
@@ -223,7 +317,7 @@ export default function BookingsPage() {
                   }`}
                 >
                   {s}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -293,15 +387,15 @@ export default function BookingsPage() {
 
                     {/* Actions */}
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors" title="View">
+                      <Button className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors" title="View">
                         <Eye size={14} className="text-gray-500" />
-                      </button>
-                      <button className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors" title="Edit">
+                      </Button>
+                      <Button className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors" title="Edit">
                         <Pencil size={14} className="text-gray-500" />
-                      </button>
-                      <button className="p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Delete">
+                      </Button>
+                      <Button className="p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Delete">
                         <Trash2 size={14} className="text-red-400" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -346,3 +440,4 @@ export default function BookingsPage() {
     </div>
   );
 }
+

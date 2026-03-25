@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 import type { DemandForecast } from './demand-forecast';
 
 // ============================================================================

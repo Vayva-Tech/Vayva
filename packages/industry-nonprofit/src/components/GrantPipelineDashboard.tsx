@@ -1,4 +1,4 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 /**
  * Grant Pipeline Dashboard Component
  * Visualizes grant applications and tracking
@@ -15,7 +15,7 @@ interface Grant {
   deadline: Date;
 }
 
-interface GrantPipelineDashboardProps {
+export interface GrantPipelineDashboardProps {
   grants?: Grant[];
   onUpdateStatus?: (grantId: string, status: string) => void;
 }
@@ -25,15 +25,17 @@ export const GrantPipelineDashboard: React.FC<GrantPipelineDashboardProps> = ({
   onUpdateStatus,
 }) => {
   const displayGrants = grants || [
-    { id: '1', name: 'Youth Programs', funder: 'XYZ Foundation', amount: 50000, status: 'submitted', deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
-    { id: '2', name: 'Education Initiative', funder: 'ABC Trust', amount: 75000, status: 'draft', deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) },
-    { id: '3', name: 'Health Fund', funder: 'State Dept', amount: 100000, status: 'awarded', deadline: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+    { id: '1', name: 'Youth Programs', funder: 'XYZ Foundation', amount: 50000, status: 'submitted', deadline: new Date('2025-02-15') },
+    { id: '2', name: 'Education Initiative', funder: 'ABC Trust', amount: 75000, status: 'draft', deadline: new Date('2025-04-01') },
+    { id: '3', name: 'Health Fund', funder: 'State Dept', amount: 100000, status: 'awarded', deadline: new Date('2024-08-01') },
   ];
 
   const stats = {
     total: displayGrants.length,
     awarded: displayGrants.filter(g => g.status === 'awarded').length,
-    pending: displayGrants.filter(['research', 'draft', 'submitted'].includes.bind(['research', 'draft', 'submitted'])).length,
+    pending: displayGrants.filter((g) =>
+      ['research', 'draft', 'submitted'].includes(g.status),
+    ).length,
     totalAmount: displayGrants.reduce((sum, g) => sum + g.amount, 0),
     awardedAmount: displayGrants.filter(g => g.status === 'awarded').reduce((sum, g) => sum + g.amount, 0),
   };
@@ -118,18 +120,18 @@ export const GrantPipelineDashboard: React.FC<GrantPipelineDashboardProps> = ({
             </div>
             {onUpdateStatus && grant.status !== 'awarded' && grant.status !== 'rejected' && (
               <div className="mt-3 flex gap-2">
-                <button
+                <Button
                   onClick={() => onUpdateStatus(grant.id, 'draft')}
                   className="px-3 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700"
                 >
                   Move to Draft
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => onUpdateStatus(grant.id, 'submitted')}
                   className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
                 >
                   Mark Submitted
-                </button>
+                </Button>
               </div>
             )}
           </div>

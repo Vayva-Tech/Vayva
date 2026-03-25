@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { sanitizeHTML } from "@/lib/sanitization";
 import { z } from "zod";
@@ -17,8 +18,12 @@ interface StoreSettings {
 }
 
 export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     // Call backend API to fetch store settings
     const result = await apiJson<{
         name: string;
@@ -27,9 +32,7 @@ export async function GET(request: NextRequest) {
     }>(
         `${process.env.BACKEND_API_URL}/api/settings`,
         {
-            headers: {
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
         }
     );
 
@@ -44,7 +47,6 @@ export async function GET(request: NextRequest) {
         {
             endpoint: "/api/settings",
             operation: "GET_SETTINGS",
-            storeId,
         }
     );
     return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });
@@ -52,8 +54,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json();
     const parsed = SettingsSchema.safeParse(body);
     if (!parsed.success) {
@@ -66,10 +72,7 @@ export async function POST(request: NextRequest) {
         `${process.env.BACKEND_API_URL}/api/settings`,
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
             body: JSON.stringify({
                 ...(data.name && { name: sanitizeHTML(data.name) }),
                 ...(data.businessCategory && { businessCategory: sanitizeHTML(data.businessCategory || "") }),
@@ -85,7 +88,6 @@ export async function POST(request: NextRequest) {
         {
             endpoint: "/api/settings",
             operation: "UPDATE_SETTINGS",
-            storeId,
         }
     );
     return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });

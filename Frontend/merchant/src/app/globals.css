@@ -118,4 +118,32 @@
     .kanban-grid {
         @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
     }
+
+    /* ------------------------------------------------------------------ */
+    /* Dashboard-wide cleanliness defaults                                */
+    /* Applied via `dashboard-page` wrapper in AdminShell                  */
+    /* ------------------------------------------------------------------ */
+    .dashboard-page {
+        @apply text-gray-900;
+    }
+
+    .dashboard-page h1 {
+        @apply text-2xl font-bold tracking-tight text-gray-900;
+    }
+
+    .dashboard-page h2 {
+        @apply text-lg font-semibold tracking-tight text-gray-900;
+    }
+
+    .dashboard-page p {
+        @apply text-gray-600;
+    }
+
+    .dashboard-surface {
+        @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+    }
+
+    .dashboard-surface-muted {
+        @apply bg-gray-50/60 rounded-2xl border border-gray-100;
+    }
 }

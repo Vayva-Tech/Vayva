@@ -6,7 +6,7 @@ import { IconCheck as Check, IconX as X } from "@tabler/icons-react";
 export function ComparisonTable(): React.JSX.Element {
   return (
     <section className="py-24 px-4">
-      <div className="max-w-[1600px] mx-auto px-6">
+      <div className="max-w-[1400px] mx-auto px-6">
         <h2 className="text-3xl font-bold text-center mb-12">
           The arithmetic doesn't lie.
         </h2>

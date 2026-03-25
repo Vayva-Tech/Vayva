@@ -4,7 +4,7 @@
  * Complete checkout experience with multi-step forms, payment integration, and order confirmation
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../types';
 
 export const CHECKOUT_FLOW_ADDON: AddOnDefinition = {
   id: 'vayva.checkout-flow',

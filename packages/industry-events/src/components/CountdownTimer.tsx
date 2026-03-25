@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 /**
@@ -88,8 +87,6 @@ export function CountdownTimerWidget({
   }, [targetDate, onComplete]);
 
   useEffect(() => {
-    updateCountdown();
-    
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
   }, [updateCountdown]);

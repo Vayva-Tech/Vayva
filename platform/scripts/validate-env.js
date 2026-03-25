@@ -13,7 +13,6 @@ const REQUIRED = [
     'DATABASE_URL',
     'REDIS_URL',
     'PAYSTACK_SECRET_KEY',
-    'YOUVERIFY_API_KEY',
     'RESEND_API_KEY'
 ];
 

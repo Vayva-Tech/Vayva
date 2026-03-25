@@ -1,13 +1,11 @@
-// @ts-nocheck
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { logger } from "@vayva/shared";
 import { format } from "date-fns";
-import { MagnifyingGlass as Search, Info, FileText, User, ClockCounterClockwise, Eye } from "@phosphor-icons/react";
+import { MagnifyingGlass as Search, Info, FileText, User, ClockCounterClockwise, Eye, X } from "@phosphor-icons/react";
 import { Button, Input } from "@vayva/ui";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface AuditLog {
   id: string;
@@ -85,19 +83,14 @@ export default function AuditLogPage() {
   const systemActions = logs.filter(l => l.actorLabel.includes('System')).length;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Breadcrumbs
-            items={[
-              { label: "Dashboard", href: "/dashboard" },
-              { label: "Settings", href: "/dashboard/settings" },
-              { label: "Audit Log" },
-            ]}
+          <PageHeader
+            title="Audit Log"
+            subtitle="Track all system activities and changes."
           />
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">Audit Log</h1>
-          <p className="text-sm text-gray-500 mt-1">Track all system activities and changes.</p>
         </div>
       </div>
 
@@ -193,13 +186,13 @@ export default function AuditLogPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
+                      <Button
                         onClick={() => setSelectedLog(log)}
                         className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors inline-flex items-center gap-1"
                       >
                         <Eye size={14} />
                         View Details
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

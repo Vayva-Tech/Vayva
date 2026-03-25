@@ -259,7 +259,7 @@ export const POST = withVayvaAPI(
 );
 
 // Verify client participated in the service
-async function verifyClientParticipation(storeId: string, serviceType: string, serviceId: string, clientId: string): Promise<boolean> {
+async function _verifyClientParticipation(_storeId: string, _serviceType: string, _serviceId: string, _clientId: string): Promise<boolean> {
   // This would check actual participation records
   // For now, returning true to allow review creation
   return true;

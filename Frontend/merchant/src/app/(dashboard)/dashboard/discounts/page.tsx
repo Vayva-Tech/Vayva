@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
-
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button, Input, Label, Select } from "@vayva/ui";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
@@ -33,6 +32,7 @@ interface Discount {
 }
 
 export default function DiscountsPage() {
+  const router = useRouter();
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -64,7 +64,7 @@ export default function DiscountsPage() {
   );
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -161,8 +161,7 @@ export default function DiscountsPage() {
                 discount={discount}
                 onUpdate={fetchDiscounts}
                 onEdit={(d) => {
-                  setDiscountToEdit(d);
-                  setShowEditModal(true);
+                  router.push(`/dashboard/marketing/discounts/${d.id}`);
                 }}
                 onDelete={async (d) => {
                   if (!confirm(`Are you sure you want to delete discount "${d.code}"?`)) {
@@ -315,13 +314,13 @@ function DiscountRow({
           </Button>
           {menuOpen && (
             <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] z-10">
-              <button
+              <Button
                 onClick={copyCode}
                 className="w-full px-3 py-2 text-sm text-left hover:bg-white flex items-center gap-2"
               >
                 <Copy className="w-4 h-4" /> Copy Code
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   onEdit(discount);
                   setMenuOpen(false);
@@ -329,8 +328,8 @@ function DiscountRow({
                 className="w-full px-3 py-2 text-sm text-left hover:bg-white flex items-center gap-2"
               >
                 <Edit className="w-4 h-4" /> Edit
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   onDelete(discount);
                   setMenuOpen(false);
@@ -338,7 +337,7 @@ function DiscountRow({
                 className="w-full px-3 py-2 text-sm text-left hover:bg-white flex items-center gap-2 text-red-500"
               >
                 <Trash className="w-4 h-4" /> Delete
-              </button>
+              </Button>
             </div>
           )}
         </div>

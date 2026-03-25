@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { logger } from "@/lib/logger";
 import { TEMPLATE_REGISTRY } from "@/lib/templates-registry";
 import { checkRateLimitCustom } from "@/lib/rate-limit";
@@ -32,6 +33,10 @@ export async function POST(req: NextRequest) {
         if (!storeId) {
             return NextResponse.json({ error: "No active store found for user" }, { status: 400 });
         }
+        const auth = await buildBackendAuthHeaders(req);
+        if (!auth?.user?.storeId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
         // Kill Switch & Rate Limit
         const isEnabled = await FlagService.isEnabled("templates.enabled", {
             merchantId: storeId,
@@ -60,10 +65,7 @@ export async function POST(req: NextRequest) {
             `${process.env.BACKEND_API_URL}/api/templates/apply`,
             {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-store-id": storeId,
-                },
+                headers: auth.headers,
                 body: JSON.stringify({ templateId }),
             }
         );

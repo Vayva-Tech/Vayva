@@ -4,8 +4,10 @@ import { logger } from "@vayva/shared";
 import React, { useState, useEffect } from "react";
 import { Lock, LockOpen as ArrowRight } from "@phosphor-icons/react/ssr";
 import { Button, Input } from "@vayva/ui";
-import { toast } from "sonner"; // Assuming sonner is available based on package.json
-import { ConfirmDialog } from "@/components/ConfirmDialog";
+import {
+  toast } from "sonner"; // Assuming sonner is available based on package.json
+import { ConfirmDialog
+} from "@/components/ConfirmDialog";
 
 interface WalletGuardProps {
   children: React.ReactNode;

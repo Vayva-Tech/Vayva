@@ -14,155 +14,156 @@ const StationUpdateSchema = z.object({
   sortOrder: z.number().int().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.KITCHEN_VIEW,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    const station = await prisma.kitchenStation.findFirst({
-      where: { id, storeId },
-      include: {
-        assignedOrders: {
-          where: { status: { not: "completed" } },
-          include: {
-            order: {
-              select: {
-                id: true,
-                tableNumber: true,
-                priority: true,
-                createdAt: true,
+      const station = await prisma.kitchenStation.findFirst({
+        where: { id, storeId },
+        include: {
+          assignedOrders: {
+            where: {
+              status: { not: "completed" },
+              order: { storeId },
+            },
+            include: {
+              order: {
+                select: {
+                  id: true,
+                  tableNumber: true,
+                  priority: true,
+                  createdAt: true,
+                },
+              },
+              menuItem: {
+                select: {
+                  name: true,
+                  category: true,
+                },
               },
             },
-            menuItem: {
-              select: {
-                name: true,
-                category: true,
+            orderBy: { createdAt: "asc" },
+          },
+          _count: {
+            select: {
+              assignedOrders: {
+                where: {
+                  order: { storeId },
+                },
               },
             },
           },
-          orderBy: { createdAt: "asc" },
         },
-        _count: {
-          select: {
-            assignedOrders: true,
+      });
+
+      if (!station) {
+        return NextResponse.json(
+          { error: "Station not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      return NextResponse.json(
+        { data: station },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: stationId } = await params;
+      logger.error("[KITCHEN_STATION_GET]", { error, stationId });
+      return NextResponse.json(
+        { error: "Failed to fetch station" },
+        { status: 500, headers: standardHeaders(requestId) },
+      );
+    }
+  },
+);
+
+export const PATCH = withVayvaAPI(
+  PERMISSIONS.KITCHEN_MANAGE,
+  async (req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
+      const json = await req.json().catch(() => ({}));
+      const parseResult = StationUpdateSchema.safeParse(json);
+
+      if (!parseResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid station data",
+            details: parseResult.error.flatten(),
           },
-        },
-      },
-    });
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
 
-    if (!station) {
-      return NextResponse.json(
-        { error: "Station not found" },
-        { status: 404, headers: standardHeaders(requestId) }
-      );
-    }
+      const updatedStation = await prisma.kitchenStation.update({
+        where: { id_storeId: { id, storeId } },
+        data: parseResult.data,
+      });
 
-    return NextResponse.json(
-      { data: station },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[KITCHEN_STATION_GET]", { error, stationId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch station" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const json = await req.json().catch(() => ({}));
-    const parseResult = StationUpdateSchema.safeParse(json);
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid station data",
-          details: parseResult.error.flatten(),
-        },
-        { status: 400, headers: standardHeaders(requestId) }
-      );
-    }
-
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
-
-    const updatedStation = await prisma.kitchenStation.update({
-      where: { id_storeId: { id, storeId } },
-      data: parseResult.data,
-    });
-
-    logger.info("[KITCHEN_STATION_UPDATE]", {
-      stationId: id,
-      updatedFields: Object.keys(parseResult.data),
-    });
-
-    return NextResponse.json(
-      { data: updatedStation },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[KITCHEN_STATION_UPDATE]", { error, stationId: params.id });
-    return NextResponse.json(
-      { error: "Failed to update station" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
-
-    // Check if station has active assignments
-    const activeAssignments = await prisma.kitchenOrderItem.count({
-      where: {
+      logger.info("[KITCHEN_STATION_UPDATE]", {
         stationId: id,
-        status: { not: "completed" },
-      },
-    });
+        updatedFields: Object.keys(parseResult.data),
+      });
 
-    if (activeAssignments > 0) {
       return NextResponse.json(
-        { error: "Cannot delete station with active order assignments" },
-        { status: 400, headers: standardHeaders(requestId) }
+        { data: updatedStation },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: stationId } = await params;
+      logger.error("[KITCHEN_STATION_UPDATE]", { error, stationId });
+      return NextResponse.json(
+        { error: "Failed to update station" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
+  },
+);
 
-    await prisma.kitchenStation.delete({
-      where: { id_storeId: { id, storeId } },
-    });
+export const DELETE = withVayvaAPI(
+  PERMISSIONS.KITCHEN_MANAGE,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    logger.info("[KITCHEN_STATION_DELETE]", { stationId: id });
+      const activeAssignments = await prisma.kitchenOrderItem.count({
+        where: {
+          stationId: id,
+          status: { not: "completed" },
+          order: { storeId },
+        },
+      });
 
-    return NextResponse.json(
-      { message: "Station deleted successfully" },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[KITCHEN_STATION_DELETE]", { error, stationId: params.id });
-    return NextResponse.json(
-      { error: "Failed to delete station" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+      if (activeAssignments > 0) {
+        return NextResponse.json(
+          { error: "Cannot delete station with active order assignments" },
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
+
+      await prisma.kitchenStation.delete({
+        where: { id_storeId: { id, storeId } },
+      });
+
+      logger.info("[KITCHEN_STATION_DELETE]", { stationId: id });
+
+      return NextResponse.json(
+        { message: "Station deleted successfully" },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: stationId } = await params;
+      logger.error("[KITCHEN_STATION_DELETE]", { error, stationId });
+      return NextResponse.json(
+        { error: "Failed to delete station" },
+        { status: 500, headers: standardHeaders(requestId) },
+      );
+    }
+  },
+);

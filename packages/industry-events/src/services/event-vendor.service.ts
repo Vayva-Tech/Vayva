@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Event Vendor Service
  * Manages vendor relationships, contracts, and coordination
@@ -74,9 +73,9 @@ export class EventVendorService {
   }
 
   async initialize(): Promise<void> {
-    console.log('[EVENT_VENDOR] Initializing service...');
+    console.warn('[EVENT_VENDOR] Initializing service...');
     this.initializeSampleData();
-    console.log('[EVENT_VENDOR] Service initialized');
+    console.warn('[EVENT_VENDOR] Service initialized');
   }
 
   private initializeSampleData(): void {

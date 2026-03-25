@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { logger, urls } from "@vayva/shared";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AuthService } from "@/services/auth";
 import { SplitAuthLayout } from "@/components/auth/SplitAuthLayout";
 import { Button, Input, Label } from "@vayva/ui";
-import { Eye, EyeSlash as EyeOff, Envelope } from "@phosphor-icons/react/ssr";
+import { Eye, EyeSlash as EyeOff } from "@phosphor-icons/react/ssr";
 import type { User, MerchantContext } from "@vayva/shared/types";
 
 interface LoginResponse {
@@ -34,6 +34,15 @@ export default function SigninPage() {
     email?: string;
     password?: string;
   }>({});
+  const [passwordResetSuccess, setPasswordResetSuccess] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("reset") === "success") {
+      setPasswordResetSuccess(true);
+    }
+  }, []);
 
   const validateEmail = (value: string) => {
     if (!value) return "Email is required";
@@ -63,6 +72,14 @@ export default function SigninPage() {
       }) as unknown as LoginResponse;
       
       if (data.requiresOTP) {
+        try {
+          sessionStorage.setItem(
+            "vayva_auth_remember_me",
+            rememberMe ? "1" : "0",
+          );
+        } catch {
+          /* ignore */
+        }
         const queryParams = new URLSearchParams();
         queryParams.set("email", email);
         queryParams.set("method", data.otpMethod || "EMAIL");
@@ -78,6 +95,14 @@ export default function SigninPage() {
       const message =
         err instanceof Error ? err.message : "Incorrect email or password";
       if (message === "EMAIL_NOT_VERIFIED" || message === "OTP_REQUIRED") {
+        try {
+          sessionStorage.setItem(
+            "vayva_auth_remember_me",
+            rememberMe ? "1" : "0",
+          );
+        } catch {
+          /* ignore */
+        }
         const queryParams = new URLSearchParams();
         queryParams.set("email", email);
         queryParams.set("method", "EMAIL"); // Default - user changes on verify page
@@ -110,6 +135,12 @@ export default function SigninPage() {
         <div aria-live="polite" aria-atomic="true" className="sr-only">
           {error && <p role="alert">{error}</p>}
         </div>
+
+        {passwordResetSuccess && (
+          <div className="p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg">
+            Your password was reset. Sign in with your new password.
+          </div>
+        )}
 
         {error && (
           <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
@@ -168,7 +199,7 @@ export default function SigninPage() {
               required
               data-testid="auth-signin-password"
             />
-            <button
+            <Button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500 transition-colors h-8 w-8 flex items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-green-500/30"
@@ -179,7 +210,7 @@ export default function SigninPage() {
               ) : (
                 <Eye className="w-5 h-5" />
               )}
-            </button>
+            </Button>
           </div>
           <div className="flex items-center justify-between mt-3">
             <label

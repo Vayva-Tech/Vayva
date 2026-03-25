@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 
 /**
  * GET /api/notifications/stream
@@ -9,10 +10,10 @@ export async function GET(request: NextRequest) {
   // Verify authentication
   const sessionCookie = request.cookies.get("vayva_session")?.value;
   if (!sessionCookie) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const encoder = new TextEncoder();

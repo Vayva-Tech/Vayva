@@ -16,6 +16,10 @@ function getString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
+function getNumber(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
 type AiAgentSettings = {
   enabled: boolean;
   tone: string;
@@ -27,6 +31,10 @@ type AiAgentSettings = {
   persuasionLevel?: number;
   allowImageUnderstanding?: boolean;
   allowVoiceNotes?: boolean;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  oneQuestionRule?: boolean;
   lastUpdated?: string;
 };
 
@@ -51,6 +59,10 @@ function getAiAgentSettingsFromSettings(
     persuasionLevel: typeof aiAgent.persuasionLevel === "number" ? aiAgent.persuasionLevel : 1,
     allowImageUnderstanding: getBoolean(aiAgent.allowImageUnderstanding) ?? false,
     allowVoiceNotes: getBoolean(aiAgent.allowVoiceNotes) ?? true,
+    model: getString(aiAgent.model),
+    temperature: getNumber(aiAgent.temperature),
+    maxTokens: getNumber(aiAgent.maxTokens),
+    oneQuestionRule: getBoolean(aiAgent.oneQuestionRule) ?? true,
     lastUpdated: getString(aiAgent.lastUpdated),
   };
 }
@@ -97,6 +109,20 @@ export const PATCH = withVayvaAPI(
       const persuasionLevel = typeof body.persuasionLevel === "number" ? body.persuasionLevel : undefined;
       const allowImageUnderstanding = getBoolean(body.allowImageUnderstanding);
       const allowVoiceNotes = getBoolean(body.allowVoiceNotes);
+      const model = getString(body.model);
+      const temperature = getNumber(body.temperature);
+      const maxTokens = getNumber(body.maxTokens);
+      const oneQuestionRule = getBoolean(body.oneQuestionRule);
+
+      const normalizedTemperature =
+        typeof temperature === "number"
+          ? Math.max(0, Math.min(2, temperature))
+          : undefined;
+      const normalizedMaxTokens =
+        typeof maxTokens === "number"
+          ? Math.max(100, Math.min(4096, Math.floor(maxTokens)))
+          : undefined;
+
       const store = await prisma.store.findUnique({
         where: { id: storeId },
         select: { settings: true },
@@ -119,6 +145,16 @@ export const PATCH = withVayvaAPI(
         persuasionLevel: persuasionLevel ?? (typeof currentAiAgent.persuasionLevel === "number" ? currentAiAgent.persuasionLevel : 1),
         allowImageUnderstanding: allowImageUnderstanding ?? getBoolean(currentAiAgent.allowImageUnderstanding),
         allowVoiceNotes: allowVoiceNotes ?? getBoolean(currentAiAgent.allowVoiceNotes),
+        model: model ?? getString(currentAiAgent.model),
+        temperature:
+          normalizedTemperature ??
+          (typeof currentAiAgent.temperature === "number"
+            ? currentAiAgent.temperature
+            : undefined),
+        maxTokens:
+          normalizedMaxTokens ??
+          (typeof currentAiAgent.maxTokens === "number" ? currentAiAgent.maxTokens : undefined),
+        oneQuestionRule: oneQuestionRule ?? getBoolean(currentAiAgent.oneQuestionRule),
         lastUpdated: new Date().toISOString(),
       };
       await prisma.store.update({
@@ -133,6 +169,10 @@ export const PATCH = withVayvaAPI(
 
       // Sync to MerchantAiProfile for AI to use these settings
       try {
+        const mappedBrevity =
+          updatedAiAgent.brevityMode === "Detailed"
+            ? "Medium"
+            : updatedAiAgent.brevityMode || "Short";
         await prisma.merchantAiProfile.upsert({
           where: { storeId },
           create: {
@@ -142,9 +182,10 @@ export const PATCH = withVayvaAPI(
                        updatedAiAgent.tone === "FRIENDLY" ? "Friendly" :
                        updatedAiAgent.tone === "WITTY" ? "Playful" :
                        updatedAiAgent.tone === "MINIMALIST" ? "Minimal" : "Friendly",
-            brevityMode: updatedAiAgent.brevityMode || "Short",
+            brevityMode: mappedBrevity,
             persuasionLevel: typeof updatedAiAgent.persuasionLevel === "number" ? updatedAiAgent.persuasionLevel : 1,
             greetingTemplate: updatedAiAgent.openingMessage,
+            oneQuestionRule: typeof updatedAiAgent.oneQuestionRule === "boolean" ? updatedAiAgent.oneQuestionRule : true,
           },
           update: {
             agentName: updatedAiAgent.agentName || undefined,
@@ -152,9 +193,10 @@ export const PATCH = withVayvaAPI(
                        updatedAiAgent.tone === "FRIENDLY" ? "Friendly" :
                        updatedAiAgent.tone === "WITTY" ? "Playful" :
                        updatedAiAgent.tone === "MINIMALIST" ? "Minimal" : undefined,
-            brevityMode: updatedAiAgent.brevityMode || undefined,
+            brevityMode: mappedBrevity || undefined,
             persuasionLevel: typeof updatedAiAgent.persuasionLevel === "number" ? updatedAiAgent.persuasionLevel : undefined,
             greetingTemplate: updatedAiAgent.openingMessage || undefined,
+            oneQuestionRule: typeof updatedAiAgent.oneQuestionRule === "boolean" ? updatedAiAgent.oneQuestionRule : undefined,
           },
         });
       } catch (profileError) {

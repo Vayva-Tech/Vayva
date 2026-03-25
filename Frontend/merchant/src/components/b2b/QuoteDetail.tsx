@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -32,7 +31,8 @@ const statusColors: Record<QuoteStatus, string> = {
 
 export function QuoteDetail() {
   const params = useParams();
-  const quoteId = params.id as string;
+  const rawId = params?.id;
+  const quoteId = typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] ?? '' : '';
   
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);

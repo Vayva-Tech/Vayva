@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiJson } from '@/lib/api-client-shared';
 import { handleApiError } from '@/lib/api-error-handler';
+import { buildBackendAuthHeaders } from '@/lib/backend-proxy';
 
 // POST /api/events/purchases - purchase tickets
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(req);
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const {
       tierId,
@@ -30,9 +36,7 @@ export async function POST(req: Request) {
       error?: string;
     }>(`${process.env.BACKEND_API_URL}/api/events/purchases`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { ...auth.headers },
       body: JSON.stringify(body),
     });
 

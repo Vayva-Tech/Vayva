@@ -287,24 +287,44 @@ The visual workflow builder allows merchants to create custom automation flows w
 
 ## AI Autopilot Engine
 
-The Autopilot engine is an AI-powered operations assistant that runs daily analysis and generates actionable recommendations for merchants. Available on PRO and PRO_PLUS tiers.
+The Autopilot engine is an AI-powered operations assistant that analyzes store data and generates actionable recommendations for merchants. The **Autopilot add-on** (`vayva.autopilot` / `StoreAddOn.extensionId`) gates access. Merchants use **Dashboard → Autopilot** to run analysis, review runs, and approve or dismiss recommendations.
 
 ### How It Works
 
-1. The engine collects a **business snapshot** -- a comprehensive data summary including inventory status, marketing metrics, customer engagement, and operational KPIs
+1. The engine collects a **business snapshot** -- a structured summary from Prisma (orders, products, bookings, carts with items for this store, disputes, invoices, flash sales ending soon, portfolio projects when present, etc.)
 2. Industry-specific **rules** are evaluated against the snapshot (configured in `Backend/core-api/src/config/autopilot-rules.ts`)
-3. The Llama 3.3 70B model (via Groq) generates AI-powered recommendations based on the snapshot and triggered rules
+3. Each triggered rule is sent to **OpenRouter** using a **Llama** instruct model (default `meta-llama/llama-3.3-70b-instruct`, overridable via `AUTOPILOT_OPENROUTER_MODEL`). Triggered rules are processed **in parallel** with bounded concurrency (`AUTOPILOT_RULE_CONCURRENCY`, default 4) to reduce wall-clock time
 4. Recommendations are saved as `AutopilotRun` records with status `PROPOSED`
-5. Merchants review and approve/reject each recommendation from the Autopilot dashboard
+5. Merchants approve or dismiss runs via the API / dashboard; approving does not auto-execute commerce actions in-app (use webhooks or workflows separately if needed)
+
+### Scheduling and integrations
+
+- **Vercel Cron** (core-api `vercel.json`): `GET /api/jobs/cron/autopilot-evaluate` on a daily schedule, authorized with `Authorization: Bearer ${CRON_SECRET}`. Processes stores in **batches**: `AUTOPILOT_CRON_MAX_STORES` per batch (default 40), up to `AUTOPILOT_CRON_MAX_BATCHES` batches per invocation (default 5). If the JSON response includes `nextCursor`, call again with `?cursor=<storeId>` (same secret) until `hasMore` is false
+- **External industry context (n8n, etc.)**: `POST /api/internal/autopilot/context` with JSON `{ "storeId", "externalBrief" }` and `Authorization: Bearer ${AUTOPILOT_INBOUND_SECRET}` (falls back to `CRON_SECRET` if unset). Merges into `Store.settings.autopilot.externalBrief` and is appended to LLM prompts when non-empty
+- **Optional webhook** after each `PROPOSED` run: set `Store.settings.autopilot.proposedWebhookUrl` and `proposedWebhookSecret`; Vayva sends a JSON POST with `X-Autopilot-Signature: hex(hmac-sha256(secret, body))`
+- **Optional webhook on approve**: when a merchant approves a run, if `approvedWebhookUrl` and `approvedWebhookSecret` are set (aliases: `automationWebhookUrl` / `automationWebhookSecret`), Vayva POSTs `event: autopilot.approved` with `runId`, `ruleSlug`, `title`, `summary`, `reasoning`, and `input` (snapshot JSON). If dispatched, `AutopilotRun.executedAt` is set and `output.automationWebhookDispatched` is true; n8n or a worker can apply discounts, send messages, etc.
+
+### Configuration (environment)
+
+| Variable | Purpose |
+|----------|---------|
+| `OPENROUTER_API_KEY` | Required for Autopilot LLM calls |
+| `AUTOPILOT_OPENROUTER_MODEL` | Optional model id (default Llama 3.3 70B instruct on OpenRouter) |
+| `AUTOPILOT_RULE_CONCURRENCY` | Parallel rule completions (1–8, default 4) |
+| `AUTOPILOT_OPENROUTER_MAX_RETRIES` | Retries for OpenRouter 429/502/503 and transient errors (default 4) |
+| `AUTOPILOT_CRON_MAX_BATCHES` | Autopilot cron: max batches per run (default 5) |
+| `AUTOPILOT_INBOUND_SECRET` | Auth for internal context endpoint |
+| `CRON_SECRET` | Auth for cron (and fallback for context endpoint) |
+| `OPENROUTER_HTTP_REFERER` | Optional Referer header for OpenRouter |
 
 ### Business Snapshot Data Points
 
 | Category | Metrics Analyzed |
 |----------|-----------------|
-| **Inventory** | Dead stock count, low stock items, overstock items, slow movers, flash sale candidates |
-| **Marketing** | Weak product descriptions, poor SEO titles, top-selling products, abandoned cart products |
-| **Customer Engagement** | Dormant customers, VIP customers, recent buyers without reviews, lapsed donors (nonprofit) |
-| **Operations** | Average prep time (restaurants), kitchen backlog, no-shows, empty booking slots |
+| **Inventory** | Dead stock, low-velocity / low-stock signals from sales, flash sales ending soon |
+| **Marketing** | Weak descriptions / SEO titles, top sellers, **abandoned carts** (carts with items for this store, stale updatedAt), external brief |
+| **Customer Engagement** | Dormant customers, VIP customers, recent buyers (review signal placeholder), lapsed donors (nonprofit) |
+| **Operations** | No-shows and booking utilization (same-day bookings), open disputes, overdue invoices |
 
 ### Industry-Specific Rules
 

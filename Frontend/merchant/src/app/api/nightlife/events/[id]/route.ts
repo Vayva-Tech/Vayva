@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { prisma, type Product, type ProductVariant } from "@vayva/db";
@@ -16,8 +17,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const storeId = request.headers.get("x-store-id") || "";
-
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const event = await prisma.product?.findFirst({
       where: { id, storeId, productType: "event" },
       include: {

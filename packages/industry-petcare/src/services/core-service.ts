@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Petcare Industry Core Service
  * Main service orchestrator for the petcare industry engine
  */
 
-import { prisma } from '@vayva/db';
+import { prisma } from '../db/petcare-prisma';
 import { 
   Pet, 
   PetOwner, 
@@ -146,9 +145,9 @@ export class PetcareCoreService {
    */
   async createAppointment(data: Omit<PetAppointment, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'paymentStatus'>) {
     // Validate pet exists and is active
-    const pet = await prisma.pet.findUnique({
+    const pet = (await prisma.pet.findUnique({
       where: { id: data.petId },
-    });
+    })) as { isActive?: boolean } | null;
 
     if (!pet || !pet.isActive) {
       throw new Error('Pet not found or inactive');
@@ -268,10 +267,10 @@ export class PetcareCoreService {
   }
 
   private async updatePetVaccinationStatus(petId: string) {
-    const vaccinations = await prisma.vaccinationRecord.findMany({
+    const vaccinations = (await prisma.vaccinationRecord.findMany({
       where: { petId },
       orderBy: { nextDueDate: 'asc' },
-    });
+    })) as Array<{ nextDueDate?: Date | null }>;
 
     if (vaccinations.length === 0) return;
 
@@ -331,7 +330,7 @@ export class PetcareCoreService {
         break;
     }
 
-    const [totalPets, activePets, appointments, revenue] = await Promise.all([
+    const [totalPets, activePets, appointments, revenueRaw] = await Promise.all([
       prisma.pet.count({
         where: {
           owner: { storeId: this.storeId }
@@ -360,6 +359,8 @@ export class PetcareCoreService {
       }),
     ]);
 
+    const revenue = revenueRaw as { _sum: { cost: number | null } };
+
     return {
       totalPets,
       activePets,
@@ -369,7 +370,7 @@ export class PetcareCoreService {
   }
 
   async getPopularServices() {
-    const services = await prisma.petAppointment.groupBy({
+    const services = (await prisma.petAppointment.groupBy({
       by: ['appointmentType'],
       where: {
         storeId: this.storeId,
@@ -380,9 +381,9 @@ export class PetcareCoreService {
         _count: { appointmentType: 'desc' },
       },
       take: 5,
-    });
+    })) as Array<{ appointmentType: string; _count: number }>;
 
-    return services.map(service => ({
+    return services.map((service) => ({
       type: service.appointmentType,
       count: service._count,
     }));

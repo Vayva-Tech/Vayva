@@ -4,10 +4,10 @@
  * Wraps add-on components to catch errors and display fallback UI,
  * preventing individual add-on failures from breaking the entire page.
  */
-
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from "@vayva/ui";
+import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 
 interface AddOnErrorBoundaryProps {
   /** Add-on instance identifier for error reporting */
@@ -131,20 +131,20 @@ export class AddOnErrorBoundary extends Component<
             {error?.message || 'An unexpected error occurred'}
           </p>
           <div className="addon-error-boundary__actions">
-            <button
+            <Button
               className="addon-error-boundary__retry"
               onClick={this.handleRetry}
               type="button"
             >
               Try Again
-            </button>
-            <button
+            </Button>
+            <Button
               className="addon-error-boundary__disable"
               onClick={this.handleDisable}
               type="button"
             >
               Disable
-            </button>
+            </Button>
           </div>
         </div>
       );

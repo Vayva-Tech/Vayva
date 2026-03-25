@@ -3,20 +3,26 @@
  * WatermelonDB schema for all industry models
  */
 
-import { appSchema, tableSchema } from '@nozbe/watermelondb';
+import { appSchema as buildAppSchema, tableSchema } from '@nozbe/watermelondb';
 
-export const appSchema = appSchema({
+export const appSchema = buildAppSchema({
   version: 1,
   tables: [
     // Healthcare - Patients
     tableSchema({
       name: 'patients',
       columns: [
-        { name: 'name', type: 'string' },
+        { name: 'first_name', type: 'string' },
+        { name: 'last_name', type: 'string' },
+        { name: 'date_of_birth', type: 'string', isOptional: true },
         { name: 'email', type: 'string', isOptional: true },
         { name: 'phone', type: 'string', isOptional: true },
-        { name: 'date_of_birth', type: 'string', isOptional: true },
-        { name: 'medical_history', type: 'string', isOptional: true },
+        { name: 'insurance_provider', type: 'string', isOptional: true },
+        { name: 'insurance_id', type: 'string', isOptional: true },
+        { name: 'allergies', type: 'string', isOptional: true },
+        { name: 'medications', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ],
     }),
 

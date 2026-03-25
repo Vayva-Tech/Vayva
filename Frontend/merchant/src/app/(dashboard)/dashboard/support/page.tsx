@@ -1,6 +1,5 @@
-// @ts-nocheck
 "use client";
-
+import { Button } from "@vayva/ui";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -157,7 +156,7 @@ export default function SupportPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
+    <div className="space-y-10 max-w-5xl">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mx-auto">
@@ -240,7 +239,7 @@ export default function SupportPage() {
         </div>
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
           {recentTickets.map((ticket) => {
-            const status = statusConfig[ticket.status];
+            const status = statusConfig[ticket.status as keyof typeof statusConfig];
             const StatusIcon = status.icon;
             return (
               <Link
@@ -292,7 +291,7 @@ export default function SupportPage() {
             const isOpen = openFaq === item.id;
             return (
               <div key={item.id}>
-                <button
+                <Button
                   onClick={() => toggleFaq(item.id)}
                   className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50/50 transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                 >
@@ -304,7 +303,7 @@ export default function SupportPage() {
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
-                </button>
+                </Button>
                 {isOpen && (
                   <div className="px-5 pb-4 -mt-1">
                     <p className="text-sm text-gray-600 leading-relaxed">
@@ -347,3 +346,4 @@ export default function SupportPage() {
     </div>
   );
 }
+

@@ -32,17 +32,34 @@ export default async function WalletPage() {
   if (!storeId) redirect("/onboarding");
 
   const cookieHeader = await getCookieHeader();
-  const backendResponse = await fetch(
-    `${process?.env?.BACKEND_API_URL}/api/payments/wallet/summary`,
-    {
-      headers: {
-        cookie: cookieHeader,
-      },
+  const backendBase = process?.env?.BACKEND_API_URL;
+  const fetchSummary = async () => {
+    const r = await fetch(`${backendBase}/api/payments/wallet/summary`, {
+      headers: { cookie: cookieHeader },
       cache: "no-store",
-    }
-  );
+    });
+    return await r.json().catch(() => null);
+  };
 
-  const summary = await backendResponse.json().catch(() => null);
+  let summary = await fetchSummary();
+
+  // Auto-provision a Paystack dedicated virtual account once KYC is VERIFIED.
+  // This endpoint is idempotent, so it's safe to call when missing.
+  const kycStatus = String(summary?.kycStatus || "").toUpperCase();
+  const hasVirtualAccount = Boolean(summary?.virtualAccount?.accountNumber);
+  if (backendBase && kycStatus === "VERIFIED" && !hasVirtualAccount) {
+    try {
+      await fetch(`${backendBase}/api/payments/wallet/virtual-account/create`, {
+        method: "POST",
+        headers: { cookie: cookieHeader },
+        cache: "no-store",
+      });
+      summary = await fetchSummary();
+    } catch {
+      // best-effort only
+    }
+  }
+
   const balance = summary?.availableBalance ?? 0;
   const pending = summary?.pendingBalance ?? 0;
   const wallet = summary?.virtualAccount

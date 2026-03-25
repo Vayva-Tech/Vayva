@@ -1,10 +1,9 @@
-// @ts-nocheck
 // ============================================================================
 // Meal Kit Industry Package - Main Entry Point
 // ============================================================================
 
 // Core engine
-export { MealKitEngine, mealKitEngine } from './meal-kit.engine';
+export { MealKitEngine, getMealKitEngine } from './meal-kit.engine';
 
 // Dashboard configuration
 export type { MealKitDashboardConfig } from './dashboard/config';
@@ -34,4 +33,4 @@ export type {
   CustomerMealPreference,
   DeliverySlot,
   MealKitPlanType,
-} from '@prisma/client';
+} from '../../../infra/db/src/generated/client';

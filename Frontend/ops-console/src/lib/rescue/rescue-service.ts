@@ -1,9 +1,4 @@
 import { prisma, Prisma } from "@vayva/db";
-import Groq from "groq-sdk";
-
-const groq = new Groq({
-  apiKey: process.env?.GROQ_API_KEY_RESCUE || process.env?.GROQ_API_KEY || "",
-});
 
 export class RescueService {
   /**
@@ -57,7 +52,7 @@ export class RescueService {
   }
 
   /**
-   * Use Groq to analyze incident and suggest fixes
+   * Use OpenRouter to analyze incident and suggest fixes
    */
   static async analyzeWithAI(incidentId: string) {
     const incident = await prisma.rescueIncident?.findUnique({
@@ -67,8 +62,21 @@ export class RescueService {
     if (!incident) return;
 
     try {
-      const completion = await groq.chat?.completions.create({
-        messages: [
+      const apiKey = process.env.OPENROUTER_API_KEY || "";
+      if (!apiKey) return;
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://vayva.tech",
+          "X-Title": "Vayva Ops Rescue",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          response_format: { type: "json_object" },
+          messages: [
           {
             role: "system",
             content: `
@@ -89,13 +97,13 @@ export class RescueService {
             `,
           },
         ],
-        model: "llama-3.1-70b-versatile",
-        response_format: { type: "json_object" },
+        }),
+        signal: AbortSignal.timeout(25_000),
       });
 
-      const analysis = JSON.parse(
-        completion.choices[0]?.message?.content || "{}",
-      );
+      if (!response.ok) return;
+      const completion = await response.json();
+      const analysis = JSON.parse(completion.choices[0]?.message?.content || "{}");
 
       await prisma.rescueIncident?.update({
         where: { id: incidentId },

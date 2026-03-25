@@ -7,8 +7,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "lint": "eslint src/ --config ../../../.eslintrc.json",
-    "lint:fix": "eslint src/ --config ../../../.eslintrc.json --fix",
+    "lint": "eslint src/ --config ../../.eslintrc.json",
+    "lint:fix": "eslint src/ --config ../../.eslintrc.json --fix",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -16,7 +16,8 @@
     "@vayva/db": "workspace:*",
     "@vayva/shared": "workspace:*",
     "@node-saml/node-saml": "^4.0.5",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
@@ -25,11 +26,12 @@
   },
   "eslintConfig": {
     "rules": {
-      "@typescript-eslint/no-unused-vars": ["warn", { 
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_|^TODO"
-      }],
-      "@typescript-eslint/no-explicit-any": "warn"
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_|^TODO" }
+      ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "no-console": ["warn", { "allow": ["warn", "error"] }]
     }
   }
 }

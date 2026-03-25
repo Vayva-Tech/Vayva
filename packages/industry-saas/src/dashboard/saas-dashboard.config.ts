@@ -1,9 +1,8 @@
-// @ts-nocheck
 // ============================================================================
 // SaaS Industry Dashboard Configuration
 // ============================================================================
 
-import type { DashboardEngineConfig, WidgetDefinition } from '../types';
+import type { DashboardEngineConfig, WidgetDefinition } from '@vayva/industry-core';
 
 const TOTAL_MRR_WIDGET: WidgetDefinition = {
   id: 'total-mrr',
@@ -114,6 +113,17 @@ const AT_RISK_TENANTS_WIDGET: WidgetDefinition = {
 
 export const SAAS_DASHBOARD_CONFIG: DashboardEngineConfig = {
   industry: 'saas',
+  title: 'SaaS Operations',
+  subtitle: 'MRR, tenants, churn, and expansion',
+  primaryObjectLabel: 'Tenant',
+  defaultTimeHorizon: 'month',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
   widgets: [
     TOTAL_MRR_WIDGET,
     ACTIVE_TENANTS_WIDGET,
@@ -151,21 +161,28 @@ export const SAAS_DASHBOARD_CONFIG: DashboardEngineConfig = {
   alertRules: [
     {
       id: 'high-churn',
-      condition: 'churn.rate > threshold',
-      threshold: 5,
-      action: 'notify:admin',
+      name: 'High churn rate',
+      condition: { metric: 'churn.rate', operator: 'gt', value: 5 },
+      severity: 'warning',
+      message: 'Churn rate exceeded 5%',
     },
     {
       id: 'mrr-decline',
-      condition: 'revenue.mrrGrowth < -threshold',
-      threshold: 5,
-      action: 'notify:admin',
+      name: 'MRR contraction',
+      condition: { metric: 'revenue.mrrGrowth', operator: 'lt', value: -5 },
+      severity: 'warning',
+      message: 'MRR growth fell below -5%',
     },
   ],
   actions: [
-    { id: 'new-tenant', label: 'Add Tenant', icon: 'user-plus', action: 'navigate:/tenants/new' },
-    { id: 'upgrade-tenant', label: 'Upgrade Plan', icon: 'trending-up', action: 'navigate:/subscriptions/upgrade' },
-    { id: 'review-churn', label: 'Review Churn', icon: 'user-minus', action: 'navigate:/analytics/churn' },
+    { id: 'new-tenant', label: 'Add Tenant', icon: 'user-plus', href: '/tenants/new' },
+    { id: 'upgrade-tenant', label: 'Upgrade Plan', icon: 'trending-up', href: '/subscriptions/upgrade' },
+    { id: 'review-churn', label: 'Review Churn', icon: 'user-minus', href: '/analytics/churn' },
+  ],
+  failureModes: [
+    'Runaway churn',
+    'MRR contraction',
+    'Seat overages without upgrade path',
   ],
 };
 

@@ -14,7 +14,7 @@ class VercelStorageProvider implements StorageProvider {
   async upload(data: Buffer | string, path: string): Promise<string> {
     return path;
   }
-  async getSignedUrl(path: string, expiresInSeconds: number): Promise<string> {
+  async getSignedUrl(path: string, _expiresInSeconds: number): Promise<string> {
     return path;
   }
 }
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Use authenticated user's ID or provided user ID for anonymous users
-    const userId = session?.user?.id || bodyUserId;
+    const _userId = session?.user?.id || bodyUserId;
     const targetStoreId = storeId || session?.user?.storeId;
 
     if (!targetStoreId) {

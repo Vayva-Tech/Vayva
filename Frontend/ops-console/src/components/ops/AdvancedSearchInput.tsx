@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { MagnifyingGlass as Search, X, Command, Question } from "@phosphor-icons/react/ssr";
-import { cn } from "@vayva/ui";
+import { cn, Button } from "@vayva/ui";
 import { parseSearchQuery, type SearchQuery } from "@/lib/search/queryParser";
 
 // Helper function for search suggestions
@@ -212,17 +212,17 @@ export function AdvancedSearchInput({
         {/* Action buttons */}
         <div className="flex items-center gap-1 shrink-0">
           {value && (
-            <button
+            <Button
               onClick={clearSearch}
               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title="Clear search"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           )}
           
           {showHelp && (
-            <button
+            <Button
               onClick={() => setShowHelpPanel(!showHelpPanel)}
               className={cn(
                 "p-1.5 rounded-lg transition-colors",
@@ -233,7 +233,7 @@ export function AdvancedSearchInput({
               title="Search syntax help"
             >
               <Question className="h-4 w-4" />
-            </button>
+            </Button>
           )}
 
           {/* Keyboard shortcut hint */}

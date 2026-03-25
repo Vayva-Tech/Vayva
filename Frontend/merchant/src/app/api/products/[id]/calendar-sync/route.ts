@@ -1,15 +1,27 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> },
+) {
   try {
     const { id } = await params;
-    const body = await request.json().catch(() => ({}));
-    const name = String(body?.name || "").trim();
-    const url = String(body?.url || "").trim();
+    if (!id) {
+      return NextResponse.json({ error: "Product id required" }, { status: 400 });
+    }
+
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body: unknown = await request.json().catch(() => ({}));
+    const rec = typeof body === "object" && body !== null ? body as Record<string, unknown> : {};
+    const name = String(rec.name ?? "").trim();
+    const url = String(rec.url ?? "").trim();
 
     if (!name || !url) {
       return NextResponse.json({ error: "name and url are required" }, { status: 400 });
@@ -27,18 +39,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       syncStatus: string;
       error: string | null;
       createdAt: string;
-    }>(
-      `${process.env.BACKEND_API_URL}/api/products/${id}/calendar-sync`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-store-id": storeId,
-        },
-        body: JSON.stringify({ name, url }),
-      }
-    );
-    
+    }>(`${process.env.BACKEND_API_URL}/api/products/${id}/calendar-sync`, {
+      method: "POST",
+      headers: auth.headers,
+      body: JSON.stringify({ name, url }),
+    });
+
     return NextResponse.json(result, {
       headers: { "Cache-Control": "no-store" },
     });
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
     return NextResponse.json(
       { error: "Failed to add calendar sync" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

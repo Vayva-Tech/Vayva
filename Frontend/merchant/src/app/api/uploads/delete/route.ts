@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { logger } from "@vayva/shared";
 import { NextRequest, NextResponse } from "next/server";
-import { PERMISSIONS } from "@/lib/team/permissions";
-import { apiJson } from "@/lib/api-client-shared";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
@@ -26,11 +24,29 @@ function getS3Config() {
 
 export async function POST(request: NextRequest) {
   try {
-    const storeId = request.headers.get("x-store-id") || "";
-    const body = (await request.json()) as DeleteUploadBody;
-    const { key } = body;
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
+    const actorUserId =
+      "id" in auth.user && typeof (auth.user as { id?: unknown }).id === "string"
+        ? (auth.user as { id: string }).id
+        : null;
 
-    if (!key || typeof key !== "string") {
+    const body: unknown = await request.json();
+    if (body === null || typeof body !== "object") {
+      return NextResponse.json(
+        { success: false, error: "Invalid body" },
+        { status: 400 },
+      );
+    }
+    const key =
+      typeof (body as DeleteUploadBody).key === "string"
+        ? (body as DeleteUploadBody).key
+        : "";
+
+    if (!key) {
       return NextResponse.json(
         { success: false, error: "Upload key is required" },
         { status: 400 },
@@ -51,7 +67,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { endpoint, accessKeyId, secretAccessKey, bucket, region } = getS3Config();
+    const { endpoint, accessKeyId, secretAccessKey, bucket, region } =
+      getS3Config();
 
     const s3 = new S3Client({
       region,
@@ -69,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     logger.info("[UPLOAD_DELETED]", {
       storeId,
-      userId: user.id,
+      userId: actorUserId,
       key,
     });
 
@@ -84,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(
       { error: "Failed to delete upload" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

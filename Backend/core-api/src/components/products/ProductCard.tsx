@@ -3,7 +3,7 @@ import {
   ProductServiceItem,
   ProductServiceType,
   ProductServiceStatus,
-  formatCurrency,
+  formatCurrency
 } from "@vayva/shared";
 import { Icon, cn, Button } from "@vayva/ui";
 

@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Button } from "@vayva/ui";
 import {
   LayoutDashboard,
   Globe,
@@ -36,8 +37,10 @@ export function DashboardMockup(): React.JSX.Element {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="relative w-full max-w-6xl mx-auto"
+      className="relative w-full max-w-6xl mx-auto min-w-0"
     >
+      <div className="max-sm:overflow-x-auto max-sm:rounded-t-xl [-webkit-overflow-scrolling:touch] sm:overflow-visible">
+        <div className="max-sm:min-w-[880px] sm:min-w-0">
       {/* Browser Chrome */}
       <div className="relative bg-slate-900 rounded-t-xl p-3 flex items-center gap-2">
         <div className="flex gap-1.5">
@@ -47,10 +50,16 @@ export function DashboardMockup(): React.JSX.Element {
         </div>
         <div className="flex-1 mx-4">
           <div className="bg-slate-800 rounded-lg px-4 py-1.5 text-xs text-slate-400 flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-emerald-500/20 flex items-center justify-center">
-              <span className="text-emerald-400 text-[10px] font-bold">V</span>
+            <div className="relative h-4 w-4 shrink-0 overflow-hidden rounded bg-white/90">
+              <Image
+                src="/vayva-logo-official.svg"
+                alt=""
+                width={16}
+                height={11}
+                className="h-full w-full object-contain p-0.5"
+              />
             </div>
-            merchant.vayva.ng/dashboard
+            luxefashion.vayva.ng/dashboard
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -69,7 +78,7 @@ export function DashboardMockup(): React.JSX.Element {
 
       {/* Dashboard Container - Mint Theme */}
       <div className="bg-emerald-50/50 rounded-b-xl overflow-hidden shadow-2xl">
-        <div className="flex h-[600px]">
+        <div className="flex h-[520px] sm:h-[600px]">
           {/* Left Icon Sidebar - Fixed Settings at Bottom */}
           <div className="w-14 bg-white border-r border-slate-200 flex flex-col items-center py-4">
             {/* Logo at top */}
@@ -109,10 +118,10 @@ export function DashboardMockup(): React.JSX.Element {
             {/* Merchant Header */}
             <div className="p-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-900">Merchant</span>
+                <span className="font-semibold text-slate-900">Luxe Fashion</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] text-slate-400">amina.vayva.ng</span>
+                <span className="text-[10px] text-slate-400">luxefashion.vayva.ng</span>
                 <span className="text-[10px] px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded">Live</span>
               </div>
             </div>
@@ -126,8 +135,8 @@ export function DashboardMockup(): React.JSX.Element {
                 <Plus className="w-4 h-4 text-slate-400 cursor-pointer" />
               </div>
               <div className="flex gap-2 mb-3">
-                <button className="px-3 py-1 bg-slate-900 text-white text-xs font-medium rounded-full">Today</button>
-                <button className="px-3 py-1 text-slate-500 text-xs font-medium hover:bg-slate-100 rounded-full">Tomorrow</button>
+                <Button type="button" className="px-3 py-1 bg-slate-900 text-white text-xs font-medium rounded-full h-auto hover:bg-slate-800 hover:text-white">Today</Button>
+                <Button type="button" variant="ghost" className="px-3 py-1 text-slate-500 text-xs font-medium hover:bg-slate-100 rounded-full h-auto">Tomorrow</Button>
               </div>
               <div className="space-y-2">
                 <TaskItem icon={Package} title="Review 3 pending or..." desc="Orders awaiting confirm..." />
@@ -184,19 +193,19 @@ export function DashboardMockup(): React.JSX.Element {
                 <p className="text-xs text-slate-500 mb-0.5">Manage and track your store</p>
                 <h1 className="text-xl font-semibold text-slate-900">Store Dashboard</h1>
               </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-xl hover:bg-slate-800">
+              <Button type="button" className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-xl hover:bg-slate-800 h-auto hover:text-white">
                 <Plus className="w-4 h-4" />
                 Add Product
-              </button>
+              </Button>
             </div>
 
             {/* Key Metrics */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-200 mb-6">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-slate-900">Key Metrics</h3>
                 <ArrowRight className="w-4 h-4 text-slate-400" />
               </div>
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <KeyMetric label="REVENUE" value="₦2.4M" change="23%" isPositive />
                 <KeyMetric label="ORDERS" value="347" change="12%" isPositive />
                 <KeyMetric label="CUSTOMERS" value="1,204" change="8%" isPositive />
@@ -205,7 +214,7 @@ export function DashboardMockup(): React.JSX.Element {
             </div>
 
             {/* Charts Row */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Revenue & AI Conversions */}
               <div className="bg-white rounded-2xl p-5 border border-slate-200">
                 <div className="flex items-center justify-between mb-4">
@@ -256,7 +265,7 @@ export function DashboardMockup(): React.JSX.Element {
                 <h3 className="text-sm font-semibold text-slate-900">AI Performance</h3>
                 <span className="text-[10px] px-2 py-1 bg-emerald-100 text-emerald-600 rounded-full">Active</span>
               </div>
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <AIPerformanceMetric icon={MessageSquare} label="CONVERSATIONS" value="892" change="+24%" />
                 <AIPerformanceMetric icon={Zap} label="AUTO-ORDERS" value="234" change="+31%" />
                 <AIPerformanceMetric icon={Clock} label="AVG RESPONSE" value="1.2s" change="-0.3s" />
@@ -339,6 +348,8 @@ export function DashboardMockup(): React.JSX.Element {
               </div>
             </div>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </motion.div>

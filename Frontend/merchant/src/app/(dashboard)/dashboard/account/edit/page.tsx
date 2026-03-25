@@ -1,13 +1,10 @@
-// @ts-nocheck
 "use client";
-
 import { logger } from "@vayva/shared";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { FloppyDisk as Save, Trash as Trash2, Shield, House as Building, User, Warning as AlertTriangle, Camera } from "@phosphor-icons/react";
+import { FloppyDisk as Save, Trash as Trash2, Shield, House as Building, User, Warning as AlertTriangle, Camera, CircleNotch as Loader2 } from "@phosphor-icons/react";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Button, Input, cn } from "@vayva/ui";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -109,7 +106,6 @@ export default function AccountEditPage() {
       const data = await apiJson<MerchantProfile>("/api/account/profile");
       if (data) {
         setProfile(data);
-        setFormData(data);
       }
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -120,31 +116,6 @@ export default function AccountEditPage() {
       toast.error(_errMsg || "Failed to load profile");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const isSensitiveField = (field: string) => {
-    return ["email", "phone", "businessPhone"].includes(field);
-  };
-
-  const handleFieldChange = (field: keyof MerchantProfile, value: string) => {
-    if (
-      isSensitiveField(field) &&
-      profile &&
-      value !== profile[field as keyof MerchantProfile]
-    ) {
-      setOtpDialog({
-        open: true,
-        field: field as "email" | "phone" | "businessPhone",
-        newValue: value,
-        otp: "",
-        sendingOtp: false,
-        verifyingOtp: false,
-        resendTimer: 0,
-        canResend: true,
-      });
-    } else {
-      setFormData({ ...formData, [field]: value });
     }
   };
 
@@ -187,10 +158,7 @@ export default function AccountEditPage() {
           otp: otpDialog.otp,
         }),
       });
-      setFormData({ ...formData, [otpDialog.field]: otpDialog.newValue });
-      setProfile((prev) =>
-        prev ? { ...prev, [otpDialog.field]: otpDialog.newValue } : null,
-      );
+      setProfile((prev) => ({ ...prev, [otpDialog.field]: otpDialog.newValue }));
       toast.success("Field updated successfully");
       setOtpDialog({
         open: false,
@@ -211,14 +179,13 @@ export default function AccountEditPage() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async () => {
     if (saving) return;
     setSaving(true);
     try {
       await apiJson<{ success: boolean }>("/api/account/profile", {
         method: "PATCH",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(profile),
       });
       toast.success("Profile updated successfully");
       router.push("/dashboard/account");
@@ -368,8 +335,13 @@ export default function AccountEditPage() {
             )}
             <FileUpload
               accept="image/*"
-              onFileSelect={(file) => { /* Handle upload */ }}
-              className="max-w-xs"
+              value={profile.avatarUrl || ""}
+              onChange={(url) =>
+                setProfile((p) => ({ ...p, avatarUrl: url }))
+              }
+              label="Upload photo"
+              purpose="USER_AVATAR"
+              maxSizeMB={5}
             />
           </div>
         </FormSection>

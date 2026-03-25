@@ -5,7 +5,6 @@ import { logger } from "@vayva/shared";
 import { useRouter } from "next/navigation";
 import { Button } from "@vayva/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ThemeCustomizer } from "@/components/control-center/ThemeCustomizer";
 import { toast } from "sonner";
 import {
@@ -15,6 +14,7 @@ import {
   Globe,
 } from "@phosphor-icons/react/ssr";
 import { buildPreviewStorefrontUrl } from "@/lib/storefront/urls";
+import { apiJson } from "@/lib/api-client-shared";
 
 import { Template, ThemeConfig } from "@/types/templates";
 
@@ -25,8 +25,6 @@ interface StorefrontDraft {
   template: Template | null;
   themeConfig: ThemeConfig;
 }
-
-import { apiJson } from "@/lib/api-client-shared";
 
 interface DraftResponse {
   draft: StorefrontDraft | null;
@@ -67,7 +65,8 @@ export default function StorefrontCustomizePage() {
     }
 
     // 2. Send message to iframe for instant preview
-    if (iframeRef.current?.contentWindow) {iframeRef?.current?.contentWindow.postMessage(
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
         {
           type: "VAYVA_PREVIEW_UPDATE",
           config: newConfig,
@@ -82,7 +81,7 @@ export default function StorefrontCustomizePage() {
         method: "PATCH",
         body: JSON.stringify({ themeConfig: newConfig }),
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       const _errMsg = e instanceof Error ? e.message : String(e);
       logger.error("[AUTO_SAVE_ERROR]", { error: _errMsg, app: "merchant" });
     }
@@ -133,7 +132,6 @@ export default function StorefrontCustomizePage() {
       <div className="h-14 bg-white  border-b border-gray-200 flex items-center justify-between px-4 z-20">
         <div className="flex items-center gap-4">
           <BackButton />
-          <Breadcrumbs />
           <div>
             <h1 className="font-bold text-sm leading-none">
               {draft.template?.displayName}

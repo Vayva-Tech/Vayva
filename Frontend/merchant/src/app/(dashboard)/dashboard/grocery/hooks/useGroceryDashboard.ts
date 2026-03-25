@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Dashboard Hook
  * Fetches all grocery dashboard data
@@ -110,10 +109,11 @@ export function useGroceryDashboard() {
           throw new Error('Failed to fetch dashboard data');
         }
         
-        const result = await response.json();
-        const data = result.data;
-        
-        setData(data);
+        const result = (await response.json()) as { data?: DashboardData };
+        if (!result.data) {
+          throw new Error('Invalid dashboard payload');
+        }
+        setData(result.data);
         
         setError(null);
       } catch (err) {

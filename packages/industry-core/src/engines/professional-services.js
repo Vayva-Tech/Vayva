@@ -10,7 +10,7 @@ class ProfessionalServicesEngine {
   }
   
   async initialize() {
-    console.log('[PROFESSIONAL_SERVICES_ENGINE] Initialized');
+    console.warn('[PROFESSIONAL_SERVICES_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

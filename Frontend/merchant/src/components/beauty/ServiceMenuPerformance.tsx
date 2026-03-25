@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
 
-import { Card, Button } from "@vayva/ui";
+import { Card, Button, Badge } from "@vayva/ui";
 
 interface ServicePerformance {
   id: string;
@@ -94,16 +93,16 @@ export function ServiceMenuPerformance({
             <div className="flex flex-wrap gap-2">
               {Object.keys(categoryBreakdown).length > 0 ? (
                 Object.entries(categoryBreakdown).map(([category, data]: [string, any]) => (
-                  <Badge key={category} variant="secondary" className="bg-white/10 text-white text-xs">
+                  <Badge key={category} variant="outline" className="bg-white/10 text-white text-xs">
                     {category} ({data.count})
                   </Badge>
                 ))
               ) : (
                 <>
-                  <Badge variant="secondary" className="bg-white/10 text-white text-xs">Hair (18)</Badge>
-                  <Badge variant="secondary" className="bg-white/10 text-white text-xs">Nails (12)</Badge>
-                  <Badge variant="secondary" className="bg-white/10 text-white text-xs">Spa (8)</Badge>
-                  <Badge variant="secondary" className="bg-white/10 text-white text-xs">Makeup (10)</Badge>
+                  <Badge variant="outline" className="bg-white/10 text-white text-xs">Hair (18)</Badge>
+                  <Badge variant="outline" className="bg-white/10 text-white text-xs">Nails (12)</Badge>
+                  <Badge variant="outline" className="bg-white/10 text-white text-xs">Spa (8)</Badge>
+                  <Badge variant="outline" className="bg-white/10 text-white text-xs">Makeup (10)</Badge>
                 </>
               )}
             </div>

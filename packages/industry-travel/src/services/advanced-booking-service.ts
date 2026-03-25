@@ -1,8 +1,7 @@
-// @ts-nocheck
-import type { 
-  BookingData, 
-  PaymentMethod, 
-  NotificationPayload 
+import type {
+  BookingData,
+  PaymentMethod as _PaymentMethod,
+  NotificationPayload
 } from '../types';
 import { TravelBookingService } from './travel-booking-service';
 import { AvailabilityService } from './availability-service';
@@ -241,7 +240,7 @@ export class AdvancedBookingService {
   /**
    * Modify an existing booking
    */
-  async modifyBooking(bookingId: string, changes: BookingChanges): Promise<any> {
+  async modifyBooking(_bookingId: string, _changes: BookingChanges): Promise<any> {
     // Implementation for modifying bookings
     // This would handle date changes, guest count adjustments, etc.
     throw new Error('Not implemented');
@@ -363,7 +362,7 @@ export class AdvancedBookingService {
   private async processRefund(bookingId: string, amount: number): Promise<void> {
     try {
       // In a real implementation, this would call Paystack's refund API
-      console.log(`Processing refund for booking ${bookingId}: ₦${amount}`);
+      console.warn(`Processing refund for booking ${bookingId}: ₦${amount}`);
       
       // await this.paymentService.createRefund({
       //   transaction: booking.paymentReference,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // DASHBOARD WEBSOCKET HOOK
 // ============================================================================
@@ -15,8 +14,18 @@ import { logger } from "@vayva/shared";
 // WebSocket message format
 export interface WebSocketMessage {
   event: string;
-  data: any;
+  data: unknown;
   timestamp: number;
+}
+
+function isWebSocketMessage(value: unknown): value is WebSocketMessage {
+  if (typeof value !== "object" || value === null) return false;
+  const o = value as Record<string, unknown>;
+  return (
+    typeof o.event === "string" &&
+    typeof o.timestamp === "number" &&
+    "data" in o
+  );
 }
 
 // Connection status
@@ -32,7 +41,7 @@ interface UseWebSocketOptions {
 }
 
 export function useDashboardWebSocket(
-  industrySlug: string,
+  _industrySlug: string,
   options: UseWebSocketOptions = {}
 ) {
   const { token } = useAuth();
@@ -90,18 +99,27 @@ export function useDashboardWebSocket(
 
       ws.onmessage = (event) => {
         try {
-          const message: WebSocketMessage = JSON.parse(event.data);
+          const raw: unknown = JSON.parse(String(event.data));
+          if (!isWebSocketMessage(raw)) {
+            logger.warn("[WEBSOCKET_HOOK] Ignoring malformed message shape");
+            return;
+          }
+          const message = raw;
           logger.debug("[WEBSOCKET_HOOK] Received message:", message);
           
           setLastMessage(message);
           onMessage?.(message);
-        } catch (error) {
-          logger.error("[WEBSOCKET_HOOK] Failed to parse message:", error);
+        } catch (error: unknown) {
+          logger.error("[WEBSOCKET_HOOK] Failed to parse message:", {
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       };
 
-      ws.onerror = (error) => {
-        logger.error("[WEBSOCKET_HOOK] WebSocket error:", error);
+      ws.onerror = (error: Event) => {
+        logger.error("[WEBSOCKET_HOOK] WebSocket error:", {
+          type: error.type,
+        });
         updateStatus("error");
       };
 
@@ -123,11 +141,21 @@ export function useDashboardWebSocket(
         }
       };
 
-    } catch (error) {
-      logger.error("[WEBSOCKET_HOOK] Connection failed:", error);
+    } catch (error: unknown) {
+      logger.error("[WEBSOCKET_HOOK] Connection failed:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       updateStatus("error");
     }
-  }, [token, autoReconnect, reconnectInterval, maxReconnectAttempts, onMessage, updateStatus]);
+  }, [
+    token,
+    autoReconnect,
+    reconnectInterval,
+    maxReconnectAttempts,
+    onMessage,
+    onStatusChange,
+    updateStatus,
+  ]);
 
   // Disconnect from WebSocket
   const disconnect = useCallback(() => {
@@ -145,7 +173,7 @@ export function useDashboardWebSocket(
   }, [updateStatus]);
 
   // Send message to server
-  const sendMessage = useCallback((event: string, data: any = {}) => {
+  const sendMessage = useCallback((event: string, data: unknown = {}) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       const message: WebSocketMessage = {
         event,
@@ -207,7 +235,7 @@ export function useDashboardWebSocket(
 }
 
 // Specific hooks for common dashboard updates
-export function useOrderUpdates(onOrderUpdate: (data: any) => void) {
+export function useOrderUpdates(onOrderUpdate: (data: unknown) => void) {
   const { lastMessage } = useDashboardWebSocket("orders");
   
   useEffect(() => {
@@ -219,7 +247,7 @@ export function useOrderUpdates(onOrderUpdate: (data: any) => void) {
   return lastMessage?.event === "order_updated" ? lastMessage.data : null;
 }
 
-export function useKitchenUpdates(onKitchenUpdate: (data: any) => void) {
+export function useKitchenUpdates(onKitchenUpdate: (data: unknown) => void) {
   const { lastMessage } = useDashboardWebSocket("kitchen");
   
   useEffect(() => {
@@ -231,7 +259,7 @@ export function useKitchenUpdates(onKitchenUpdate: (data: any) => void) {
   return lastMessage?.event === "kitchen_status" ? lastMessage.data : null;
 }
 
-export function useBookingUpdates(onBookingUpdate: (data: any) => void) {
+export function useBookingUpdates(onBookingUpdate: (data: unknown) => void) {
   const { lastMessage } = useDashboardWebSocket("bookings");
   
   useEffect(() => {

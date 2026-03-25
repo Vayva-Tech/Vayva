@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
+    const _category = searchParams.get('category');
     const timeframe = searchParams.get('timeframe') || '7d';
 
     const now = new Date();

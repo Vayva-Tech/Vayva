@@ -1,6 +1,4 @@
-// @ts-nocheck
 "use client";
-
 import React, { useState } from "react";
 import { logger } from "@vayva/shared";
 import Link from "next/link";
@@ -71,12 +69,12 @@ export default function SignupPage() {
     setError(null);
     setSlugError(null);
     try {
-      await AuthService.register({ 
-        email, 
-        password, 
-        firstName, 
+      await AuthService.register({
+        email,
+        password,
+        firstName,
         lastName,
-        businessName,
+        storeName: businessName,
         storeSlug,
       });
       router.push(`/verify?email=${encodeURIComponent(email)}`);

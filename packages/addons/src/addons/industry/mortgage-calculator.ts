@@ -4,7 +4,7 @@
  * Property mortgage and affordability calculator
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const MORTGAGE_CALCULATOR_ADDON: AddOnDefinition = {
   id: 'vayva.mortgage-calculator',

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wholesale Industry Types
  * Type definitions for wholesale-specific features

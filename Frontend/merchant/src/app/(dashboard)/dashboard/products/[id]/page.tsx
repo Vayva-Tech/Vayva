@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Button, Input, Label, Select, Textarea } from "@vayva/ui";
 import { FloppyDisk as Save, Trash } from "@phosphor-icons/react/ssr";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { logger } from "@vayva/shared";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { ProductDeliverySection } from "@/components/products/ProductDeliverySection";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 import { apiJson } from "@/lib/api-client-shared";
 
@@ -139,7 +140,7 @@ export default function EditProductPage() {
   if (!product) return null;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="space-y-6">
       {/* Live region for screen readers */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {saving && <p>Saving product changes...</p>}
@@ -158,37 +159,50 @@ export default function EditProductPage() {
         </div>
       )}
 
-      <Breadcrumbs />
-      <div className="flex items-center gap-4 mb-8">
-        <BackButton href="/dashboard/products" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-          <p className="text-gray-500 text-sm">
-            Update your product details
-          </p>
-        </div>
-        <div className="ml-auto flex gap-2">
-          <Button
-            variant="outline"
-            className="text-red-500 border-red-500/20 hover:bg-red-500"
-            onClick={() => setShowDeleteConfirm(true)}
-            aria-label="Delete product"
-          >
-            <Trash className="h-4 w-4 mr-2" /> Delete
-          </Button>
-          <Button onClick={handleSubmit} disabled={saving}>
-            {saving ? (
-              "Saving..."
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" /> Save Changes
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button
+                  variant="outline"
+                  className="text-red-500 border-red-500/20 hover:bg-red-500 justify-between"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  aria-label="Delete product"
+                >
+                  <span>Delete</span>
+                  <Trash className="h-4 w-4" />
+                </Button>
+                <Button onClick={handleSubmit} disabled={saving} className="justify-between">
+                  <span>{saving ? "Saving..." : "Save changes"}</span>
+                  <Save className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Tip
+              </div>
+              <div className="mt-2 text-sm font-semibold text-gray-900">
+                Keep images consistent
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Similar backgrounds and angles help your catalog look premium.
+              </p>
+            </div>
+          </>
+        }
+      >
+        <div className="flex items-center gap-4">
+          <BackButton href="/dashboard/products" />
+          <PageHeader title="Edit Product" subtitle="Update your product details" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Main Form */}
         <div className="md:col-span-2 space-y-6">
           <div className="bg-white  p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
@@ -329,6 +343,7 @@ export default function EditProductPage() {
           <ProductDeliverySection productId={id} />
         </div>
       </div>
+      </PageWithInsights>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

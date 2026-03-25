@@ -51,7 +51,7 @@ export const GET = withVayvaAPI(
         currentOrders,
         comparisonOrders,
         currentCustomers,
-        comparisonCustomers,
+        _comparisonCustomers,
         currentProducts,
         currentSuppliers,
         currentInventory,

@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { prisma } from '@vayva/prisma';
+import { fashionPrisma as prisma } from '@fashion-prisma';
 
 export interface VisualSearchConfig {
   model: 'vayva-fashion-v1' | 'vayva-fashion-v2';

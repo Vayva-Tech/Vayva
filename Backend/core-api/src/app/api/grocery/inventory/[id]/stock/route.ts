@@ -20,144 +20,139 @@ const StockAdjustmentSchema = z.object({
   referenceNumber: z.string().optional(),
 });
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
+export const GET = withVayvaAPI(
+  PERMISSIONS.INVENTORY_VIEW,
+  async (_req: NextRequest, { storeId, params, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
 
-    // Verify product exists
-    const product = await prisma.groceryProduct.findFirst({
-      where: { id, storeId },
-    });
+      const product = await prisma.groceryProduct.findFirst({
+        where: { id, storeId },
+      });
 
-    if (!product) {
+      if (!product) {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
+
+      const stockHistory = await prisma.groceryStockMovement.findMany({
+        where: {
+          productId: id,
+          product: { storeId },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+      });
+
+      const totalMovements = stockHistory.reduce(
+        (sum, movement) => sum + movement.quantityChange,
+        0,
+      );
+
+      const stockData = {
+        currentStock: product.stockQuantity,
+        calculatedStock: totalMovements,
+        discrepancy: product.stockQuantity - totalMovements,
+        lastUpdated: product.updatedAt,
+        history: stockHistory,
+      };
+
       return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404, headers: standardHeaders(requestId) }
+        { data: stockData },
+        { headers: standardHeaders(requestId) },
+      );
+    } catch (error: unknown) {
+      const { id: productId } = await params;
+      logger.error("[GROCERY_STOCK_GET]", { error, productId });
+      return NextResponse.json(
+        { error: "Failed to fetch stock information" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
+  },
+);
 
-    // Get stock history
-    const stockHistory = await prisma.groceryStockMovement.findMany({
-      where: { productId: id },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
+export const POST = withVayvaAPI(
+  PERMISSIONS.INVENTORY_MANAGE,
+  async (req: NextRequest, { storeId, params, user, correlationId }: APIContext) => {
+    const requestId = correlationId;
+    try {
+      const { id } = await params;
+      const json = await req.json().catch(() => ({}));
+      const parseResult = StockAdjustmentSchema.safeParse(json);
 
-    // Calculate current stock level
-    const totalMovements = stockHistory.reduce(
-      (sum, movement) => sum + movement.quantityChange,
-      0
-    );
+      if (!parseResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid stock adjustment data",
+            details: parseResult.error.flatten(),
+          },
+          { status: 400, headers: standardHeaders(requestId) },
+        );
+      }
 
-    const stockData = {
-      currentStock: product.stockQuantity,
-      calculatedStock: totalMovements,
-      discrepancy: product.stockQuantity - totalMovements,
-      lastUpdated: product.updatedAt,
-      history: stockHistory,
-    };
+      const { quantity, reason, notes, referenceNumber } = parseResult.data;
 
-    return NextResponse.json(
-      { data: stockData },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[GROCERY_STOCK_GET]", { error, productId: params.id });
-    return NextResponse.json(
-      { error: "Failed to fetch stock information" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+      const product = await prisma.groceryProduct.findFirst({
+        where: { id, storeId },
+      });
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const requestId = crypto.randomUUID();
-  try {
-    const { id } = params;
-    const json = await req.json().catch(() => ({}));
-    const parseResult = StockAdjustmentSchema.safeParse(json);
+      if (!product) {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404, headers: standardHeaders(requestId) },
+        );
+      }
 
-    if (!parseResult.success) {
+      const newStock = Math.max(0, product.stockQuantity + quantity);
+
+      const [updatedProduct, stockMovement] = await prisma.$transaction([
+        prisma.groceryProduct.update({
+          where: { id_storeId: { id, storeId } },
+          data: {
+            stockQuantity: newStock,
+            lowStockAlert: newStock <= product.reorderPoint,
+          },
+        }),
+        prisma.groceryStockMovement.create({
+          data: {
+            productId: id,
+            quantityChange: quantity,
+            reason,
+            notes,
+            referenceNumber,
+            createdBy: user.id,
+          },
+        }),
+      ]);
+
+      logger.info("[GROCERY_STOCK_ADJUST]", {
+        productId: id,
+        quantityChange: quantity,
+        reason,
+        newStock,
+        userId: user.id,
+      });
+
       return NextResponse.json(
         {
-          error: "Invalid stock adjustment data",
-          details: parseResult.error.flatten(),
+          data: {
+            product: updatedProduct,
+            movement: stockMovement,
+          },
         },
-        { status: 400, headers: standardHeaders(requestId) }
+        { headers: standardHeaders(requestId) },
       );
-    }
-
-    // Extract storeId from request context
-    const storeId = "test-store-id"; // Placeholder
-
-    const { quantity, reason, notes, referenceNumber } = parseResult.data;
-
-    // Get current product
-    const product = await prisma.groceryProduct.findFirst({
-      where: { id, storeId },
-    });
-
-    if (!product) {
+    } catch (error: unknown) {
+      const { id: productId } = await params;
+      logger.error("[GROCERY_STOCK_ADJUST]", { error, productId });
       return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404, headers: standardHeaders(requestId) }
+        { error: "Failed to adjust stock" },
+        { status: 500, headers: standardHeaders(requestId) },
       );
     }
-
-    // Update stock quantity
-    const newStock = Math.max(0, product.stockQuantity + quantity);
-    
-    const [updatedProduct, stockMovement] = await prisma.$transaction([
-      prisma.groceryProduct.update({
-        where: { id_storeId: { id, storeId } },
-        data: {
-          stockQuantity: newStock,
-          lowStockAlert: newStock <= product.reorderPoint,
-        },
-      }),
-      prisma.groceryStockMovement.create({
-        data: {
-          productId: id,
-          quantityChange: quantity,
-          reason,
-          notes,
-          referenceNumber,
-          createdBy: "system", // Would come from auth context
-        },
-      }),
-    ]);
-
-    logger.info("[GROCERY_STOCK_ADJUST]", {
-      productId: id,
-      quantityChange: quantity,
-      reason,
-      newStock,
-    });
-
-    return NextResponse.json(
-      { 
-        data: { 
-          product: updatedProduct,
-          movement: stockMovement 
-        } 
-      },
-      { headers: standardHeaders(requestId) }
-    );
-  } catch (error: unknown) {
-    logger.error("[GROCERY_STOCK_ADJUST]", { error, productId: params.id });
-    return NextResponse.json(
-      { error: "Failed to adjust stock" },
-      { status: 500, headers: standardHeaders(requestId) }
-    );
-  }
-}
+  },
+);

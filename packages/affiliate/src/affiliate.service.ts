@@ -345,10 +345,11 @@ export class AffiliateService {
 
   async approvePayout(
     payoutId: string,
-    approvedBy: string
+    approvedBy: string,
+    storeId: string
   ): Promise<{ success: boolean; error?: string; transferCode?: string }> {
-    const payout = await prisma.affiliatePayout.findUnique({
-      where: { id: payoutId },
+    const payout = await prisma.affiliatePayout.findFirst({
+      where: { id: payoutId, storeId },
       include: {
         affiliate: true,
       },

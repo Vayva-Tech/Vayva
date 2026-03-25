@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Route matchers
 const PUBLIC_ROUTES = [
-  "/",
+  "",
   "/login",
   "/register",
   "/forgot-password",
@@ -19,31 +19,56 @@ const PUBLIC_ROUTES = [
 
 const PROTECTED_ROUTE_PREFIXES = [
   "/dashboard",
+  "/beta",
+  "/api/beta",
   "/api/account",
   "/api/billing",
   "/api/checkout",
   "/api/customers",
   "/api/finance",
+  "/api/fulfillment",
+  "/api/integrations",
+  "/api/nightlife",
+  "/api/social-connections",
+  "/api/workflows",
+  "/api/ledger",
+  "/api/me",
+  "/api/onboarding",
+  "/api/ops",
+  "/api/payments",
   "/api/merchant",
   "/api/orders",
   "/api/products",
   "/api/settings",
+  "/api/socials",
+  "/api/storage",
   "/api/support",
+  "/api/team",
+  "/api/uploads",
 ];
 
 const AUTH_ROUTES = [
-  "/login",
-  "/register",
+  "/signin",
+  "/signup",
   "/forgot-password",
   "/reset-password",
 ];
+
+function matchesAuthRoute(pathname: string): boolean {
+  return AUTH_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
 
 /**
  * Check if a route is public (no auth required)
  */
 function isPublicRoute(pathname: string): boolean {
+  if (pathname === "/") return true;
+  // Email / OTP verification must stay reachable without a session
+  if (pathname === "/verify" || pathname.startsWith("/verify/")) return true;
   return (
-    PUBLIC_ROUTES.some((route) => pathname.startsWith(route)) ||
+    PUBLIC_ROUTES.some((route) => route && pathname.startsWith(route)) ||
     pathname.includes("/_next/") ||
     pathname.includes("/static/") ||
     pathname.match(/\.(png|jpg|jpeg|gif|svg|css|js|ico|woff|woff2)$/) !== null
@@ -63,16 +88,25 @@ function isProtectedRoute(pathname: string): boolean {
  * Check if route is an auth page (redirect if logged in)
  */
 function isAuthRoute(pathname: string): boolean {
-  return AUTH_ROUTES.includes(pathname);
+  return matchesAuthRoute(pathname);
 }
 
 /**
  * Get auth token from request
  */
 function getAuthToken(request: NextRequest): string | null {
-  // Check cookie first
-  const cookieToken = request.cookies.get("vayva.session")?.value;
-  if (cookieToken) return cookieToken;
+  const cookieNames = [
+    "vayva_session",
+    "session",
+    "__Secure-vayva-merchant-session",
+    "next-auth.merchant-session",
+    "__Secure-next-auth.session-token",
+    "next-auth.session-token",
+  ];
+  for (const name of cookieNames) {
+    const value = request.cookies.get(name)?.value;
+    if (value) return value;
+  }
 
   // Check Authorization header
   const authHeader = request.headers.get("authorization");
@@ -125,8 +159,8 @@ export async function middleware(request: NextRequest) {
           { status: 401 }
         );
       }
-      // Page routes redirect to login
-      const loginUrl = new URL("/login", request.url);
+      // Page routes redirect to sign-in (App Router uses /signin)
+      const loginUrl = new URL("/signin", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Recipe Costing Feature
  * Calculate and optimize recipe costs for food businesses

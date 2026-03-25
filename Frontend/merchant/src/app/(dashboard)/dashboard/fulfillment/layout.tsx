@@ -1,6 +1,6 @@
-// @ts-nocheck
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@vayva/ui";
@@ -14,9 +14,9 @@ const FULFILLMENT_TABS = [
 export default function FulfillmentLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <div className="space-y-4">

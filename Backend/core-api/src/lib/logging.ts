@@ -21,7 +21,7 @@ interface LogEntry {
   timestamp: string;
   level: LogLevel;
   message: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   storeId?: number;
   userId?: string;
   requestId?: string;
@@ -45,7 +45,7 @@ class Logger {
   /**
    * Log a message at specified level
    */
-  async log(level: LogLevel, message: string, context?: Record<string, any>): Promise<void> {
+  async log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<void> {
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
@@ -70,19 +70,19 @@ class Logger {
   /**
    * Convenience methods for different log levels
    */
-  async debug(message: string, context?: Record<string, any>) {
+  async debug(message: string, context?: Record<string, unknown>) {
     await this.log('debug', message, context);
   }
 
-  async info(message: string, context?: Record<string, any>) {
+  async info(message: string, context?: Record<string, unknown>) {
     await this.log('info', message, context);
   }
 
-  async warn(message: string, context?: Record<string, any>) {
+  async warn(message: string, context?: Record<string, unknown>) {
     await this.log('warn', message, context);
   }
 
-  async error(message: string, error?: Error, context?: Record<string, any>) {
+  async error(message: string, error?: Error, context?: Record<string, unknown>) {
     const enrichedContext = {
       ...context,
       error: error ? {
@@ -179,14 +179,14 @@ class Logger {
     } else if (entry.level === 'warn') {
       console.warn(prefix, entry.message, entry.context);
     } else {
-      console.log(prefix, entry.message, entry.context);
+      console.warn(prefix, entry.message, entry.context);
     }
   }
 
   /**
    * Create a child logger with additional context
    */
-  child(defaultContext: Record<string, any>): ChildLogger {
+  child(defaultContext: Record<string, unknown>): ChildLogger {
     return new ChildLogger(this, defaultContext);
   }
 }
@@ -197,22 +197,22 @@ class Logger {
 class ChildLogger {
   constructor(
     private parent: Logger,
-    private defaultContext: Record<string, any>
+    private defaultContext: Record<string, unknown>
   ) {}
 
-  async debug(message: string, context?: Record<string, any>) {
+  async debug(message: string, context?: Record<string, unknown>) {
     await this.parent.debug(message, { ...this.defaultContext, ...context });
   }
 
-  async info(message: string, context?: Record<string, any>) {
+  async info(message: string, context?: Record<string, unknown>) {
     await this.parent.info(message, { ...this.defaultContext, ...context });
   }
 
-  async warn(message: string, context?: Record<string, any>) {
+  async warn(message: string, context?: Record<string, unknown>) {
     await this.parent.warn(message, { ...this.defaultContext, ...context });
   }
 
-  async error(message: string, error?: Error, context?: Record<string, any>) {
+  async error(message: string, error?: Error, context?: Record<string, unknown>) {
     await this.parent.error(message, error, { ...this.defaultContext, ...context });
   }
 }
@@ -238,7 +238,7 @@ export function createRequestLogger() {
       });
 
       // Clone response to read body (be careful with this in production)
-      const clonedResponse = response.clone();
+      const _clonedResponse = response.clone();
       
       const duration = Date.now() - start;
       

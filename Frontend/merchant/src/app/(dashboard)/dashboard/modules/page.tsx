@@ -224,7 +224,7 @@ export default function ModulesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {!m.isRequired && (
-                      <button
+                      <Button
                         onClick={() => handleToggle(m.id, m.isEnabled)}
                         className={`p-2 rounded-lg transition-colors ${
                           m.isEnabled 
@@ -234,23 +234,23 @@ export default function ModulesPage() {
                         title={m.isEnabled ? "Disable" : "Enable"}
                       >
                         <Power size={16} />
-                      </button>
+                      </Button>
                     )}
-                    <button
+                    <Button
                       onClick={() => openEdit(m)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit"
                     >
                       <Edit size={16} />
-                    </button>
+                    </Button>
                     {!m.isRequired && (
-                      <button
+                      <Button
                         onClick={() => setDeleteConfirm({ id: m.id, name: m.name })}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete"
                       >
                         <Trash size={16} />
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export default function ModulesPage() {
           <h2 className="text-xl font-semibold text-gray-900">
             {editingModule ? "Edit" : "New"} Module
           </h2>
-          <button
+          <Button
             onClick={() => setIsOpen(false)}
             className="p-2 text-gray-500 hover:text-gray-700"
           >
@@ -283,7 +283,7 @@ export default function ModulesPage() {
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          </button>
+          </Button>
         </div>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -378,19 +378,19 @@ export default function ModulesPage() {
           </div>
         </div>
         <div className="flex items-center justify-end mt-4">
-          <button
+          <Button
             onClick={() => setIsOpen(false)}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={isSubmitting}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
           >
             {isSubmitting ? "Saving..." : editingModule ? "Update" : "Create"}
-          </button>
+          </Button>
         </div>
       </dialog>
 
@@ -398,7 +398,7 @@ export default function ModulesPage() {
       <dialog open={!!deleteConfirm} className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Delete Module</h2>
-          <button
+          <Button
             onClick={() => setDeleteConfirm(null)}
             className="p-2 text-gray-500 hover:text-gray-700"
           >
@@ -415,25 +415,25 @@ export default function ModulesPage() {
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          </button>
+          </Button>
         </div>
         <div className="text-center">
           <p className="text-gray-700 mb-4">
             Are you sure you want to delete "{deleteConfirm?.name}"?
           </p>
           <div className="flex items-center justify-center gap-4">
-            <button
+            <Button
               onClick={() => setDeleteConfirm(null)}
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => deleteConfirm && handleDelete(deleteConfirm.id)}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
             >
               Delete
-            </button>
+            </Button>
           </div>
         </div>
       </dialog>

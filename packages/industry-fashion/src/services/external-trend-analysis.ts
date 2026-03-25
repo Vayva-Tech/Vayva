@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface TrendAnalysis {
   name: string;
   category: string;

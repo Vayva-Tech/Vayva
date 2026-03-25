@@ -1,8 +1,11 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import useSWR from "swr";
+import Link from "next/link";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 import {
   Package,
   PackageCheck,
@@ -229,13 +232,13 @@ export default function InventoryPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load inventory</h3>
           <p className="text-sm text-gray-500 mb-4">There was a problem fetching your inventory data. Please try again.</p>
-          <button
+          <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -273,22 +276,20 @@ export default function InventoryPage() {
   if (inventoryItems.length === 0) {
     return (
       <div className="space-y-8 pb-12">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Inventory</h1>
-            <p className="text-sm text-gray-500 mt-1">Track and manage your stock levels</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Inventory"
+          subtitle="Track and manage your stock levels"
+        />
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
             <Package className="w-7 h-7 text-gray-400" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">No inventory tracked yet</h3>
           <p className="text-sm text-gray-500 max-w-sm mb-4">Add products to start managing inventory</p>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
+          <Button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
             <Plus className="w-4 h-4" />
             Add Stock
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -296,34 +297,83 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Inventory
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Track and manage your stock levels
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => mutate()}
-            className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw size={16} />
-            Refresh
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-            <FileBarChart size={16} />
-            Stock Report
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-600 transition-colors">
-            <Plus size={16} />
-            Add Stock
-          </button>
-        </div>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/products"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Products</span>
+                  <ArrowUpRight className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/analytics"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Analytics</span>
+                  <ArrowUpRight className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/inventory/locations"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Locations</span>
+                  <ArrowUpRight className="w-4 h-4 text-gray-400" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Low stock</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {summary?.lowStock ?? 0}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Out of stock</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {summary?.outOfStock ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Inventory"
+          subtitle="Track and manage your stock levels"
+          actions={
+            <>
+              <Button
+                onClick={() => mutate()}
+                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </Button>
+              <Button className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+                <FileBarChart size={16} />
+                Stock Report
+              </Button>
+              <Button className="inline-flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-600 transition-colors">
+                <Plus size={16} />
+                Add Stock
+              </Button>
+            </>
+          }
+        />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -475,24 +525,24 @@ export default function InventoryPage() {
                     </td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button
+                        <Button
                           className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <Edit size={14} className="text-gray-500" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                           title="Restock"
                         >
                           <RefreshCw size={14} className="text-gray-500" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
                           <Trash2 size={14} className="text-gray-400 hover:text-red-500" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -527,6 +577,8 @@ export default function InventoryPage() {
         </div>
         <StockMovementChart stockMovement={stockMovement} />
       </div>
+      </PageWithInsights>
     </div>
   );
 }
+

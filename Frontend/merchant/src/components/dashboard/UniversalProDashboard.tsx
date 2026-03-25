@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 const useUser = () => { const { merchant } = useAuth(); return { user: merchant ? { id: (merchant as any)?.id, fullName: (merchant as any)?.name } : null }; };
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -29,11 +28,17 @@ import {
   StationWorkload,
   EightySixBoard
 } from '@/components/dashboard/kitchen';
-import { useRealTimeDashboard , useDashboardMetrics, useDashboardAlerts, useDashboardActions } from '@/hooks/useRealTimeDashboard';
+import { useRealTimeDashboard, useDashboardMetrics, useDashboardAlerts, useDashboardActions } from '@/hooks/useRealTimeDashboard';
 import { SettingsButton } from './SettingsButton';
-import type { UniversalDashboardProps } from '@/config/dashboard-universal-types';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import type { UniversalDashboardProps, DashboardVariant } from '@/config/dashboard-universal-types';
+import type { DesignCategory } from '@/components/vayva-ui/VayvaThemeProvider';
+import { formatCurrency, formatDate, cn } from '@/lib/utils';
+import type { DashboardAlert } from '@/services/dashboard-alerts';
+import type { SuggestedAction } from '@/services/dashboard-actions';
 import { AlertCircle, RefreshCw, TrendingUp, BarChart3, ChefHat, Layers, Lock } from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageWithInsights } from '@/components/layout/PageWithInsights';
+import { getIndustryDashboardDefinition } from '@/config/industry-dashboard-definitions';
 import {
   ActiveCoursesSection,
   StudentProgressPanel,
@@ -67,6 +72,7 @@ export function UniversalProDashboard({
   onConfigChange,
   onError
 }: UniversalDashboardProps) {
+  const dashboardConfig = useMemo(() => ({ industry }), [industry]);
   const { user } = useUser();
   const {
     data: dashboardData,
@@ -75,7 +81,8 @@ export function UniversalProDashboard({
     actions: realtimeActions,
     systemStatus,
     isLoading: loading,
-    isError: error,
+    isError,
+    error: fetchError,
     wsConnected,
     refresh,
     mutate,
@@ -107,6 +114,10 @@ export function UniversalProDashboard({
   // Calculate last updated time
   const lastUpdated = dashboardData?.lastUpdated ? new Date(dashboardData.lastUpdated) : null;
   const isValidating = loading;
+  const errorMessage =
+    fetchError instanceof Error
+      ? fetchError.message
+      : "Failed to load dashboard";
 
   // Handle loading state
   if (loading && !dashboardData) {
@@ -114,7 +125,7 @@ export function UniversalProDashboard({
   }
 
   // Handle error state
-  if (error) {
+  if (isError) {
     return (
       <div className="space-y-6">
         <Alert variant="destructive">
@@ -123,7 +134,7 @@ export function UniversalProDashboard({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">Failed to load dashboard</h3>
-                <p className="text-sm opacity-90">{error.message}</p>
+                <p className="text-sm opacity-90">{errorMessage}</p>
               </div>
               <Button 
                 variant="outline" 
@@ -143,7 +154,7 @@ export function UniversalProDashboard({
           <div className="opacity-70">
             <DashboardContent 
               dashboardData={dashboardData}
-              config={config}
+              config={dashboardConfig}
               metrics={metrics}
               alerts={alerts}
               actions={actions}
@@ -151,6 +162,11 @@ export function UniversalProDashboard({
               refresh={refresh}
               isValidating={isValidating}
               variant={variant}
+              designCategory={designCategory as DesignCategory}
+              planTier={planTier}
+              industry={industry}
+              userId={userId}
+              businessId={businessId}
             />
           </div>
         )}
@@ -178,7 +194,7 @@ export function UniversalProDashboard({
   return (
     <DashboardContent 
       dashboardData={dashboardData}
-      config={config}
+      config={dashboardConfig}
       metrics={metrics}
       alerts={alerts}
       actions={actions}
@@ -186,9 +202,11 @@ export function UniversalProDashboard({
       refresh={refresh}
       isValidating={isValidating}
       variant={variant}
-      designCategory={designCategory}
+      designCategory={designCategory as DesignCategory}
       planTier={planTier}
       industry={industry}
+      userId={userId}
+      businessId={businessId}
       className={className}
     />
   );
@@ -200,17 +218,19 @@ export function UniversalProDashboard({
 
 interface DashboardContentProps {
   dashboardData: any;
-  config: any;
+  config: { industry?: string };
   metrics: any[];
   alerts: any[];
   actions: any[];
   lastUpdated: Date | null;
   refresh: () => Promise<void>;
   isValidating: boolean;
-  variant: string;
-  designCategory: string;
+  variant: DashboardVariant;
+  designCategory: DesignCategory;
   planTier: string;
   industry: string;
+  userId: string;
+  businessId: string;
   className?: string;
 }
 
@@ -227,39 +247,103 @@ function DashboardContent({
   designCategory,
   planTier,
   industry,
+  userId,
+  businessId,
   className
 }: DashboardContentProps) {
-  return (
-    <div className={`space-y-6 ${className || ''}`}>
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {config?.industry ? formatIndustryTitle(config.industry) : 'Dashboard'}
-          </h1>
-          <p className="text-gray-500 mt-1">
-            {lastUpdated && (
-              <span>
-                Last updated {formatDate(lastUpdated)} •{' '}
-              </span>
-            )}
-            <span className="capitalize">{variant} plan</span>
-          </p>
+  const dashboardDefinition = useMemo(() => {
+    try {
+      return getIndustryDashboardDefinition(industry as any);
+    } catch {
+      return null;
+    }
+  }, [industry]);
+
+  const industryTitle =
+    dashboardDefinition?.title ??
+    (config?.industry ? formatIndustryTitle(config.industry) : 'Dashboard');
+
+  const insights = (
+    <>
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          KPI snapshot
         </div>
-        
-        <div className="flex items-center gap-2">
-          <SettingsButton />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refresh}
-            disabled={isValidating}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isValidating ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          {metrics.slice(0, 4).map((metric) => (
+            <div
+              key={metric.key}
+              className="rounded-xl border border-gray-100 bg-gray-50/60 p-3"
+            >
+              <div className="text-xs text-gray-500 truncate">
+                {formatMetricLabel(metric.key)}
+              </div>
+              <div className="text-base font-bold text-gray-900 mt-0.5 truncate">
+                {formatMetricValue(metric)}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
+
+      {alerts.length > 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Alerts
+          </div>
+          <div className="mt-3 space-y-2">
+            {alerts.slice(0, 3).map((a) => (
+              <div
+                key={a.id}
+                className="rounded-xl border border-gray-100 bg-white p-3"
+              >
+                <div className="text-sm font-semibold text-gray-900">
+                  {a.title}
+                </div>
+                <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+                  {a.message}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+
+  return (
+    <PageWithInsights insights={insights} className={className}>
+      <div className="space-y-6">
+        <PageHeader
+          title={industryTitle}
+          subtitle={
+            <>
+              {dashboardDefinition?.subtitle ? (
+                <span className="text-gray-500">{dashboardDefinition.subtitle} • </span>
+              ) : null}
+              {lastUpdated ? (
+                <span>
+                  Last updated {formatDate(lastUpdated)} •{' '}
+                </span>
+              ) : null}
+              <span className="capitalize">{variant} plan</span>
+            </>
+          }
+          actions={
+            <>
+              <SettingsButton />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refresh}
+                disabled={isValidating}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isValidating ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </>
+          }
+        />
 
       {/* Key Metrics Grid */}
       {metrics.length > 0 && (
@@ -270,20 +354,36 @@ function DashboardContent({
             icon={<TrendingUp className="h-5 w-5" />}
           />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-            {metrics.map((metric, index) => (
-              <UniversalMetricCard
+          <div
+            className={cn(
+              "mt-4 gap-4",
+              "flex md:grid md:grid-cols-2 lg:grid-cols-4 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible",
+              "snap-x snap-mandatory md:snap-none",
+            )}
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {metrics.map((metric) => (
+              <div
                 key={metric.key}
-                title={formatMetricLabel(metric.key)}
-                value={formatMetricValue(metric)}
-                change={metric.change ? {
-                  value: Math.abs(metric.change),
-                  isPositive: metric.isPositive ?? metric.change >= 0
-                } : undefined}
-                icon={getMetricIcon(metric.key)}
-                loading={false}
-                status={getMetricStatus(metric)}
-              />
+                className="max-md:snap-center shrink-0 w-[min(18rem,calc(100vw-4.5rem))] md:w-auto md:shrink"
+              >
+                <UniversalMetricCard
+                  title={formatMetricLabel(metric.key)}
+                  value={formatMetricValue(metric)}
+                  change={
+                    metric.change
+                      ? {
+                          value: Math.abs(metric.change),
+                          isPositive:
+                            metric.isPositive ?? metric.change >= 0,
+                        }
+                      : undefined
+                  }
+                  icon={getMetricIcon(metric.key)}
+                  loading={false}
+                  status={getMetricStatus(metric)}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -399,13 +499,13 @@ function DashboardContent({
               {industry === 'events' ? (
                 <>
                   <CountdownTimerWidget
-                    widget={{ id: 'event-countdown', type: 'custom', title: 'Event Countdown', industry: 'events', dataSource: { type: 'event' } }}
+                    widget={{ id: 'event-countdown', type: 'custom', title: 'Event Countdown', industry: 'events', dataSource: { type: 'event' } } as any}
                     targetDate={dashboardData.event?.startDate || new Date()}
                     eventName={dashboardData.event?.title}
                     size="large"
                   />
                   <TicketSalesTrackerWidget
-                    widget={{ id: 'ticket-sales', type: 'kpi-card', title: 'Ticket Sales', industry: 'events', dataSource: { type: 'analytics' } }}
+                    widget={{ id: 'ticket-sales', type: 'kpi-card', title: 'Ticket Sales', industry: 'events', dataSource: { type: 'analytics' } } as any}
                     eventId={dashboardData.event?.id || ''}
                     totalCapacity={dashboardData.event?.capacity || 0}
                     ticketsSold={dashboardData.event?.ticketsSold || 0}
@@ -415,13 +515,21 @@ function DashboardContent({
               ) : industry === 'automotive' ? (
                 <>
                   <VehicleGalleryWidget
-                    widget={{ id: 'vehicle-gallery', type: 'custom', title: 'Vehicle Inventory', industry: 'automotive', dataSource: { type: 'entity' } }}
+                    widget={{ id: 'vehicle-gallery', type: 'custom', title: 'Vehicle Inventory', industry: 'automotive', dataSource: { type: 'entity' } } as any}
                     vehicles={dashboardData.vehicles || []}
                     viewMode="grid"
                     showFilters={true}
                   />
                   <TestDriveSchedulerWidget
-                    widget={{ id: 'test-drive-schedule', type: 'calendar', title: 'Test Drives', industry: 'automotive', dataSource: { type: 'calendar' } }}
+                    widget={
+                      {
+                        id: "test-drive-schedule",
+                        type: "calendar",
+                        title: "Test Drives",
+                        industry: "automotive",
+                        dataSource: { type: "analytics" },
+                      } as any
+                    }
                     vehicles={dashboardData.vehicles || []}
                     testDrives={dashboardData.testDrives || []}
                   />
@@ -429,12 +537,20 @@ function DashboardContent({
               ) : industry === 'travel_hospitality' ? (
                 <>
                   <OccupancyHeatmapWidget
-                    widget={{ id: 'occupancy-heatmap', type: 'heatmap', title: 'Occupancy Rate', industry: 'travel_hospitality', dataSource: { type: 'analytics' } }}
+                    widget={{ id: 'occupancy-heatmap', type: 'heatmap', title: 'Occupancy Rate', industry: 'travel_hospitality', dataSource: { type: 'analytics' } } as any}
                     occupancyData={dashboardData.occupancyHistory || []}
                     viewMode="month"
                   />
                   <GuestTimelineWidget
-                    widget={{ id: 'guest-timeline', type: 'timeline', title: 'Guest Stays', industry: 'travel_hospitality', dataSource: { type: 'timeline' } }}
+                    widget={
+                      {
+                        id: "guest-timeline",
+                        type: "timeline",
+                        title: "Guest Stays",
+                        industry: "travel_hospitality",
+                        dataSource: { type: "analytics" },
+                      } as any
+                    }
                     stays={dashboardData.guestStays || []}
                     viewMode="week"
                   />
@@ -445,8 +561,6 @@ function DashboardContent({
                   variant={variant}
                   userId={userId}
                   businessId={businessId}
-                  designCategory={designCategory}
-                  planTier={planTier}
                   className="col-span-full"
                 />
               ) : industry === 'education' ? (
@@ -470,14 +584,41 @@ function DashboardContent({
               ) : (
                 <>
                   <PrimaryObjectHealth
+                    label={
+                      config?.industry
+                        ? formatIndustryTitle(String(config.industry))
+                        : "Catalog"
+                    }
+                    topSelling={
+                      (dashboardData.primaryObjectHealth
+                        ?.top_products as any[]) || []
+                    }
+                    lowStock={
+                      (dashboardData.primaryObjectHealth
+                        ?.low_stock as any[]) || []
+                    }
+                    deadStock={
+                      (dashboardData.primaryObjectHealth
+                        ?.dead_stock as any[]) || []
+                    }
+                    isLoading={false}
                     designCategory={designCategory}
-                    industry={industry}
-                    planTier={planTier}
                   />
                   <LiveOperations
+                    title="Live operations"
+                    items={
+                      (() => {
+                        const live = dashboardData.liveOperations || {};
+                        return Object.keys(live).map((key) => ({
+                          key,
+                          label: key.replace(/_/g, " "),
+                          value: (live as any)[key]?.value ?? (live as any)[key] ?? 0,
+                          icon: "Activity",
+                        }));
+                      })()
+                    }
+                    isLoading={false}
                     designCategory={designCategory}
-                    industry={industry}
-                    planTier={planTier}
                   />
                 </>
               )}
@@ -571,19 +712,19 @@ function DashboardContent({
 
       {/* Alerts Section */}
       <div className="mb-8">
-        <AlertsList 
-          designCategory={designCategory} 
-          industry={industry} 
-          planTier={planTier}
+        <AlertsList
+          alerts={alerts as DashboardAlert[]}
+          isLoading={false}
+          designCategory={designCategory}
         />
       </div>
 
       {/* Suggested Actions */}
       <div>
-        <SuggestedActionsList 
-          designCategory={designCategory} 
-          industry={industry} 
-          planTier={planTier}
+        <SuggestedActionsList
+          actions={actions as SuggestedAction[]}
+          isLoading={false}
+          designCategory={designCategory}
         />
       </div>
 
@@ -614,7 +755,8 @@ function DashboardContent({
           />
         </div>
       )}
-    </div>
+      </div>
+    </PageWithInsights>
   );
 }
 

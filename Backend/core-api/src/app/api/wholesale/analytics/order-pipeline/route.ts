@@ -34,7 +34,7 @@ export const GET = withVayvaAPI(
       });
 
       // Calculate on-time shipment rate (simplified - would need actual ship dates vs promised dates)
-      const recentShippedOrders = await prisma.wholesaleOrder.count({
+      const _recentShippedOrders = await prisma.wholesaleOrder.count({
         where: {
           storeId,
           status: "shipped",

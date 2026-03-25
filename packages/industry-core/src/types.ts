@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 // Industry Core Types
 // ============================================================================
@@ -12,29 +11,44 @@ import type { z } from "zod";
 // Industry Types
 // ============================================================================
 
+/** Canonical store / dashboard industry keys (merchant INDUSTRY_CONFIG + analytics vertical). */
 export type IndustrySlug =
-  | "retail"
-  | "fashion"
-  | "electronics"
-  | "beauty"
-  | "grocery"
-  | "one_product"
-  | "food"
-  | "services"
-  | "b2b"
-  | "events"
-  | "nightlife"
-  | "automotive"
-  | "travel_hospitality"
-  | "real_estate"
-  | "digital"
-  | "nonprofit"
-  | "education"
-  | "blog_media"
   | "analytics"
+  | "automotive"
+  | "b2b"
+  | "beauty"
+  | "blog_media"
+  | "catering"
   | "creative_portfolio"
+  | "digital"
+  | "education"
+  | "electronics"
+  | "events"
+  | "fashion"
+  | "fitness"
+  | "food"
+  | "grocery"
+  | "healthcare"
+  | "hotel"
+  | "jobs"
+  | "legal"
+  | "marketplace"
+  | "meal-kit"
+  | "nightlife"
+  | "nonprofit"
+  | "one_product"
+  | "petcare"
+  | "real_estate"
   | "restaurant"
-  | "healthcare";
+  | "retail"
+  | "saas"
+  | "salon"
+  | "services"
+  | "specialized"
+  | "spa"
+  | "travel_hospitality"
+  | "wellness"
+  | "wholesale";
 
 // ============================================================================
 // Widget Types
@@ -45,6 +59,7 @@ export type WidgetType =
   | "chart-line"
   | "chart-bar"
   | "chart-pie"
+  | "chart-donut"
   | "table"
   | "calendar"
   | "map"
@@ -53,7 +68,19 @@ export type WidgetType =
   | "heatmap"
   | "gauge"
   | "list"
-  | "custom";
+  | "custom"
+  | "gallery"
+  | "grid"
+  | "metric"
+  | "chart"
+  | "feed"
+  | "weekly-recipe-selector"
+  | "subscription-plan-builder"
+  | "delivery-slot-picker"
+  | "meal-preference-tracker"
+  | "ingredient-inventory-manager"
+  | "kds-board"
+  | "86-board";
 
 export type DataSourceType =
   | "entity"
@@ -62,7 +89,10 @@ export type DataSourceType =
   | "composite"
   | "event"
   | "geo"
-  | "static";
+  | "static"
+  | "insights"
+  | "finance"
+  | "predictive";
 
 export interface DataSourceConfig {
   type: DataSourceType;
@@ -86,6 +116,7 @@ export interface WidgetDefinition {
   permissions?: string[];
   component?: string;
   config?: Record<string, unknown>;
+  visualization?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -207,6 +238,44 @@ export interface DashboardEngineConfig {
   kpiCards: KPICardDefinition[];
   alertRules: AlertRule[];
   actions: QuickAction[];
+  failureModes: string[];
+}
+
+/** Rich universal-dashboard metadata (merchant shell); not a full {@link DashboardEngineConfig}. */
+export interface IndustryDashboardMetricTile {
+  key: string;
+  label: string;
+  format: string;
+  icon: string;
+  emptyText?: string;
+}
+
+export interface IndustryDashboardDefinition {
+  industry: IndustrySlug;
+  title: string;
+  subtitle: string;
+  primaryObjectLabel: string;
+  defaultTimeHorizon: DashboardTimeHorizon;
+  sections: DashboardSectionKey[];
+  primaryObjectHealth?: IndustryDashboardMetricTile[];
+  liveOps?: IndustryDashboardMetricTile[];
+  alertThresholds?: Array<{
+    key: string;
+    label: string;
+    operator: string;
+    value: number;
+    severity: string;
+    message: string;
+  }>;
+  suggestedActionRules?: Array<{
+    id: string;
+    title: string;
+    reason: string;
+    conditionKey: string;
+    severity: string;
+    href: string;
+    icon: string;
+  }>;
   failureModes: string[];
 }
 
@@ -356,3 +425,4 @@ export interface IndustryWidgetDataModel {
   cachedAt: Date;
   expiresAt: Date;
 }
+

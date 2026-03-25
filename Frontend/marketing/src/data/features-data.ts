@@ -331,7 +331,7 @@ export const allFeatures: Feature[] = [
     tier: "free",
     icon: "Box",
     category: "inventory",
-    highlights: ["Unlimited products (Starter+)", "Image galleries", "SEO fields"],
+    highlights: ["Tiered catalog limits (100 / 300 / 500 by plan)", "Image galleries", "SEO fields"],
   },
   {
     id: "variant-management",
@@ -980,7 +980,7 @@ export const allFeatures: Feature[] = [
   {
     id: "zapier",
     name: "Zapier Integration",
-    description: "Connect with 5000+ apps without coding",
+    description: "Connect with many popular apps through automation platforms—no coding required",
     tier: "starter",
     icon: "Zap",
     category: "integrations",
@@ -1037,7 +1037,12 @@ export const featureComparison = [
     { name: "Subscription Billing", free: false, starter: false, pro: true },
   ]},
   { category: "Inventory", features: [
-    { name: "Product Management", free: "Up to 20", starter: "Up to 500", pro: "Unlimited" },
+    {
+      name: "Product Management",
+      free: "Up to 20",
+      starter: "Up to 100",
+      pro: "Up to 300 (Pro), 500 (Pro+)",
+    },
     { name: "Variant Management", free: false, starter: true, pro: true },
     { name: "Low Stock Alerts", free: false, starter: true, pro: true },
     { name: "Multi-Location", free: false, starter: false, pro: true },
@@ -1058,13 +1063,18 @@ export const featureComparison = [
   ]},
   { category: "Operations", features: [
     { name: "Delivery Tracking", free: true, starter: true, pro: true },
-    { name: "Staff Management", free: "1 user", starter: "3 users", pro: "Unlimited" },
+    {
+      name: "Staff Management",
+      free: "1 user",
+      starter: "1 user",
+      pro: "3 users (Pro), 5 (Pro+)",
+    },
     { name: "Automation Rules", free: false, starter: true, pro: true },
     { name: "Route Optimization", free: false, starter: false, pro: true },
   ]},
   { category: "Content", features: [
-    { name: "Templates", free: "4", starter: "60+", pro: "60+" },
-    { name: "Custom Domain", free: false, starter: true, pro: true },
+    { name: "Templates", free: "—", starter: "1 incl.", pro: "2 (Pro) / 5 (Pro+)" },
+    { name: "Custom Domain", free: false, starter: false, pro: true },
     { name: "Blog Platform", free: false, starter: true, pro: true },
     { name: "Course Builder", free: false, starter: false, pro: true },
   ]},

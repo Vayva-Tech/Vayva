@@ -28,7 +28,7 @@ export const GET = withVayvaAPI(
       const endOfDay = new Date();
       endOfDay.setHours(23, 59, 59, 999);
 
-      const salesByCategory = await prisma.orderItem.groupBy({
+      const _salesByCategory = await prisma.orderItem.groupBy({
         by: ['productId'],
         where: {
           orderId: {

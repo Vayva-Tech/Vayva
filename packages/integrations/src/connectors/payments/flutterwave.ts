@@ -3,6 +3,7 @@
  * Integration with Flutterwave Payment API
  */
 
+import { createHmac } from 'node:crypto';
 import type { ConnectorConfig, SyncResult } from '../../marketplace/types';
 
 export interface FlutterwaveConfig extends ConnectorConfig {
@@ -180,9 +181,7 @@ export class FlutterwaveConnector {
    * Verify webhook signature
    */
   verifyWebhookSignature(payload: string, signature: string): boolean {
-    const crypto = require('crypto') as typeof import('crypto');
-    const hash = crypto
-      .createHmac('sha256', this.config.secretKey)
+    const hash = createHmac('sha256', this.config.secretKey)
       .update(payload)
       .digest('hex');
     return hash === signature;

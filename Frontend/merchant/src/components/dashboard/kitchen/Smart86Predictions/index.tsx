@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { Brain, AlertTriangle, TrendingDown, Clock, Package } from 'lucide-react';
@@ -231,15 +232,15 @@ export function Smart86Predictions({
 
             {/* Actions */}
             <div className="flex items-center gap-2 mt-3">
-              <button className="px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition-colors">
+              <Button className="px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition-colors">
                 Add to 86 Board
-              </button>
-              <button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors">
+              </Button>
+              <Button className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition-colors">
                 Adjust Prediction
-              </button>
-              <button className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors">
+              </Button>
+              <Button className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors">
                 Order More
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -257,3 +258,4 @@ export function Smart86Predictions({
     </div>
   );
 }
+

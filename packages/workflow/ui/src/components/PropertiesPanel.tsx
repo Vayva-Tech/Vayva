@@ -1,3 +1,4 @@
+import { Button } from "@vayva/ui";
 /**
  * PropertiesPanel Component
  * Side panel for editing node and edge properties
@@ -460,12 +461,12 @@ export function PropertiesPanel({
         <h3 className="text-sm font-semibold text-gray-900">
           {isNode ? 'Node Properties' : 'Edge Properties'}
         </h3>
-        <button
+        <Button
           onClick={onClose}
           className="p-1 text-gray-400 hover:text-gray-600 rounded"
         >
           <X className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">

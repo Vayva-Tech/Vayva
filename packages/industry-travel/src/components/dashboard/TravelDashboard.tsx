@@ -1,25 +1,24 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { cn , Card, CardContent, CardHeader, CardTitle , Badge , Button } from '@vayva/ui';
+import { cn, Card, CardContent, CardHeader, Badge, Button } from '@vayva/ui';
 import { useTravelDashboardData } from '../../hooks/useTravelDashboardData';
-import { 
-  MapPin, 
-  Calendar, 
-  TrendingUp, 
-  Users, 
-  Bell, 
-  CheckCircle, 
-  Clock, 
+import {
+  MapPin,
+  Calendar,
+  TrendingUp,
+  Users,
+  Bell,
+  CheckCircle,
+  Clock,
   AlertTriangle,
   Star,
   Globe,
-  DollarSign,
-  Bed,
+  DollarSign as _DollarSign,
+  Bed as _Bed,
   Home,
-  Plane,
-  Car,
+  Plane as _Plane,
+  Car as _Car,
   Waves,
   Sun,
   RefreshCw
@@ -38,7 +37,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
   className 
 }) => {
   const [activeTheme, setActiveTheme] = useState<TravelTheme>(theme);
-  const [tenantId, setTenantId] = useState<string | undefined>(undefined);
+  const [tenantId, _setTenantId] = useState<string | undefined>(undefined);
   
   // Get real data from hook
   const {
@@ -46,18 +45,18 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
     revenueReport,
     guestDemographics,
     properties,
-    recentReviews,
+    recentReviews: _recentReviews,
     isLoading,
     error,
     refreshAll,
-    subscribeToUpdates
+    subscribeToUpdates,
   } = useTravelDashboardData(tenantId);
 
   // Subscribe to real-time updates
   useEffect(() => {
     const unsubscribe = subscribeToUpdates(() => {
       // Trigger re-render when data updates
-      console.log('Dashboard data updated');
+      console.warn('Dashboard data updated');
     });
 
     return unsubscribe;
@@ -100,7 +99,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
     }
   };
 
-  const currentTheme = themeColors[activeTheme];
+  const _currentTheme = themeColors[activeTheme];
 
   // Derived data from real services
   const occupancyData = occupancyMetrics ? {
@@ -140,7 +139,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
   };
 
   // Transform guest demographics data
-  const transformedDemographics = guestDemographics?.byCountry.slice(0, 5).map((countryData, index) => {
+  const _transformedDemographics = guestDemographics?.byCountry.slice(0, 5).map((countryData, index) => {
     const flags = ['🇺🇸', '🇬🇧', '🇩🇪', '🇫🇷', '🇦🇺'];
     return {
       country: countryData.country,
@@ -227,7 +226,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="glass-effect border-0 shadow-lg">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Today's Check-ins</CardTitle>
+                <div className="text-sm font-medium text-gray-600">Today&apos;s Check-ins</div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-gray-900">{occupancyData.todayCheckIns}</div>
@@ -237,7 +236,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
             
             <Card className="glass-effect border-0 shadow-lg">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Tonight's Occupancy</CardTitle>
+                <div className="text-sm font-medium text-gray-600">Tonight&apos;s Occupancy</div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-gray-900">{occupancyData.tonightOccupancy}%</div>
@@ -247,7 +246,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
             
             <Card className="glass-effect border-0 shadow-lg">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Avg Daily Rate</CardTitle>
+                <div className="text-sm font-medium text-gray-600">Avg Daily Rate</div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-gray-900">${occupancyData.avgDailyRate}/night</div>
@@ -342,7 +341,10 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
                   <div className="text-2xl font-bold text-gray-800">$180K</div>
                   <div className="flex justify-center space-x-8 mt-4">
                     <div className="text-center">
-                      <div className="text-lg font-semibold">ADR: ${occupancyData.avgDailyRate}</div>
+                      <div className="text-lg font-semibold">
+                        ADR: $
+                        {occupancyData?.avgDailyRate ?? revenueReport?.averageDailyRate ?? 0}
+                      </div>
                       <div className="text-xs text-gray-600">Avg Daily Rate</div>
                     </div>
                     <div className="text-center">
@@ -374,13 +376,15 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
                 <div>
                   <h3 className="font-medium text-gray-800 mb-3">Top Countries</h3>
                   <div className="space-y-2">
-                    {guestDemographics.map((country, index) => (
-                      <div key={index} className="flex items-center justify-between">
+                    {(guestDemographics?.byCountry ?? []).map((row, index) => (
+                      <div key={`${row.country}-${index}`} className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <span className="mr-2">{country.flag}</span>
-                          <span className="text-sm">{country.country}</span>
+                          <span className="mr-2" aria-hidden>
+                            🌍
+                          </span>
+                          <span className="text-sm">{row.country}</span>
                         </div>
-                        <span className="text-sm font-medium">{country.percentage}%</span>
+                        <span className="text-sm font-medium">{row.percentage}%</span>
                       </div>
                     ))}
                   </div>
@@ -614,7 +618,7 @@ const TravelDashboard: React.FC<TravelDashboardProps> = ({
             <h3 className="text-sm font-medium text-gray-800 mb-2">Theme</h3>
             <div className="flex space-x-2">
               {Object.keys(themeColors).map((themeKey) => (
-                <button
+                <Button
                   key={themeKey}
                   onClick={() => setActiveTheme(themeKey as TravelTheme)}
                   className={cn(

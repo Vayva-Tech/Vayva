@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Grocery Industry UI Components
  */

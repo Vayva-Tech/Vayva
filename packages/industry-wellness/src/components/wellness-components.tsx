@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 /**
  * Wellness Components
  * UI components for wellness/spa industry
@@ -66,12 +66,12 @@ export const TreatmentRoomScheduler: FC<TreatmentRoomSchedulerProps> = ({
                   </div>
                 ))}
             </div>
-            <button 
+            <Button 
               className="book-btn"
               onClick={() => onBookRoom?.({ roomId: room.id })}
             >
               Book Room
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -232,9 +232,9 @@ export const ServiceMenuBuilder: FC<ServiceMenuBuilderProps> = ({
   return (
     <div className="service-menu-builder">
       <h2>Service Menu Builder</h2>
-      <button className="add-service-btn" onClick={() => onAddService?.({})}>
+      <Button className="add-service-btn" onClick={() => onAddService?.({})}>
         + Add Service
-      </button>
+      </Button>
       
       <div className="menu-categories">
         {categories.map(category => (
@@ -254,10 +254,10 @@ export const ServiceMenuBuilder: FC<ServiceMenuBuilderProps> = ({
                       </div>
                     </div>
                     <div className="service-actions">
-                      <button onClick={() => onUpdateService?.(service.id, { isActive: !service.isActive })}>
+                      <Button onClick={() => onUpdateService?.(service.id, { isActive: !service.isActive })}>
                         {service.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button>Edit</button>
+                      </Button>
+                      <Button>Edit</Button>
                     </div>
                   </div>
                 ))}
@@ -447,7 +447,7 @@ export const AppointmentBookingForm: FC<AppointmentBookingFormProps> = ({
         />
       </div>
 
-      <button type="submit" className="submit-btn">Book Appointment</button>
+      <Button type="submit" className="submit-btn">Book Appointment</Button>
     </form>
   );
 };
@@ -460,3 +460,4 @@ export const WELLNESS_COMPONENTS = {
   WellnessDashboardSummary,
   AppointmentBookingForm,
 };
+

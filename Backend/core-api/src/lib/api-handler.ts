@@ -7,7 +7,7 @@ import { getRequestId } from "./request-id";
 import {
   validateSessionVersion,
   checkStoreStatus,
-  checkStoreRestrictions,
+  checkStoreRestrictions
 } from "./api-checks";
 import { prisma } from "@vayva/db";
 import { standardHeaders, BaseError, logger } from "@vayva/shared";
@@ -195,7 +195,7 @@ export function withVayvaAPI(
       // 5. Prepare Context
       const firstArg = args[0];
       const { getIsolatedPrisma } = await import("@vayva/db");
-      const isolatedPrisma = getIsolatedPrisma();
+      const isolatedPrisma = getIsolatedPrisma(storeId);
 
       const apiContext: APIContext = {
         user: authedUser,

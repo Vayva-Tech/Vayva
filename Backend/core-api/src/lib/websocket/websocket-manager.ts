@@ -1,10 +1,11 @@
 import { logger } from "@vayva/shared";
 import { EventEmitter } from "events";
+import { WebSocket } from "ws";
 
 // Types for WebSocket events
 export interface WebSocketEvent {
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp: string;
   storeId: string;
 }
@@ -387,7 +388,8 @@ export class WebSocketManager extends EventEmitter {
    */
   private sendToConnection(
     connectionId: string,
-    event: WebSocketEvent
+    event: Omit<WebSocketEvent, "timestamp" | "storeId"> &
+      Partial<Pick<WebSocketEvent, "timestamp" | "storeId">>
   ): boolean {
     const connection = this.connections.get(connectionId);
     if (!connection || connection.socket.readyState !== WebSocket.OPEN) {
@@ -395,7 +397,12 @@ export class WebSocketManager extends EventEmitter {
     }
 
     try {
-      connection.socket.send(JSON.stringify(event));
+      const fullEvent: WebSocketEvent = {
+        timestamp: event.timestamp ?? new Date().toISOString(),
+        storeId: event.storeId ?? connection.storeId,
+        ...event,
+      };
+      connection.socket.send(JSON.stringify(fullEvent));
       return true;
     } catch (error) {
       logger.error("[WEBSOCKET_SEND_ERROR]", {
@@ -462,7 +469,7 @@ export class RealTimeEventPublisher {
     storeId: string,
     eventType: WebSocketEventType,
     orderId: string,
-    orderData: any
+    orderData: unknown
   ) {
     this.wsManager.sendToStore(storeId, {
       type: eventType,
@@ -503,7 +510,7 @@ export class RealTimeEventPublisher {
     storeId: string,
     eventType: WebSocketEventType,
     customerId: string,
-    customerData: any
+    customerData: unknown
   ) {
     this.wsManager.sendToStore(storeId, {
       type: eventType,
@@ -544,7 +551,7 @@ export class RealTimeEventPublisher {
     alertType: string,
     message: string,
     severity: 'low' | 'medium' | 'high' | 'critical',
-    metadata?: any
+    metadata?: unknown
   ) {
     this.wsManager.sendToStore(storeId, {
       type: WebSocketEventType.ALERT_CRITICAL,
@@ -563,7 +570,7 @@ export class RealTimeEventPublisher {
    */
   public publishPerformanceUpdate(
     storeId: string,
-    metrics: any
+    metrics: unknown
   ) {
     this.wsManager.sendToStore(storeId, {
       type: WebSocketEventType.PERFORMANCE_UPDATE,
@@ -577,16 +584,15 @@ export class RealTimeEventPublisher {
   /**
    * Publish live analytics
    */
-  public publishLiveAnalytics(
-    storeId: string,
-    analyticsData: any
-  ) {
+  public publishLiveAnalytics(storeId: string, analyticsData: unknown) {
     this.wsManager.sendToStore(storeId, {
       type: WebSocketEventType.ANALYTICS_LIVE,
       payload: {
-        ...analyticsData,
-        timestamp: new Date().toISOString()
-      }
+        ...(analyticsData && typeof analyticsData === "object"
+          ? (analyticsData as Record<string, unknown>)
+          : {}),
+        timestamp: new Date().toISOString(),
+      },
     });
   }
 }

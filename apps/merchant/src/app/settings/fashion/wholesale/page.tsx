@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React, { useState } from 'react';
 import { GlassPanel } from '@vayva/ui/components/fashion';
@@ -119,9 +120,9 @@ const WholesaleSettingsPage = () => {
                       <p className="text-xs text-white/50">
                         Net price: {(100 - tier.discount)}% of retail
                       </p>
-                      <button className="text-xs text-rose-400 hover:text-rose-300">
+                      <Button className="text-xs text-rose-400 hover:text-rose-300">
                         Delete Tier
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -170,3 +171,4 @@ const WholesaleSettingsPage = () => {
 };
 
 export default WholesaleSettingsPage;
+

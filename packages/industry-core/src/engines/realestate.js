@@ -10,7 +10,7 @@ class RealEstateEngine {
   }
   
   async initialize() {
-    console.log('[REALESTATE_ENGINE] Initialized');
+    console.warn('[REALESTATE_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

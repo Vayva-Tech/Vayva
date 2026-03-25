@@ -11,7 +11,7 @@ export const POST = withVayvaAPI(
       const [store, defaultPayout, wallet] = await Promise.all([
         prisma.store.findUnique({
           where: { id: storeId },
-          select: { id: true, name: true, kycStatus: true },
+          select: { id: true, name: true, kycStatus: true, kycRecord: { select: { status: true } } },
         }),
         prisma.bankBeneficiary.findFirst({
           where: { storeId, isDefault: true },
@@ -48,7 +48,9 @@ export const POST = withVayvaAPI(
       }
 
       // Gate: KYC must be VERIFIED
-      const kycStatus = String(store.kycStatus || "NOT_STARTED").toUpperCase();
+      // NOTE: Some flows update `kycRecord.status` without syncing `store.kycStatus`.
+      // Accept either as the source of truth.
+      const kycStatus = String(store.kycStatus || store.kycRecord?.status || "NOT_STARTED").toUpperCase();
       if (kycStatus !== "VERIFIED") {
         return NextResponse.json(
           {

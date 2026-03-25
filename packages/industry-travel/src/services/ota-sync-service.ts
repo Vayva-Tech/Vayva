@@ -1,8 +1,7 @@
-// @ts-nocheck
-import { 
-  TravelProperty, 
-  TravelRoom, 
-  TravelBooking,
+import {
+  TravelProperty,
+  TravelRoom,
+  TravelBooking as _TravelBooking,
   DateRange
 } from '../types';
 
@@ -75,7 +74,7 @@ export interface OTAWebhookPayload {
 
 export class OTASyncService {
   private configs: Map<string, OTAConfig> = new Map();
-  private syncInterval: NodeJS.Timeout | null = null;
+  private syncInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     // Initialize with default configurations
@@ -311,7 +310,7 @@ export class OTASyncService {
     } as TravelProperty;
   }
 
-  private async getRoomById(roomId: string): Promise<TravelRoom | null> {
+  private async getRoomById(_roomId: string): Promise<TravelRoom | null> {
     // Mock implementation
     return null;
   }
@@ -319,10 +318,10 @@ export class OTASyncService {
   private async syncPropertyToPlatform(
     property: TravelProperty, 
     platform: string, 
-    config: OTAConfig
+    _config: OTAConfig
   ): Promise<SyncResult> {
     // Mock implementation - in real scenario, this would make API calls
-    console.log(`Syncing property ${property.id} to ${platform}`);
+    console.warn(`Syncing property ${property.id} to ${platform}`);
     
     return {
       success: true,
@@ -337,19 +336,19 @@ export class OTASyncService {
     platform: string,
     config: OTAConfig,
     roomId: string,
-    dates: DateRange,
-    available: boolean
+    _dates: DateRange,
+    _available: boolean
   ): Promise<void> {
     // Mock implementation
-    console.log(`Updating ${platform} availability for room ${roomId}`);
+    console.warn(`Updating ${platform} availability for room ${roomId}`);
   }
 
-  private async fetchPlatformBookings(platform: string, config: OTAConfig): Promise<any[]> {
+  private async fetchPlatformBookings(_platform: string, _config: OTAConfig): Promise<any[]> {
     // Mock implementation
     return [];
   }
 
-  private async processIncomingBookings(bookings: any[], platform: string): Promise<OTABooking[]> {
+  private async processIncomingBookings(bookings: any[], _platform: string): Promise<OTABooking[]> {
     // Convert platform-specific bookings to standard format
     return bookings.map(booking => ({
       id: booking.id,
@@ -373,31 +372,31 @@ export class OTASyncService {
     rateUpdates: RateUpdate[]
   ): Promise<void> {
     // Mock implementation
-    console.log(`Updating ${platform} rates for ${rateUpdates.length} items`);
+    console.warn(`Updating ${platform} rates for ${rateUpdates.length} items`);
   }
 
   private async handleIncomingBooking(platform: string, data: any): Promise<void> {
     // Process new booking from OTA
-    console.log(`Processing new booking from ${platform}:`, data);
+    console.warn(`Processing new booking from ${platform}:`, data);
   }
 
   private async handleBookingModification(platform: string, data: any): Promise<void> {
     // Handle booking changes
-    console.log(`Processing booking modification from ${platform}:`, data);
+    console.warn(`Processing booking modification from ${platform}:`, data);
   }
 
   private async handleBookingCancellation(platform: string, data: any): Promise<void> {
     // Handle booking cancellation
-    console.log(`Processing booking cancellation from ${platform}:`, data);
+    console.warn(`Processing booking cancellation from ${platform}:`, data);
   }
 
   private async handleAvailabilityUpdate(platform: string, data: any): Promise<void> {
     // Handle availability changes from OTA
-    console.log(`Processing availability update from ${platform}:`, data);
+    console.warn(`Processing availability update from ${platform}:`, data);
   }
 
   private async performAutoSync(): Promise<void> {
-    console.log('Performing automatic OTA sync');
+    console.warn('Performing automatic OTA sync');
     // This would sync all properties and check for new bookings
   }
 

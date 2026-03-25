@@ -69,7 +69,7 @@ export default function ViewingsPage() {
   const upcomingRequests = requests.filter((r) => (r as any).status === "CONFIRMED");
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">

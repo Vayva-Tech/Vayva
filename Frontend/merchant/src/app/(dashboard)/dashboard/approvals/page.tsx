@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
-
 import { logger, formatDate } from "@vayva/shared";
 import React, { useState, useEffect } from "react";
-import { Button, Textarea } from "@vayva/ui";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button, Textarea, Icon } from "@vayva/ui";
 import { CheckCircle, XCircle, ClockCounterClockwise, FileText, ShieldCheck } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client-shared";
@@ -147,7 +146,7 @@ export default function ApprovalsPage() {
 
       {/* Tabs */}
       <div className="flex items-center gap-6 border-b border-gray-200 pb-3">
-        <button
+        <Button
           onClick={() => setActiveTab("pending")}
           className={`text-sm font-medium border-b-2 pb-3 -mb-3.5 transition-colors ${
             activeTab === "pending"
@@ -156,8 +155,8 @@ export default function ApprovalsPage() {
           }`}
         >
           Pending
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setActiveTab("history")}
           className={`text-sm font-medium border-b-2 pb-3 -mb-3.5 transition-colors ${
             activeTab === "history"
@@ -166,7 +165,7 @@ export default function ApprovalsPage() {
           }`}
         >
           History
-        </button>
+        </Button>
       </div>
 
       {/* Approvals List */}

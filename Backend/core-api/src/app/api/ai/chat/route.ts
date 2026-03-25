@@ -31,14 +31,14 @@ export const POST = withVayvaAPI(
         );
       }
 
-      // Check if Groq API key is configured
-      const isConfigured = !!process.env.GROQ_ADMIN_KEY;
+      // Check if OpenRouter is configured
+      const isConfigured = !!process.env.OPENROUTER_API_KEY;
       if (!isConfigured) {
         return NextResponse.json(
           {
             error:
-              "AI service not configured. Please add GROQ_ADMIN_KEY to your .env file.",
-            setup_url: "https://console.groq.com/keys",
+              "AI service not configured. Please add OPENROUTER_API_KEY to your .env file.",
+            setup_url: "https://openrouter.ai/keys",
           },
           { status: 503 },
         );
@@ -68,7 +68,7 @@ export const POST = withVayvaAPI(
 
 // Health check endpoint
 export const GET = withVayvaAPI(PERMISSIONS.DASHBOARD_VIEW, async () => {
-  const isConfigured = !!process.env.GROQ_ADMIN_KEY;
+  const isConfigured = !!process.env.OPENROUTER_API_KEY;
   const isEnabled = process.env.ENABLE_AI_ASSISTANT === "true";
   return NextResponse.json(
     {

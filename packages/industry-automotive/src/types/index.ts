@@ -1,51 +1,4 @@
-// @ts-nocheck
 import { z } from 'zod';
-
-// ─── Shared Dashboard Types ───────────────────────────────────────────────────
-
-export type IndustrySlug = 'fashion' | 'restaurant' | 'realestate' | 'healthcare' | 'electronics' | 'beauty' | 'events' | 'b2b' | 'grocery' | 'retail' | 'travel' | 'automotive';
-
-export type WidgetType =
-  | 'kpi-card' | 'chart-line' | 'chart-bar' | 'chart-pie' | 'table'
-  | 'calendar' | 'map' | 'kanban' | 'timeline' | 'heatmap' | 'gauge' | 'list' | 'custom';
-
-export interface DataSourceConfig {
-  type: 'analytics' | 'composite' | 'realtime' | 'event';
-  query?: string;
-  queries?: string[];
-  params?: Record<string, unknown>;
-  channel?: string;
-  entity?: string;
-}
-
-export interface VisualizationConfig { type: string; options?: Record<string, unknown>; }
-export interface LayoutItem { i: string; x: number; y: number; w: number; h: number; }
-export interface LayoutPreset { id: string; name: string; breakpoints: { lg?: LayoutItem[]; md?: LayoutItem[]; sm?: LayoutItem[] }; }
-export interface KPICardDefinition { id: string; label: string; format: 'percent' | 'currency' | 'number'; invert?: boolean; alertThreshold?: number; }
-export interface AlertRule { id: string; condition: string; threshold: number; action: string; }
-export interface QuickAction { id: string; label: string; icon: string; action: string; }
-export interface Permission { resource: string; action: string; }
-
-export interface WidgetDefinition {
-  id: string;
-  type: WidgetType;
-  title: string;
-  industry: IndustrySlug;
-  component?: string;
-  dataSource: DataSourceConfig;
-  visualization?: VisualizationConfig;
-  refreshInterval?: number;
-  permissions?: Permission[];
-}
-
-export interface DashboardEngineConfig {
-  industry: IndustrySlug;
-  widgets: WidgetDefinition[];
-  layouts: LayoutPreset[];
-  kpiCards: KPICardDefinition[];
-  alertRules: AlertRule[];
-  actions: QuickAction[];
-}
 
 // ─── Core Automotive Types ────────────────────────────────────────────────────
 
@@ -180,6 +133,8 @@ export const ServiceAppointmentSchema = z.object({
   createdAt: z.date(),
 });
 export type ServiceAppointment = z.infer<typeof ServiceAppointmentSchema>;
+
+export type { TradeInEvaluation, AcquisitionType } from './acquisition.types';
 
 // Analytics
 export interface AutomotiveAnalytics {

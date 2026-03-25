@@ -16,6 +16,7 @@ interface PaystackWebhookEvent {
     status: string;
     amount: number;
     paid_at?: string;
+    transfer_code?: string;
     metadata?: {
       orderRef?: string;
       storeId?: string;
@@ -193,6 +194,72 @@ async function handleRefund(event: PaystackWebhookEvent) {
   logger.info("[WEBHOOK] Refund processed", { orderRef, reference });
 }
 
+async function handleAffiliateTransfer(event: PaystackWebhookEvent) {
+  const reference = event.data.reference || "";
+  if (!reference.startsWith("AFF-PAYOUT-")) return;
+  const payoutId = reference.replace(/^AFF-PAYOUT-/, "");
+
+  await prisma.$transaction(async (tx) => {
+    const payout = await tx.affiliatePayout.findUnique({
+      where: { id: payoutId },
+      select: {
+        id: true,
+        affiliateId: true,
+        storeId: true,
+        amount: true,
+        status: true,
+        earningIds: true,
+      },
+    });
+    if (!payout) return;
+
+    if (event.event === "transfer.success") {
+      if (payout.status !== "PAID") {
+        await tx.affiliatePayout.update({
+          where: { id: payout.id },
+          data: {
+            status: "PAID",
+            processedAt: new Date(),
+            webhookReceivedAt: new Date(),
+            webhookData: event as any,
+          },
+        });
+
+        const amount = Number(payout.amount || 0);
+        await tx.affiliate.update({
+          where: { id: payout.affiliateId },
+          data: {
+            pendingEarnings: { decrement: amount },
+            paidEarnings: { increment: amount },
+          },
+        });
+
+        if (Array.isArray(payout.earningIds) && payout.earningIds.length > 0) {
+          await tx.affiliateEarning.updateMany({
+            where: { id: { in: payout.earningIds } },
+            data: { status: "paid", paidAt: new Date(), payoutId: payout.id },
+          });
+        }
+      }
+    }
+
+    if (event.event === "transfer.failed") {
+      if (payout.status !== "FAILED") {
+        await tx.affiliatePayout.update({
+          where: { id: payout.id },
+          data: {
+            status: "FAILED",
+            failedAt: new Date(),
+            failureReason: "Paystack transfer failed",
+            webhookReceivedAt: new Date(),
+            webhookData: event as any,
+          },
+        });
+      }
+    }
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const signature = req.headers.get("x-paystack-signature");
@@ -212,6 +279,10 @@ export async function POST(req: Request) {
     switch (event.event) {
       case "charge.success":
         await handleChargeSuccess(event);
+        break;
+      case "transfer.success":
+      case "transfer.failed":
+        await handleAffiliateTransfer(event);
         break;
       case "refund.processed":
       case "charge.reversed":

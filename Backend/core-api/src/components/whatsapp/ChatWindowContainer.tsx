@@ -3,7 +3,7 @@ import {
   type WhatsAppMessage,
   type WhatsAppConversation,
   WhatsAppMessageSender,
-  WhatsAppLinkedEntityType,
+  WhatsAppLinkedEntityType
 } from "@vayva/shared";
 import React, { useState, useEffect } from "react";
 import { ChatWindow } from "./ChatWindow";

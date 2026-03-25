@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
 import { Card } from "@vayva/ui";
-import { Clock, UserStar } from "@phosphor-icons/react";
+import { Clock, Star } from "@phosphor-icons/react";
 import type { TimeTrackingMetrics } from "@/types/legal";
 
 interface TimeTrackingProps {
@@ -42,7 +41,7 @@ export function TimeTracking({ data }: TimeTrackingProps) {
       {data.topProducer.attorneyName && (
         <div className="pt-4 border-t border-gray-200">
           <div className="flex items-center gap-2">
-            <UserStar size={16} className="text-amber-500" />
+            <Star size={16} className="text-amber-500" />
             <span className="text-sm text-gray-500">Top Producer:</span>
             <span className="text-sm font-semibold text-gray-900">{data.topProducer.attorneyName}</span>
             <span className="text-sm text-gray-500">({data.topProducer.hours}h this week)</span>

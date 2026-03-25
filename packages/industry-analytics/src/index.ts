@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Industry Analytics Package - Generalized for all industries
 
 // Engine

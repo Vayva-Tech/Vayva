@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React from 'react';
@@ -37,7 +36,13 @@ export function SalesByChannelChart({ channels, className }: SalesByChannelChart
                 outerRadius={100}
                 paddingAngle={5}
                 dataKey="value"
-                label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
+                label={({ name, payload }) => {
+                  const pct =
+                    payload && typeof payload === 'object' && 'percentage' in payload
+                      ? Number((payload as ChannelData).percentage)
+                      : 0;
+                  return `${name}: ${pct.toFixed(1)}%`;
+                }}
                 labelLine={false}
               >
                 {channels.map((entry, index) => (
@@ -45,9 +50,11 @@ export function SalesByChannelChart({ channels, className }: SalesByChannelChart
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: number) => [
-                  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value),
-                  'Revenue'
+                formatter={(value) => [
+                  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                    Number(value ?? 0),
+                  ),
+                  'Revenue',
                 ]}
               />
               <Legend />

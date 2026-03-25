@@ -14,6 +14,7 @@ import {
   IconArrowUpRight as ExternalLink,
 } from "@tabler/icons-react";
 import { trustContent } from "@/data/marketing-content";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 export function TrustClient(): React.JSX.Element {
   const pillarIcons = [Lock, Shield, FileText];
@@ -21,21 +22,21 @@ export function TrustClient(): React.JSX.Element {
   const reliabilityIcons = [Activity, Shield, ExternalLink];
 
   return (
-    <div className="relative text-slate-900">
+    <div className="relative w-full min-w-0 overflow-x-hidden text-slate-900">
       {/* Section 1: Hero */}
       <section className="pt-16 pb-12 px-4 text-center">
-        <div className="max-w-[1600px] mx-auto px-6">
-          <div className="relative inline-flex">
-            <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl border-2 border-emerald-200/60" />
-            <div className="relative inline-flex items-center justify-center w-16 h-16 bg-white/90 backdrop-blur rounded-2xl shadow-[0_14px_30px_rgba(15,23,42,0.12)] text-emerald-600 mb-6 border-2 border-slate-900/10">
-              <Shield size={32} />
-            </div>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 min-w-0">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-sm text-emerald-600 mb-6 border border-slate-200/80">
+            <Shield size={32} />
           </div>
-          <h1 className="text-4xl md:text-6xl font-semibold mb-6 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold mb-5 sm:mb-6 tracking-tight">
             {trustContent.heroTitle}
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            {trustContent.heroDescription}
+          <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            <span className="md:hidden">
+              Security, compliance, and reliability—details in the sections below.
+            </span>
+            <span className="hidden md:inline">{trustContent.heroDescription}</span>
           </p>
         </div>
       </section>
@@ -54,9 +55,10 @@ export function TrustClient(): React.JSX.Element {
               {trustContent.pillars.map((pillar, index) => {
                 const Icon = pillarIcons[index] ?? Lock;
                 return (
-                  <div key={pillar.title} className="relative">
-                    <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-xl border-2 border-emerald-200/60" />
-                    <div className="relative flex gap-4 items-start p-4 bg-white/90 backdrop-blur border-2 border-slate-900/10 rounded-xl shadow-[0_16px_38px_rgba(15,23,42,0.1)]">
+                  <div
+                    key={pillar.title}
+                    className="flex gap-4 items-start p-4 bg-white border border-slate-200/80 rounded-xl shadow-sm"
+                  >
                       <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0 shadow-[0_10px_20px_rgba(16,185,129,0.18)]">
                         <Icon size={20} className="text-emerald-600" />
                       </div>
@@ -64,7 +66,6 @@ export function TrustClient(): React.JSX.Element {
                         <h3 className="font-semibold mb-1 text-slate-900">{pillar.title}</h3>
                         <p className="text-sm text-slate-600">{pillar.description}</p>
                       </div>
-                    </div>
                   </div>
                 );
               })}
@@ -81,20 +82,41 @@ export function TrustClient(): React.JSX.Element {
             <p className="text-slate-600 max-w-2xl mx-auto">{trustContent.complianceDescription}</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {trustContent.complianceCards.map((card, index) => {
               const Icon = complianceIcons[index] ?? Database;
               return (
-                <div key={card.title} className="relative">
-                  <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-xl border-2 border-emerald-200/60" />
-                  <div className="relative bg-white/90 backdrop-blur p-6 rounded-xl border-2 border-slate-900/10 shadow-[0_16px_40px_rgba(15,23,42,0.1)]">
+                <div
+                  key={card.title}
+                  className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm"
+                >
                     <Icon className="text-emerald-600 mb-4" size={32} />
                     <h3 className="font-semibold mb-2 text-slate-900">{card.title}</h3>
                     <p className="text-sm text-slate-600">{card.description}</p>
-                  </div>
                 </div>
               );
             })}
+          </div>
+          <div className="md:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Compliance and privacy"
+              hint="Swipe for each topic"
+              showDots
+              dotCount={trustContent.complianceCards.length}
+            >
+              {trustContent.complianceCards.map((card, index) => {
+                const Icon = complianceIcons[index] ?? Database;
+                return (
+                  <MarketingSnapItem key={card.title}>
+                    <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm h-full">
+                      <Icon className="text-emerald-600 mb-4" size={32} />
+                      <h3 className="font-semibold mb-2 text-slate-900">{card.title}</h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">{card.description}</p>
+                    </div>
+                  </MarketingSnapItem>
+                );
+              })}
+            </MarketingSnapRow>
           </div>
         </div>
       </section>
@@ -102,9 +124,7 @@ export function TrustClient(): React.JSX.Element {
       {/* Section 4: Payments & Transactions */}
       <section className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="relative">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[34px] border-2 border-emerald-200/60" />
-            <div className="relative rounded-3xl p-8 md:p-12 border-2 border-slate-900/10 bg-white/85 backdrop-blur shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+          <div className="rounded-3xl p-8 md:p-12 border border-slate-200/80 bg-white shadow-sm">
               <div className="flex items-start gap-6 mb-8">
                 <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0 border border-emerald-200">
                   <CreditCard size={24} className="text-emerald-600" />
@@ -119,18 +139,34 @@ export function TrustClient(): React.JSX.Element {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="hidden md:grid md:grid-cols-3 gap-6">
                 {trustContent.paymentHighlights.map((item) => (
-                  <div key={item.title} className="relative">
-                    <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-xl border-2 border-emerald-200/60" />
-                    <div className="relative bg-white/90 backdrop-blur p-6 rounded-xl border-2 border-slate-900/10 shadow-[0_16px_40px_rgba(15,23,42,0.1)]">
+                  <div
+                    key={item.title}
+                    className="bg-slate-50/80 p-6 rounded-xl border border-slate-200/80 shadow-sm"
+                  >
                       <h3 className="font-semibold mb-2 text-slate-900">{item.title}</h3>
                       <p className="text-sm text-slate-600">{item.description}</p>
-                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+              <div className="md:hidden -mx-1 mt-4">
+                <MarketingSnapRow
+                  ariaLabel="Payment highlights"
+                  hint="Swipe for payment details"
+                  showDots
+                  dotCount={trustContent.paymentHighlights.length}
+                >
+                  {trustContent.paymentHighlights.map((item) => (
+                    <MarketingSnapItem key={item.title}>
+                      <div className="bg-slate-50/80 p-6 rounded-xl border border-slate-200/80 shadow-sm h-full min-h-[120px]">
+                        <h3 className="font-semibold mb-2 text-slate-900">{item.title}</h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
+                      </div>
+                    </MarketingSnapItem>
+                  ))}
+                </MarketingSnapRow>
+              </div>
           </div>
         </div>
       </section>
@@ -143,22 +179,42 @@ export function TrustClient(): React.JSX.Element {
             <p className="text-slate-600 max-w-2xl mx-auto">{trustContent.reliabilityDescription}</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="hidden md:grid md:grid-cols-3 gap-8">
             {trustContent.reliabilityCards.map((card, index) => {
               const Icon = reliabilityIcons[index] ?? Activity;
               return (
-                <div key={card.title} className="relative text-center">
-                  <div className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl border-2 border-emerald-200/60" />
-                  <div className="relative rounded-2xl border-2 border-slate-900/10 bg-white/90 backdrop-blur p-6 shadow-[0_16px_40px_rgba(15,23,42,0.1)]">
-                    <div className="w-16 h-16 bg-white/90 backdrop-blur rounded-2xl shadow-[0_12px_26px_rgba(15,23,42,0.12)] flex items-center justify-center mx-auto mb-4 border-2 border-slate-900/10">
+                <div key={card.title} className="text-center rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-200/80">
                       <Icon size={32} className="text-emerald-600" />
                     </div>
                     <h3 className="font-semibold text-lg mb-2 text-slate-900">{card.title}</h3>
                     <p className="text-sm text-slate-600">{card.description}</p>
-                  </div>
                 </div>
               );
             })}
+          </div>
+          <div className="md:hidden -mx-1">
+            <MarketingSnapRow
+              ariaLabel="Platform reliability"
+              hint="Swipe for each commitment"
+              showDots
+              dotCount={trustContent.reliabilityCards.length}
+            >
+              {trustContent.reliabilityCards.map((card, index) => {
+                const Icon = reliabilityIcons[index] ?? Activity;
+                return (
+                  <MarketingSnapItem key={card.title}>
+                    <div className="text-center rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm h-full">
+                      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-200/80">
+                        <Icon size={32} className="text-emerald-600" />
+                      </div>
+                      <h3 className="font-semibold text-lg mb-2 text-slate-900">{card.title}</h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">{card.description}</p>
+                    </div>
+                  </MarketingSnapItem>
+                );
+              })}
+            </MarketingSnapRow>
           </div>
         </div>
       </section>
@@ -166,9 +222,7 @@ export function TrustClient(): React.JSX.Element {
       {/* Section 6: CTA */}
       <section className="py-16 px-4 text-center">
         <div className="max-w-2xl mx-auto">
-          <div className="relative">
-            <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-[34px] border-2 border-emerald-200/60" />
-            <div className="relative rounded-[32px] border-2 border-slate-900/10 bg-white/90 backdrop-blur p-10 shadow-[0_26px_60px_rgba(15,23,42,0.12)]">
+          <div className="rounded-[32px] border border-slate-200/80 bg-white p-10 shadow-sm">
               <h2 className="text-3xl font-semibold text-slate-900 mb-6">{trustContent.ctaTitle}</h2>
               <p className="text-slate-600 mb-8 text-lg">{trustContent.ctaDescription}</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -186,7 +240,6 @@ export function TrustClient(): React.JSX.Element {
                   </Button>
                 </Link>
               </div>
-            </div>
           </div>
         </div>
       </section>

@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { z } from "zod";
@@ -33,14 +34,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const body = await req.json();
     const validated = feedbackSchema.parse(body);
 
+    const auth = await buildBackendAuthHeaders(req);
+    const forwardHeaders = auth
+      ? { ...auth.headers }
+      : { "Content-Type": "application/json" };
+
     // Call backend API to submit feedback
     const result = await apiJson<{ success: boolean; feedback?: { id: string } }>(
       `${process.env.BACKEND_API_URL}/api/feedback`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: forwardHeaders,
         body: JSON.stringify({
           rating: validated.rating,
           comment: validated.comment || null,

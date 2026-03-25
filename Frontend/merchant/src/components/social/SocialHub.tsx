@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Social Hub & Community Features
  * Integrated social media management and community engagement tools
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -34,7 +33,8 @@ import {
   ChartBar,
   ChartPie,
   Pulse,
-  DotsThree
+  DotsThree,
+  Image as ImageIcon,
 } from '@phosphor-icons/react';
 import useSWR from 'swr';
 import { apiJson } from '@/lib/api-client-shared';
@@ -123,7 +123,7 @@ export default function SocialHub() {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch social metrics
-  const { data: metrics, isLoading: metricsLoading } = useSWR<SocialMetrics>(
+  const { data: metrics, isLoading: metricsLoading } = useSWR<SocialMetrics | null>(
     '/api/social-hub/metrics',
     async (url: string) => {
       try {
@@ -190,7 +190,7 @@ export default function SocialHub() {
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -201,7 +201,7 @@ export default function SocialHub() {
           >
             {tab.icon}
             {tab.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -316,7 +316,7 @@ export default function SocialHub() {
       )}
       
       {activeTab === 'analytics' && (
-        <AnalyticsView metrics={metrics} loading={metricsLoading} />
+        <AnalyticsView metrics={metrics ?? null} loading={metricsLoading} />
       )}
       
       {activeTab === 'schedule' && (
@@ -371,7 +371,7 @@ function PostsView({ posts, loading, selectedPost, onSelectPost }: any) {
             {post.mediaUrl && (
               <div className="mb-4">
                 <div className="aspect-video bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg flex items-center justify-center">
-                  <Image className="h-8 w-8 text-gray-500" />
+                  <ImageIcon className="h-8 w-8 text-gray-500" />
                 </div>
               </div>
             )}
@@ -398,9 +398,9 @@ function PostsView({ posts, loading, selectedPost, onSelectPost }: any) {
                   {post.metrics.comments?.toLocaleString() || '0'}
                 </span>
               </div>
-              <button className="p-1 hover:bg-gray-100 rounded">
+              <Button className="p-1 hover:bg-gray-100 rounded">
                 <DotsThree className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </ThemedCard>
         </motion.div>
@@ -608,15 +608,15 @@ function AnalyticsView({ metrics, loading }: { metrics: SocialMetrics | null; lo
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <h3 className="font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
+            <Button className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium">
               Create Post
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Schedule Content
-            </button>
-            <button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+            </Button>
+            <Button className="w-full px-3 py-2 border border-gray-100 rounded-lg hover:bg-gray-100 transition-colors text-sm">
               Analyze Performance
-            </button>
+            </Button>
           </div>
         </ThemedCard>
       </div>
@@ -634,10 +634,10 @@ function ScheduleView() {
         <ThemedCard industry={store?.industrySlug || 'default'}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-semibold">Content Calendar</h3>
-            <button className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+            <Button className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg hover:opacity-90 transition-opacity">
               <Plus className="h-4 w-4" />
               Schedule Post
-            </button>
+            </Button>
           </div>
           
           <div className="space-y-4">

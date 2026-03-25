@@ -140,7 +140,7 @@ export async function purgeCDNCache(paths: string[]): Promise<void> {
       await purgeFastlyCache(paths);
     } else if (cdnProvider === 'vercel') {
       // Vercel automatically handles cache invalidation on deploy
-      console.log('Vercel CDN cache will be invalidated on next deployment');
+      console.warn('Vercel CDN cache will be invalidated on next deployment');
     }
   } catch (error) {
     console.error('Failed to purge CDN cache:', error);
@@ -178,7 +178,7 @@ async function purgeCloudflareCache(paths: string[]): Promise<void> {
 /**
  * Purge Fastly cache
  */
-async function purgeFastlyCache(paths: string[]): Promise<void> {
+async function purgeFastlyCache(_paths: string[]): Promise<void> {
   const serviceId = process.env.FASTLY_SERVICE_ID;
   const apiKey = process.env.FASTLY_API_KEY;
 

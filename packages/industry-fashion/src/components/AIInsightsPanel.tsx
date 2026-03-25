@@ -1,7 +1,7 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 import React, { useState, useEffect } from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 import { aiRecommendationEngine, type AIRecommendation as EngineAIRecommendation } from '../services/ai-recommendation-engine';
 
 export interface AIRecommendation {
@@ -27,20 +27,27 @@ export const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
 
   // Fetch AI recommendations when component mounts or storeId changes
   useEffect(() => {
-    if (isProTier) {
+    if (!isProTier) return;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
       setLoading(true);
-      // TODO: Pass actual storeId from context
-      aiRecommendationEngine
-        .getAllRecommendations('store-id-placeholder')
+      void aiRecommendationEngine
+        .getAllRecommendations("store-id-placeholder")
         .then((recs) => {
-          setAiRecommendations(recs);
-          setLoading(false);
+          if (!cancelled) {
+            setAiRecommendations(recs);
+            setLoading(false);
+          }
         })
         .catch((error) => {
-          console.error('Error fetching AI recommendations:', error);
-          setLoading(false);
+          console.error("Error fetching AI recommendations:", error);
+          if (!cancelled) setLoading(false);
         });
-    }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isProTier]);
   if (!isProTier) {
     return (
@@ -53,9 +60,9 @@ export const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
           <p className="text-sm text-white/60 mb-4">
             Upgrade to Pro to access AI-powered recommendations for inventory optimization, trend forecasting, and revenue growth.
           </p>
-          <button className="px-4 py-2 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-lg transition-colors">
+          <Button className="px-4 py-2 bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium rounded-lg transition-colors">
             Upgrade to Pro
-          </button>
+          </Button>
         </div>
       </GlassPanel>
     );
@@ -97,7 +104,7 @@ export const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
             <p className="text-sm text-white/60">
               No recommendations at this time. Check back later for AI-powered insights.
             </p>
-            <button
+            <Button
               onClick={() => {
                 setLoading(true);
                 aiRecommendationEngine
@@ -114,7 +121,7 @@ export const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
               className="mt-3 px-4 py-2 bg-white/10 hover:bg-white/20 text-rose-400 text-sm font-medium rounded-lg transition-colors"
             >
               Refresh Insights
-            </button>
+            </Button>
           </div>
         )
       ) : (
@@ -142,9 +149,9 @@ export const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
                     Predicted impact: {rec.predictedImpact}
                   </p>
                 </div>
-                <button className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap">
+                <Button className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap">
                   Take Action
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -158,3 +165,4 @@ export const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
 };
 
 export default AIInsightsPanel;
+

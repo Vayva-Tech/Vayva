@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { prisma as _prisma } from "@vayva/db";
 
 interface PerformanceMetric {
   name: string;
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Log metric (replace with actual database storage)
-    console.log("[Performance Metric]", metricData);
+    console.warn("[Performance Metric]", metricData);
 
     // Send to analytics pipeline if configured
     if (process.env.ANALYTICS_ENDPOINT) {

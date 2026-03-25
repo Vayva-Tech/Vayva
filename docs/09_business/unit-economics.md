@@ -77,7 +77,7 @@ Infrastructure costs are allocated per merchant using an activity-based model:
 | VPS (Appserver) | ₦62,000 | Equal per active merchant | ₦124 |
 | VPS (Dbserver) | ₦77,500 | Weighted by data volume | ₦155 |
 | Vercel (4 projects) | ₦124,000 | Weighted by page views (storefronts heavy) | ₦248 |
-| Cloudinary | ₦0--138,000 | By storage used | ₦0--276 |
+| Storage (MinIO self-hosted) | ₦0 | Included in VPS allocation | ₦0 |
 | Sentry | ₦0--40,000 | Equal per project | ₦0--80 |
 | **Total infra/merchant** | | | **₦527--₦883** |
 

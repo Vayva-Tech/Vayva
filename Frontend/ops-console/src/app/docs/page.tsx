@@ -175,7 +175,7 @@ export default function DocsPage() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="px-4 pb-4 space-y-1">
-                  <button
+                  <Button
                     onClick={() => setSelectedTag(null)}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                       selectedTag === null
@@ -187,9 +187,9 @@ export default function DocsPage() {
                     <span className="ml-2 float-right">
                       <Badge variant="secondary">{endpoints.length}</Badge>
                     </span>
-                  </button>
+                  </Button>
                   {tags.map((tag) => (
-                    <button
+                    <Button
                       key={tag}
                       onClick={() => setSelectedTag(tag)}
                       className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
@@ -202,7 +202,7 @@ export default function DocsPage() {
                       <span className="ml-2 float-right">
                         <Badge variant="secondary">{groups[tag].length}</Badge>
                       </span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </CardContent>

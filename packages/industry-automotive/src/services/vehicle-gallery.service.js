@@ -11,7 +11,7 @@ export class VehicleGalleryService {
 
   async initialize() {
     // Initialize service
-    console.log('[VEHICLE_GALLERY_SERVICE] Initialized');
+    console.warn('[VEHICLE_GALLERY_SERVICE] Initialized');
   }
 
   async getVehicles(filter = {}) {

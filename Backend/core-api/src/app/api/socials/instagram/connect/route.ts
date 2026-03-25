@@ -72,6 +72,14 @@ export const GET = withVayvaAPI(
         maxAge: 60 * 10,
       });
 
+      res.cookies.set("ig_oauth_store_id", storeId, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 10,
+      });
+
       return res;
     } catch (error: unknown) {
       logger.error("[INSTAGRAM_CONNECT_GET]", error, { storeId });

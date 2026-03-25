@@ -1,4 +1,4 @@
-import { NextRequest , NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 // @ts-expect-error - Module resolution pending
 import { GET as metricsHandler } from './metrics/route';

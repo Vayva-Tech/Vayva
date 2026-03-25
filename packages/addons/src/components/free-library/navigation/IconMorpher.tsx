@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -16,19 +16,6 @@ interface IconMorpherProps {
 export function IconMorpher({ className = '', size = 24 }: IconMorpherProps) {
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
-
-  const pathVariants = {
-    menu: {
-      d: [
-        'M3 6h18M3 12h18M3 18h18', // Hamburger
-      ],
-    },
-    close: {
-      d: [
-        'M6 6l12 12M6 18L18 6', // X
-      ],
-    },
-  };
 
   return (
     <motion.button

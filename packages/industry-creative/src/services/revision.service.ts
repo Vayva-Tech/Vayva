@@ -1,10 +1,9 @@
-// @ts-nocheck
 /**
  * Revision Control Service
  * Handles version history, change tracking, and revision management
  */
 
-import { PrismaClient } from '@vayva/prisma';
+import { PrismaClient } from '@vayva/db';
 
 export interface Revision {
   id: string;

@@ -972,6 +972,7 @@ export type NormalizedTemplate = {
 
 export function getNormalizedTemplates(): NormalizedTemplate[] {
   return Object.values(TEMPLATE_REGISTRY)
+    .filter((t) => t.status === "implemented" || t.status === "pending")
     .map((t) => {
       const slug = t.slug || t.templateId;
 
@@ -1007,14 +1008,13 @@ export function getNormalizedTemplates(): NormalizedTemplate[] {
         features,
         isFree,
         requiredPlan,
-        status: (t as any).status || "active",
+        status: t.status,
 
         layoutComponent: t.layoutComponent,
         componentProps: t.componentProps,
         registry: t, // Keep ref to original
       };
-    })
-    .filter((t) => (t as any).status === "implemented" || (t as any).status === "pending");
+    });
 }
 
 export const TEMPLATES = getNormalizedTemplates();

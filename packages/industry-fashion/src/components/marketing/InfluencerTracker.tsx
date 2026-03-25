@@ -1,6 +1,6 @@
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { GlassPanel } from '@vayva/ui/components/fashion';
+import { GlassPanel } from '@vayva/ui/fashion';
 
 export interface Influencer {
   id: string;
@@ -81,12 +81,12 @@ export const InfluencerTracker: React.FC<InfluencerTrackerProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Influencer Partnerships</h2>
         {onAddInfluencer && (
-          <button
+          <Button
             onClick={onAddInfluencer}
             className="px-4 py-2 bg-purple-400 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors"
           >
             + Add Influencer
-          </button>
+          </Button>
         )}
       </div>
 
@@ -147,9 +147,9 @@ export const InfluencerTracker: React.FC<InfluencerTrackerProps> = ({
                   {influencer.status.charAt(0).toUpperCase() + influencer.status.slice(1)}
                 </span>
               </div>
-              <button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
+              <Button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/70 text-xs rounded transition-colors">
                 View Profile
-              </button>
+              </Button>
             </div>
           </div>
         ))}

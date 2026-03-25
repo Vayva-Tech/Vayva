@@ -1,8 +1,12 @@
 {
-  "extends": "@vayva/tsconfig/base.json",
+  "extends": "../tsconfig/base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@vayva/prisma": ["./src/lib/food-prisma-stub.ts"]
+    },
     "jsx": "react-jsx"
   },
   "include": ["src/**/*"],

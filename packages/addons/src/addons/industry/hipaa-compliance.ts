@@ -4,7 +4,7 @@
  * Healthcare privacy and compliance management tools
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const HIPAA_COMPLIANCE_ADDON: AddOnDefinition = {
   id: 'vayva.hipaa-compliance',

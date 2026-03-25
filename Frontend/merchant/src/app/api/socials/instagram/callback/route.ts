@@ -1,10 +1,8 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
-import { apiJson } from "@/lib/api-client-shared";
+import { prisma, Prisma } from "@vayva/db";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { encrypt } from "@/lib/security/encryption";
+
 type FbTokenResponse = {
   access_token: string;
   token_type?: string;
@@ -50,38 +48,43 @@ async function readJsonOrThrow<T>(res: Response): Promise<T> {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
+  const returnToCookie = request.cookies.get("ig_oauth_return_to")?.value ?? null;
+  const returnTo = safeReturnTo(returnToCookie);
+
+  const buildRedirectUrl = (params: Record<string, string>): string => {
+    const url = new URL(returnTo, request.nextUrl.origin || "/");
+    for (const [key, value] of Object.entries(params)) {
+      url.searchParams.set(key, value);
+    }
+    return url.toString();
+  };
+
   try {
-    const returnToCookie = request.cookies?.get("ig_oauth_return_to")?.value || null;
-    const returnTo = safeReturnTo(returnToCookie);
-    
-    const buildRedirectUrl = (params: Record<string, string>): string => {
-      const url = new URL(returnTo, request.nextUrl?.origin || "/");
-      for (const [key, value] of Object.entries(params)) {
-        url?.searchParams?.set(key, value);
-      }
-      return url.toString();
-    };
+    const code = request.nextUrl.searchParams.get("code");
+    const state = request.nextUrl.searchParams.get("state");
 
-    const code = request.nextUrl?.searchParams.get("code");
-    const state = request.nextUrl?.searchParams.get("state");
-
-    const expectedState = request.cookies?.get("ig_oauth_state")?.value || null;
+    const expectedState = request.cookies.get("ig_oauth_state")?.value ?? null;
 
     if (!code) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "missing_code" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "missing_code" }));
     }
 
     if (!state || !expectedState || state !== expectedState) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "invalid_state" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "invalid_state" }));
     }
 
-    const appId = process.env?.META_APP_ID;
-    const appSecret = process.env?.META_APP_SECRET;
-    const redirectUri = process.env?.META_IG_REDIRECT_URI;
+    const storeId = request.cookies.get("ig_oauth_store_id")?.value?.trim() ?? "";
+    if (!storeId) {
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "missing_store" }));
+    }
+
+    const appId = process.env.META_APP_ID;
+    const appSecret = process.env.META_APP_SECRET;
+    const redirectUri = process.env.META_IG_REDIRECT_URI;
 
     if (!appId || !appSecret || !redirectUri) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "missing_config" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "missing_config" }));
     }
 
     const tokenUrl = new URL("https://graph.facebook.com/v17.0/oauth/access_token");
@@ -92,7 +95,7 @@ export async function GET(request: NextRequest) {
 
     const tokenRes = await fetch(tokenUrl.toString(), { method: "GET" });
     if (!tokenRes.ok) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "token_exchange_failed" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "token_exchange_failed" }));
     }
 
     const shortLived = await readJsonOrThrow<FbTokenResponse>(tokenRes);
@@ -105,7 +108,7 @@ export async function GET(request: NextRequest) {
 
     const longRes = await fetch(longLivedUrl.toString(), { method: "GET" });
     if (!longRes.ok) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "long_lived_exchange_failed" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "long_lived_exchange_failed" }));
     }
 
     const longLived = await readJsonOrThrow<FbTokenResponse>(longRes);
@@ -116,21 +119,21 @@ export async function GET(request: NextRequest) {
 
     const accountsRes = await fetch(accountsUrl.toString(), { method: "GET" });
     if (!accountsRes.ok) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "fetch_pages_failed" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "fetch_pages_failed" }));
     }
 
     const accounts = await readJsonOrThrow<FbAccountsResponse>(accountsRes);
     const pageWithIg = (accounts.data || []).find((p) => p.instagram_business_account?.id && p.access_token);
 
     if (!pageWithIg || !pageWithIg.access_token || !pageWithIg.instagram_business_account?.id) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "no_ig_business_account" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "no_ig_business_account" }));
     }
 
     const encryptedPageToken = encrypt(pageWithIg.access_token);
 
-    const store = await prisma.store?.findUnique({ where: { id: storeId } });
+    const store = await prisma.store.findUnique({ where: { id: storeId } });
     if (!store) {
-      return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "store_not_found" }));
+      return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "store_not_found" }));
     }
 
     const settings = (store.settings as StoreSettings | null) ?? {};
@@ -141,16 +144,16 @@ export async function GET(request: NextRequest) {
         provider: "meta",
         pageId: pageWithIg.id,
         pageName: pageWithIg.name || null,
-        igBusinessId: pageWithIg.instagram_business_account?.id,
+        igBusinessId: pageWithIg.instagram_business_account.id,
         encryptedPageAccessToken: encryptedPageToken,
         connectedAt: new Date().toISOString(),
       },
     };
 
-    await prisma.store?.update({
+    await prisma.store.update({
       where: { id: storeId },
       data: {
-        settings: nextSettings as any,
+        settings: nextSettings as Prisma.InputJsonValue,
       },
     });
 
@@ -160,15 +163,16 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    res.cookies?.set("ig_oauth_state", "", { path: "/", maxAge: 0 });
-    res.cookies?.set("ig_oauth_return_to", "", { path: "/", maxAge: 0 });
+    res.cookies.set("ig_oauth_state", "", { path: "/", maxAge: 0 });
+    res.cookies.set("ig_oauth_return_to", "", { path: "/", maxAge: 0 });
+    res.cookies.set("ig_oauth_store_id", "", { path: "/", maxAge: 0 });
 
     return res;
-  } catch (error) {
+  } catch (error: unknown) {
     handleApiError(error, {
       endpoint: "/api/socials/instagram/callback",
       operation: "INSTAGRAM_OAUTH_CALLBACK",
     });
-    return NextResponse.redirect(buildRedirectUrl({ ig: "ERROR", reason: "internal_error" }));
+    return NextResponse.redirect(buildRedirectUrl({ ig: "error", reason: "internal_error" }));
   }
 }

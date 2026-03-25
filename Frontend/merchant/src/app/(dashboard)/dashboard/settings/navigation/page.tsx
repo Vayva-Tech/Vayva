@@ -20,7 +20,7 @@ import {
 } from "@/config/mobile-nav";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { normalizeSidebarHref } from "@/lib/utils";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function MobileNavigationSettingsPage() {
   const [savedConfig, setSavedConfig] = useLocalStorage<MobileNavConfig>(
@@ -99,14 +99,11 @@ export default function MobileNavigationSettingsPage() {
 
   return (
     <div className="p-6 md:p-8">
-      <Breadcrumbs />
       <div className="max-w-4xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mobile Navigation</h1>
-          <p className="text-gray-700 mt-1">
-            Personalize your bottom tab bar and control what appears in More.
-          </p>
-        </div>
+        <PageHeader
+          title="Mobile Navigation"
+          subtitle="Personalize your bottom tab bar and control what appears in More."
+        />
 
         <section className="rounded-[20px] border border-gray-100 bg-white  p-5 space-y-4">
           <div className="flex items-center justify-between">

@@ -1,10 +1,11 @@
-// @ts-nocheck
-  "use client";
+"use client";
 
-import { useState, useEffect } from "react";
-import { User, FileText, Warning, TrendUp, Target, Plus, ChartBar } from "@phosphor-icons/react";
+import { useState, useEffect, useCallback } from "react";
+import { User, FileText, Warning, TrendUp, Target, Plus } from "@phosphor-icons/react";
 import Link from "next/link";
 import { HubGrid, type HubModule } from "@/components/shared";
+import { apiJson } from "@/lib/api-client-shared";
+import { toast } from "sonner";
 
 const salesModules: HubModule[] = [
   {
@@ -35,19 +36,56 @@ const salesModules: HubModule[] = [
 
 export default function SalesHubPage() {
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState([
+    { label: "Total Leads", value: "0", icon: Target },
+    { label: "Pending Quotes", value: "0", icon: FileText },
+    { label: "Active Rescue", value: "0", icon: Warning },
+    { label: "Won / leads", value: "—", icon: TrendUp },
+  ]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
+  const loadStats = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [leadsRes, quotesRes] = await Promise.all([
+        apiJson<{ success?: boolean; data?: Array<{ status?: string }> }>(
+          "/api/leads?limit=200",
+        ),
+        apiJson<{ success?: boolean; data?: Array<{ status?: string }> }>(
+          "/api/quotes?limit=200",
+        ),
+      ]);
+      const leads = leadsRes.data ?? [];
+      const quotes = quotesRes.data ?? [];
+      const pendingQuotes = quotes.filter((q) => {
+        const s = (q.status ?? "").toLowerCase();
+        return s === "pending" || s === "draft" || s === "sent";
+      }).length;
+      const wonLeads = leads.filter((l) => {
+        const s = (l.status ?? "").toLowerCase();
+        return s === "won" || s === "converted" || s === "closed_won";
+      }).length;
+      const conv =
+        leads.length > 0 ? `${Math.round((wonLeads / leads.length) * 100)}%` : "—";
+      setStats([
+        { label: "Total Leads", value: String(leads.length), icon: Target },
+        { label: "Open quotes", value: String(pendingQuotes), icon: FileText },
+        {
+          label: "Active Rescue",
+          value: "0",
+          icon: Warning,
+        },
+        { label: "Win rate (sample)", value: conv, icon: TrendUp },
+      ]);
+    } catch {
+      toast.error("Could not load sales stats");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Mock stats - replace with actual API data
-  const stats = [
-    { label: "Total Leads", value: "24", icon: Target },
-    { label: "Pending Quotes", value: "8", icon: FileText },
-    { label: "Active Rescue", value: "2", icon: Warning },
-    { label: "Conversion Rate", value: "32%", icon: TrendUp },
-  ];
+  useEffect(() => {
+    void loadStats();
+  }, [loadStats]);
 
   return (
     <div className="space-y-6">
@@ -61,22 +99,26 @@ export default function SalesHubPage() {
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <SummaryWidget
-            key={stat.label}
-            icon={<stat.icon size={18} />}
-            label={stat.label}
-            value={stat.value}
-            trend="current"
-            positive
-          />
-        ))}
+        {loading ? (
+          <div className="col-span-full text-sm text-gray-500 py-4">Loading…</div>
+        ) : (
+          stats.map((stat) => (
+            <SummaryWidget
+              key={stat.label}
+              icon={<stat.icon size={18} />}
+              label={stat.label}
+              value={stat.value}
+              trend="Live data"
+              positive
+            />
+          ))
+        )}
       </div>
 
       {/* Hub Modules */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Sales Modules</h2>
-        <HubGrid modules={salesModules} loading={loading} />
+        <HubGrid modules={salesModules} />
       </div>
 
       {/* Quick Actions */}

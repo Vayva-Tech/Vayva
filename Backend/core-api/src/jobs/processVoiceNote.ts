@@ -1,6 +1,8 @@
 import { VoiceProcessor, SalesAgent } from "@vayva/ai-agent";
 import { logger } from "@vayva/shared";
 import { prisma } from "@vayva/db";
+import { getAiPackage } from "@/lib/ai/ai-packages";
+import { AICreditService } from "@/lib/ai/credit-service";
 
 interface VoiceNoteJobData {
   storeId: string;
@@ -36,6 +38,24 @@ export class ProcessVoiceNoteJob {
     const startTime = Date.now();
 
     try {
+      // Enforce plan packaging: voice is Pro+ only
+      const sub = await prisma.merchantAiSubscription
+        .findUnique({ where: { storeId }, select: { planKey: true } })
+        .catch(() => null);
+      const pkg = getAiPackage(sub?.planKey);
+      if (!pkg.voiceEnabled) {
+        logger.info("[VOICE_JOB_BLOCKED_BY_PLAN]", { storeId, conversationId });
+        await this.sendFallbackMessage(
+          storeId,
+          customerPhone,
+          "I’ve received your voice message, but voice notes are not enabled on this plan. Please type your message and I’ll help right away.",
+        );
+        return {
+          success: false,
+          error: "Voice notes not enabled for this plan",
+        };
+      }
+
       // Check if voice notes are enabled for this merchant
       const store = await prisma.store.findUnique({
         where: { id: storeId },
@@ -68,6 +88,32 @@ export class ProcessVoiceNoteJob {
         audioUrl: audioUrl?.substring(0, 100),
         duration: metadata?.duration,
       });
+
+      if (typeof metadata?.duration === "number" && metadata.duration > pkg.maxVoiceSeconds) {
+        await this.sendFallbackMessage(
+          storeId,
+          customerPhone,
+          `That voice note is a bit long for this plan (max ${pkg.maxVoiceSeconds}s). Please send a shorter voice note or type your message.`,
+        );
+        return { success: false, error: "Voice note too long" };
+      }
+
+      // Meter voice note: reserve message budget for transcription (reply is metered by SalesAgent as 1 AI message)
+      const transcriptionDebit = Math.max(0, pkg.voiceNoteMessageCost - 1);
+      if (transcriptionDebit > 0) {
+        const debit = await AICreditService.deductCredits(storeId, transcriptionDebit, {
+          requestId: `voice-transcribe-${conversationId}-${Date.now()}`,
+          skipInsufficientCheck: false,
+        });
+        if (!debit.success || debit.blocked) {
+          await this.sendFallbackMessage(
+            storeId,
+            customerPhone,
+            "I can’t process voice notes right now because this store has reached its AI message limit. Please type your message or top up to continue.",
+          );
+          return { success: false, error: "Insufficient AI messages for voice transcription" };
+        }
+      }
 
       // 1. Transcribe the voice note
       const voiceProcessor = new VoiceProcessor();

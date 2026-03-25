@@ -20,13 +20,16 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@vayva/ai-agent": "workspace:*",
     "@vayva/industry-core": "workspace:*",
     "@vayva/ui": "workspace:*",
-    "react": "^18.x",
-    "react-dom": "^18.x"
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/react": "^18.x",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.0.2",
     "typescript": "^5.x"
   }
 }

@@ -65,7 +65,7 @@ export const POST = withVayvaAPI(
   async (req: NextRequest, { storeId, user, correlationId }: APIContext) => {
     const requestId = correlationId;
     try {
-      const json = await req.json().catch(() => ({}));
+      const _json = await req.json().catch(() => ({}));
       
       // This would handle creating new recurring donation schedules
       // Implementation would be similar to the recurring logic in donations/route.ts

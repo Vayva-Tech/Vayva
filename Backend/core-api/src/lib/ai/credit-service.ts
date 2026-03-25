@@ -18,7 +18,7 @@
  *   - Cost: ₦0.24 per 1,000 tokens
  *   - Best value: cheap, fast, multilingual, capable
  *
- * - AUTOPILOT MODEL: Meta Llama 3.3 70B Instruct via Groq
+ * - AUTOPILOT MODEL: Meta Llama 3.3 70B Instruct via OpenRouter
  *   - Cost: ₦0.34 per 1,000 tokens ($0.21/M ≈ ₦336/M)
  *   - 67% cheaper than previous llama3-70b-8192
  *
@@ -32,9 +32,8 @@
  * - GPT-4o Mini: ~0.24 credits per 1,000 tokens
  */
 
-import { prisma } from '@vayva/db';
-import { logger } from '@vayva/infra';
-import type { Prisma } from '@prisma/client';
+import { prisma, type AiUsageEvent } from '@vayva/db';
+import { logger, ErrorCategory } from '@/lib/logger';
 
 export interface CreditConsumption {
   creditsUsed: number;
@@ -74,13 +73,13 @@ export class AICreditService {
   // Source: https://openrouter.ai/models
   // Costs are in NGN (₦) per 1K tokens (approximate, assuming $1 = ₦1,600)
   // 
-  // PRIMARY MODEL: GPT-4o Mini - Used for 95% of requests
+  // PRIMARY MODEL: Gemini 2.0 Flash Lite - used for most requests
   // FALLBACK MODELS: Claude 3 Sonnet (complex tasks), Mistral Large (code)
   private static MODEL_COST_RATES: Record<string, number> = {
     // Primary Model (DEFAULT)
-    'openai/gpt-4o-mini': 0.24,     // $0.15/1M input + $0.60/1M output ≈ ₦0.24/1K avg
+    'google/gemini-2.0-flash-lite-001': 0.12, // ~$0.075/M input + $0.30/M output ≈ ₦0.12/1K (input) baseline
 
-    // Autopilot Model (Groq)
+    // Autopilot Model
     'meta-llama/llama-3.3-70b-instruct': 0.34, // $0.21/M avg ≈ ₦336/M ≈ ₦0.34/1K
 
     // Fallback Models (auto-routed for complex tasks)
@@ -89,10 +88,10 @@ export class AICreditService {
   };
 
   // Default model for all requests (can be overridden for specific use cases)
-  private static DEFAULT_MODEL = 'openai/gpt-4o-mini';
+  private static DEFAULT_MODEL = 'google/gemini-2.0-flash-lite-001';
   
   // Default rate for unknown models (uses GPT-4o Mini rate)
-  private static DEFAULT_COST_RATE = 0.24;
+  private static DEFAULT_COST_RATE = 0.12;
 
   // Credits per image generation
   private static IMAGE_CREDIT_COST = 10;
@@ -266,28 +265,63 @@ export class AICreditService {
     return price;
   }
 
+  /** Aligns with AiUsageService.checkLimits: STARTER trial uses 20 messages; else plan monthlyRequestLimit. */
+  private static planMessageLimit(sub: {
+    planKey: string;
+    plan: { monthlyRequestLimit: number };
+  }): number {
+    return sub.planKey === 'STARTER' ? 20 : sub.plan.monthlyRequestLimit;
+  }
+
+  private static addonMessagesTotal(
+    addonPurchases: { messagesAdded: number }[],
+  ): number {
+    return addonPurchases.reduce((s, a) => s + a.messagesAdded, 0);
+  }
+
+  private static totalMessageLimit(sub: {
+    planKey: string;
+    plan: { monthlyRequestLimit: number };
+    addonPurchases: { messagesAdded: number }[];
+  }): number {
+    return (
+      AICreditService.planMessageLimit(sub) +
+      AICreditService.addonMessagesTotal(sub.addonPurchases)
+    );
+  }
+
+  private static creditsRemainingForSub(sub: {
+    monthMessagesUsed: number;
+    planKey: string;
+    plan: { monthlyRequestLimit: number };
+    addonPurchases: { messagesAdded: number }[];
+  }): number {
+    const total = AICreditService.totalMessageLimit(sub);
+    return Math.max(0, total - sub.monthMessagesUsed);
+  }
+
+  private static async loadSubscriptionWithPlan(storeId: string) {
+    return prisma.merchantAiSubscription.findUnique({
+      where: { storeId },
+      include: { plan: true, addonPurchases: true },
+    });
+  }
+
   /**
-   * Initialize credits for new subscription
+   * Reset MTD message usage (optional onboarding hook). Plan allocation comes from {@link AiPlan} + add-ons.
    */
   static async initializeSubscriptionCredits(
     storeId: string,
-    planKey: string
+    planKey: string,
   ): Promise<void> {
-    const initialCredits = this.getInitialCreditsForPlan(planKey);
-
     await prisma.merchantAiSubscription.update({
       where: { storeId },
-      data: {
-        totalCreditsPurchased: initialCredits,
-        creditsRemaining: initialCredits,
-        lastTopupAt: new Date(),
-      },
+      data: { monthMessagesUsed: 0 },
     });
 
-    logger.info('[AICreditService] Initialized subscription credits', {
+    logger.info('[AICreditService] Reset MTD AI message usage for store', {
       storeId,
       planKey,
-      initialCredits,
     });
   }
 
@@ -300,51 +334,61 @@ export class AICreditService {
     options?: {
       requestId?: string;
       skipInsufficientCheck?: boolean;
-    }
+    },
   ): Promise<{ success: boolean; remainingCredits: number; blocked: boolean }> {
-    const subscription = await prisma.merchantAiSubscription.findUnique({
-      where: { storeId },
-    });
+    const subscription = await AICreditService.loadSubscriptionWithPlan(storeId);
 
     if (!subscription) {
-      logger.warn('[AICreditService] No subscription found', { storeId });
+      logger.warn(
+        '[AICreditService] No subscription found',
+        ErrorCategory.API,
+        { storeId },
+      );
       return { success: false, remainingCredits: 0, blocked: true };
     }
 
-    // Check if enough credits
-    if (!options?.skipInsufficientCheck && subscription.creditsRemaining < creditsUsed) {
-      logger.warn('[AICreditService] Insufficient credits', {
-        storeId,
-        required: creditsUsed,
-        available: subscription.creditsRemaining,
-      });
+    const remaining = AICreditService.creditsRemainingForSub(subscription);
+    const debit = Math.max(1, Math.ceil(creditsUsed));
+
+    if (!options?.skipInsufficientCheck && remaining < debit) {
+      logger.warn(
+        '[AICreditService] Insufficient credits / message quota',
+        ErrorCategory.API,
+        {
+          storeId,
+          required: debit,
+          available: remaining,
+        },
+      );
 
       return {
         success: false,
-        remainingCredits: subscription.creditsRemaining,
+        remainingCredits: remaining,
         blocked: true,
       };
     }
 
-    // Deduct credits
     const updated = await prisma.merchantAiSubscription.update({
       where: { storeId },
       data: {
-        creditsRemaining: {
-          decrement: creditsUsed,
-        },
+        monthMessagesUsed: { increment: debit },
       },
     });
 
-    logger.info('[AICreditService] Credits deducted', {
+    const newRemaining = AICreditService.creditsRemainingForSub({
+      ...subscription,
+      monthMessagesUsed: updated.monthMessagesUsed,
+    });
+
+    logger.info('[AICreditService] Credits deducted (message quota)', {
       storeId,
-      creditsUsed,
-      remaining: updated.creditsRemaining,
+      creditsUsed: debit,
+      remaining: newRemaining,
     });
 
     return {
       success: true,
-      remainingCredits: updated.creditsRemaining,
+      remainingCredits: newRemaining,
       blocked: false,
     };
   }
@@ -355,54 +399,41 @@ export class AICreditService {
   static async addCredits(
     storeId: string,
     creditsAmount: number,
-    transactionId: string
+    transactionId: string,
   ): Promise<CreditTopUpResult> {
-    const subscription = await prisma.merchantAiSubscription.findUnique({
-      where: { storeId },
-    });
+    const subscription = await AICreditService.loadSubscriptionWithPlan(storeId);
 
     if (!subscription) {
       throw new Error('No subscription found for store');
     }
 
-    const updated = await prisma.merchantAiSubscription.update({
-      where: { storeId },
-      data: {
-        totalCreditsPurchased: {
-          increment: creditsAmount,
-        },
-        creditsRemaining: {
-          increment: creditsAmount,
-        },
-        lastTopupAt: new Date(),
-        lastCreditAlertAt: new Date(), // Reset low credit alert
-      },
-    });
+    const beforeRemaining = AICreditService.creditsRemainingForSub(subscription);
 
-    // Record addon purchase
     await prisma.aiAddonPurchase.create({
       data: {
         storeId,
         subscriptionId: subscription.id,
-        packType: 'CREDITS_1000',
-        priceKobo: BigInt(300000), // ₦3,000 in kobo
+        packType: 'CREDITS_TOPUP',
+        priceKobo: BigInt(300000),
         transactionId,
-        messagesAdded: creditsAmount, // Track as "messages" for compatibility
+        messagesAdded: creditsAmount,
         imagesAdded: 0,
       },
     });
 
-    logger.info('[AICreditService] Credits added via top-up', {
+    const newRemaining = beforeRemaining + creditsAmount;
+
+    logger.info('[AICreditService] Credits added via top-up (addon pack)', {
       storeId,
       creditsAdded: creditsAmount,
       transactionId,
-      newBalance: updated.creditsRemaining,
+      newBalance: newRemaining,
     });
 
     return {
       success: true,
       creditsAdded: creditsAmount,
-      newBalance: updated.creditsRemaining,
+      newBalance: newRemaining,
       transactionId,
     };
   }
@@ -415,38 +446,24 @@ export class AICreditService {
     creditsRemaining: number;
     percentageUsed: number;
   }> {
-    const subscription = await prisma.merchantAiSubscription.findUnique({
-      where: { storeId },
-    });
+    const subscription = await AICreditService.loadSubscriptionWithPlan(storeId);
 
     if (!subscription) {
       return { showAlert: false, creditsRemaining: 0, percentageUsed: 0 };
     }
 
-    const threshold = 200; // Alert at 200 credits
-    const creditsRemaining = subscription.creditsRemaining;
-    const percentageUsed = Math.round(
-      ((subscription.totalCreditsPurchased - creditsRemaining) / subscription.totalCreditsPurchased) * 100
-    );
+    const total = AICreditService.totalMessageLimit(subscription);
+    const creditsRemaining =
+      AICreditService.creditsRemainingForSub(subscription);
+    const percentageUsed =
+      total > 0
+        ? Math.round(
+            ((total - creditsRemaining) / total) * 100,
+          )
+        : 0;
 
-    // Check if already shown recently (within 24 hours)
-    const now = new Date();
-    const lastAlert = subscription.lastCreditAlertAt;
-    const hoursSinceLastAlert = lastAlert
-      ? (now.getTime() - lastAlert.getTime()) / (1000 * 60 * 60)
-      : Infinity;
-
-    const showAlert = creditsRemaining <= threshold && hoursSinceLastAlert > 24;
-
-    if (showAlert) {
-      // Update last alert time
-      await prisma.merchantAiSubscription.update({
-        where: { storeId },
-        data: {
-          lastCreditAlertAt: now,
-        },
-      });
-    }
+    const threshold = Math.min(200, Math.max(1, Math.floor(total * 0.1)));
+    const showAlert = total > 0 && creditsRemaining <= threshold;
 
     return {
       showAlert,
@@ -466,9 +483,7 @@ export class AICreditService {
     isLowCredit: boolean;
     estimatedRequestsRemaining: number;
   }> {
-    const subscription = await prisma.merchantAiSubscription.findUnique({
-      where: { storeId },
-    });
+    const subscription = await AICreditService.loadSubscriptionWithPlan(storeId);
 
     if (!subscription) {
       return {
@@ -481,23 +496,33 @@ export class AICreditService {
       };
     }
 
-    const creditsUsed = subscription.totalCreditsPurchased - subscription.creditsRemaining;
-    const percentageUsed = Math.round(
-      (creditsUsed / subscription.totalCreditsPurchased) * 100
-    );
+    const totalCreditsPurchased =
+      AICreditService.totalMessageLimit(subscription);
+    const creditsRemaining =
+      AICreditService.creditsRemainingForSub(subscription);
+    const creditsUsed = subscription.monthMessagesUsed;
+    const percentageUsed =
+      totalCreditsPurchased > 0
+        ? Math.round((creditsUsed / totalCreditsPurchased) * 100)
+        : 0;
 
-    // Estimate remaining requests (assuming avg 5 credits per request)
     const avgCreditsPerRequest = 5;
     const estimatedRequestsRemaining = Math.floor(
-      subscription.creditsRemaining / avgCreditsPerRequest
+      creditsRemaining / avgCreditsPerRequest,
+    );
+
+    const lowThreshold = Math.min(
+      200,
+      Math.max(1, Math.floor(totalCreditsPurchased * 0.1)),
     );
 
     return {
-      totalCreditsPurchased: subscription.totalCreditsPurchased,
-      creditsRemaining: subscription.creditsRemaining,
+      totalCreditsPurchased,
+      creditsRemaining,
       creditsUsed,
       percentageUsed,
-      isLowCredit: subscription.creditsRemaining <= 200,
+      isLowCredit:
+        totalCreditsPurchased > 0 && creditsRemaining <= lowThreshold,
       estimatedRequestsRemaining,
     };
   }
@@ -526,23 +551,42 @@ export class AICreditService {
             name: true,
           },
         },
+        plan: true,
+        addonPurchases: true,
       },
     });
 
-    return subscriptions.map((sub) => ({
-      storeId: sub.storeId,
-      storeName: sub.store.name,
-      planKey: sub.planKey,
-      totalCreditsPurchased: sub.totalCreditsPurchased,
-      creditsRemaining: sub.creditsRemaining,
-      creditsUsed: sub.totalCreditsPurchased - sub.creditsRemaining,
-      percentageUsed: Math.round(
-        ((sub.totalCreditsPurchased - sub.creditsRemaining) / sub.totalCreditsPurchased) * 100
-      ),
-      isLowCredit: sub.creditsRemaining <= 200,
-      lastTopupAt: sub.lastTopupAt,
-      status: sub.status,
-    }));
+    return subscriptions.map((sub) => {
+      const total = AICreditService.totalMessageLimit(sub);
+      const creditsRemaining = AICreditService.creditsRemainingForSub(sub);
+      const creditsUsed = sub.monthMessagesUsed;
+      const percentageUsed =
+        total > 0 ? Math.round((creditsUsed / total) * 100) : 0;
+      const lastTopupAt =
+        sub.addonPurchases.length > 0
+          ? new Date(
+              Math.max(
+                ...sub.addonPurchases.map((a) => a.createdAt.getTime()),
+              ),
+            )
+          : null;
+
+      return {
+        storeId: sub.storeId,
+        storeName: sub.store.name,
+        planKey: sub.planKey,
+        totalCreditsPurchased: total,
+        creditsRemaining,
+        creditsUsed,
+        percentageUsed,
+        isLowCredit:
+          total > 0 &&
+          creditsRemaining <=
+            Math.min(200, Math.max(1, Math.floor(total * 0.1))),
+        lastTopupAt,
+        status: sub.status,
+      };
+    });
   }
 
   /**
@@ -555,7 +599,7 @@ export class AICreditService {
       endDate?: Date;
       limit?: number;
     }
-  ): Promise<Prisma.AiUsageEventGetPayload<{}>[]> {
+  ): Promise<AiUsageEvent[]> {
     const { startDate, endDate, limit = 100 } = options || {};
 
     return prisma.aiUsageEvent.findMany({

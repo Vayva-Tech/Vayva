@@ -1,6 +1,7 @@
 import { GET } from '../route';
 import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
 
 // Mock the dependencies
 jest.mock('next-auth', () => ({
@@ -18,6 +19,10 @@ jest.mock('@/lib/prisma', () => ({
 describe('Fashion Inventory Breakdown API', () => {
   const mockSession = {
     user: { id: 'user-123' },
+  };
+
+  const mockedPrisma = prisma as jest.Mocked<typeof prisma> & {
+    productVariant: { findMany: jest.Mock };
   };
 
   beforeEach(() => {
@@ -63,8 +68,7 @@ describe('Fashion Inventory Breakdown API', () => {
         },
       ];
       
-      const prisma = require('@/lib/prisma').prisma;
-      prisma.productVariant.findMany.mockResolvedValue(mockVariants);
+      mockedPrisma.productVariant.findMany.mockResolvedValue(mockVariants);
       
       const request = new NextRequest('http://localhost/api/fashion/inventory/breakdown?businessId=biz-123');
       const response = await GET(request);
@@ -77,13 +81,12 @@ describe('Fashion Inventory Breakdown API', () => {
     });
 
     it('should filter by category when categoryId is provided', async () => {
-      const prisma = require('@/lib/prisma').prisma;
-      prisma.productVariant.findMany.mockResolvedValue([]);
+      mockedPrisma.productVariant.findMany.mockResolvedValue([]);
       
       const request = new NextRequest('http://localhost/api/fashion/inventory/breakdown?businessId=biz-123&categoryId=cat-1');
       await GET(request);
       
-      expect(prisma.productVariant.findMany).toHaveBeenCalledWith(
+      expect(mockedPrisma.productVariant.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             categoryId: 'cat-1',
@@ -113,8 +116,7 @@ describe('Fashion Inventory Breakdown API', () => {
         },
       ];
       
-      const prisma = require('@/lib/prisma').prisma;
-      prisma.productVariant.findMany.mockResolvedValue(mockVariants);
+      mockedPrisma.productVariant.findMany.mockResolvedValue(mockVariants);
       
       const request = new NextRequest('http://localhost/api/fashion/inventory/breakdown?businessId=biz-123&alertType=out_of_stock');
       const response = await GET(request);

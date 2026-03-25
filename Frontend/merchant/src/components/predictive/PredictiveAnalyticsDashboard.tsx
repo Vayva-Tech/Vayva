@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Predictive Analytics Dashboard
  * Demand forecasting, churn prediction, and lifetime value modeling
  */
-
 "use client";
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -77,7 +76,7 @@ export default function PredictiveAnalyticsDashboard() {
   const [timeframe, setTimeframe] = useState<'30d' | '90d' | '1y'>('90d');
 
   // Fetch predictive summary
-  const { data: summary, isLoading: summaryLoading } = useSWR<PredictiveSummary>(
+  const { data: summary, isLoading: summaryLoading } = useSWR<PredictiveSummary | null>(
     '/api/predictive/summary',
     async (url: string) => {
       try {
@@ -152,7 +151,7 @@ export default function PredictiveAnalyticsDashboard() {
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex gap-2">
           {tabs.map((tab) => (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -163,7 +162,7 @@ export default function PredictiveAnalyticsDashboard() {
             >
               {tab.icon}
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
         

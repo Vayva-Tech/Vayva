@@ -1,9 +1,8 @@
-// @ts-nocheck
 // ============================================================================
 // Inventory Service
 // ============================================================================
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@vayva/db';
 
 export interface IngredientRequirement {
   productId: string;
@@ -104,11 +103,11 @@ export class InventoryService {
           storeId,
         },
         include: {
-          inventory: true,
+          inventoryItems: true,
         },
       });
 
-      if (!product || !product.inventory) {
+      if (!product?.inventoryItems?.length) {
         results.push({
           productId: requirement.productId,
           inStock: false,
@@ -116,7 +115,10 @@ export class InventoryService {
         continue;
       }
 
-      const availableQuantity = product.inventory.reduce((sum, inv) => sum + inv.quantity, 0);
+      const availableQuantity = product.inventoryItems.reduce(
+        (sum: number, inv: { available: number }) => sum + inv.available,
+        0
+      );
       
       results.push({
         productId: requirement.productId,
@@ -135,25 +137,28 @@ export class InventoryService {
     const products = await this.prisma.product.findMany({
       where: {
         storeId,
-        inventory: {
+        inventoryItems: {
           some: {
-            quantity: { lte: threshold },
+            available: { lte: threshold },
           },
         },
       },
       include: {
-        inventory: {
+        inventoryItems: {
           where: {
-            quantity: { lte: threshold },
+            available: { lte: threshold },
           },
         },
       },
     });
 
-    return products.map(product => ({
+    return products.map((product) => ({
       productId: product.id,
-      productName: product.name,
-      currentStock: product.inventory.reduce((sum, inv) => sum + inv.quantity, 0),
+      productName: product.title,
+      currentStock: product.inventoryItems.reduce(
+        (sum: number, inv: { available: number }) => sum + inv.available,
+        0
+      ),
       threshold,
     }));
   }
@@ -168,22 +173,21 @@ export class InventoryService {
     try {
       for (const reservation of reservations) {
         // Find inventory for this product
-        const inventory = await this.prisma.inventory.findFirst({
+        const inventory = await this.prisma.inventoryItem.findFirst({
           where: {
             productId: reservation.productId,
-            storeId,
+            product: { storeId },
           },
         });
 
-        if (!inventory || inventory.quantity < reservation.quantity) {
+        if (!inventory || inventory.available < reservation.quantity) {
           return false;
         }
 
-        // Decrement inventory
-        await this.prisma.inventory.update({
+        await this.prisma.inventoryItem.update({
           where: { id: inventory.id },
           data: {
-            quantity: { decrement: reservation.quantity },
+            available: { decrement: reservation.quantity },
           },
         });
       }

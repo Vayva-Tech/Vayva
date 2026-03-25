@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Education Industry Type Definitions
  * 
@@ -14,6 +13,8 @@ import type { z } from 'zod';
 export interface Course {
   id: string;
   title: string;
+  /** Display alias used by some dashboard mocks */
+  name?: string;
   description?: string;
   instructorId: string;
   instructorName?: string;
@@ -23,6 +24,9 @@ export interface Course {
   enrolledStudents: number;
   status: 'draft' | 'published' | 'archived';
   progress: number;
+  /** Dashboard shorthand for enrolled headcount */
+  students?: number;
+  completionRate?: number;
   revenue: number;
   rating: number;
   reviewCount: number;
@@ -41,12 +45,18 @@ export interface Student {
   completedCourses: number;
   inProgressCourses: number;
   overallProgress: number;
+  /** Per-course progress percent for dashboard mocks */
+  progress?: number;
   totalLearningTime: number; // in minutes
   lastActiveAt: Date;
   enrolledAt: Date;
   certificatesEarned: number;
   averageGrade?: number;
   atRisk: boolean;
+  riskLevel?: string;
+  lastActive?: Date;
+  /** At-risk dashboard: enrolled course count */
+  courses?: number;
 }
 
 export interface Instructor {
@@ -65,6 +75,10 @@ export interface Instructor {
   joinedAt: Date;
   isVerified: boolean;
   specialties?: string[];
+  courses?: number;
+  students?: number;
+  revenue?: number;
+  rating?: number;
 }
 
 export interface Enrollment {
@@ -87,8 +101,12 @@ export interface Assignment {
   title: string;
   courseId: string;
   courseTitle?: string;
+  /** Legacy dashboard label (course name) */
+  course?: string;
   type: 'quiz' | 'assignment' | 'project' | 'exam';
   dueDate: Date;
+  /** Alias used by some UIs for submissionsCount */
+  submissions?: number;
   totalPoints: number;
   submissionsCount: number;
   gradedCount: number;
@@ -130,6 +148,7 @@ export interface EngagementMetrics {
   videoViews: number; // percentage
   quizAttempts: number; // percentage
   forumPosts: number; // percentage
+  forumActivity?: number;
   assignmentsCompleted: number; // percentage
   loginFrequency: {
     daily: number;

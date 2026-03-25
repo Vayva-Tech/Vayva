@@ -8,7 +8,16 @@
  * - Image optimization
  */
 
-import { lazy, Suspense, useMemo, useCallback, memo, useRef, useState, useEffect } from 'react';
+import React, {
+  lazy,
+  Suspense,
+  useMemo,
+  useCallback,
+  memo,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 
 // ============================================================================
 // LAZY LOADING UTILITIES
@@ -35,19 +44,21 @@ export function createLazyComponent<T extends object>(
     timeout = 10000
   } = options;
 
-  const LazyComponent = lazy(() => 
+  const LazyComponent = lazy(() =>
     Promise.race([
       importFn(),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Component load timeout')), timeout)
-      )
-    ])
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Component load timeout")), timeout),
+      ),
+    ]),
   );
+
+  const Lazy = LazyComponent as unknown as React.ComponentType<T>;
 
   return {
     Component: (props: T) => (
       <Suspense fallback={loadingFallback}>
-        <LazyComponent {...props} />
+        <Lazy {...props} />
       </Suspense>
     ),
     preload: () => importFn()
@@ -108,6 +119,8 @@ export function useMemoizedCalculation<T>(
   calculation: () => T,
   dependencies: any[]
 ): T {
+  /* Forwarding wrapper: callers pass their own dependency list. */
+  // eslint-disable-next-line react-hooks/use-memo -- intentional non-literal deps passthrough
   return useMemo(calculation, dependencies);
 }
 
@@ -122,6 +135,8 @@ export function useMemoizedCallback<T extends (...args: any[]) => any>(
   callback: T,
   dependencies: any[]
 ): T {
+  /* Forwarding wrapper: callers pass their own dependency list. */
+  // eslint-disable-next-line react-hooks/use-memo -- intentional non-literal deps passthrough (useCallback)
   return useCallback(callback, dependencies);
 }
 
@@ -296,15 +311,35 @@ export function useDebounce<T>(value: T, delay: number): T {
  */
 export function useThrottle<T>(value: T, interval: number): T {
   const [throttledValue, setThrottledValue] = useState(value);
-  const lastUpdated = useRef(Date.now());
+  const lastEmit = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const valueRef = useRef(value);
 
   useEffect(() => {
+    valueRef.current = value;
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
     const now = Date.now();
-    
-    if (now - lastUpdated.current >= interval) {
-      setThrottledValue(value);
-      lastUpdated.current = now;
+    const last = lastEmit.current;
+
+    const run = () => {
+      queueMicrotask(() => {
+        setThrottledValue(valueRef.current);
+        lastEmit.current = Date.now();
+      });
+      timeoutRef.current = null;
+    };
+
+    if (last === null || now - last >= interval) {
+      run();
+    } else {
+      timeoutRef.current = setTimeout(run, interval - (now - last));
     }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, [value, interval]);
 
   return throttledValue;

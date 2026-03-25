@@ -1,27 +1,35 @@
-// @ts-nocheck
 /**
  * Legal Industry Dashboard Configuration
- * Premium Glass Design Category - Justice Blue Theme
  */
 
+import type { DashboardEngineConfig } from '@vayva/industry-core';
 import type { LegalDashboardResponse } from '../types';
 
-export const LEGAL_DASHBOARD_CONFIG = {
-  industry: 'legal' as const,
+export const LEGAL_DASHBOARD_CONFIG: DashboardEngineConfig = {
+  industry: 'legal',
   title: 'Legal Dashboard',
-  subtitle: 'Law Firm Management Platform',
+  subtitle: 'Law firm management platform',
   primaryObjectLabel: 'Cases',
-  defaultTimeHorizon: 'month' as const,
-  designCategory: 'premium_glass' as const,
-  theme: {
-    primary: '#1E40AF', // Justice Blue
-    secondary: '#D97706', // Authority Gold
-    accent: '#059669', // Integrity Green
-    background: '#EFF6FF',
-    success: '#059669',
-    warning: '#D97706',
-    danger: '#DC2626',
-  },
+  defaultTimeHorizon: 'month',
+  sections: [
+    'primary_object_health',
+    'live_operations',
+    'decision_kpis',
+    'bottlenecks_alerts',
+    'suggested_actions',
+  ],
+  failureModes: [],
+  widgets: [],
+  layouts: [
+    {
+      id: 'default',
+      name: 'Legal overview',
+      breakpoints: { lg: [] },
+    },
+  ],
+  kpiCards: [],
+  alertRules: [],
+  actions: [],
 };
 
 export async function getLegalDashboardConfig(

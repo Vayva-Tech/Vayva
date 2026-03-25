@@ -1,5 +1,5 @@
-// @ts-nocheck
 'use client';
+import { Button } from "@vayva/ui";
 
 /**
  * VehicleGallery Widget
@@ -76,7 +76,7 @@ function VehicleCard({ vehicle, onClick, onScheduleTestDrive }: VehicleCardProps
         {/* Quick Actions Overlay */}
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
           {onScheduleTestDrive && vehicle.status === 'available' && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 onScheduleTestDrive();
@@ -84,15 +84,15 @@ function VehicleCard({ vehicle, onClick, onScheduleTestDrive }: VehicleCardProps
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               Test Drive
-            </button>
+            </Button>
           )}
           {onClick && (
-            <button
+            <Button
               onClick={onClick}
               className="px-4 py-2 bg-white text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
             >
               View Details
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -233,7 +233,7 @@ export function VehicleGalleryWidget({
         {showFilters && (
           <div className="flex flex-wrap gap-3">
             <div className="flex gap-2">
-              <button
+              <Button
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === 'all'
@@ -242,8 +242,8 @@ export function VehicleGalleryWidget({
                 }`}
               >
                 All ({stats.total})
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setFilter('available')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === 'available'
@@ -252,8 +252,8 @@ export function VehicleGalleryWidget({
                 }`}
               >
                 Available ({stats.available})
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setFilter('reserved')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === 'reserved'
@@ -262,7 +262,7 @@ export function VehicleGalleryWidget({
                 }`}
               >
                 Reserved ({stats.reserved})
-              </button>
+              </Button>
             </div>
 
             <select
@@ -318,3 +318,4 @@ export function VehicleGalleryWidget({
 VehicleGalleryWidget.displayName = 'VehicleGalleryWidget';
 
 export default VehicleGalleryWidget;
+

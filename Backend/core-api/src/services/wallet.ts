@@ -63,7 +63,7 @@ export const WalletService = {
 
     if (!wallet) {
       // Create wallet if it doesn't exist
-      const newWallet = await prisma.wallet.create({
+      const _newWallet = await prisma.wallet.create({
         data: {
           storeId,
           availableKobo: 0,
@@ -442,7 +442,7 @@ export const WalletService = {
             success: true,
             message: "Withdrawal completed successfully. Funds will be credited to your account shortly.",
           };
-        } catch (otpError) {
+        } catch {
           // OTP failed, mark as failed and restore funds
           await handleWithdrawalFailure(storeId, withdrawalId, withdrawal.amountKobo);
           throw new Error("Invalid OTP. Please try again.");

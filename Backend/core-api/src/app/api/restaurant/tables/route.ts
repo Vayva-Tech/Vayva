@@ -30,7 +30,7 @@ export const GET = withVayvaAPI(
       const { searchParams } = new URL(req.url);
       
       const queryData = Object.fromEntries(searchParams.entries());
-      const { section, isActive, hasReservation } = QuerySchema.parse(queryData);
+      const { section, isActive, _hasReservation } = QuerySchema.parse(queryData);
       
       const where: any = { storeId };
       

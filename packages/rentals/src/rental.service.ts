@@ -494,7 +494,7 @@ export class RentalService {
   /**
    * Process pickup
    */
-  async processPickup(bookingId: string, actualCondition?: string): Promise<RentalBooking> {
+  async processPickup(bookingId: string, _actualCondition?: string): Promise<RentalBooking> {
     const booking = await prisma.rentalBooking.findUnique({
       where: { id: bookingId },
       include: { rentalProduct: true },
@@ -672,7 +672,7 @@ export class RentalService {
   /**
    * Exercise purchase option (rent-to-own)
    */
-  async exercisePurchaseOption(bookingId: string, paymentMethod: string): Promise<RentalBooking> {
+  async exercisePurchaseOption(bookingId: string, _paymentMethod: string): Promise<RentalBooking> {
     const booking = await prisma.rentalBooking.findUnique({ where: { id: bookingId } });
     if (!booking) throw new Error("Booking not found");
 
@@ -829,7 +829,7 @@ export class RentalService {
     const [products, activeRentals, revenue] = await Promise.all([
       prisma.rentalProduct.count({ where: { storeId } }),
       prisma.rentalBooking.count({
-        where: { storeId, status: { in: ["active", "picked_up"] } } },
+        where: { storeId, status: { in: ["active", "picked_up"] } },
       }),
       prisma.rentalBooking.aggregate({
         where: {

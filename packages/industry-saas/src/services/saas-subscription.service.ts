@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SaaS Subscription Service
  * Manages recurring subscriptions, billing cycles, and usage tracking

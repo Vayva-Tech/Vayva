@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import type { InventoryItem, InventoryLocation, InventoryMovement } from "@vayva/db";
+import type { InventoryItem as _InventoryItem, InventoryLocation, InventoryMovement } from "@vayva/db";
 import { StockAdjustmentResult } from "@/types/inventory";
 
 export class InventoryService {

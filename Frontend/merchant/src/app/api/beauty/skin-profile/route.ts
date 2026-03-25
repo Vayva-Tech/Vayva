@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { authOptions } from '@/lib/auth';
@@ -9,7 +10,8 @@ import { beautyService } from '@/services/beauty.service';
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const sessionStoreId = session?.user?.storeId;
+    if (!session?.user || !sessionStoreId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -20,7 +22,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Missing customerId' }, { status: 400 });
     }
 
-    const profile = await beautyService.getSkinProfile(customerId);
+    const profile = await beautyService.getSkinProfile(sessionStoreId, customerId);
     
     if (!profile) {
       return NextResponse.json({ error: 'Skin profile not found' }, { status: 404 });
@@ -39,7 +41,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const sessionStoreId = session?.user?.storeId;
+    if (!session?.user || !sessionStoreId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -53,7 +56,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const profile = await beautyService.createSkinProfile({
+    const profile = await beautyService.createSkinProfile(sessionStoreId, {
       customerId,
       skinType,
       skinTone,
@@ -64,6 +67,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ profile }, { status: 201 });
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'Customer not found') {
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
+    }
     return NextResponse.json(
       { error: 'Failed to create skin profile', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -75,7 +81,8 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const sessionStoreId = session?.user?.storeId;
+    if (!session?.user || !sessionStoreId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -87,10 +94,13 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const profile = await beautyService.updateSkinProfile(customerId, body);
+    const profile = await beautyService.updateSkinProfile(sessionStoreId, customerId, body);
 
     return NextResponse.json({ profile });
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'Skin profile not found') {
+      return NextResponse.json({ error: 'Skin profile not found' }, { status: 404 });
+    }
     return NextResponse.json(
       { error: 'Failed to update skin profile', message: error instanceof Error ? error.message : String(error) },
       { status: 500 }

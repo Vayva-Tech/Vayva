@@ -7,7 +7,7 @@ import {
   logger,
   standardHeaders,
   computeKycStatus,
-  isRegisteredBusiness,
+  isRegisteredBusiness
 } from "@vayva/shared";
 import { prisma, KycStatus } from "@vayva/db";
 import { encrypt } from "@/lib/security/encryption";

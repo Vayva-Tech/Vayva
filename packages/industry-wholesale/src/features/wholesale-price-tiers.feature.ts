@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Wholesale Price Tiers Feature
  */

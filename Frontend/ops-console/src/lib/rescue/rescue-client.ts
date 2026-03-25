@@ -1,4 +1,3 @@
-import { Groq } from "groq-sdk";
 import { logger } from "@/lib/logger";
 
 // Regex to identify potential sensitive data patterns (generic PII + keys)
@@ -13,23 +12,16 @@ const SENSITIVE_REGEX = {
   JWT: /eyJ[a-zA-Z0-9-_]+\.eyJ[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+/g,
 };
 
-export class RescueGroqClient {
-  private client: Groq | null = null;
+export class RescueOpenRouterClient {
+  private apiKey: string | null = null;
 
   constructor() {
-    const apiKey = process.env.GROQ_API_KEY_RESCUE;
-
-    if (!apiKey) {
+    this.apiKey = process.env.OPENROUTER_API_KEY || null;
+    if (!this.apiKey) {
       logger.warn(
-        "[RescueGroqClient] No API key found. Rescue features will fallback to safe mode.",
+        "[RescueOpenRouterClient] No API key found. Rescue features will fallback to safe mode.",
       );
-      return;
     }
-
-    this.client = new Groq({
-      apiKey,
-      dangerouslyAllowBrowser: false,
-    });
   }
 
   /**
@@ -57,8 +49,8 @@ export class RescueGroqClient {
       maxTokens?: number;
     } = {},
   ) {
-    if (!this.client) {
-      logger.warn("[RescueGroqClient] Call skipped due to missing API key");
+    if (!this.apiKey) {
+      logger.warn("[RescueOpenRouterClient] Call skipped due to missing API key");
       return null;
     }
 
@@ -68,22 +60,29 @@ export class RescueGroqClient {
         content: this.sanitizeInput(m.content),
       }));
 
-      const response = await this.client.chat.completions.create({
-        messages: safeMessages,
-        model: options.model || "llama3-70b-8192", // High reasoning model for code/logs
-        temperature: options.temperature ?? 0.1, // Low temp for deterministic diagnostics
-        max_tokens: options.maxTokens ?? 2048,
-        stop: ["MUTATION_ATTEMPT"], // Guardrail stop sequence
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+          "HTTP-Referer": "https://vayva.tech",
+          "X-Title": "Vayva Ops Rescue",
+        },
+        body: JSON.stringify({
+          messages: safeMessages,
+          model: options.model || "google/gemini-2.5-flash",
+          temperature: options.temperature ?? 0.1,
+          max_tokens: options.maxTokens ?? 2048,
+          stop: ["MUTATION_ATTEMPT"],
+        }),
+        signal: AbortSignal.timeout(25_000),
       });
 
-      logger.info("[RescueGroqClient] Diagnostic success", {
-        model: response.model,
-        usage: response.usage,
-      });
-
-      return response.choices[0]?.message?.content || null;
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices[0]?.message?.content || null;
     } catch (error: unknown) {
-      logger.error("[RescueGroqClient] API call failed", { error });
+      logger.error("[RescueOpenRouterClient] API call failed", { error });
       return null;
     }
   }

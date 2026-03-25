@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@vayva/ui";
 
 import React from 'react';
 
@@ -24,12 +25,12 @@ export const EnhancedMetricCard = ({ widget, data, isLoading, error }: any) => {
           <span className="text-red-500">⚠️</span>
         </div>
         <p className="text-red-600 text-sm">{error}</p>
-        <button 
+        <Button 
           className="mt-3 text-xs text-red-700 hover:text-red-900 underline"
           onClick={() => window.location.reload()}
         >
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -120,7 +121,7 @@ export const ChartWidget = ({ widget, data, isLoading, error }: any) => {
   // Generate sample data points if none provided
   const chartData = data?.points || Array.from({ length: 12 }, (_, i) => ({
     label: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i],
-    value: Math.floor(Math.random() * 1000) + 500
+    value: 500 + ((i * 83) % 1000),
   }));
 
   const maxValue = Math.max(...chartData.map((d: any) => d.value));

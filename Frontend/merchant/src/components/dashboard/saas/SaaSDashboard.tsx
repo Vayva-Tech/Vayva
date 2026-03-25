@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useMemo } from 'react';
@@ -126,8 +125,8 @@ export function SaaSDashboard({ className = '' }: SaaSDashboardProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-6">
-          <RecurringRevenue data={subscriptionData || undefined} />
-          <FeatureFlags data={featureFlagsData || undefined} />
+          <RecurringRevenue />
+          <FeatureFlags />
           <TenantHealth />
         </div>
 
@@ -135,7 +134,7 @@ export function SaaSDashboard({ className = '' }: SaaSDashboardProps) {
         <div className="space-y-6">
           <TenantGrowth data={tenantGrowthData || undefined} />
           <UsageAnalytics data={usageData || undefined} />
-          <ChurnRisk data={churnRiskData || undefined} />
+          <ChurnRisk />
         </div>
       </div>
 

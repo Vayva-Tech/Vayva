@@ -18,7 +18,7 @@ interface SpanContext {
   service: string;
   operation: string;
   resource?: string;
-  tags?: Record<string, any>;
+  tags?: Record<string, unknown>;
   error?: Error;
   duration?: number;
 }
@@ -66,7 +66,7 @@ class APMMonitor {
    */
   async metric(name: string, value: number, tags?: Record<string, string>) {
     if (!this.enabled) {
-      console.log(`[METRIC] ${name}: ${value}`, tags);
+      console.warn(`[METRIC] ${name}: ${value}`, tags);
       return;
     }
 
@@ -274,7 +274,7 @@ class NewRelicSpan implements Span {
   async finish() {
     // New Relic browser agent would handle this automatically
     // This is a simplified server-side implementation
-    console.log('[NEW RELIC SPAN]', {
+    console.warn('[NEW RELIC SPAN]', {
       ...this.context,
       tags: this.tags,
       error: this.error,

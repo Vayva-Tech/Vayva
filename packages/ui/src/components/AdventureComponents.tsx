@@ -1,5 +1,6 @@
+import { Button } from "@vayva/ui";
 import React from 'react';
-import { MountainIcon, MapIcon, UsersIcon, ClockIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { GlobeAmericasIcon, MapIcon, UsersIcon, ClockIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 interface DifficultyBadgeProps {
   level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
@@ -33,7 +34,7 @@ export const DifficultyBadge: React.FC<DifficultyBadgeProps> = ({
 
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${config.bg} ${className}`}>
-      <MountainIcon className="h-3 w-3 mr-1" />
+      <GlobeAmericasIcon className="h-3 w-3 mr-1" />
       {config.label}
     </span>
   );
@@ -80,7 +81,7 @@ export const AdventureTourCard: React.FC<AdventureTourCardProps> = ({
           />
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-            <MountainIcon className="h-16 w-16 text-green-600" />
+            <GlobeAmericasIcon className="h-16 w-16 text-green-600" />
           </div>
         )}
         
@@ -146,9 +147,9 @@ export const AdventureTourCard: React.FC<AdventureTourCardProps> = ({
           </div>
         )}
         
-        <button className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+        <Button className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
           View Details
-        </button>
+        </Button>
       </div>
     </div>
   );

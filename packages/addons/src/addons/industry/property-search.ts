@@ -4,7 +4,7 @@
  * Advanced property search with filters, map view, and saved searches
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const PROPERTY_SEARCH_ADDON: AddOnDefinition = {
   id: 'vayva.property-search',

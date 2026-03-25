@@ -60,6 +60,7 @@ describe("GET /api/socials/instagram/callback", () => {
       cookies: {
         ig_oauth_state: "expected",
         ig_oauth_return_to: "/dashboard/socials",
+        ig_oauth_store_id: "store_1",
       },
     });
 
@@ -105,6 +106,7 @@ describe("GET /api/socials/instagram/callback", () => {
       cookies: {
         ig_oauth_state: "expected",
         ig_oauth_return_to: "/dashboard/socials",
+        ig_oauth_store_id: "store_1",
       },
     });
 

@@ -10,7 +10,7 @@ class HealthcareEngine {
   }
   
   async initialize() {
-    console.log('[HEALTHCARE_ENGINE] Initialized');
+    console.warn('[HEALTHCARE_ENGINE] Initialized');
   }
   
   getDashboardConfig() {

@@ -8,7 +8,7 @@
  * - Container query support for responsive add-on layouts
  */
 
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 // ============================================================================
 // Types

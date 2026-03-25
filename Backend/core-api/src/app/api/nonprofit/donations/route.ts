@@ -248,7 +248,7 @@ export const POST = withVayvaAPI(
 );
 
 // Helper method to calculate frequency in milliseconds
-function getFrequencyMilliseconds(frequency: string): number {
+function _getFrequencyMilliseconds(frequency: string): number {
   const msInDay = 24 * 60 * 60 * 1000;
   switch (frequency) {
     case "weekly": return 7 * msInDay;

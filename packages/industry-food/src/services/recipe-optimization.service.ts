@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Recipe Optimization AI Service
  * 
@@ -7,7 +6,33 @@
  */
 
 import { BaseAIService } from '@vayva/ai-agent';
-import type { RecipeOptimizationResult } from '@vayva/ai-agent';
+
+export interface RecipeOptimizationResult {
+  recipeId: string;
+  currentCost: {
+    totalCost: number;
+    costPerServing: number;
+    ingredientCosts: Array<{ ingredient: string; cost: number }>;
+  };
+  optimizations: Array<{
+    type: string;
+    description: string;
+    costSavings: number;
+    qualityImpact: string;
+    implementationDifficulty: string;
+  }>;
+  marginAnalysis: {
+    currentMargin: number;
+    optimizedMargin: number;
+    targetMargin: number;
+  };
+  menuEngineering: {
+    category: string;
+    popularity: number;
+    profitability: number;
+    recommendations: string[];
+  };
+}
 
 export interface RecipeOptimizationInput {
   /** Recipe identifier */
@@ -50,6 +75,38 @@ export class RecipeOptimizationService extends BaseAIService<RecipeOptimizationI
       requireHumanValidation: true, // Recipe changes need chef approval
       confidenceThreshold: 0.75,
     });
+  }
+
+  async initialize(): Promise<void> {
+    // Hook for engine orchestration
+  }
+
+  protected defaultOutput(input: RecipeOptimizationInput): RecipeOptimizationResult {
+    const totalCost = input.ingredients.reduce((s, ing) => s + ing.quantity * ing.costPerUnit, 0);
+    const costPerServing = totalCost / Math.max(1, input.portions);
+    return {
+      recipeId: input.recipeId,
+      currentCost: {
+        totalCost,
+        costPerServing,
+        ingredientCosts: input.ingredients.map((ing) => ({
+          ingredient: ing.name,
+          cost: ing.quantity * ing.costPerUnit,
+        })),
+      },
+      optimizations: [],
+      marginAnalysis: {
+        currentMargin: 0,
+        optimizedMargin: 0,
+        targetMargin: input.goals?.targetMarginPercent ?? 0,
+      },
+      menuEngineering: {
+        category: 'dog',
+        popularity: 0,
+        profitability: 0,
+        recommendations: [],
+      },
+    };
   }
 
   protected async buildPrompt(input: RecipeOptimizationInput): Promise<string> {
@@ -152,31 +209,32 @@ Provide practical, implementable suggestions that maintain or improve quality.`;
       // Add validation rules
       this.addValidationRule({
         id: 'has_cost_breakdown',
-        validate: (data) => data.currentCost.ingredientCosts.length > 0,
+        validate: (data: RecipeOptimizationResult) => data.currentCost.ingredientCosts.length > 0,
         errorMessage: 'No ingredient cost breakdown provided',
         isCritical: true,
       });
 
       this.addValidationRule({
         id: 'has_optimizations',
-        validate: (data) => data.optimizations.length > 0,
+        validate: (data: RecipeOptimizationResult) => data.optimizations.length > 0,
         errorMessage: 'No optimization recommendations provided',
         isCritical: false,
       });
 
       this.addValidationRule({
         id: 'valid_menu_category',
-        validate: (data) => ['star', 'plowhorse', 'puzzle', 'dog'].includes(data.menuEngineering.category),
+        validate: (data: RecipeOptimizationResult) =>
+          ['star', 'plowhorse', 'puzzle', 'dog'].includes(data.menuEngineering.category),
         errorMessage: 'Invalid menu engineering category',
         isCritical: true,
       });
 
       this.addValidationRule({
         id: 'realistic_savings',
-        validate: (data) => 
-          data.optimizations.every(opt => 
-            opt.costSavings >= 0 && 
-            opt.costSavings <= data.currentCost.totalCost * 0.5
+        validate: (data: RecipeOptimizationResult) =>
+          data.optimizations.every(
+            (opt) =>
+              opt.costSavings >= 0 && opt.costSavings <= data.currentCost.totalCost * 0.5
           ),
         errorMessage: 'Cost savings estimates unrealistic',
         isCritical: false,
@@ -192,7 +250,7 @@ Provide practical, implementable suggestions that maintain or improve quality.`;
           targetMargin: input.goals?.targetMarginPercent || 0,
         },
         menuEngineering: parsed.menuEngineering,
-      };
+      } as RecipeOptimizationResult;
     } catch (error) {
       console.error('[RecipeOptimization] Failed to parse response:', error);
       throw new Error(`Failed to parse recipe optimization: ${error instanceof Error ? error.message : 'Unknown error'}`);

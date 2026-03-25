@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-store-id") || "";
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     // Call backend API to fetch WhatsApp stats
     const result = await apiJson<{
         status: "HEALTHY" | "DEGRADED";
@@ -21,9 +26,7 @@ export async function GET(request: NextRequest) {
     }>(
         `${process.env.BACKEND_API_URL}/api/settings/whatsapp/stats`,
         {
-            headers: {
-                "x-store-id": storeId,
-            },
+            headers: auth.headers,
         }
     );
 

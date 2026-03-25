@@ -6,6 +6,8 @@ import { Article, Plus, PencilSimple as Edit, Trash, Eye, EyeSlash, Star } from 
 import { logger } from "@vayva/shared";
 import { Button, Input } from "@vayva/ui";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface Post {
   id: string;
@@ -70,17 +72,59 @@ export default function PostsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Blog Posts</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage content and articles</p>
-        </div>
-        <Button onClick={() => { setEditingPost(null); resetForm(); setIsOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold">
-          <Plus size={18} className="mr-2" />
-          New Post
-        </Button>
-      </div>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button
+                  onClick={() => { setEditingPost(null); resetForm(); setIsOpen(true); }}
+                  className="bg-green-600 hover:bg-green-700 text-white h-10 rounded-xl font-semibold justify-between"
+                >
+                  <span>New post</span>
+                  <Plus size={18} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Published</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {published}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Drafts</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {draft}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title="Blog Posts"
+          subtitle="Manage content and articles"
+          actions={
+            <Button
+              onClick={() => { setEditingPost(null); resetForm(); setIsOpen(true); }}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 h-10 rounded-xl font-semibold"
+            >
+              <Plus size={18} className="mr-2" />
+              New Post
+            </Button>
+          }
+        />
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
@@ -206,28 +250,28 @@ export default function PostsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {p.status === "draft" && (
-                      <button
+                      <Button
                         onClick={() => handlePublish(p.id)}
                         className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                         title="Publish"
                       >
                         <Eye size={16} />
-                      </button>
+                      </Button>
                     )}
-                    <button
+                    <Button
                       onClick={() => openEdit(p)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit"
                     >
                       <Edit size={16} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => setDeleteConfirm({ id: p.id, title: p.title })}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete"
                     >
                       <Trash size={16} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -325,19 +369,19 @@ export default function PostsPage() {
             </div>
           </div>
           <div className="flex items-center justify-end mt-4">
-            <button
+            <Button
               onClick={() => setIsOpen(false)}
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={isSubmitting}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold ml-2"
             >
               {isSubmitting ? "Saving..." : editingPost ? "Update" : "Create"}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -348,21 +392,22 @@ export default function PostsPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Delete Post</h2>
           <p className="text-gray-700 mb-4">Delete "{deleteConfirm?.title}"?</p>
           <div className="flex items-center justify-end">
-            <button
+            <Button
               onClick={() => setDeleteConfirm(null)}
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => deleteConfirm && handleDelete(deleteConfirm.id)}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold ml-2"
             >
               Delete
-            </button>
+            </Button>
           </div>
         </div>
       </div>
+      </PageWithInsights>
     </div>
   );
 }

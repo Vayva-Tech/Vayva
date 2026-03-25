@@ -5,10 +5,10 @@ import React, { useState, useEffect } from "react";
 import { Button, Card, Icon, Input, Checkbox } from "@vayva/ui";
 import { toast } from "sonner";
 import { PERMISSION_GROUPS } from "@/lib/team/permissions";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { BackButton } from "@/components/ui/BackButton";
 
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 interface Role {
   id: string;
@@ -97,7 +97,7 @@ export default function RolesSettingsPage() {
 
   if (isEditing) {
     return (
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">
             {currentRole.id ? "Edit Role" : "Create Custom Role"}
@@ -177,28 +177,22 @@ export default function RolesSettingsPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-8">
-      <Breadcrumbs />
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-4xl font-black tracking-tight text-black">
-            Roles & Permissions
-          </h1>
-          <p className="text-gray-500">
-            Define custom access levels for your staff. Limit sensitive data
-            visibility.
-          </p>
-        </div>
-        <Button
-          onClick={() => {
-            setCurrentRole({ name: "", description: "", permissionIds: [] });
-            setIsEditing(true);
-          }}
-        >
-          <Icon name="Plus" size={18} className="mr-2" />
-          Create Role
-        </Button>
-      </div>
+    <div className="max-w-6xl space-y-8">
+      <PageHeader
+        title="Roles & Permissions"
+        subtitle="Define custom access levels for your staff. Limit sensitive data visibility."
+        actions={
+          <Button
+            onClick={() => {
+              setCurrentRole({ name: "", description: "", permissionIds: [] });
+              setIsEditing(true);
+            }}
+          >
+            <Icon name="Plus" size={18} className="mr-2" />
+            Create Role
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* System Roles */}

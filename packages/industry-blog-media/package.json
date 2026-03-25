@@ -11,11 +11,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "^5.9.0",
+    "@vayva/db": "workspace:*",
     "@vayva/industry-core": "workspace:*"
   },
   "devDependencies": {
+    "@types/react": "19.2.7",
     "@vayva/tsconfig": "workspace:*",
+    "react": "19.2.3",
     "typescript": "^5.3.0"
   },
   "peerDependencies": {

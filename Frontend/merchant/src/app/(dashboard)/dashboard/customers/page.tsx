@@ -1,8 +1,11 @@
 "use client";
-// @ts-nocheck
+import { Button } from "@vayva/ui";
 
 import { useState, useMemo } from "react";
 import useSWR from "swr";
+import Link from "next/link";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 import {
   Users,
   UserPlus,
@@ -241,13 +244,13 @@ export default function CustomersPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load customers</h3>
           <p className="text-sm text-gray-500 mb-4">There was a problem fetching your customer data. Please try again.</p>
-          <button
+          <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -295,22 +298,20 @@ export default function CustomersPage() {
   if (customers.length === 0) {
     return (
       <div className="min-h-screen space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customers</h1>
-            <p className="text-sm text-gray-500 mt-1">Manage and grow your customer relationships</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Customers"
+          subtitle="Manage and grow your customer relationships"
+        />
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
             <Users className="w-7 h-7 text-gray-400" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-1">No customers yet</h3>
           <p className="text-sm text-gray-500 max-w-sm mb-4">Your customers will appear as orders come in</p>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
+          <Button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
             <Plus className="w-4 h-4" />
             Add Customer
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -318,33 +319,86 @@ export default function CustomersPage() {
 
   return (
     <div className="min-h-screen space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customers</h1>
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick actions
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Link
+                  href="/dashboard/orders"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>View orders</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/analytics"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Analytics</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </Link>
+                <Link
+                  href="/dashboard/customers/insights"
+                  className="inline-flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <span>Smart insights</span>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                KPI snapshot
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Total</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {summary?.total?.toLocaleString() ?? customers.length}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                  <div className="text-xs text-gray-500">Returning</div>
+                  <div className="text-lg font-bold text-gray-900 mt-0.5">
+                    {summary?.returningPct ?? "--"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        <PageHeader
+          title={
+            <span className="inline-flex items-center gap-3">
+              <span>Customers</span>
               <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
                 {summary?.total?.toLocaleString() ?? customers.length}
               </span>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">Manage and grow your customer relationships</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => mutate()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
-          >
-            <RefreshCw size={16} />
-            Refresh
-          </button>
-          <button className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
-            <UserPlus size={16} />
-            Add Customer
-          </button>
-        </div>
-      </div>
+            </span>
+          }
+          subtitle="Manage and grow your customer relationships"
+          actions={
+            <>
+              <Button
+                onClick={() => mutate()}
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </Button>
+              <Button className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-colors shadow-sm">
+                <UserPlus size={16} />
+                Add Customer
+              </Button>
+            </>
+          }
+        />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -399,7 +453,7 @@ export default function CustomersPage() {
           {/* Segment Filter */}
           <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
             {segments.map((seg) => (
-              <button
+              <Button
                 key={seg}
                 onClick={() => {
                   setSegmentFilter(seg);
@@ -412,7 +466,7 @@ export default function CustomersPage() {
                 }`}
               >
                 {seg}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -511,16 +565,16 @@ export default function CustomersPage() {
               Showing {(currentPage - 1) * perPage + 1}–{Math.min(currentPage * perPage, filtered.length)} of {filtered.length} customers
             </p>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={14} />
                 Previous
-              </button>
+              </Button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
+                <Button
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
@@ -530,20 +584,22 @@ export default function CustomersPage() {
                   }`}
                 >
                   {page}
-                </button>
+                </Button>
               ))}
-              <button
+              <Button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
                 className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Next
                 <ChevronRight size={14} />
-              </button>
+              </Button>
             </div>
           </div>
         )}
       </div>
+      </PageWithInsights>
     </div>
   );
 }
+

@@ -24,7 +24,7 @@ export const GET = withVayvaAPI(
         timeEntries,
         trustAccounts,
         deadlines,
-        documents,
+        _documents,
         courtAppearances,
       ] = await Promise.all([
         prisma.case.findMany({

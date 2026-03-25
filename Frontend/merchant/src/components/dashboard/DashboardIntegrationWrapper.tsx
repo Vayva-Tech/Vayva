@@ -6,7 +6,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { DashboardProvider, useDashboard } from "@/providers/dashboard-provider";
+import {
+  DashboardProvider,
+  useDashboard,
+} from "@/providers/dashboard-provider";
+import type { PlanTier } from "@/lib/access-control/tier-limits";
 import { FeatureFlags } from '@/lib/feature-flags';
 
 interface DashboardWrapperProps {
@@ -17,9 +21,11 @@ interface DashboardWrapperProps {
 function DashboardContentWrapper({ children, initialIndustry }: DashboardWrapperProps) {
   const { featureFlags, currentTier } = useDashboard();
 
-  // Initialize feature flags when tier changes
+  // Initialize feature flags when tier changes (FREE maps to STARTER for limits)
   useEffect(() => {
-    featureFlags.initialize(currentTier);
+    const tier: PlanTier =
+      currentTier === "FREE" ? "STARTER" : currentTier;
+    featureFlags.initialize(tier);
   }, [currentTier, featureFlags]);
 
   return <>{children}</>;

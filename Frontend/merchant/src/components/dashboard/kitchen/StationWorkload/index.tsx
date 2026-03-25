@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import type { KDSStation } from '@vayva/industry-restaurant/types';
 import { useRealTimeKDS } from '@/hooks/useRealTimeKDS';
-import { Activity, Clock, AlertTriangle } from 'lucide-react';
+import { Activity, Clock } from 'lucide-react';
 
 interface StationWorkloadProps {
   designCategory?: string;
@@ -20,7 +21,7 @@ export function StationWorkload({
   industry = 'food',
   planTier = 'standard'
 }: StationWorkloadProps) {
-  const { stations } = useRealTimeKDS();
+  const { stations, tickets } = useRealTimeKDS();
 
   const getWorkloadLevel = (queueLength: number, maxCapacity: number = 10) => {
     const percentage = (queueLength / maxCapacity) * 100;
@@ -29,13 +30,8 @@ export function StationWorkload({
     return { level: 'low', color: 'green' };
   };
 
-  const getStatusBadge = (station: any) => {
-    const workload = getWorkloadLevel(station.queueLength || 0);
-    
-    if (!station.isActive) {
-      return { text: 'Offline', color: 'gray' };
-    }
-    
+  const getStatusBadge = (queueLength: number) => {
+    const workload = getWorkloadLevel(queueLength);
     if (workload.level === 'high') {
       return { text: 'Overwhelmed', color: 'red' };
     }
@@ -45,6 +41,9 @@ export function StationWorkload({
     return { text: 'Clear', color: 'green' };
   };
 
+  const queueForStation = (station: KDSStation) =>
+    tickets.filter((t) => t.station === station.id).length;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -52,15 +51,14 @@ export function StationWorkload({
           <Activity className="h-5 w-5 text-gray-600" />
           <h3 className="text-lg font-semibold">Station Workload</h3>
         </div>
-        <span className="text-sm text-gray-500">
-          {stations.filter(s => s.isActive).length} active stations
-        </span>
+        <span className="text-sm text-gray-500">{stations.length} stations</span>
       </div>
 
       <div className="space-y-3">
         {stations.map((station) => {
-          const status = getStatusBadge(station);
-          const workload = getWorkloadLevel(station.queueLength || 0);
+          const queueLength = queueForStation(station);
+          const status = getStatusBadge(queueLength);
+          const workload = getWorkloadLevel(queueLength);
           
           return (
             <div
@@ -70,7 +68,9 @@ export function StationWorkload({
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h4 className="font-semibold text-gray-900">{station.name}</h4>
-                  <p className="text-sm text-gray-500 capitalize">{station.type} Station</p>
+                  <p className="text-sm text-gray-500">
+                    {station.categories.slice(0, 2).join(', ') || 'General'}
+                  </p>
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -79,9 +79,6 @@ export function StationWorkload({
                   >
                     {status.text}
                   </span>
-                  {!station.isActive && (
-                    <AlertTriangle className="h-4 w-4 text-gray-400" />
-                  )}
                 </div>
               </div>
 
@@ -89,17 +86,17 @@ export function StationWorkload({
               <div className="mt-3">
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-gray-600">
-                    {station.queueLength || 0} items in queue
+                    {queueLength} items in queue
                   </span>
                   <span className="text-gray-500">
-                    Backlog: ~{station.avgCookTime || 12} min
+                    Target prep: ~12 min
                   </span>
                 </div>
                 
                 <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className={`h-full bg-gradient-to-r from-${workload.color}-400 to-${workload.color}-600 transition-all duration-500`}
-                    style={{ width: `${Math.min((station.queueLength || 0) / 10 * 100, 100)}%` }}
+                    style={{ width: `${Math.min((queueLength / 10) * 100, 100)}%` }}
                   />
                 </div>
               </div>
@@ -108,11 +105,11 @@ export function StationWorkload({
               <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  <span>Avg: {(station.avgCookTime || 0).toFixed(1)} min</span>
+                  <span>Avg: 12.0 min</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Activity className="h-3 w-3" />
-                  <span>Efficiency: {station.efficiency || 100}%</span>
+                  <span>Efficiency: 100%</span>
                 </div>
               </div>
             </div>

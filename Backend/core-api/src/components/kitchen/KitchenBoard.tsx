@@ -6,7 +6,7 @@ import { KitchenTicket } from "./KitchenTicket";
 import { Button } from "@vayva/ui";
 import {
   Spinner as Loader2,
-  ForkKnife as UtensilsCrossed,
+  ForkKnife as UtensilsCrossed
 } from "@phosphor-icons/react/ssr";
 
 import { apiJson } from "@/lib/api-client-shared";

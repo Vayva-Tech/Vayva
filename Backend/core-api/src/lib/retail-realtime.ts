@@ -1,5 +1,16 @@
-import { prisma } from '@vayva/db';
+import { prismaDelegates } from "@vayva/db";
 import { getRetailWebSocketServer } from '../websockets/retail-dashboard';
+
+type MiddlewareParams = {
+  model?: string;
+  action?: string;
+  args?: { where?: { id?: string } };
+};
+type MiddlewareNext = (params: unknown) => Promise<unknown>;
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
+}
 
 /**
  * Prisma middleware to trigger real-time WebSocket broadcasts
@@ -7,33 +18,35 @@ import { getRetailWebSocketServer } from '../websockets/retail-dashboard';
  */
 
 export function setupRetailRealtimeHooks() {
-  console.log('[Retail Realtime] Setting up Prisma middleware hooks');
+  console.warn('[Retail Realtime] Setting up Prisma middleware hooks');
 
   // Order lifecycle hooks
-  prisma.$use(async (params, next) => {
-    const result = await next(params);
+  prismaDelegates.$use(async (params: unknown, next: MiddlewareNext) => {
+    const p = params as MiddlewareParams;
+    const result = asRecord(await next(params));
 
-    if (params.model === 'Order') {
+    if (p.model === 'Order') {
       const wss = getRetailWebSocketServer();
+      const storeId = String(result.storeId ?? "");
       
-      if (params.action === 'create') {
+      if (p.action === 'create') {
         // New order created
-        wss?.broadcastToChannel(`store:${result.storeId}:orders`, {
+        wss?.broadcastToChannel(`store:${storeId}:orders`, {
           type: 'order_created',
           order: result,
         });
 
         // Also broadcast to general orders channel
-        wss?.broadcastToStore(result.storeId, 'orders', {
+        wss?.broadcastToStore(storeId, 'orders', {
           type: 'new_order',
-          orderId: result.id,
+          orderId: String(result.id ?? ""),
           amount: result.totalAmount,
         });
       }
 
-      if (params.action === 'update') {
+      if (p.action === 'update') {
         // Order status changed
-        wss?.broadcastToChannel(`store:${result.storeId}:orders`, {
+        wss?.broadcastToChannel(`store:${storeId}:orders`, {
           type: 'order_updated',
           order: result,
         });
@@ -44,39 +57,46 @@ export function setupRetailRealtimeHooks() {
   });
 
   // Inventory item hooks
-  prisma.$use(async (params, next) => {
-    const before = Date.now();
-    const result = await next(params);
-    const after = Date.now();
+  prismaDelegates.$use(async (params: unknown, next: MiddlewareNext) => {
+    const p = params as MiddlewareParams;
+    const _before = Date.now();
+    const existingId = p.args?.where?.id;
+    const oldItem =
+      p.model === "InventoryItem" && p.action === "update" && existingId
+        ? await prismaDelegates.inventoryItem.findUnique({ where: { id: existingId } })
+        : null;
 
-    if (params.model === 'InventoryItem') {
+    const result = asRecord(await next(params));
+    const _after = Date.now();
+
+    if (p.model === 'InventoryItem') {
       const wss = getRetailWebSocketServer();
+      const storeId = String(result.storeId ?? "");
       
-      if (params.action === 'update') {
+      if (p.action === 'update') {
         // Stock level changed
-        const oldItem = await prisma.inventoryItem.findUnique({
-          where: { id: result.id },
-        });
-
-        if (oldItem && oldItem.quantity !== result.quantity) {
-          wss?.broadcastToChannel(`store:${result.storeId}:inventory`, {
+        const quantity = typeof result.quantity === "number" ? result.quantity : 0;
+        const reorderPoint = typeof result.reorderPoint === "number" ? result.reorderPoint : 0;
+        const product = result.product as Record<string, unknown> | undefined;
+        if (oldItem && oldItem.quantity !== quantity) {
+          wss?.broadcastToChannel(`store:${storeId}:inventory`, {
             type: 'inventory_updated',
             productId: result.productId,
             previousStock: oldItem.quantity,
-            currentStock: result.quantity,
-            change: result.quantity - oldItem.quantity,
-            isLowStock: result.quantity <= result.reorderPoint,
+            currentStock: quantity,
+            change: quantity - oldItem.quantity,
+            isLowStock: quantity <= reorderPoint,
           });
 
           // Alert if low stock
-          if (result.quantity <= result.reorderPoint && 
+          if (quantity <= reorderPoint && 
               oldItem.quantity > oldItem.reorderPoint) {
-            wss?.broadcastToStore(result.storeId, 'alerts', {
+            wss?.broadcastToStore(storeId, 'alerts', {
               type: 'low_stock_alert',
               productId: result.productId,
-              productName: result.product?.name,
-              currentStock: result.quantity,
-              reorderPoint: result.reorderPoint,
+              productName: typeof product?.name === "string" ? product.name : undefined,
+              currentStock: quantity,
+              reorderPoint,
             });
           }
         }
@@ -87,37 +107,38 @@ export function setupRetailRealtimeHooks() {
   });
 
   // Store transfer hooks
-  prisma.$use(async (params, next) => {
-    const result = await next(params);
+  prismaDelegates.$use(async (params: unknown, next: MiddlewareNext) => {
+    const p = params as MiddlewareParams;
+    const result = asRecord(await next(params));
 
-    if (params.model === 'StoreTransfer') {
+    if (p.model === 'StoreTransfer') {
       const wss = getRetailWebSocketServer();
       
-      if (params.action === 'create' || params.action === 'update') {
+      if (p.action === 'create' || p.action === 'update') {
         // Broadcast to both stores involved in transfer
-        wss?.broadcastToChannel(`store:${result.fromStoreId}:transfers`, {
+        wss?.broadcastToChannel(`store:${String(result.fromStoreId ?? "")}:transfers`, {
           type: 'transfer_updated',
           transfer: result,
         });
 
         if (result.toStoreId) {
-          wss?.broadcastToChannel(`store:${result.toStoreId}:transfers`, {
+          wss?.broadcastToChannel(`store:${String(result.toStoreId)}:transfers`, {
             type: 'transfer_updated',
             transfer: result,
           });
         }
       }
 
-      if (params.action === 'update' && result.status === 'completed') {
+      if (p.action === 'update' && result.status === 'completed') {
         // Transfer completed - update inventory notifications
-        wss?.broadcastToStore(result.fromStoreId, 'notifications', {
+        wss?.broadcastToStore(String(result.fromStoreId ?? ""), 'notifications', {
           type: 'transfer_completed',
           transferId: result.id,
           direction: 'outbound',
         });
 
         if (result.toStoreId) {
-          wss?.broadcastToStore(result.toStoreId, 'notifications', {
+          wss?.broadcastToStore(String(result.toStoreId), 'notifications', {
             type: 'transfer_completed',
             transferId: result.id,
             direction: 'inbound',
@@ -130,24 +151,29 @@ export function setupRetailRealtimeHooks() {
   });
 
   // Customer/Loyalty program hooks
-  prisma.$use(async (params, next) => {
-    const result = await next(params);
+  prismaDelegates.$use(async (params: unknown, next: MiddlewareNext) => {
+    const p = params as MiddlewareParams;
+    const existingId = p.args?.where?.id;
+    const oldMember =
+      p.model === "LoyaltyMember" && p.action === "update" && existingId
+        ? await prismaDelegates.loyaltyMember.findUnique({ where: { id: existingId } })
+        : null;
 
-    if (params.model === 'LoyaltyMember') {
+    const result = asRecord(await next(params));
+
+    if (p.model === 'LoyaltyMember') {
       const wss = getRetailWebSocketServer();
+      const storeId = String(result.storeId ?? "");
       
-      if (params.action === 'update') {
+      if (p.action === 'update') {
         // Points changed or tier updated
-        const oldMember = await prisma.loyaltyMember.findUnique({
-          where: { id: result.id },
-        });
-
-        if (oldMember && oldMember.points !== result.points) {
-          wss?.broadcastToChannel(`store:${result.storeId}:loyalty`, {
+        const points = typeof result.points === "number" ? result.points : 0;
+        if (oldMember && oldMember.points !== points) {
+          wss?.broadcastToChannel(`store:${storeId}:loyalty`, {
             type: 'loyalty_updated',
             memberId: result.id,
-            pointsChange: result.points - oldMember.points,
-            newPoints: result.points,
+            pointsChange: points - oldMember.points,
+            newPoints: points,
             tier: result.tier,
           });
         }
@@ -157,7 +183,7 @@ export function setupRetailRealtimeHooks() {
     return result;
   });
 
-  console.log('[Retail Realtime] Prisma middleware hooks active');
+  console.warn('[Retail Realtime] Prisma middleware hooks active');
 }
 
 /**
@@ -168,7 +194,7 @@ export class RetailBroadcast {
   /**
    * Broadcast custom event to store channel
    */
-  static async toStore(storeId: string, type: string, data: any) {
+  static async toStore(storeId: string, type: string, data: unknown) {
     const wss = getRetailWebSocketServer();
     wss?.broadcastToStore(storeId, type, data);
   }
@@ -176,7 +202,7 @@ export class RetailBroadcast {
   /**
    * Broadcast to specific channel
    */
-  static async toChannel(channel: string, data: any) {
+  static async toChannel(channel: string, data: unknown) {
     const wss = getRetailWebSocketServer();
     wss?.broadcastToChannel(channel, data);
   }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
@@ -20,12 +19,12 @@ import {
   ShieldCheck,
   ChartBar,
 } from "@phosphor-icons/react";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { useProfessionalDashboard, useProfessionalAnalytics } from "@/hooks/useProfessionalServices";
 import { useThemedStyles } from "@/context/ThemeContext";
 import { FirmOverview } from "@/components/professional/FirmOverview";
 import { MatterPipeline } from "@/components/professional/MatterPipeline";
 import { ClientPortfolio } from "@/components/professional/ClientPortfolio";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export default function ProfessionalDashboardPage() {
   const { data, loading, error, refresh, lastUpdated } = useProfessionalDashboard();
@@ -59,42 +58,43 @@ export default function ProfessionalDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <Breadcrumbs />
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">
-            Professional Services Dashboard
-          </h1>
-          <p className="text-gray-700 mt-1">
-            Law Firm & Professional Services Management | {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+      <PageHeader
+        title="Professional Services Dashboard"
+        subtitle={
+          <>
+            Law Firm & Professional Services Management ·{" "}
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
-            {lastUpdated && (
-              <span className="ml-2 text-xs">
-                • Updated {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => void refresh()} className={buttonOutline}>
-            <RefreshCw size={18} className="mr-2" />
-            Refresh
-          </Button>
-          <Button className={button}>
-            <Plus size={18} className="mr-2" />
-            New Matter
-          </Button>
-          <Button variant="outline" className={buttonOutline}>
-            <FileText size={18} className="mr-2" />
-            Reports
-          </Button>
-        </div>
-      </div>
+            {lastUpdated ? (
+              <span className="ml-2 text-xs">• Updated {lastUpdated.toLocaleTimeString()}</span>
+            ) : null}
+          </>
+        }
+        actions={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => void refresh()}
+              className={buttonOutline}
+            >
+              <RefreshCw size={18} className="mr-2" />
+              Refresh
+            </Button>
+            <Button className={button}>
+              <Plus size={18} className="mr-2" />
+              New Matter
+            </Button>
+            <Button variant="outline" className={buttonOutline}>
+              <FileText size={18} className="mr-2" />
+              Reports
+            </Button>
+          </>
+        }
+      />
 
       {/* Firm Status Bar */}
       {data && (

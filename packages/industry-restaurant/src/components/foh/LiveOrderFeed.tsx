@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { RestaurantDashboardService, type Order } from '../../services';
-import { Card, CardContent, CardHeader, CardTitle , ScrollArea , Badge } from '@vayva/ui';
+import { Card, CardContent, CardHeader, Badge, Button } from "@vayva/ui";
+import { CardTitle, ScrollArea } from '../restaurant-ui';
 import { 
   Clock, 
   Utensils, 
@@ -24,7 +24,7 @@ export function LiveOrderFeed({ dashboardService }: LiveOrderFeedProps) {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const liveOrders = await dashboardService.getLiveOrders();
+        const liveOrders = dashboardService.getLiveOrderFeed();
         setOrders(liveOrders);
         setLoading(false);
       } catch (error) {
@@ -108,7 +108,7 @@ export function LiveOrderFeed({ dashboardService }: LiveOrderFeedProps) {
         <CardTitle className="flex items-center gap-2 text-orange-800">
           <Utensils className="h-5 w-5" />
           Live Order Feed
-          <Badge variant="secondary" className="ml-auto bg-orange-100 text-orange-700">
+          <Badge variant="outline" className="ml-auto bg-orange-100 text-orange-700">
             {orders.length} active
           </Badge>
         </CardTitle>
@@ -139,7 +139,7 @@ export function LiveOrderFeed({ dashboardService }: LiveOrderFeedProps) {
                   <div className="flex-grow min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-orange-900 truncate">
-                        {order.customerName || 'Walk-in Customer'}
+                        {order.customerId ? `Guest ${order.customerId.slice(0, 8)}…` : 'Walk-in Customer'}
                       </h3>
                       <Badge className={getOrderStatusColor(order.status)}>
                         <div className="flex items-center gap-1">
@@ -157,18 +157,18 @@ export function LiveOrderFeed({ dashboardService }: LiveOrderFeedProps) {
                     <div className="flex items-center gap-4 text-xs text-orange-500">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
-                        Table {order.tableNumber || 'N/A'}
+                        Table {order.tableId ?? 'N/A'}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {formatTimeAgo(new Date(order.createdAt))}
                       </div>
-                      {order.totalAmount && (
+                      {order.total != null && (
                         <span className="font-medium text-orange-700">
                           {new Intl.NumberFormat('en-US', {
                             style: 'currency',
                             currency: 'USD'
-                          }).format(order.totalAmount)}
+                          }).format(order.total)}
                         </span>
                       )}
                     </div>
@@ -176,13 +176,13 @@ export function LiveOrderFeed({ dashboardService }: LiveOrderFeedProps) {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col gap-2">
-                    <button className="px-3 py-1 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition-colors">
+                    <Button className="px-3 py-1 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition-colors">
                       View
-                    </button>
+                    </Button>
                     {order.status === 'pending' && (
-                      <button className="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors">
+                      <Button className="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors">
                         Accept
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>

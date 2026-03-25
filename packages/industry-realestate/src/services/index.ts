@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Real Estate Services
  * Business logic services for real estate operations

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Client, ClientType } from '../types';
 
 export class ClientService {

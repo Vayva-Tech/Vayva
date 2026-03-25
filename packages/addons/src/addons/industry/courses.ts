@@ -4,7 +4,7 @@
  * Course catalog and management system
  */
 
-import { AddOnDefinition } from '../../types';
+import type { AddOnDefinition } from '../../types';
 
 export const COURSES_ADDON: AddOnDefinition = {
   id: 'vayva.courses',

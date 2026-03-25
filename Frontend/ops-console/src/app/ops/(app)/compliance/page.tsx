@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@vayva/ui";
 
 import React from "react";
 import { useOpsQuery } from "@/hooks/useOpsQuery";
@@ -113,12 +114,12 @@ export default function CompliancePage(): React.JSX.Element {
       title="Compliance Dashboard"
       description="KYC, data exports, and regulatory reporting"
       headerActions={
-        <button
+        <Button
           onClick={() => refetch()}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowsClockwise className={`h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
-        </button>
+        </Button>
       }
     >
       {/* Overview Stats */}
@@ -351,10 +352,10 @@ export default function CompliancePage(): React.JSX.Element {
                   </td>
                   <td className="px-4 py-3">
                     {req.status === "COMPLETED" ? (
-                      <button className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+                      <Button className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 text-sm font-medium">
                         <Download size={14} />
                         Download
-                      </button>
+                      </Button>
                     ) : (
                       <span className="text-gray-400">-</span>
                     )}
@@ -403,14 +404,15 @@ export default function CompliancePage(): React.JSX.Element {
           </div>
         </div>
         <div className="mt-4 flex gap-3">
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+          <Button className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
             Review Deletion Queue
-          </button>
-          <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+          </Button>
+          <Button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
             Export Retention Report
-          </button>
+          </Button>
         </div>
       </div>
     </OpsPageShell>
   );
 }
+

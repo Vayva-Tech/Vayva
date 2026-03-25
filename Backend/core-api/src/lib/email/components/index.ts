@@ -4,7 +4,7 @@ import {
   Spacing,
   Typography,
   Borders,
-  Shadows,
+  Shadows
 } from "../design-system";
 function style(s: Record<string, string | number>): string {
   return Object.entries(s)

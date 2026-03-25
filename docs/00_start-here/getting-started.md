@@ -80,10 +80,8 @@ EMAIL_HELLO="hello@vayva.ng"
 EVOLUTION_API_URL="http://163.245.209.202:8080"
 EVOLUTION_API_KEY="your-evolution-api-key"
 
-# AI (Groq)
-GROQ_API_KEY="gsk_..."
-GROQ_ADMIN_KEY="gsk_..."
-GROQ_WHATSAPP_KEY="gsk_..."
+# AI (OpenRouter)
+OPENROUTER_API_KEY="sk-or-..."
 
 # File Storage (MinIO)
 MINIO_ENDPOINT="your-minio-endpoint"

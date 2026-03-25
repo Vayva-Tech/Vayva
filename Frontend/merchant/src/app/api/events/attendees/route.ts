@@ -47,7 +47,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const sessionStoreId = session?.user?.storeId;
+    if (!session?.user || !sessionStoreId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const attendee = await eventsService.addAttendee({
+    const attendee = await eventsService.addAttendee(sessionStoreId, {
       eventId,
       customerId,
       email,

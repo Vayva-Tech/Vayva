@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { Button, Card, Input, Label, Select, Textarea } from "@vayva/ui";
 import { toast } from "sonner";
 import { BackButton } from "@/components/ui/BackButton";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Plus, Trash as Trash2 } from "@phosphor-icons/react/ssr";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { apiJson } from "@/lib/api-client-shared";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { PageWithInsights } from "@/components/layout/PageWithInsights";
 
 interface TicketType {
   name: string;
@@ -92,13 +93,30 @@ export default function NewEventPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <Breadcrumbs />
-      <BackButton href="/dashboard/nightlife/events" label="Back to Events" />
+    <div className="space-y-6">
+      <PageWithInsights
+        insights={
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Tip
+              </div>
+              <div className="mt-2 text-sm font-semibold text-gray-900">
+                Add a flyer
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Events with clear posters and ticket types convert better.
+              </p>
+            </div>
+          </>
+        }
+      >
+        <div className="flex items-center gap-4">
+          <BackButton href="/dashboard/nightlife/events" label="Back to Events" />
+          <PageHeader title="Create New Event" subtitle="Set details, tickets, and a flyer." />
+        </div>
 
-      <h1 className="text-2xl font-bold mb-8">Create New Event</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
         {/* Basic Info */}
         <Card className="p-6">
           <h2 className="font-bold text-lg mb-4">Event Details</h2>
@@ -296,6 +314,7 @@ export default function NewEventPage() {
           </Button>
         </div>
       </form>
+      </PageWithInsights>
     </div>
   );
 }

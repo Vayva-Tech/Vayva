@@ -1,92 +1,111 @@
-// @ts-nocheck
-import { getServerSession } from 'next-auth';
-import { NextResponse } from 'next/server';
-import { authOptions } from '@/lib/auth';
-import { apiJson } from '@/lib/api-client-shared';
-import { handleApiError } from '@/lib/api-error-handler';
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
+import { handleApiError } from "@/lib/api-error-handler";
 
- // GET /api/content/calendar?storeId=xxx&filters...
- export async function GET(req: Request) {
-   try {
-     const session = await getServerSession(authOptions);
-     if (!session?.user) {
-       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-     }
+function backendBase(): string {
+  return process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
+}
 
-     const { searchParams } = new URL(req.url);
-     const storeId = searchParams.get('storeId');
-     const type = searchParams.get('type');
-     const status = searchParams.get('status');
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
 
-     if (!storeId) {
-       return NextResponse.json({ error: 'Missing storeId' }, { status: 400 });
-     }
+// GET /api/content/calendar?storeId=xxx&filters...
+export async function GET(req: Request) {
+  try {
+    const request = req as NextRequest;
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-     // Fetch content calendar via backend API
-     const queryParams = new URLSearchParams({ storeId });
-     if (type) queryParams.append('type', type);
-     if (status) queryParams.append('status', status);
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-     const result = await apiJson<{
-       success: boolean;
-       data?: any[];
-       error?: string;
-     }>(`${process.env.BACKEND_API_URL}/api/content/calendar?${queryParams.toString()}`);
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get("type");
+    const status = searchParams.get("status");
 
-     if (!result.success) {
-       throw new Error(result.error || 'Failed to fetch calendar');
-     }
+    const queryParams = new URLSearchParams({ storeId });
+    if (type) queryParams.append("type", type);
+    if (status) queryParams.append("status", status);
 
-     return NextResponse.json({ items: result.data || [] });
-   } catch (error: unknown) {
-     handleApiError(
-       error,
-       {
-         endpoint: '/api/content/calendar',
-         operation: 'FETCH_CONTENT_CALENDAR',
-       }
-     );
-     const errorMessage = error instanceof Error ? error.message : String(error);
-     return NextResponse.json(
-       { error: 'Failed to fetch calendar', message: errorMessage },
-       { status: 500 }
-     );
-   }
+    const result = await apiJson<{
+      success: boolean;
+      data?: unknown[];
+      error?: string;
+    }>(`${backendBase()}/api/content/calendar?${queryParams.toString()}`, {
+      headers: auth.headers,
+    });
+
+    if (!result.success) {
+      throw new Error(result.error || "Failed to fetch calendar");
+    }
+
+    const items = Array.isArray(result.data) ? result.data : [];
+    return NextResponse.json({ items });
+  } catch (error: unknown) {
+    handleApiError(error, {
+      endpoint: "/api/content/calendar",
+      operation: "FETCH_CONTENT_CALENDAR",
+    });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { error: "Failed to fetch calendar", message: errorMessage },
+      { status: 500 }
+    );
+  }
 }
 
 // POST /api/content/calendar
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const request = req as NextRequest;
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const {
-      storeId,
-      title,
-      type,
-      platform,
-      description,
-      scheduledDate,
-      assigneeId,
-      notes,
-    } = body;
-
-    if (!storeId || !title || !type || !scheduledDate) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await apiJson<{ success: boolean; data?: any; error?: string }>(
-      `${process.env.BACKEND_API_URL}/api/content/calendar`,
+    const body: unknown = await req.json();
+    if (!isRecord(body)) {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+
+    const title = body.title;
+    const type = body.type;
+    const platform = body.platform;
+    const description = body.description;
+    const scheduledDate = body.scheduledDate;
+    const assigneeId = body.assigneeId;
+    const notes = body.notes;
+
+    if (typeof title !== "string" || typeof type !== "string" || typeof scheduledDate !== "string") {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const result = await apiJson<{ success: boolean; data?: unknown; error?: string }>(
+      `${backendBase()}/api/content/calendar`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-store-id': storeId },
-        body: JSON.stringify({ storeId, title, type, platform, description, scheduledDate, assigneeId, notes }),
+        method: "POST",
+        headers: { ...auth.headers },
+        body: JSON.stringify({
+          storeId,
+          title,
+          type,
+          platform,
+          description,
+          scheduledDate,
+          assigneeId,
+          notes,
+        }),
       }
     );
 
@@ -94,7 +113,7 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Failed to create calendar item', message: errorMessage },
+      { error: "Failed to create calendar item", message: errorMessage },
       { status: 500 }
     );
   }
@@ -103,30 +122,41 @@ export async function POST(req: Request) {
 // PATCH /api/content/calendar?id=xxx - update status
 export async function PATCH(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const request = req as NextRequest;
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }
 
-    const body = await req.json();
-    const { status, contentId, storeId } = body;
-
-    if (!status) {
-      return NextResponse.json({ error: 'Missing status' }, { status: 400 });
+    const storeId = auth.user.storeId;
+    if (!storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await apiJson<{ success: boolean; data?: any; error?: string }>(
-      `${process.env.BACKEND_API_URL}/api/content/calendar?id=${id}`,
+    const body: unknown = await req.json();
+    if (!isRecord(body)) {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+
+    const status = body.status;
+    const contentId = body.contentId;
+
+    if (typeof status !== "string") {
+      return NextResponse.json({ error: "Missing status" }, { status: 400 });
+    }
+
+    const result = await apiJson<{ success: boolean; data?: unknown; error?: string }>(
+      `${backendBase()}/api/content/calendar?id=${encodeURIComponent(id)}`,
       {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'x-store-id': storeId || '' },
+        method: "PATCH",
+        headers: { ...auth.headers },
         body: JSON.stringify({ status, contentId }),
       }
     );
@@ -135,7 +165,7 @@ export async function PATCH(req: Request) {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Failed to update calendar item', message: errorMessage },
+      { error: "Failed to update calendar item", message: errorMessage },
       { status: 500 }
     );
   }

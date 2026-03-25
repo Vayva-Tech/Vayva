@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
  * GET /api/retail/customers/segments
  * Get customer segmentation data
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
     };
 
     const now = new Date();
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const _thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const _ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
     customers.forEach(customer => {
       const totalOrders = customer.orders.length;

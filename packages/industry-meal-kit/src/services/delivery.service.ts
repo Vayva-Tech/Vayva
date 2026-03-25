@@ -1,9 +1,9 @@
-// @ts-nocheck
 // ============================================================================
 // Delivery Service
 // ============================================================================
 
-import { PrismaClient, DeliverySlot } from '@prisma/client';
+import type { DeliverySlot } from '../../../../infra/db/src/generated/client';
+import { PrismaClient } from '@vayva/db';
 
 export class DeliveryService {
   private prisma: PrismaClient;

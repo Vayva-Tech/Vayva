@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Delivery Route Optimization Feature
  * Manages delivery route planning and optimization

@@ -77,14 +77,14 @@
 export {
   AffiliateReferralTracker,
   getReferralCookie,
-  clearReferralCookie,
+  clearReferralCookie
 } from "./ReferralTracker";
 
 // Widget components
 export {
   AffiliateWidget,
   AffiliateBadge,
-  ShareAndEarnButton,
+  ShareAndEarnButton
 } from "./AffiliateWidget";
 
 // Link generation

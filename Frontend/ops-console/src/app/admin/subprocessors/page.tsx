@@ -4,9 +4,9 @@
  * Manage subprocessors list - add, edit, remove
  * GDPR Article 28 compliance management
  */
-
 'use client';
 
+import { Button } from "@vayva/ui";
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Send, Download, Filter } from 'lucide-react';
 
@@ -78,17 +78,17 @@ export default function SubprocessorsAdmin() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+          <Button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             Export CSV
-          </button>
-          <button 
+          </Button>
+          <Button 
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Subprocessor
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -187,14 +187,14 @@ export default function SubprocessorsAdmin() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex gap-3">
-                    <button className="text-blue-600 hover:text-blue-900 flex items-center gap-1">
+                    <Button className="text-blue-600 hover:text-blue-900 flex items-center gap-1">
                       <Edit className="w-4 h-4" />
                       Edit
-                    </button>
-                    <button className="text-red-600 hover:text-red-900 flex items-center gap-1">
+                    </Button>
+                    <Button className="text-red-600 hover:text-red-900 flex items-center gap-1">
                       <Trash2 className="w-4 h-4" />
                       Remove
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -210,12 +210,12 @@ export default function SubprocessorsAdmin() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Add New Subprocessor</h2>
-                <button
+                <Button
                   onClick={() => setShowAddModal(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ✕
-                </button>
+                </Button>
               </div>
 
               <form className="space-y-6">
@@ -323,20 +323,20 @@ export default function SubprocessorsAdmin() {
                 </div>
 
                 <div className="flex gap-4 pt-6">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowAddModal(false)}
                     className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                   >
                     <Send className="w-5 h-5" />
                     Save & Notify Merchants
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
