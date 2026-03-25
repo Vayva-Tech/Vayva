@@ -602,7 +602,7 @@ export const AdminShell = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-xl hover:bg-gray-100 text-gray-500"
+                    className="rounded-xl hover:bg-transparent text-green-600"
                     aria-label="Close navigation"
                   >
                     <X size={20} />
@@ -783,7 +783,7 @@ export const AdminShell = ({
             <TrialBanner />
             <GlobalBanner />
             {/* Header: safe-area inset above the bar; frosted glass on small screens */}
-            <header className="w-full shrink-0 relative z-30 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
+            <header className="w-full shrink-0 relative z-30 sticky top-0 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
               <div className="pt-safe-top md:pt-0">
                 <div className="h-14 w-full px-4 md:px-6 flex items-center justify-between gap-2 md:gap-4">
                 {/* Left: Menu + Back */}
@@ -792,7 +792,7 @@ export const AdminShell = ({
                     <Button
                       type="button"
                       onClick={() => setMobileMenuOpen(true)}
-                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center text-green-600 hover:bg-transparent transition-colors"
                       aria-label="Open navigation menu"
                     >
                       <PanelLeftOpen size={22} strokeWidth={2} />

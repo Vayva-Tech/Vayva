@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import * as motion from "framer-motion/client";
+import { Skeleton } from "@/components/Skeleton";
 import {
   IconX as X,
   IconDownload as Download,
   IconBrandWhatsapp as WhatsappLogo,
   IconCircleCheck as CheckCircle,
 } from "@tabler/icons-react";
-import { Button } from "@vayva/ui";
+import { Button, Input } from "@vayva/ui";
 
 interface LeadMagnetPopupProps {
   // Controlled by parent for exit-intent
@@ -237,13 +238,23 @@ export function LeadMagnetPopup({ isOpen: controlledOpen, onClose, triggerOnExit
           </div>
         ) : (
           <div className="p-8 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-6">
-              <CheckCircle className="w-10 h-10 text-emerald-600" />
-            </div>
-            <h3 className="text-2xl font-black text-foreground mb-2">Guide Sent! 🎉</h3>
-            <p className="text-muted-foreground mb-6">
-              Check your email (and WhatsApp) for your free guide. Start implementing these hacks today!
-            </p>
+            {isLoading ? (
+              <div className="space-y-4">
+                <Skeleton variant="circular" width="80px" height="80px" className="mx-auto mb-6" />
+                <Skeleton className="w-48 h-8 mx-auto" />
+                <TextSkeleton lines={2} />
+              </div>
+            ) : (
+              <>
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-6">
+                  <CheckCircle className="w-10 h-10 text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-black text-foreground mb-2">Guide Sent! 🎉</h3>
+                <p className="text-muted-foreground mb-6">
+                  Check your email (and WhatsApp) for your free guide. Start implementing these hacks today!
+                </p>
+              </>
+            )}
             <div className="flex flex-col gap-3">
               <a
                 href="https://wa.me/2349160000000?text=Hi%20Vayva%2C%20I%20just%20downloaded%20the%20guide%20and%20want%20to%20learn%20more%20about%20the%20platform"

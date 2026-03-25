@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@/lib/prisma';
 import { verifyStripeSignature } from '@/lib/webhooks/signature';
 
 export async function POST(request: NextRequest) {

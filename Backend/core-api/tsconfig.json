@@ -88,6 +88,21 @@
             ],
             "@vayva/security/*": [
                 "../../packages/security/src/*"
+            ],
+            "@vayva/billing": [
+                "../../packages/billing/src/index.ts"
+            ],
+            "@vayva/billing/*": [
+                "../../packages/billing/src/*"
+            ],
+            "@vayva/integrations": [
+                "../../packages/integrations/src/index.ts"
+            ],
+            "@vayva/integrations/*": [
+                "../../packages/integrations/src/*"
+            ],
+            "@fashion-prisma": [
+                "../../packages/industry-fashion/src/lib/prisma-fashion.ts"
             ]
         }
     },

@@ -1,5 +1,5 @@
 import { prisma } from "@vayva/db";
-import { logger } from "../logger.js";
+import { logger } from "../logger";
 
 type Objection = "PRICE" | "DELIVERY" | "TRUST";
 

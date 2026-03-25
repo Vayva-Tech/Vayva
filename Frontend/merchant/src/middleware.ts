@@ -125,6 +125,15 @@ export async function middleware(request: NextRequest) {
   const token = getAuthToken(request);
   const isAuthenticated = !!token;
 
+  // 0. ROOT REDIRECT: Fail-safe redirect for `/` to prevent blank page
+  if (pathname === "/") {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/signin", request.url));
+    } else {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
   // 1. Security headers for all responses
   const response = NextResponse.next();
   response.headers.set("X-Frame-Options", "DENY");

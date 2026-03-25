@@ -20,8 +20,8 @@ export const AuthRightPanel = ({
     <div
       className="flex-1 lg:w-[60%] flex flex-col min-h-0 crm-canvas"
     >
-      {/* Top bar with help link only */}
-      <div className="h-14 px-6 lg:px-10 flex items-center justify-end border-b border-green-200/30">
+      {/* Top bar with help link only - Desktop only */}
+      <div className="h-14 px-6 lg:px-10 flex items-center justify-end border-b border-green-200/30 hidden lg:block">
         <Link
           href="/help"
           className="text-sm text-gray-500 hover:text-black font-medium transition-colors"
@@ -46,6 +46,16 @@ export const AuthRightPanel = ({
 
             {/* Form content */}
             <div>{children}</div>
+
+            {/* Mobile: Having trouble link between form and footer */}
+            <div className="mt-4 text-center lg:hidden">
+              <Link
+                href="/help"
+                className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors"
+              >
+                Having trouble? Get help
+              </Link>
+            </div>
 
             {/* Simple Footer Links - Centered under the form */}
             <div className="mt-6 flex items-center justify-center gap-4 text-sm text-gray-400">

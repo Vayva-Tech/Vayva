@@ -35,6 +35,7 @@ function PricingTierCard({
   plan,
   bulletLimit,
   motionProps,
+  billingPeriod,
 }: {
   plan: Plan;
   bulletLimit?: number;
@@ -44,11 +45,25 @@ function PricingTierCard({
     viewport?: { once: boolean };
     transition?: { delay: number };
   };
+  billingPeriod?: "monthly" | "quarterly";
 }): React.JSX.Element {
   const bullets =
     bulletLimit != null ? plan.bullets.slice(0, bulletLimit) : plan.bullets;
   const hasMore =
     bulletLimit != null && plan.bullets.length > bulletLimit;
+  
+  // Calculate price based on billing period
+  const basePrice = plan.monthlyAmount;
+  const quarterlyPrice = Math.round(basePrice * 3 * (1 - QUARTERLY_DISCOUNT_PERCENT / 100));
+  const displayPrice = billingPeriod === "quarterly" ? quarterlyPrice : basePrice;
+  const priceSuffix = billingPeriod === "quarterly" ? "/quarter" : "/month";
+  
+  // AI usage by plan
+  const aiUsage = {
+    starter: { messages: 600, autopilot: false, voice: false },
+    pro: { messages: 800, autopilot: true, autopilotRuns: 20, voice: false },
+    proPlus: { messages: 1200, autopilot: true, autopilotRuns: 60, voice: true },
+  }[plan.key as keyof typeof aiUsage];
 
   const inner = (
     <>
@@ -69,13 +84,56 @@ function PricingTierCard({
         {plan.promoBadge ? (
           <p className="mt-2 text-xs font-bold text-emerald-700 uppercase tracking-wide">{plan.promoBadge}</p>
         ) : null}
-        <div className="mt-6 flex items-end gap-2">
-          <span className="text-3xl sm:text-4xl font-semibold text-slate-900 tabular-nums">
-            {formatNGN(plan.monthlyAmount)}
-          </span>
-          <span className="text-sm text-slate-500 pb-1">/month</span>
+        
+        {/* Price with billing toggle */}
+        <div className="mt-6">
+          <div className="flex items-end gap-2">
+            <span className="text-3xl sm:text-4xl font-semibold text-slate-900 tabular-nums">
+              {formatNGN(displayPrice)}
+            </span>
+            <span className="text-sm text-slate-500 pb-1">{priceSuffix}</span>
+          </div>
+          {billingPeriod === "quarterly" && (
+            <p className="mt-1 text-xs text-emerald-600 font-medium">
+              Save {QUARTERLY_DISCOUNT_PERCENT}% vs monthly
+            </p>
+          )}
         </div>
-        <ul className="mt-6 space-y-2.5 text-sm flex-grow">
+        
+        {/* AI Usage Section */}
+        <div className="mt-5 pt-5 border-t border-slate-100">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">AI included</p>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-start gap-2">
+              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-slate-700"><span className="font-semibold">{aiUsage.messages}</span> AI messages/mo</span>
+            </li>
+            {aiUsage.autopilot ? (
+              <li className="flex items-start gap-2">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <span className="text-slate-700"><span className="font-semibold">{aiUsage.autopilotRuns}</span> Autopilot runs/mo</span>
+              </li>
+            ) : (
+              <li className="flex items-start gap-2 opacity-50">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-slate-300 shrink-0" />
+                <span className="text-slate-500">Autopilot not included</span>
+              </li>
+            )}
+            {aiUsage.voice ? (
+              <li className="flex items-start gap-2">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <span className="text-slate-700">Voice notes enabled</span>
+              </li>
+            ) : (
+              <li className="flex items-start gap-2 opacity-50">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-slate-300 shrink-0" />
+                <span className="text-slate-500">Voice not included</span>
+              </li>
+            )}
+          </ul>
+        </div>
+        
+        <ul className="mt-5 space-y-2.5 text-sm flex-grow">
           {bullets.map((feature) => (
             <li key={feature} className="flex items-start gap-3">
               <span className="mt-1.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
@@ -93,6 +151,11 @@ function PricingTierCard({
             {plan.ctaLabel}
           </Button>
         </Link>
+        <div className="mt-4 text-center">
+          <a href="#plan-comparison" className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1">
+            Compare plans →
+          </a>
+        </div>
       </div>
     </>
   );
@@ -116,6 +179,7 @@ function PricingTierCard({
 
 export function NewPricingClient(): React.JSX.Element {
   const [faqExpanded, setFaqExpanded] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "quarterly">("monthly");
   const { starterFirstMonthFree } = useMarketingOffer();
   const offerCopy = getOfferCopy(starterFirstMonthFree);
   const displayPlans = useMemo(
@@ -177,10 +241,41 @@ export function NewPricingClient(): React.JSX.Element {
             AI automation and local payments on every plan.
             <span className="hidden md:inline">
               {" "}
-              At checkout, quarterly billing saves {QUARTERLY_DISCOUNT_PERCENT}%
-              vs three monthly payments.
+              Quarterly billing saves {QUARTERLY_DISCOUNT_PERCENT}% vs monthly.
             </span>
           </motion.p>
+          
+          {/* Billing Period Toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 flex items-center justify-center gap-3"
+          >
+            <button
+              onClick={() => setBillingPeriod("monthly")}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                billingPeriod === "monthly"
+                  ? "bg-slate-900 text-white shadow-md"
+                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingPeriod("quarterly")}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+                billingPeriod === "quarterly"
+                  ? "bg-slate-900 text-white shadow-md"
+                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              Quarterly
+              <span className="text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full">
+                Save {QUARTERLY_DISCOUNT_PERCENT}%
+              </span>
+            </button>
+          </motion.div>
         </div>
       </section>
 
@@ -191,6 +286,7 @@ export function NewPricingClient(): React.JSX.Element {
             <PricingTierCard
               key={plan.key}
               plan={plan}
+              billingPeriod={billingPeriod}
               motionProps={{
                 initial: { opacity: 0, y: 30 },
                 whileInView: { opacity: 1, y: 0 },
@@ -210,117 +306,16 @@ export function NewPricingClient(): React.JSX.Element {
         >
           {displayPlans.map((plan) => (
             <MarketingSnapItem key={plan.key}>
-              <PricingTierCard plan={plan} bulletLimit={MOBILE_BULLET_CAP} />
+              <PricingTierCard plan={plan} bulletLimit={MOBILE_BULLET_CAP} billingPeriod={billingPeriod} />
             </MarketingSnapItem>
           ))}
         </MarketingSnapRow>
-      </section>
-
-      {/* AI usage packages */}
-      <section className="py-12 sm:py-20 border-t border-slate-200/70">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-3xl mx-auto">
-            <p className="text-xs uppercase tracking-[0.35em] text-emerald-600 font-semibold">
-              AI usage packages
-            </p>
-            <h2 className="mt-3 sm:mt-4 text-2xl sm:text-3xl font-black text-balance">
-              Clear AI limits. No surprises.
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-600">
-              AI usage is measured in <span className="font-semibold">AI messages</span>. One
-              AI reply typically uses 1 message. Heavy features (Autopilot + voice) cost more.
-            </p>
-          </div>
-
-          <div className="mt-10 grid md:grid-cols-3 gap-6">
-            <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Starter</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                For daily sales chats and support.
-              </p>
-              <ul className="text-sm text-slate-700 space-y-2">
-                <li>
-                  AI messages: <span className="font-semibold">600 / month</span>
-                </li>
-                <li>
-                  Autopilot: <span className="font-semibold">Not included</span>
-                </li>
-                <li>
-                  Voice notes: <span className="font-semibold">Not included</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-[28px] border border-emerald-200 bg-emerald-50/40 p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Pro</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                More volume + Autopilot insights.
-              </p>
-              <ul className="text-sm text-slate-700 space-y-2">
-                <li>
-                  AI messages: <span className="font-semibold">800 / month</span>
-                </li>
-                <li>
-                  Autopilot: <span className="font-semibold">20 runs / month</span>
-                </li>
-                <li>
-                  Autopilot cost: <span className="font-semibold">10 AI messages</span> per run
-                </li>
-                <li>
-                  Voice notes: <span className="font-semibold">Not included</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Pro+</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                Everything unlocked (with caps).
-              </p>
-              <ul className="text-sm text-slate-700 space-y-2">
-                <li>
-                  AI messages: <span className="font-semibold">1,200 / month</span>
-                </li>
-                <li>
-                  Autopilot: <span className="font-semibold">60 runs / month</span>
-                </li>
-                <li>
-                  Autopilot cost: <span className="font-semibold">10 AI messages</span> per run
-                </li>
-                <li>
-                  Voice notes: <span className="font-semibold">Enabled</span> (max 60s each)
-                </li>
-                <li>
-                  Voice cost: <span className="font-semibold">5 AI messages</span> per voice note
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8 rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h4 className="font-semibold text-slate-900">Need more AI?</h4>
-                <p className="text-sm text-slate-600">
-                  Buy message packs anytime from your dashboard.
-                </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3">
-                  <p className="font-semibold text-slate-900">+250 messages</p>
-                  <p className="text-slate-600">₦2,000</p>
-                </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3">
-                  <p className="font-semibold text-slate-900">+1,000 messages</p>
-                  <p className="text-slate-600">₦5,000</p>
-                </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3">
-                  <p className="font-semibold text-slate-900">+3,000 messages</p>
-                  <p className="text-slate-600">₦12,000</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        
+        {/* Mobile-only: Jump to comparison link */}
+        <div className="md:hidden text-center mt-6">
+          <a href="#plan-comparison" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1">
+            Jump to full comparison →
+          </a>
         </div>
       </section>
 

@@ -2,6 +2,8 @@
  * Nightlife Industry Services
  */
 
+export { NightlifeService } from './nightlife.service';
+
 export { NightlifePromoterService } from './nightlife-promoter.service';
 export type { Promotion, GuestListEntry, PromotionConfig } from './nightlife-promoter.service';
 

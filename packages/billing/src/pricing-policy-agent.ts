@@ -1,6 +1,6 @@
-import type { PlanTier, TierLimits, UsageMetric } from '@/lib/access-control/tier-limits';
-import { TIER_LIMITS, TIER_TRIAL_PERIODS, canAccessIndustryDashboards, canUseAI, getAITokenQuota } from '@/lib/access-control/tier-limits';
-import { logger } from '../logger';
+import type { PlanTier, TierLimits, UsageMetric } from './tier-limits';
+import { TIER_LIMITS, TIER_TRIAL_PERIODS, canAccessIndustryDashboards, canUseAI, getAITokenQuota } from './tier-limits';
+import { logger } from './logger';
 
 /**
  * Centralized Pricing Policy Agent

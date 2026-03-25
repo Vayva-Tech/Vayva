@@ -131,25 +131,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       logger.warn("[Contact Form] RESEND_API_KEY not configured, skipping email");
     }
 
-    // Persist to RescueIncident for Ops visibility
-    await prisma.rescueIncident?.create({
-      data: {
-        surface: "MARKETING_CONTACT" as any,
-        severity: "LOW",
-        errorType: "CONTACT_FORM_SUBMISSION",
-        errorMessage: `[Subject: ${body.subject}] from ${body.email}`,
-        fingerprint: `contact-${Date.now()}-${Math.random()}`,
-        status: "OPEN",
-        diagnostics: {
-          name: `${body.firstName} ${body.lastName}`,
-          email: body.email,
-          message: body.message,
-          subject: body.subject,
-          source: body.source || "marketing_site",
-          emailSent,
+    // Persist to RescueIncident for Ops visibility (never fail request if DB is unavailable)
+    try {
+      await prisma.rescueIncident?.create({
+        data: {
+          surface: "MARKETING_CONTACT" as any,
+          severity: "LOW",
+          errorType: "CONTACT_FORM_SUBMISSION",
+          errorMessage: `[Subject: ${body.subject}] from ${body.email}`,
+          fingerprint: `contact-${Date.now()}-${Math.random()}`,
+          status: "OPEN",
+          diagnostics: {
+            name: `${body.firstName} ${body.lastName}`,
+            email: body.email,
+            message: body.message,
+            subject: body.subject,
+            source: body.source || "marketing_site",
+            emailSent,
+          },
         },
-      },
-    });
+      });
+    } catch (dbError: unknown) {
+      const dbErrMsg = dbError instanceof Error ? dbError.message : String(dbError);
+      logger.warn("[Contact Form] DB persist failed (non-blocking)", { error: dbErrMsg });
+      // Continue - don't fail the request just because DB write failed
+    }
 
     return NextResponse.json({ success: true, message: "Message received" });
   } catch (error: unknown) {

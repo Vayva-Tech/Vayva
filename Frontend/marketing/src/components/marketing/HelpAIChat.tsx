@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@vayva/ui";
+import { Skeleton } from "@/components/Skeleton";
 import {
   IconSend as Send,
   IconSparkles as Sparkles,
@@ -98,7 +99,7 @@ export function HelpAIChat(): React.JSX.Element {
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
       >
-        {messages.length === 0 && (
+        {messages.length === 0 && !isLoading && (
           <div className="h-full flex flex-col items-center justify-center text-center space-y-6 px-4">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
               <MessageSquare className="w-6 h-6 text-primary" />
@@ -121,6 +122,15 @@ export function HelpAIChat(): React.JSX.Element {
                   {prompt}
                 </Button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {isLoading && messages[messages.length - 1]?.role === "user" && (
+          <div className="flex justify-start">
+            <div className="max-w-[85%] px-4 py-3 rounded-2xl bg-muted space-y-2">
+              <Skeleton className="w-32 h-4" />
+              <Skeleton className="w-48 h-4" />
             </div>
           </div>
         )}

@@ -1,4 +1,5 @@
 import React from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NewPricingClient } from "@/components/marketing/NewPricingClient";
 import Script from "next/script";
 import { readStarterFirstMonthFreeEnabled } from "@/lib/read-starter-first-month-free";
@@ -59,7 +60,25 @@ export default async function PricingPage(): Promise<React.JSX.Element> {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(generateFaqSchema(faqData)) }}
       />
-      <NewPricingClient />
+      <ErrorBoundary 
+        name="Pricing Page" 
+        fallback={
+          <div className="flex min-h-[600px] items-center justify-center p-8">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-red-900 mb-2">Unable to load pricing</h3>
+              <p className="text-red-700 mb-4">Please refresh the page or try again later.</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              >
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        }
+      >
+        <NewPricingClient />
+      </ErrorBoundary>
     </div>
   );
 }

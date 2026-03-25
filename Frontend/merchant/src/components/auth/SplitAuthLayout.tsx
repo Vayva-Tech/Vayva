@@ -37,13 +37,13 @@ export const SplitAuthLayout = ({
       />
 
       {/* Mobile header - Only visible on mobile */}
-      <div className="lg:hidden bg-white  p-6 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="lg:hidden bg-white p-6 border-b border-gray-100">
+        <a href="https://vayva.ng" className="flex items-center gap-2">
           <Logo size="md" showText={false} disableLink />
           <span className="font-bold text-2xl tracking-tight text-black">
             Merchant
           </span>
-        </Link>
+        </a>
       </div>
 
       {/* Right Panel - Form area */}

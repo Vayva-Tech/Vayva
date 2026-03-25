@@ -173,7 +173,7 @@ export class SamlSsoProvider {
       callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/saml/acs`,
       entryPoint: idp.ssoUrl,
       issuer: `vayva-${process.env.NODE_ENV}`,
-      cert: idp.certificate,
+      idpCert: idp.certificate,
       privateKey: process.env.SAML_PRIVATE_KEY,
       decryptionPvk: process.env.SAML_PRIVATE_KEY,
       signatureAlgorithm: 'sha256',

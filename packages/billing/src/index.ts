@@ -40,6 +40,16 @@ export type {
   Contract,
 } from './revenue-recognition';
 
+// Pricing Policy Agent
+export {
+  PricingPolicyAgent,
+  pricingPolicyAgent,
+  type PricingPolicy,
+  type Subscription,
+  type AddonPurchase,
+  type UsageStats,
+} from './pricing-policy-agent';
+
 // Constants
 export {
   OVERAGE_RATES,

@@ -61,3 +61,9 @@ export { cohortAnalyzer, CohortAnalyzer } from './cohort-analyzer';
 export { funnelAnalyzer, FunnelAnalyzer } from './funnel-analyzer';
 export { npsSystem, NpsSystem } from './nps-system';
 export { predictiveAnalytics, PredictiveAnalytics, InsightType } from './predictive-analytics';
+
+// Also export from legacy file names for backwards compatibility
+export { cohortAnalyzer as cohortAnalyzerLegacy } from './cohort';
+export { funnelAnalyzer as funnelAnalyzerLegacy } from './funnel';
+export { npsSystem as npsSystemLegacy } from './nps';
+export { predictiveAnalytics as predictiveAnalyticsLegacy } from './predictive';

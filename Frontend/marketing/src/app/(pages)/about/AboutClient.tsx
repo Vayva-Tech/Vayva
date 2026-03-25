@@ -113,6 +113,9 @@ export function AboutClient(): React.JSX.Element {
               on tasks that should take minutes.
             </p>
             <p>
+              Founded in Q4 2025, we spent months building and refining the platform in close partnership with local merchants. After extensive testing and development throughout late 2025 and early 2026, we officially launched at the end of Q1 2026.
+            </p>
+            <p>
               We built Vayva because every merchant deserves the same powerful
               technology that drives the world&apos;s best businesses — designed
               from the ground up for how African commerce actually works.

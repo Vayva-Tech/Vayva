@@ -143,9 +143,24 @@ const StatusPill = ({ status, count }: { status: string; count: number }) => {
 export function ProDashboardMarketing() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
+  // Mock data matching merchant dashboard structure
+  const metrics = [
+    { key: "total-revenue", value: 2400000, change: 12.5, isPositive: true },
+    { key: "orders", value: 384, change: 8.2, isPositive: true },
+    { key: "customers", value: 1247, change: 5.1, isPositive: true },
+    { key: "conversion-rate", value: 3.8, change: -0.4, isPositive: false },
+  ];
+
+  const alerts = [
+    { id: "1", title: "Low stock alert", message: "15 products are running low on inventory", severity: "warning" as const },
+    { id: "2", title: "Payment pending", message: "₦125,000 in payments awaiting confirmation", severity: "info" as const },
+  ];
+
   return (
-    <div className="w-full min-w-0 max-sm:overflow-x-auto max-sm:rounded-2xl max-sm:border max-sm:border-gray-200/70 max-sm:shadow-sm [-webkit-overflow-scrolling:touch]">
-      <div className="flex min-h-[520px] sm:min-h-[780px] bg-gray-50/80 min-w-[900px] w-max sm:min-w-0 sm:w-full">
+    <div className="w-full min-w-0 max-sm:overflow-hidden max-sm:rounded-2xl max-sm:border max-sm:border-gray-200/70 max-sm:shadow-sm">
+      {/* Mobile: scale down to fit, Desktop: normal size */}
+      <div className="max-sm:scale-[0.45] max-sm:origin-top-left max-sm:w-[1000px] max-sm:-ml-[10%]">
+        <div className="flex min-h-[520px] sm:min-h-[780px] bg-gray-50/80 min-w-[900px] w-max sm:min-w-0 sm:w-full">
       {/* ============================================================== */}
       {/* SIDEBAR — Collapsed by default, expands on hover               */}
       {/* ============================================================== */}
@@ -387,79 +402,164 @@ export function ProDashboardMarketing() {
 
         {/* Dashboard Content */}
         <div className="flex-1 p-5 overflow-auto">
-          {/* Page Header */}
-          <div className="flex items-start justify-between mb-5">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Dashboard</h2>
-              <p className="text-sm text-gray-500 mt-0.5 max-w-lg">
-                Monitor sales, track orders, and manage your business.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Time filter */}
-              <div className="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 cursor-pointer hover:bg-gray-50">
-                <Clock size={12} className="text-gray-400" />
-                <span>Last 30 days</span>
-                <ChevronDown size={11} className="text-gray-400" />
+          {/* Page Header - Matching Merchant Dashboard Structure */}
+          <div className="mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-2xl font-bold text-gray-900 tracking-tight truncate">
+                  Fashion & Apparel Dashboard
+                </div>
+                <div className="text-sm text-gray-500 mt-1">
+                  Track your fashion business performance • Last updated just now • <span className="capitalize">pro plan</span>
+                </div>
               </div>
-              {/* Team Avatars */}
-              <div className="flex -space-x-2 ml-2">
-                {[
-                  { color: "bg-orange-200", initials: "AO" },
-                  { color: "bg-blue-200", initials: "MK" },
-                  { color: "bg-green-200", initials: "CN" },
-                ].map((m, i) => (
-                  <div
-                    key={i}
-                    className={`w-8 h-8 rounded-full ${m.color} border-2 border-white flex items-center justify-center text-xs font-medium text-gray-600`}
-                  >
-                    {m.initials}
-                  </div>
-                ))}
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <Button type="button" variant="ghost" size="sm" className="h-auto p-2" aria-label="Settings">
+                  <Settings size={16} className="text-gray-400" />
+                </Button>
+                <Button type="button" variant="outline" size="sm" className="h-auto" disabled={false}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-2 animate-spin"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                  Refresh
+                </Button>
               </div>
-              <Button type="button" variant="ghost" className="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors p-0" aria-label="Add team member">
-                <Plus size={12} className="text-gray-400" />
-              </Button>
             </div>
           </div>
 
-          {/* ============================================================ */}
-          {/* 4 KPI CARDS — Revenue, Orders, Customers, Conversion         */}
-          {/* ============================================================ */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
-            <KPICard
-              icon={DollarSign}
-              label="Total Revenue"
-              value="₦2.4M"
-              change="12.5%"
-              positive={true}
-              accent="bg-green-500"
-            />
-            <KPICard
-              icon={ShoppingCart}
-              label="Orders"
-              value="384"
-              change="8.2%"
-              positive={true}
-              accent="bg-blue-500"
-            />
-            <KPICard
-              icon={Users}
-              label="Customers"
-              value="1,247"
-              change="5.1%"
-              positive={true}
-              accent="bg-purple-500"
-            />
-            <KPICard
-              icon={Eye}
-              label="Conversion Rate"
-              value="3.8%"
-              change="0.4%"
-              positive={false}
-              accent="bg-orange-500"
-            />
-          </div>
+          {/* Key Metrics Grid - Matching Merchant Dashboard */}
+          <section className="mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="h-5 w-5 text-gray-500" />
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Key Performance Indicators</h3>
+                <p className="text-xs text-gray-500">Track your most important metrics</p>
+              </div>
+            </div>
+            
+            <div
+              className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible snap-x snap-mandatory md:snap-none"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              {/* Total Revenue */}
+              <div className="max-md:snap-center shrink-0 w-[min(18rem,calc(100vw-4.5rem))] md:w-auto md:shrink">
+                <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center">
+                      <DollarSign size={17} className="text-white" />
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Pencil size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Maximize2 size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <MoreHorizontal size={13} className="text-gray-400" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight">₦2.4M</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-500">Total Revenue</p>
+                    <span className="flex items-center gap-0.5 text-[11px] font-semibold text-green-600">
+                      <ArrowUpRight size={11} />
+                      12.5%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Orders */}
+              <div className="max-md:snap-center shrink-0 w-[min(18rem,calc(100vw-4.5rem))] md:w-auto md:shrink">
+                <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center">
+                      <ShoppingCart size={17} className="text-white" />
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Pencil size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Maximize2 size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <MoreHorizontal size={13} className="text-gray-400" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight">384</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-500">Orders</p>
+                    <span className="flex items-center gap-0.5 text-[11px] font-semibold text-green-600">
+                      <ArrowUpRight size={11} />
+                      8.2%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customers */}
+              <div className="max-md:snap-center shrink-0 w-[min(18rem,calc(100vw-4.5rem))] md:w-auto md:shrink">
+                <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-purple-500 flex items-center justify-center">
+                      <Users size={17} className="text-white" />
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Pencil size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Maximize2 size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <MoreHorizontal size={13} className="text-gray-400" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight">1,247</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-500">Customers</p>
+                    <span className="flex items-center gap-0.5 text-[11px] font-semibold text-green-600">
+                      <ArrowUpRight size={11} />
+                      5.1%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conversion Rate */}
+              <div className="max-md:snap-center shrink-0 w-[min(18rem,calc(100vw-4.5rem))] md:w-auto md:shrink">
+                <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center">
+                      <Eye size={17} className="text-white" />
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Pencil size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <Maximize2 size={13} className="text-gray-400" />
+                      </Button>
+                      <Button type="button" variant="ghost" className="p-1 h-auto hover:bg-gray-100 rounded-lg transition-colors">
+                        <MoreHorizontal size={13} className="text-gray-400" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight">3.8%</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-500">Conversion Rate</p>
+                    <span className="flex items-center gap-0.5 text-[11px] font-semibold text-red-500">
+                      <ArrowDownRight size={11} />
+                      0.4%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* ============================================================ */}
           {/* ROW 2: Revenue Chart + Order Status + AI Insights             */}
@@ -628,6 +728,7 @@ export function ProDashboardMarketing() {
         </div>
       </div>
       </div>
+      </div> {/* Close scale wrapper */}
     </div>
   );
 }

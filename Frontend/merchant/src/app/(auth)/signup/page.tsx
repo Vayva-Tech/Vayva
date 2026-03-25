@@ -13,8 +13,6 @@ export default function SignupPage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [storeSlug, setStoreSlug] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,22 +22,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [slugError, setSlugError] = useState<string | null>(null);
-
-  // Generate store slug from business name
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
-  const validateSlug = (value: string) => {
-    if (!value) return "Store URL is required";
-    if (value.length < 3) return "Must be at least 3 characters";
-    if (!/^[a-z0-9-]+$/.test(value)) return "Only lowercase letters, numbers, and hyphens allowed";
-    return undefined;
-  };
 
   // RFC 5322 compliant email validation
   const validateEmail = (value: string) => {
@@ -60,22 +42,14 @@ export default function SignupPage() {
       setError("Passwords do not match");
       return;
     }
-    const slugError = validateSlug(storeSlug);
-    if (slugError) {
-      setSlugError(slugError);
-      return;
-    }
     setLoading(true);
     setError(null);
-    setSlugError(null);
     try {
       await AuthService.register({
         email,
         password,
         firstName,
         lastName,
-        storeName: businessName,
-        storeSlug,
       });
       router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err: unknown) {
@@ -146,52 +120,7 @@ export default function SignupPage() {
               }
             }}
             required
-            data-testid="auth-signup-business-name"
           />
-          <p className="text-xs text-gray-400">
-            The official name of your business
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="storeSlug">
-            Your storefront URL
-            <span className="text-gray-400 font-normal ml-1">
-              (yourstore.vayva.ng)
-            </span>
-          </Label>
-          <div className="flex items-center gap-2">
-            <Input
-              id="storeSlug"
-              type="text"
-              placeholder="yourstore"
-              value={storeSlug}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setStoreSlug(e.target?.value);
-                if (slugError) setSlugError(null);
-              }}
-              onBlur={() => {
-                const err = validateSlug(storeSlug);
-                if (err) setSlugError(err);
-              }}
-              required
-              data-testid="auth-signup-store-slug"
-              aria-invalid={!!slugError}
-              aria-describedby={slugError ? "slug-error" : undefined}
-              className={slugError ? "border-red-400 focus:border-red-500 focus:ring-red-200" : ""}
-            />
-            <span className="text-sm text-gray-400 whitespace-nowrap">
-              .vayva.ng
-            </span>
-          </div>
-          {slugError && (
-            <p id="slug-error" className="text-xs text-red-600 mt-1" role="alert">
-              {slugError}
-            </p>
-          )}
-          <p className="text-xs text-gray-400">
-            Your unique storefront address - customers will visit this URL
-          </p>
         </div>
 
         <div className="space-y-2">
@@ -311,7 +240,6 @@ export default function SignupPage() {
             By creating an account, you agree to our{" "}
             <Link
               href="/legal/terms"
-              target="_blank"
               className="text-gray-900 font-medium underline"
             >
               Terms
@@ -319,7 +247,6 @@ export default function SignupPage() {
             ,{" "}
             <Link
               href="/legal/privacy"
-              target="_blank"
               className="text-gray-900 font-medium underline"
             >
               Privacy
@@ -327,7 +254,6 @@ export default function SignupPage() {
             , and{" "}
             <Link
               href="/legal/eula"
-              target="_blank"
               className="text-gray-900 font-medium underline"
             >
               EULA

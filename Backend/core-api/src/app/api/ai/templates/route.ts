@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/api-handler";
-import { PERMISSIONS } from "@/lib/permissions";
-import { prisma } from "@vayva/data";
+import { PERMISSIONS } from "@/lib/team/permissions";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/ai/templates

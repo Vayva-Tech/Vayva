@@ -3,13 +3,58 @@ import { addDays, format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import { logger } from "@vayva/shared";
 import { getRedis } from "@vayva/redis";
+import { ResendEmailService } from "@/lib/email/resend";
+import { wrapEmail } from "@/lib/email/layout";
 
-// Stub email functions to fix build - actual functions loaded at runtime
-const sendAccountDeletionScheduled = async (_email: string, _data: { storeName: string; scheduledDate: string; cancelUrl: string }) => {
-  logger.info("[EMAIL_STUB] sendAccountDeletionScheduled called");
+// Email notification functions for account deletion
+const sendAccountDeletionScheduled = async (email: string, data: { storeName: string; scheduledDate: string; cancelUrl: string }) => {
+  try {
+    await ResendEmailService.sendTransactionalEmail({
+      to: email,
+      subject: `Account Deletion Scheduled - ${data.storeName}`,
+      html: wrapEmail(
+        `
+          <p>Hello,</p>
+          <p>Your account deletion request for <strong>${data.storeName}</strong> has been scheduled.</p>
+          <p><strong>Scheduled Date:</strong> ${data.scheduledDate}</p>
+          <p>If you change your mind, you can cancel the deletion before this date:</p>
+          <p><a href="${data.cancelUrl}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 16px 0;">Cancel Deletion</a></p>
+          <p>After this date, all your store data will be permanently deleted and cannot be recovered.</p>
+          <p>If you didn't request this deletion, please contact our support team immediately.</p>
+          <p>Best regards,<br/>The Vayva Team</p>
+        `,
+        "Account Deletion Scheduled"
+      ),
+    });
+    logger.info("[DELETION] Scheduled deletion email sent successfully", { email });
+  } catch (error) {
+    logger.error("[DELETION] Failed to send scheduled deletion email", { email, error });
+    throw error;
+  }
 };
-const sendAccountDeletionCompleted = async (_email: string, _data: { storeName: string }) => {
-  logger.info("[EMAIL_STUB] sendAccountDeletionCompleted called");
+
+const sendAccountDeletionCompleted = async (email: string, data: { storeName: string }) => {
+  try {
+    await ResendEmailService.sendTransactionalEmail({
+      to: email,
+      subject: `Account Deletion Completed - ${data.storeName}`,
+      html: wrapEmail(
+        `
+          <p>Hello,</p>
+          <p>Your account for <strong>${data.storeName}</strong> has been successfully deleted.</p>
+          <p>All your store data, including products, orders, and customer information, has been permanently removed from our systems.</p>
+          <p>If you have any questions or need assistance in the future, please don't hesitate to reach out to us.</p>
+          <p>We hope to serve you again someday.</p>
+          <p>Best regards,<br/>The Vayva Team</p>
+        `,
+        "Account Deletion Completed"
+      ),
+    });
+    logger.info("[DELETION] Completion email sent successfully", { email });
+  } catch (error) {
+    logger.error("[DELETION] Failed to send completion email", { email, error });
+    throw error;
+  }
 };
 
 export class DeletionService {

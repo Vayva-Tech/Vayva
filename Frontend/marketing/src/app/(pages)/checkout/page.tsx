@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, Label } from "@vayva/ui";
@@ -204,8 +205,25 @@ export default function CheckoutPage(): React.JSX.Element {
   };
 
   return (
-    <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white text-slate-900">
-      <div className="relative overflow-hidden border-b border-slate-200/70">
+    <ErrorBoundary
+      name="Checkout"
+      fallback={
+        <div className="flex min-h-[600px] items-center justify-center p-8">
+          <div className="text-center">
+            <h3 className="text-xl font-semibold text-red-900 mb-2">Checkout unavailable</h3>
+            <p className="text-red-700 mb-4">Please refresh and try again.</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <div className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white text-slate-900">
+        <div className="relative overflow-hidden border-b border-slate-200/70">
         <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-200/20 blur-3xl" />
         <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <h1 className="text-3xl md:text-4xl font-black tracking-tight">Checkout</h1>
@@ -505,10 +523,12 @@ export default function CheckoutPage(): React.JSX.Element {
           </div>
 
           <div className="mt-6 text-xs text-slate-500">
-            After payment, we’ll email you a 6-digit code to verify your account and access your dashboard.
+            After payment, we'll email you a 6-digit code to verify your account and access your dashboard.
           </div>
         </aside>
+        </div>
       </div>
+    </ErrorBoundary>
     </div>
   );
 }

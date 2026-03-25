@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI, APIContext } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { standardHeaders } from "@vayva/shared";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // GET /api/services/dashboard
 export const GET = withVayvaAPI(

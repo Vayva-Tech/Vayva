@@ -43,6 +43,50 @@ export class ResendEmailService {
       throw new Error("Email service is not configured");
     }
   }
+
+  // --- Generic Transactional Email ---
+  static async sendTransactionalEmail(options: {
+    to: string;
+    subject: string;
+    html: string;
+    from?: string;
+  }) {
+    if (!FEATURES.EMAIL_ENABLED && process.env.NODE_ENV !== "production") {
+      logger.warn(
+        "[ResendEmailService] EMAIL_ENABLED=false. Skipping transactional email in development.",
+        { app: "merchant", to: options.to, subject: options.subject },
+      );
+      return { success: true, skipped: true };
+    }
+    this.assertConfigured();
+    try {
+      const { data, error } = await this.client.emails.send({
+        from: options.from || this.fromEmail,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+      });
+      if (error) {
+        logger.error("[Resend] Transactional Email Error:", {
+          error: error instanceof Error ? error.message : String(error),
+          to: options.to,
+          subject: options.subject,
+        });
+        throw new Error(
+          `Failed to send transactional email: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+      return { success: true, messageId: data?.id };
+    } catch (error) {
+      logger.error("[Resend] Transactional Email Error:", {
+        error: error instanceof Error ? error.message : String(error),
+        to: options.to,
+        subject: options.subject,
+      });
+      throw error;
+    }
+  }
+
   // --- 1. OTP Verification ---
   static async sendOTPEmail(to: string, code: string, firstName: string) {
     if (!FEATURES.EMAIL_ENABLED && process.env.NODE_ENV !== "production") {

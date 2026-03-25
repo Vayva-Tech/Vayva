@@ -47,12 +47,9 @@ const LEGAL_ESSENTIAL = [
   { label: "Terms", href: "/legal/terms" },
 ];
 
+// Hidden per requirements: Refunds, Acceptable use, Data processing, KYC & safety
 const LEGAL_MORE = [
   { label: "Cookies", href: "/legal/cookies" },
-  { label: "Refunds", href: "/legal/refund-policy" },
-  { label: "Acceptable use", href: "/legal/acceptable-use" },
-  { label: "Data processing", href: "/legal/dpa" },
-  { label: "KYC & safety", href: "/legal/kyc-safety" },
 ];
 
 function FooterLinkList({
