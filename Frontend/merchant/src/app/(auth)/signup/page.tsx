@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { logger } from "@vayva/shared";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,20 +9,48 @@ import { SplitAuthLayout } from "@/components/auth/SplitAuthLayout";
 import { Button, Input, Label } from "@vayva/ui";
 import { Eye, EyeSlash as EyeOff } from "@phosphor-icons/react/ssr";
 import { PasswordStrengthIndicator } from "@/components/ui/PasswordStrengthIndicator";
+import { PlanKey } from "@/config/pricing";
+
+// Plan configuration
+const PLANS = {
+  starter: { name: "Starter", price: "₦25,000/mo", firstMonthFree: true },
+  pro: { name: "Pro", price: "₦35,000/mo", firstMonthFree: false },
+  pro_plus: { name: "Pro+", price: "₦50,000/mo", firstMonthFree: false },
+} as const;
+
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const planParam = searchParams.get("plan") as PlanKey | null;
+  
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [storeSlug, setStoreSlug] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey>(planParam || "starter");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+
+  // Update plan from URL parameter
+  useEffect(() => {
+    if (planParam && ["starter", "pro", "pro_plus"].includes(planParam)) {
+      setSelectedPlan(planParam);
+    }
+  }, [planParam]);
 
   // RFC 5322 compliant email validation
   const validateEmail = (value: string) => {
@@ -34,24 +63,50 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!agreedToTerms) {
       setError("Please agree to the Terms, Privacy Policy, and EULA.");
       return;
     }
+    
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+    
     setLoading(true);
     setError(null);
+    
     try {
-      await AuthService.register({
+      // Register user account
+      const registration = await AuthService.register({
         email,
         password,
         firstName,
         lastName,
       });
-      router.push(`/verify?email=${encodeURIComponent(email)}`);
+      
+      // Create merchant/store profile
+      const createMerchantRes = await fetch("/api/merchant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeName: businessName,
+          storeSlug: storeSlug || generateSlug(businessName),
+          plan: selectedPlan,
+          userId: registration.userId,
+        }),
+      });
+      
+      if (!createMerchantRes.ok) {
+        throw new Error("Failed to create merchant account");
+      }
+      
+      const merchantData = await createMerchantRes.json();
+      
+      // Redirect to verification for all plans
+      // After verification, auth context will route to onboarding
+      router.push(`/verify?email=${encodeURIComponent(email)}${selectedPlan ? `&plan=${selectedPlan}` : ""}`);
     } catch (err: unknown) {
       const _errMsg = err instanceof Error ? err.message : String(err);
       logger.error("[SIGNUP_ERROR]", { error: _errMsg, app: "merchant" });
@@ -63,8 +118,18 @@ export default function SignupPage() {
 
   return (
     <SplitAuthLayout
-      title="Welcome to Vayva Merchant"
-      subtitle="Create your account to start taking orders, tracking payments, and staying on top of your business."
+      title={
+        selectedPlan === "starter" 
+          ? "Start your first month free" 
+          : `Start with ${PLANS[selectedPlan].name}`
+      }
+      subtitle={
+        selectedPlan === "starter"
+          ? "No credit card required. Get 30 days free, then ₦25,000/month."
+          : selectedPlan === "pro"
+          ? "Pay ₦35,000/month to activate Pro features. 7-day trial included."
+          : "Pay ₦50,000/month to activate Pro+ features. Maximum power unlocked."
+      }
       showSignInLink
       leftVariant="signup"
     >
@@ -79,6 +144,43 @@ export default function SignupPage() {
             {error}
           </div>
         )}
+
+        {/* Plan Selection Display */}
+        <div className="rounded-xl border border-slate-200 bg-gradient-to-r from-emerald-50 to-purple-50 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Selected Plan</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">{PLANS[selectedPlan].name}</p>
+              <p className="text-sm text-slate-600">{PLANS[selectedPlan].price}</p>
+            </div>
+            {selectedPlan === "starter" && (
+              <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-500 px-3 py-1 text-xs font-bold text-white shadow-md">
+                🎉 First Month Free
+              </span>
+            )}
+            {selectedPlan !== "starter" && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                💳 Payment required
+              </span>
+            )}
+          </div>
+          <div className="mt-3 flex gap-2">
+            {(["starter", "pro", "pro_plus"] as const).map((planKey) => (
+              <button
+                key={planKey}
+                type="button"
+                onClick={() => setSelectedPlan(planKey)}
+                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                  selectedPlan === planKey
+                    ? "bg-slate-900 text-white shadow-md"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                {PLANS[planKey].name}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -268,7 +370,11 @@ export default function SignupPage() {
           className="w-full h-12"
           data-testid="auth-signup-submit"
         >
-          Create account
+          {loading 
+            ? "Creating account..." 
+            : selectedPlan === "starter"
+            ? "Create account — First month free"
+            : `Create account & pay ${PLANS[selectedPlan].price}`}
         </Button>
       </form>
 

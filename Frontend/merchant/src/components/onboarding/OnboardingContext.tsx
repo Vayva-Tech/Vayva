@@ -299,6 +299,39 @@ export function OnboardingProvider({
       await reload();
       await refreshProfile();
 
+      // Check if user selected Pro/Pro+ plan during signup
+      let postOnboardingPlan: string | null = null;
+      let postOnboardingEmail: string | null = null;
+      try {
+        postOnboardingPlan = sessionStorage.getItem("vayva_post_onboarding_plan");
+        postOnboardingEmail = sessionStorage.getItem("vayva_post_onboarding_email");
+      } catch {
+        /* ignore storage errors */
+      }
+
+      // Clear storage
+      try {
+        sessionStorage.removeItem("vayva_post_onboarding_plan");
+        sessionStorage.removeItem("vayva_post_onboarding_email");
+      } catch {
+        /* ignore storage errors */
+      }
+
+      // Redirect to checkout for paid plans
+      if (postOnboardingPlan && ["pro", "pro_plus"].includes(postOnboardingPlan) && postOnboardingEmail) {
+        logger.info("[ONBOARDING_COMPLETE] Redirecting to checkout for paid plan", {
+          plan: postOnboardingPlan,
+          email: postOnboardingEmail,
+        });
+        
+        // Get store ID from merchant context or use email as fallback
+        const merchantId = formData.business?.storeSlug || postOnboardingEmail;
+        
+        router.push(`/checkout?plan=${postOnboardingPlan}&email=${encodeURIComponent(postOnboardingEmail)}&store=${encodeURIComponent(merchantId)}`);
+        return;
+      }
+
+      // Default: go to dashboard (Starter plan or no plan selected)
       router.push("/dashboard");
       router.refresh();
     } catch (error: unknown) {

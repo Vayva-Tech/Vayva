@@ -21,7 +21,7 @@ export const AuthRightPanel = ({
       className="flex-1 lg:w-[60%] flex flex-col min-h-0 crm-canvas"
     >
       {/* Top bar with help link only - Desktop only */}
-      <div className="h-14 px-6 lg:px-10 items-center justify-end border-b border-green-200/30 hidden lg:flex">
+      <div className="h-14 px-6 lg:px-10 hidden lg:flex items-center justify-end border-b border-green-200/30">
         <Link
           href="/help"
           className="text-sm text-gray-500 hover:text-black font-medium transition-colors"

@@ -129,7 +129,7 @@ export const PLANS: Plan[] = [
       "Remove Vayva branding (custom domain on Pro and above)",
     ],
     ctaLabel: "Start with Starter",
-    checkoutHref: "/checkout?plan=starter",
+    checkoutHref: "/signup?plan=starter",
     featured: true,
   },
   {
@@ -145,7 +145,7 @@ export const PLANS: Plan[] = [
       "Custom domain, dedicated account manager, and custom integrations",
     ],
     ctaLabel: "Choose Pro",
-    checkoutHref: "/checkout?plan=pro",
+    checkoutHref: "/signup?plan=pro",
   },
   {
     key: "pro_plus",
@@ -161,7 +161,7 @@ export const PLANS: Plan[] = [
       "Priority support and higher AI credits",
     ],
     ctaLabel: "Choose Pro+",
-    checkoutHref: "/checkout?plan=pro_plus",
+    checkoutHref: "/signup?plan=pro_plus",
   },
 ];
 

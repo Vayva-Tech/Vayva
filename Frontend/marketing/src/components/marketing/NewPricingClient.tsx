@@ -24,6 +24,7 @@ const MOBILE_BULLET_CAP = 3;
 const MOBILE_FAQ_INITIAL = 3;
 
 function resolvePlanHref(href: string): string {
+  // All plan selection now goes through merchant signup
   if (href.startsWith("/signup")) {
     return `${APP_URL}${href}`;
   }
@@ -72,16 +73,23 @@ function PricingTierCard({
       <div className="absolute -bottom-24 -left-24 w-48 h-48 rounded-full bg-gradient-to-tr from-purple-400/30 to-emerald-400/30 blur-3xl" />
 
       <div className="relative rounded-[34px] border border-slate-200/80 p-6 sm:p-8 shadow-sm h-full flex flex-col bg-white/95">
-        {plan.featured && (
-          <span className="inline-flex w-fit items-center rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-700">
-            Most popular
-          </span>
-        )}
+        <div className="flex items-start justify-between gap-2">
+          {plan.featured && (
+            <span className="inline-flex w-fit items-center rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-700">
+              Most popular
+            </span>
+          )}
+          {plan.key === "starter" && plan.promoBadge && (
+            <span className="inline-flex w-fit items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-500 px-3 py-1 text-xs font-bold text-white shadow-md animate-pulse">
+              🎉 First Month Free
+            </span>
+          )}
+        </div>
         <h3 className="mt-4 text-xl font-semibold text-slate-900">
           {plan.name}
         </h3>
         <p className="mt-2 text-sm text-slate-600 leading-snug">{plan.tagline}</p>
-        {plan.promoBadge ? (
+        {plan.key !== "starter" && plan.promoBadge ? (
           <p className="mt-2 text-xs font-bold text-emerald-700 uppercase tracking-wide">{plan.promoBadge}</p>
         ) : null}
         
@@ -147,9 +155,16 @@ function PricingTierCard({
           </p>
         )}
         <Link href={resolvePlanHref(plan.checkoutHref)} className="mt-8 block">
-          <Button className="w-full py-5 sm:py-6 rounded-2xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
-            {plan.ctaLabel}
-          </Button>
+          <div className="relative">
+            <Button className="w-full py-5 sm:py-6 rounded-2xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
+              {plan.key === "starter" ? plan.ctaLabel : `${plan.ctaLabel} → Pay to activate`}
+            </Button>
+            {plan.key !== "starter" && (
+              <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-slate-500 whitespace-nowrap">
+                Payment required to activate
+              </p>
+            )}
+          </div>
         </Link>
         <div className="mt-4 text-center">
           <a href="#plan-comparison" className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1">

@@ -18,6 +18,7 @@ const VerifyContent = () => {
   const searchParams = useSearchParams();
   const email = searchParams?.get("email") || "";
   const otpFromQuery = searchParams?.get("otp") || "";
+  const plan = searchParams?.get("plan") || null;
   const method =
     (searchParams?.get("method") as "EMAIL" | "WHATSAPP") || "EMAIL";
   const maskedPhone = searchParams?.get("maskedPhone") || "";
@@ -107,6 +108,17 @@ const VerifyContent = () => {
       }
 
       const { token, user, merchant } = response;
+      
+      // Store plan in sessionStorage for post-onboarding checkout redirect
+      if (plan && ["pro", "pro_plus"].includes(plan)) {
+        try {
+          sessionStorage.setItem("vayva_post_onboarding_plan", plan);
+          sessionStorage.setItem("vayva_post_onboarding_email", email);
+        } catch {
+          /* ignore storage errors */
+        }
+      }
+      
       login(token, user as unknown as User, (merchant || null) as unknown as MerchantContext | null);
     } catch (err: unknown) {
       const _errMsg = err instanceof Error ? err.message : String(err);
