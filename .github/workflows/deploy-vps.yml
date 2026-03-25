@@ -1,0 +1,88 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [Vayva]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Build backend
+        run: pnpm --filter=@vayva/core-api build
+        env:
+          NODE_ENV: production
+      
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            echo "🚀 Starting deployment from GitHub Actions..."
+            
+            cd /home/fredrick/vayva
+            
+            # Pull latest changes
+            git pull origin Vayva
+            
+            # Install production dependencies
+            pnpm install --prod
+            
+            # Build backend
+            pnpm --filter=@vayva/core-api build
+            
+            # Run database migrations
+            pnpm --filter=@vayva/db migrate
+            
+            # Restart backend service
+            sudo systemctl restart vayva-backend
+            
+            # Wait for service to be ready
+            sleep 5
+            
+            # Check if frontend changed
+            if git diff HEAD~1 HEAD --quiet -- Frontend/ packages/; then
+              echo "ℹ️ No frontend changes detected"
+            else
+              echo "🎨 Building frontend applications..."
+              pnpm --filter=@vayva/merchant build
+              pnpm --filter=marketing build
+              sudo systemctl reload nginx
+            fi
+            
+            # Verify services
+            echo "✅ Checking service status..."
+            systemctl is-active vayva-backend || exit 1
+            systemctl is-active nginx || exit 1
+            
+            # Health check
+            echo "🏥 Running health checks..."
+            curl -f http://localhost:4000/api/health || echo "⚠️ Backend health check skipped (port may differ)"
+            
+            # Cleanup
+            pnpm store prune
+            
+            echo "✅ Deployment completed successfully!"

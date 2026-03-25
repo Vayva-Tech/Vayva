@@ -783,7 +783,7 @@ export const AdminShell = ({
             <TrialBanner />
             <GlobalBanner />
             {/* Header: safe-area inset above the bar; frosted glass on small screens */}
-            <header className="w-full shrink-0 relative z-30 sticky top-0 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
+            <header className="w-full shrink-0 sticky z-30 top-0 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">
               <div className="pt-safe-top md:pt-0">
                 <div className="h-14 w-full px-4 md:px-6 flex items-center justify-between gap-2 md:gap-4">
                 {/* Left: Menu + Back */}
@@ -1108,7 +1108,7 @@ export const AdminShell = ({
                       </div>
                     </div>
 
-                    <div className="px-3 pb-4 pb-safe-bottom max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
+                    <div className="px-3 pb-safe-bottom max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
                       {moreSheetGroups.map((group: any, idx: number) => (
                         <div key={group.name || idx} className="mb-4">
                           {group.name && (
@@ -1173,7 +1173,7 @@ export const AdminShell = ({
                       </Button>
                     </div>
                   </div>
-                  <div className="px-4 pb-safe-bottom pb-6 space-y-3">
+                  <div className="px-4 pb-safe-bottom space-y-3">
                     <Button
                       variant="outline"
                       type="button"
