@@ -365,7 +365,7 @@ export function ProDashboardMarketing() {
           </div>
 
           {/* Search */}
-          <div className="w-full sm:w-auto sm:ml-auto flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-400 sm:w-48 min-w-0">
+          <div className="w-full sm:w-auto sm:ml-auto flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-400 min-w-0">
             <Search size={13} />
             <span>Search</span>
           </div>

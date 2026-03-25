@@ -1108,7 +1108,7 @@ export const AdminShell = ({
                       </div>
                     </div>
 
-                    <div className="px-3 pb-safe-bottom pb-4 max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
+                    <div className="px-3 pb-4 pb-safe-bottom max-h-[70vh] overflow-y-auto overscroll-contain custom-scrollbar">
                       {moreSheetGroups.map((group: any, idx: number) => (
                         <div key={group.name || idx} className="mb-4">
                           {group.name && (

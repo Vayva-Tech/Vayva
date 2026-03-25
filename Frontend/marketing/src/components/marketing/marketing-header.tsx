@@ -153,77 +153,84 @@ export function MarketingHeader(): React.JSX.Element {
 
           {/* Mobile Menu Toggle */}
           <Button
-            className="lg:hidden p-2 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+            className="lg:hidden p-2 text-slate-500 hover:text-emerald-600 rounded-lg transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
             aria-controls="marketing-mobile-nav"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileMenuOpen ? <X size={24} className="text-emerald-600" /> : <Menu size={24} className="text-emerald-600" />}
           </Button>
         </div>
       </div>
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div
-          id="marketing-mobile-nav"
-          className="lg:hidden absolute top-full left-3 right-3 sm:left-4 sm:right-4 mt-2 bg-white/80 backdrop-blur-xl shadow-2xl py-6 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200 rounded-2xl border border-slate-200/50 max-h-[80vh] overflow-y-auto"
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
-          {NAV_ITEMS.map((section) => (
-            <div key={section.label} className="flex flex-col gap-2">
-              {section.items ? (
-                <>
-                  <div className="px-4 py-2 bg-emerald-50 rounded-xl">
-                    <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-                      {section.label}
-                    </span>
-                  </div>
+        <React.Fragment>
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-md z-40 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden
+          />
+          <div
+            id="marketing-mobile-nav"
+            className="lg:hidden fixed top-[64px] md:top-[72px] left-0 right-0 bg-white/95 backdrop-blur-xl shadow-2xl py-6 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200 z-50 max-h-[calc(100vh-64px)] md:max-h-[calc(100vh-72px)] overflow-y-auto border-t border-slate-200/50"
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
+            {NAV_ITEMS.map((section) => (
+              <div key={section.label} className="flex flex-col gap-2">
+                {section.items ? (
+                  <>
+                    <div className="px-4 py-2 bg-emerald-50 rounded-xl">
+                      <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
+                        {section.label}
+                      </span>
+                    </div>
+                    <Link
+                      href={section.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="px-4 py-2 text-sm font-semibold text-emerald-800 hover:text-emerald-900"
+                    >
+                      {section.label} overview →
+                    </Link>
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 px-4 py-3 rounded-xl transition-all"
+                        >
+                          <Icon size={20} className="text-emerald-600" />
+                          <span className="font-semibold">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </>
+                ) : (
                   <Link
                     href={section.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-2 text-sm font-semibold text-emerald-800 hover:text-emerald-900"
+                    className="flex items-center gap-3 text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 px-4 py-3 rounded-xl transition-all font-semibold"
                   >
-                    {section.label} overview →
+                    {section.label}
                   </Link>
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 px-4 py-3 rounded-xl transition-all"
-                      >
-                        <Icon size={20} className="text-emerald-600" />
-                        <span className="font-semibold">{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </>
-              ) : (
-                <Link
-                  href={section.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 px-4 py-3 rounded-xl transition-all font-semibold"
-                >
-                  {section.label}
-                </Link>
-              )}
-            </div>
-          ))}
-          <div className="h-px bg-emerald-100 my-2" />
-          <div className="flex flex-col gap-3 px-2">
-            <div
-              className="flex justify-center w-full"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <HeaderActions />
+                )}
+              </div>
+            ))}
+            <div className="h-px bg-emerald-100 my-2" />
+            <div className="flex flex-col gap-3 px-2">
+              <div
+                className="flex justify-center w-full"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <HeaderActions />
+              </div>
             </div>
           </div>
-        </div>
+        </React.Fragment>
       )}
     </header>
   );

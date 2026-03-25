@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "@vayva/ui";
 import { APP_URL } from "@/lib/constants";
 import { pricingFaqs } from "@/data/marketing-content";
+import { MarketingSnapRow, MarketingSnapItem } from "@/components/ui/MarketingSnapRow";
 import {
   PLANS,
   formatNGN,
@@ -201,40 +202,18 @@ export function NewPricingClient(): React.JSX.Element {
         </div>
 
         {/* Mobile: horizontal snap carousel */}
-        <div className="md:hidden w-full min-w-0">
-          <p className="text-center text-sm font-medium text-slate-600 mb-1 px-4">
-            Swipe to compare plans
-          </p>
-          <p className="text-center text-xs text-slate-400 mb-4 px-4">
-            One card at a time · snap to each tier
-          </p>
-          <div
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden touch-pan-x"
-            style={{ WebkitOverflowScrolling: "touch" }}
-            role="region"
-            aria-label="Pricing plans, swipe horizontally"
-          >
-            {displayPlans.map((plan) => (
-              <div
-                key={plan.key}
-                className="snap-center shrink-0 w-[min(100%,calc(100vw-2rem))] max-w-[380px]"
-              >
-                <PricingTierCard plan={plan} bulletLimit={MOBILE_BULLET_CAP} />
-              </div>
-            ))}
-          </div>
-          <div
-            className="flex justify-center gap-1.5 pt-1"
-            aria-hidden
-          >
-            {displayPlans.map((p) => (
-              <span
-                key={p.key}
-                className="h-1.5 w-1.5 rounded-full bg-emerald-200"
-              />
-            ))}
-          </div>
-        </div>
+        <MarketingSnapRow
+          ariaLabel="Pricing plans, swipe horizontally"
+          hint="Swipe to compare plans"
+          showDots
+          dotCount={displayPlans.length}
+        >
+          {displayPlans.map((plan) => (
+            <MarketingSnapItem key={plan.key}>
+              <PricingTierCard plan={plan} bulletLimit={MOBILE_BULLET_CAP} />
+            </MarketingSnapItem>
+          ))}
+        </MarketingSnapRow>
       </section>
 
       {/* AI usage packages */}
