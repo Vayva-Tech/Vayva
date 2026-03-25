@@ -3,7 +3,6 @@
  * 
  * Enterprise-grade secrets management supporting:
  * - HashiCorp Vault
- * - AWS Secrets Manager
  * - Azure Key Vault
  */
 

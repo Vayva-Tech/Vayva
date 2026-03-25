@@ -46,3 +46,9 @@ export {
   PLAN_LIMITS,
   DUNNING_SCHEDULE,
 } from './types';
+
+export { pricingPolicyAgent } from './pricing-policy-agent';
+export type {
+  Subscription as PricingPolicySubscription,
+} from './pricing-policy-agent';
+export { coercePlanTier, type PlanTier } from './tier-limits';

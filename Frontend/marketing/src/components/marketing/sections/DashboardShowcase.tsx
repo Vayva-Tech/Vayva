@@ -9,6 +9,7 @@ import {
   IconRobot as Bot,
 } from "@tabler/icons-react";
 import * as motion from "framer-motion/client";
+import { ProDashboardMarketing } from "@/components/marketing/ProDashboardMarketing";
 
 export default function DashboardShowcase(): React.JSX.Element {
   return (
@@ -41,8 +42,25 @@ export default function DashboardShowcase(): React.JSX.Element {
           <div className="absolute -inset-4 bg-gradient-to-br from-emerald-500/30 via-primary/20 to-emerald-400/25 rounded-[40px] blur-2xl opacity-60 group-hover:opacity-80 transition duration-1000" />
           
           {/* Mockup container */}
-          <div className="relative surface-glass border border-border/60 rounded-[28px] shadow-2xl overflow-hidden p-4">
-            {/* Dashboard mock removed */}
+          <div className="relative bg-white border border-slate-200/60 rounded-[28px] shadow-2xl overflow-hidden">
+            <div className="border-b border-slate-200 bg-slate-50 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-rose-500" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                </div>
+                <div className="min-w-0 flex-1 rounded-md bg-white px-3 py-1.5 font-mono text-xs text-slate-500">
+                  merchant.vayva.ng/dashboard
+                </div>
+                <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  Live Dashboard
+                </span>
+              </div>
+            </div>
+            <div className="p-4 max-h-[560px] overflow-auto">
+              <ProDashboardMarketing />
+            </div>
           </div>
         </div>
 

@@ -59,7 +59,7 @@ class CloudWatchTransport extends winston.Transport {
       this.emit('logged', info);
     });
 
-    // In production, this would send to AWS CloudWatch
+    // In production, forward structured logs to your observability stack (e.g. Grafana, Datadog, self-hosted).
     // For now, we'll just output structured JSON
     if (process.env.NODE_ENV === 'production') {
       console.log(JSON.stringify(info));

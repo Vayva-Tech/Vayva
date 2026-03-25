@@ -47,7 +47,7 @@ Vayva has implemented a **zero-cost, self-built compliance infrastructure** that
 A **subprocessor** is any third-party service provider that processes personal data on behalf of Vayva merchants. Examples:
 
 - **Paystack** - Payment processing
-- **AWS** - Cloud hosting
+- **MinIO** - Cloud storage
 - **Cloudflare** - CDN & security
 - **Google Analytics** - Analytics
 - **Hotjar** - User behavior analytics
@@ -467,7 +467,7 @@ You can generate professional PDF reports for:
 
 **Storage:**
 - Primary: Google Drive (`compliance/reports/`)
-- Backup: AWS S3 (`vayva-compliance-archive/`)
+- Backup: MinIO (`vayva-compliance-archive/`)
 - Access: Compliance team + CTO + Legal counsel
 
 ---

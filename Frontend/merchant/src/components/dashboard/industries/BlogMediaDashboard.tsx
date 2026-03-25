@@ -1,17 +1,17 @@
+"use client";
+
+import React from "react";
+import { UniversalProDashboard } from "@/components/dashboard/UniversalProDashboard";
+import type { IndustryDashboardProps } from "@vayva/industry-core";
+
 /**
- * Blog/Media Industry Dashboard Component
- * Content publishing, audience analytics, and monetization dashboard
+ * Blog/media industry dashboard — lives in merchant so it can use UniversalProDashboard (@/ paths).
  */
-
-import React from 'react';
-import { UniversalProDashboard } from '@/components/dashboard/UniversalProDashboard';
-import type { IndustryDashboardProps } from '@vayva/industry-core';
-
 export function BlogMediaDashboard({
   userId,
   businessId,
-  designCategory = 'signature',
-  planTier = 'advanced',
+  designCategory = "signature",
+  planTier = "advanced",
   className,
 }: IndustryDashboardProps) {
   return (

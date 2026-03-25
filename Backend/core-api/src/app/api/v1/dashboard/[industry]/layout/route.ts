@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db/prisma";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth/session";
 
 // Validation schema for layout update

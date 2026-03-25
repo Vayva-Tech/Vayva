@@ -1,8 +1,8 @@
 /**
  * HashiCorp Vault Secrets Management
- * 
+ *
  * Enterprise-grade secrets management for Vayva platform.
- * Supports both HashiCorp Vault and AWS Secrets Manager as backends.
+ * Supports HashiCorp Vault and Azure Key Vault as backends.
  */
 
 import { logger } from '@vayva/shared';
@@ -13,7 +13,7 @@ export interface VaultConfig {
   roleId?: string;
   secretId?: string;
   namespace?: string;
-  backend: 'vault' | 'aws-secrets-manager' | 'azure-key-vault';
+  backend: 'vault' | 'azure-key-vault';
 }
 
 export interface SecretVersion {
@@ -53,9 +53,6 @@ export class VaultClient {
     switch (this.config.backend) {
       case 'vault':
         await this.authenticateWithVault();
-        break;
-      case 'aws-secrets-manager':
-        // AWS uses IAM roles, no explicit auth needed
         break;
       case 'azure-key-vault':
         // Azure uses managed identity
@@ -116,8 +113,6 @@ export class VaultClient {
       switch (this.config.backend) {
         case 'vault':
           return await this.getSecretFromVault(path);
-        case 'aws-secrets-manager':
-          return await this.getSecretFromAWS(path);
         case 'azure-key-vault':
           return await this.getSecretFromAzure(path);
         default:
@@ -163,23 +158,6 @@ export class VaultClient {
   }
 
   /**
-   * Get secret from AWS Secrets Manager
-   */
-  private async getSecretFromAWS(path: string): Promise<SecretValue> {
-    // Dynamic import to avoid bundling AWS SDK when not needed
-    const { SecretsManagerClient, GetSecretValueCommand } = await import('@aws-sdk/client-secrets-manager');
-    
-    const client = new SecretsManagerClient({});
-    const command = new GetSecretValueCommand({ SecretId: path });
-    const response = await client.send(command);
-
-    return {
-      value: response.SecretString || '',
-      version: parseInt(response.VersionId || '1', 10),
-    };
-  }
-
-  /**
    * Get secret from Azure Key Vault
    */
   private async getSecretFromAzure(path: string): Promise<SecretValue> {
@@ -204,9 +182,6 @@ export class VaultClient {
       switch (this.config.backend) {
         case 'vault':
           await this.setSecretInVault(path, value, metadata);
-          break;
-        case 'aws-secrets-manager':
-          await this.setSecretInAWS(path, value);
           break;
         case 'azure-key-vault':
           await this.setSecretInAzure(path, value);
@@ -252,31 +227,6 @@ export class VaultClient {
   }
 
   /**
-   * Set secret in AWS Secrets Manager
-   */
-  private async setSecretInAWS(path: string, value: string): Promise<void> {
-    const { SecretsManagerClient, CreateSecretCommand, PutSecretValueCommand } = await import('@aws-sdk/client-secrets-manager');
-    
-    const client = new SecretsManagerClient({});
-
-    try {
-      // Try to update existing secret
-      const command = new PutSecretValueCommand({
-        SecretId: path,
-        SecretString: value,
-      });
-      await client.send(command);
-    } catch {
-      // Create new secret if it doesn't exist
-      const command = new CreateSecretCommand({
-        Name: path,
-        SecretString: value,
-      });
-      await client.send(command);
-    }
-  }
-
-  /**
    * Set secret in Azure Key Vault
    */
   private async setSecretInAzure(path: string, value: string): Promise<void> {
@@ -296,9 +246,6 @@ export class VaultClient {
       switch (this.config.backend) {
         case 'vault':
           await this.deleteSecretFromVault(path);
-          break;
-        case 'aws-secrets-manager':
-          await this.deleteSecretFromAWS(path);
           break;
         case 'azure-key-vault':
           await this.deleteSecretFromAzure(path);
@@ -331,18 +278,6 @@ export class VaultClient {
     if (!response.ok && response.status !== 404) {
       throw new Error(`Vault API error: ${response.statusText}`);
     }
-  }
-
-  private async deleteSecretFromAWS(path: string): Promise<void> {
-    const { SecretsManagerClient, DeleteSecretCommand } = await import('@aws-sdk/client-secrets-manager');
-    
-    const client = new SecretsManagerClient({});
-    const command = new DeleteSecretCommand({
-      SecretId: path,
-      ForceDeleteWithoutRecovery: false,
-      RecoveryWindowInDays: 30,
-    });
-    await client.send(command);
   }
 
   private async deleteSecretFromAzure(path: string): Promise<void> {

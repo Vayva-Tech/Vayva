@@ -2,6 +2,8 @@
 
 This guide walks you through setting up the Vayva platform for local development.
 
+**Browse all documentation:** [Documentation home](../README.md) (folder map, role-based entry points, and where to add new docs).
+
 ---
 
 ## Prerequisites

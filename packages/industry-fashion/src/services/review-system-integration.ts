@@ -1,4 +1,4 @@
-import { fashionPrisma as prisma } from '@fashion-prisma';
+import { fashionPrisma as prisma } from '../lib/prisma-fashion';
 
 export interface Review {
   id: string;
@@ -236,7 +236,7 @@ export class ReviewSystemIntegrationService {
     commonPraises: string[];
     commonComplaints: string[];
   }> {
-    // Production: Integrate with NLP services (e.g., Google Cloud Natural Language, AWS Comprehend) for automated sentiment scoring and aspect extraction
+    // Production: Integrate with an NLP service for automated sentiment scoring and aspect extraction
     // Would analyze review text for sentiment and extract key themes
     
     const reviews = await this.getProductReviews(productId, 100);

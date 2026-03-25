@@ -15,11 +15,7 @@ export class EmailChannel implements ChannelProvider {
       console.info(`[EmailChannel] Subject: ${message.title}`);
       console.info(`[EmailChannel] Body: ${message.content.substring(0, 100)}...`);
 
-      // In real implementation, this would use an email service like:
-      // - AWS SES
-      // - SendGrid  
-      // - Mailgun
-      // - Nodemailer
+      // In production this would use Resend (or another ESP), e.g. via @vayva/emails.
       
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -57,11 +53,7 @@ export class SMSChannel implements ChannelProvider {
       console.info(`[SMSChannel] Sending SMS to ${message.recipients.join(', ')}`);
       console.info(`[SMSChannel] Message: ${message.content.substring(0, 50)}...`);
 
-      // In real implementation, this would use:
-      // - Twilio
-      // - AWS SNS
-      // - Plivo
-      // - Nexmo
+      // In production: Termii, Twilio, or another SMS provider.
       
       await new Promise(resolve => setTimeout(resolve, 50));
       this.deliveryStatus.set(message.id!, 'sent');

@@ -82,13 +82,9 @@ The project already operates a VPS for PostgreSQL (`163.245.209.203:5432`), Redi
 - A single VPS is a single point of failure. Vercel's global edge network provides geographic redundancy automatically.
 - Preview deployments per PR require significant tooling to replicate (e.g., GitHub Actions + Docker + dynamic Nginx config), whereas Vercel provides them for free.
 
-### AWS Amplify
+### Other managed Next.js platforms
 
-AWS Amplify supports Next.js deployments and preview environments. Rejected because:
-
-- Amplify's Next.js support has historically lagged behind Vercel's (e.g., App Router support was delayed).
-- The team had existing familiarity with Vercel, reducing onboarding time.
-- Amplify's pricing model and configuration complexity are higher for a small team.
+Other vendors offer managed Next.js deployments and previews. **Rejected** in favor of Vercel because upstream Next.js features (e.g. App Router) land on Vercel first, the team was already productive on Vercel, and alternative pricing/configuration was a poorer fit for a small team.
 
 ### Cloudflare Pages
 

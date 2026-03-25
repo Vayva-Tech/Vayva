@@ -4,11 +4,11 @@ const path = require("path");
 
 const nextConfig = {
     output: "standalone",
-    transpilePackages: ["@vayva/ui", "@vayva/theme", "@vayva/schemas", "@vayva/shared", "@vayva/api-client", "@vayva/content", "@vayva/compliance", "@vayva/redis", "@vayva/emails", "@vayva/templates", "@vayva/ai-agent"],
-    serverExternalPackages: ["@prisma/client", "@vayva/db", "bullmq", "ioredis", "pg", "jsdom", "isomorphic-dompurify"],
+    transpilePackages: ["@vayva/ui", "@vayva/theme", "@vayva/schemas", "@vayva/shared", "@vayva/api-client", "@vayva/content", "@vayva/compliance", "@vayva/redis", "@vayva/emails", "@vayva/templates", "@vayva/ai-agent", "@vayva/billing", "@vayva/integrations", "@vayva/industry-blog-media", "@vayva/analytics"],
+    serverExternalPackages: ["@prisma/client", "@vayva/db", "bullmq", "ioredis", "pg", "jsdom", "isomorphic-dompurify", "puppeteer-core"],
     reactCompiler: false,
     experimental: {
-        optimizePackageImports: ["@phosphor-icons/react", "@vayva/ui", "@vayva/shared", "@vayva/api-client", "framer-motion", "recharts"],
+        optimizePackageImports: ["@phosphor-icons/react", "@vayva/ui", "@vayva/shared", "@vayva/api-client", "framer-motion", "recharts", "@vayva/analytics"],
     },
     images: {
         remotePatterns: [

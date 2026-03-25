@@ -171,7 +171,7 @@ Required by: GDPR Article 28(2) - specific prior authorization
 ```
 
 **Solution Options:**
-1. Create `/subprocessors` page with current list (Paystack, YouVerify, AWS/Cloudflare, etc.)
+1. Create `/subprocessors` page with current list (Paystack, YouVerify, MinIO/Cloudflare, etc.)
 2. Remove reference and require written consent for each new subprocessor
 
 ---
@@ -421,7 +421,7 @@ Required by: GDPR Article 28(2) - specific prior authorization
 **Content Needed:**
 - Paystack (payments/BVN verification)
 - YouVerify (NIN verification)
-- Cloud provider (AWS/GCP/Azure)
+- Cloud provider (managed hosting)
 - CDN (Cloudflare)
 - Email (Resend)
 - Analytics (Google Analytics)

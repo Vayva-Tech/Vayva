@@ -13,3 +13,6 @@ export type { BottleServiceOrder, BottleOrderItem, BottleInventory, BottleServic
 
 export { EventAnalyticsService } from './event-analytics.service';
 export type { AttendanceMetrics, RevenueMetrics, DemographicBreakdown, EventAnalyticsConfig } from './event-analytics.service';
+
+// Aggregated service singleton
+export { nightlifeService, NightlifeService } from './nightlife.service';

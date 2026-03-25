@@ -4,7 +4,7 @@
  * Uses rule-based and statistical models (no external API calls)
  */
 
-import { logger } from "../logger.js";
+import { logger } from "../logger";
 import { SentimentAnalyzer } from "./sentiment-analyzer";
 import { SalesForecaster } from "./sales-forecaster";
 import { RecommendationEngine } from "./recommendation-engine";

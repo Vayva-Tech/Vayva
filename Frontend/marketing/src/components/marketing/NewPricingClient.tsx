@@ -18,6 +18,7 @@ import {
 import { PlanComparisonMobile } from "@/components/pricing/PlanComparisonMobile";
 import { cn } from "@/lib/utils";
 import { useMarketingOffer } from "@/context/MarketingOfferContext";
+import { MarketingSnapItem, MarketingSnapRow } from "@/components/marketing/MarketingSnapRow";
 
 const MOBILE_BULLET_CAP = 3;
 const MOBILE_FAQ_INITIAL = 3;
@@ -34,6 +35,7 @@ function PricingTierCard({
   plan,
   bulletLimit,
   motionProps,
+  inGroup = false,
 }: {
   plan: Plan;
   bulletLimit?: number;
@@ -43,19 +45,37 @@ function PricingTierCard({
     viewport?: { once: boolean };
     transition?: { delay: number };
   };
+  inGroup?: boolean;
 }): React.JSX.Element {
   const bullets =
     bulletLimit != null ? plan.bullets.slice(0, bulletLimit) : plan.bullets;
   const hasMore =
     bulletLimit != null && plan.bullets.length > bulletLimit;
 
+  const aiAllowance = (() => {
+    if (plan.key === "starter") return "600 AI messages / month";
+    if (plan.key === "pro") return "800 AI messages / month + Autopilot";
+    return "1,200 AI messages / month + Autopilot + Voice";
+  })();
+
   const inner = (
     <>
-      <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-emerald-500/10 via-purple-500/10 to-emerald-500/20 backdrop-blur-xl overflow-hidden" />
-      <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br from-emerald-400/30 to-purple-400/30 blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 w-48 h-48 rounded-full bg-gradient-to-tr from-purple-400/30 to-emerald-400/30 blur-3xl" />
+      {!inGroup ? (
+        <>
+          <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-emerald-500/10 via-purple-500/10 to-emerald-500/20 backdrop-blur-xl overflow-hidden" />
+          <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br from-emerald-400/30 to-purple-400/30 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-48 h-48 rounded-full bg-gradient-to-tr from-purple-400/30 to-emerald-400/30 blur-3xl" />
+        </>
+      ) : null}
 
-      <div className="relative rounded-[34px] border border-slate-200/80 p-6 sm:p-8 shadow-sm h-full flex flex-col bg-white/95">
+      <div
+        className={cn(
+          "relative p-6 sm:p-8 h-full flex flex-col bg-white/95",
+          inGroup
+            ? "rounded-none border-0 shadow-none"
+            : "rounded-[34px] border border-slate-200/80 shadow-sm",
+        )}
+      >
         {plan.featured && (
           <span className="inline-flex w-fit items-center rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-700">
             Most popular
@@ -74,6 +94,9 @@ function PricingTierCard({
           </span>
           <span className="text-sm text-slate-500 pb-1">/month</span>
         </div>
+        <div className="mt-3 inline-flex w-fit items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
+          {aiAllowance}
+        </div>
         <ul className="mt-6 space-y-2.5 text-sm flex-grow">
           {bullets.map((feature) => (
             <li key={feature} className="flex items-start gap-3">
@@ -87,11 +110,19 @@ function PricingTierCard({
             +{plan.bullets.length - bulletLimit!} more in full comparison below
           </p>
         )}
-        <Link href={resolvePlanHref(plan.checkoutHref)} className="mt-8 block">
-          <Button className="w-full py-5 sm:py-6 rounded-2xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
-            {plan.ctaLabel}
-          </Button>
-        </Link>
+        <div className="mt-8 flex flex-col gap-2">
+          <Link href={resolvePlanHref(plan.checkoutHref)} className="block">
+            <Button className="w-full py-5 sm:py-6 rounded-2xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
+              {plan.ctaLabel}
+            </Button>
+          </Link>
+          <a
+            href="#plan-comparison"
+            className="text-center text-sm font-semibold text-slate-600 hover:text-emerald-700"
+          >
+            Compare plans →
+          </a>
+        </div>
       </div>
     </>
   );
@@ -99,7 +130,7 @@ function PricingTierCard({
   if (motionProps) {
     return (
       <motion.div
-        className="relative h-full min-w-0"
+        className="relative h-full min-w-0 overflow-hidden"
         initial={motionProps.initial}
         whileInView={motionProps.whileInView}
         viewport={motionProps.viewport}
@@ -110,7 +141,7 @@ function PricingTierCard({
     );
   }
 
-  return <div className="relative h-full min-w-0">{inner}</div>;
+  return <div className="relative h-full min-w-0 overflow-hidden">{inner}</div>;
 }
 
 export function NewPricingClient(): React.JSX.Element {
@@ -185,11 +216,14 @@ export function NewPricingClient(): React.JSX.Element {
 
       {/* Desktop: 3-column grid */}
       <section className="py-12 sm:py-20">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 hidden md:grid md:grid-cols-3 gap-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 hidden md:block">
+          <div className="overflow-hidden rounded-[34px] border border-slate-200/80 bg-white shadow-sm">
+            <div className="grid grid-cols-3 divide-x divide-slate-200/70">
           {displayPlans.map((plan, index) => (
             <PricingTierCard
               key={plan.key}
               plan={plan}
+              inGroup
               motionProps={{
                 initial: { opacity: 0, y: 30 },
                 whileInView: { opacity: 1, y: 0 },
@@ -198,149 +232,33 @@ export function NewPricingClient(): React.JSX.Element {
               }}
             />
           ))}
+            </div>
+          </div>
         </div>
 
         {/* Mobile: horizontal snap carousel */}
         <div className="md:hidden w-full min-w-0">
-          <p className="text-center text-sm font-medium text-slate-600 mb-1 px-4">
-            Swipe to compare plans
-          </p>
-          <p className="text-center text-xs text-slate-400 mb-4 px-4">
-            One card at a time · snap to each tier
-          </p>
-          <div
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden touch-pan-x"
-            style={{ WebkitOverflowScrolling: "touch" }}
-            role="region"
-            aria-label="Pricing plans, swipe horizontally"
+          <MarketingSnapRow
+            ariaLabel="Pricing plans"
+            hint="Swipe to compare plans"
+            hintSub="One card at a time · snap to each tier"
+            showDots
+            dotCount={displayPlans.length}
+            trackClassName="pb-4"
           >
             {displayPlans.map((plan) => (
-              <div
-                key={plan.key}
-                className="snap-center shrink-0 w-[min(100%,calc(100vw-2rem))] max-w-[380px]"
-              >
+              <MarketingSnapItem key={plan.key} className="!max-w-[380px]">
                 <PricingTierCard plan={plan} bulletLimit={MOBILE_BULLET_CAP} />
-              </div>
+              </MarketingSnapItem>
             ))}
-          </div>
-          <div
-            className="flex justify-center gap-1.5 pt-1"
-            aria-hidden
-          >
-            {displayPlans.map((p) => (
-              <span
-                key={p.key}
-                className="h-1.5 w-1.5 rounded-full bg-emerald-200"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* AI usage packages */}
-      <section className="py-12 sm:py-20 border-t border-slate-200/70">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-3xl mx-auto">
-            <p className="text-xs uppercase tracking-[0.35em] text-emerald-600 font-semibold">
-              AI usage packages
-            </p>
-            <h2 className="mt-3 sm:mt-4 text-2xl sm:text-3xl font-black text-balance">
-              Clear AI limits. No surprises.
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-600">
-              AI usage is measured in <span className="font-semibold">AI messages</span>. One
-              AI reply typically uses 1 message. Heavy features (Autopilot + voice) cost more.
-            </p>
-          </div>
-
-          <div className="mt-10 grid md:grid-cols-3 gap-6">
-            <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Starter</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                For daily sales chats and support.
-              </p>
-              <ul className="text-sm text-slate-700 space-y-2">
-                <li>
-                  AI messages: <span className="font-semibold">600 / month</span>
-                </li>
-                <li>
-                  Autopilot: <span className="font-semibold">Not included</span>
-                </li>
-                <li>
-                  Voice notes: <span className="font-semibold">Not included</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-[28px] border border-emerald-200 bg-emerald-50/40 p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Pro</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                More volume + Autopilot insights.
-              </p>
-              <ul className="text-sm text-slate-700 space-y-2">
-                <li>
-                  AI messages: <span className="font-semibold">800 / month</span>
-                </li>
-                <li>
-                  Autopilot: <span className="font-semibold">20 runs / month</span>
-                </li>
-                <li>
-                  Autopilot cost: <span className="font-semibold">10 AI messages</span> per run
-                </li>
-                <li>
-                  Voice notes: <span className="font-semibold">Not included</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Pro+</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                Everything unlocked (with caps).
-              </p>
-              <ul className="text-sm text-slate-700 space-y-2">
-                <li>
-                  AI messages: <span className="font-semibold">1,200 / month</span>
-                </li>
-                <li>
-                  Autopilot: <span className="font-semibold">60 runs / month</span>
-                </li>
-                <li>
-                  Autopilot cost: <span className="font-semibold">10 AI messages</span> per run
-                </li>
-                <li>
-                  Voice notes: <span className="font-semibold">Enabled</span> (max 60s each)
-                </li>
-                <li>
-                  Voice cost: <span className="font-semibold">5 AI messages</span> per voice note
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8 rounded-[24px] border border-slate-200/80 bg-white p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h4 className="font-semibold text-slate-900">Need more AI?</h4>
-                <p className="text-sm text-slate-600">
-                  Buy message packs anytime from your dashboard.
-                </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3">
-                  <p className="font-semibold text-slate-900">+250 messages</p>
-                  <p className="text-slate-600">₦2,000</p>
-                </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3">
-                  <p className="font-semibold text-slate-900">+1,000 messages</p>
-                  <p className="text-slate-600">₦5,000</p>
-                </div>
-                <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3">
-                  <p className="font-semibold text-slate-900">+3,000 messages</p>
-                  <p className="text-slate-600">₦12,000</p>
-                </div>
-              </div>
-            </div>
+          </MarketingSnapRow>
+          <div className="mt-6 flex justify-center px-4">
+            <a
+              href="#plan-comparison"
+              className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+            >
+              Jump to full comparison →
+            </a>
           </div>
         </div>
       </section>

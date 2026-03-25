@@ -11,11 +11,7 @@ import {
   InternalError,
   logger
 } from "@vayva/shared";
-import {
-  S3Client,
-  HeadObjectCommand,
-  DeleteObjectCommand
-} from "@aws-sdk/client-s3";
+import { Client } from "minio";
 
 function getS3Config() {
   const endpoint = process.env.MINIO_ENDPOINT;
@@ -103,13 +99,15 @@ export const POST = withVayvaAPI(
       try {
         const { endpoint, accessKeyId, secretAccessKey, bucket, region } =
           getS3Config();
-        const s3 = new S3Client({
+        const minioClient = new Client({
+          endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
+          port: parseInt(endpoint.split(":").pop() || "443"),
+          useSSL: endpoint.startsWith("https"),
+          accessKey: accessKeyId,
+          secretKey: secretAccessKey,
           region,
-          endpoint,
-          forcePathStyle: true,
-          credentials: { accessKeyId, secretAccessKey },
         });
-        await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+        await minioClient.removeObject(bucket, key);
       } catch {
         // ignore
       }
@@ -128,21 +126,20 @@ export const POST = withVayvaAPI(
       region,
       publicBaseUrl,
     } = getS3Config();
-    const s3 = new S3Client({
+    const minioClient = new Client({
+      endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
+      port: parseInt(endpoint.split(":").pop() || "443"),
+      useSSL: endpoint.startsWith("https"),
+      accessKey: accessKeyId,
+      secretKey: secretAccessKey,
       region,
-      endpoint,
-      forcePathStyle: true,
-      credentials: { accessKeyId, secretAccessKey },
     });
 
     const blobUrl = buildPublicUrl({ publicBaseUrl, endpoint, bucket, key });
     let size: number | undefined;
     try {
-      const meta = await s3.send(
-        new HeadObjectCommand({ Bucket: bucket, Key: key }),
-      );
-      size =
-        typeof meta.ContentLength === "number" ? meta.ContentLength : undefined;
+      const meta = await minioClient.statObject(bucket, key);
+      size = meta.size;
     } catch {
       throw new NotFoundError("File not found in storage");
     }
@@ -156,9 +153,7 @@ export const POST = withVayvaAPI(
 
       // Rule 43.1 B: Allowlist check
       if (!mimeOk) {
-        await s3
-          .send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
-          .catch(() => {});
+        await minioClient.removeObject(bucket, key).catch(() => {});
         await prisma.upload.updateMany({
           where: { id: upload.id, storeId: ctx.storeId },
           data: { status: "REJECTED", detectedMime: detectedMime || "unknown" },

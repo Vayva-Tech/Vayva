@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withVayvaAPI } from "@/lib/api-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { handleApiError } from "@/lib/api-error-handler";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Client } from "minio";
 import { logger } from "@vayva/shared";
 
 function getS3Config() {
@@ -157,21 +156,21 @@ export const POST = withVayvaAPI(
         publicBaseUrl,
       } = getS3Config();
 
-      const s3 = new S3Client({
+      const minioClient = new Client({
+        endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
+        port: parseInt(endpoint.split(":").pop() || "443"),
+        useSSL: endpoint.startsWith("https"),
+        accessKey: accessKeyId,
+        secretKey: secretAccessKey,
         region,
-        endpoint,
-        forcePathStyle: true,
-        credentials: { accessKeyId, secretAccessKey },
       });
 
       // Generate presigned URL for PUT
-      const command = new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        ContentType: mimeType || "application/octet-stream",
-      });
-
-      const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minutes
+      const uploadUrl = await minioClient.presignedPutObject(
+        bucket,
+        key,
+        300, // 5 minutes
+      );
       const publicUrl = buildPublicUrl({ publicBaseUrl, endpoint, bucket, key });
 
       return NextResponse.json({

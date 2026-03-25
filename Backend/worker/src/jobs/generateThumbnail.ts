@@ -1,7 +1,7 @@
 import { prisma } from "@vayva/db";
 import { logger } from "@vayva/shared";
 import { chromium } from "playwright";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { Client } from "minio";
 
 function getS3Config() {
   const endpoint = process.env.MINIO_ENDPOINT;
@@ -83,23 +83,19 @@ export async function generateThumbnail(data: {
       region,
       publicBaseUrl,
     } = getS3Config();
-    const s3 = new S3Client({
+    const minioClient = new Client({
+      endPoint: endpoint.replace(/^https?:\/\//, "").split("/")[0],
+      port: parseInt(endpoint.split(":").pop() || "443"),
+      useSSL: endpoint.startsWith("https"),
+      accessKey: accessKeyId,
+      secretKey: secretAccessKey,
       region,
-      endpoint,
-      forcePathStyle: true,
-      credentials: { accessKeyId, secretAccessKey },
     });
 
     const key = `thumbnails/${storeId}/${deploymentId || templateProjectId || "latest"}-${Date.now()}.jpg`;
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        Body: buffer,
-        ContentType: "image/jpeg",
-        ACL: "public-read",
-      }),
-    );
+    await minioClient.putObject(bucket, key, buffer, {
+      "Content-Type": "image/jpeg",
+    });
 
     const thumbnailUrl = buildPublicUrl({
       publicBaseUrl,

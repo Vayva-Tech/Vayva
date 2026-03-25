@@ -1,4 +1,4 @@
-import { fashionPrisma as prisma } from '@fashion-prisma';
+import { fashionPrisma as prisma } from '../lib/prisma-fashion';
 
 export interface VisualSearchConfig {
   model: 'vayva-fashion-v1' | 'vayva-fashion-v2';

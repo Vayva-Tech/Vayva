@@ -1,6 +1,13 @@
-import type { PlanTier, TierLimits, UsageMetric } from '@/lib/access-control/tier-limits';
-import { TIER_LIMITS, TIER_TRIAL_PERIODS, canAccessIndustryDashboards, canUseAI, getAITokenQuota } from '@/lib/access-control/tier-limits';
-import { logger } from '../logger';
+import type { PlanTier, TierLimits } from './tier-limits';
+import type { UsageMetric } from './types';
+import {
+  TIER_LIMITS,
+  TIER_TRIAL_PERIODS,
+  canAccessIndustryDashboards,
+  canUseAI,
+  coercePlanTier,
+} from './tier-limits';
+import { logger } from '@vayva/shared';
 
 /**
  * Centralized Pricing Policy Agent
@@ -114,7 +121,7 @@ export class PricingPolicyAgent implements PricingPolicy {
    */
   getUsageQuota(tier: PlanTier, metric: UsageMetric): number {
     // Convert metric to the format used in tier limits
-    const metricMap: Record<UsageMetric, keyof typeof TIER_LIMITS.FREE> = {
+    const metricMap: Record<UsageMetric, keyof TierLimits> = {
       'AI_TOKENS': 'aiTokens',
       'WHATSAPP_MESSAGES': 'whatsappMessages',
       'WHATSAPP_MEDIA': 'whatsappMessages', // Same quota bucket
@@ -142,10 +149,9 @@ export class PricingPolicyAgent implements PricingPolicy {
   } {
     const limit = this.getUsageQuota(tier, metric);
     const remaining = Math.max(0, limit - current);
-    const allowed = current < limit;
-    
-    // Recommend upgrade if usage is over 80% of limit
-    const upgradeRequired = (current / limit) > 0.8;
+    const allowed = limit <= 0 ? true : current < limit;
+    const upgradeRequired =
+      limit > 0 ? current / limit > 0.8 : false;
     
     return { allowed, remaining, upgradeRequired };
   }
@@ -197,23 +203,19 @@ export class PricingPolicyAgent implements PricingPolicy {
    * Get recommended upgrade path based on usage patterns
    */
   getRecommendedUpgradePath(currentTier: PlanTier, usagePattern: Record<UsageMetric, number>): PlanTier | null {
-    const currentLimits = TIER_LIMITS[currentTier];
-    
-    // Check if current usage exceeds limits
     let needsUpgrade = false;
-    
+
     for (const [metric, usage] of Object.entries(usagePattern)) {
       const limit = this.getUsageQuota(currentTier, metric as UsageMetric);
-      if (usage > limit * 0.8) { // 80% threshold
+      if (limit > 0 && usage > limit * 0.8) {
         needsUpgrade = true;
         break;
       }
     }
-    
+
     if (!needsUpgrade) return null;
-    
-    // Recommend next tier
-    const tierOrder: PlanTier[] = ['FREE', 'STARTER', 'PRO'];
+
+    const tierOrder: PlanTier[] = ["STARTER", "PRO", "PRO_PLUS"];
     const currentIndex = tierOrder.indexOf(currentTier);
     
     if (currentIndex < tierOrder.length - 1) {
@@ -251,8 +253,9 @@ export class PricingPolicyAgent implements PricingPolicy {
       let totalOverageCost = 0;
       
       // Generate stats for each metric
+      const tier = coercePlanTier(String(subscription.planKey));
       for (const [metric, used] of Object.entries(mockUsage)) {
-        const limit = this.getUsageQuota(subscription.planKey, metric as UsageMetric);
+        const limit = this.getUsageQuota(tier, metric as UsageMetric);
         const percentage = Math.min(100, Math.round((used / limit) * 100));
         const overage = Math.max(0, used - limit);
         const overageCost = this.calculateOverageCost(metric as UsageMetric, overage);
@@ -280,7 +283,9 @@ export class PricingPolicyAgent implements PricingPolicy {
       
       return { stats, totalOverageCost, recommendations };
     } catch (error) {
-      logger.error('[PricingPolicyAgent] Failed to generate usage report', error);
+      logger.error('[PricingPolicyAgent] Failed to generate usage report', {
+        err: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   }

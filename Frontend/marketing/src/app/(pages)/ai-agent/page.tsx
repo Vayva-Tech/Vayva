@@ -438,7 +438,7 @@ export function RedesignedAIAgentPage(): React.JSX.Element {
               </motion.div>
             ))}
           </div>
-          <div className="md:hidden -mx-1 max-w-5xl mx-auto">
+          <div className="md:hidden max-w-5xl mx-auto">
             <MarketingSnapRow
               ariaLabel="Pricing plans"
               hint="Swipe to compare plans"

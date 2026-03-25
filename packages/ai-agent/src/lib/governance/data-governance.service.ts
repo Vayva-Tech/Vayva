@@ -83,7 +83,7 @@ export class DataGovernanceService {
     /**
      * Internal PII Redaction Logic
      * Enhanced regex-based masking.
-     * NOTE: For Enterprise usage, integrate with VGS, Google DLP, or AWS Macie.
+     * NOTE: For Enterprise usage, integrate with VGS, Google DLP, or another DLP/classification service.
      */
     static redactPII(text: string | undefined) {
         if (!text)

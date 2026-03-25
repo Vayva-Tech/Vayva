@@ -18,7 +18,7 @@
 ### 3. **Subprocessor List** (`subprocessors.ts`)
 - Complete list of all third-party data processors
 - GDPR Article 28 transparency compliance
-- Includes Paystack, AWS, Cloudflare, Google Analytics, etc.
+- Includes Paystack, MinIO, Cloudflare, Google Analytics, etc.
 
 ---
 

@@ -32,7 +32,7 @@ class EmailChannel implements NotificationChannelInterface {
   async send(payload: NotificationPayload): Promise<ChannelResponse> {
     try {
       // In a real implementation, this would integrate with an email service
-      // like SendGrid, AWS SES, or SMTP
+      // e.g. Resend, SendGrid, or SMTP
       
       const email = payload.recipient.email;
       if (!email) {

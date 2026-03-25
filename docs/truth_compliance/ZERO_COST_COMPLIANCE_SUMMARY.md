@@ -15,7 +15,7 @@
 
 **Contents:**
 - Complete list of all third-party data processors
-- Paystack (payments), AWS (hosting), Cloudflare (CDN), Google Analytics, Hotjar, etc.
+- Paystack (payments), MinIO (storage), Cloudflare (CDN), Google Analytics, Hotjar, etc.
 - Data transfer safeguards documented (SCCs, adequacy decisions)
 - Objection process for merchants (30-day notice)
 - International data transfer disclosures

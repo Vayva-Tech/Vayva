@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@vayva/ui";
 import React, { useState } from 'react';
 import { GlassPanel } from '@vayva/ui/fashion';

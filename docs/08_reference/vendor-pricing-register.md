@@ -10,6 +10,8 @@
 - **Vercel Pro**: **$20 / month** (baseline)
 - **Business email**: **$5 / month** (baseline)
 - **OpenRouter launch deposit**: **$50** (prepaid deposit; re-deposit from merchant revenue once subscriptions start)
+- **Resend**: **$0** on Free (3k/mo); **$20/mo** on Pro (50k/mo, **$0.90/1k** overage) when transactional volume requires it
+- **GitHub org (Team)**: **$4 per user / month** when off Free — see [GitHub Pricing](https://github.com/pricing)
 
 ## Exchange rate convention (docs)
 
@@ -59,7 +61,10 @@
 - **Key env vars**:
   - `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO`
 - **Pricing model**:
-  - Typically billed by **email volume/month** (tiered plans) with optional add-ons.
+  - **Free:** up to **3,000** emails/mo.
+  - **Pro:** **$20/mo** for **50,000** emails/mo; **overage $0.90 per 1,000** emails above 50k.
+  - Plan positioning includes **ticket support**, **30-day** data retention, **10 domains**, **no daily send limit** (still monitor reputation/bounces).
+  - **Business** and above for higher included volumes — see Resend’s public pricing when you exceed Pro.
 
 ### Delivery/Logistics — Kwik Delivery
 
@@ -98,7 +103,7 @@
 - **Provider**: MinIO or any S3-compatible storage (self-hosted or managed)
 - **What we use it for**: file uploads (branding, product images, dispute evidence)
 - **Primary code entrypoints**:
-  - `Backend/core-api/src/app/api/uploads/create/route.ts` (pre-signed upload URL; AWS SDK)
+  - `Backend/core-api/src/app/api/uploads/create/route.ts` (pre-signed upload URL; S3-compatible client for MinIO)
   - `Backend/core-api/src/app/api/uploads/finalize/route.ts` (HEAD + MIME sniff + finalize + entity attach)
   - `Backend/core-api/src/lib/storage/storageService.ts`
   - `Frontend/merchant/src/lib/storage/storageService.ts`

@@ -98,7 +98,7 @@ function DashboardMockup() {
           <div className="flex-1 flex justify-center">
             <div className="px-4 py-1 rounded-md bg-[#252525] text-xs text-zinc-500 flex items-center gap-2">
               <Shield size={12} />
-              dashboard.vayva.co
+              merchant.vayva.ng/dashboard
             </div>
           </div>
         </div>
@@ -121,12 +121,12 @@ function DashboardMockup() {
               <span className="text-white font-semibold truncate">Luxe Fashion</span>
             </div>
 
-            {/* Nav Groups */}
+            {/* Nav — same group labels as merchant app sidebar (retail default). */}
             <div className="space-y-4">
               <div>
-                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2 mb-2">General</p>
+                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2 mb-2">Home</p>
                 <nav className="space-y-0.5">
-                  {["Dashboard", "Orders", "Products", "Customers"].map((item, i) => (
+                  {["Dashboard", "Analytics", "AI Intelligence"].map((item, i) => (
                     <div
                       key={item}
                       className={cn(
@@ -144,9 +144,9 @@ function DashboardMockup() {
               </div>
 
               <div>
-                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2 mb-2">Finance</p>
+                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2 mb-2">Commerce</p>
                 <nav className="space-y-0.5">
-                  {["Payments", "Invoices"].map((item) => (
+                  {["Orders", "Products", "Fulfillment"].map((item) => (
                     <div
                       key={item}
                       className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03] transition-colors"
@@ -155,6 +155,16 @@ function DashboardMockup() {
                       {item}
                     </div>
                   ))}
+                </nav>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2 mb-2">Money</p>
+                <nav className="space-y-0.5">
+                  <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03] transition-colors">
+                    <div className="w-4 h-4 rounded bg-zinc-700/50" />
+                    Finance
+                  </div>
                 </nav>
               </div>
             </div>
@@ -172,8 +182,8 @@ function DashboardMockup() {
           <div className="flex-1 bg-[#0f0f0f] flex flex-col">
             {/* Header */}
             <header className="h-14 border-b border-white/[0.06] flex items-center justify-between px-6">
-              <div className="flex items-center gap-3">
-                <h1 className="text-white font-semibold">Luxe Fashion</h1>
+              <div className="flex items-center gap-3 min-w-0">
+                <h1 className="text-white font-semibold truncate">Retail Operations</h1>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   Live
@@ -197,7 +207,7 @@ function DashboardMockup() {
                   { label: "Revenue", value: "₦847,500", change: "+12.5%" },
                   { label: "Orders", value: "156", change: "+8.2%" },
                   { label: "Customers", value: "89", change: "+15.3%" },
-                  { label: "Products", value: "47", change: "+3" },
+                  { label: "Conversion", value: "3.2%", change: "−0.2%" },
                 ].map((stat) => (
                   <div key={stat.label} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                     <p className="text-xs text-zinc-500 mb-1">{stat.label}</p>

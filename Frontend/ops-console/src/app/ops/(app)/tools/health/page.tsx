@@ -88,7 +88,7 @@ export default function HealthPage(): React.JSX.Element {
             <h3 className="text-sm font-medium text-gray-900">
               Primary Database
             </h3>
-            <p className="text-xs text-gray-500 mt-1">AWS RDS (Postgres)</p>
+            <p className="text-xs text-gray-500 mt-1">PostgreSQL (VPS / managed as deployed)</p>
 
             <div className="mt-6 flex items-center justify-between text-sm">
               <span className="text-gray-500">Latency</span>

@@ -1,4 +1,4 @@
-import { fashionPrisma as prisma } from '@fashion-prisma';
+import { fashionPrisma as prisma } from '../lib/prisma-fashion';
 import type { ProductSizeCurveRow } from '../services/size-curve-service';
 
 // ============================================================================

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { AuthLeftPanel } from "./AuthLeftPanel";
 import { AuthRightPanel } from "./AuthRightPanel";
+import { urls } from "@vayva/shared";
 
 type AuthLeftPanelVariant = "signin" | "signup" | "support";
 
@@ -38,12 +39,16 @@ export const SplitAuthLayout = ({
 
       {/* Mobile header - Only visible on mobile */}
       <div className="lg:hidden bg-white  p-6 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2">
+        <a
+          href={urls.marketingBase()}
+          className="flex items-center gap-2"
+          aria-label="Go to Vayva marketing site"
+        >
           <Logo size="md" showText={false} disableLink />
           <span className="font-bold text-2xl tracking-tight text-black">
             Merchant
           </span>
-        </Link>
+        </a>
       </div>
 
       {/* Right Panel - Form area */}

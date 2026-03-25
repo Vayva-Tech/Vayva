@@ -141,6 +141,12 @@ export async function middleware(request: NextRequest) {
 
   // 2. Public routes - allow access
   if (isPublicRoute(pathname)) {
+    // Fail-safe: ensure the domain root always lands on auth/dashboard
+    if (pathname === "/") {
+      return NextResponse.redirect(
+        new URL(isAuthenticated ? "/dashboard" : "/signin", request.url),
+      );
+    }
     return response;
   }
 

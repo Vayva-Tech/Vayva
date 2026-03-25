@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import { writeFileSync } from "node:fs";
 import { promisify } from "util";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { Client } from "minio";
 import { logger } from "@vayva/shared";
 import { prisma } from "@vayva/db";
 
@@ -67,33 +67,25 @@ export async function handleDatabaseBackup(
     
     logger.info("Backup file created", { sizeMB: sizeInMB, path: tempPath });
 
-    // Upload to S3/MinIO
-    const s3Client = new S3Client({
-      endpoint: config.s3Endpoint,
-      region: "us-east-1", // MinIO doesn't care about region
-      credentials: {
-        accessKeyId: config.s3AccessKey,
-        secretAccessKey: config.s3SecretKey,
-      },
-      forcePathStyle: true, // Required for MinIO
+    // Upload to MinIO
+    const minioClient = new Client({
+      endPoint: config.s3Endpoint.replace(/^https?:\/\//, "").split("/")[0],
+      port: parseInt(config.s3Endpoint.split(":").pop() || "443"),
+      useSSL: config.s3Endpoint.startsWith("https"),
+      accessKey: config.s3AccessKey,
+      secretKey: config.s3SecretKey,
+      region: "us-east-1",
     });
 
     const fileContent = await execAsync(`cat ${tempPath}`).then(r => Buffer.from(r.stdout, "binary"));
     
     const uploadKey = `database/${backupFileName}`;
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: config.s3Bucket,
-        Key: uploadKey,
-        Body: fileContent,
-        ContentType: "application/gzip",
-        Metadata: {
-          "db-name": config.dbName,
-          "timestamp": timestamp,
-          "size-mb": String(sizeInMB),
-        },
-      })
-    );
+    await minioClient.putObject(config.s3Bucket, uploadKey, fileContent, {
+      "Content-Type": "application/gzip",
+      "x-amz-meta-db-name": config.dbName,
+      "x-amz-meta-timestamp": timestamp,
+      "x-amz-meta-size-mb": String(sizeInMB),
+    });
 
     logger.info("Backup uploaded to S3", { key: uploadKey, sizeMB: sizeInMB });
 

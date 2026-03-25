@@ -4,7 +4,7 @@
  * No external APIs, no training costs
  */
 
-import { logger } from "../logger.js";
+import { logger } from "../logger";
 
 export interface RecommendationResult {
   productId: string;

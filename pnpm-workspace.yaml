@@ -18,3 +18,5 @@ packages:
   - "packages/realtime"
   - "packages/security"
   - "packages/addons"
+  - "packages/billing"
+  - "packages/integrations"

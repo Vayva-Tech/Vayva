@@ -1,4 +1,4 @@
-import { fashionPrisma as prisma } from '@fashion-prisma';
+import { fashionPrisma as prisma } from '../lib/prisma-fashion';
 import type { DemandForecast } from './demand-forecast';
 
 // ============================================================================

@@ -8,16 +8,25 @@ import jwt from "jsonwebtoken";
 import { getJwtSecret } from "@/lib/session.server";
 import { logger } from "@/lib/logger";
 
-const JWT_SECRET = getJwtSecret();
-
 export const POST = withVayvaAPI(
   PERMISSIONS.SECURITY_MANAGE,
   async (req, { storeId, user }) => {
     try {
+      let jwtSecret: string;
+      try {
+        jwtSecret = getJwtSecret();
+      } catch {
+        logger.error("[PIN_RESET] Missing NEXTAUTH_SECRET or JWT_SECRET", "CONFIG");
+        return NextResponse.json(
+          { error: "Server configuration error" },
+          { status: 500 },
+        );
+      }
+
       // 1. Generate Reset Token (Valid for 15 mins)
       const token = jwt.sign(
         { userId: user.id, storeId, type: "pin_reset" },
-        JWT_SECRET,
+        jwtSecret,
         { expiresIn: "15m" },
       );
 

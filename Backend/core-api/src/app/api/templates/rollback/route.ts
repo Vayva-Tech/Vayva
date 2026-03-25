@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
 import { getSessionUser } from '@/lib/session.server';
 
 export async function POST(_request: NextRequest) {
