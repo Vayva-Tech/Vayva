@@ -31,7 +31,6 @@
     "@tanstack/react-query-devtools": "^5.91.2",
     "@vayva/api-client": "workspace:*",
     "@vayva/compliance": "workspace:*",
-    "@vayva/db": "workspace:*",
     "@vayva/emails": "workspace:*",
     "@vayva/payments": "workspace:*",
     "@vayva/redis": "workspace:*",

@@ -9,6 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Scale, Clock, DollarSign, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { logger } from '@vayva/shared';
 
 interface CaseManagementSettings {
   defaultPracticeAreaId?: string;
@@ -50,10 +52,13 @@ export default function CaseManagementSettingsPage() {
 
       if (response.ok) {
         setSuccess('Case management settings saved successfully');
+        toast.success('Case management settings saved successfully');
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save case management settings';
+      logger.error('[CASE_MANAGEMENT_ERROR]', { error });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

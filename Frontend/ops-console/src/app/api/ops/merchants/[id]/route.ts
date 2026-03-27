@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { validateStoreCompliance } from "@vayva/compliance";
 import { logger } from "@vayva/shared";
 
 export const dynamic = "force-dynamic";
@@ -19,120 +18,9 @@ export async function GET(
     const resolvedParams = await params;
     const { id } = resolvedParams;
 
-    const [store, complianceReport] = await Promise.all([
-      prisma.store.findUnique({
-        where: { id },
-        include: {
-          tenant: {
-            include: {
-              tenantMemberships: {
-                include: {
-                  user: {
-                    select: {
-                      id: true,
-                      firstName: true,
-                      lastName: true,
-                      email: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              orders: true,
-              products: true,
-              customers: true,
-            },
-          },
-        },
-      }),
-      validateStoreCompliance(id),
-    ]);
-
-    if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
-    }
-
-    const gmvAggregate = await prisma.order.aggregate({
-      where: { storeId: id, paymentStatus: "SUCCESS" },
-      _sum: { total: true },
-    });
-
-    const wallet = await prisma.wallet.findUnique({
-      where: { storeId: id },
-    });
-
-    const recentAudit = await prisma.auditLog.findMany({
-      where: { app: "ops", targetStoreId: id },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      select: {
-        action: true,
-        ip: true,
-        createdAt: true,
-      },
-    });
-
-    const ownerMember = store.tenant?.tenantMemberships.find((m: any) => m.role === "OWNER",
-    );
-    const ownerEmail = ownerMember?.user.email;
-
-    // Parse settings for notes
-    const settings = (store.settings as Record<string, unknown>) || {};
-    const notes = settings.internalNotes || [];
-
-    return NextResponse.json({
-      id: store.id,
-      name: store.name,
-      slug: store.slug,
-      onboardingStatus: store.onboardingStatus,
-      industrySlug: store.industrySlug,
-      kycStatus: store.kycStatus,
-      isActive: store.isActive,
-      payoutsEnabled: store.payoutsEnabled,
-      kycDetails: null,
-      walletStatus: wallet
-        ? {
-            id: wallet.id,
-            storeId: wallet.storeId,
-            availableKobo: wallet.availableKobo,
-            pendingKobo: wallet.pendingKobo,
-            isLocked: wallet.isLocked,
-            kycStatus: wallet.kycStatus,
-            vaStatus: wallet.vaStatus,
-            vaBankName: wallet.vaBankName,
-            vaAccountNumber: wallet.vaAccountNumber,
-            vaAccountName: wallet.vaAccountName,
-            vaProviderRef: wallet.vaProviderRef,
-            updatedAt: wallet.updatedAt,
-          }
-        : null,
-      history: recentAudit.map((a) => ({
-        action: a.action,
-        timestamp: a.createdAt,
-        ip: a.ip,
-      })),
-      profile: {
-        id: store.id,
-        name: store.name,
-        slug: store.slug,
-        logoUrl: store.logoUrl,
-        isLive: store.isLive,
-        createdAt: store.createdAt,
-        ownerEmail,
-      },
-      stats: {
-        ordersCount: store._count.orders,
-        productsCount: store._count.products,
-        customersCount: store._count.customers,
-        gmv: gmvAggregate._sum.total || 0,
-        walletBalance: wallet ? Number(wallet.availableKobo) / 100 : 0,
-      },
-      notes,
-      compliance: complianceReport,
-    });
+    // Proxy to backend
+    const response = await apiClient.get(`/api/v1/admin/merchants/${id}`);
+    return NextResponse.json(response);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {

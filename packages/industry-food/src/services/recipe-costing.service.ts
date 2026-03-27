@@ -3,7 +3,7 @@
  * Calculates recipe costs, food costing, and ingredient analysis
  */
 
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
 import { z } from 'zod';
 
 const recipeCostSchema = z.object({
@@ -64,7 +64,7 @@ export class RecipeCostingService {
       totalCost,
       costPerPortion,
       portions,
-      ingredients: recipe.ingredients.map(i => ({
+      ingredients: recipe.ingredients.map((i) => ({
         name: i.ingredient.name,
         quantity: i.quantity,
         cost: i.quantity * i.ingredient.costPerUnit,

@@ -3,6 +3,7 @@ import { IndustrySlug } from "../lib/templates/types";
 
 export type OnboardingStepId =
   | "welcome"
+  | "plan_selection"
   | "identity"
   | "business"
   | "tools"
@@ -61,6 +62,13 @@ export interface OnboardingState {
     email?: string;
     phone?: string;
     businessRegistrationType?: string;
+    businessType?: "b2b" | "b2c" | "nonprofit" | "hybrid";
+    organizationType?: "for_profit" | "nonprofit" | "government";
+    employeeCount?: number;
+    businessSize?: "solo" | "small" | "medium" | "large";
+    enableWholesale?: boolean;
+    hasEvents?: boolean;
+    needsTicketing?: boolean;
   };
   logistics?: {
     pickupAddress?: string;
@@ -80,6 +88,23 @@ export interface OnboardingState {
   kyc?: KycData;
   intent?: {
     segment?: string;
+  };
+  b2bConfig?: {
+    enableQuotes?: boolean;
+    enableCreditAccounts?: boolean;
+    defaultCreditLimit?: number;
+    paymentTerms?: "net_15" | "net_30" | "net_60" | "due_on_receipt";
+    requireApproval?: boolean;
+  };
+  nonprofitConfig?: {
+    acceptDonations?: boolean;
+    volunteerManagement?: boolean;
+    fundraisingGoals?: number;
+  };
+  eventsConfig?: {
+    enableTickets?: boolean;
+    venueCapacity?: number;
+    enableRSVP?: boolean;
   };
   completedAt?: Date | null;
   updatedAt: Date;

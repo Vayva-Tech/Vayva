@@ -1,514 +1,340 @@
 "use client";
-import { motion } from "framer-motion";
-import { useState, useEffect, useCallback } from "react";
+
+/**
+ * Wellness & Fitness Dashboard - Main Page
+ * Gym, fitness studio, and wellness center management
+ * Theme: Teal to Lime gradient
+ */
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Dumbbell, Users, TrendingUp, DollarSign, Calendar, Heart, Award, Clock } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 import { apiJson } from "@/lib/api-client-shared";
-import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
-import { Button } from "@vayva/ui";
-import {
-  Calendar,
-  Users,
-  CurrencyDollar as DollarSign,
-  TrendUp as TrendingUp,
-  Star,
-  Package,
-  Bell,
-  Gear as Settings
-} from "@phosphor-icons/react/ssr";
-import { applyTheme, wellnessThemes } from "@vayva/theme";
-import { 
-  WellnessCard, 
-  AppointmentStatus, 
-  StaffStatus, 
-  WellnessKPICard 
-} from "@/components/wellness";
+import logger from "@/lib/logger";
 
-type AppointmentUiStatus =
-  | "in-session"
-  | "checked-in"
-  | "available"
-  | "no-show"
-  | "filling-up"
-  | "waiting-list";
-
-interface WellnessDashboardData {
-  todaysOverview: {
-    appointments: number;
-    staffOnDuty: number;
-    revenue: number;
-    appointmentTrend: number;
-    revenueTrend: number;
-  };
-  appointments: Array<{
-    id: string;
-    time: string;
-    service: string;
-    staff: string;
-    client: string;
-    status: AppointmentUiStatus;
-  }>;
-  staffAvailability: Array<{
-    name: string;
-    role: string;
-    status: string;
-    availability: string;
-  }>;
-  servicePerformance: Array<{
-    name: string;
-    bookings: number;
-    revenue: number;
-    rating: number;
-  }>;
-  retailSales: Array<{ category: string; amount: number; trend: number }>;
-  classes: Array<{
-    time: string;
-    type: string;
-    enrolled: number;
-    capacity: number;
-    instructor: string;
-  }>;
-  membershipMetrics: {
-    total: number;
-    newThisMonth: number;
-    churned: number;
-    netGrowth: number;
-    tiers: { unlimited: number; classPack: number; monthly: number };
-  };
+interface DashboardStats {
+  totalRevenue: number;
+  activeMembers: number;
+  totalClasses: number;
+  trainerCount: number;
+  membershipGrowth: number;
+  averageAttendance: number;
+  classCapacity: number;
+  appointmentsToday: number;
 }
 
-const WELLNESS_EMPTY: WellnessDashboardData = {
-  todaysOverview: {
-    appointments: 0,
-    staffOnDuty: 0,
-    revenue: 0,
-    appointmentTrend: 0,
-    revenueTrend: 0,
-  },
-  appointments: [],
-  staffAvailability: [],
-  servicePerformance: [],
-  retailSales: [],
-  classes: [],
-  membershipMetrics: {
-    total: 0,
-    newThisMonth: 0,
-    churned: 0,
-    netGrowth: 0,
-    tiers: { unlimited: 0, classPack: 0, monthly: 0 },
-  },
-};
+interface FitnessClass {
+  id: string;
+  name: string;
+  trainer: string;
+  schedule: string;
+  capacity: number;
+  enrolled: number;
+  type: "yoga" | "pilates" | "cardio" | "strength" | "hiit" | "spinning";
+}
 
-function mapBookingWellnessStatus(ui: string): AppointmentUiStatus {
-  switch (ui) {
-    case "Confirmed":
-      return "checked-in";
-    case "Completed":
-      return "in-session";
-    case "Pending":
-      return "waiting-list";
-    case "Cancelled":
-      return "no-show";
-    default:
-      return "waiting-list";
-  }
+interface Member {
+  id: string;
+  name: string;
+  membershipType: string;
+  joinDate: string;
+  status: "active" | "inactive" | "frozen";
+  lastVisit: string;
 }
 
 export default function WellnessDashboard() {
-  const searchParams = useSearchParams();
-  const theme = searchParams?.get("theme") || "serene-garden";
-  const [dash, setDash] = useState<WellnessDashboardData>(WELLNESS_EMPTY);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [classes, setClasses] = useState<FitnessClass[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
 
-  const loadWellness = useCallback(async () => {
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const fetchAllData = async () => {
     try {
       setLoading(true);
-      const today = new Date().toISOString().slice(0, 10);
-      const start = new Date(`${today}T00:00:00.000Z`);
-      const end = new Date(`${today}T23:59:59.999Z`);
-      type BeautyOverview = {
-        revenue?: number;
-        appointments?: number;
-        productSales?: number;
-        topServices?: Array<{
-          serviceName?: string;
-          count?: number;
-          revenue?: number;
-        }>;
-        totalStylists?: number;
-        stylistsOnDuty?: number;
-      };
-
-      const [overviewRes, bookingsRes, stylistsRes] = await Promise.all([
-        apiJson<{ success?: boolean; data?: BeautyOverview }>(
-          `/api/beauty/dashboard/overview?date=${today}`,
-        ),
-        apiJson<{
-          data?: Array<{
-            id: string;
-            customerName: string;
-            service: string;
-            time: string;
-            status: string;
-          }>;
-        }>(
-          `/api/bookings?start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`,
-        ),
-        apiJson<{
-          success?: boolean;
-          data?: Array<{
-            firstName?: string | null;
-            lastName?: string | null;
-            role?: string | null;
-          }>;
-        }>("/api/beauty/stylists?limit=30"),
+      await Promise.all([
+        fetchStats(),
+        fetchClasses(),
+        fetchMembers(),
       ]);
-
-      const ov = overviewRes.data;
-      const bookings = bookingsRes.data ?? [];
-      const stylists = stylistsRes.data ?? [];
-
-      const appointments = bookings.map((b) => ({
-        id: b.id,
-        time: b.time,
-        service: b.service,
-        staff: "Team",
-        client: b.customerName,
-        status: mapBookingWellnessStatus(b.status),
-      }));
-
-      const staffAvailability = stylists.map((s) => {
-        const name = [s.firstName, s.lastName].filter(Boolean).join(" ").trim() || "Staff";
-        return {
-          name,
-          role: s.role ?? "Staff",
-          status: "active",
-          availability: "See schedule",
-        };
-      });
-
-      const topServices = ov?.topServices ?? [];
-      const servicePerformance = topServices.map((t) => ({
-        name: t.serviceName ?? "Service",
-        bookings: t.count ?? 0,
-        revenue: t.revenue ?? 0,
-        rating: 0,
-      }));
-
-      const productSales = ov?.productSales ?? 0;
-      const retailSales =
-        productSales > 0
-          ? [{ category: "Retail (today)", amount: Math.round(productSales), trend: 0 }]
-          : [];
-
-      setDash({
-        todaysOverview: {
-          appointments: ov?.appointments ?? 0,
-          staffOnDuty: ov?.totalStylists ?? stylists.length,
-          revenue: ov?.revenue ?? 0,
-          appointmentTrend: 0,
-          revenueTrend: 0,
-        },
-        appointments,
-        staffAvailability,
-        servicePerformance,
-        retailSales,
-        classes: [],
-        membershipMetrics: WELLNESS_EMPTY.membershipMetrics,
-      });
-    } catch {
-      toast.error("Could not load wellness data");
-      setDash(WELLNESS_EMPTY);
+    } catch (error) {
+      logger.error("Failed to fetch wellness dashboard data", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    void loadWellness();
-  }, [loadWellness]);
+  const fetchStats = async () => {
+    try {
+      const response = await apiJson<{ data: DashboardStats }>("/api/wellness/stats");
+      setStats(response.data || null);
+    } catch (error) {
+      logger.warn("Failed to fetch wellness stats", error);
+      setStats(null);
+    }
+  };
 
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+  const fetchClasses = async () => {
+    try {
+      const response = await apiJson<{ data: FitnessClass[] }>("/api/wellness/classes?limit=10");
+      setClasses(response.data || []);
+    } catch (error) {
+      logger.warn("Failed to fetch classes", error);
+      setClasses([]);
+    }
+  };
 
-  const rated = dash.servicePerformance.filter((s) => s.rating > 0);
-  const avgServiceRating =
-    rated.length > 0
-      ? (rated.reduce((a, s) => a + s.rating, 0) / rated.length).toFixed(1)
-      : null;
+  const fetchMembers = async () => {
+    try {
+      const response = await apiJson<{ data: Member[] }>("/api/wellness/members?limit=10");
+      setMembers(response.data || []);
+    } catch (error) {
+      logger.warn("Failed to fetch members", error);
+      setMembers([]);
+    }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(value);
+  };
+
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className={`space-y-6 p-6 bg-white min-h-screen ${loading ? "opacity-60 pointer-events-none" : ""}`}
-    >
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">VAYVA WELLNESS</h1>
-          <p className="text-gray-500 mt-1">Natural Warmth Design</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Bell className="w-4 h-4" />
-            Notifications
+    <ErrorBoundary serviceName="WellnessDashboard">
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-lime-50 p-6">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Wellness & Fitness Dashboard</h1>
+            <p className="mt-1 text-gray-600">Manage gym, classes, members, and wellness programs</p>
           </div>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
+          <Button onClick={() => router.push("/dashboard/wellness/members/new")}>
+            Add Member
           </Button>
         </div>
-      </div>
 
-      {/* Today's Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <WellnessKPICard 
-          title="Today's Appointments"
-          value={dash.todaysOverview.appointments}
-          trend={dash.todaysOverview.appointmentTrend}
-          trendLabel="vs last week"
-          icon={<Calendar className="w-5 h-5" />}
-        />
-        
-        <WellnessKPICard 
-          title="Staff On Duty"
-          value={dash.todaysOverview.staffOnDuty}
-          trend={undefined}
-          icon={<Users className="w-5 h-5" />}
-        />
-        
-        <WellnessKPICard 
-          title="Revenue Today"
-          value={`₦${dash.todaysOverview.revenue.toLocaleString()}`}
-          trend={dash.todaysOverview.revenueTrend}
-          trendLabel="vs avg"
-          icon={<DollarSign className="w-5 h-5" />}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Appointment Schedule */}
-        <WellnessCard 
-          title="📅 APPOINTMENT SCHEDULE"
-          headerAction={<Button variant="outline" size="sm">Quick Add</Button>}
-        >
-          <div className="space-y-3">
-            {dash.appointments.length === 0 && (
-              <p className="text-sm text-gray-500 py-2">No appointments scheduled for today.</p>
-            )}
-            {dash.appointments.map((apt) => (
-              <div key={apt.id} className="flex justify-between items-center p-3 rounded-lg bg-gray-100">
-                <div className="flex-1">
-                  <div className="font-medium">{apt.time}</div>
-                  <div className="text-sm text-gray-500">{apt.service} - {apt.staff}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium">{apt.client || "Available"}</div>
-                  <div className="mt-1">
-                    <AppointmentStatus status={apt.status} size="sm" />
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Stats Cards */}
+        <ErrorBoundary serviceName="WellnessStatsCards">
+          <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+            <StatCard title="Total Revenue" value={stats?.totalRevenue ? formatCurrency(stats.totalRevenue) : "N/A"} icon={DollarSign} trend="+18.3%" description="This month" color="green" />
+            <StatCard title="Active Members" value={stats?.activeMembers?.toString() || "0"} icon={Users} trend="+14.7%" description="Current" color="teal" />
+            <StatCard title="Total Classes" value={stats?.totalClasses?.toString() || "0"} icon={Calendar} description="Scheduled" color="blue" />
+            <StatCard title="Trainers" value={stats?.trainerCount?.toString() || "0"} icon={Award} description="On staff" color="purple" />
+            <StatCard title="Membership Growth" value={stats?.membershipGrowth ? `${stats.membershipGrowth}%` : "N/A"} icon={TrendingUp} trend="+12.5%" description="MoM" color="orange" />
+            <StatCard title="Avg Attendance" value={stats?.averageAttendance?.toString() || "N/A"} icon={Heart} description="Per class" color="red" />
+            <StatCard title="Class Capacity" value={stats?.classCapacity ? `${stats.classCapacity}%` : "N/A"} icon={Dumbbell} description="Utilization" color="indigo" />
+            <StatCard title="Appointments Today" value={stats?.appointmentsToday?.toString() || "0"} icon={Clock} description="Scheduled" color="cyan" />
           </div>
-        </WellnessCard>
+        </ErrorBoundary>
 
-        {/* Staff Availability */}
-        <WellnessCard 
-          title="👥 STAFF AVAILABILITY"
-          headerAction={<Button variant="outline" size="sm">Schedule Editor</Button>}
-        >
-          <div className="space-y-3">
-            {dash.staffAvailability.length === 0 && (
-              <p className="text-sm text-gray-500 py-2">No staff roster for this store yet.</p>
-            )}
-            {dash.staffAvailability.map((staff, idx) => (
-              <div key={`${staff.name}-${idx}`} className="flex justify-between items-center p-3 rounded-lg bg-gray-100">
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="classes" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+          <TabsTrigger value="classes">Classes</TabsTrigger>
+          <TabsTrigger value="members">Members</TabsTrigger>
+          <TabsTrigger value="trainers">Trainers</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="classes">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">{staff.name}</div>
-                  <div className="text-sm text-gray-500">{staff.role}</div>
+                  <CardTitle>Scheduled Classes</CardTitle>
+                  <CardDescription>Upcoming fitness classes and sessions</CardDescription>
                 </div>
-                <StaffStatus 
-                  status={staff.status as any} 
-                  availability={staff.availability}
+                <Button onClick={() => router.push("/dashboard/wellness/classes")}>View All</Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {classes.length === 0 ? (
+                <EmptyState
+                  title="No classes scheduled"
+                  description="Create your first fitness class"
+                  actionLabel="Schedule Class"
+                  onAction={() => router.push("/dashboard/wellness/classes/new")}
                 />
-              </div>
-            ))}
-          </div>
-        </WellnessCard>
-      </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Class Name</TableHead>
+                      <TableHead>Trainer</TableHead>
+                      <TableHead>Schedule</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Enrolled</TableHead>
+                      <TableHead>Capacity</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {classes.map((cls) => (
+                      <TableRow key={cls.id}>
+                        <TableCell className="font-medium">{cls.name}</TableCell>
+                        <TableCell>{cls.trainer}</TableCell>
+                        <TableCell>{new Date(cls.schedule).toLocaleString()}</TableCell>
+                        <TableCell><Badge variant="outline">{cls.type}</Badge></TableCell>
+                        <TableCell>{cls.enrolled} enrolled</TableCell>
+                        <TableCell>{cls.capacity} spots</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Service Performance */}
-        <WellnessCard title="💆 SERVICE PERFORMANCE">
-          <div className="space-y-4">
-            {dash.servicePerformance.length === 0 && (
-              <p className="text-sm text-gray-500 py-2">No service volume yet for today.</p>
-            )}
-            {dash.servicePerformance.map((service, idx) => (
-              <div key={`${service.name}-${idx}`} className="flex justify-between items-center">
+        <TabsContent value="members">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">{service.name}</div>
-                  <div className="text-sm text-gray-500">{service.bookings} bookings</div>
+                  <CardTitle>Recent Members</CardTitle>
+                  <CardDescription>Member enrollment and status</CardDescription>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold">₦{Number(service.revenue).toLocaleString()}</div>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                    {service.rating > 0 ? `${service.rating}/5` : "—"}
-                  </div>
-                </div>
+                <Button onClick={() => router.push("/dashboard/wellness/members")}>View All</Button>
               </div>
-            ))}
-            <div className="pt-4 border-t">
-              <div className="flex justify-between text-sm">
-                <span>Avg service rating</span>
-                <span className="font-medium">{avgServiceRating ? `${avgServiceRating}/5` : "—"}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Rebooking rate</span>
-                <span className="font-medium">—</span>
-              </div>
-            </div>
-          </div>
-        </WellnessCard>
+            </CardHeader>
+            <CardContent>
+              {members.length === 0 ? (
+                <EmptyState
+                  title="No members yet"
+                  description="Add members to track memberships"
+                  actionLabel="Add Member"
+                  onAction={() => router.push("/dashboard/wellness/members/new")}
+                />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Membership</TableHead>
+                      <TableHead>Join Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Last Visit</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {members.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="font-medium">{member.name}</TableCell>
+                        <TableCell>{member.membershipType}</TableCell>
+                        <TableCell>{new Date(member.joinDate).toLocaleDateString()}</TableCell>
+                        <TableCell><Badge variant={member.status === "active" ? "default" : "outline"}>{member.status}</Badge></TableCell>
+                        <TableCell>{new Date(member.lastVisit).toLocaleDateString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-        {/* Retail Sales */}
-        <WellnessCard title="🛍️ RETAIL SALES">
-          <div className="space-y-4">
-            {dash.retailSales.length === 0 && (
-              <p className="text-sm text-gray-500 py-2">No retail sales recorded for today.</p>
-            )}
-            {dash.retailSales.map((category, idx) => (
-              <div key={`${category.category}-${idx}`} className="flex justify-between items-center">
-                <div className="font-medium">{category.category}</div>
-                <div className="text-right">
-                  <div className="font-semibold">₦{category.amount.toLocaleString()}</div>
-                  <div className={`text-sm flex items-center gap-1 ${
-                    category.trend >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {category.trend >= 0 ? '▲' : '▼'} {Math.abs(category.trend)}%
-                  </div>
-                </div>
-              </div>
-            ))}
-            {dash.retailSales.length > 0 && (
-              <div className="pt-4 border-t">
-                <div className="flex justify-between text-sm">
-                  <span>Attach rate</span>
-                  <span className="font-medium">—</span>
-                </div>
-                <div className="text-xs text-gray-500">Share of clients who bought retail (when tracked)</div>
-              </div>
-            )}
-          </div>
-        </WellnessCard>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Class Schedule */}
-        <WellnessCard title="🧘 CLASS SCHEDULE">
-          <div className="space-y-3">
-            {dash.classes.length === 0 && (
-              <p className="text-sm text-gray-500 py-2">No class schedule synced yet.</p>
-            )}
-            {dash.classes.map((classItem, idx) => (
-              <div key={`${classItem.time}-${idx}`} className="flex justify-between items-center p-3 rounded-lg bg-gray-100">
+        <TabsContent value="trainers">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">{classItem.time} {classItem.type}</div>
-                  <div className="text-sm text-gray-500">Instructor: {classItem.instructor}</div>
+                  <CardTitle>Our Trainers</CardTitle>
+                  <CardDescription>Fitness instructors and wellness coaches</CardDescription>
                 </div>
-                <div className="text-right">
-                  <div className="font-medium">{classItem.enrolled}/{classItem.capacity}</div>
-                  <div className="text-xs text-gray-500">students</div>
-                </div>
+                <Button onClick={() => router.push("/dashboard/wellness/trainers")}>View All</Button>
               </div>
-            ))}
-            {dash.classes.length > 0 && (
-              <div className="pt-4 border-t">
-                <div className="text-sm text-gray-500">Top instructors appear here when class data is connected.</div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <Award className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <p className="text-gray-600">Trainer directory coming soon</p>
+                <Button className="mt-4" onClick={() => router.push("/dashboard/wellness/trainers")}>
+                  View Trainer Roster
+                </Button>
               </div>
-            )}
-          </div>
-        </WellnessCard>
-
-        {/* Membership Metrics */}
-        <WellnessCard title="🎯 MEMBERSHIP METRICS">
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-gray-100 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{dash.membershipMetrics.total}</div>
-                <div className="text-sm text-gray-500">Total Members</div>
-              </div>
-              <div className="text-center p-4 bg-gray-100 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">+{dash.membershipMetrics.netGrowth}</div>
-                <div className="text-sm text-gray-500">Net Growth</div>
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t">
-              <div className="text-sm mb-3">
-                <span className="font-medium">Membership Tiers:</span>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Unlimited:</span>
-                  <span className="font-medium">{dash.membershipMetrics.tiers.unlimited} members</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>10-Class:</span>
-                  <span className="font-medium">{dash.membershipMetrics.tiers.classPack} members</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Monthly:</span>
-                  <span className="font-medium">{dash.membershipMetrics.tiers.monthly} members</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t text-sm">
-              <div className="flex justify-between mb-1">
-                <span>New This Month:</span>
-                <span className="font-medium text-green-600">+{dash.membershipMetrics.newThisMonth}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Churned:</span>
-                <span className="font-medium text-red-600">{dash.membershipMetrics.churned}</span>
-              </div>
-            </div>
-          </div>
-        </WellnessCard>
-      </div>
-
-      {/* Theme Selector */}
-      <WellnessCard title="🎨 Theme Selection">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {Object.values(wellnessThemes).map((wellnessTheme) => (
-            <Button
-              key={wellnessTheme.id}
-              onClick={() => {
-                const url = new URL(window.location.href);
-                url.searchParams.set('theme', wellnessTheme.id);
-                window.location.href = url.toString();
-              }}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                theme === wellnessTheme.id 
-                  ? 'border-green-500 bg-green-500/10' 
-                  : 'border-gray-200 hover:border-green-500/50'
-              }`}
-            >
-              <div 
-                className="w-full h-8 rounded mb-2" 
-                style={{ backgroundColor: wellnessTheme.colors.primary }}
-              />
-              <div className="text-sm font-medium text-gray-900">{wellnessTheme.name}</div>
-              <div className="text-xs text-gray-500">{wellnessTheme.description}</div>
-            </Button>
-          ))}
-        </div>
-      </WellnessCard>
-    </motion.div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      </ErrorBoundary>
+    </ErrorBoundary>
   );
 }
+
+// Sub-components
+function StatCard({ title, value, icon: Icon, trend, description, color }: any) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className={`h-4 w-4 text-${color || "gray"}-600`} />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {trend && (
+          <p className={`text-xs mt-1 ${trend.startsWith("+") ? "text-green-600" : "text-red-600"}`}>
+            {trend} {description && `• ${description}`}
+          </p>
+        )}
+        {description && !trend && <p className="text-xs text-gray-600 mt-1">{description}</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
+function EmptyState({ title, description, actionLabel, onAction }: any) {
+  return (
+    <div className="text-center py-12">
+      <Dumbbell className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-gray-600 mb-4">{description}</p>
+      <Button onClick={onAction}>{actionLabel}</Button>
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-lime-50 p-6">
+      <div className="mb-8">
+        <Skeleton className="h-10 w-96 mb-2" />
+        <Skeleton className="h-5 w-64" />
+      </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+        {[...Array(8)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader><Skeleton className="h-4 w-24" /></CardHeader>
+            <CardContent><Skeleton className="h-8 w-32 mb-2" /><Skeleton className="h-3 w-20" /></CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// API INTEGRATION NOTES:
+// Required Endpoints:
+// - GET /api/wellness/stats - Dashboard statistics
+// - GET /api/wellness/members - Membership management
+// - GET /api/wellness/classes - Class scheduling
+// - GET /api/wellness/trainers - Trainer roster
+// - GET /api/wellness/memberships - Membership plans
+// - GET /api/wellness/progress - Member progress tracking
+// - GET /api/wellness/appointments - Personal training bookings
+// - GET /api/wellness/nutrition - Meal planning
+// - GET /api/wellness/analytics - Performance analytics

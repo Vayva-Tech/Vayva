@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma, Prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
-
-type DispatchJobWithShipment = Prisma.DispatchJobGetPayload<{
-  include: {
-    shipment: {
-      include: {
-        order: { select: { orderNumber: true } };
-      };
-    };
-  };
-}>;
 
 export const dynamic = "force-dynamic";
 
@@ -28,53 +18,19 @@ export async function GET(
     const { id } = resolvedParams;
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
+    const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || "10";
 
-    const [dispatchJobs, total] = await Promise.all([
-      prisma.dispatchJob.findMany({
-        where: { storeId: id },
-        take: limit,
-        skip,
-        orderBy: { createdAt: "desc" },
-        include: {
-          shipment: {
-            include: {
-              order: { select: { orderNumber: true } },
-            },
-          },
-        },
-      }),
-      prisma.dispatchJob.count({ where: { storeId: id } }),
-    ]);
-
-    return NextResponse.json({
-      data: dispatchJobs.map((job: DispatchJobWithShipment) => ({
-        id: job.id,
-        orderId: job.shipment?.order?.orderNumber,
-        carrier: job.carrier,
-        status: job.status,
-        rider: job.assignedRiderName,
-        riderPhone: job.assignedRiderPhone,
-        createdAt: job.createdAt,
-      })),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+    const response = await apiClient.get(`/api/v1/admin/merchants/${id}/deliveries`, {
+      page,
+      limit,
     });
 
-  } catch (error: unknown) {
-    if (
-      error instanceof Error ? error.message : String(error) === "Unauthorized"
-    ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("[MERCHANT_DELIVERIES_ERROR]", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to fetch deliveries" },
       { status: 500 },
     );
   }

@@ -5,6 +5,7 @@ import { PageEmpty } from "@/components/layout/PageEmpty";
 import { useAuth } from "@/context/AuthContext";
 import { useStore } from "@/context/StoreContext";
 import { ChartLine } from "@phosphor-icons/react/ssr";
+import { IndustryBadge } from "@/components/dashboard/IndustryBadge";
 
 export default function DashboardPage() {
   const { user, merchant, isLoading } = useAuth();
@@ -12,7 +13,8 @@ export default function DashboardPage() {
 
   if (isLoading) return null;
 
-  const industry = (merchant?.industrySlug || store?.industrySlug || "retail") as any;
+  // Use type guard for industry slug - fallback to 'retail' as default
+  const industry = merchant?.industrySlug || store?.industrySlug || "retail";
   const userId = user?.id;
   const businessId = user?.storeId || merchant?.storeId || store?.id;
 
@@ -28,5 +30,10 @@ export default function DashboardPage() {
     );
   }
 
-  return <IndustryDashboardRouter industry={industry} userId={userId} businessId={businessId} />;
+  return (
+    <div>
+      {/* Industry badge removed - now shown only in navigation sidebar to avoid duplication */}
+      <IndustryDashboardRouter industry={industry} userId={userId} businessId={businessId} />
+    </div>
+  );
 }

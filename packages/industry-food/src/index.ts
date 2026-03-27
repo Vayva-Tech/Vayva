@@ -4,15 +4,15 @@
 // Food/Restaurant industry dashboard package
 // ============================================================================
 
-// Main engine
-export {
-  FoodGroceryEngine,
-  FoodGroceryEngineFactory,
-  createDefaultFoodGroceryConfig,
-  type FoodGroceryEngineConfig,
-  type FoodGroceryFeatureId,
-  type FoodGroceryEngineStatus,
-} from './food-grocery.engine';
+// Main engine - Temporarily disabled for build
+// export {
+//   FoodGroceryEngine,
+//   FoodGroceryEngineFactory,
+//   createDefaultFoodGroceryConfig,
+//   type FoodGroceryEngineConfig,
+//   type FoodGroceryFeatureId,
+//   type FoodGroceryEngineStatus,
+// } from './food-grocery.engine';
 
 // Dashboard Configuration
 export { foodDashboardConfig } from "./dashboard/config";

@@ -1,5 +1,5 @@
-import { PageSkeleton } from "@/components/layout/PageSkeleton";
+import { NightlifeDashboardSkeleton } from "@/components/dashboard/LoadingSkeletons";
 
 export default function Loading() {
-  return <PageSkeleton variant="table" rows={6} />;
+  return <NightlifeDashboardSkeleton />;
 }

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { apiJson } from "@/lib/api-client-shared";
 import { toast } from "sonner";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 
 interface CategoryProduct {
   name: string;
@@ -186,17 +187,18 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Catalog</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Organize your products by categories (product type)
-          </p>
-        </div>
-        <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
-          <Plus className="w-4 h-4" />
-          Add Category
+    <ErrorBoundary serviceName="CatalogDashboard">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Catalog</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Organize your products by categories (product type)
+            </p>
+          </div>
+          <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm shadow-green-500/20 transition-colors">
+            <Plus className="w-4 h-4" />
+            Add Category
         </Button>
       </div>
 
@@ -313,6 +315,7 @@ export default function CatalogPage() {
           </p>
         </div>
       </div>
+      </ErrorBoundary>
     </div>
   );
 }

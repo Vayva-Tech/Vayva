@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { DashboardErrorBoundary } from '@/components/error-boundary/error-boundary-utils';
 
 export interface NightlifeDashboardProps {
   userId?: string;
@@ -23,10 +24,16 @@ export function NightlifeDashboard({
   className,
 }: NightlifeDashboardProps) {
   return (
-    <div className={className} data-industry="nightlife" data-plan={planTier}>
-      <div>Nightlife Dashboard</div>
-      <div>Business: {businessId}</div>
-    </div>
+    <DashboardErrorBoundary serviceName="NightlifeDashboard">
+      <div className={className} data-industry="nightlife" data-plan={planTier}>
+        <DashboardErrorBoundary serviceName="NightlifeDashboardHeader">
+          <div>Nightlife Dashboard</div>
+        </DashboardErrorBoundary>
+        <DashboardErrorBoundary serviceName="NightlifeDashboardInfo">
+          <div>Business: {businessId}</div>
+        </DashboardErrorBoundary>
+      </div>
+    </DashboardErrorBoundary>
   );
 }
 

@@ -22,6 +22,7 @@ import {
   List as Menu,
   X,
   Rocket,
+  Target,
 } from "@phosphor-icons/react/ssr";
 
 interface StepConfig {
@@ -37,6 +38,12 @@ const STEP_CONFIGS: StepConfig[] = [
     title: "Get Started",
     description: "Welcome to Vayva",
     icon: "Sparkles",
+  },
+  {
+    id: "plan_selection",
+    title: "Choose Plan",
+    description: "Find your perfect plan",
+    icon: "Target",
   },
   {
     id: "identity",
@@ -190,6 +197,14 @@ export default function OnboardingLayout({
                 <>
                   {step.icon === "Sparkles" && (
                     <Sparkles
+                      size={14}
+                      className={
+                        isCurrent ? "text-white" : "text-gray-400"
+                      }
+                    />
+                  )}
+                  {step.icon === "Target" && (
+                    <Target
                       size={14}
                       className={
                         isCurrent ? "text-white" : "text-gray-400"

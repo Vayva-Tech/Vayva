@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
 
 export const dynamic = "force-dynamic";
@@ -18,55 +18,19 @@ export async function GET(
     const { id } = resolvedParams;
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
+    const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || "10";
 
-    const [orders, total] = await Promise.all([
-      prisma.order.findMany({
-        where: { storeId: id },
-        take: limit,
-        skip,
-        orderBy: { createdAt: "desc" },
-        include: {
-          customer: {
-            select: { firstName: true, lastName: true, email: true },
-          },
-        },
-      }),
-      prisma.order.count({ where: { storeId: id } }),
-    ]);
-
-    return NextResponse.json({
-      data: orders.map((o) => ({
-        id: o.id,
-        displayId: o.orderNumber,
-        total: o.total,
-        status: o.status,
-        paymentStatus: o.paymentStatus,
-        fulfillmentStatus: o.fulfillmentStatus,
-        customer: o.customer
-          ? `${o.customer.firstName || ""} ${o.customer.lastName || ""}`.trim()
-          : "Guest",
-        createdAt: o.createdAt,
-      })),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+    const response = await apiClient.get(`/api/v1/admin/merchants/${id}/orders`, {
+      page,
+      limit,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: unknown) {
-    if (
-      error instanceof Error ? error.message : String(error) === "Unauthorized"
-    ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("[MERCHANT_ORDERS_ERROR]", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to fetch orders" },
       { status: 500 },
     );
   }

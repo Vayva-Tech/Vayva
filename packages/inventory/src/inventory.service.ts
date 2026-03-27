@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from "@vayva/db";
+/**
+ * Inventory Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
+ * Database operations moved to Backend/core-api/src/services/inventory/inventory.service.ts
+ */
 import { z } from "zod";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -78,52 +81,40 @@ export interface StockTransfer {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Service
+// Service - Frontend Version (Calls Backend API)
 // ────────────────────────────────────────────────────────────────────────────
 
+/**
+ * InventoryService - Frontend
+ * Calls backend API for all database operations
+ */
 export class InventoryService {
-  // ── Read ──────────────────────────────────────────────────────────────────
+  private readonly apiBaseUrl: string;
+
+  constructor(apiBaseUrl?: string) {
+    this.apiBaseUrl = apiBaseUrl || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+  }
 
   /**
-   * Get stock level for a product variant
+   * Get stock level for a product variant via backend API
    */
   async getStock(
     storeId: string,
     variantId: string,
     locationId?: string
   ): Promise<StockLevel | null> {
-    const where: Record<string, unknown> = {
-      variantId,
-      inventoryLocation: { storeId },
-    };
-    if (locationId) where.locationId = locationId;
-
-    const item = await prisma.inventoryItem.findFirst({
-      where,
-      include: { inventoryLocation: true },
+    const url = `${this.apiBaseUrl}/inventory/stock/${variantId}?locationId=${locationId || ''}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${storeId}`,
+      },
     });
 
-    if (!item) return null;
-
-    const onHand = item.onHand ?? 0;
-    const reserved = item.reserved ?? 0;
-    const lowStockThreshold = (item as any).lowStockThreshold ?? 5;
-    const reorderPoint = item.reorderPoint ?? 10;
-
-    return {
-      productId: item.productId,
-      variantId: item.variantId,
-      locationId: item.locationId,
-      storeId,
-      onHand,
-      reserved,
-      available: Math.max(0, onHand - reserved),
-      reorderPoint,
-      lowStockThreshold,
-      isLowStock: onHand <= lowStockThreshold && onHand > 0,
-      isOutOfStock: onHand <= 0,
-      lastUpdatedAt: item.updatedAt,
-    };
+    if (!response.ok) return null;
+    
+    const data = await response.json();
+    return data.data;
   }
 
   /**

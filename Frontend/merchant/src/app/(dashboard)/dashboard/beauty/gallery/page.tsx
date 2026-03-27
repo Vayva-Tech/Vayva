@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { Card, Button, Input, Label, Textarea, Badge, cn } from "@vayva/ui";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { logger } from "@vayva/shared";
 import {
   Upload,
   Image,
@@ -87,7 +89,8 @@ export default function BeautyGalleryPage() {
         });
       }
     } catch (error) {
-      console.error("Upload failed:", error);
+      logger.error("[GALLERY_UPLOAD_ERROR]", { error });
+      toast.error("Failed to upload photo");
     } finally {
       setUploading(false);
     }
@@ -104,9 +107,11 @@ export default function BeautyGalleryPage() {
       const result = await response.json();
       if (result.success) {
         setPhotos(photos.map(p => p.id === id ? result.data : p));
+        toast.success("Photo approved successfully");
       }
     } catch (error) {
-      console.error("Failed to approve photo:", error);
+      logger.error("[GALLERY_APPROVE_ERROR]", { error });
+      toast.error("Failed to approve photo");
     }
   };
 
@@ -121,9 +126,11 @@ export default function BeautyGalleryPage() {
       const result = await response.json();
       if (result.success) {
         setPhotos(photos.filter(p => p.id !== id));
+        toast.success("Photo deleted successfully");
       }
     } catch (error) {
-      console.error("Failed to delete photo:", error);
+      logger.error("[GALLERY_DELETE_ERROR]", { error });
+      toast.error("Failed to delete photo");
     }
   };
 

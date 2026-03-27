@@ -467,3 +467,118 @@ export interface CreateGrantExpenseInput {
   date: Date;
   receiptUrl?: string;
 }
+
+// ============================================================================
+// ENHANCED NONPROFIT GRANT MANAGEMENT (Phase 5)
+// ============================================================================
+
+export type NonprofitGrantStatus = 'draft' | 'submitted' | 'under_review' | 'funded' | 'rejected' | 'closed';
+export type GrantApplicationStatus = 'draft' | 'submitted' | 'under_review' | 'awarded' | 'rejected';
+
+export interface NonprofitGrant {
+  id: string;
+  storeId: string;
+  title: string;
+  funder: string;
+  description: string;
+  requestedAmount: number;
+  duration: number; // months
+  deadline: Date;
+  website?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  eligibilityRequirements?: string[];
+  requiredDocuments?: string[];
+  evaluationCriteria?: string[];
+  notes?: string;
+  status: NonprofitGrantStatus;
+  applications?: GrantApplication[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateNonprofitGrantInput {
+  storeId: string;
+  title: string;
+  funder: string;
+  description: string;
+  requestedAmount: number;
+  duration: number;
+  deadline: Date;
+  website?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  eligibilityRequirements?: string[];
+  requiredDocuments?: string[];
+  evaluationCriteria?: string[];
+  notes?: string;
+}
+
+export interface GrantApplication {
+  id: string;
+  storeId: string;
+  grantId: string;
+  projectName: string;
+  projectDescription: string;
+  requestedAmount: number;
+  startDate: Date;
+  endDate: Date;
+  teamMembers: Array<{
+    name: string;
+    role: string;
+    qualifications?: string;
+  }>;
+  budgetBreakdown: Array<{
+    category: string;
+    amount: number;
+    description?: string;
+  }>;
+  expectedOutcomes: string[];
+  sustainabilityPlan?: string;
+  supportingDocuments?: string[];
+  notes?: string;
+  status: GrantApplicationStatus;
+  submittedAt?: Date;
+  reviewedAt?: Date;
+  awardedAmount?: number;
+  feedback?: string;
+  grant?: {
+    title: string;
+    funder: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateGrantApplicationInput {
+  storeId: string;
+  grantId: string;
+  projectName: string;
+  projectDescription: string;
+  requestedAmount: number;
+  startDate: Date;
+  endDate: Date;
+  teamMembers?: Array<{
+    name: string;
+    role: string;
+    qualifications?: string;
+  }>;
+  budgetBreakdown?: Array<{
+    category: string;
+    amount: number;
+    description?: string;
+  }>;
+  expectedOutcomes?: string[];
+  sustainabilityPlan?: string;
+  supportingDocuments?: string[];
+  notes?: string;
+}
+
+export interface SuccessRateMetrics {
+  totalApplications: number;
+  awardedApplications: number;
+  totalAwarded: number;
+  successRate: number;
+}

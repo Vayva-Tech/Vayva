@@ -3,12 +3,12 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
+    "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@vayva/prisma": ["./src/lib/food-prisma-stub.ts"]
-    },
-    "jsx": "react-jsx"
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/dashboard/**/*", "src/components/**/*", "src/widgets/**/*", "src/types/**/*"],
+  "exclude": ["node_modules", "dist", "src/services", "src/food.engine.ts", "src/food-grocery.engine.ts"]
 }

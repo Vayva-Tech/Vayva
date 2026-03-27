@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
 
 export const dynamic = "force-dynamic";

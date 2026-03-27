@@ -8,6 +8,7 @@ import { Button, Input } from "@vayva/ui";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 import { apiJson } from "@/lib/api-client-shared";
 
 interface Campaign {
@@ -152,29 +153,30 @@ export default function CampaignsPage() {
   const avgConversionRate = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(1) : "0";
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Marketing Campaigns</h1>
-          <p className="text-sm text-gray-500 mt-1">Create and manage marketing campaigns across channels</p>
+    <ErrorBoundary serviceName="CampaignsDashboard">
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Marketing Campaigns</h1>
+            <p className="text-sm text-gray-500 mt-1">Create and manage marketing campaigns across channels</p>
+          </div>
+          <Button onClick={() => { setEditingCampaign(null); resetForm(); setIsOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white">
+            <Plus size={18} className="mr-2" />
+            New Campaign
+          </Button>
         </div>
-        <Button onClick={() => { setEditingCampaign(null); resetForm(); setIsOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white">
-          <Plus size={18} className="mr-2" />
-          New Campaign
-        </Button>
-      </div>
 
-      {/* Summary Widgets */}
-      {campaigns.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-          <SummaryWidget
-            icon={<Megaphone size={18} />}
-            label="Total Campaigns"
-            value={String(totalCampaigns)}
-            trend={`${draftCampaigns} drafts`}
-            positive
-          />
+        {/* Summary Widgets */}
+        {campaigns.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <SummaryWidget
+              icon={<Megaphone size={18} />}
+              label="Total Campaigns"
+              value={String(totalCampaigns)}
+              trend={`${draftCampaigns} drafts`}
+              positive
+            />
           <SummaryWidget
             icon={<Play size={18} />}
             label="Active"
@@ -369,6 +371,7 @@ export default function CampaignsPage() {
       </Dialog>
 
       <ConfirmDialog isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete Campaign" message={`Delete "${deleteConfirm?.name}"?`} confirmText="Delete" onConfirm={() => deleteConfirm && handleDelete(deleteConfirm.id)} />
+      </ErrorBoundary>
     </div>
   );
 }

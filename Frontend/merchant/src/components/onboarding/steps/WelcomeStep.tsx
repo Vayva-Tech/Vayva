@@ -106,6 +106,52 @@ export default function WelcomeStep() {
         </div>
       </div>
 
+      {/* One-Time Setup Notice */}
+      <div className="bg-gradient-to-r from-violet-50 to-purple-50 border-2 border-purple-200 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0">
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <Shield size={24} className="text-purple-600" />
+            </div>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-purple-900 mb-2">
+              🎯 One-Time Business Setup - Extremely Important
+            </h3>
+            <p className="text-sm text-purple-800 mb-3">
+              This comprehensive setup ensures your store is configured perfectly for your specific business needs. 
+              Getting this right means:
+            </p>
+            <ul className="space-y-2 mb-3">
+              <li className="flex items-start gap-2 text-sm text-purple-700">
+                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <span>✅ AI captures orders correctly for your industry</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-purple-700">
+                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <span>✅ Payment processing works flawlessly</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-purple-700">
+                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <span>✅ Customer experience is personalized</span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-purple-700">
+                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <span>✅ Analytics and insights are relevant</span>
+              </li>
+            </ul>
+            <div className="bg-white/60 rounded-lg p-3">
+              <p className="text-xs font-semibold text-purple-900">
+                ⏱️ Time Required: 15-20 minutes total
+              </p>
+              <p className="text-xs text-purple-700 mt-1">
+                Most merchants complete this once and never need to revisit. The accuracy of your responses here directly impacts your success on Vayva.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Complete Checklist Card - All 10 steps in OPTIMIZED order */}
       <div className="bg-white border border-gray-100 rounded-[32px] p-8  space-y-6">
         <div className="flex items-center justify-between border-b border-gray-100 pb-4">

@@ -32,6 +32,8 @@ import {
 } from "@phosphor-icons/react";
 import type { AdPlatform, CampaignCreateInput, CampaignObjective } from "@/types/ad-platforms";
 import { PLATFORM_CONFIGS } from "@/services/ad-platforms/hub";
+import { validateCampaignData, budgetAmountSchema, campaignNameSchema } from "@/lib/campaign-validation";
+import { toast } from "sonner";
 
 interface CampaignCreateFormProps {
   platform: AdPlatform;
@@ -75,6 +77,17 @@ export function CampaignCreateForm({
   };
 
   const handleSubmit = () => {
+    // Validate campaign data before submission
+    const validation = validateCampaignData(formData);
+    
+    if (!validation.success) {
+      const errors = validation.errors?.errors;
+      if (errors && errors.length > 0) {
+        toast.error(`Validation Error: ${errors[0].message}`);
+        return;
+      }
+    }
+    
     onSubmit(formData);
   };
 
@@ -200,6 +213,22 @@ function SettingsStep({
     : Math.round(formData.budget.amount / 30);
   const monthlyEstimate = dailyBudget * 30;
   
+  // Validate campaign name
+  const nameValidation = campaignNameSchema.safeParse(formData.name);
+  const nameError = formData.name && !nameValidation.success ? nameValidation.error.errors[0]?.message : null;
+  
+  // Validate budget amount
+  const budgetValidation = budgetAmountSchema.safeParse(formData.budget.amount);
+  const budgetError = !budgetValidation.success ? budgetValidation.error.errors[0]?.message : null;
+  
+  const canProceed = formData.name && !nameError && !budgetError;
+  
+  const handleNext = () => {
+    if (canProceed) {
+      onNext();
+    }
+  };
+  
   return (
     <Card>
       <CardHeader>
@@ -227,14 +256,21 @@ function SettingsStep({
           </p>
         </div>
         <div className="space-y-2">
-          <Label>Campaign Name</Label>
+          <Label>Campaign Name {formData.name && <span className="text-xs text-gray-500">(min 3 characters)</span>}</Label>
           <Input
             placeholder="e.g., Summer Sale 2024"
             value={formData.name}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onChange({ ...formData, name: e.target.value })
             }
+            aria-invalid={!!nameError}
+            aria-describedby={nameError ? "campaign-name-error" : undefined}
           />
+          {nameError && (
+            <p id="campaign-name-error" className="text-xs text-red-600 flex items-center gap-1">
+              ⚠️ {nameError}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -263,7 +299,7 @@ function SettingsStep({
           </div>
 
           <div className="space-y-2">
-            <Label>Amount (₦)</Label>
+            <Label>Amount (₦) {formData.budget.amount > 0 && <span className="text-xs text-gray-500">(min ₦1,000)</span>}</Label>
             <Input
               type="number"
               min={1000}
@@ -278,7 +314,14 @@ function SettingsStep({
                   },
                 })
               }
+              aria-invalid={!!budgetError}
+              aria-describedby={budgetError ? "budget-amount-error" : undefined}
             />
+            {budgetError && (
+              <p id="budget-amount-error" className="text-xs text-red-600 flex items-center gap-1">
+                ⚠️ {budgetError}
+              </p>
+            )}
             <p className="text-xs text-gray-500">
               Min: ₦1,000 • Billed in {formData.platform === "google" ? "USD" : "local currency"}
             </p>
@@ -322,8 +365,8 @@ function SettingsStep({
           <Button variant="outline" onClick={onBack}>
             Back
           </Button>
-          <Button onClick={onNext} disabled={!formData.name}>
-            Continue
+          <Button onClick={handleNext} disabled={!canProceed}>
+            Continue {nameError || budgetError ? `(${nameError || budgetError})` : ''}
           </Button>
         </div>
       </CardContent>

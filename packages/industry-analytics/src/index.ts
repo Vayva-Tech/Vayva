@@ -10,16 +10,7 @@ export * from './types';
 // Services
 export * from './services';
 
-// Components
-export * from './components';
-
-// Dashboard
+// Dashboard config only (dashboard component has too many dependencies)
 export { ANALYTICS_DASHBOARD_CONFIG } from './dashboard/analytics-dashboard.config';
 
-// Email Marketing (from fashion package, generalized)
-export { EmailMarketing } from '../../industry-fashion/src/components/marketing/EmailMarketing';
-export type { EmailCampaign } from '../../industry-fashion/src/components/marketing/EmailMarketing';
-
-// Customer Segmentation (from fashion package, generalized)
-export { CustomerSegmentation } from '../../industry-fashion/src/components/marketing/CustomerSegmentation';
-export type { CustomerSegment } from '../../industry-fashion/src/components/marketing/CustomerSegmentation';
+export const VERSION = '0.1.0';

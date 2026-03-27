@@ -1,9 +1,9 @@
 "use client";
 
-import { Component, ReactNode, ErrorInfo } from "react";
-import { logger } from "@/lib/logger";
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { AlertTriangle, RefreshCw, Bug } from "@phosphor-icons/react";
 import { Button } from "@vayva/ui";
-import { Warning, ArrowClockwise } from "@phosphor-icons/react/ssr";
+import { logger } from "@vayva/shared";
 
 interface Props {
   children: ReactNode;
@@ -14,138 +14,109 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
-/**
- * ErrorBoundary component that catches JavaScript errors
- * and displays a fallback UI instead of crashing the app
- */
 export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  public state: State = {
+    hasError: false,
+  };
 
-  static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log to error reporting service
-    logger.error("[ErrorBoundary] Caught error:", { error, errorInfo });
-    
-    // Call custom error handler if provided
-    this.props.onError?.(error, errorInfo);
-    
-    // Send to error reporting (in production, this would go to Sentry/Datadog/etc)
-    if (typeof window !== "undefined") {
-      // Example: Send to analytics endpoint
-      fetch("/api/error-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          error: error.message,
-          stack: error.stack,
-          componentStack: errorInfo.componentStack,
-          url: window.location.href,
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-        }),
-      }).catch(() => {
-        // Silent fail for error reporting
-      });
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    logger.error("[ERROR_BOUNDARY]", {
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+    });
+
+    this.setState({ error, errorInfo });
+
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
     }
   }
 
-  handleRetry = () => {
-    this.setState({ hasError: false, error: undefined });
+  private handleReset = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+    window.location.reload();
   };
 
-  render() {
+  private handleGoBack = () => {
+    window.history.back();
+  };
+
+  public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
-      return <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />;
+      return (
+        <div className="min-h-[400px] flex items-center justify-center p-8">
+          <div className="max-w-md w-full bg-white rounded-xl border border-red-100 shadow-lg p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+              <Bug className="h-8 w-8 text-red-500" />
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              Oops! Something went wrong
+            </h2>
+
+            <p className="text-gray-600 mb-6">
+              We encountered an error while loading this section. Don't worry, our team has been notified.
+            </p>
+
+            {process.env.NODE_ENV === "development" && this.state.error && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg text-left max-h-48 overflow-auto">
+                <p className="text-xs font-mono text-red-600 break-all">
+                  {this.state.error.toString()}
+                </p>
+                {this.state.errorInfo && (
+                  <details className="mt-2 text-xs text-gray-500">
+                    <summary className="cursor-pointer hover:text-gray-700">Component Stack</summary>
+                    <pre className="mt-2 whitespace-pre-wrap">
+                      {this.state.errorInfo.componentStack}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            )}
+
+            <div className="flex gap-3 justify-center">
+              <Button onClick={this.handleGoBack} variant="outline">
+                Go Back
+              </Button>
+              <Button onClick={this.handleReset} className="bg-green-500 hover:bg-green-600">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
     }
 
     return this.props.children;
   }
 }
 
-interface ErrorFallbackProps {
-  error?: Error;
-  onRetry: () => void;
-}
-
-function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
-  return (
-    <div className="min-h-[300px] flex items-center justify-center p-8">
-      <div className="max-w-md w-full text-center">
-        <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Warning className="w-8 h-8 text-red-500" />
-        </div>
-        
-        <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
-        <p className="text-gray-500 mb-6">
-          We encountered an unexpected error. Our team has been notified and we&apos;re working to fix it.
-        </p>
-
-        {error && process.env.NODE_ENV === "development" && (
-          <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left">
-            <p className="text-sm font-mono text-red-500">{error.message}</p>
-          </div>
-        )}
-
-        <div className="flex gap-3 justify-center">
-          <Button variant="outline" onClick={() => window.location.reload()}>
-            Refresh Page
-          </Button>
-          <Button onClick={onRetry}>
-            <ArrowClockwise className="w-4 h-4 mr-2" />
-            Try Again
-          </Button>
-        </div>
-
-        <p className="mt-6 text-sm text-gray-500">
-          If the problem persists, please contact support.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Section-level error boundary for wrapping specific parts of the UI
- */
-export function SectionErrorBoundary({
-  children,
-  title = "This section",
-}: {
-  children: ReactNode;
-  title?: string;
-}) {
-  return (
-    <ErrorBoundary
-      fallback={
-        <div className="p-6 border border-red-500/20 rounded-xl bg-red-500">
-          <div className="flex items-center gap-3">
-            <Warning className="w-5 h-5 text-red-500" />
-            <p className="text-sm">
-              {title} failed to load.{" "}
-              <Button
-                onClick={() => window.location.reload()}
-                className="underline hover:no-underline text-red-500"
-              >
-                Refresh
-              </Button>
-            </p>
-          </div>
-        </div>
-      }
-    >
-      {children}
+export function withErrorBoundary<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  displayName?: string
+) {
+  const WithErrorBoundary = (props: P) => (
+    <ErrorBoundary>
+      <WrappedComponent {...props} />
     </ErrorBoundary>
   );
+
+  if (displayName) {
+    WithErrorBoundary.displayName = displayName;
+  }
+
+  return WithErrorBoundary;
 }

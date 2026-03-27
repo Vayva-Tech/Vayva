@@ -5,11 +5,12 @@
 
 import { DashboardEngine } from '@vayva/industry-core';
 
-import { RecipeCostingService } from './services/recipe-costing.service';
-import { MenuEngineeringService } from './services/menu-engineering.service';
-import { KitchenDisplayService } from './services/kitchen-display.service';
-import { InventoryTrackingService } from './services/inventory-tracking.service';
-import { NutritionalAnalysisService } from './services/nutritional-analysis.service';
+// Traditional services temporarily disabled for build
+// import { RecipeCostingService } from './services/recipe-costing.service';
+// import { MenuEngineeringService } from './services/menu-engineering.service';
+// import { KitchenDisplayService } from './services/kitchen-display.service';
+// import { InventoryTrackingService } from './services/inventory-tracking.service';
+// import { NutritionalAnalysisService } from './services/nutritional-analysis.service';
 
 import { FOOD_DASHBOARD_CONFIG } from './dashboard/food-dashboard.config';
 

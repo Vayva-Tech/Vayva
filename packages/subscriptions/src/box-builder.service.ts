@@ -1,4 +1,7 @@
-import { prisma } from "@vayva/db";
+/**
+ * Subscription Box Builder Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
+ * Database operations moved to Backend/core-api/src/services/subscriptions/box-builder.service.ts
+ */
 
 export interface SubscriptionBox {
   id: string;

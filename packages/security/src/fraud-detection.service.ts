@@ -1,5 +1,9 @@
-import { OrderStatus, Prisma, prisma } from "@vayva/db";
-import { prismaDelegates } from "./prisma-delegates";
+/**
+ * Fraud Detection Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
+ * Database operations moved to Backend/core-api/src/services/security/fraud-detection.service.ts
+ */
+// import { OrderStatus, Prisma, prisma } from "@vayva/db";
+// import { prismaDelegates } from "./prisma-delegates";
 import crypto from "crypto";
 import {
   parseFraudPayload,

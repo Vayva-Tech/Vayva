@@ -6,6 +6,7 @@
 
 import type { FC } from 'react';
 import { useState } from 'react';
+import { DashboardErrorBoundary } from '@/components/error-boundary/error-boundary-utils';
 
 // Student Progress Tracker
 interface StudentProgressTrackerProps {
@@ -24,26 +25,28 @@ export const StudentProgressTracker: FC<StudentProgressTrackerProps> = ({
   courses = [] 
 }) => {
   return (
-    <div className="student-progress-tracker">
-      <h2>Student Progress</h2>
-      {studentId && <p className="student-id">Student: {studentId}</p>}
-      <div className="progress-cards">
-        {courses.map(course => (
-          <div key={course.id} className="progress-card">
-            <h3>{course.name}</h3>
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${course.progress}%` }}
-              />
+    <DashboardErrorBoundary serviceName="StudentProgressTracker">
+      <div className="student-progress-tracker">
+        <h2>Student Progress</h2>
+        {studentId && <p className="student-id">Student: {studentId}</p>}
+        <div className="progress-cards">
+          {courses.map(course => (
+            <div key={course.id} className="progress-card">
+              <h3>{course.name}</h3>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${course.progress}%` }}
+                />
+              </div>
+              <p className="progress-text">
+                {course.completedLessons}/{course.totalLessons} lessons
+              </p>
             </div>
-            <p className="progress-text">
-              {course.completedLessons}/{course.totalLessons} lessons
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </DashboardErrorBoundary>
   );
 };
 
@@ -64,33 +67,35 @@ export const CurriculumPlanner: FC<CurriculumPlannerProps> = ({
   onAddUnit
 }) => {
   return (
-    <div className="curriculum-planner">
-      <h2>Curriculum Planner</h2>
-      <div className="units-list">
-        {units.map(unit => (
-          <div key={unit.id} className="unit-card">
-            <h3>{unit.title}</h3>
-            <p>{unit.description}</p>
-            <div className="lessons">
-              <h4>Lessons:</h4>
-              <ul>
-                {unit.lessons.map((lesson, idx) => (
-                  <li key={idx}>{lesson}</li>
-                ))}
-              </ul>
-            </div>
-            {unit.standards && (
-              <div className="standards">
-                <h4>Standards:</h4>
-                {unit.standards.map((std, idx) => (
-                  <span key={idx} className="standard-badge">{std}</span>
-                ))}
+    <DashboardErrorBoundary serviceName="CurriculumPlanner">
+      <div className="curriculum-planner">
+        <h2>Curriculum Planner</h2>
+        <div className="units-list">
+          {units.map(unit => (
+            <div key={unit.id} className="unit-card">
+              <h3>{unit.title}</h3>
+              <p>{unit.description}</p>
+              <div className="lessons">
+                <h4>Lessons:</h4>
+                <ul>
+                  {unit.lessons.map((lesson, idx) => (
+                    <li key={idx}>{lesson}</li>
+                  ))}
+                </ul>
               </div>
-            )}
-          </div>
-        ))}
+              {unit.standards && (
+                <div className="standards">
+                  <h4>Standards:</h4>
+                  {unit.standards.map((std, idx) => (
+                    <span key={idx} className="standard-badge">{std}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </DashboardErrorBoundary>
   );
 };
 

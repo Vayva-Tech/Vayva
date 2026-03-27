@@ -21,13 +21,26 @@ import { cn } from '@/lib/utils';
 import { ADDON_CATEGORIES, type AddOnDefinition, type AddOnCategory, type InstalledAddOn } from '@vayva/addons/types';
 import { AddOnDetailModal } from './components/add-on-detail-modal';
 import { InstallAddOnDialog } from './components/install-add-on-dialog';
+import { useAuth } from '@/context/AuthContext';
+import { useStore } from '@/context/StoreContext';
+import { logger } from '@vayva/shared';
 
-// Get store info from session/API instead of props
+// Get store info from session/context
 function useStoreInfo() {
-  // TODO: Replace with actual store fetch from session or API
+  const { merchant } = useAuth();
+  const { store } = useStore();
+  
+  // Use real data from contexts, fallback to demo data only in development
+  const storeId = merchant?.storeId || store?.id || (process.env.NODE_ENV === 'development' ? 'demo-store' : undefined);
+  const currentTemplateId = store?.templateId || 'default';
+  
+  if (!storeId) {
+    logger.warn('[ADDONS_PAGE] Store ID not available');
+  }
+  
   return {
-    storeId: 'demo-store',
-    currentTemplateId: 'default'
+    storeId: storeId || 'demo-store',
+    currentTemplateId
   };
 }
 

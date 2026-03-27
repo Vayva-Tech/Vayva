@@ -71,6 +71,10 @@ export function CampaignsList() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleCampaignClick = (campaignId: string) => {
+    window.location.href = `/dashboard/nonprofit/campaigns/${campaignId}`;
+  };
+
   if (isLoading) {
     return <div className="flex justify-center p-8">Loading campaigns...</div>;
   }
@@ -133,7 +137,11 @@ export function CampaignsList() {
               : 0;
 
             return (
-              <Card key={campaign.id} className="hover:shadow-md transition-shadow">
+              <Card 
+                key={campaign.id} 
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => handleCampaignClick(campaign.id)}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">

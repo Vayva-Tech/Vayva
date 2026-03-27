@@ -78,31 +78,15 @@ export default function SignupPage() {
     setError(null);
     
     try {
-      // Register user account
+      // Register user account and create store in single call - includes plan selection for database persistence
       const registration = await AuthService.register({
         email,
         password,
         firstName,
         lastName,
+        businessName,
+        plan: selectedPlan, // Send plan to backend for database persistence
       });
-      
-      // Create merchant/store profile
-      const createMerchantRes = await fetch("/api/merchant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          storeName: businessName,
-          storeSlug: storeSlug || generateSlug(businessName),
-          plan: selectedPlan,
-          userId: registration.userId,
-        }),
-      });
-      
-      if (!createMerchantRes.ok) {
-        throw new Error("Failed to create merchant account");
-      }
-      
-      const merchantData = await createMerchantRes.json();
       
       // Redirect to verification for all plans
       // After verification, auth context will route to onboarding

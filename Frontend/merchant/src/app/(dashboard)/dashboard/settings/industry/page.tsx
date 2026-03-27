@@ -87,6 +87,16 @@ export default function IndustrySettingsPage() {
 
   const handleSave = async () => {
     if (!selectedSlug) return;
+
+    // Warn user about changing industry
+    const currentIndustry = merchant?.industrySlug || "retail";
+    if (selectedSlug !== currentIndustry) {
+      const confirmed = window.confirm(
+        `Changing your industry from "${currentIndustry}" to "${selectedSlug}" will update your dashboard layout, modules, and features. This may take a moment. Continue?`
+      );
+      if (!confirmed) return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -95,7 +105,7 @@ export default function IndustrySettingsPage() {
         body: JSON.stringify({ industrySlug: selectedSlug }),
       });
 
-      toast.success("Industry updated successfully");
+      toast.success("Industry updated successfully! Reloading your dashboard...");
 
       // Force reload to update sidebar and app context
       window.location.href = "/dashboard";

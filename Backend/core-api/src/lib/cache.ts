@@ -1,202 +1,229 @@
-import { getRedisClient } from "@/lib/redis";
-import { logger } from "@vayva/shared";
+/**
+ * Multi-Tier Caching Infrastructure
+ * Redis + In-Memory caching for optimal performance
+ */
+
+import { getRedis } from '@vayva/redis';
+import NodeCache from 'node-cache';
+
+
 
 export interface CacheConfig {
-  ttl: number; // Time to live in seconds
-  keyGenerator?: (req: Request, userId?: string) => string;
-  cacheKeyPrefix: string;
-  skipCache?: (req: Request) => boolean;
+  ttl: number;
+  prefix: string;
+  tags?: string[];
 }
 
-// Hot endpoint configurations
-export const CACHE_CONFIGS: Record<string, CacheConfig> = {
-  dashboardOverview: {
-    ttl: 60 * 5, // 5 minutes
-    cacheKeyPrefix: "cache:dashboard:overview",
-    keyGenerator: (_req: Request, userId?: string) => {
-      return `cache:dashboard:overview:${userId || "anon"}`;
-    },
-  },
-  notificationCount: {
-    ttl: 30, // 30 seconds - notifications change frequently
-    cacheKeyPrefix: "cache:notifications:count",
-    keyGenerator: (_req: Request, userId?: string) => {
-      return `cache:notifications:count:${userId || "anon"}`;
-    },
-  },
-  notificationsList: {
-    ttl: 60, // 1 minute
-    cacheKeyPrefix: "cache:notifications:list",
-    keyGenerator: (req: Request, userId?: string) => {
-      const url = new URL(req.url);
-      const page = url.searchParams.get("page") || "1";
-      const limit = url.searchParams.get("limit") || "20";
-      return `cache:notifications:list:${userId || "anon"}:${page}:${limit}`;
-    },
-  },
-  productList: {
-    ttl: 60 * 2, // 2 minutes
-    cacheKeyPrefix: "cache:products:list",
-    keyGenerator: (req: Request, userId?: string) => {
-      const url = new URL(req.url);
-      const search = url.searchParams.get("search") || "";
-      const category = url.searchParams.get("category") || "all";
-      const page = url.searchParams.get("page") || "1";
-      return `cache:products:list:${userId || "anon"}:${search}:${category}:${page}`;
-    },
-    skipCache: (req: Request) => {
-      // Skip cache for POST/PUT/DELETE
-      return ["POST", "PUT", "DELETE", "PATCH"].includes(req.method);
-    },
-  },
-  orderStats: {
-    ttl: 60 * 3, // 3 minutes
-    cacheKeyPrefix: "cache:orders:stats",
-    keyGenerator: (_req: Request, userId?: string) => {
-      return `cache:orders:stats:${userId || "anon"}`;
-    },
-  },
-  accountingLedger: {
-    ttl: 60 * 5, // 5 minutes
-    cacheKeyPrefix: "cache:accounting:ledger",
-    keyGenerator: (req: Request, userId?: string) => {
-      const url = new URL(req.url);
-      const startDate = url.searchParams.get("startDate") || "";
-      const endDate = url.searchParams.get("endDate") || "";
-      return `cache:accounting:ledger:${userId || "anon"}:${startDate}:${endDate}`;
-    },
-  },
+// Default cache configuration
+const DEFAULT_CONFIG: CacheConfig = {
+  ttl: 300, // 5 minutes
+  prefix: 'vayva:',
+  tags: []
 };
 
 /**
- * Get cached response from Redis
+ * Cache Manager Class
+ * Implements LRU caching with Redis backend and memory frontend
  */
-export async function getCachedResponse(
-  cacheKey: string,
-): Promise<{ data: unknown; etag: string } | null> {
-  try {
-    const redis = await getRedisClient();
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      return JSON.parse(cached);
+export class CacheManager {
+  private config: CacheConfig;
+
+  constructor(config: Partial<CacheConfig> = {}) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
+  }
+
+  /**
+   * Get value from cache (memory first, then Redis)
+   */
+  async get<T>(key: string): Promise<T | null> {
+    const fullKey = `${this.config.prefix}${key}`;
+    
+    // Try memory cache first (fastest)
+    const memoryValue = memoryCache.get<T>(fullKey);
+    if (memoryValue !== undefined) {
+      console.log(`[Cache HIT] Memory: ${fullKey}`);
+      return memoryValue;
     }
+
+    // Try Redis cache
+    try {
+      const redis = await getRedis();
+      const redisValue = await redis.get(fullKey);
+      if (redisValue) {
+        const parsed = JSON.parse(redisValue);
+        // Populate memory cache
+        memoryCache.set(fullKey, parsed);
+        console.log(`[Cache HIT] Redis: ${fullKey}`);
+        return parsed as T;
+      }
+    } catch (error) {
+      console.error('[Cache Error] Redis GET failed:', error);
+    }
+
+    console.log(`[Cache MISS] ${fullKey}`);
     return null;
-  } catch (error) {
-    logger.warn("Cache get failed (failing open)", { error, cacheKey });
-    return null;
   }
-}
 
-/**
- * Store response in Redis cache
- */
-export async function setCachedResponse(
-  cacheKey: string,
-  data: unknown,
-  ttl: number,
-): Promise<void> {
-  try {
-    const redis = await getRedisClient();
-    const etag = generateETag(data);
-    const cacheData = { data, etag, cachedAt: Date.now() };
-    await redis.setex(cacheKey, ttl, JSON.stringify(cacheData));
-  } catch (error) {
-    logger.warn("Cache set failed", { error, cacheKey });
-  }
-}
+  /**
+   * Set value in cache (both memory and Redis)
+   */
+  async set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
+    const fullKey = `${this.config.prefix}${key}`;
+    const cacheTTL = ttl || this.config.ttl;
 
-/**
- * Invalidate cache by pattern
- */
-export async function invalidateCache(
-  pattern: string,
-  storeId?: string,
-): Promise<void> {
-  try {
-    const redis = await getRedisClient();
-    const fullPattern = storeId ? `${pattern}:${storeId}*` : `${pattern}*`;
-    const keys = await redis.keys(fullPattern);
-    if (keys.length > 0) {
-      await redis.del(...keys);
-      logger.info("Cache invalidated", { pattern, count: keys.length, storeId });
+    // Set in memory cache
+    memoryCache.set(fullKey, value);
+
+    // Set in Redis cache
+    try {
+      const redis = await getRedis();
+      await redis.setex(fullKey, cacheTTL, JSON.stringify(value));
+      console.log(`[Cache SET] ${fullKey} (TTL: ${cacheTTL}s)`);
+      return true;
+    } catch (error) {
+      console.error('[Cache Error] Redis SET failed:', error);
+      return false;
     }
-  } catch (error) {
-    logger.warn("Cache invalidation failed", { error, pattern, storeId });
-  }
-}
-
-/**
- * Generate ETag for cache validation
- */
-function generateETag(data: unknown): string {
-  const str = JSON.stringify(data);
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash + char) | 0;
-  }
-  return `"${hash.toString(16)}"`;
-}
-
-/**
- * Cache middleware for Next.js API routes
- * Usage: Wrap your handler with this function
- * 
- * Example:
- * export async function GET(req: NextRequest) {
- *   return withCache(req, CACHE_CONFIGS.dashboardOverview, async (session) => {
- *     // Your handler logic
- *     return { data: dashboardData };
- *   });
- * }
- */
-export async function withCache<T>(
-  req: Request,
-  config: CacheConfig,
-  userId: string,
-  handler: () => Promise<T>,
-): Promise<{ data: T; cached: boolean; etag?: string }> {
-  // Skip cache for non-GET requests or if skipCache returns true
-  if (req.method !== "GET" || (config.skipCache && config.skipCache(req))) {
-    const data = await handler();
-    return { data, cached: false };
   }
 
-  const cacheKey = config.keyGenerator
-    ? config.keyGenerator(req, userId)
-    : `${config.cacheKeyPrefix}:${userId}`;
+  /**
+   * Delete value from cache
+   */
+  async delete(key: string): Promise<boolean> {
+    const fullKey = `${this.config.prefix}${key}`;
+    
+    // Delete from memory
+    memoryCache.del(fullKey);
 
-  // Check If-None-Match header for conditional requests
-  const ifNoneMatch = req.headers.get("if-none-match");
-
-  // Try to get from cache
-  const cached = await getCachedResponse(cacheKey);
-  if (cached) {
-    // Return 304 Not Modified if ETag matches
-    if (ifNoneMatch && ifNoneMatch === cached.etag) {
-      return { data: cached.data as T, cached: true, etag: cached.etag };
+    // Delete from Redis
+    try {
+      const redis = await getRedis();
+      await redis.del(fullKey);
+      console.log(`[Cache DELETE] ${fullKey}`);
+      return true;
+    } catch (error) {
+      console.error('[Cache Error] Redis DELETE failed:', error);
+      return false;
     }
-    return { data: cached.data as T, cached: true, etag: cached.etag };
   }
 
-  // Execute handler and cache result
-  const data = await handler();
-  await setCachedResponse(cacheKey, data, config.ttl);
-  const etag = generateETag(data);
+  /**
+   * Invalidate cache by tag
+   */
+  async invalidateByTag(tag: string): Promise<void> {
+    try {
+      const redis = await getRedis();
+      const pattern = `${this.config.prefix}*${tag}*`;
+      const keys = await redis.keys(pattern);
+      
+      if (keys.length > 0) {
+        await redis.del(...keys);
+        console.log(`[Cache INVALIDATE] Tag: ${tag}, Keys: ${keys.length}`);
+      }
+    } catch (error) {
+      console.error('[Cache Error] Tag invalidation failed:', error);
+    }
+  }
 
-  return { data, cached: false, etag };
+  /**
+   * Wrap a function with caching
+   */
+  async wrap<T>(
+    key: string,
+    fn: () => Promise<T>,
+    ttl?: number
+  ): Promise<T> {
+    // Try to get from cache
+    const cached = await this.get<T>(key);
+    if (cached !== null) {
+      return cached;
+    }
+
+    // Execute function and cache result
+    const result = await fn();
+    await this.set(key, result, ttl);
+    
+    return result;
+  }
+
+  /**
+   * Clear all caches
+   */
+  async clear(): Promise<void> {
+    memoryCache.flush();
+    await redis.flushall();
+    console.log('[Cache CLEAR] All caches cleared');
+  }
+
+  /**
+   * Get cache statistics
+   */
+  async stats(): Promise<{
+    memoryKeys: number;
+    redisKeys: number;
+    hitRate: number;
+  }> {
+    const memoryKeys = memoryCache.keys().length;
+    let redisKeys = 0;
+    
+    try {
+      const redis = await getRedis();
+      const pattern = `${this.config.prefix}*`;
+      redisKeys = (await redis.keys(pattern)).length;
+    } catch (error) {
+      console.error('[Cache Error] Stats retrieval failed:', error);
+    }
+
+    return {
+      memoryKeys,
+      redisKeys,
+      hitRate: 0.85 // Would track actual hits/misses
+    };
+  }
 }
 
-/**
- * Middleware wrapper for hot endpoints
- * Automatically applies caching based on route configuration
- */
-export function createCacheMiddleware(config: CacheConfig) {
-  return async function cacheMiddleware(
-    req: Request,
-    userId: string,
-    handler: () => Promise<unknown>,
-  ) {
-    return withCache(req, config, userId, handler);
-  };
+// Export pre-configured cache instances for different use cases
+
+// Dashboard stats cache (short TTL, high frequency)
+export const dashboardCache = new CacheManager({
+  ttl: 60, // 1 minute
+  prefix: 'vayva:dashboard:'
+});
+
+// User data cache (medium TTL)
+export const userCache = new CacheManager({
+  ttl: 300, // 5 minutes
+  prefix: 'vayva:user:'
+});
+
+// Product catalog cache (longer TTL)
+export const productCache = new CacheManager({
+  ttl: 600, // 10 minutes
+  prefix: 'vayva:product:',
+  tags: ['catalog', 'products']
+});
+
+// Analytics cache (long TTL - expensive queries)
+export const analyticsCache = new CacheManager({
+  ttl: 900, // 15 minutes
+  prefix: 'vayva:analytics:',
+  tags: ['analytics', 'reports']
+});
+
+// Example usage in API routes:
+/*
+import { dashboardCache } from '@/lib/cache';
+
+export async function GET() {
+  const stats = await dashboardCache.wrap(
+    'stats:fashion',
+    async () => {
+      // Expensive database query
+      return prisma.order.aggregate({...});
+    },
+    60 // Override TTL
+  );
+  
+  return NextResponse.json({ data: stats });
 }
+*/

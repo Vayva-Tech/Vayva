@@ -84,6 +84,33 @@ model AdminAuditLog {
   @@index([storeId, createdAt])
 }
 
+// HIPAA-compliant audit log for healthcare PHI access tracking
+model HIPAAAAuditLog {
+  id             String   @id @default(cuid())
+  userId         String
+  action         String   // VIEW, CREATE, UPDATE, DELETE, EXPORT, LOGIN, LOGOUT, ACCESS_ATTEMPT
+  resourceType   String   // PATIENT_RECORD, APPOINTMENT, PRESCRIPTION, LAB_RESULT, BILLING, CONSENT
+  resourceId     String
+  timestamp      DateTime @default(now())
+  ipAddress      String
+  userAgent      String
+  reason         String?  // For emergency/break-glass access
+  storeId        String
+  patientId      String?  // Link to patient when applicable
+  metadata       String?  // JSON string for additional context
+  hash           String   @db.VarChar(64) // SHA-256 integrity hash
+  immutable      Boolean  @default(true) // Write-once flag
+  retentionUntil DateTime // 6 years from creation (HIPAA requirement)
+  createdAt      DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@index([resourceType, resourceId])
+  @@index([storeId, timestamp])
+  @@index([patientId, timestamp])
+  @@index([action, timestamp])
+  @@map("hipaa_audit_log")
+}
+
 model AiActionDefinition {
   id          String   @id @default(uuid())
   triggerType String
@@ -2177,6 +2204,10 @@ model Store {
   addOns                  StoreAddOn[]
   autopilotRuns           AutopilotRun[]
   merchantWorkflows       MerchantWorkflow[]
+  
+  // Nonprofit Grant Management
+  nonprofitGrants         NonprofitGrant[]
+  nonprofitGrantApplications NonprofitGrantApplication[]
 }
 
 /// Visual automation workflows (merchant workflow builder); merchantId in API = storeId
@@ -9044,19 +9075,84 @@ model Grant {
   @@map("grants")
 }
 
+// Phase 5: Nonprofit Grant Management (Enhanced)
+model NonprofitGrant {
+  id                      String   @id @default(uuid())
+  storeId                 String
+  title                   String
+  funder                  String
+  description             String
+  requestedAmount         Decimal
+  duration                Int      // Duration in months
+  deadline                DateTime
+  website                 String?
+  contactName             String?
+  contactEmail            String?
+  contactPhone            String?
+  eligibilityRequirements Json?    @default("[]")
+  requiredDocuments       Json?    @default("[]")
+  evaluationCriteria      Json?    @default("[]")
+  notes                   String?
+  status                  String   @default("draft") // draft, submitted, under_review, funded, rejected, closed
+  applications            NonprofitGrantApplication[]
+  store                   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([storeId, status])
+  @@index([storeId, deadline])
+  @@map("nonprofit_grants")
+}
+
+model NonprofitGrantApplication {
+  id                    String   @id @default(uuid())
+  storeId               String
+  grantId               String
+  projectName           String
+  projectDescription    String
+  requestedAmount       Decimal
+  startDate             DateTime
+  endDate               DateTime
+  teamMembers           Json     @default("[]") // [{name, role, qualifications}]
+  budgetBreakdown       Json     @default("[]") // [{category, amount, description}]
+  expectedOutcomes      Json     @default("[]") // [string]
+  sustainabilityPlan    String?
+  supportingDocuments   Json     @default("[]") // [string URLs]
+  notes                 String?
+  status                String   @default("draft") // draft, submitted, under_review, awarded, rejected
+  submittedAt           DateTime?
+  reviewedAt            DateTime?
+  awardedAmount         Decimal?
+  feedback              String?
+  grant                 NonprofitGrant @relation(fields: [grantId], references: [id], onDelete: Cascade)
+  store                 Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  expenses              GrantExpense[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([storeId, grantId])
+  @@index([storeId, status])
+  @@index([grantId])
+  @@map("nonprofit_grant_applications")
+}
+
 model GrantExpense {
-  id          String   @id @default(uuid())
-  grantId     String
-  category    String
-  description String
-  amount      Decimal
-  receiptUrl  String?
-  date        DateTime
-  approvedBy  String?
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
+  id                    String   @id @default(uuid())
+  grantId               String
+  nonprofitGrantApplicationId String?
+  category              String
+  description           String
+  amount                Decimal
+  receiptUrl            String?
+  date                  DateTime
+  approvedBy            String?
+  status                String   @default("pending")
+  createdAt             DateTime @default(now())
+
+  nonprofitGrantApplication NonprofitGrantApplication? @relation(fields: [nonprofitGrantApplicationId], references: [id], onDelete: Cascade)
 
   @@index([grantId])
+  @@index([nonprofitGrantApplicationId])
   @@map("grant_expenses")
 }
 

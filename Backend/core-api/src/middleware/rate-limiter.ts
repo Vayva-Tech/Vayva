@@ -1,176 +1,96 @@
 /**
  * Rate Limiting Middleware
- * Implements tier-based rate limiting for API endpoints
+ * Protects APIs from abuse and DDoS attacks
  */
 
+import rateLimit from 'express-rate-limit';
 import { NextRequest, NextResponse } from 'next/server';
 
-export interface RateLimitConfig {
-  free: number;        // requests per hour
-  starter: number;     // requests per hour
-  pro: number;         // requests per hour
-  enterprise: number;  // requests per hour
-}
+// General API rate limiter
+export const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests',
+    message: 'You have exceeded the request limit. Please try again later.',
+    retryAfter: 900 // seconds
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-export const DEFAULT_LIMITS: RateLimitConfig = {
-  free: 100,
-  starter: 500,
-  pro: 2000,
-  enterprise: 10000,
-};
+// Strict rate limiter for authentication endpoints
+export const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5, // limit each IP to 5 login attempts per windowMs
+  message: {
+    error: 'Too many login attempts',
+    message: 'Please try again after 15 minutes or reset your password.',
+    retryAfter: 900
+  },
+  skipSuccessfulRequests: true, // only count failed attempts
+});
 
-interface RateLimitState {
-  count: number;
-  resetAt: number;
-}
+// Payment endpoints - very strict
+export const paymentLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // limit each IP to 10 payment requests per hour
+  message: {
+    error: 'Too many payment requests',
+    message: 'Payment request limit exceeded. Please contact support.',
+    retryAfter: 3600
+  },
+});
 
-// In-memory store (use Redis in production)
-const rateLimitStore = new Map<string, RateLimitState>();
+// Dashboard stats - more permissive (read-only)
+export const dashboardLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30, // limit each IP to 30 requests per minute
+  message: {
+    error: 'Too many dashboard requests',
+    message: 'Dashboard refresh rate limit exceeded.',
+    retryAfter: 60
+  },
+});
 
-/**
- * Get rate limit based on plan tier
- */
-export function getRateLimitForTier(tier: string): number {
-  switch (tier.toLowerCase()) {
-    case 'enterprise':
-      return DEFAULT_LIMITS.enterprise;
-    case 'pro':
-      return DEFAULT_LIMITS.pro;
-    case 'starter':
-      return DEFAULT_LIMITS.starter;
-    default:
-      return DEFAULT_LIMITS.free;
-  }
-}
+// Industry-specific rate limiters
+export const industryDashboardLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60, // 60 requests per minute per industry dashboard
+  message: {
+    error: 'Too many requests',
+    message: 'Dashboard request limit exceeded.',
+    retryAfter: 60
+  },
+});
 
-/**
- * Check if request should be rate limited
- */
-export function checkRateLimit(
-  userId: string,
-  tier: string = 'free'
-): { allowed: boolean; remaining: number; resetAt: number } {
-  const limit = getRateLimitForTier(tier);
-  const now = Date.now();
-  const windowMs = 60 * 60 * 1000; // 1 hour window
-  
-  const state = rateLimitStore.get(userId);
-  
-  if (!state || now > state.resetAt) {
-    // New window
-    rateLimitStore.set(userId, {
-      count: 1,
-      resetAt: now + windowMs,
-    });
-    
-    return {
-      allowed: true,
-      remaining: limit - 1,
-      resetAt: now + windowMs,
-    };
-  }
-  
-  if (state.count >= limit) {
-    // Rate limited
-    return {
-      allowed: false,
-      remaining: 0,
-      resetAt: state.resetAt,
-    };
-  }
-  
-  // Increment counter
-  state.count++;
-  rateLimitStore.set(userId, state);
-  
-  return {
-    allowed: true,
-    remaining: limit - state.count,
-    resetAt: state.resetAt,
-  };
-}
-
-/**
- * Create rate limiting middleware
- */
-export function withRateLimit<T extends (...args: unknown[]) => unknown>(
-  handler: T,
-  options?: {
-    tierField?: string;
-    customLimits?: Partial<RateLimitConfig>;
-  }
+// Helper function to apply rate limiting in Next.js API routes
+export function withRateLimiter(
+  handler: (req: NextRequest) => Promise<NextResponse>,
+  limiter: ReturnType<typeof rateLimit>,
+  identifier: string = 'ip'
 ) {
-  return async (request: NextRequest, ...rest: unknown[]) => {
-    try {
-      // Extract user ID from request (adjust based on your auth)
-      const userId = request.headers.get('x-user-id');
-      const tier = request.headers.get('x-plan-tier') || 'free';
-      
-      if (!userId) {
-        // Can't rate limit without user ID, allow but log
-        console.warn('[RATE LIMIT] No user ID provided');
-        return handler(request, ...rest);
-      }
-      
-      const _limits = options?.customLimits 
-        ? { ...DEFAULT_LIMITS, ...options.customLimits }
-        : DEFAULT_LIMITS;
-      
-      const limit = getRateLimitForTier(tier);
-      const result = checkRateLimit(userId, tier);
-      
-      // Add rate limit headers to response
-      const headers = {
-        'X-RateLimit-Limit': String(limit),
-        'X-RateLimit-Remaining': String(result.remaining),
-        'X-RateLimit-Reset': String(result.resetAt),
-      };
-      
-      if (!result.allowed) {
-        return NextResponse.json(
-          {
-            error: 'Rate limit exceeded',
-            message: `You've exceeded your ${limit} requests per hour limit.`,
-            retryAfter: Math.ceil((result.resetAt - Date.now()) / 1000),
-          },
-          {
-            status: 429,
-            headers,
-          }
-        );
-      }
-      
-      // Proceed with request
-      const response = await handler(request, ...rest);
-      
-      // Add headers to response
-      if (response instanceof NextResponse) {
-        Object.entries(headers).forEach(([key, value]) => {
-          response.headers.set(key, value);
-        });
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('[RATE LIMIT] Error:', error);
-      return handler(request, ...rest);
-    }
-  };
-}
+  return async function (request: NextRequest): Promise<NextResponse> {
+    const ip = request.headers.get('x-forwarded-for') || 
+               request.headers.get('x-real-ip') ||
+               'anonymous';
+    
+    const key = identifier === 'user' 
+      ? `user:${request.headers.get('authorization')}`
+      : `ip:${ip}`;
 
-/**
- * Clean up old entries (call periodically)
- */
-export function cleanupRateLimitStore() {
-  const now = Date.now();
-  let cleaned = 0;
-  
-  for (const [userId, state] of rateLimitStore.entries()) {
-    if (now > state.resetAt) {
-      rateLimitStore.delete(userId);
-      cleaned++;
-    }
-  }
-  
-  return cleaned;
+    // Check rate limit
+    const response = await new Promise<NextResponse>((resolve, reject) => {
+      limiter(
+        { headers: { get: () => key } } as any,
+        { setHeader: () => {} } as any,
+        (err) => {
+          if (err) reject(err);
+          else resolve(handler(request));
+        }
+      );
+    });
+
+    return response;
+  };
 }

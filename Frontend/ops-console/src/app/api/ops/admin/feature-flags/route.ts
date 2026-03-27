@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
 import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
 
@@ -15,29 +15,9 @@ export async function GET(req: NextRequest) {
       throw roleErr;
     }
 
-    const { searchParams } = new URL(req.url);
-    const search = searchParams.get("q") || "";
-
-    const where: Record<string, unknown> = {};
-    if (search) {
-      where.OR = [
-        { key: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const flags = await prisma.featureFlag.findMany({
-      where,
-      select: {
-        id: true,
-        key: true,
-        description: true,
-        enabled: true,
-        updatedAt: true,
-      },
-      orderBy: { key: "asc" },
-    });
-
-    return NextResponse.json({ flags });
+    // Proxy to backend
+    const response = await apiClient.get('/api/v1/admin/feature-flags');
+    return NextResponse.json(response);
   } catch (error) {
     const authRes = opsApiAuthErrorResponse(error);
     if (authRes) return authRes;
@@ -62,7 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { key, description } = body;
+    const { key, description, enabled, metadata } = body;
 
     if (!key) {
       return NextResponse.json(
@@ -71,15 +51,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const flag = await prisma.featureFlag.create({
-      data: {
-        key,
-        description,
-        enabled: false,
-      },
+    // Proxy to backend
+    const response = await apiClient.post('/api/v1/admin/feature-flags', {
+      name: key,
+      description,
+      enabled: enabled ?? false,
+      metadata,
     });
-
-    return NextResponse.json({ success: true, flag });
+    
+    return NextResponse.json(response);
   } catch (error: unknown) {
     const authRes = opsApiAuthErrorResponse(error);
     if (authRes) return authRes;

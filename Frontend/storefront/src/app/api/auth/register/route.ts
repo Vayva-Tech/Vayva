@@ -1,99 +1,48 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
-import { z } from "zod";
-import { hash } from "bcryptjs";
-import { getTenantFromHost } from "@/lib/tenant";
-import { withStorefrontAPI } from "@/lib/api-handler";
-import { standardHeaders, logger, BaseError } from "@vayva/shared";
+import { NextRequest, NextResponse } from "next/server";
+import { apiClient, handleApiError } from "@/lib/api-client";
 
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  firstName: z.string(),
-  lastName: z.string(),
-});
-
-export const POST = withStorefrontAPI(async (req: any, ctx: any) => {
-  const { requestId } = ctx;
+export async function POST(req: NextRequest) {
   try {
-    const t = await getTenantFromHost(req.headers.get("host") || undefined);
-    if (!t.ok) {
-      return NextResponse.json(
-        { error: "Store not found", requestId },
-        { status: 404 },
-      );
-    }
-
-    const store = await prisma.store.findUnique({
-      where: { slug: t.slug },
-      select: { id: true },
-    });
-    if (!store) {
-      return NextResponse.json(
-        { error: "Store not found", requestId },
-        { status: 404 },
-      );
-    }
-
     const body = await req.json();
-    const { email, password, firstName, lastName } = registerSchema.parse(body);
+    const { email, password, firstName, lastName } = body;
 
-    // Check availability
-    const existing = await prisma.customer.findUnique({
-      where: { storeId_email: { storeId: store.id, email } },
-    });
-
-    if (existing) {
+    if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
-        { error: "Customer already exists", requestId },
-        { status: 400, headers: standardHeaders(requestId) },
+        { error: "All fields are required" },
+        { status: 400 }
       );
     }
 
-    const hashedPassword = await hash(password, 10);
-
-    // Create Customer Record
-    const customer = await prisma.customer.create({
-      data: {
-        storeId: store.id,
-        email,
-        firstName,
-        lastName,
-        marketingOptIn: true,
-        passwordHash: hashedPassword,
-      },
+    // Call backend auth register endpoint
+    const response = await apiClient.post<any>('/api/v1/auth/register', {
+      email,
+      password,
+      firstName,
+      lastName,
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        customer: {
-          id: customer.id,
-          email: customer.email,
-          name: `${customer.firstName} ${customer.lastName}`,
-        },
-        requestId,
-      },
-      { headers: standardHeaders(requestId) },
-    );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid input data", requestId },
-        { status: 400, headers: standardHeaders(requestId) },
-      );
+    // Set auth token in cookies
+    const nextResponse = NextResponse.json({
+      success: true,
+      user: response.data.user,
+    });
+
+    if (response.data.token) {
+      nextResponse.cookies.set('auth_token', response.data.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
     }
-    if (error instanceof BaseError) throw error;
 
-    logger.error("Registration error", {
-      requestId,
-      error: error instanceof Error ? error.message : String(error),
-      app: "storefront",
-    });
+    return nextResponse;
+  } catch (error) {
+    console.error("[AUTH_REGISTER] Error:", error);
+    const { message, code } = handleApiError(error);
     return NextResponse.json(
-      { error: "Registration failed", requestId },
-      { status: 500, headers: standardHeaders(requestId) },
+      { error: message, code },
+      { status: 500 }
     );
   }
-});
+}

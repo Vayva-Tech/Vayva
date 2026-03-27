@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     const firstName = getString(body.firstName);
     const lastName = getString(body.lastName);
     const businessName = getString(body.businessName);
+    const selectedPlan = (getString(body.plan) as "starter" | "pro" | "pro_plus") || "starter"; // Capture plan selection
     // 0. Kill Switch & Rate Limit
     const isEnabled =
       process.env.NODE_ENV !== "production" ||
@@ -143,6 +144,11 @@ export async function POST(request: NextRequest) {
           slug: `${storeName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`,
           onboardingCompleted: false,
           onboardingLastStep: "welcome",
+          // Store intended plan for post-onboarding checkout redirect
+          metadata: {
+            intendedPlanKey: selectedPlan,
+            planSelectionDate: new Date().toISOString(),
+          },
         },
       });
       // Create membership (owner role)

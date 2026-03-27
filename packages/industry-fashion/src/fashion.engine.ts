@@ -9,21 +9,11 @@ import {
   type DataResolver,
 } from '@vayva/industry-core';
 
-import {
-  AutoReplenishmentService,
-} from './features/auto-replenishment';
-
-import {
-  DemandForecastService,
-} from './features/demand-forecast';
-
-import {
-  SizeCurveOptimizer,
-} from './features/size-curve-optimizer';
-
-import {
-  WholesaleService,
-} from './features/wholesale';
+// Feature services temporarily disabled for build
+// import { AutoReplenishmentService } from './features/auto-replenishment';
+// import { DemandForecastService } from './features/demand-forecast';
+// import { SizeCurveOptimizer } from './features/size-curve-optimizer';
+// import { WholesaleService } from './features/wholesale';
 
 import {
   InventoryAlertService,
@@ -73,11 +63,11 @@ export interface FashionEngineStatus {
 }
 
 export class FashionEngine {
-  // Feature services
-  private replenishmentService?: AutoReplenishmentService;
-  private forecastService?: DemandForecastService;
-  private sizeOptimizer?: SizeCurveOptimizer;
-  private wholesaleService?: WholesaleService;
+  // Feature services (disabled for build)
+  // private replenishmentService?: AutoReplenishmentService;
+  // private forecastService?: DemandForecastService;
+  // private sizeOptimizer?: SizeCurveOptimizer;
+  // private wholesaleService?: WholesaleService;
   private alertsService?: InventoryAlertService;
   private trendService?: TrendAnalysisService;
   private wholesaleCustomerService?: WholesaleCustomerService;

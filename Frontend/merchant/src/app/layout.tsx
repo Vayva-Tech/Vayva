@@ -2,6 +2,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import { QueryClientProviderWrapper } from "@/providers/QueryClientProvider";
 import { ConsentBanner } from "@/components/legal/ConsentBanner";
 import { IncidentBanner } from "@/components/layout/IncidentBanner";
 import { Analytics } from "@vercel/analytics/react";
@@ -75,12 +76,14 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="system" enableSystem>
-          <AuthProvider>
-            <IncidentBanner />
-            {children}
-            <ResponsiveToaster richColors />
-            <ConsentBanner />
-          </AuthProvider>
+          <QueryClientProviderWrapper>
+            <AuthProvider>
+              <IncidentBanner />
+              {children}
+              <ResponsiveToaster richColors />
+              <ConsentBanner />
+            </AuthProvider>
+          </QueryClientProviderWrapper>
         </ThemeProvider>
         {/* Performance Monitoring */}
         <Analytics />

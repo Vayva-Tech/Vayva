@@ -7,26 +7,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { AlertCircle, Building, FileCheck, Calculator } from 'lucide-react';
+import { toast } from 'sonner';
+import { logger } from '@vayva/shared';
 
 interface TrustSettings {
   enableIolta: boolean;
   ioltaAccountNumber: string;
+  jurisdiction: string; // State bar association
   enableThreeWayReconciliation: boolean;
   reconciliationFrequency: 'monthly' | 'quarterly';
   lowBalanceThreshold: number;
   requireDualApproval: boolean;
   autoDisburseFees: boolean;
+  clientLedgerRequired: boolean;
+  overdraftNotification: boolean;
+  annualReporting: boolean;
 }
 
 export default function TrustAccountSettingsPage() {
   const [settings, setSettings] = useState<TrustSettings>({
     enableIolta: true,
     ioltaAccountNumber: '',
+    jurisdiction: 'CA', // Default to California
     enableThreeWayReconciliation: true,
     reconciliationFrequency: 'monthly',
     lowBalanceThreshold: 1000,
     requireDualApproval: true,
     autoDisburseFees: false,
+    clientLedgerRequired: true,
+    overdraftNotification: true,
+    annualReporting: true,
   });
 
   const [loading, setLoading] = useState(false);
@@ -43,10 +53,13 @@ export default function TrustAccountSettingsPage() {
 
       if (response.ok) {
         setSuccess('Trust account settings saved successfully');
+        toast.success('Trust account settings saved successfully');
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save trust account settings';
+      logger.error('[TRUST_ACCOUNT_ERROR]', { error });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -72,6 +85,77 @@ export default function TrustAccountSettingsPage() {
       )}
 
       <div className="grid gap-6">
+        {/* Jurisdiction Selection - State-Specific Rules */}
+        <Card className="p-6 border-l-4 border-red-700">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <AlertCircle size={20} />
+            Jurisdiction & Compliance Rules
+          </h3>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="jurisdiction">State Bar Association</Label>
+              <select
+                id="jurisdiction"
+                className="w-full mt-1 p-2 border rounded"
+                value={settings.jurisdiction}
+                onChange={(e) =>
+                  setSettings({ ...settings, jurisdiction: e.target.value })
+                }
+              >
+                <option value="CA">California - State Bar of California</option>
+                <option value="NY">New York - New York State Bar Association</option>
+                <option value="TX">Texas - State Bar of Texas</option>
+                <option value="FL">Florida - The Florida Bar</option>
+                <option value="IL">Illinois - Illinois Attorney Registration & Disciplinary Commission</option>
+                <option value="PA">Pennsylvania - Pennsylvania Bar Association</option>
+                <option value="OH">Ohio - Supreme Court of Ohio</option>
+                <option value="GA">Georgia - State Bar of Georgia</option>
+                <option value="NC">North Carolina - North Carolina State Bar</option>
+                <option value="MI">Michigan - State Bar of Michigan</option>
+              </select>
+              <p className="text-sm text-gray-700 mt-1">
+                Select your primary jurisdiction for state-specific IOLTA compliance rules
+              </p>
+            </div>
+
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-800 font-semibold mb-2">
+                Selected Jurisdiction: {settings.jurisdiction}
+              </p>
+              <ul className="text-xs text-red-700 space-y-1">
+                {settings.jurisdiction === 'CA' && (
+                  <>
+                    <li>• Monthly reconciliation required (Rule 1.15)</li>
+                    <li>• Overdraft notification mandatory</li>
+                    <li>• Annual IOLTA certification required</li>
+                    <li>• Client ledger cards must be maintained</li>
+                  </>
+                )}
+                {settings.jurisdiction === 'NY' && (
+                  <>
+                    <li>• Monthly reconciliation required (Part 1300)</li>
+                    <li>• Approved depositories only</li>
+                    <li>• Bounced check reporting mandatory</li>
+                    <li>• Retain records for 7 years</li>
+                  </>
+                )}
+                {settings.jurisdiction === 'TX' && (
+                  <>
+                  <li>• Monthly reconciliation required (Rule 1.14)</li>
+                  <li>• IOLTA account must be interest-bearing</li>
+                  <li>• Annual compliance certificate</li>
+                  <li>• Dual signature requirement for checks over $2,500</li>
+                </>
+                )}
+                {!['CA', 'NY', 'TX'].includes(settings.jurisdiction) && (
+                  <li>• Check your state bar's specific IOLTA rules</li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </Card>
+
         {/* IOLTA Configuration */}
         <Card className="p-6 border-l-4 border-blue-900">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -108,6 +192,36 @@ export default function TrustAccountSettingsPage() {
               <p className="text-sm text-gray-700 mt-1">
                 Last 4 digits only for security
               </p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label>Client Ledger Cards Required</Label>
+                <p className="text-sm text-gray-700">
+                  Maintain individual ledger for each client (required in most states)
+                </p>
+              </div>
+              <Switch
+                checked={settings.clientLedgerRequired}
+                onCheckedChange={(checked) =>
+                  setSettings({ ...settings, clientLedgerRequired: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label>Overdraft Notification</Label>
+                <p className="text-sm text-gray-700">
+                  Automatic reporting to bar association if trust account overdrafts
+                </p>
+              </div>
+              <Switch
+                checked={settings.overdraftNotification}
+                onCheckedChange={(checked) =>
+                  setSettings({ ...settings, overdraftNotification: checked })
+                }
+              />
             </div>
 
             <AlertCircle className="text-yellow-600" size={20} />

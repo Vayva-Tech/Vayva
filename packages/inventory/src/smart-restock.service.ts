@@ -1,4 +1,7 @@
-import { prisma } from "@vayva/db";
+/**
+ * Smart Restock Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
+ * Database operations moved to Backend/core-api/src/services/inventory/smart-restock.service.ts
+ */
 
 export interface RestockAlert {
   id: string;

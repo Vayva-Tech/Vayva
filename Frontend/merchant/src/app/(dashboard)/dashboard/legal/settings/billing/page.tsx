@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { DollarSign, FileText, Clock, Calculator } from 'lucide-react';
+import { toast } from 'sonner';
+import { logger } from '@vayva/shared';
 
 interface BillingSettings {
   defaultHourlyRate: number;
@@ -45,10 +47,13 @@ export default function BillingSettingsPage() {
 
       if (response.ok) {
         setSuccess('Billing settings saved successfully');
+        toast.success('Billing settings saved successfully');
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save billing settings';
+      logger.error('[BILLING_SETTINGS_ERROR]', { error });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

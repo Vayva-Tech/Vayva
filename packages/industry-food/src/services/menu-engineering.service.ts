@@ -3,7 +3,7 @@
  * Menu optimization, item profitability analysis, and menu mix optimization
  */
 
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
 
 export interface MenuItemAnalysis {
   id: string;
@@ -42,7 +42,7 @@ export class MenuEngineeringService {
       },
     });
 
-    return menuItems.map(item => {
+    return menuItems.map((item) => {
       const cost = item.recipe?.ingredients.reduce((sum, ing) => {
         return sum + (ing.quantity * ing.ingredient.costPerUnit);
       }, 0) || 0;

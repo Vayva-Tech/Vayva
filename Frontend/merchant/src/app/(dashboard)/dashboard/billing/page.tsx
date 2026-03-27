@@ -8,11 +8,14 @@ import {
   Info,
   Warning,
   Bank,
+  ArrowDownToLine,
 } from "@phosphor-icons/react";
 import { Button } from "@vayva/ui";
 import { PLANS, getPlanPrice, type BillingCycle, type PlanKey } from "@/lib/billing/plans";
 import { toast } from "sonner";
 import { AddOnsSection } from "@/components/billing/AddOnsSection";
+import { DowngradeModal } from "@/components/billing/DowngradeModal";
+import { CancellationModal } from "@/components/billing/CancellationModal";
 import { apiJson } from "@/lib/api-client-shared";
 
 interface BillingInvoice {
@@ -47,12 +50,26 @@ export default function BillingPage() {
   const [error, setError] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
   const [paymentMethod, setPaymentMethod] = useState<"card" | "bank_transfer">("card");
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
+  const [showCancellationModal, setShowCancellationModal] = useState(false);
+  const [currentUsage, setCurrentUsage] = useState<{
+    products: number;
+    orders: number;
+    customers: number;
+    staffSeats: number;
+  } | null>(null);
 
   const fetchStatus = React.useCallback(async () => {
     try {
       setLoading(true);
-      const data = await apiJson<BillingStatus>("/api/merchant/billing/status");
-      setStatus(data);
+      const [billingData, usageData] = await Promise.all([
+        apiJson<BillingStatus>("/api/merchant/billing/status"),
+        apiJson<{ success: boolean; data?: { usage: any } }>("/api/billing/downgrade").catch(() => null),
+      ]);
+      setStatus(billingData);
+      if (usageData?.success && usageData.data) {
+        setCurrentUsage(usageData.data.usage);
+      }
       setError(null);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to load billing status";
@@ -161,9 +178,35 @@ export default function BillingPage() {
                 {status.periodEnd && `Renews ${formatDate(status.periodEnd)}`}
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-              {status.status === "active" ? "Active" : status.status}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                {status.status === "active" ? "Active" : status.status}
+              </span>
+              {currentUsage && (
+                <>
+                  {(status.planKey === "pro" || status.planKey === "pro_plus") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDowngradeModal(true)}
+                      className="flex items-center gap-2 border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300"
+                    >
+                      <ArrowDownToLine className="w-4 h-4" />
+                      Downgrade
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCancellationModal(true)}
+                    className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <TrendingDown className="w-4 h-4" />
+                    Cancel Subscription
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -399,6 +442,29 @@ export default function BillingPage() {
           </table>
         </div>
       </div>
+
+      {/* Downgrade Modal */}
+      {currentUsage && (
+        <DowngradeModal
+          open={showDowngradeModal}
+          onOpenChange={setShowDowngradeModal}
+          currentPlan={status?.planKey || "starter"}
+          currentUsage={currentUsage}
+          onSuccess={() => {
+            void fetchStatus();
+          }}
+        />
+      )}
+
+      {/* Cancellation Modal */}
+      <CancellationModal
+        open={showCancellationModal}
+        onOpenChange={setShowCancellationModal}
+        currentPlan={status?.planKey || "starter"}
+        onSuccess={() => {
+          void fetchStatus();
+        }}
+      />
     </div>
   );
 }

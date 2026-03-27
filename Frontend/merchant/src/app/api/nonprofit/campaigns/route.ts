@@ -1,130 +1,72 @@
-import { getServerSession } from 'next-auth';
-import { NextResponse } from 'next/server';
-import { authOptions } from '@/lib/auth';
-import { apiJson } from '@/lib/api-client-shared';
-import { handleApiError } from '@/lib/api-error-handler';
-import type { CampaignStatus } from '@/types/phase4-industry';
+import { NextRequest } from "next/server";
+import { prisma, logger } from "@vayva/shared";
 
-// GET /api/nonprofit/campaigns?storeId=xxx&status=xxx
-export async function GET(req: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { searchParams } = new URL(request.url);
+    const campaignId = searchParams.get("campaignId");
+
+    if (campaignId) {
+      // Get single campaign with donations
+      const campaign = await prisma.donationCampaign.findUnique({
+        where: { id: campaignId },
+        include: {
+          donations: {
+            include: {
+              donor: true,
+            },
+            orderBy: { createdAt: "desc" },
+          },
+          _count: {
+            select: { donations: true },
+          },
+        },
+      });
+
+      return Response.json({ data: [campaign] });
     }
 
-    const storeId = session.user.storeId;
-    if (!storeId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Get all campaigns
+    const campaigns = await prisma.donationCampaign.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        _count: {
+          select: { donations: true },
+        },
+      },
+    });
 
-    const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
-    const featured = searchParams.get('featured') === 'true' ? true : undefined;
-
-    // Fetch campaigns via API instead of direct service call
-    const queryParams = new URLSearchParams({ storeId });
-    if (status) queryParams.append('status', status);
-    if (featured !== undefined) queryParams.append('featured', String(featured));
-
-    const result = await apiJson<{
-      success: boolean;
-      data?: Array<any>;
-      error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/nonprofit/campaigns?${queryParams.toString()}`);
-
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch campaigns');
-    }
-
-    return NextResponse.json({ campaigns: result.data });
-  } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: "/api/nonprofit/campaigns",
-        operation: "FETCH_CAMPAIGNS",
-      }
-    );
-    return NextResponse.json(
-      { error: 'Failed to fetch campaigns' },
-      { status: 500 }
-    );
+    return Response.json({ data: campaigns });
+  } catch (error: unknown) {
+    const _errMsg = error instanceof Error ? error.message : String(error);
+    logger.error("[CAMPAIGNS_GET_ERROR]", { error: _errMsg });
+    return Response.json({ error: _errMsg }, { status: 500 });
   }
 }
 
-// POST /api/nonprofit/campaigns
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const body = await request.json();
+    const { title, description, goal, currency, startDate, endDate, category, impactMetrics } = body;
 
-    const storeId = session.user.storeId;
-    if (!storeId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const {
-      title,
-      description,
-      goal,
-      currency,
-      startDate,
-      endDate,
-      bannerImage,
-      impactMetrics,
-    } = body;
-
-    if (!title || !goal || !startDate) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
-    // Create campaign via API instead of direct service call
-    const result = await apiJson<{
-      success: boolean;
-      data?: any;
-      error?: string;
-    }>(`${process.env.BACKEND_API_URL}/api/nonprofit/campaigns`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-store-id': storeId,
-      },
-      body: JSON.stringify({
-        storeId,
+    const campaign = await prisma.donationCampaign.create({
+      data: {
         title,
         description,
-        goal,
-        currency,
-        startDate: new Date(startDate),
+        goal: parseFloat(goal),
+        currency: currency || "USD",
+        startDate: startDate ? new Date(startDate) : undefined,
         endDate: endDate ? new Date(endDate) : undefined,
-        bannerImage,
-        impactMetrics,
-      }),
+        category: category || "general",
+        status: "draft",
+        impactMetrics: impactMetrics || {},
+      },
     });
 
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to create campaign');
-    }
-
-    return NextResponse.json({ campaign: result.data }, { status: 201 });
-  } catch (error) {
-    handleApiError(
-      error,
-      {
-        endpoint: "/api/nonprofit/campaigns",
-        operation: "CREATE_CAMPAIGN",
-      }
-    );
-    return NextResponse.json(
-      { error: 'Failed to create campaign' },
-      { status: 500 }
-    );
+    return Response.json({ data: campaign });
+  } catch (error: unknown) {
+    const _errMsg = error instanceof Error ? error.message : String(error);
+    logger.error("[CAMPAIGN_CREATE_ERROR]", { error: _errMsg });
+    return Response.json({ error: _errMsg }, { status: 500 });
   }
 }

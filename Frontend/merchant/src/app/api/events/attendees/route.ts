@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
-import { eventsService } from '@/services/events.service';
 import { apiJson } from '@/lib/api-client-shared';
 import { handleApiError } from '@/lib/api-error-handler';
 
@@ -73,20 +72,29 @@ export async function POST(req: Request) {
       );
     }
 
-    const attendee = await eventsService.addAttendee(sessionStoreId, {
-      eventId,
-      customerId,
-      email,
-      firstName,
-      lastName,
-      company,
-      jobTitle,
-      dietaryRequirements,
-      accessibilityNeeds,
-      notes,
-    });
+    // Call backend API to add attendee
+    const result = await apiJson.post(
+      `${process.env.BACKEND_API_URL}/api/events/attendees`,
+      {
+        eventId,
+        customerId,
+        email,
+        firstName,
+        lastName,
+        company,
+        jobTitle,
+        dietaryRequirements,
+        accessibilityNeeds,
+        notes,
+      },
+      {
+        headers: {
+          'x-store-id': sessionStoreId,
+        },
+      }
+    );
 
-    return NextResponse.json({ attendee }, { status: 201 });
+    return NextResponse.json({ attendee: result.data }, { status: 201 });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(

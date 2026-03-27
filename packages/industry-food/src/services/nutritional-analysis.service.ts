@@ -3,7 +3,7 @@
  * Nutrition calculations and dietary information
  */
 
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
 
 export interface NutritionalInfo {
   calories: number;

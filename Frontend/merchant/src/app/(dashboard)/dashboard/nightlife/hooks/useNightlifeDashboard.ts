@@ -1,11 +1,12 @@
 /**
  * Nightlife Dashboard Hook
- * Fetches all nightlife dashboard data
+ * Fetches all nightlife dashboard data using React Query for caching and auto-refresh
  */
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { logger } from '@vayva/shared';
 import type {
   NightlifeMetrics,
   NightlifeTable,
@@ -17,6 +18,7 @@ import type {
   DemographicsBreakdown,
   TableReservation,
 } from '@vayva/industry-nightlife/types';
+import { QUERY_KEYS, DEFAULT_QUERY_CONFIG } from '@/lib/react-query';
 
 interface NightlifeDashboardData {
   metrics: NightlifeMetrics;
@@ -30,70 +32,60 @@ interface NightlifeDashboardData {
   bottleInventory: Array<{ name: string; quantity: number; status: 'low' | 'ok' | 'critical' }>;
 }
 
+const DEFAULT_DATA: NightlifeDashboardData = {
+  metrics: {
+    revenue: 0,
+    revenueChange: 0,
+    covers: 0,
+    coversChange: 0,
+    vipCount: 0,
+    vipCountChange: 0,
+    bottleSales: 0,
+    bottleSalesChange: 0,
+    occupancyRate: 0,
+    occupancyChange: 0,
+    waitTime: '0 min',
+    walksCount: 0,
+  },
+  tables: [],
+  vipGuests: [],
+  bottleOrders: [],
+  promoters: [],
+  doorActivity: {
+    entries: [],
+    demographics: {
+      gender: { male: 0, female: 0, other: 0 },
+      ageGroups: { '21-25': 0, '26-30': 0, '31-35': 0, '35+': 0 },
+    },
+  },
+  securityIncidents: [],
+  reservations: [],
+  bottleInventory: [],
+};
+
 export function useNightlifeDashboard() {
-  const [data, setData] = useState<NightlifeDashboardData>({
-    metrics: {
-      revenue: 0,
-      revenueChange: 0,
-      covers: 0,
-      coversChange: 0,
-      vipCount: 0,
-      vipCountChange: 0,
-      bottleSales: 0,
-      bottleSalesChange: 0,
-      occupancyRate: 0,
-      occupancyChange: 0,
-      waitTime: '0 min',
-      walksCount: 0,
-    },
-    tables: [],
-    vipGuests: [],
-    bottleOrders: [],
-    promoters: [],
-    doorActivity: {
-      entries: [],
-      demographics: {
-        gender: { male: 0, female: 0, other: 0 },
-        ageGroups: { '21-25': 0, '26-30': 0, '31-35': 0, '35+': 0 },
-      },
-    },
-    securityIncidents: [],
-    reservations: [],
-    bottleInventory: [],
-  });
+  const queryKey = QUERY_KEYS.nightlife.dashboard('default');
   
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        setIsLoading(true);
-        
-        // Fetch from API (to be implemented)
-        const response = await fetch('/api/nightlife/dashboard');
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch nightlife dashboard');
-        }
-        
-        const result = (await response.json()) as { data?: NightlifeDashboardData };
-        if (!result.data) {
-          throw new Error('Invalid nightlife dashboard payload');
-        }
-        setData(result.data);
-        
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching nightlife dashboard:', err);
-        setError(err instanceof Error ? err : new Error('Failed to fetch dashboard data'));
-      } finally {
-        setIsLoading(false);
+  const { data, isLoading, error, refetch, isFetching } = useQuery<NightlifeDashboardData, Error>({
+    queryKey,
+    queryFn: async () => {
+      const response = await fetch('/api/nightlife/dashboard');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch nightlife dashboard: ${response.statusText}`);
       }
-    }
+      const result = await response.json();
+      return result.data as NightlifeDashboardData || DEFAULT_DATA;
+    },
+    ...DEFAULT_QUERY_CONFIG,
+    staleTime: 15 * 1000, // 15 seconds - nightlife data changes fast
+    refetchInterval: 30 * 1000, // 30 seconds - frequent updates for real-time feel
+  });
 
-    fetchDashboardData();
-  }, []);
-
-  return { data, isLoading, error };
+  return {
+    data: data || DEFAULT_DATA,
+    loading: isLoading,
+    fetching: isFetching,
+    error: error?.message || null,
+    refetch,
+  };
 }

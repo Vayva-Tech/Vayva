@@ -99,8 +99,8 @@ export interface SignUpInput {
   password: string;
   firstName: string;
   lastName: string;
-  storeName: string;
-  storeSlug?: string;
+  businessName?: string; // Optional business name for store creation
+  plan?: "starter" | "pro" | "pro_plus"; // Plan selection for database persistence
 }
 
 export interface VerifyOTPInput {

@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
-import { eventsService } from '@/services/events.service';
 import { apiJson } from '@/lib/api-client-shared';
 import { handleApiError } from '@/lib/api-error-handler';
 
@@ -59,32 +58,41 @@ export async function POST(req: Request) {
       description,
       price,
       quantity,
-      salesStart,
-      salesEnd,
-      maxPerOrder,
-      benefits,
+      saleStartDate,
+      saleEndDate,
+      minPerCustomer,
+      maxPerCustomer,
     } = body;
 
-    if (!eventId || !name || price === undefined || !quantity || !salesStart || !salesEnd) {
+    if (!eventId || !name || typeof price !== 'number') {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    const tier = await eventsService.createTicketTier(sessionStoreId, {
-      eventId,
-      name,
-      description,
-      price,
-      quantity,
-      salesStart: new Date(salesStart),
-      salesEnd: new Date(salesEnd),
-      maxPerOrder,
-      benefits,
-    });
+    // Call backend API to create ticket tier
+    const result = await apiJson.post(
+      `${process.env.BACKEND_API_URL}/api/events/tickets`,
+      {
+        eventId,
+        name,
+        description,
+        price,
+        quantity,
+        saleStartDate,
+        saleEndDate,
+        minPerCustomer,
+        maxPerCustomer,
+      },
+      {
+        headers: {
+          'x-store-id': sessionStoreId,
+        },
+      }
+    );
 
-    return NextResponse.json({ tier }, { status: 201 });
+    return NextResponse.json({ tier: result.data }, { status: 201 });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(

@@ -150,9 +150,15 @@ const VerifyContent = () => {
   return (
     <SplitAuthLayout
       stepIndicator="Step 2/2"
-      title="Verify your account"
+      title={
+        plan && ["pro", "pro_plus"].includes(plan)
+          ? `Verify & Activate Your ${plan === "pro" ? "Pro" : "Pro+"} Plan`
+          : "Verify your account"
+      }
       subtitle={
-        method === "WHATSAPP" && maskedPhone
+        plan && ["pro", "pro_plus"].includes(plan)
+          ? "After verification, you'll complete a one-time business setup (15-20 min), then activate your paid plan."
+          : method === "WHATSAPP" && maskedPhone
           ? `We sent a 6-digit code to ${maskedPhone}`
           : `We sent a 6-digit code to ${email || "your email"}`
       }
@@ -276,9 +282,53 @@ const VerifyContent = () => {
             Verifying...
           </>
         ) : (
-          "Verify account"
+          plan && ["pro", "pro_plus"].includes(plan)
+            ? `Verify & Continue to Setup`
+            : "Verify account"
         )}
       </Button>
+
+      {/* Skip to Checkout Option for Pro/Pro+ */}
+      {plan && ["pro", "pro_plus"].includes(plan) && (
+        <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-emerald-50 rounded-xl border border-purple-200">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <Icon name="Lightning" className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-purple-900">
+                Fast-Track Your Activation
+              </h4>
+              <p className="text-xs text-purple-700 mt-1">
+                You can skip the business setup and activate your {plan === "pro" ? "Pro" : "Pro+"} plan now. 
+                The setup can be completed later from your dashboard.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    router.push(`/checkout?plan=${plan}&email=${email}`);
+                  }}
+                  className="flex-1"
+                >
+                  ⚡ Skip to Payment & Activate Now
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    // User chooses to do setup first - they'll be redirected by auth context
+                  }}
+                  className="flex-1"
+                >
+                  Complete Setup First
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Help Text */}
       <div className="mt-6 text-center space-y-2">

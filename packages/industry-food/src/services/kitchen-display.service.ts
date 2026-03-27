@@ -3,7 +3,7 @@
  * Kitchen display system (KDS) integration and order management
  */
 
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
 
 export interface KDSOrder {
   id: string;

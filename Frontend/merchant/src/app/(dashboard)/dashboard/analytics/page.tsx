@@ -1,7 +1,7 @@
 "use client";
-import { Button } from "@vayva/ui";
+import { Button, Skeleton } from "@vayva/ui";
 
-import { useState } from "react";
+import { useState, useEffect, memo, useMemo } from "react";
 import Link from "next/link";
 import {
   TrendingUp,
@@ -80,18 +80,20 @@ const REVENUE_DATA = [
   { label: "Sun", revenue: 1180000, orders: 182 },
 ];
 
-function DualAxisChart() {
-  const w = 720;
-  const h = 300;
-  const pt = 30;
-  const pb = 40;
-  const pl = 65;
-  const pr = 55;
-  const cw = w - pl - pr;
-  const ch = h - pt - pb;
+const DualAxisChart = memo(function DualAxisChart() {
+  // Memoize expensive calculations
+  const chartMetrics = useMemo(() => {
+    const w = 720;
+    const h = 300;
+    const pt = 30;
+    const pb = 40;
+    const pl = 65;
+    const pr = 55;
+    const cw = w - pl - pr;
+    const ch = h - pt - pb;
 
-  const maxRev = Math.max(...REVENUE_DATA.map((d) => d.revenue)) * 1.1;
-  const maxOrd = Math.max(...REVENUE_DATA.map((d) => d.orders)) * 1.1;
+    const maxRev = Math.max(...REVENUE_DATA.map((d) => d.revenue)) * 1.1;
+    const maxOrd = Math.max(...REVENUE_DATA.map((d) => d.orders)) * 1.1;
 
   const revPoints = REVENUE_DATA.map((d, i) => ({
     x: pl + (i / (REVENUE_DATA.length - 1)) * cw,
@@ -178,7 +180,7 @@ function DualAxisChart() {
       </text>
     </svg>
   );
-}
+}, []);
 
 /* ------------------------------------------------------------------ */
 /*  Sales by Channel Donut Chart                                       */
@@ -439,10 +441,69 @@ const PERF_METRICS = [
 ];
 
 /* ================================================================== */
+/*  Loading Skeleton                                                   */
+/* ================================================================== */
+function AnalyticsSkeleton() {
+  return (
+    <div className="p-6 space-y-8">
+      {/* Header Skeleton */}
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="h-10 w-32" />
+      </div>
+
+      {/* Range Selector Skeleton */}
+      <div className="flex gap-2">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-9 w-20 rounded-lg" />
+        ))}
+      </div>
+
+      {/* Summary Cards Skeleton */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="p-6 border rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+            </div>
+            <Skeleton className="h-8 w-32" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Skeleton */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {[1, 2].map((i) => (
+          <div key={i} className="p-6 border rounded-xl space-y-4">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================== */
 /*  Main Analytics Page                                                */
 /* ================================================================== */
 export default function AnalyticsPage() {
+  const [loading, setLoading] = useState(true);
   const [activeRange, setActiveRange] = useState<"today" | "7d" | "30d" | "90d">("30d");
+
+  useEffect(() => {
+    // Simulate loading analytics data
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const ranges: { key: typeof activeRange; label: string }[] = [
     { key: "today", label: "Today" },
@@ -450,6 +511,10 @@ export default function AnalyticsPage() {
     { key: "30d", label: "30d" },
     { key: "90d", label: "90d" },
   ];
+
+  if (loading) {
+    return <AnalyticsSkeleton />;
+  }
 
   const summaryCards = [
     {

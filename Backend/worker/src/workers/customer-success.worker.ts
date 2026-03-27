@@ -6,16 +6,17 @@
 import { Worker, Queue } from 'bullmq';
 import { logger, QUEUES as _QUEUES } from '@vayva/shared';
 import type { RedisConnection } from '../types';
-import {
-  healthScoreCalculator,
-  playbookExecutor,
-  npsSystem,
-  CS_QUEUES,
-  HealthScoreJobData,
-  PlaybookJobData,
-  NpsSurveyJobData,
-  NpsResponseJobData,
-} from '@vayva/customer-success';
+// Temporarily disabled - customer-success package not building
+// import {
+//   healthScoreCalculator,
+//   playbookExecutor,
+//   npsSystem,
+//   CS_QUEUES,
+//   HealthScoreJobData,
+//   PlaybookJobData,
+//   NpsSurveyJobData,
+//   NpsResponseJobData,
+// } from '@vayva/customer-success';
 
 // WhatsApp sender using Evolution API
 async function sendWhatsAppMessage(phone: string, message: string): Promise<void> {

@@ -5,6 +5,7 @@
 
 import React from 'react';
 import type { IndustryDashboardProps } from '@vayva/industry-core';
+import { DashboardErrorBoundary } from '@/components/error-boundary/error-boundary-utils';
 
 /**
  * Shell component: merchant apps compose UniversalProDashboard with routing and theming.
@@ -15,13 +16,17 @@ export function ProfessionalServicesDashboard({
   className,
 }: IndustryDashboardProps) {
   return (
-    <section
-      className={className}
-      data-industry="professional"
-      data-user-id={userId}
-      data-business-id={businessId}
-      aria-label="Professional services dashboard"
-    />
+    <DashboardErrorBoundary serviceName="ProfessionalServicesDashboard">
+      <section
+        className={className}
+        data-industry="professional"
+        data-user-id={userId}
+        data-business-id={businessId}
+        aria-label="Professional services dashboard"
+      >
+        {/* Professional services content will be added here */}
+      </section>
+    </DashboardErrorBoundary>
   );
 }
 

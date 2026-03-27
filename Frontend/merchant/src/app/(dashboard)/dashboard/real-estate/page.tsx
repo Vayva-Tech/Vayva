@@ -1,5 +1,7 @@
 "use client";
 import { Button } from "@vayva/ui";
+import { toast } from "sonner";
+import { logger } from "@vayva/shared";
 
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
@@ -60,10 +62,13 @@ export default function RealEstateDashboard() {
         setError(null);
       } else {
         setError(data.error || "Failed to fetch dashboard data");
+        logger.error("[REAL_ESTATE_DASHBOARD_ERROR]", { error: data.error });
       }
     } catch (err) {
-      setError("An error occurred while fetching dashboard data");
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : "An error occurred while fetching dashboard data";
+      setError(errorMessage);
+      logger.error("[REAL_ESTATE_DASHBOARD_ERROR]", { error: err });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

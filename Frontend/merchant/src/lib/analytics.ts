@@ -2,7 +2,10 @@
 // Analytics Module
 // ============================================================================
 // Provides event tracking utilities for dashboard and feature usage analytics.
+// Uses structured logging for development debugging.
 // ============================================================================
+
+import { logger } from './logger';
 
 export const trackEvents = {
   /**
@@ -16,9 +19,13 @@ export const trackEvents = {
     try {
       if (typeof window === 'undefined') return;
 
-      // Log in development
+      // Log in development using structured logger
       if (process.env.NODE_ENV === 'development') {
-        console.debug('[Analytics] featureUsed:', { userId, eventName, properties });
+        logger.debug('[ANALYTICS_EVENT]', { 
+          event: eventName, 
+          userId,
+          properties 
+        });
       }
 
       // Send to analytics endpoint if available
@@ -54,7 +61,12 @@ export const trackEvents = {
       if (typeof window === 'undefined') return;
 
       if (process.env.NODE_ENV === 'development') {
-        console.debug('[Analytics] pageView:', { userId, page, properties });
+        logger.debug('[ANALYTICS_PAGEVIEW]', { 
+          event: 'page_view', 
+          userId,
+          page,
+          properties 
+        });
       }
     } catch {
       // Analytics should never break the app
@@ -72,7 +84,10 @@ export const trackEvents = {
       if (typeof window === 'undefined') return;
 
       if (process.env.NODE_ENV === 'development') {
-        console.debug('[Analytics] track:', { eventName, properties });
+        logger.debug('[ANALYTICS_CUSTOM_EVENT]', { 
+          event: eventName, 
+          properties 
+        });
       }
     } catch {
       // Analytics should never break the app

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { apiJson } from "@/lib/api-client-shared";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PageWithInsights } from "@/components/layout/PageWithInsights";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 
 interface BlogPost {
   id: string;
@@ -195,17 +196,18 @@ export default function BlogPage() {
               New Post
             </Button>
           }
-        />
+        </ErrorBoundary>
 
       {/* Summary Widgets */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <SummaryWidget
-          icon={<FileText size={18} />}
-          label="Total Posts"
-          value={String(totalPosts)}
-          trend="articles"
-          positive
-        />
+      <ErrorBoundary serviceName="BlogSummaryWidgets">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <SummaryWidget
+            icon={<FileText size={18} />}
+            label="Total Posts"
+            value={String(totalPosts)}
+            trend="articles"
+            positive
+          />
         <SummaryWidget
           icon={<CheckCircle size={18} />}
           label="Published"
@@ -382,6 +384,7 @@ export default function BlogPage() {
         cancelText="Cancel"
         variant="danger"
       />
+      </ErrorBoundary>
       </PageWithInsights>
     </div>
   );

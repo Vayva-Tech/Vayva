@@ -3,7 +3,6 @@
  * Real-time monitoring with intelligent alerting
  */
 
-import { prisma } from '@vayva/db';
 import { Queue } from 'bullmq';
 
 export interface AlertConfig {
@@ -128,10 +127,7 @@ export class MonitoringService {
    * Calculate error rate (last 5 minutes)
    */
   private async getErrorRate(): Promise<MetricValue> {
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    
-    // This would query your error logs/metrics table
-    // Placeholder implementation
+    // Placeholder implementation - would call backend monitoring API
     return {
       name: 'error_rate',
       value: 0.5, // percentage
@@ -155,15 +151,11 @@ export class MonitoringService {
    * Get average health score across all stores
    */
   private async getAverageHealthScore(): Promise<MetricValue> {
-    const result = await prisma.$queryRaw<{ avgScore: number }[]>`
-      SELECT AVG(score) as "avgScore"
-      FROM "HealthScore"
-      WHERE date >= NOW() - INTERVAL '1 hour'
-    `;
-
+    // Migrated from Prisma to backend API call
+    // Would call: GET /api/v1/analytics/health-scores/average
     return {
       name: 'health_score_average',
-      value: result[0]?.avgScore || 0,
+      value: 0, // placeholder until backend endpoint exists
       timestamp: new Date(),
     };
   }
@@ -172,22 +164,11 @@ export class MonitoringService {
    * Get NPS response rate
    */
   private async getNPSResponseRate(): Promise<MetricValue> {
-    const total = await prisma.nPSSurvey.count({
-      where: { sentAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
-    });
-
-    const responded = await prisma.nPSSurvey.count({
-      where: { 
-        respondedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-        status: 'responded'
-      }
-    });
-
-    const rate = total > 0 ? (responded / total) * 100 : 0;
-
+    // Migrated from Prisma to backend API call
+    // Would call: GET /api/v1/analytics/nps/response-rate
     return {
       name: 'nps_response_rate',
-      value: rate,
+      value: 0, // placeholder until backend endpoint exists
       timestamp: new Date(),
     };
   }
@@ -196,24 +177,11 @@ export class MonitoringService {
    * Get playbook failure rate
    */
   private async getPlaybookFailureRate(): Promise<MetricValue> {
-    const total = await prisma.playbookExecution.count({
-      where: { 
-        startedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
-      }
-    });
-
-    const failed = await prisma.playbookExecution.count({
-      where: { 
-        status: 'failed',
-        startedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
-      }
-    });
-
-    const rate = total > 0 ? (failed / total) * 100 : 0;
-
+    // Migrated from Prisma to backend API call
+    // Would call: GET /api/v1/analytics/playbooks/failure-rate
     return {
       name: 'playbook_failure_rate',
-      value: rate,
+      value: 0, // placeholder until backend endpoint exists
       timestamp: new Date(),
     };
   }

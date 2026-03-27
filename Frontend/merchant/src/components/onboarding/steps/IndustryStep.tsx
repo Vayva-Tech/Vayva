@@ -117,7 +117,23 @@ export default function IndustryStep() {
     });
 
   const handleContinue = async () => {
-    if (!selectedIndustry) return;
+    if (!selectedIndustry) {
+      // Show validation error - must select an industry
+      // Enhanced with clearer messaging
+      const confirmed = window.confirm(
+        "⚠️ Industry Selection Required\n\n" +
+        "Selecting your industry is CRITICAL because it:\n" +
+        "• Customizes your AI's behavior for your business type\n" +
+        "• Sets up industry-specific features and KPIs\n" +
+        "• Configures the right payment processing rules\n" +
+        "• Personalizes your entire dashboard experience\n\n" +
+        "This is a one-time setup that ensures everything works perfectly for YOUR business.\n\n" +
+        "Not sure? You can select 'Not Sure' and we'll help you choose, or you can change this later in settings (though it requires data migration).\n\n" +
+        "Would you like to proceed without selecting an industry?"
+      );
+      
+      if (!confirmed) return;
+    }
     
     try {
       // Save industry selection
@@ -141,6 +157,7 @@ export default function IndustryStep() {
       await nextStep(industryData);
     } catch (error) {
       console.error("Failed to save industry selection:", error);
+      alert("Failed to save industry selection. Please try again.");
     }
   };
 
@@ -194,7 +211,7 @@ export default function IndustryStep() {
       </div>
 
       {/* Industry Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
         {industries.map((industry) => {
           const IconComponent = INDUSTRY_ICONS[industry.slug] || Package;
           const isSelected = selectedIndustry === industry.slug;
@@ -250,6 +267,30 @@ export default function IndustryStep() {
             </Button>
           );
         })}
+        
+        {/* Not Sure Option */}
+        <Button
+          onClick={() => setSelectedIndustry("services")} // Default to services as safe fallback
+          className={`
+            text-left p-5 rounded-2xl border-2 border-dashed transition-all duration-200
+            ${selectedIndustry === "not_sure"
+              ? "border-green-500 bg-green-500/5 ring-2 ring-green-500" 
+              : "border-gray-300 hover:border-green-500/50 bg-gray-50"
+            }
+          `}
+        >
+          <div className="flex flex-col items-center justify-center h-full text-center py-4">
+            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-3">
+              <Sparkle size={32} className="text-gray-500" />
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">
+              🤔 Not Sure / Multiple Industries
+            </h3>
+            <p className="text-sm text-gray-600">
+              We'll help you choose based on your primary revenue source. You can change this later in settings.
+            </p>
+          </div>
+        </Button>
       </div>
 
       {/* Footer */}

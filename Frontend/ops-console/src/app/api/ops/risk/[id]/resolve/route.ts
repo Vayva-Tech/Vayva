@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { logger } from "@vayva/shared";
 
 export async function POST(
   req: NextRequest,
@@ -10,16 +10,20 @@ export async function POST(
 
   try {
     const { id } = await params;
+    const body = await req.json();
+    const { resolution } = body;
 
-    // Log the resolution
+    const response = await apiClient.post(`/api/v1/compliance/risk/${id}/resolve`, {
+      resolution,
+    });
+
     await OpsAuthService.logEvent(user.id, "RISK_FLAG_RESOLVED", {
       flagId: id,
     });
 
-    return NextResponse.json({ success: true });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: unknown) {
-    logger.error("[RISK_RESOLVE_ERROR]", { error });
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("[RISK_RESOLVE_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to resolve flag" },
       { status: 500 },

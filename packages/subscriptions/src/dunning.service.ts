@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from "@vayva/db";
-import { sendPaymentFailed, sendPaymentRecovered, sendSubscriptionEnded } from "@vayva/emails";
-
-// Note: boxSubscription / dunningAttempt / dunningConfig models pending migration
-// The platform `prisma.subscription` is SaaS billing – box subscriptions use (prisma as any)
-const db = prisma as any;
+/**
+ * Dunning Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
+ * Database operations moved to Backend/core-api/src/services/subscriptions/dunning.service.ts
+ */
+// import { sendPaymentFailed, sendPaymentRecovered, sendSubscriptionEnded } from "@vayva/emails";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types

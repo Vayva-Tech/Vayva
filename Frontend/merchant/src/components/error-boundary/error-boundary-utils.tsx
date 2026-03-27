@@ -1,0 +1,268 @@
+/**
+ * Error Boundary Utilities for Industry Dashboards
+ * 
+ * Phase 3 Issue #7 (from Phase 2): Component Error Boundaries Rollout
+ * 
+ * Usage:
+ * ```typescript
+ * import { withDashboardErrorBoundary } from './error-boundary-utils';
+ * 
+ * // Wrap individual components
+ * const ProtectedComponent = withDashboardErrorBoundary(
+ *   MyComponent,
+ *   { serviceName: 'MyComponent', retryEnabled: true }
+ * );
+ * 
+ * // Or use in JSX
+ * <DashboardErrorBoundary serviceName="ComponentName">
+ *   <MyComponent />
+ * </DashboardErrorBoundary>
+ * ```
+ */
+
+'use client';
+
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { logger } from '@vayva/shared';
+
+// ============================================================================
+// ERROR BOUNDARY COMPONENT
+// ============================================================================
+
+interface DashboardErrorBoundaryProps {
+  children: ReactNode;
+  serviceName: string;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  retryEnabled?: boolean;
+  maxRetries?: number;
+}
+
+interface DashboardErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  retryCount: number;
+  isRetrying: boolean;
+}
+
+export class DashboardErrorBoundary extends Component<
+  DashboardErrorBoundaryProps,
+  DashboardErrorBoundaryState
+> {
+  private retryTimeout: NodeJS.Timeout | null = null;
+
+  public state: DashboardErrorBoundaryState = {
+    hasError: false,
+    error: null,
+    retryCount: 0,
+    isRetrying: false,
+  };
+
+  public static getDerivedStateFromError(error: Error): DashboardErrorBoundaryState {
+    return {
+      hasError: true,
+      error,
+      retryCount: 0,
+      isRetrying: false,
+    };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    const { serviceName, onError } = this.props;
+
+    logger.error('[DASHBOARD_ERROR_BOUNDARY]', {
+      serviceName,
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+    });
+
+    this.setState({ error });
+
+    if (onError) {
+      onError(error, errorInfo);
+    }
+
+    // Auto-retry logic
+    if (this.props.retryEnabled && this.state.retryCount < (this.props.maxRetries || 3)) {
+      this.attemptRetry();
+    }
+  }
+
+  private attemptRetry = () => {
+    this.setState({ isRetrying: true });
+
+    // Exponential backoff: 1s, 2s, 4s
+    const delay = Math.pow(2, this.state.retryCount) * 1000;
+
+    this.retryTimeout = setTimeout(() => {
+      this.setState((prev) => ({
+        hasError: false,
+        error: null,
+        retryCount: prev.retryCount + 1,
+        isRetrying: false,
+      }));
+    }, delay);
+  };
+
+  public handleManualRetry = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      retryCount: 0,
+      isRetrying: false,
+    });
+  };
+
+  public componentWillUnmount() {
+    if (this.retryTimeout) {
+      clearTimeout(this.retryTimeout);
+    }
+  }
+
+  public render() {
+    const { hasError, error, isRetrying, retryCount } = this.state;
+    const { children, fallback, serviceName } = this.props;
+
+    if (isRetrying) {
+      return (
+        <div
+          className="flex min-h-[200px] items-center justify-center rounded-lg border border-blue-200 bg-blue-50 p-6"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="text-center">
+            <div
+              className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"
+              aria-label="Retrying"
+            />
+            <p className="text-sm font-medium text-blue-800">
+              Retrying {serviceName}... (Attempt {retryCount + 1})
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (hasError) {
+      if (fallback) {
+        return fallback;
+      }
+
+      return (
+        <div
+          className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-6"
+          role="alert"
+          aria-label={`${serviceName} error`}
+        >
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+            <svg
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+
+          <h3 className="mb-2 text-lg font-semibold text-red-900">
+            {serviceName} Failed to Load
+          </h3>
+
+          <p className="mb-4 text-sm text-red-700">
+            {error?.message || 'An unexpected error occurred'}
+          </p>
+
+          <div className="flex gap-3">
+            <button
+              onClick={this.handleManualRetry}
+              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return children;
+  }
+}
+
+// ============================================================================
+// HIGHER-ORDER COMPONENT
+// ============================================================================
+
+interface WithErrorBoundaryOptions {
+  serviceName: string;
+  fallback?: ReactNode;
+  retryEnabled?: boolean;
+  maxRetries?: number;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+export function withDashboardErrorBoundary<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  options: WithErrorBoundaryOptions
+) {
+  const { serviceName, fallback, retryEnabled = false, maxRetries = 3, onError } = options;
+
+  return function WithErrorBoundary(props: P) {
+    return (
+      <DashboardErrorBoundary
+        serviceName={serviceName}
+        fallback={fallback}
+        retryEnabled={retryEnabled}
+        maxRetries={maxRetries}
+        onError={onError}
+      >
+        <WrappedComponent {...props} />
+      </DashboardErrorBoundary>
+    );
+  };
+}
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Create a reusable error boundary for a specific section
+ */
+export function createSectionErrorBoundary(sectionName: string) {
+  return function SectionErrorBoundary({ children }: { children: ReactNode }) {
+    return (
+      <DashboardErrorBoundary serviceName={sectionName}>
+        {children}
+      </DashboardErrorBoundary>
+    );
+  };
+}
+
+/**
+ * Error boundary configurations for common dashboard sections
+ */
+export const SectionErrorBoundaries = {
+  StatsGrid: createSectionErrorBoundary('StatsGrid'),
+  DataTable: createSectionErrorBoundary('DataTable'),
+  Chart: createSectionErrorBoundary('Chart'),
+  MetricCard: createSectionErrorBoundary('MetricCard'),
+  Form: createSectionErrorBoundary('Form'),
+  List: createSectionErrorBoundary('List'),
+  Gallery: createSectionErrorBoundary('Gallery'),
+  Timeline: createSectionErrorBoundary('Timeline'),
+  Kanban: createSectionErrorBoundary('Kanban'),
+  Calendar: createSectionErrorBoundary('Calendar'),
+};

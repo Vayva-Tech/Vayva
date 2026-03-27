@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session.server";
 import { AdminShell } from "@/components/admin-shell";
 import { OnboardingWrapper } from "@/components/onboarding/OnboardingWrapper";
+import { SkipLink } from "@/lib/accessibility";
 
 export default async function DashboardLayout({
   children,
@@ -16,8 +17,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <AdminShell>
-      <OnboardingWrapper>{children}</OnboardingWrapper>
-    </AdminShell>
+    <>
+      <SkipLink />
+      <AdminShell>
+        <OnboardingWrapper>{children}</OnboardingWrapper>
+      </AdminShell>
+    </>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { Skeleton } from "@vayva/ui";
 import {
   Package,
   Truck,
@@ -68,6 +69,18 @@ const sections = [
 ];
 
 export default function FulfillmentPage() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading fulfillment data
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <FulfillmentSkeleton />;
+  }
+
   return (
     <div className="space-y-6 max-w-5xl">
       {/* Header */}
@@ -147,6 +160,53 @@ export default function FulfillmentPage() {
             </Link>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================== */
+/*  Loading Skeleton                                                   */
+/* ================================================================== */
+function FulfillmentSkeleton() {
+  return (
+    <div className="p-6 space-y-8">
+      {/* Header Skeleton */}
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-12 w-12 rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+      </div>
+
+      {/* KPI Cards Skeleton */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="p-6 border rounded-xl space-y-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-lg" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <Skeleton className="h-8 w-16" />
+          </div>
+        ))}
+      </div>
+
+      {/* Sections Skeleton */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {[1, 2].map((i) => (
+          <div key={i} className="p-6 border rounded-xl space-y-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-12 w-12 rounded-xl" />
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            </div>
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ))}
       </div>
     </div>
   );

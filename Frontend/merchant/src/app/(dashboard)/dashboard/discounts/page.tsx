@@ -175,7 +175,7 @@ export default function DiscountsPage() {
                     fetchDiscounts();
                   } catch (error) {
                     toast.error("Failed to delete discount");
-                    console.error(error);
+                    logger.error("[DISCOUNT_DELETE_ERROR]", { error });
                   }
                 }}
               />
@@ -243,7 +243,7 @@ function DiscountRow({
       onUpdate();
     } catch (error) {
       toast.error("Failed to delete discount");
-      console.error(error);
+      logger.error("[DISCOUNT_DELETE_ERROR]", { error });
     }
   };
 

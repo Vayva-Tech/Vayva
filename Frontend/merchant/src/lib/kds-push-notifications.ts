@@ -9,6 +9,8 @@
  * - Performance milestone celebrations
  */
 
+import { logger } from './logger';
+
 interface PushNotification {
   id: string;
   title: string;
@@ -32,7 +34,10 @@ class KDSPushNotificationService {
    */
   async requestPermission(): Promise<boolean> {
     if (!('Notification' in window)) {
-      console.warn('[KDS_Push] Browser does not support notifications');
+      logger.warn('[KDS_PUSH_NOTIFICATIONS] Browser does not support notifications', 'unknown', {
+        feature: 'push_notifications',
+        reason: 'browser_unsupported'
+      });
       return false;
     }
 
@@ -40,7 +45,11 @@ class KDSPushNotificationService {
       this.permission = await Notification.requestPermission();
       return this.permission === 'granted';
     } catch (error) {
-      console.error('[KDS_Push] Permission request error:', error);
+      logger.error(
+        '[KDS_PUSH_NOTIFICATIONS] Permission request error',
+        error instanceof Error ? error : new Error(String(error)),
+        { feature: 'push_notifications', step: 'permission_request' }
+      );
       return false;
     }
   }
@@ -64,7 +73,11 @@ class KDSPushNotificationService {
       // Send subscription to backend
       await this.sendSubscriptionToBackend(this.subscription);
     } catch (error) {
-      console.error('[KDS_Push] Subscription error:', error);
+      logger.error(
+        '[KDS_PUSH_NOTIFICATIONS] Subscription error',
+        error instanceof Error ? error : new Error(String(error)),
+        { feature: 'push_notifications', step: 'subscription' }
+      );
       throw error;
     }
   }
@@ -190,7 +203,11 @@ class KDSPushNotificationService {
         body: JSON.stringify(subscription.toJSON()),
       });
     } catch (error) {
-      console.error('[KDS_Push] Failed to send subscription:', error);
+      logger.error(
+        '[KDS_PUSH_NOTIFICATIONS] Failed to send subscription',
+        error instanceof Error ? error : new Error(String(error)),
+        { feature: 'push_notifications', step: 'backend_subscription_sync' }
+      );
     }
   }
 

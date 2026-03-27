@@ -1,4 +1,7 @@
-import { prisma } from "@vayva/db";
+/**
+ * POS Sync Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
+ * Database operations moved to Backend/core-api/src/services/pos/pos-sync.service.ts
+ */
 
 export interface POSDevice {
   id: string;

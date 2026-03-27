@@ -29,6 +29,7 @@ import { NotificationBell } from "./notifications/NotificationBell";
 import { NotificationCenter } from "./notifications/NotificationCenter";
 import { GlobalBanner } from "./notifications/GlobalBanner";
 import { TrialBanner } from "./dashboard/TrialBanner";
+import { TrialCountdownBanner } from "./layout/TrialCountdownBanner";
 import { Logo } from "./Logo";
 import { SupportChat } from "./support/support-chat";
 import { CommandPalette } from "./ai/CommandPalette";
@@ -150,7 +151,7 @@ export const AdminShell = ({
   const router = useRouter();
   const { user, merchant, logout } = useAuth();
   const isPaidPlan = (() => {
-    const v = String((merchant as any)?.plan || "")
+    const v = String(merchant?.plan || "")
       .trim()
       .toLowerCase();
 
@@ -781,6 +782,7 @@ export const AdminShell = ({
           {/* Main content area */}
           <main className="flex-1 h-full flex flex-col relative overflow-hidden bg-white">
             <TrialBanner />
+            <TrialCountdownBanner />
             <GlobalBanner />
             {/* Header: safe-area inset above the bar; frosted glass on small screens */}
             <header className="w-full shrink-0 sticky z-30 top-0 border-b border-gray-100/80 bg-white/90 backdrop-blur-md md:bg-white md:backdrop-blur-none">

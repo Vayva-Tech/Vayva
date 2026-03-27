@@ -4,6 +4,7 @@ import { Button } from "@vayva/ui";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { apiJson } from "@/lib/api-client-shared";
 import { toast } from "sonner";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 import {
   CalendarDays,
   Clock,
@@ -182,21 +183,22 @@ export default function BookingsPage() {
   ];
 
   return (
-    <div className="min-h-screen space-y-6">
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Bookings</h1>
-            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
-              {bookings.length}
-            </span>
+    <ErrorBoundary serviceName="BookingsDashboard">
+      <div className="min-h-screen space-y-6">
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Bookings</h1>
+              <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                {bookings.length}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Manage appointments and client schedules</p>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Manage appointments and client schedules</p>
-        </div>
-        <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
-          <Plus size={16} />
-          New Booking
+          <Button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+            <Plus size={16} />
+            New Booking
         </Button>
       </div>
 
@@ -437,6 +439,7 @@ export default function BookingsPage() {
           )}
         </div>
       </div>
+      </ErrorBoundary>
     </div>
   );
 }

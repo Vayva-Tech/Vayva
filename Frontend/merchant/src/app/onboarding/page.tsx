@@ -2,12 +2,18 @@
 
 import { useOnboarding } from "@/components/onboarding/OnboardingContext";
 import OnboardingLayout from "@/components/onboarding/OnboardingLayout";
+import { OnboardingProgressIndicator } from "@/components/onboarding/OnboardingProgressIndicator";
+import { ValueDemonstrationBanner } from "@/components/onboarding/ValueDemonstration";
+import { MidOnboardingUpgradePrompt } from "@/components/onboarding/MidOnboardingUpgradePrompt";
 import { Spinner as Loader2 } from "@phosphor-icons/react/ssr";
+import { OnboardingErrorBoundary } from "@/components/onboarding/OnboardingErrorBoundary";
 
 // Step Components
 import WelcomeStep from "@/components/onboarding/steps/WelcomeStep";
+import { PlanSelectionStep } from "@/components/onboarding/steps/PlanSelectionStep";
 import IdentityStep from "@/components/onboarding/steps/IdentityStep";
 import BusinessStep from "@/components/onboarding/steps/BusinessStep";
+import IndustryStep from "@/components/onboarding/steps/IndustryStep";
 import ToolsStep from "@/components/onboarding/steps/ToolsStep";
 import FirstItemStep from "@/components/onboarding/steps/FirstItemStep";
 import SocialsStep from "@/components/onboarding/steps/SocialsStep";
@@ -34,10 +40,14 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case "welcome":
         return <WelcomeStep />;
+      case "plan_selection":
+        return <PlanSelectionStep />;
       case "identity":
         return <IdentityStep />;
       case "business":
         return <BusinessStep />;
+      case "industry":
+        return <IndustryStep />;
       case "tools":
         return <ToolsStep />;
       case "first_item":
@@ -59,5 +69,27 @@ export default function OnboardingPage() {
     }
   };
 
-  return <OnboardingLayout>{renderStep()}</OnboardingLayout>;
+  return (
+    <OnboardingErrorBoundary>
+      <div className="relative">
+        {/* Progress Indicator at Top */}
+        <OnboardingProgressIndicator currentStepKey={currentStep} />
+        
+        {/* Step Content */}
+        <OnboardingLayout>
+          {renderStep()}
+          
+          {/* Mid-Onboarding Upgrade Prompts for Starter Users (strategic positions) */}
+          {(currentStep === "socials" || currentStep === "finance" || currentStep === "first_item" || currentStep === "publish") && (
+            <div className="mt-6 px-6 pb-6">
+              <MidOnboardingUpgradePrompt stepId={currentStep} />
+            </div>
+          )}
+        </OnboardingLayout>
+        
+        {/* Value Demonstration Banner (appears at key moments) */}
+        <ValueDemonstrationBanner />
+      </div>
+    </OnboardingErrorBoundary>
+  );
 }

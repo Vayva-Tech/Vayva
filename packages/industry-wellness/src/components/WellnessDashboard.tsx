@@ -6,6 +6,7 @@
 import React from 'react';
 import { UniversalProDashboard } from '@/components/dashboard/UniversalProDashboard';
 import type { IndustryDashboardProps } from '@vayva/industry-core';
+import { DashboardErrorBoundary } from '@/components/error-boundary/error-boundary-utils';
 
 export function WellnessDashboard({
   userId,
@@ -15,15 +16,17 @@ export function WellnessDashboard({
   className,
 }: IndustryDashboardProps) {
   return (
-    <UniversalProDashboard
-      industry="wellness"
-      variant="pro"
-      userId={userId}
-      businessId={businessId}
-      designCategory={designCategory}
-      planTier={planTier}
-      className={className}
-    />
+    <DashboardErrorBoundary serviceName="WellnessDashboard">
+      <UniversalProDashboard
+        industry="wellness"
+        variant="pro"
+        userId={userId}
+        businessId={businessId}
+        designCategory={designCategory}
+        planTier={planTier}
+        className={className}
+      />
+    </DashboardErrorBoundary>
   );
 }
 

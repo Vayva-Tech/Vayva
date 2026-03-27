@@ -212,7 +212,13 @@
                 "apps/merchant/src/**/*.ts",
                 "apps/merchant/src/**/*.tsx",
                 "Frontend/merchant/**/*.ts",
-                "Frontend/merchant/**/*.tsx"
+                "Frontend/merchant/**/*.tsx",
+                "Frontend/storefront/**/*.ts",
+                "Frontend/storefront/**/*.tsx",
+                "Frontend/ops-console/**/*.ts",
+                "Frontend/ops-console/**/*.tsx",
+                "Frontend/marketing/**/*.ts",
+                "Frontend/marketing/**/*.tsx"
             ],
             "rules": {
                 "@typescript-eslint/ban-ts-comment": "off",
@@ -250,8 +256,22 @@
                 "no-empty-pattern": "off",
                 "@typescript-eslint/no-unused-vars": "off",
                 "no-console": "off",
-                "no-restricted-imports": "off",
-                "no-restricted-syntax": "off"
+                "no-restricted-syntax": "off",
+                "no-restricted-imports": [
+                    "error",
+                    {
+                        "patterns": [
+                            {
+                                "group": ["@vayva/db"],
+                                "message": "❌ Frontend packages cannot import @vayva/db. Use API calls via apiJson() or @vayva/api-client instead. Database access is only allowed in backend services."
+                            },
+                            {
+                                "group": ["prisma"],
+                                "message": "❌ Direct Prisma imports are not allowed in frontend. Use backend API endpoints instead."
+                            }
+                        ]
+                    }
+                ]
             }
         },
         {

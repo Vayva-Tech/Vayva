@@ -13,6 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { OnboardingState, OnboardingStepId } from "@/types/onboarding";
 import useSWR from "swr";
+import { buildStepSequence } from "@/components/onboarding/stepBuilder";
 
 // Google Analytics gtag type
 declare global {
@@ -44,10 +45,12 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(
   undefined,
 );
 
-const STEPS: OnboardingStepId[] = [
+// Static fallback steps (used when state is not yet loaded)
+const FALLBACK_STEPS: OnboardingStepId[] = [
   "welcome",
   "identity",
   "business",
+  "industry",      // Industry selection - CRITICAL for dashboard personalization
   "tools",
   "first_item",
   "socials",
@@ -91,6 +94,9 @@ export function OnboardingProvider({
   const [currentStep, setCurrentStep] = useState<OnboardingStepId>("welcome");
   const [formData, setFormData] = useState<Partial<OnboardingState>>({});
   const [isSaving, setIsSaving] = useState(false);
+
+  // Dynamic step sequence based on merchant state
+  const steps = useMemo(() => buildStepSequence(formData), [formData]);
 
   const {
     data: serverState,
@@ -245,7 +251,7 @@ export function OnboardingProvider({
   };
 
   const nextStep = async (additionalData?: Partial<OnboardingState>) => {
-    const idx = STEPS.indexOf(currentStep);
+    const idx = steps.indexOf(currentStep);
 
     const dataToValidate = additionalData
       ? { ...formData, ...additionalData }
@@ -255,8 +261,8 @@ export function OnboardingProvider({
       return;
     }
 
-    if (idx < STEPS.length - 1) {
-      const next = STEPS[idx + 1];
+    if (idx < steps.length - 1) {
+      const next = steps[idx + 1];
       setCurrentStep(next);
       await saveState(dataToValidate, next);
       trackOnboardingEvent("step_completed", {
@@ -300,13 +306,33 @@ export function OnboardingProvider({
       await refreshProfile();
 
       // Check if user selected Pro/Pro+ plan during signup
+      // Priority: 1. Database (from store.metadata), 2. sessionStorage (fallback)
       let postOnboardingPlan: string | null = null;
       let postOnboardingEmail: string | null = null;
+      
       try {
-        postOnboardingPlan = sessionStorage.getItem("vayva_post_onboarding_plan");
-        postOnboardingEmail = sessionStorage.getItem("vayva_post_onboarding_email");
-      } catch {
-        /* ignore storage errors */
+        // Try to get plan from database first (more reliable)
+        const storeData = await apiJson<{ metadata?: { intendedPlanKey?: string } }>("/api/merchant/store/status", { method: "GET" });
+        if (storeData?.metadata?.intendedPlanKey) {
+          postOnboardingPlan = storeData.metadata.intendedPlanKey;
+          logger.info("[ONBOARDING_COMPLETE] Retrieved plan from database", {
+            plan: postOnboardingPlan,
+          });
+        }
+      } catch (dbError) {
+        logger.warn("[ONBOARDING_COMPLETE] Failed to retrieve plan from database, using sessionStorage", {
+          error: dbError,
+        });
+      }
+      
+      // Fallback to sessionStorage if database didn't have plan
+      if (!postOnboardingPlan) {
+        try {
+          postOnboardingPlan = sessionStorage.getItem("vayva_post_onboarding_plan");
+          postOnboardingEmail = sessionStorage.getItem("vayva_post_onboarding_email");
+        } catch {
+          /* ignore storage errors */
+        }
       }
 
       // Clear storage
@@ -396,7 +422,7 @@ export function OnboardingProvider({
     prevStep,
     completeOnboarding,
     skipOnboarding,
-    steps: STEPS,
+    steps: steps, // Dynamic steps based on merchant state
     refresh: reload,
   };
 

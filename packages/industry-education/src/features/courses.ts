@@ -1,11 +1,26 @@
 /**
- * Course Management Feature
+ * Course Management Feature - PURE BUSINESS LOGIC ONLY
  * 
- * Handles course creation, updates, analytics, and dashboard data
+ * Database operations moved to Backend/core-api/src/services/education/courses.service.ts
+ * Use backend API endpoints instead:
+ * - GET /api/v1/education/courses
+ * - POST /api/v1/education/courses
+ * - GET /api/v1/education/courses/stats
  */
 
-import type { PrismaClient } from '@vayva/db';
 import type { Course, CourseAnalytics, GetCourseStatsResponse } from '../types';
+
+/**
+ * Pure business logic functions for courses (no database access)
+ */
+export function calculateCourseCompletionRate(enrolledStudents: number, completedStudents: number) {
+  if (enrolledStudents === 0) return 0;
+  return (completedStudents / enrolledStudents) * 100;
+}
+
+export function validateCourseData(courseData: any) {
+  return courseData.title && courseData.description && courseData.price;
+}
 
 /**
  * Get course statistics for dashboard

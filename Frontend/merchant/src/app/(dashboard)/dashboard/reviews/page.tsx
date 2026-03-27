@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { formatDate } from "@vayva/shared";
 import { Card, Button } from "@vayva/ui";
 import { apiJson } from "@/lib/api-client-shared";
+import { toast } from "sonner";
+import { logger } from "@vayva/shared";
 import {
   Star,
   Check,
@@ -38,7 +40,8 @@ export default function ReviewsPage() {
       const data = await apiJson<Review[]>("/api/reviews");
       setReviews(data || []);
     } catch (error) {
-      console.error("Failed to load reviews:", error);
+      logger.error("[REVIEWS_LOAD_ERROR]", { error });
+      toast.error("Failed to load reviews");
     } finally {
       setLoading(false);
     }
@@ -50,9 +53,11 @@ export default function ReviewsPage() {
         method: "PATCH",
         body: JSON.stringify({ status: action.toUpperCase() }),
       });
+      toast.success("Review updated successfully");
       loadReviews();
     } catch (error) {
-      console.error("Failed to update review:", error);
+      logger.error("[REVIEW_UPDATE_ERROR]", { error });
+      toast.error("Failed to update review");
     }
   };
 

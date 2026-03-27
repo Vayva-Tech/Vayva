@@ -11,6 +11,7 @@ import type {
 } from '@/config/dashboard-universal-types';
 import { generateDashboardConfig } from '@/config/industry-dashboard-config';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface UseUniversalDashboardOptions {
   industry: IndustrySlug;
@@ -193,12 +194,19 @@ export function useUniversalDashboard({
             setLastUpdated(new Date());
           }
         } catch (err) {
-          console.warn('Failed to parse WebSocket message:', err);
+          logger.error(
+            '[WEBSOCKET_MESSAGE_PARSE_ERROR]',
+            err instanceof Error ? err : new Error(String(err)),
+            { feature: 'universal_dashboard', step: 'message_parse' }
+          );
         }
       };
       
       ws.onerror = (error) => {
-        console.warn('Dashboard WebSocket error:', error);
+        logger.warn('[DASHBOARD_WEBSOCKET_ERROR]', { 
+          feature: 'universal_dashboard',
+          error: error instanceof Error ? error.message : String(error)
+        });
       };
       
       return () => {

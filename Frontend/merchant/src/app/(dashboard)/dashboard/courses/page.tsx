@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { apiJson } from "@/lib/api-client-shared";
 import { toast } from "sonner";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 
 interface Course {
   id: string;
@@ -127,15 +128,16 @@ export default function CoursesPage() {
           </Link>
         </div>
 
-        {/* Summary Widgets */}
-        <div className="grid grid-cols-4 gap-4">
-          <SummaryWidget
-            icon={<BookBookmark size={18} weight="fill" />}
-            label="Total Courses"
-            value={courses.length.toString()}
-            trend={`${publishedCount} published`}
-            positive={true}
-          />
+        <ErrorBoundary serviceName="CoursesDashboard">
+          {/* Summary Widgets */}
+          <div className="grid grid-cols-4 gap-4">
+            <SummaryWidget
+              icon={<BookBookmark size={18} weight="fill" />}
+              label="Total Courses"
+              value={courses.length.toString()}
+              trend={`${publishedCount} published`}
+              positive={true}
+            />
           <SummaryWidget
             icon={<GraduationCap size={18} />}
             label="Total Students"
@@ -281,6 +283,7 @@ export default function CoursesPage() {
           ))}
         </div>
       )}
+      </ErrorBoundary>
     </div>
   );
 }

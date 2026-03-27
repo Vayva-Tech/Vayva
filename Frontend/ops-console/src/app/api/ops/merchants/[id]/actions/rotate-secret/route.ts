@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
-import crypto from "crypto";
-import { logger } from "@vayva/shared";
 
 export async function POST(
   req: NextRequest,
@@ -19,47 +17,17 @@ export async function POST(
   try {
     const { id: storeId } = await params;
 
-    // Generate new webhook secret
-    const newSecret = `whsec_${crypto.randomBytes(32).toString("hex")}`;
+    const response = await apiClient.post(`/api/v1/admin/merchants/${storeId}/actions/rotate-secret`);
 
-    // Update store settings with new secret
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { settings: true, name: true },
-    });
-
-    if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
-    }
-
-    const currentSettings = (store.settings as Record<string, unknown>) || {};
-
-    await prisma.store.update({
-      where: { id: storeId },
-      data: {
-        settings: {
-          ...currentSettings,
-          webhookSecret: newSecret,
-          webhookSecretRotatedAt: new Date().toISOString(),
-        },
-      },
-    });
-
-    await OpsAuthService.logEvent(user.id, "ROTATE_WEBHOOK_SECRET", {
+    await OpsAuthService.logEvent(user.id, "WEBHOOK_SECRET_ROTATED", {
       storeId,
-      storeName: store.name,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Webhook secret rotated successfully",
-      secretPreview: `${newSecret.slice(0, 12)}...`,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: unknown) {
-    logger.error("[ROTATE_SECRET_ERROR]", { error });
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("[ROTATE_SECRET_ERROR]", error);
     return NextResponse.json(
-      { error: "Failed to rotate secret" },
+      { error: "Failed to rotate webhook secret" },
       { status: 500 },
     );
   }

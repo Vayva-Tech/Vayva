@@ -32,3 +32,4 @@ export * from "./components/Checkbox";
 export * from "./components/Switch";
 export * from "./components/Skeleton";
 export * from "./components/Progress";
+export * from "./components/virtual-list";

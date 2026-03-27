@@ -5676,9 +5676,56 @@ exports.Prisma.GrantScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.NonprofitGrantScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  title: 'title',
+  funder: 'funder',
+  description: 'description',
+  requestedAmount: 'requestedAmount',
+  duration: 'duration',
+  deadline: 'deadline',
+  website: 'website',
+  contactName: 'contactName',
+  contactEmail: 'contactEmail',
+  contactPhone: 'contactPhone',
+  eligibilityRequirements: 'eligibilityRequirements',
+  requiredDocuments: 'requiredDocuments',
+  evaluationCriteria: 'evaluationCriteria',
+  notes: 'notes',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NonprofitGrantApplicationScalarFieldEnum = {
+  id: 'id',
+  storeId: 'storeId',
+  grantId: 'grantId',
+  projectName: 'projectName',
+  projectDescription: 'projectDescription',
+  requestedAmount: 'requestedAmount',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  teamMembers: 'teamMembers',
+  budgetBreakdown: 'budgetBreakdown',
+  expectedOutcomes: 'expectedOutcomes',
+  sustainabilityPlan: 'sustainabilityPlan',
+  supportingDocuments: 'supportingDocuments',
+  notes: 'notes',
+  status: 'status',
+  submittedAt: 'submittedAt',
+  reviewedAt: 'reviewedAt',
+  awardedAmount: 'awardedAmount',
+  feedback: 'feedback',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.GrantExpenseScalarFieldEnum = {
   id: 'id',
   grantId: 'grantId',
+  nonprofitGrantApplicationId: 'nonprofitGrantApplicationId',
   category: 'category',
   description: 'description',
   amount: 'amount',
@@ -8249,6 +8296,8 @@ exports.Prisma.ModelName = {
   VolunteerShift: 'VolunteerShift',
   VolunteerAssignment: 'VolunteerAssignment',
   Grant: 'Grant',
+  NonprofitGrant: 'NonprofitGrant',
+  NonprofitGrantApplication: 'NonprofitGrantApplication',
   GrantExpense: 'GrantExpense',
   SettlementBatch: 'SettlementBatch',
   StockTransfer: 'StockTransfer',

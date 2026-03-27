@@ -1,16 +1,53 @@
 // ============================================================================
-// Recipe Service
+// Recipe Service - PURE BUSINESS LOGIC ONLY (NO DATABASE)
 // ============================================================================
+// Note: Database operations moved to Backend/core-api/src/services/meal-kit/recipe.service.ts
+// This service now contains only pure business logic functions
 
-import { PrismaClient } from '@vayva/db';
 import { MealKitRecipeSchema, MealKitRecipeInput } from '../types';
 
-export class RecipeService {
-  private prisma: PrismaClient;
-
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+export class RecipeCalculator {
+  /**
+   * Scale recipe ingredients by a factor
+   */
+  static scaleRecipe(recipe: any, scaleFactor: number) {
+    return {
+      ...recipe,
+      ingredients: recipe.ingredients?.map((ing: any) => ({
+        ...ing,
+        quantity: ing.quantity * scaleFactor,
+      })),
+    };
   }
+
+  /**
+   * Calculate nutrition totals from ingredients
+   */
+  static calculateNutritionTotals(recipe: any) {
+    // Pure calculation logic - no database access
+    return recipe.ingredients?.reduce(
+      (totals: any, ingredient: any) => {
+        return {
+          calories: totals.calories + (ingredient.nutrition?.calories || 0),
+          protein: totals.protein + (ingredient.nutrition?.protein || 0),
+          carbs: totals.carbs + (ingredient.nutrition?.carbs || 0),
+          fat: totals.fat + (ingredient.nutrition?.fat || 0),
+        };
+      },
+      { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
+  }
+}
+
+// Keep RecipeService for backward compatibility but remove database dependency
+export class RecipeService {
+  /**
+   * @deprecated Use backend API instead: POST /api/v1/meal-kit/recipes
+   */
+  static validateRecipeInput(data: MealKitRecipeInput) {
+    return MealKitRecipeSchema.parse(data);
+  }
+}
 
   /**
    * Create a new recipe

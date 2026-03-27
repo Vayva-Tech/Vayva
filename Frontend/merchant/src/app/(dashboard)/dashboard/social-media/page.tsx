@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { logger } from "@vayva/shared";
 import {
   TelegramLogo,
   DiscordLogo,
@@ -128,7 +129,7 @@ export default function SocialMediaDashboard() {
       });
     } catch (error) {
       toast.error("Failed to load dashboard data");
-      console.error("Dashboard load error:", error);
+      logger.error("[SOCIAL_MEDIA_DASHBOARD_ERROR]", { error });
       setDashboardData(null);
     } finally {
       setLoading(false);

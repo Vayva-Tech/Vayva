@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { logger } from "@vayva/shared";
 import {
   Lightbulb,
   Clock,
@@ -66,7 +68,8 @@ export default function FeatureRequestsPage() {
       const response = await apiJson<{ items: FeatureRequest[] }>("/api/merchant/feature-request");
       setRequests(response.items || []);
     } catch (error) {
-      console.error("Failed to fetch feature requests:", error);
+      logger.error("[FEATURE_REQUESTS_LOAD_ERROR]", { error });
+      toast.error("Failed to load feature requests");
     } finally {
       setLoading(false);
     }

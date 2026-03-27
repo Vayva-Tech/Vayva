@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
 
 export const dynamic = "force-dynamic";
@@ -11,25 +11,14 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get("limit") || "50");
+  const limit = searchParams.get("limit") || "50";
   const rating = searchParams.get("rating");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = {};
+  const params: Record<string, string> = { limit };
   if (rating && rating !== "ALL") {
-    where.rating = rating;
+    params.rating = rating;
   }
 
-  const feedbacks = await prisma.supportBotFeedback.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take: limit,
-    include: {
-      store: {
-        select: { id: true, name: true, slug: true },
-      },
-    },
-  });
-
-  return NextResponse.json({ data: feedbacks });
+  const response = await apiClient.get('/api/v1/ai/feedback', params);
+  return NextResponse.json(response);
 }

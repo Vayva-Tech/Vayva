@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { 
   RestaurantDashboardService,
   KDSService,
@@ -16,6 +16,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from 'lucide-react';
+import { DashboardErrorBoundary } from '@/components/error-boundary/error-boundary-utils';
 
 // Restaurant-specific components
 import { LiveOrderFeed } from './foh/LiveOrderFeed';
@@ -45,37 +46,43 @@ export function RestaurantDashboard({
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeView, setActiveView] = useState<'foh' | 'kds'>(viewMode);
 
-  // Initialize services
-  const dashboardService = new RestaurantDashboardService();
-  const kdsService = new KDSService();
-  const tableService = new TableManagementService();
-  const reservationService = new ReservationService();
+  // Memoize service instances to prevent recreation on re-renders
+  const services = useMemo(
+    () => ({
+      dashboardService: new RestaurantDashboardService(),
+      kdsService: new KDSService(),
+      tableService: new TableManagementService(),
+      reservationService: new ReservationService(),
+    }),
+    []
+  );
 
   // Fetch dashboard data
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await services.dashboardService.getLiveMetrics();
+      setDashboardData(data);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [services.dashboardService]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await dashboardService.getLiveMetrics();
-        setDashboardData(data);
-        setLastUpdated(new Date());
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchDashboardData();
     // Refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(fetchDashboardData, 30000);
     return () => clearInterval(interval);
-  }, [storeId]);
+  }, [fetchDashboardData]);
 
-  const handleRefresh = async () => {
+  // Memoized event handlers
+  const handleRefresh = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await dashboardService.getLiveMetrics();
+      const data = await services.dashboardService.getLiveMetrics();
       setDashboardData(data);
       setLastUpdated(new Date());
     } catch (error) {
@@ -83,7 +90,15 @@ export function RestaurantDashboard({
     } finally {
       setLoading(false);
     }
-  };
+  }, [services.dashboardService]);
+
+  const handleViewChange = useCallback((view: 'foh' | 'kds') => {
+    setActiveView(view);
+  }, []);
+
+  const handleConfigChange = useCallback((config: any) => {
+    onConfigChange?.(config);
+  }, [onConfigChange]);
 
   if (loading && !dashboardData) {
     return <RestaurantDashboardSkeleton />;
@@ -97,7 +112,7 @@ export function RestaurantDashboard({
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={() => setActiveView('foh')}
+              onClick={() => handleViewChange('foh')}
               className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
             >
               Switch to FOH
@@ -116,10 +131,14 @@ export function RestaurantDashboard({
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <KDSTicketGrid kdsService={kdsService} />
+            <DashboardErrorBoundary serviceName="KDSTicketGrid">
+              <KDSTicketGrid kdsService={services.kdsService} />
+            </DashboardErrorBoundary>
           </div>
           <div>
-            <PrepList kdsService={kdsService} />
+            <DashboardErrorBoundary serviceName="PrepList">
+              <PrepList kdsService={services.kdsService} />
+            </DashboardErrorBoundary>
           </div>
         </div>
       </div>
@@ -147,7 +166,7 @@ export function RestaurantDashboard({
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
-              onClick={() => setActiveView('kds')}
+              onClick={() => handleViewChange('kds')}
               className="border-orange-500 text-orange-700 hover:bg-orange-100"
             >
               Switch to KDS
@@ -167,87 +186,103 @@ export function RestaurantDashboard({
 
       {/* KPI Cards */}
       {dashboardData && (
-        <section className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-5 w-5 text-orange-600" />
-            <div>
-              <h2 className="text-lg font-semibold text-orange-900">Service Overview</h2>
-              <p className="text-sm text-orange-600">Today&apos;s performance metrics</p>
+        <DashboardErrorBoundary serviceName="ServiceOverviewKPIs">
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="h-5 w-5 text-orange-600" />
+              <div>
+                <h2 className="text-lg font-semibold text-orange-900">Service Overview</h2>
+                <p className="text-sm text-orange-600">Today&apos;s performance metrics</p>
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-4">
-            <RestaurantMetricTile
-              title="Revenue"
-              value={formatCurrency(dashboardData.revenue?.current || 0)}
-              change={dashboardData.revenue?.change ?? 0}
-              icon={<Utensils className="h-5 w-5" />}
-            />
-            <RestaurantMetricTile
-              title="Orders"
-              value={(dashboardData.orders?.current || 0).toLocaleString()}
-              change={dashboardData.orders?.change ?? 0}
-              icon={<Users className="h-5 w-5" />}
-            />
-            <RestaurantMetricTile
-              title="Guests"
-              value={(dashboardData.guests?.current || 0).toLocaleString()}
-              change={dashboardData.guests?.change ?? 0}
-              icon={<Users className="h-5 w-5" />}
-            />
-            <RestaurantMetricTile
-              title="Table Turn"
-              value={`${dashboardData.tableTurnRate?.current || 0}x`}
-              change={dashboardData.tableTurnRate?.change ?? 0}
-              icon={<Clock className="h-5 w-5" />}
-            />
-            <RestaurantMetricTile
-              title="Avg Ticket"
-              value={formatCurrency(dashboardData.avgTicket?.current || 0)}
-              change={dashboardData.avgTicket?.change ?? 0}
-              icon={<TrendingUp className="h-5 w-5" />}
-            />
-          </div>
-        </section>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-4">
+              <MemoizedMetricTile
+                title="Revenue"
+                value={formatCurrency(dashboardData.revenue?.current || 0)}
+                change={dashboardData.revenue?.change ?? 0}
+                icon={<Utensils className="h-5 w-5" />}
+              />
+              <MemoizedMetricTile
+                title="Orders"
+                value={(dashboardData.orders?.current || 0).toLocaleString()}
+                change={dashboardData.orders?.change ?? 0}
+                icon={<Users className="h-5 w-5" />}
+              />
+              <MemoizedMetricTile
+                title="Guests"
+                value={(dashboardData.guests?.current || 0).toLocaleString()}
+                change={dashboardData.guests?.change ?? 0}
+                icon={<Users className="h-5 w-5" />}
+              />
+              <MemoizedMetricTile
+                title="Table Turn"
+                value={`${dashboardData.tableTurnRate?.current || 0}x`}
+                change={dashboardData.tableTurnRate?.change ?? 0}
+                icon={<Clock className="h-5 w-5" />}
+              />
+              <MemoizedMetricTile
+                title="Avg Ticket"
+                value={formatCurrency(dashboardData.avgTicket?.current || 0)}
+                change={dashboardData.avgTicket?.change ?? 0}
+                icon={<TrendingUp className="h-5 w-5" />}
+              />
+            </div>
+          </section>
+        </DashboardErrorBoundary>
       )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Live Operations */}
         <div className="lg:col-span-2 space-y-6">
-          <LiveOrderFeed dashboardService={dashboardService} />
+          <DashboardErrorBoundary serviceName="LiveOrderFeed">
+            <LiveOrderFeed dashboardService={services.dashboardService} />
+          </DashboardErrorBoundary>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TableFloorPlan tableService={tableService} />
-            <MenuPerformance dashboardService={dashboardService} />
+            <DashboardErrorBoundary serviceName="TableFloorPlan">
+              <TableFloorPlan tableService={services.tableService} />
+            </DashboardErrorBoundary>
+            <DashboardErrorBoundary serviceName="MenuPerformance">
+              <MenuPerformance dashboardService={services.dashboardService} />
+            </DashboardErrorBoundary>
           </div>
           
-          <ReservationsTimeline reservationService={reservationService} />
+          <DashboardErrorBoundary serviceName="ReservationsTimeline">
+            <ReservationsTimeline reservationService={services.reservationService} />
+          </DashboardErrorBoundary>
         </div>
 
         {/* Right Column - Management */}
         <div className="space-y-6">
-          <EightySixBoard dashboardService={dashboardService} />
-          <StaffActivityPanel dashboardService={dashboardService} />
+          <DashboardErrorBoundary serviceName="EightySixBoard">
+            <EightySixBoard dashboardService={services.dashboardService} />
+          </DashboardErrorBoundary>
+          <DashboardErrorBoundary serviceName="StaffActivityPanel">
+            <StaffActivityPanel dashboardService={services.dashboardService} />
+          </DashboardErrorBoundary>
           
           {dashboardData?.alerts && dashboardData.alerts.length > 0 && (
-            <div className="bg-white rounded-2xl border border-orange-200 p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
-                <h3 className="font-semibold text-orange-800">Alerts</h3>
-              </div>
-              <div className="space-y-3">
-                {dashboardData.alerts.slice(0, 3).map((alert: any, index: number) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
-                    <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-orange-800">{alert.title}</p>
-                      <p className="text-xs text-orange-600">{alert.message}</p>
+            <DashboardErrorBoundary serviceName="AlertsPanel">
+              <div className="bg-white rounded-2xl border border-orange-200 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  <h3 className="font-semibold text-orange-800">Alerts</h3>
+                </div>
+                <div className="space-y-3">
+                  {dashboardData.alerts.slice(0, 3).map((alert: any, index: number) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
+                      <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-orange-800">{alert.title}</p>
+                        <p className="text-xs text-orange-600">{alert.message}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </DashboardErrorBoundary>
           )}
         </div>
       </div>
@@ -313,8 +348,8 @@ function RestaurantDashboardSkeleton() {
   );
 }
 
-// Helper Functions
-function RestaurantMetricTile({
+// Helper Functions - Memoized for performance
+const RestaurantMetricTile = memo(function RestaurantMetricTile({
   title,
   value,
   change,
@@ -325,7 +360,8 @@ function RestaurantMetricTile({
   change: number;
   icon: React.ReactNode;
 }): React.JSX.Element {
-  const isPositive = change >= 0;
+  const isPositive = useMemo(() => change >= 0, [change]);
+  
   return (
     <Card className="border border-orange-200 bg-white p-4">
       <div className="flex justify-between items-start gap-2">
@@ -343,8 +379,12 @@ function RestaurantMetricTile({
       </div>
     </Card>
   );
-}
+});
 
+// Create a named export for the memoized version
+const MemoizedMetricTile = RestaurantMetricTile;
+
+// Pure function - no need to memoize
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',

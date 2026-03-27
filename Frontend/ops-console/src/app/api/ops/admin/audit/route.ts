@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { OpsAuthService } from "@/lib/ops-auth";
 
 export const dynamic = "force-dynamic";
@@ -12,17 +12,9 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get("limit") || "100");
+  const limit = searchParams.get("limit") || "100";
 
-  const logs = await prisma.opsAuditEvent.findMany({
-    take: limit,
-    orderBy: { createdAt: "desc" },
-    include: {
-      opsUser: {
-        select: { name: true, email: true },
-      },
-    },
-  });
-
-  return NextResponse.json({ data: logs });
+  // Proxy to backend
+  const response = await apiClient.get('/api/v1/admin/audit', { limit });
+  return NextResponse.json(response);
 }

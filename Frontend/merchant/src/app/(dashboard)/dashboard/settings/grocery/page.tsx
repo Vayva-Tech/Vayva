@@ -6,6 +6,8 @@
 
 import { Button } from "@vayva/ui";
 import React, { useState } from 'react';
+import { toast } from "sonner";
+import { logger } from "@vayva/shared";
 import { Save, AlertTriangle, Truck, Tag, Users, Clock } from 'lucide-react';
 
 export default function GrocerySettingsPage() {
@@ -57,10 +59,10 @@ export default function GrocerySettingsPage() {
     try {
       // Would save to backend
       await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('Settings saved successfully!');
+      toast.success('Settings saved successfully!');
     } catch (error) {
-      console.error('Failed to save settings:', error);
-      alert('Failed to save settings');
+      logger.error('[GROCERY_SETTINGS_ERROR]', { error });
+      toast.error('Failed to save settings');
     } finally {
       setIsLoading(false);
     }

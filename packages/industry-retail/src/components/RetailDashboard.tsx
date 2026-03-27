@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Card } from "@vayva/ui";
 import { retailDashboardConfig } from "../dashboard/config";
 import { registerRetailWidgets } from "../widgets/registry";
+import { DashboardErrorBoundary } from "@/components/error-boundary/error-boundary-utils";
 
 export interface RetailDashboardProps {
   industry: string;
@@ -100,19 +101,24 @@ export function RetailDashboard({
 
   return (
     <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{retailDashboardConfig.title}</h1>
-        <p className="text-muted-foreground mt-1">{retailDashboardConfig.subtitle}</p>
-      </div>
-      <Card className="p-6">
-        <p className="text-sm text-muted-foreground">
-          {retailDashboardConfig.primaryObjectLabel}: {state?.widgetsLoaded ?? 0} widgets in config
-          {state?.lastRefreshed ? ` · last refresh ${state.lastRefreshed}` : ""}
-        </p>
-        <Button variant="secondary" className="mt-4" onClick={() => void refreshMetrics()}>
-          Refresh
-        </Button>
-      </Card>
+      <DashboardErrorBoundary serviceName="RetailDashboardHeader">
+        <div>
+          <h1 className="text-2xl font-semibold">{retailDashboardConfig.title}</h1>
+          <p className="text-muted-foreground mt-1">{retailDashboardConfig.subtitle}</p>
+        </div>
+      </DashboardErrorBoundary>
+      
+      <DashboardErrorBoundary serviceName="RetailDashboardContent">
+        <Card className="p-6">
+          <p className="text-sm text-muted-foreground">
+            {retailDashboardConfig.primaryObjectLabel}: {state?.widgetsLoaded ?? 0} widgets in config
+            {state?.lastRefreshed ? ` · last refresh ${state.lastRefreshed}` : ""}
+          </p>
+          <Button variant="secondary" className="mt-4" onClick={() => void refreshMetrics()}>
+            Refresh
+          </Button>
+        </Card>
+      </DashboardErrorBoundary>
     </div>
   );
 }

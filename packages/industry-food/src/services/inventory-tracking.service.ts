@@ -3,7 +3,7 @@
  * Ingredient inventory management and tracking
  */
 
-import { prisma } from '@vayva/prisma';
+import { prisma } from '@vayva/db';
 
 export interface InventoryItem {
   id: string;
@@ -31,7 +31,7 @@ export class InventoryTrackingService {
       },
     });
 
-    return ingredients.map(ing => {
+    return ingredients.map((ing) => {
       const currentStock = ing.stockLevels[0]?.quantity || 0;
       const needsRestock = currentStock <= ing.minStockLevel;
 

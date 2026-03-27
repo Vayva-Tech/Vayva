@@ -4,6 +4,7 @@ import { Button } from "@vayva/ui";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { apiJson } from "@/lib/api-client-shared";
 import { toast } from "sonner";
+import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 import {
   ChevronLeft,
   ChevronRight,
@@ -177,26 +178,27 @@ export default function CalendarPage() {
   for (let d = 1; d <= daysInMonth; d++) miniCells.push(d);
 
   return (
-    <div className="min-h-screen space-y-6">
-      {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Calendar</h1>
-          <p className="text-sm text-gray-500 mt-1">View and manage your schedule</p>
-        </div>
+    <ErrorBoundary serviceName="CalendarDashboard">
+      <div className="min-h-screen space-y-6">
+        {/* ── Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Calendar</h1>
+            <p className="text-sm text-gray-500 mt-1">View and manage your schedule</p>
+          </div>
 
-        <div className="flex items-center gap-3">
-          {/* View toggle */}
-          <div className="flex items-center bg-gray-100 rounded-xl p-1">
-            {(["Month", "Week", "Day"] as const).map((v) => (
-              <Button
-                key={v}
-                onClick={() => setViewMode(v)}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  viewMode === v
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+          <div className="flex items-center gap-3">
+            {/* View toggle */}
+            <div className="flex items-center bg-gray-100 rounded-xl p-1">
+              {(["Month", "Week", "Day"] as const).map((v) => (
+                <Button
+                  key={v}
+                  onClick={() => setViewMode(v)}
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    viewMode === v
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 {v}
               </Button>
@@ -429,6 +431,7 @@ export default function CalendarPage() {
           </Button>
         </div>
       </div>
+      </ErrorBoundary>
     </div>
   );
 }

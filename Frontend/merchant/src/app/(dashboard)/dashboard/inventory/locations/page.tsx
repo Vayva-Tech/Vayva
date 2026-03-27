@@ -274,7 +274,7 @@ function LocationRow({
       onUpdate();
     } catch (error) {
       toast.error("Failed to delete location");
-      console.error(error);
+      logger.error("[LOCATION_DELETE_ERROR]", { error });
     }
   };
 

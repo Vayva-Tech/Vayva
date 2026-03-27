@@ -14,7 +14,6 @@
     "@sentry/nextjs": "^10.34.0",
     "@vayva/api-client": "workspace:*",
     "@vayva/content": "workspace:*",
-    "@vayva/db": "workspace:*",
     "@vayva/schemas": "workspace:*",
     "@vayva/shared": "workspace:*",
     "@vayva/templates": "workspace:*",
