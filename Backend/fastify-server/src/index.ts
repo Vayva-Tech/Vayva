@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
+import rateLimit from '@fastify/rate-limit';
 import pino from 'pino';
 import dotenv from 'dotenv';
 
@@ -20,21 +21,25 @@ import { checkoutRoutes } from './routes/api/v1/commerce/checkout.routes';
 import { collectionRoutes } from './routes/api/v1/commerce/collections.routes';
 import { couponRoutes } from './routes/api/v1/commerce/coupons.routes';
 import { discountRulesRoutes } from './routes/api/v1/commerce/discount-rules.routes';
-import { reviewRoutes } from './routes/api/v1/commerce/reviews.routes';
+import { reviewsRoutes } from './routes/api/v1/commerce/reviews.routes';
 import { servicesRoutes } from './routes/api/v1/commerce/services.routes';
 
 // Import routes - Financial Services
 import { paymentsRoutes } from './routes/api/v1/financial/payments.routes';
 import { walletRoutes } from './routes/api/v1/financial/wallet.routes';
 import { paymentMethodsRoutes } from './routes/api/v1/financial/payment-methods.routes';
+import { paymentsOpsRoutes } from './routes/api/v1/financial/payments-ops.routes';
 
 // Import routes - Industry Services
 import { posRoutes } from './routes/api/v1/pos/pos.routes';
+import { invoiceRoutes } from './routes/api/v1/pos/invoice.routes';
 import { rentalRoutes } from './routes/api/v1/rentals/rental.routes';
 import { mealKitRecipesRoutes } from './routes/api/v1/meal-kit/recipes.routes';
-import { fashionQuizRoutes } from './routes/api/v1/fashion/style-quiz.routes';
-import { educationCoursesRoutes } from './routes/api/v1/education/courses.routes';
+import { fashionRoutes } from './routes/api/v1/fashion/style-quiz.routes';
+import { fashionDashboardRoutes } from './routes/api/v1/industry/fashion.routes';
+import { educationRoutes } from './routes/api/v1/education/courses.routes';
 import { restaurantRoutes } from './routes/api/v1/industry/restaurant.routes';
+import { foodDashboardRoutes } from './routes/api/v1/industry/food.routes';
 import { groceryRoutes } from './routes/api/v1/industry/grocery.routes';
 import { healthcareRoutes } from './routes/api/v1/industry/healthcare.routes';
 import { beautyRoutes } from './routes/api/v1/industry/beauty.routes';
@@ -50,16 +55,64 @@ import { travelRoutes } from './routes/api/v1/industry/travel.routes';
 import { wellnessRoutes } from './routes/api/v1/industry/wellness.routes';
 import { professionalServicesRoutes } from './routes/api/v1/industry/professional-services.routes';
 
+// Import routes - Platform Services (BFF Migration)
+import { financeRoutes } from './routes/platform/finance.routes';
+import { beautyDashboardRoutes } from './routes/industry/beauty-dashboard.routes';
+import { nightlifeRoutes as nightlifeExtendedRoutes } from './routes/api/v1/industry/nightlife.routes';
+import { merchantTeamRoutes } from './routes/platform/merchant-team.routes';
+import { supportRoutes as supportExtendedRoutes } from './routes/api/v1/platform/support.routes';
+import { affiliateRoutes } from './routes/platform/affiliate.routes';
+import { healthRoutes } from './routes/platform/health.routes';
+import { b2bRoutes } from './routes/platform/b2b.routes';
+import { bnplRoutes } from './routes/platform/bnpl.routes';
+import { calendarSyncRoutes } from './routes/platform/calendar-sync.routes';
+import { dashboardRoutes as dashboardExtendedRoutes } from './routes/platform/dashboard.routes';
+import { beautyRoutes as beautyExtendedRoutes } from './routes/industry/beauty.routes';
+import { educationRoutes as educationExtendedRoutes } from './routes/industry/education.routes';
+import { marketplaceRoutes } from './routes/platform/marketplace.routes';
+import { rescueRoutes as rescueExtendedRoutes } from './routes/industry/rescue.routes';
+import { financeExtendedRoutes } from './routes/platform/finance-extended.routes';
+import { onboardingRoutes } from './routes/platform/onboarding.routes';
+import { kitchenRoutes } from './routes/industry/kitchen.routes';
+import { legalRoutes } from './routes/industry/legal.routes';
+import { resourceRoutes } from './routes/platform/resource.routes';
+import { betaRoutes } from './routes/platform/beta.routes';
+import { webhookRoutes } from './routes/platform/webhook.routes';
+import { kycRoutes } from './routes/platform/kyc.routes';
+import { beautyStylistsRoutes } from './routes/industry/beauty-stylists.routes';
+import { beautyGalleryRoutes } from './routes/industry/beauty-gallery.routes';
+import { beautyPackagesRoutes } from './routes/industry/beauty-packages.routes';
+import { marketplaceVendorsRoutes } from './routes/platform/marketplace-vendors.routes';
+import { educationEnrollmentsRoutes } from './routes/platform/education-enrollments.routes';
+import { dashboardSidebarCountsRoutes } from './routes/platform/dashboard-sidebar-counts.routes';
+import { b2bCreditApplicationsRoutes } from './routes/platform/b2b-credit.routes';
+import { b2bRfqRoutes } from './routes/platform/b2b-rfq.routes';
+import { accountManagementRoutes } from './routes/api/v1/platform/account-management.routes';
+import { beautyExtended_routes } from './routes/api/v1/industry/beauty-extended.routes';
+
+// Import routes - Compliance Services
+import { registerAccountDeletionRoutes } from './routes/api/v1/compliance/account-deletion.routes';
+
+// Import routes - Order Management
+import { registerOrderStateRoutes } from './routes/api/v1/orders/order-state.routes';
+
 // Import routes - Platform Services
 import { campaignsRoutes } from './routes/api/v1/platform/campaigns.routes';
 import { creativeRoutes } from './routes/api/v1/platform/creative.routes';
 import { nonprofitRoutes } from './routes/api/v1/platform/nonprofit.routes';
 import { dashboardRoutes } from './routes/api/v1/platform/dashboard.routes';
+import { dashboardIndustryRoutes } from './routes/api/v1/platform/dashboard-industry.routes';
 import { analyticsRoutes } from './routes/api/v1/platform/analytics.routes';
+import { analyticsOpsRoutes } from './routes/api/v1/platform/analytics-ops.routes';
 import { notificationsRoutes } from './routes/api/v1/platform/notifications.routes';
 import { marketingRoutes } from './routes/api/v1/platform/marketing.routes';
+import { electronicsRoutes } from './routes/api/v1/platform/electronics.routes';
+import { beautyRoutes } from './routes/api/v1/platform/beauty.routes';
+import { foodRoutes } from './routes/api/v1/platform/food.routes';
+import { realestateRoutes } from './routes/api/v1/platform/realestate.routes';
 import { integrationsRoutes } from './routes/api/v1/platform/integrations.routes';
 import { complianceRoutes } from './routes/api/v1/platform/compliance.routes';
+import { complianceOpsRoutes } from './routes/api/v1/platform/compliance-ops.routes';
 import { domainsRoutes } from './routes/api/v1/platform/domains.routes';
 import { blogRoutes } from './routes/api/v1/platform/blog.routes';
 import { sitesRoutes } from './routes/api/v1/platform/sites.routes';
@@ -75,6 +128,7 @@ import { rescueRoutes } from './routes/api/v1/platform/rescue.routes';
 import { healthScoreRoutes } from './routes/api/v1/platform/health-score.routes';
 import { npsRoutes } from './routes/api/v1/platform/nps.routes';
 import { playbooksRoutes } from './routes/api/v1/platform/playbooks.routes';
+import { riskRoutes } from './routes/api/v1/platform/risk.routes';
 
 // Import routes - Core Services
 import { accountRoutes } from './routes/api/v1/core/account.routes';
@@ -97,14 +151,14 @@ import { leadsRoutes } from './routes/api/v1/marketing/leads.routes';
 import { merchantAdminRoutes } from './routes/api/v1/admin/merchants.routes';
 import { adminSystemRoutes } from './routes/api/v1/admin/admin-system.routes';
 
+// Import routes - Security Services
+import { securityRoutes } from './routes/api/v1/security/routes';
+
 // Import routes - AI & Intelligent Services
 import { aiRoutes } from './routes/api/v1/ai/ai.routes';
 import { aiAgentRoutes } from './routes/api/v1/ai/aiAgent.routes';
 import { automationRoutes } from './routes/api/v1/ai/automation.routes';
 import { aiOpsRoutes } from './routes/api/v1/ai/ai-ops.routes';
-
-// Import routes - Platform Services (Risk)
-import { riskRoutes } from './routes/api/v1/platform/risk.routes';
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -142,6 +196,55 @@ export async function buildServer(): Promise<FastifyInstance> {
     }
   });
 
+  // Register Rate Limiting
+  await server.register(rateLimit, {
+    // Global default settings
+    max: 100,
+    timeWindow: '1 minute',
+    
+    // Allowlist - localhost bypasses rate limiting for development
+    allowList: ['127.0.0.1', '::1'],
+    
+    // Custom key generator - use userId or IP
+    keyGenerator: (request) => {
+      const user = (request as any).user;
+      if (user?.id) {
+        return `user:${user.id}`;
+      }
+      return request.ip || 'unknown';
+    },
+    
+    // Add rate limit headers to responses
+    addHeadersOnExceeding: {
+      'X-RateLimit-Limit': 'true',
+      'X-RateLimit-Remaining': 'true',
+      'X-RateLimit-Reset': 'true',
+    },
+    
+    // Send headers on every response
+    addHeaders: {
+      'X-RateLimit-Limit': true,
+      'X-RateLimit-Remaining': true,
+      'X-RateLimit-Reset': true,
+      'Retry-After': true,
+    },
+    
+    // Custom error response
+    errorResponseBuilder: (request, context) => {
+      const user = (request as any).user;
+      const tier = user?.tier || 'STARTER';
+      return {
+        success: false,
+        error: 'Too Many Requests',
+        message: `Rate limit exceeded. Maximum ${context.max} requests per ${context.timeWindow}.`,
+        retryAfter: 60,
+        upgrade: tier === 'FREE' ? 'Consider upgrading for higher limits' : undefined,
+      };
+    },
+  });
+
+  server.log.info('✅ Rate limiting configured successfully');
+
   // Register routes - Core Commerce Services
   await server.register(authRoutes, { prefix: '/api/v1/auth' });
   await server.register(inventoryRoutes, { prefix: '/api/v1/inventory' });
@@ -155,21 +258,25 @@ export async function buildServer(): Promise<FastifyInstance> {
   await server.register(collectionRoutes, { prefix: '/api/v1/collections' });
   await server.register(couponRoutes, { prefix: '/api/v1/coupons' });
   await server.register(discountRulesRoutes, { prefix: '/api/v1/discount-rules' });
-  await server.register(reviewRoutes, { prefix: '/api/v1/reviews' });
+  await server.register(reviewsRoutes, { prefix: '/api/v1/reviews' });
   await server.register(servicesRoutes, { prefix: '/api/v1/services' });
 
   // Register routes - Financial Services
   await server.register(paymentsRoutes, { prefix: '/api/v1/payments' });
   await server.register(walletRoutes, { prefix: '/api/v1/wallet' });
   await server.register(paymentMethodsRoutes, { prefix: '/api/v1/payment-methods' });
+  await server.register(paymentsOpsRoutes, { prefix: '/api/v1/financial' });
 
   // Register routes - Industry Services
   await server.register(posRoutes, { prefix: '/api/v1/pos' });
+  await server.register(invoiceRoutes, { prefix: '/api/v1/pos/invoices' });
   await server.register(rentalRoutes, { prefix: '/api/v1/rentals' });
   await server.register(mealKitRecipesRoutes, { prefix: '/api/v1/meal-kit/recipes' });
-  await server.register(fashionQuizRoutes, { prefix: '/api/v1/fashion/quizzes' });
-  await server.register(educationCoursesRoutes, { prefix: '/api/v1/education/courses' });
+  await server.register(fashionRoutes, { prefix: '/api/v1/fashion/quizzes' });
+  await server.register(fashionDashboardRoutes, { prefix: '/api/v1/industry/fashion' });
+  await server.register(educationRoutes, { prefix: '/api/v1/education/courses' });
   await server.register(restaurantRoutes, { prefix: '/api/v1/restaurant' });
+  await server.register(foodDashboardRoutes, { prefix: '/api/v1/industry/food' });
   await server.register(groceryRoutes, { prefix: '/api/v1/grocery' });
   await server.register(healthcareRoutes, { prefix: '/api/v1/healthcare' });
   await server.register(beautyRoutes, { prefix: '/api/v1/beauty' });
@@ -190,11 +297,18 @@ export async function buildServer(): Promise<FastifyInstance> {
   await server.register(creativeRoutes, { prefix: '/api/v1/creative' });
   await server.register(nonprofitRoutes, { prefix: '/api/v1/nonprofit' });
   await server.register(dashboardRoutes, { prefix: '/api/v1/dashboard' });
+  await server.register(dashboardIndustryRoutes, { prefix: '/api/v1/dashboard-industry' });
   await server.register(analyticsRoutes, { prefix: '/api/v1/analytics' });
+  await server.register(analyticsOpsRoutes, { prefix: '/api/v1/analytics' });
   await server.register(notificationsRoutes, { prefix: '/api/v1/notifications' });
   await server.register(marketingRoutes, { prefix: '/api/v1/marketing' });
+  await server.register(electronicsRoutes, { prefix: '/api/v1/electronics' });
+  await server.register(beautyRoutes, { prefix: '/api/v1/beauty' });
+  await server.register(foodRoutes, { prefix: '/api/v1/food' });
+  await server.register(realestateRoutes, { prefix: '/api/v1/realestate' });
   await server.register(integrationsRoutes, { prefix: '/api/v1/integrations' });
   await server.register(complianceRoutes, { prefix: '/api/v1/compliance' });
+  await server.register(complianceOpsRoutes, { prefix: '/api/v1/compliance' });
   await server.register(domainsRoutes, { prefix: '/api/v1/domains' });
   await server.register(blogRoutes, { prefix: '/api/v1/blog' });
   await server.register(sitesRoutes, { prefix: '/api/v1/sites' });
@@ -212,6 +326,9 @@ export async function buildServer(): Promise<FastifyInstance> {
   await server.register(merchantAdminRoutes, { prefix: '/api/v1/admin/merchants' });
   await server.register(adminSystemRoutes, { prefix: '/api/v1/admin' });
   
+  // Register Security Services
+  await server.register(securityRoutes, { prefix: '/api/v1/security' });
+  
   // Register AI Ops Routes
   await server.register(aiOpsRoutes, { prefix: '/api/v1/ai' });
   
@@ -221,6 +338,47 @@ export async function buildServer(): Promise<FastifyInstance> {
   await server.register(healthScoreRoutes, { prefix: '/api/v1/health-score' });
   await server.register(npsRoutes, { prefix: '/api/v1/nps' });
   await server.register(playbooksRoutes, { prefix: '/api/v1/playbooks' });
+
+  // Register new backend service routes for frontend migration
+  await server.register(financeRoutes, { prefix: '/api/v1/finance' });
+  await server.register(beautyDashboardRoutes, { prefix: '/api/v1/beauty/dashboard' });
+  await server.register(nightlifeExtendedRoutes, { prefix: '/api/v1/nightlife' });
+  await server.register(merchantTeamRoutes, { prefix: '/api/v1/merchant' });
+  await server.register(supportExtendedRoutes, { prefix: '/api/v1/support' });
+  await server.register(affiliateRoutes, { prefix: '/api/v1/affiliate' });
+  await server.register(healthRoutes, { prefix: '/api/v1/health' });
+  await server.register(b2bRoutes, { prefix: '/api/v1/b2b' });
+  await server.register(bnplRoutes, { prefix: '/api/v1/bnpl' });
+  await server.register(calendarSyncRoutes, { prefix: '/api/v1/calendar-sync' });
+  await server.register(dashboardExtendedRoutes, { prefix: '/api/v1/dashboard' });
+  await server.register(beautyExtendedRoutes, { prefix: '/api/v1/beauty' });
+  await server.register(educationExtendedRoutes, { prefix: '/api/v1/education' });
+  await server.register(marketplaceRoutes, { prefix: '/api/v1/marketplace' });
+  await server.register(rescueExtendedRoutes, { prefix: '/api/v1/rescue' });
+  await server.register(financeExtendedRoutes, { prefix: '/api/v1/finance' });
+  await server.register(onboardingRoutes, { prefix: '/api/v1/onboarding' });
+  await server.register(accountManagementRoutes, { prefix: '/api/v1/account-management' });
+  await server.register(beautyExtendedRoutes, { prefix: '/api/v1/beauty' });
+  await server.register(kitchenRoutes, { prefix: '/api/v1/kitchen' });
+  await server.register(legalRoutes, { prefix: '/api/v1/legal' });
+  await server.register(resourceRoutes, { prefix: '/api/v1/resources' });
+  await server.register(betaRoutes, { prefix: '/api/v1/beta' });
+  await server.register(webhookRoutes, { prefix: '/api/v1/webhooks' });
+  await server.register(kycRoutes, { prefix: '/api/v1/kyc' });
+  await server.register(beautyStylistsRoutes, { prefix: '/api/v1/beauty/stylists' });
+  await server.register(beautyGalleryRoutes, { prefix: '/api/v1/beauty/gallery' });
+  await server.register(beautyPackagesRoutes, { prefix: '/api/v1/beauty/packages' });
+  await server.register(marketplaceVendorsRoutes, { prefix: '/api/v1/marketplace/vendors' });
+  await server.register(educationEnrollmentsRoutes, { prefix: '/api/v1/education/enrollments' });
+  await server.register(dashboardSidebarCountsRoutes, { prefix: '/api/v1/dashboard/sidebar-counts' });
+  await server.register(b2bCreditApplicationsRoutes, { prefix: '/api/v1/b2b/credit/applications' });
+  await server.register(b2bRfqRoutes, { prefix: '/api/v1/b2b/rfq' });
+  
+  // Register Compliance Services
+  await server.register(registerAccountDeletionRoutes, { prefix: '/api/v1/compliance/account-deletion' });
+  
+  // Register Order Management Services
+  await server.register(registerOrderStateRoutes, { prefix: '/api/v1/orders/state' });
 
   // Register routes - Core Services
   await server.register(accountRoutes, { prefix: '/api/v1/account' });
