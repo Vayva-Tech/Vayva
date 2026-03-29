@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       success: boolean;
       data?: unknown[];
       error?: string;
-    }>(`${buildBackendUrl("/api/nonprofit/donors")}?${queryParams.toString()}`, {
+    }>(`${buildBackendUrl("/nonprofit/donors")}?${queryParams.toString()}`, {
       headers: auth.headers,
     });
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ donors: result.data || [] });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/nonprofit/donors",
+      endpoint: "/nonprofit/donors",
       operation: "FETCH_DONORS",
       storeId,
     });
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await apiJson<{ success: boolean; data?: unknown; error?: string }>(
-      buildBackendUrl("/api/nonprofit/donors"),
+      buildBackendUrl("/nonprofit/donors"),
       {
         method: "POST",
         headers: {
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ donor: result.data }, { status: 201 });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/nonprofit/donors",
+      endpoint: "/nonprofit/donors",
       operation: "CREATE_DONOR",
       storeId,
     });

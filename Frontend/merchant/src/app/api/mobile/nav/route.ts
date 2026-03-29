@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/mobile/nav", operation: "GET" });
+    handleApiError(error, { endpoint: "/mobile/nav", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch mobile nav" }, { status: 500 });
   }
 }

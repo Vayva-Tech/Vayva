@@ -125,7 +125,7 @@ export function DiscountForm({ id }: { id?: string }) {
       };
 
       await apiJson<{ success: boolean }>(
-        id ? `/api/marketing/discounts/${id}` : "/api/marketing/discounts",
+        id ? `/api/marketing/discounts/${id}` : "/marketing/discounts",
         {
           method: id ? "PATCH" : "POST",
           body: JSON.stringify(payload),

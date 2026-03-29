@@ -47,7 +47,7 @@ export function BeautyDashboard({ definition, designCategory = "glass" }: Beauty
         setIsLoading(true);
         
         // Fetch overview data
-        const overviewRes = await fetch("/api/beauty/dashboard/overview");
+        const overviewRes = await fetch("/beauty/dashboard/overview");
         const overviewJson = await overviewRes.json();
         if (overviewJson.success) {
           setOverviewData({
@@ -61,14 +61,14 @@ export function BeautyDashboard({ definition, designCategory = "glass" }: Beauty
         }
 
         // Fetch stylist availability
-        const stylistsRes = await fetch("/api/beauty/stylists/availability");
+        const stylistsRes = await fetch("/beauty/stylists/availability");
         const stylistsJson = await stylistsRes.json();
         if (stylistsJson.success) {
           setStylistsData(stylistsJson.data);
         }
 
         // Fetch service performance
-        const servicesRes = await fetch("/api/beauty/services/performance");
+        const servicesRes = await fetch("/beauty/services/performance");
         const servicesJson = await servicesRes.json();
         if (servicesJson.success) {
           setServicesData(servicesJson.data);

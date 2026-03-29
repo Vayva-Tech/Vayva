@@ -54,7 +54,7 @@ export async function POST(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/templates/mine/[id]/duplicate",
+      endpoint: "/templates/mine/[id]/duplicate",
       operation: "DUPLICATE_TEMPLATE_MINE",
     });
     return NextResponse.json(

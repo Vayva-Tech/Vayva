@@ -56,7 +56,7 @@ export default function HealthcareAppointmentsPage() {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Appointment[] }>("/api/healthcare/appointments?limit=200");
+      const response = await apiJson<{ data: Appointment[] }>("/healthcare/appointments?limit=200");
       setAppointments(response.data || generateMockAppointments());
     } catch (error) {
       setAppointments(generateMockAppointments());

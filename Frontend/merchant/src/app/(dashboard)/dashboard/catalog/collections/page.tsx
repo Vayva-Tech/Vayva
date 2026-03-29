@@ -52,7 +52,7 @@ export default function CollectionsPage() {
   const fetchCollections = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<CollectionsResponse>("/api/collections");
+      const data = await apiJson<CollectionsResponse>("/collections");
       setCollections(data?.data || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -93,7 +93,7 @@ export default function CollectionsPage() {
     try {
       const url =
         mode === "CREATE"
-          ? "/api/collections"
+          ? "/collections"
           : `/api/collections/${currentId}`;
       const method = mode === "CREATE" ? "POST" : "PUT";
 
@@ -278,14 +278,14 @@ export default function CollectionsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Collection</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Handle</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Visibility</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Updated</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Collection</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Handle</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Products</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Visibility</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Updated</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

@@ -1,39 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 
 export async function GET(_req: NextRequest) {
   try {
-    const { user } = await OpsAuthService.requireSession();
+    await OpsAuthService.requireSession();
 
-    // Fetch latest feature flags config
-    const latestConfig = await prisma.opsAuditEvent.findFirst({
-      where: {
-        eventType: "OPS_FEATURE_FLAGS",
-      },
-      orderBy: { createdAt: "desc" },
-      take: 1,
-    });
-
-    // Default flags
-    const defaultFlags = {
-      maintenanceMode: false,
-      betaFeatures: false,
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (!latestConfig || !latestConfig.metadata) {
-      return NextResponse.json({ flags: defaultFlags });
-    }
-
-    const flags = latestConfig.metadata as Record<string, unknown>;
+    const response = await apiClient.get('/api/v1/admin/config/feature-flags');
     
-    return NextResponse.json({ 
-      flags: {
-        ...defaultFlags,
-        ...flags,
-      }
-    });
+    return NextResponse.json(response);
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch feature flags" },
@@ -52,15 +27,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { maintenanceMode, betaFeatures } = body;
 
-    // Persist config via audit log event
-    await OpsAuthService.logEvent(user.id, "OPS_FEATURE_FLAGS", {
-      maintenanceMode: maintenanceMode ?? false,
-      betaFeatures: betaFeatures ?? false,
-      updatedAt: new Date().toISOString(),
-      updatedBy: user.id,
+    const response = await apiClient.post('/api/v1/admin/config/feature-flags', {
+      maintenanceMode,
+      betaFeatures,
     });
-
-    return NextResponse.json({ success: true });
+    
+    return NextResponse.json(response);
   } catch {
     return NextResponse.json(
       { error: "Failed to update feature flags" },

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@vayva/db";
+import { apiJson } from "@/lib/api-client-shared";
 
 export async function GET(
   request: NextRequest,
@@ -13,26 +13,19 @@ export async function GET(
     if (!auth?.user?.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const storeId = auth.user.storeId;
 
-    const incident = await prisma.rescueIncident.findFirst({
-      where: { id, storeId },
-    });
-
-    if (!incident) {
-      return NextResponse.json({ error: "Incident not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(
-      { success: true, data: incident },
-      {
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      },
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/rescue/incidents/${id}`,
+      { headers: auth.headers }
     );
+
+    return NextResponse.json(response, {
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/rescue/incidents/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/rescue/incidents/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

@@ -32,7 +32,7 @@ export default function FashionTrendsPage() {
 
   const fetchTrends = async () => {
     try {
-      const response = await apiJson<{ data: Trend[] }>("/api/fashion/trends");
+      const response = await apiJson<{ data: Trend[] }>("/fashion/trends");
       setTrends(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch fashion trends", error);

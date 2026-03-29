@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { api } from '@/lib/api-client';
 import type {
   GhostBrand,
   Reservation,
@@ -9,50 +9,19 @@ export class FoodService {
   // ===== GHOST BRANDS =====
 
   async getGhostBrands(storeId: string): Promise<GhostBrand[]> {
-    const brands = await prisma.ghostBrand?.findMany({
-      where: { storeId, isActive: true },
-    });
-
-    return brands.map((b: any) => ({
-      id: b.id,
-      storeId: b.storeId,
-      name: b.name,
-      cuisine: b.cuisine,
-      logoUrl: b.logoUrl ?? undefined,
-      menuIds: b.menuIds,
-      deliveryPlatforms: b.deliveryPlatforms,
-      isActive: b.isActive,
-      createdAt: b.createdAt,
-    }));
+    const response = await api.get(`/food/${storeId}/ghost-brands`);
+    return response.data || [];
   }
 
   async createGhostBrand(
     storeId: string,
     data: Omit<GhostBrand, 'id' | 'storeId' | 'isActive' | 'createdAt'>
   ): Promise<GhostBrand> {
-    const brand = await prisma.ghostBrand?.create({
-      data: {
-        storeId,
-        name: data.name,
-        cuisine: data.cuisine,
-        logoUrl: data.logoUrl,
-        menuIds: data.menuIds,
-        deliveryPlatforms: data.deliveryPlatforms,
-        isActive: true,
-      },
+    const response = await api.post(`/food/${storeId}/ghost-brands`, {
+      storeId,
+      ...data,
     });
-
-    return {
-      id: brand.id,
-      storeId: brand.storeId,
-      name: brand.name,
-      cuisine: brand.cuisine,
-      logoUrl: brand.logoUrl ?? undefined,
-      menuIds: brand.menuIds,
-      deliveryPlatforms: brand.deliveryPlatforms,
-      isActive: brand.isActive,
-      createdAt: brand.createdAt,
-    };
+    return response.data || {};
   }
 
   // ===== WASTE TRACKING =====
@@ -67,20 +36,10 @@ export class FoodService {
     recordedBy: string;
     notes?: string;
   }): Promise<any> {
-    const log = await prisma.wasteLog?.create({
-      data: {
-        storeId: data.storeId,
-        ingredientId: data.ingredientId,
-        quantity: data.quantity,
-        unit: data.unit,
-        reason: data.reason,
-        cost: data.cost,
-        recordedBy: data.recordedBy,
-        notes: data.notes,
-      },
+    const response = await api.post('/food/waste-log', {
+      ...data,
     });
-
-    return log;
+    return response.data || {};
   }
 
   async getWasteReport(
@@ -88,16 +47,12 @@ export class FoodService {
     startDate: Date,
     endDate: Date
   ): Promise<any> {
-    const logs = await prisma.wasteLog?.findMany({
-      where: {
-        storeId,
-        createdAt: { gte: startDate, lte: endDate },
-      },
+    const response = await api.get(`/food/${storeId}/waste-report`, {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
     });
-
-    const totalCost = logs.reduce((sum: number, log: any) => sum + Number(log.cost), 0);
-    const byReason = logs.reduce((acc: Record<string, number>, log: any) => {
-      acc[log.reason] = (acc[log.reason] || 0) + Number(log.cost);
+    return response.data || {};
+  }
       return acc;
     }, {});
 
@@ -116,133 +71,31 @@ export class FoodService {
     date: Date,
     status?: ReservationStatus
   ): Promise<Reservation[]> {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const reservations = await prisma.reservation?.findMany({
-      where: {
-        storeId,
-        date: { gte: startOfDay, lte: endOfDay },
-        ...(status && { status }),
-      },
-      orderBy: { time: 'asc' },
+    const response = await api.get(`/food/${storeId}/reservations`, {
+      date: date.toISOString(),
+      status,
     });
-
-    return reservations.map((r: any) => ({
-      id: r.id,
-      storeId: r.storeId,
-      customerId: r.customerId,
-      customerName: r.customerName,
-      customerPhone: r.customerPhone,
-      partySize: r.partySize,
-      date: r.date,
-      time: r.time,
-      tableId: r.tableId ?? undefined,
-      status: (r as any).status as ReservationStatus,
-      specialRequests: r.specialRequests ?? undefined,
-      dietaryRestrictions: r.dietaryRestrictions,
-      arrivedAt: r.arrivedAt ?? undefined,
-      completedAt: r.completedAt ?? undefined,
-      cancelledAt: r.cancelledAt ?? undefined,
-      noShow: r.noShow,
-      depositAmount: Number(r.depositAmount),
-      createdAt: r.createdAt,
-      updatedAt: r.updatedAt,
-    }));
+    return response.data || [];
   }
 
   async createReservation(
     data: Omit<Reservation, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'arrivedAt' | 'completedAt' | 'cancelledAt' | 'noShow'>
   ): Promise<Reservation> {
-    // Check availability
-    const existing = await prisma.reservation?.count({
-      where: {
-        storeId: data.storeId,
-        date: data.date,
-        time: data.time,
-        status: { notIn: ['cancelled', 'no_show'] },
-      },
+    const response = await api.post('/food/reservations', {
+      ...data,
     });
-
-    if (existing >= 50) {
-      throw new Error('Time slot fully booked');
-    }
-
-    const reservation = await prisma.reservation?.create({
-      data: {
-        storeId: data.storeId,
-        customerId: data.customerId,
-        customerName: data.customerName,
-        customerPhone: data.customerPhone,
-        partySize: data.partySize,
-        date: data.date,
-        time: data.time,
-        tableId: data.tableId,
-        status: 'confirmed',
-        specialRequests: data.specialRequests,
-        dietaryRestrictions: data.dietaryRestrictions,
-        depositAmount: data.depositAmount ?? 0,
-        noShow: false,
-      },
-    });
-
-    return {
-      id: reservation.id,
-      storeId: reservation.storeId,
-      customerId: reservation.customerId,
-      customerName: reservation.customerName,
-      customerPhone: reservation.customerPhone,
-      partySize: reservation.partySize,
-      date: reservation.date,
-      time: reservation.time,
-      tableId: reservation.tableId ?? undefined,
-      status: (reservation as any).status as ReservationStatus,
-      specialRequests: reservation.specialRequests ?? undefined,
-      dietaryRestrictions: reservation.dietaryRestrictions,
-      noShow: reservation.noShow,
-      depositAmount: Number(reservation.depositAmount),
-      createdAt: reservation.createdAt,
-      updatedAt: reservation.updatedAt,
-    };
+    return response.data || {};
   }
 
   async checkInReservation(storeId: string, id: string): Promise<Reservation> {
-    const updateResult = await prisma.reservation?.updateMany({
-      where: { id, storeId },
-      data: { status: 'completed', arrivedAt: new Date() },
-    });
-
-    if (!updateResult || updateResult.count === 0) {
-      throw new Error('Reservation not found');
-    }
-
-    const reservation = await prisma.reservation?.findFirst({
-      where: { id, storeId },
-    });
-
-    if (!reservation) {
-      throw new Error('Reservation not found');
-    }
-
-    await this.updateDiningHistory(reservation.storeId, reservation.customerId);
-
-    return this.mapReservationRow(reservation);
+    const response = await api.patch(`/food/reservations/${id}/check-in`, { storeId });
+    return response.data || {};
   }
 
   async cancelReservation(storeId: string, id: string): Promise<Reservation> {
-    const updateResult = await prisma.reservation?.updateMany({
-      where: { id, storeId },
-      data: { status: 'cancelled', cancelledAt: new Date() },
-    });
-
-    if (!updateResult || updateResult.count === 0) {
-      throw new Error('Reservation not found');
-    }
-
-    const reservation = await prisma.reservation?.findFirst({
-      where: { id, storeId },
+    const response = await api.patch(`/food/reservations/${id}/cancel`, { storeId });
+    return response.data || {};
+  }
     });
 
     if (!reservation) {

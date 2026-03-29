@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { ReviewService } from '../../../services/commerce/review.service';
+import { ReviewService } from '../../../../services/commerce/review.service';
 
 const reviewService = new ReviewService();
 

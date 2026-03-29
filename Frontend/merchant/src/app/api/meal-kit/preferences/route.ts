@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/meal-kit/preferences",
+        endpoint: "/meal-kit/preferences",
         operation: "GET_PREFERENCES",
       }
     );
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/meal-kit/preferences",
+        endpoint: "/meal-kit/preferences",
         operation: "SAVE_PREFERENCES",
       }
     );

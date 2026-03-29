@@ -126,13 +126,13 @@ export function useFashionDashboard() {
     queryKey,
     queryFn: async () => {
       const [statsRes, productsRes, ordersRes, customersRes, suppliersRes, trendsRes, collectionsRes] = await Promise.all([
-        apiJson<{ data: DashboardStats | null }>("/api/fashion/stats").catch(() => ({ data: null })),
-        apiJson<{ data: Product[] }>("/api/fashion/products?limit=100").catch(() => ({ data: [] })),
-        apiJson<{ data: Order[] }>("/api/fashion/orders?limit=50").catch(() => ({ data: [] })),
-        apiJson<{ data: Customer[] }>("/api/fashion/customers?limit=100").catch(() => ({ data: [] })),
-        apiJson<{ data: Supplier[] }>("/api/fashion/suppliers?limit=50").catch(() => ({ data: [] })),
-        apiJson<{ data: Trend[] }>("/api/fashion/trends?limit=20").catch(() => ({ data: [] })),
-        apiJson<{ data: Collection[] }>("/api/fashion/collections?limit=20").catch(() => ({ data: [] })),
+        apiJson<{ data: DashboardStats | null }>("/fashion/stats").catch(() => ({ data: null })),
+        apiJson<{ data: Product[] }>("/fashion/products?limit=100").catch(() => ({ data: [] })),
+        apiJson<{ data: Order[] }>("/fashion/orders?limit=50").catch(() => ({ data: [] })),
+        apiJson<{ data: Customer[] }>("/fashion/customers?limit=100").catch(() => ({ data: [] })),
+        apiJson<{ data: Supplier[] }>("/fashion/suppliers?limit=50").catch(() => ({ data: [] })),
+        apiJson<{ data: Trend[] }>("/fashion/trends?limit=20").catch(() => ({ data: [] })),
+        apiJson<{ data: Collection[] }>("/fashion/collections?limit=20").catch(() => ({ data: [] })),
       ]);
 
       return {

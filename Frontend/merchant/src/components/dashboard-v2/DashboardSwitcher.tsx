@@ -56,7 +56,7 @@ export function DashboardSwitcher({
   useEffect(() => {
     const fetchAddOns = async () => {
       try {
-        const data = await apiJson<AddOnsResponse>("/api/merchant/addons");
+        const data = await apiJson<AddOnsResponse>("/merchant/addons");
         const active = (data.addOns || [])
           .filter(
             (a: any) => a.purchase?.status?.toUpperCase() === "ACTIVE" && !a.isBaseExtension,

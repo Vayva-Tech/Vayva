@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { affiliateService } from "@vayva/affiliate";
-import { prisma } from "@vayva/db";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
@@ -44,7 +43,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/affiliate/dashboard",
+      endpoint: "/affiliate/dashboard",
       operation: "GET_AFFILIATE_DASHBOARD",
     });
     return NextResponse.json(

@@ -21,14 +21,14 @@ export async function GET(request: NextRequest) {
       success: boolean;
       analytics?: unknown;
       error?: string;
-    }>(buildBackendUrl("/api/merchant/referrals/analytics"), {
+    }>(buildBackendUrl("/merchant/referrals/analytics"), {
       headers: auth.headers,
     });
 
     return NextResponse.json({ analytics: result.analytics ?? result });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/referrals/analytics",
+      endpoint: "/merchant/referrals/analytics",
       operation: "GET_REFERRALS",
       storeId,
     });

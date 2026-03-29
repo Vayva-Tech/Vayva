@@ -71,7 +71,7 @@ export default function RescueDashboardPage() {
     const fetchIncidents = async () => {
       try {
         setLoading(true);
-        const data = await apiJson<RescueIncident[]>("/api/rescue/incidents");
+        const data = await apiJson<RescueIncident[]>("/rescue/incidents");
         setIncidents(data);
 
         // Calculate stats

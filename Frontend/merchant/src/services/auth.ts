@@ -1,6 +1,7 @@
 /**
  * Authentication Service
  * Handles merchant authentication, password reset, and OTP verification
+ * All operations delegate to Fastify backend - NO direct database access
  */
 
 import type {
@@ -16,70 +17,110 @@ import type {
   RequestPasswordResetInput,
 } from "@/types/auth";
 
+// Backend API base URL configuration
+const BACKEND_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_API_URL || process.env.BACKEND_API_URL || "";
+
 export class AuthService {
   /**
    * Request password reset email
+   * Delegates to backend which handles:
+   * - Token generation
+   * - Email sending via Resend
+   * - Token storage and expiration
    */
-  static async requestPasswordReset(email: string): Promise<PasswordResetResponse> {
-    const res = await fetch("/api/auth/forgot-password", {
+  static async requestPasswordReset(
+    email: string,
+  ): Promise<PasswordResetResponse> {
+    const res = await fetch(`${BACKEND_BASE_URL}/api/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Failed to request password reset" } }));
-      const errorMessage = errorData.error?.message || errorData.message || errorData.error || `Failed to request password reset: ${res.statusText}`;
+      const errorData = await res.json().catch(() => ({
+        error: { message: "Failed to request password reset" },
+      }));
+      const errorMessage =
+        errorData.error?.message ||
+        errorData.message ||
+        errorData.error ||
+        `Failed to request password reset: ${res.statusText}`;
       throw new Error(errorMessage);
     }
     return res.json();
   }
 
   // Alias for backward compatibility
-  static async forgotPassword(data: RequestPasswordResetInput): Promise<PasswordResetResponse> {
+  static async forgotPassword(
+    data: RequestPasswordResetInput,
+  ): Promise<PasswordResetResponse> {
     return AuthService.requestPasswordReset(data.email);
   }
 
   /**
    * Verify password reset token and set new password
+   * Delegates to backend which handles:
+   * - Token validation and expiration check
+   * - Password hashing with bcrypt
+   * - Token invalidation after use
    */
   static async verifyPasswordReset(
     token: string,
-    password: string
+    password: string,
   ): Promise<PasswordResetResponse> {
-    const res = await fetch("/api/auth/reset-password", {
+    const res = await fetch(`${BACKEND_BASE_URL}/api/auth/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, password }),
     });
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Failed to reset password" } }));
-      const errorMessage = errorData.error?.message || errorData.message || errorData.error || `Failed to reset password: ${res.statusText}`;
+      const errorData = await res
+        .json()
+        .catch(() => ({ error: { message: "Failed to reset password" } }));
+      const errorMessage =
+        errorData.error?.message ||
+        errorData.message ||
+        errorData.error ||
+        `Failed to reset password: ${res.statusText}`;
       throw new Error(errorMessage);
     }
     return res.json();
   }
 
   // Alias for backward compatibility
-  static async resetPassword(data: PasswordResetInput): Promise<PasswordResetResponse> {
+  static async resetPassword(
+    data: PasswordResetInput,
+  ): Promise<PasswordResetResponse> {
     return AuthService.verifyPasswordReset(data.token, data.password);
   }
 
   /**
    * Sign in with email and password
+   * Delegates to backend which handles:
+   * - User lookup and password verification with bcrypt
+   * - JWT token generation
+   * - OTP generation and email sending (if required)
    */
   static async signIn(
     email: string,
     password: string,
-    otpMethod?: "EMAIL" | "WHATSAPP"
+    otpMethod?: "EMAIL" | "WHATSAPP",
   ): Promise<SignInResponse> {
-    const res = await fetch("/api/auth/merchant/login", {
+    const res = await fetch(`${BACKEND_BASE_URL}/api/auth/merchant/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, otpMethod }),
     });
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Invalid credentials" } }));
-      const errorMessage = errorData.error?.message || errorData.message || errorData.error || `Failed to sign in: ${res.statusText}`;
+      const errorData = await res
+        .json()
+        .catch(() => ({ error: { message: "Invalid credentials" } }));
+      const errorMessage =
+        errorData.error?.message ||
+        errorData.message ||
+        errorData.error ||
+        `Failed to sign in: ${res.statusText}`;
       throw new Error(errorMessage);
     }
     return res.json();
@@ -92,104 +133,35 @@ export class AuthService {
 
   /**
    * Register new merchant account
+   * Delegates to backend which handles:
+   * - Duplicate email check
+   * - User creation with bcrypt password hashing
+   * - Merchant/store creation
+   * - OTP generation and email sending via Resend
    */
   static async signUp(data: SignUpInput): Promise<SignUpResponse> {
-    const res = await fetch("/api/auth/merchant/register", {
+    const res = await fetch(`${BACKEND_BASE_URL}/api/auth/merchant/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Failed to create account" } }));
-      const errorMessage = errorData.error?.message || errorData.message || errorData.error || `Failed to sign up: ${res.statusText}`;
+      const errorData = await res
+        .json()
+        .catch(() => ({ error: { message: "Failed to create account" } }));
+      const errorMessage =
+        errorData.error?.message ||
+        errorData.message ||
+        errorData.error ||
+        `Failed to sign up: ${res.statusText}`;
       throw new Error(errorMessage);
     }
     return res.json();
   }
 
-  // Alias for backward compatibility
-  static async register(data: Omit<SignUpInput, "storeName"> & { storeName?: string }): Promise<SignUpResponse> {
-    return AuthService.signUp({ ...data, storeName: data.storeName || "" });
-  }
-
-  /**
-   * Verify OTP code
-   */
-  static async verifyOTP(
-    email: string,
-    code: string,
-    method?: "EMAIL" | "WHATSAPP",
-    rememberMe?: boolean,
-  ): Promise<VerifyOTPResponse> {
-    const res = await fetch("/api/auth/merchant/verify-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        code,
-        method: method || "EMAIL",
-        rememberMe: rememberMe === true,
-      }),
-    });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Invalid verification code" } }));
-      const errorMessage = errorData.error?.message || errorData.message || errorData.error || `Failed to verify OTP: ${res.statusText}`;
-      throw new Error(errorMessage);
-    }
-    return res.json();
-  }
-
-  // Alias for backward compatibility
-  static async resendCode(data: ResendCodeInput): Promise<ResendCodeResponse> {
-    const res = await fetch("/api/auth/merchant/resend-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: { message: "Failed to resend code" } }));
-      const errorMessage = errorData.error?.message || errorData.message || errorData.error || `Failed to resend code: ${res.statusText}`;
-      throw new Error(errorMessage);
-    }
-    return res.json();
-  }
-}
-
-// Keep individual exports for backward compatibility
-export async function requestPasswordReset(email: string): Promise<{ success: boolean }> {
-  return AuthService.requestPasswordReset(email);
-}
-
-export async function verifyPasswordReset(
-  token: string,
-  password: string
-): Promise<{ success: boolean }> {
-  return AuthService.verifyPasswordReset(token, password);
-}
-
-export async function signIn(
-  email: string,
-  password: string,
-  otpMethod?: "EMAIL" | "WHATSAPP"
-): Promise<SignInResponse> {
-  return AuthService.signIn(email, password, otpMethod);
-}
-
-export async function signUp(data: {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  storeName: string;
-}): Promise<{ success: boolean }> {
+// Alias for backward compatibility
+static async register(
+  data: SignUpInput,
+): Promise<SignUpResponse> {
   return AuthService.signUp(data);
-}
-
-export async function verifyOTP(
-  email: string,
-  code: string,
-  method?: "EMAIL" | "WHATSAPP",
-  rememberMe?: boolean,
-): Promise<{ success: boolean }> {
-  return AuthService.verifyOTP(email, code, method, rememberMe);
 }

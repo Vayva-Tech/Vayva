@@ -49,7 +49,7 @@ export class SubscriptionsService {
         id: `sub-${Date.now()}`,
         storeId,
         planKey,
-        provider: provider || 'STRIPE',
+        provider: provider || 'PAYSTACK',
         providerSubscriptionId: providerSubscriptionId || null,
         status: 'TRIALING',
         currentPeriodStart: new Date(),
@@ -524,5 +524,334 @@ export class SubscriptionsService {
     );
 
     return { success: true, attempt, config };
+  }
+
+  /**
+   * Get current subscription for a store
+   */
+  async getCurrentSubscription(storeId: string) {
+    const subscription = await this.db.subscription.findFirst({
+      where: { storeId },
+      orderBy: { currentPeriodStart: 'desc' },
+    });
+
+    return subscription;
+  }
+
+  /**
+   * Get available features for a store based on their subscription
+   */
+  async getAvailableFeatures(storeId: string) {
+    const subscription = await this.getCurrentSubscription(storeId);
+    
+    const planKey = subscription?.planKey || 'FREE';
+    const status = subscription?.status || 'INACTIVE';
+    
+    // Feature matrix by plan
+    const featureMatrix: Record<string, string[]> = {
+      STARTER: [
+        'basic_dashboard',
+        'paystack_payments',
+        'csv_import',
+        'basic_analytics',
+        'advanced_analytics',
+        'email_support',
+        'remove_branding',
+        'automation',
+        'financial_charts',
+        'dashboard_metrics_6',
+      ],
+      PRO: [
+        'basic_dashboard',
+        'paystack_payments',
+        'csv_import',
+        'basic_analytics',
+        'advanced_analytics',
+        'accounting',
+        'multi_store',
+        'api_access',
+        'webhooks',
+        'industry_dashboards',
+        'custom_domain',
+        'remove_branding',
+        'automation',
+        'custom_integrations',
+        'financial_charts',
+        'dashboard_metrics_10',
+        'ai_autopilot',
+      ],
+      PRO_PLUS: [
+        'basic_dashboard',
+        'paystack_payments',
+        'csv_import',
+        'basic_analytics',
+        'advanced_analytics',
+        'accounting',
+        'multi_store',
+        'priority_support',
+        'api_access',
+        'webhooks',
+        'industry_dashboards',
+        'merged_industry_dashboard',
+        'visual_workflow_builder',
+        'custom_domain',
+        'remove_branding',
+        'automation',
+        'custom_integrations',
+        'financial_charts',
+        'dashboard_metrics_unlimited',
+        'ai_autopilot',
+      ],
+    };
+
+    return {
+      planKey,
+      status,
+      features: featureMatrix[planKey] || featureMatrix.STARTER,
+    };
+  }
+
+  /**
+   * Create Paystack checkout session
+   */
+  async createCheckoutSession(params: {
+    storeId: string;
+    planKey: string;
+    billingCycle: 'monthly' | 'quarterly';
+    successUrl: string;
+    cancelUrl: string;
+  }) {
+    // Use existing Paystack API - call merchant app endpoint
+    const backendUrl = process.env.BACKEND_API_URL || 'http://localhost:3000';
+    
+    const response = await fetch(`${backendUrl}/api/subscriptions/initiate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        planId: params.planKey.toLowerCase(),
+        email: (await this.getStoreOwnerEmail(params.storeId)) || '',
+        storeName: (await this.getStoreName(params.storeId)) || '',
+        amount: this.getPlanAmount(params.planKey, params.billingCycle),
+        duration: params.billingCycle === 'quarterly' ? 'three_month' : 'monthly',
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to initialize Paystack checkout');
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || 'Paystack initialization failed');
+    }
+
+    logger.info(`[Subscriptions] Created Paystack checkout ${result.reference} for store ${params.storeId}`);
+    return { sessionId: result.reference, url: result.authorization_url };
+  }
+
+  /**
+   * Create Paystack billing portal session (redirect to billing dashboard)
+   */
+  async createPortalSession(params: { storeId: string; returnUrl?: string }) {
+    // Paystack doesn't have a billing portal like Stripe
+    // Redirect to merchant billing dashboard instead
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+    const portalUrl = `${appUrl}/dashboard/billing`;
+    
+    logger.info(`[Subscriptions] Created portal redirect for store ${params.storeId}`);
+    return { url: portalUrl };
+  }
+
+  /**
+   * Get usage metrics for a store
+   */
+  async getUsageMetrics(storeId: string) {
+    const subscription = await this.getCurrentSubscription(storeId);
+    const planKey = subscription?.planKey || 'STARTER';
+
+    // Get limits for current plan
+    const limits: Record<string, number> = {
+      STARTER: { products: 100, orders: 500, teamMembers: 1 },
+      PRO: { products: 300, orders: 10000, teamMembers: 3 },
+      PRO_PLUS: { products: 500, orders: -1, teamMembers: 5 }, // -1 = unlimited
+    };
+
+    const planLimits = limits[planKey] || limits.STARTER;
+
+    // Get current usage
+    const [productCount, orderCount, memberCount] = await Promise.all([
+      this.db.product.count({ where: { storeId } }),
+      this.db.order.count({ where: { storeId } }),
+      this.db.membership.count({ where: { storeId } }),
+    ]);
+
+    return {
+      planKey,
+      usage: {
+        products: { current: productCount, limit: planLimits.products },
+        orders: { current: orderCount, limit: planLimits.orders },
+        teamMembers: { current: memberCount, limit: planLimits.teamMembers },
+      },
+    };
+  }
+
+  /**
+   * Upgrade plan immediately
+   */
+  async upgradePlan(params: { storeId: string; targetPlanKey: string; paymentMethodId?: string }) {
+    const { storeId, targetPlanKey, paymentMethodId } = params;
+
+    const currentSubscription = await this.getCurrentSubscription(storeId);
+
+    if (!currentSubscription) {
+      throw new Error('No active subscription found');
+    }
+
+    // Update subscription plan
+    const updated = await this.db.subscription.update({
+      where: { id: currentSubscription.id },
+      data: {
+        planKey: targetPlanKey,
+        status: 'ACTIVE',
+      },
+    });
+
+    logger.info(
+      `[Subscriptions] Upgraded store ${storeId} from ${currentSubscription.planKey} to ${targetPlanKey}`,
+    );
+
+    return { subscription: updated };
+  }
+
+  /**
+   * Cancel subscription at period end
+   */
+  async cancelAtPeriodEnd(params: { storeId: string; cancellationReason?: string }) {
+    const { storeId, cancellationReason } = params;
+
+    const subscription = await this.getCurrentSubscription(storeId);
+    if (!subscription) {
+      throw new Error('No active subscription found');
+    }
+
+    const updated = await this.db.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        cancelAtPeriodEnd: true,
+        cancellationReason,
+      },
+    });
+
+    logger.info(`[Subscriptions] Set subscription ${subscription.id} to cancel at period end`);
+    return { subscription: updated };
+  }
+
+  /**
+   * Handle Paystack webhook events
+   */
+  async handlePaystackWebhook(params: { eventBody: any }) {
+    const { eventBody } = params;
+    
+    // Paystack webhook event types
+    const eventType = eventBody.event || '';
+    const data = eventBody.data || {};
+
+    logger.info(`[Subscriptions] Received Paystack webhook: ${eventType}`);
+
+    // Process event based on type
+    switch (eventType) {
+      case 'charge.success': {
+        const reference = data.reference as string;
+        const metadata = data.metadata || {};
+        const storeId = metadata.storeId as string;
+        const planKey = metadata.newPlan || metadata.planKey as string;
+        const billingCycle = metadata.billingCycle || metadata.billing_cycle as string;
+
+        if (!storeId || !planKey) {
+          throw new Error('Missing metadata in Paystack webhook');
+        }
+
+        // Find or create subscription
+        const existingSubscription = await this.db.subscription.findFirst({
+          where: { 
+            storeId,
+            providerSubscriptionId: reference,
+          },
+        });
+
+        if (existingSubscription) {
+          // Update existing subscription
+          await this.db.subscription.update({
+            where: { id: existingSubscription.id },
+            data: {
+              status: 'ACTIVE',
+              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            },
+          });
+        } else {
+          // Create new subscription
+          await this.db.subscription.create({
+            data: {
+              id: `sub-${Date.now()}`,
+              storeId,
+              planKey: planKey.toUpperCase(),
+              status: 'ACTIVE',
+              provider: 'PAYSTACK',
+              providerSubscriptionId: reference,
+              currentPeriodStart: new Date(),
+              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              startedAt: new Date(),
+            },
+          });
+        }
+
+        logger.info(`[Subscriptions] Charge successful for store ${storeId}, reference ${reference}`);
+        break;
+      }
+
+      case 'transfer.success':
+      case 'transfer.failed': {
+        // Handle payout events if using Paystack for merchant payouts
+        logger.info(`[Subscriptions] Transfer event: ${eventType}`);
+        break;
+      }
+
+      default:
+        logger.warn(`[Subscriptions] Unhandled Paystack webhook event type: ${eventType}`);
+    }
+
+    return { received: true, eventType };
+  }
+
+  // Helper methods for Paystack integration
+  private async getStoreOwnerEmail(storeId: string): Promise<string | null> {
+    const store = await this.db.store.findUnique({
+      where: { id: storeId },
+      include: {
+        memberships: {
+          where: { role_enum: 'OWNER' },
+          take: 1,
+          include: { user: true },
+        },
+      },
+    });
+    return store?.memberships[0]?.user?.email || null;
+  }
+
+  private async getStoreName(storeId: string): Promise<string | null> {
+    const store = await this.db.store.findUnique({
+      where: { id: storeId },
+      select: { name: true },
+    });
+    return store?.name || null;
+  }
+
+  private getPlanAmount(planKey: string, billingCycle: 'monthly' | 'quarterly'): number {
+    const amounts: Record<string, { monthly: number; quarterly: number }> = {
+      STARTER: { monthly: 25000, quarterly: 60000 },
+      PRO: { monthly: 35000, quarterly: 84000 },
+      PRO_PLUS: { monthly: 50000, quarterly: 120000 },
+    };
+    return amounts[planKey]?.[billingCycle] || 0;
   }
 }

@@ -69,7 +69,7 @@ export function useNightlifeDashboard() {
   const { data, isLoading, error, refetch, isFetching } = useQuery<NightlifeDashboardData, Error>({
     queryKey,
     queryFn: async () => {
-      const response = await fetch('/api/nightlife/dashboard');
+      const response = await fetch('/nightlife/dashboard');
       if (!response.ok) {
         throw new Error(`Failed to fetch nightlife dashboard: ${response.statusText}`);
       }

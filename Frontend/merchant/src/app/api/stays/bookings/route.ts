@@ -46,7 +46,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/stays/bookings",
+        endpoint: "/stays/bookings",
         operation: "GET_BOOKINGS",
         storeId: undefined,
       }

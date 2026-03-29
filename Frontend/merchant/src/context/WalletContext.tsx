@@ -43,12 +43,12 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshWallet = async () => {
     setIsLoading(true);
     try {
-      const s = await apiJson<WalletSummary>("/api/wallet/summary");
+      const s = await apiJson<WalletSummary>("/wallet/summary");
       setSummary(s);
       setHasPin(s.pinSet);
       setIsLocked(s.status === "locked");
 
-      const l = await apiJson<Transaction[]>("/api/wallet/ledger");
+      const l = await apiJson<Transaction[]>("/wallet/ledger");
       setLedger(l || []);
     } catch (error: any) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -69,7 +69,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
 
   const unlockWallet = async (pin: string) => {
     try {
-      const result = await apiJson<{ success: boolean }>("/api/wallet/unlock", {
+      const result = await apiJson<{ success: boolean }>("/wallet/unlock", {
         method: "POST",
         body: JSON.stringify({ pin }),
       });
@@ -85,7 +85,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleSetPin = async (pin: string) => {
-    await apiJson("/api/wallet/pin", {
+    await apiJson("/wallet/pin", {
       method: "POST",
       body: JSON.stringify({ pin }),
     });

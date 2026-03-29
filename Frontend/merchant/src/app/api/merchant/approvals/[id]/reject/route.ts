@@ -25,7 +25,7 @@ export async function POST(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/approvals/:id/reject", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/approvals/:id/reject", operation: "POST" });
     return NextResponse.json({ error: "Failed to reject approval" }, { status: 500 });
   }
 }

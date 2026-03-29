@@ -120,7 +120,7 @@ export default function ABTestingDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ tests: ABTest[] }>("/api/ab-testing/tests");
+      const response = await apiJson<{ tests: ABTest[] }>("/ab-testing/tests");
       setTests(response.tests || []);
     } catch (error) {
       logger.error("[AB Testing] Failed to load:", { error });
@@ -131,7 +131,7 @@ export default function ABTestingDashboard() {
 
   const handleCreateTest = async (data: Omit<ABTest, "id" | "createdAt" | "updatedAt">) => {
     try {
-      await apiJson("/api/ab-testing/tests", {
+      await apiJson("/ab-testing/tests", {
         method: "POST",
         body: JSON.stringify(data),
       });

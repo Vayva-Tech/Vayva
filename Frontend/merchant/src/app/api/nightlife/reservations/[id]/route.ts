@@ -38,7 +38,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/nightlife/reservations/[id]",
+      endpoint: "/nightlife/reservations/[id]",
       operation: "PATCH",
       storeId,
     });

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { BookingService } from '../../../services/core/booking.service';
+import { BookingService } from '../../../../services/core/booking.service';
 
 const bookingService = new BookingService();
 

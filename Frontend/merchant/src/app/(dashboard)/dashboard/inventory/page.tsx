@@ -6,6 +6,7 @@ import useSWR from "swr";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PageWithInsights } from "@/components/layout/PageWithInsights";
+import { fetcher } from "@/lib/utils";
 import {
   Package,
   PackageCheck,
@@ -52,15 +53,6 @@ interface InventoryData {
 }
 
 /* ------------------------------------------------------------------ */
-/*  SWR Fetcher                                                        */
-/* ------------------------------------------------------------------ */
-
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-});
-
-/* ------------------------------------------------------------------ */
 /*  Skeleton Components                                                */
 /* ------------------------------------------------------------------ */
 
@@ -81,24 +73,42 @@ function InventoryTableSkeleton() {
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-pulse">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-gray-50 border-b border-gray-100" scope="col">
             <tr>
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <th key={i} className="px-4 py-3.5"><div className="w-16 h-3 bg-gray-100 rounded" /></th>
+                <th key={i} className="px-4 py-3.5" scope="col">
+                  <div className="w-16 h-3 bg-gray-100 rounded" />
+                </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {[1, 2, 3, 4, 5].map((i) => (
               <tr key={i}>
-                <td className="px-6 py-4"><div className="w-32 h-4 bg-gray-100 rounded" /></td>
-                <td className="px-4 py-4"><div className="w-20 h-4 bg-gray-100 rounded" /></td>
-                <td className="px-4 py-4"><div className="w-24 h-4 bg-gray-100 rounded" /></td>
-                <td className="px-4 py-4"><div className="w-8 h-4 bg-gray-100 rounded ml-auto" /></td>
-                <td className="px-4 py-4"><div className="w-8 h-4 bg-gray-100 rounded ml-auto" /></td>
-                <td className="px-4 py-4"><div className="w-16 h-5 bg-gray-100 rounded-full" /></td>
-                <td className="px-4 py-4"><div className="w-20 h-4 bg-gray-100 rounded" /></td>
-                <td className="px-4 py-4"><div className="w-16 h-4 bg-gray-100 rounded ml-auto" /></td>
+                <td className="px-6 py-4">
+                  <div className="w-32 h-4 bg-gray-100 rounded" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-20 h-4 bg-gray-100 rounded" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-24 h-4 bg-gray-100 rounded" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-8 h-4 bg-gray-100 rounded ml-auto" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-8 h-4 bg-gray-100 rounded ml-auto" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-16 h-5 bg-gray-100 rounded-full" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-20 h-4 bg-gray-100 rounded" />
+                </td>
+                <td className="px-4 py-4">
+                  <div className="w-16 h-4 bg-gray-100 rounded ml-auto" />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -134,10 +144,14 @@ function getStatusStyle(status: string) {
 }
 
 // ── Stock Movement Chart ───────────────────────────────────
-function StockMovementChart({ stockMovement }: { stockMovement: { day: string; stockIn: number; stockOut: number }[] }) {
+function StockMovementChart({
+  stockMovement,
+}: {
+  stockMovement: { day: string; stockIn: number; stockOut: number }[];
+}) {
   if (!stockMovement || stockMovement.length === 0) return null;
   const maxVal = Math.max(
-    ...stockMovement.map((d) => Math.max(d.stockIn, d.stockOut))
+    ...stockMovement.map((d) => Math.max(d.stockIn, d.stockOut)),
   );
   const chartWidth = 420;
   const chartHeight = 140;
@@ -146,7 +160,10 @@ function StockMovementChart({ stockMovement }: { stockMovement: { day: string; s
   const gap = 4;
 
   return (
-    <svg viewBox={`0 0 ${chartWidth} ${chartHeight + 30}`} className="w-full h-48">
+    <svg
+      viewBox={`0 0 ${chartWidth} ${chartHeight + 30}`}
+      className="w-full h-48"
+    >
       {stockMovement.map((day, i) => {
         const x = i * groupWidth + (groupWidth - barWidth * 2 - gap) / 2;
         const inHeight = (day.stockIn / maxVal) * chartHeight;
@@ -194,9 +211,9 @@ export default function InventoryPage() {
   const [statusFilter, setStatusFilter] = useState("All Status");
 
   const { data, error, isLoading, mutate } = useSWR<InventoryData>(
-    '/api/products?view=inventory',
+    "/products?view=inventory",
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { revalidateOnFocus: false, dedupingInterval: 30000 },
   );
 
   const inventoryItems: InventoryItem[] = data?.items || [];
@@ -205,10 +222,34 @@ export default function InventoryPage() {
   const summary = data?.summary;
 
   const summaryCards = [
-    { label: "Total Items", value: summary?.totalItems ?? 0, icon: Package, iconBg: "bg-blue-50", iconColor: "text-blue-600" },
-    { label: "In Stock", value: summary?.inStock ?? 0, icon: PackageCheck, iconBg: "bg-green-50", iconColor: "text-green-600" },
-    { label: "Low Stock", value: summary?.lowStock ?? 0, icon: AlertTriangle, iconBg: "bg-yellow-50", iconColor: "text-yellow-600" },
-    { label: "Out of Stock", value: summary?.outOfStock ?? 0, icon: PackageX, iconBg: "bg-red-50", iconColor: "text-red-600" },
+    {
+      label: "Total Items",
+      value: summary?.totalItems ?? 0,
+      icon: Package,
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
+    {
+      label: "In Stock",
+      value: summary?.inStock ?? 0,
+      icon: PackageCheck,
+      iconBg: "bg-green-50",
+      iconColor: "text-green-600",
+    },
+    {
+      label: "Low Stock",
+      value: summary?.lowStock ?? 0,
+      icon: AlertTriangle,
+      iconBg: "bg-yellow-50",
+      iconColor: "text-yellow-600",
+    },
+    {
+      label: "Out of Stock",
+      value: summary?.outOfStock ?? 0,
+      icon: PackageX,
+      iconBg: "bg-red-50",
+      iconColor: "text-red-600",
+    },
   ];
 
   const filteredItems = inventoryItems.filter((item) => {
@@ -230,8 +271,12 @@ export default function InventoryPage() {
           <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load inventory</h3>
-          <p className="text-sm text-gray-500 mb-4">There was a problem fetching your inventory data. Please try again.</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            Failed to load inventory
+          </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            There was a problem fetching your inventory data. Please try again.
+          </p>
           <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
@@ -255,7 +300,9 @@ export default function InventoryPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => <SummaryCardSkeleton key={i} />)}
+          {[1, 2, 3, 4].map((i) => (
+            <SummaryCardSkeleton key={i} />
+          ))}
         </div>
         <div className="flex flex-col sm:flex-row gap-3 animate-pulse">
           <div className="flex-1 h-10 bg-gray-100 rounded-2xl" />
@@ -284,8 +331,12 @@ export default function InventoryPage() {
           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
             <Package className="w-7 h-7 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">No inventory tracked yet</h3>
-          <p className="text-sm text-gray-500 max-w-sm mb-4">Add products to start managing inventory</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            No inventory tracked yet
+          </h3>
+          <p className="text-sm text-gray-500 max-w-sm mb-4">
+            Add products to start managing inventory
+          </p>
           <Button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
             <Plus className="w-4 h-4" />
             Add Stock
@@ -375,210 +426,244 @@ export default function InventoryPage() {
           }
         />
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {summaryCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={card.label}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div
-                  className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center`}
-                >
-                  <Icon size={18} className={card.iconColor} />
-                </div>
-              </div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {card.label}
-              </p>
-              <p className="text-2xl font-bold text-gray-900 tracking-tight mt-1">
-                {card.value}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Search + Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Search by product name or SKU..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white shadow-sm"
-          />
-        </div>
-        <div className="relative">
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="appearance-none pl-4 pr-10 py-2.5 rounded-2xl border border-gray-200 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
-        </div>
-        <div className="relative">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none pl-4 pr-10 py-2.5 rounded-2xl border border-gray-200 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-          >
-            {stockStatuses.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
-        </div>
-      </div>
-
-      {/* Inventory Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Product Name
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  SKU
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                  Current Stock
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                  Reorder Level
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Last Restocked
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredItems.map((item) => {
-                const isLowStock = item.status === "Low Stock";
-                const isOutOfStock = item.status === "Out of Stock";
-                const rowBg = isLowStock ? "bg-yellow-50" : "";
-
-                return (
-                  <tr
-                    key={item.id}
-                    className={`${rowBg} hover:bg-gray-50/70 transition-colors`}
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {summaryCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <div
+                key={card.label}
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div
+                    className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center`}
                   >
-                    <td className="px-6 py-4 font-semibold text-gray-900 whitespace-nowrap">
-                      {item.name}
-                    </td>
-                    <td className="px-4 py-4 text-gray-500 font-mono text-xs">
-                      {item.sku}
-                    </td>
-                    <td className="px-4 py-4 text-gray-600">{item.category}</td>
-                    <td className="px-4 py-4 text-right font-semibold text-gray-900">
-                      {item.currentStock}
-                    </td>
-                    <td className="px-4 py-4 text-right text-gray-500">
-                      {item.reorderLevel}
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusStyle(item.status)}`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-gray-500 text-xs">
-                      {new Date(item.lastRestocked).toLocaleDateString("en-NG", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Edit size={14} className="text-gray-500" />
-                        </Button>
-                        <Button
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Restock"
-                        >
-                          <RefreshCw size={14} className="text-gray-500" />
-                        </Button>
-                        <Button
-                          className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} className="text-gray-400 hover:text-red-500" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    <Icon size={18} className={card.iconColor} />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {card.label}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-1">
+                  {card.value}
+                </p>
+              </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Stock Movement Chart */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">
-              Stock Movement
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Stock in vs stock out over the last 7 days
-            </p>
+        {/* Search + Filters */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search by product name or SKU..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white shadow-sm"
+            />
           </div>
-          <div className="flex items-center gap-4 text-xs text-gray-500">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-green-500" />
-              Stock In
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-red-500 opacity-60" />
-              Stock Out
-            </div>
+          <div className="relative">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="appearance-none pl-4 pr-10 py-2.5 rounded-2xl border border-gray-200 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
+          </div>
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none pl-4 pr-10 py-2.5 rounded-2xl border border-gray-200 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+            >
+              {stockStatuses.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
           </div>
         </div>
-        <StockMovementChart stockMovement={stockMovement} />
-      </div>
+
+        {/* Inventory Table */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead
+                className="bg-gray-50 border-b border-gray-100"
+                scope="col"
+              >
+                <tr>
+                  <th
+                    className="px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                  >
+                    Product Name
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                  >
+                    SKU
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                  >
+                    Category
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right"
+                    scope="col"
+                  >
+                    Current Stock
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right"
+                    scope="col"
+                  >
+                    Reorder Level
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                  >
+                    Status
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                  >
+                    Last Restocked
+                  </th>
+                  <th
+                    className="px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right"
+                    scope="col"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredItems.map((item) => {
+                  const isLowStock = item.status === "Low Stock";
+                  const isOutOfStock = item.status === "Out of Stock";
+                  const rowBg = isLowStock ? "bg-yellow-50" : "";
+
+                  return (
+                    <tr
+                      key={item.id}
+                      className={`${rowBg} hover:bg-gray-50/70 transition-colors`}
+                    >
+                      <td className="px-6 py-4 font-semibold text-gray-900 whitespace-nowrap">
+                        {item.name}
+                      </td>
+                      <td className="px-4 py-4 text-gray-500 font-mono text-xs">
+                        {item.sku}
+                      </td>
+                      <td className="px-4 py-4 text-gray-600">
+                        {item.category}
+                      </td>
+                      <td className="px-4 py-4 text-right font-semibold text-gray-900">
+                        {item.currentStock}
+                      </td>
+                      <td className="px-4 py-4 text-right text-gray-500">
+                        {item.reorderLevel}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusStyle(item.status)}`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-gray-500 text-xs">
+                        {new Date(item.lastRestocked).toLocaleDateString(
+                          "en-NG",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit size={14} className="text-gray-500" />
+                          </Button>
+                          <Button
+                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Restock"
+                          >
+                            <RefreshCw size={14} className="text-gray-500" />
+                          </Button>
+                          <Button
+                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2
+                              size={14}
+                              className="text-gray-400 hover:text-red-500"
+                            />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Stock Movement Chart */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">
+                Stock Movement
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Stock in vs stock out over the last 7 days
+              </p>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-sm bg-green-500" />
+                Stock In
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-sm bg-red-500 opacity-60" />
+                Stock Out
+              </div>
+            </div>
+          </div>
+          <StockMovementChart stockMovement={stockMovement} />
+        </div>
       </PageWithInsights>
     </div>
   );
 }
-

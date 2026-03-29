@@ -190,14 +190,14 @@ export default function SocialPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50" scope="col">
               <tr>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Channel</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Order</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Customer</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Channel</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Product</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Amount</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

@@ -29,7 +29,7 @@
     "lighthouse": "lhci autorun",
     "lighthouse:ci": "lhci autorun --collect.url=http://localhost:3000/dashboard/nonprofit",
     "lighthouse:assert": "lhci assert --config=./lighthouserc.js",
-    "db:seed": "node platform/infra/db/prisma/seed.ts",
+    "db:seed": "node packages/db/prisma/seed.ts",
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
     "postinstall": "turbo run db:generate"
@@ -65,7 +65,7 @@
     "node": ">=20"
   },
   "prisma": {
-    "schema": "platform/infra/db/prisma/schema.prisma"
+    "schema": "packages/db/prisma/schema.prisma"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

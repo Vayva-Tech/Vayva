@@ -1,11 +1,11 @@
-import { FastifyPluginAsync } from 'fastify';
-import { AiService } from '../../../services/ai/ai.service';
+import { FastifyPluginAsync } from "fastify";
+import { AiService } from "../../../../services/ai/ai.service";
 
 const aiService = new AiService();
 
 export const aiRoutes: FastifyPluginAsync = async (server) => {
   // Health check endpoint
-  server.get('/health', {
+  server.get("/health", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const status = await aiService.getHealthStatus();
@@ -14,7 +14,7 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
   });
 
   // Get credit summary
-  server.get('/credits', {
+  server.get("/credits", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -35,14 +35,17 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to fetch AI credit data',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch AI credit data",
         });
       }
     },
   });
 
   // Get available top-up packages
-  server.get('/credits/packages', {
+  server.get("/credits/packages", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       try {
@@ -51,14 +54,15 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to fetch packages',
+          error:
+            error instanceof Error ? error.message : "Failed to fetch packages",
         });
       }
     },
   });
 
   // Get templates
-  server.get('/templates', {
+  server.get("/templates", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -69,14 +73,17 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to fetch templates',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch templates",
         });
       }
     },
   });
 
   // Create template
-  server.post('/templates', {
+  server.post("/templates", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -88,35 +95,45 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(400).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to create template',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to create template",
         });
       }
     },
   });
 
   // Get insights
-  server.get('/insights', {
+  server.get("/insights", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
       const query = request.query as any;
-      const industry = query.industry || 'retail';
-      const timeRange = query.timeRange || '7d';
+      const industry = query.industry || "retail";
+      const timeRange = query.timeRange || "7d";
 
       try {
-        const result = await aiService.getInsights(storeId, industry, timeRange);
+        const result = await aiService.getInsights(
+          storeId,
+          industry,
+          timeRange,
+        );
         return reply.send({ success: true, data: result });
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to generate insights',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to generate insights",
         });
       }
     },
   });
 
   // Get WhatsApp status
-  server.get('/whatsapp/status', {
+  server.get("/whatsapp/status", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -127,24 +144,27 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to get WhatsApp status',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to get WhatsApp status",
         });
       }
     },
   });
 
   // Chat endpoint
-  server.post('/chat', {
+  server.post("/chat", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
-      const { messages, channel = 'web' } = request.body as any;
+      const { messages, channel = "web" } = request.body as any;
 
       try {
         if (!messages || !Array.isArray(messages) || messages.length === 0) {
           return reply.code(400).send({
             success: false,
-            error: 'Messages array is required',
+            error: "Messages array is required",
           });
         }
 
@@ -157,14 +177,17 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to process AI request',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to process AI request",
         });
       }
     },
   });
 
   // Get conversations
-  server.get('/conversations', {
+  server.get("/conversations", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -183,7 +206,7 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
   });
 
   // Get analytics
-  server.get('/analytics', {
+  server.get("/analytics", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -193,7 +216,7 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
   });
 
   // WhatsApp webhook endpoint
-  server.post('/whatsapp/webhook', {
+  server.post("/whatsapp/webhook", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -205,41 +228,28 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Webhook processing failed',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Webhook processing failed",
         });
       }
     },
   });
 
-  // Get analytics
-  server.get('/analytics', {
-    preHandler: [server.authenticate],
-    handler: async (request, reply) => {
-      const storeId = (request.user as any).storeId;
-
-      try {
-        const analytics = await aiService.getAnalytics(storeId);
-        return reply.send({ success: true, data: analytics });
-      } catch (error) {
-        return reply.code(500).send({
-          success: false,
-          error: error instanceof Error ? error.message : 'Failed to fetch analytics',
-        });
-      }
-    },
-  });
+  // Get analytics (already defined above)
 
   // Initialize credit top-up
-  server.post('/credits/topup/init', {
+  server.post("/credits/topup/init", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
       const { packId } = request.body as any;
 
-      if (!packId || typeof packId !== 'string') {
+      if (!packId || typeof packId !== "string") {
         return reply.code(400).send({
           success: false,
-          error: 'packId is required',
+          error: "packId is required",
         });
       }
 
@@ -249,14 +259,17 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(400).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to initialize top-up',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to initialize top-up",
         });
       }
     },
   });
 
   // Top-up credits
-  server.post('/credits/topup', {
+  server.post("/credits/topup", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -265,33 +278,40 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       if (!creditsAmount || !paymentReference) {
         return reply.code(400).send({
           success: false,
-          error: 'creditsAmount and paymentReference are required',
+          error: "creditsAmount and paymentReference are required",
         });
       }
 
       try {
-        const result = await aiService.topupCredits(storeId, creditsAmount, paymentReference);
+        const result = await aiService.topupCredits(
+          storeId,
+          creditsAmount,
+          paymentReference,
+        );
         return reply.code(201).send({ success: true, data: result });
       } catch (error) {
         return reply.code(400).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to process credit top-up',
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to process credit top-up",
         });
       }
     },
   });
 
   // Verify credit top-up
-  server.post('/credits/topup/verify', {
+  server.post("/credits/topup/verify", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
       const { reference } = request.body as any;
 
-      if (!reference || typeof reference !== 'string') {
+      if (!reference || typeof reference !== "string") {
         return reply.code(400).send({
           success: false,
-          error: 'reference is required',
+          error: "reference is required",
         });
       }
 
@@ -301,7 +321,8 @@ export const aiRoutes: FastifyPluginAsync = async (server) => {
       } catch (error) {
         return reply.code(400).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to verify top-up',
+          error:
+            error instanceof Error ? error.message : "Failed to verify top-up",
         });
       }
     },

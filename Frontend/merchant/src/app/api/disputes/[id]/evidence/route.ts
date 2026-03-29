@@ -36,7 +36,7 @@ export async function POST(
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/disputes/:id/evidence", operation: "POST" });
+    handleApiError(error, { endpoint: "/disputes/:id/evidence", operation: "POST" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

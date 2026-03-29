@@ -36,7 +36,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/policies/:type/publish",
+      endpoint: "/merchant/policies/:type/publish",
       operation: "POST",
     });
     return NextResponse.json(

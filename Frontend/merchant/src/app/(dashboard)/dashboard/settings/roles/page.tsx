@@ -43,7 +43,7 @@ export default function RolesSettingsPage() {
   const fetchRoles = async () => {
     setIsLoading(true);
     try {
-      const data = await apiJson<Role[]>("/api/settings/roles");
+      const data = await apiJson<Role[]>("/settings/roles");
       setRoles(data || []);
     } catch (err: unknown) {
       const _errMsg = err instanceof Error ? err.message : String(err);
@@ -63,7 +63,7 @@ export default function RolesSettingsPage() {
 
     setIsSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/settings/roles", {
+      await apiJson<{ success: boolean }>("/settings/roles", {
         method: "POST",
         body: JSON.stringify(currentRole),
       });

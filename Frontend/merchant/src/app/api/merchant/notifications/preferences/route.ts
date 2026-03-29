@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/notifications/preferences", operation: "GET" });
+    handleApiError(error, { endpoint: "/merchant/notifications/preferences", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/notifications/preferences", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/notifications/preferences", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

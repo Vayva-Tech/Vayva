@@ -43,7 +43,7 @@ export function AddOnsSection() {
   const fetchAddOns = async () => {
     try {
       setLoading(true);
-      const res = await apiJson<AddOnsResponse>("/api/merchant/addons");
+      const res = await apiJson<AddOnsResponse>("/merchant/addons");
       setAddOns(res.addOns || []);
     } catch (e: any) {
       const _errMsg = e instanceof Error ? e.message : String(e);
@@ -56,7 +56,7 @@ export function AddOnsSection() {
   const handlePurchase = async (extensionId: string) => {
     setActionId(extensionId);
     try {
-      await apiJson<{ success: boolean }>("/api/merchant/addons", {
+      await apiJson<{ success: boolean }>("/merchant/addons", {
         method: "POST",
         body: JSON.stringify({ extensionId }),
       });
@@ -74,7 +74,7 @@ export function AddOnsSection() {
     setActionId(extensionId);
     try {
       const data = await apiJson<{ message?: string }>(
-        "/api/merchant/addons/cancel",
+        "/merchant/addons/cancel",
         {
           method: "POST",
           body: JSON.stringify({ extensionId }),
@@ -93,7 +93,7 @@ export function AddOnsSection() {
   const handleRenew = async (extensionId: string) => {
     setActionId(extensionId);
     try {
-      await apiJson<{ success: boolean }>("/api/merchant/addons/renew", {
+      await apiJson<{ success: boolean }>("/merchant/addons/renew", {
         method: "POST",
         body: JSON.stringify({ extensionId }),
       });

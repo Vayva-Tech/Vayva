@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/seller/ai/whatsapp-settings", operation: "GET" });
+    handleApiError(error, { endpoint: "/seller/ai/whatsapp-settings", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/seller/ai/whatsapp-settings", operation: "PUT" });
+    handleApiError(error, { endpoint: "/seller/ai/whatsapp-settings", operation: "PUT" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

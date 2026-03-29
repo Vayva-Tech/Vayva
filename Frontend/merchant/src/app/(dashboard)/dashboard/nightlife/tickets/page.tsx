@@ -225,30 +225,30 @@ export default function TicketsPage() {
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white border-b border-gray-200">
+              <thead className="bg-white border-b border-gray-200" scope="col">
                 <tr>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Order
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Customer
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Event
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Ticket
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Qty
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Amount
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Status
                   </th>
-                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase">
+                  <th className="text-left p-4 text-xs font-bold text-gray-500 uppercase" scope="col">
                     Actions
                   </th>
                 </tr>

@@ -170,7 +170,7 @@ export function CampaignBuilder() {
   const fetchCampaigns = async () => {
     try {
       const data = await apiJson<{ campaigns?: Campaign[] }>(
-        "/api/merchant/marketing/campaigns",
+        "/merchant/marketing/campaigns",
       );
       setCampaigns(data.campaigns ?? []);
     } catch (error: unknown) {
@@ -352,7 +352,7 @@ export function CampaignBuilder() {
         });
       } else {
         // Create new
-        await apiJson("/api/merchant/marketing/campaigns", {
+        await apiJson("/merchant/marketing/campaigns", {
           method: "POST",
           body: JSON.stringify({
             name: selectedCampaign.name,

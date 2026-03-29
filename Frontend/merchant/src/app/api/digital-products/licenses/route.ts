@@ -68,7 +68,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ licenses });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/digital-products/licenses",
+      endpoint: "/digital-products/licenses",
       operation: "FETCH_LICENSES",
     });
     return NextResponse.json(

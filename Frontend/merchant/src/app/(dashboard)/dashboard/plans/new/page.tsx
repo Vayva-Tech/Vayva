@@ -29,7 +29,7 @@ export default function NewPlanPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch("/api/saas/plans", {
+      const res = await fetch("/saas/plans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

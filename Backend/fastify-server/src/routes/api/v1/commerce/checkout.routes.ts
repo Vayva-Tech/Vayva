@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { CheckoutService } from '../../../services/commerce/checkout.service';
+import { CheckoutService } from '../../../../services/commerce/checkout.service';
 
 const checkoutService = new CheckoutService();
 

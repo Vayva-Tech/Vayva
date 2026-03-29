@@ -41,14 +41,14 @@ export async function GET(request: NextRequest) {
         stages: string[];
       };
       error?: string;
-    }>(`${buildBackendUrl("/api/realestate/leads/pipeline")}?${queryParams.toString()}`, {
+    }>(`${buildBackendUrl("/realestate/leads/pipeline")}?${queryParams.toString()}`, {
       headers: auth.headers,
     });
 
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/realestate/leads/pipeline",
+      endpoint: "/realestate/leads/pipeline",
       operation: "GET_LEAD_PIPELINE",
       storeId,
     });

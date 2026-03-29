@@ -77,16 +77,16 @@ export default function TravelFlightsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Flight</th>
-                  <th className="py-3 px-4 font-medium">Route</th>
-                  <th className="py-3 px-4 font-medium">Departure</th>
-                  <th className="py-3 px-4 font-medium">Arrival</th>
-                  <th className="py-3 px-4 font-medium">Seats</th>
-                  <th className="py-3 px-4 font-medium">Price</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Flight</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Route</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Departure</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Arrival</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Seats</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Price</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/credits/balance",
+      endpoint: "/credits/balance",
       operation: "GET_CREDITS_BALANCE",
     });
     return NextResponse.json(

@@ -2,6 +2,7 @@
 
 import { IndustryDashboardRouter } from "@/components/dashboard/IndustryDashboardRouter";
 import { PageEmpty } from "@/components/layout/PageEmpty";
+import { KpiGridSkeleton } from "@/components/dashboard/KpiSkeleton";
 import { useAuth } from "@/context/AuthContext";
 import { useStore } from "@/context/StoreContext";
 import { ChartLine } from "@phosphor-icons/react/ssr";
@@ -11,7 +12,34 @@ export default function DashboardPage() {
   const { user, merchant, isLoading } = useAuth();
   const { store } = useStore();
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen space-y-6 pb-10">
+        {/* Header skeleton */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2" />
+            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+          </div>
+        </div>
+        
+        {/* KPI skeletons */}
+        <KpiGridSkeleton count={4} size="md" />
+        
+        {/* Main content skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="h-96 bg-gray-100 rounded-2xl animate-pulse" />
+            <div className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
+          </div>
+          <div className="space-y-4">
+            <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
+            <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Use type guard for industry slug - fallback to 'retail' as default
   const industry = merchant?.industrySlug || store?.industrySlug || "retail";

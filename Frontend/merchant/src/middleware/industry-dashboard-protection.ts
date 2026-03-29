@@ -31,7 +31,7 @@ async function getUserTier(request: NextRequest): Promise<PlanTier> {
   // This is a placeholder - in reality, you'd get this from your auth system
   // For now, we'll assume FREE tier to demonstrate the blocking
   const tierHeader = request.headers.get('x-user-tier');
-  return (tierHeader?.toUpperCase() as PlanTier) || 'FREE';
+  return (tierHeader?.toUpperCase() as PlanTier) || 'STARTER';
 }
 
 /**

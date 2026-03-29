@@ -32,7 +32,7 @@ export default function ProfessionalServicesResourcesPage() {
 
   const fetchResources = async () => {
     try {
-      const response = await apiJson<{ data: Resource[] }>("/api/professional-services/resources?limit=200");
+      const response = await apiJson<{ data: Resource[] }>("/professional-services/resources?limit=200");
       setResources(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch resources", error);

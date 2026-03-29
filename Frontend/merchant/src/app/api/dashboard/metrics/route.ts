@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
       const queryParams = new URLSearchParams();
       if (metric) queryParams.set("metric", metric);
-      const result = await apiJson(`${buildBackendUrl("/api/dashboard/metrics")}${queryParams.size ? `?${queryParams.toString()}` : ""}`,
+      const result = await apiJson(`${buildBackendUrl("/dashboard/metrics")}${queryParams.size ? `?${queryParams.toString()}` : ""}`,
       {
           headers: auth.headers,
         }
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/dashboard/metrics", operation: "GET" });
+    handleApiError(error, { endpoint: "/dashboard/metrics", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

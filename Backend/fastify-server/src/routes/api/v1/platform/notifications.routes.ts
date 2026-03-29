@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { NotificationsService } from '../../../services/platform/notifications.service';
+import { NotificationsService } from '../../../../services/platform/notifications.service';
 
 const notificationsService = new NotificationsService();
 

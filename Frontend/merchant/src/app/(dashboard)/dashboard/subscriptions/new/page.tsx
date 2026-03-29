@@ -30,8 +30,8 @@ export default function NewSubscriptionPage() {
     const load = async () => {
       try {
         const [tRes, pRes] = await Promise.all([
-          fetch("/api/saas/tenants"),
-          fetch("/api/saas/plans?status=active"),
+          fetch("/saas/tenants"),
+          fetch("/saas/plans?status=active"),
         ]);
         const tenantsJson = await tRes.json();
         const plansJson = await pRes.json();
@@ -54,7 +54,7 @@ export default function NewSubscriptionPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/saas/subscriptions", {
+      const res = await fetch("/saas/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

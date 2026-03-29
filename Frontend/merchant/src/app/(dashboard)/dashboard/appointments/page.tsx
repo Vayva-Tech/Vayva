@@ -76,9 +76,9 @@ export default function AppointmentsPage() {
     try {
       setLoading(true);
       const [apptsData, servicesData, customersData] = await Promise.all([
-        apiJson<Appointment[]>("/api/appointments"),
-        apiJson<ServiceOption[]>("/api/services?active=true"),
-        apiJson<CustomerOption[]>("/api/customers?limit=100"),
+        apiJson<Appointment[]>("/appointments"),
+        apiJson<ServiceOption[]>("/services?active=true"),
+        apiJson<CustomerOption[]>("/customers?limit=100"),
       ]);
       setAppointments(apptsData || []);
       setServices(servicesData || []);
@@ -122,7 +122,7 @@ export default function AppointmentsPage() {
         });
         toast.success("Appointment updated");
       } else {
-        await apiJson("/api/appointments", {
+        await apiJson("/appointments", {
           method: "POST",
           body: JSON.stringify(payload),
         });
@@ -389,13 +389,13 @@ export default function AppointmentsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Customer</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Service</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Date & Time</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

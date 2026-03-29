@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id?: string }> }) {
   try {
     const auth = await buildBackendAuthHeaders(request);
@@ -30,7 +29,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ success: true, order });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/kitchen/orders/[id]/status",
+      endpoint: "/kitchen/orders/[id]/status",
       operation: "UPDATE_ORDER_STATUS",
     });
     return NextResponse.json(

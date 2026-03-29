@@ -64,7 +64,7 @@ export function TrialCountdownBanner() {
     const fetchSubscriptionStatus = async () => {
       try {
         setIsLoading(true);
-        const data = await apiJson<SubscriptionStatus>("/api/merchant/billing/status");
+        const data = await apiJson<SubscriptionStatus>("/merchant/billing/status");
         
         if (data?.subscription) {
           setSubscription(data.subscription);

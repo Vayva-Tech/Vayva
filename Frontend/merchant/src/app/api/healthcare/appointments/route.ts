@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
         },
       });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/healthcare/appointments", operation: "GET" });
+    handleApiError(error, { endpoint: "/healthcare/appointments", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

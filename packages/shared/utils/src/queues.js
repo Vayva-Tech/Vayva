@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.QUEUES = void 0;
+exports.QUEUES = {
+    PAYMENTS_WEBHOOKS: "payments.webhooks",
+    WHATSAPP_INBOUND: "whatsapp.inbound",
+    WHATSAPP_OUTBOUND: "whatsapp.outbound",
+    AGENT_ACTIONS: "agent.actions",
+    DELIVERY_SCHEDULER: "delivery.scheduler",
+    CHINA_CATALOG_SYNC: "china.catalog.sync",
+    CART_RECOVERY_SCHEDULER: "cart.recovery.scheduler",
+    CALENDAR_SYNC_SCHEDULER: "calendar.sync.scheduler",
+    MANIFEST_SYNC: "manifest.sync",
+    MAINTENANCE_CLEANUP: "maintenance.cleanup",
+    THUMBNAIL_GENERATION: "thumbnail.generation",
+    HEALTH_SCORE_CALCULATION: "health.score.calculation",
+    NPS_SURVEY: "nps.survey",
+    PLAYBOOK_EXECUTION: "playbook.execution",
+};
+//# sourceMappingURL=queues.js.map

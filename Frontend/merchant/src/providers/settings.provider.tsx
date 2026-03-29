@@ -117,7 +117,7 @@ const DEFAULT_SETTINGS: SettingsData = {
 // API functions
 async function fetchSettings(): Promise<SettingsData> {
   try {
-    const response = await fetch('/api/settings');
+    const response = await fetch('/settings');
     if (!response.ok) {
       throw new Error('Failed to fetch settings');
     }
@@ -131,7 +131,7 @@ async function fetchSettings(): Promise<SettingsData> {
 
 async function saveSettings(data: Partial<SettingsData>): Promise<SettingsData> {
   try {
-    const response = await fetch('/api/settings', {
+    const response = await fetch('/settings', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

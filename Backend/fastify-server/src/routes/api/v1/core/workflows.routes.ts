@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { WorkflowService } from '../../../services/core/workflow.service';
+import { WorkflowService } from '../../../../services/core/workflow.service';
 
 const workflowService = new WorkflowService();
 

@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/auth/pin/setup",
+      endpoint: "/auth/pin/setup",
       operation: "SETUP_PIN",
     });
     return NextResponse.json(

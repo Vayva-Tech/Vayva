@@ -146,7 +146,7 @@ export function UsageDashboard() {
   const fetchUsage = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<UsageData>("/api/merchant/billing/usage");
+      const response = await apiJson<UsageData>("/merchant/billing/usage");
       setData(response);
     } catch (error) {
       console.error("[USAGE_DASHBOARD_ERROR]", error);

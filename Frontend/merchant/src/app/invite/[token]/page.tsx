@@ -52,7 +52,7 @@ export default function AcceptInvitePage({
     setSubmitting(true);
     setError(null);
     try {
-      await apiJson<{ success: boolean }>("/api/team/invites/accept", {
+      await apiJson<{ success: boolean }>("/team/invites/accept", {
         method: "POST",
         body: JSON.stringify({
           token,

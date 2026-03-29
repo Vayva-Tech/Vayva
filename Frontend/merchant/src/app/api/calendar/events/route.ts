@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/calendar/events",
+      endpoint: "/calendar/events",
       operation: "GET_CALENDAR_EVENTS",
     });
     return NextResponse.json(

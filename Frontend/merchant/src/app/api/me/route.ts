@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       success: boolean;
       data?: any;
       error?: string;
-    }>(buildBackendUrl("/api/auth/merchant/me"), { headers: auth.headers, cache: "no-store" });
+    }>(buildBackendUrl("/auth/merchant/me"), { headers: auth.headers, cache: "no-store" });
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to fetch merchant data');
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/me", operation: "GET" });
+    handleApiError(error, { endpoint: "/me", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

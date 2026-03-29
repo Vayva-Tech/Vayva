@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { CustomersService } from '../../../services/core/customers.service';
+import { CustomersService } from '../../../../services/core/customers.service';
 
 const customersService = new CustomersService();
 

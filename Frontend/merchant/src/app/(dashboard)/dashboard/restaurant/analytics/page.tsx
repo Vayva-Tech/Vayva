@@ -30,7 +30,7 @@ export default function RestaurantAnalyticsPage() {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await apiJson<{ data: AnalyticsMetrics }>("/api/restaurant/analytics");
+      const response = await apiJson<{ data: AnalyticsMetrics }>("/restaurant/analytics");
       setAnalytics(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch restaurant analytics", error);

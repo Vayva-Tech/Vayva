@@ -55,7 +55,7 @@ export const useCheckout = (options: UseCheckoutOptions) => {
         // In live mode, this must hit /api/checkout/initialize
         try {
           const data = await apiJson<CheckoutResponse>(
-            "/api/checkout/initialize",
+            "/checkout/initialize",
             {
               method: "POST",
               body: JSON.stringify({ items: cart, total, method: "paystack" }),

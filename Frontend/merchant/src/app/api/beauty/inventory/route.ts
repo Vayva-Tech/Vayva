@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/beauty/inventory",
+      endpoint: "/beauty/inventory",
       operation: "GET_INVENTORY",
     });
     return NextResponse.json({ error: "Failed to fetch inventory" }, { status: 500 });
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: result.success ? 201 : 400 });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/beauty/inventory",
+      endpoint: "/beauty/inventory",
       operation: "CREATE_INVENTORY_ITEM",
     });
     return NextResponse.json({ error: "Failed to create inventory item" }, { status: 500 });

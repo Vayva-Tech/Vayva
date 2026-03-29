@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { StorageService } from '../../../services/platform/storage.service';
+import { StorageService } from '../../../../services/platform/storage.service';
 
 const storageService = new StorageService();
 

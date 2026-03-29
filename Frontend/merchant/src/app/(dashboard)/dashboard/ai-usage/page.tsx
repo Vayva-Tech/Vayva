@@ -54,7 +54,7 @@ export default function AiUsagePage() {
   async function loadBalance() {
     setLoading(true);
     try {
-      const res = await fetch("/api/credits/balance", { cache: "no-store" });
+      const res = await fetch("/credits/balance", { cache: "no-store" });
       const data = (await res.json().catch(() => null)) as CreditBalance | null;
       if (!res.ok || !data) throw new Error("Failed to load AI balance");
       setBalance(data);
@@ -66,7 +66,7 @@ export default function AiUsagePage() {
   async function buyPack(packId: PackId) {
     setBusyPack(packId);
     try {
-      const res = await fetch("/api/ai/credits/topup/init", {
+      const res = await fetch("/ai/credits/topup/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packId }),
@@ -86,7 +86,7 @@ export default function AiUsagePage() {
   async function verifyTopup(reference: string) {
     setVerifying(true);
     try {
-      const res = await fetch("/api/ai/credits/topup/verify", {
+      const res = await fetch("/ai/credits/topup/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reference }),

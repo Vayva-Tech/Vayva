@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     return res;
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/socials/instagram/connect",
+      endpoint: "/socials/instagram/connect",
       operation: "INSTAGRAM_CONNECT_GET",
     });
     return NextResponse.json(
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/socials/instagram/connect",
+      endpoint: "/socials/instagram/connect",
       operation: "CONNECT_INSTAGRAM",
     });
     return NextResponse.json(

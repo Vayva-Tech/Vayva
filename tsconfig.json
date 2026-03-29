@@ -1,155 +1,88 @@
 {
-    "$schema": "https://json.schemastore.org/tsconfig",
-    "compilerOptions": {
-        "target": "ES2020",
-        "lib": [
-            "DOM",
-            "ES2020"
-        ],
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "skipLibCheck": true,
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "jsx": "react-jsx",
-        "baseUrl": ".",
-        "paths": {
-            "@vayva/templates": [
-                "packages/shared/templates/src/index.ts"
-            ],
-            "@vayva/templates/*": [
-                "packages/shared/templates/src/*"
-            ],
-            "@vayva/db": [
-                "infra/db/src/client.ts"
-            ],
-            "@vayva/payments": [
-                "packages/domain/payments/src/index.ts"
-            ],
-            "@vayva/payments/*": [
-                "packages/domain/payments/src/*"
-            ],
-            "@vayva/affiliate": [
-                "packages/affiliate/src/index.ts"
-            ],
-            "@vayva/affiliate/*": [
-                "packages/affiliate/src/*"
-            ],
-            "@vayva/extensions": [
-                "packages/shared/extensions/src/index.ts"
-            ],
-            "@vayva/extensions/*": [
-                "packages/shared/extensions/src/*"
-            ],
-            "@vayva/shared": [
-                "packages/shared/utils/src/index.ts"
-            ],
-            "@vayva/shared/*": [
-                "packages/shared/utils/src/*"
-            ],
-            "@vayva/ui": [
-                "packages/ui/src/index.ts"
-            ],
-            "@vayva/ui/*": [
-                "packages/ui/src/*"
-            ],
-            "@vayva/emails": [
-                "packages/shared/emails/src/index.ts"
-            ],
-            "@vayva/emails/*": [
-                "packages/shared/emails/src/*"
-            ],
-            "@vayva/education/*": [
-                "packages/shared/education/src/*"
-            ],
-            "@vayva/analytics/*": [
-                "packages/domain/analytics/src/*"
-            ],
-            "@vayva/redis": [
-                "packages/infra/redis-adapter/src/index.ts"
-            ],
-            "@/components/marketing/*": [
-                "Frontend/merchant/src/components/marketing/*",
-                "Frontend/marketing/src/components/marketing/*"
-            ],
-            "@/lib/*": [
-                "Frontend/merchant/src/lib/*",
-                "Frontend/marketing/src/lib/*"
-            ],
-            "@/components/seo/*": [
-                "Frontend/marketing/src/components/seo/*"
-            ],
-            "@/components/layout/*": [
-                "Frontend/marketing/src/components/layout/*",
-                "Frontend/merchant/src/components/layout/*"
-            ],
-            "@/components/*": [
-                "Frontend/merchant/src/components/*",
-                "Frontend/ops-console/src/components/*"
-            ],
-            "@/components/ui/*": [
-                "Frontend/merchant/src/components/ui/*"
-            ],
-            "@/app/*": [
-                "Frontend/merchant/src/app/*"
-            ],
-            "@/hooks/*": [
-                "Frontend/merchant/src/hooks/*",
-                "Frontend/ops-console/src/hooks/*"
-            ],
-            "@/components/ops/*": [
-                "Frontend/ops-console/src/components/ops/*"
-            ],
-            "@/components/shared/*": [
-                "Frontend/ops-console/src/components/shared/*"
-            ],
-            "@/lib/roles": [
-                "Frontend/ops-console/src/lib/roles.ts"
-            ],
-            "@/types/*": [
-                "Frontend/merchant/src/types/*"
-            ],
-            "@/services/*": [
-                "Frontend/merchant/src/services/*",
-                "Frontend/storefront/src/services/*"
-            ],
-            "@/components/blog/*": [
-                "Frontend/marketing/src/components/blog/*"
-            ],
-            "@/context/*": [
-                "Frontend/merchant/src/context/*",
-                "Frontend/marketing/src/context/*"
-            ],
-            "@/components/pricing/*": [
-                "Frontend/marketing/src/components/pricing/*"
-            ],
-            "@/components/analytics/*": [
-                "Frontend/ops-console/src/components/analytics/*",
-                "Frontend/merchant/src/components/analytics/*"
-            ],
-            "@/config/*": [
-                "Frontend/merchant/src/config/*"
-            ],
-            "@/utils/*": [
-                "Frontend/merchant/src/utils/*"
-            ]
-        }
-    },
-    "include": [
-        "frontend/*/src/**/*",
-        "backend/*/src/**/*",
-        "packages/*/src/**/*",
-        "packages/*/*/src/**/*",
-        "platform/*/src/**/*",
-        "tests/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        ".next",
-        "build",
-        "Backend/core-api"
-    ]
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["DOM", "ES2020"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@vayva/templates": ["packages/shared/templates/src/index.ts"],
+      "@vayva/templates/*": ["packages/shared/templates/src/*"],
+      "@vayva/db": ["packages/db/src/client.ts"],
+      "@vayva/payments": ["packages/domain/payments/src/index.ts"],
+      "@vayva/payments/*": ["packages/domain/payments/src/*"],
+      "@vayva/affiliate": ["packages/affiliate/src/index.ts"],
+      "@vayva/affiliate/*": ["packages/affiliate/src/*"],
+      "@vayva/extensions": ["packages/shared/extensions/src/index.ts"],
+      "@vayva/extensions/*": ["packages/shared/extensions/src/*"],
+      "@vayva/shared": ["packages/shared/utils/src/index.ts"],
+      "@vayva/shared/*": ["packages/shared/utils/src/*"],
+      "@vayva/ui": ["packages/ui/src/index.ts"],
+      "@vayva/ui/*": ["packages/ui/src/*"],
+      "@vayva/emails": ["packages/shared/emails/src/index.ts"],
+      "@vayva/emails/*": ["packages/shared/emails/src/*"],
+      "@vayva/education/*": ["packages/shared/education/src/*"],
+      "@vayva/analytics/*": ["packages/domain/analytics/src/*"],
+      "@vayva/redis": ["packages/infra/redis-adapter/src/index.ts"],
+      "@/components/marketing/*": [
+        "Frontend/merchant/src/components/marketing/*",
+        "Frontend/marketing/src/components/marketing/*"
+      ],
+      "@/lib/*": [
+        "Frontend/merchant/src/lib/*",
+        "Frontend/marketing/src/lib/*"
+      ],
+      "@/components/seo/*": ["Frontend/marketing/src/components/seo/*"],
+      "@/components/layout/*": [
+        "Frontend/marketing/src/components/layout/*",
+        "Frontend/merchant/src/components/layout/*"
+      ],
+      "@/components/*": [
+        "Frontend/merchant/src/components/*",
+        "Frontend/ops-console/src/components/*"
+      ],
+      "@/components/ui/*": ["Frontend/merchant/src/components/ui/*"],
+      "@/app/*": ["Frontend/merchant/src/app/*"],
+      "@/hooks/*": [
+        "Frontend/merchant/src/hooks/*",
+        "Frontend/ops-console/src/hooks/*"
+      ],
+      "@/components/ops/*": ["Frontend/ops-console/src/components/ops/*"],
+      "@/components/shared/*": ["Frontend/ops-console/src/components/shared/*"],
+      "@/lib/roles": ["Frontend/ops-console/src/lib/roles.ts"],
+      "@/types/*": ["Frontend/merchant/src/types/*"],
+      "@/services/*": [
+        "Frontend/merchant/src/services/*",
+        "Frontend/storefront/src/services/*"
+      ],
+      "@/components/blog/*": ["Frontend/marketing/src/components/blog/*"],
+      "@/context/*": [
+        "Frontend/merchant/src/context/*",
+        "Frontend/marketing/src/context/*"
+      ],
+      "@/components/pricing/*": ["Frontend/marketing/src/components/pricing/*"],
+      "@/components/analytics/*": [
+        "Frontend/ops-console/src/components/analytics/*",
+        "Frontend/merchant/src/components/analytics/*"
+      ],
+      "@/config/*": ["Frontend/merchant/src/config/*"],
+      "@/utils/*": ["Frontend/merchant/src/utils/*"]
+    }
+  },
+  "include": [
+    "frontend/*/src/**/*",
+    "backend/*/src/**/*",
+    "packages/*/src/**/*",
+    "packages/*/*/src/**/*",
+    "platform/*/src/**/*",
+    "tests/**/*"
+  ],
+  "exclude": ["node_modules", "dist", ".next", "build", "Backend/core-api"]
 }

@@ -298,16 +298,16 @@ export default function FraudDashboardPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Order</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Customer</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Amount</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Risk Score</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Level</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Rules</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Order</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Customer</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Amount</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Risk Score</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Level</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Rules</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/healthcare/patients",
+      endpoint: "/healthcare/patients",
       operation: "GET_PATIENTS",
     });
     return NextResponse.json({ error: "Failed to fetch patients" }, { status: 500 });

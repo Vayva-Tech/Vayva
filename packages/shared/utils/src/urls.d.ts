@@ -1,0 +1,35 @@
+export declare const urls: {
+    marketingBase: () => string;
+    merchantBase: () => string;
+    opsBase: () => string;
+    storefrontOrigin: (storeSlug: string) => string;
+    storefrontRoot: () => string;
+    apiBase: () => string;
+    paymentsBase: () => string;
+    webstudioBase: () => string;
+    resendBase: () => string;
+    metaBase: () => string;
+    openaiBase: () => string;
+    groqBase: () => string;
+    kwikBase: () => string;
+    kwikStagingBase: () => string;
+    merchantInvite: (token: string) => string;
+    merchantResetPassword: (token: string) => string;
+    merchantDashboard: () => string;
+    storefrontOrder: (storeSlug: string, refCode: string) => string;
+    storefrontOrderConfirmation: (storeSlug: string, refCodeOrId: string) => string;
+    storefrontReceipt: (storeSlug: string, refCode: string) => string;
+    emailLogo: () => string;
+    supportEmail: () => string;
+    noReplyEmail: () => string;
+    officialPhone: () => string;
+    officialWhatsApp: () => string;
+    officialWhatsAppLink: () => string;
+    storefrontHost: (storeSlug: string) => string;
+    merchantInviteUrl: (token: string) => string;
+    merchantResetPasswordUrl: (token: string) => string;
+    storefrontOrderUrl: (storeSlug: string, refCode: string) => string;
+    storefrontOrderConfirmationUrl: (storeSlug: string, refCodeOrId: string) => string;
+    storefrontReceiptUrl: (storeSlug: string, refCode: string) => string;
+};
+//# sourceMappingURL=urls.d.ts.map

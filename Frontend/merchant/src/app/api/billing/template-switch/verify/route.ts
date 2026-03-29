@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/billing/template-switch/verify",
+        endpoint: "/billing/template-switch/verify",
         operation: "VERIFY_TEMPLATE_SWITCH",
         storeId: undefined,
       }

@@ -82,7 +82,7 @@ export default function ToolsManagementPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiJson<ToolsResponse>("/api/merchant/tools");
+      const data = await apiJson<ToolsResponse>("/merchant/tools");
       setTools(data?.tools || []);
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
@@ -98,7 +98,7 @@ export default function ToolsManagementPage() {
       setSaving(toolId);
       setError(null);
 
-      await apiJson("/api/merchant/tools", {
+      await apiJson("/merchant/tools", {
         method: "POST",
         body: JSON.stringify({ toolId, enabled }),
       });

@@ -9,6 +9,8 @@ export * from './healthcare-features';
 export { PatientIntakeFeature } from './patient-intake.feature';
 export { AppointmentSchedulingFeature } from './appointment-scheduling.feature';
 export { EHRManagementFeature } from './ehr-management.feature';
+export { EHRService, createEHRService } from './ehr-system';
+export type { PatientRecord, VitalSign, Medication, Allergy, LabResult, ClinicalNote } from './ehr-system';
 export { TelemedicineFeature } from './telemedicine.feature';
 export { HIPAAComplianceFeature } from './hipaa-compliance.feature';
 export { TreatmentPlanningFeature } from './treatment-planning.feature';

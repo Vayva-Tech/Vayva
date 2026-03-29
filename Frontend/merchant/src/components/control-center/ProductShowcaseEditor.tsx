@@ -82,7 +82,7 @@ export const ProductShowcaseEditor = ({
   const loadShowcaseData = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<ShowcaseResponse>("/api/storefront/showcase");
+      const data = await apiJson<ShowcaseResponse>("/storefront/showcase");
 
       setConfig(data.config);
       setAvailableProducts(data.availableProducts || []);
@@ -111,7 +111,7 @@ export const ProductShowcaseEditor = ({
   const saveConfig = async (newConfig: ShowcaseConfig) => {
     setSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/storefront/showcase", {
+      await apiJson<{ success: boolean }>("/storefront/showcase", {
         method: "PATCH",
         body: JSON.stringify(newConfig),
       });

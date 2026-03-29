@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/assignments", operation: "GET" });
+    handleApiError(error, { endpoint: "/education/assignments", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch assignments" }, { status: 500 });
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/assignments", operation: "POST" });
+    handleApiError(error, { endpoint: "/education/assignments", operation: "POST" });
     return NextResponse.json({ error: "Failed to create assignment" }, { status: 500 });
   }
 }
@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/assignments", operation: "PUT" });
+    handleApiError(error, { endpoint: "/education/assignments", operation: "PUT" });
     return NextResponse.json({ error: "Failed to update assignment" }, { status: 500 });
   }
 }
@@ -89,7 +89,7 @@ export async function DELETE(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/assignments", operation: "DELETE" });
+    handleApiError(error, { endpoint: "/education/assignments", operation: "DELETE" });
     return NextResponse.json({ error: "Failed to delete assignment" }, { status: 500 });
   }
 }

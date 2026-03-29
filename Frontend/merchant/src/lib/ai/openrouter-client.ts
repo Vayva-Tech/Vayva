@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { prisma } from "@vayva/db";
+import { api } from '@/lib/api-client';
 
 // Regex to identify potential emails and phone numbers for stripping
 const PII_REGEX = {
@@ -37,10 +37,12 @@ interface ChatCompletionResponse {
 export class OpenRouterClient {
   context: string;
   apiKey: string | null;
+  referer: string;
 
   constructor(context: string = "MERCHANT") {
     this.context = context;
     this.apiKey = process.env.OPENROUTER_API_KEY || null;
+    this.referer = process.env.OPENROUTER_REFERER || "https://merchant.vayva.ng";
     if (!this.apiKey) {
       logger.warn(
         `[OpenRouterClient] No API key found for ${context} context. AI features will fallback.`,
@@ -71,7 +73,7 @@ export class OpenRouterClient {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
-        "HTTP-Referer": "https://vayva.tech",
+        "HTTP-Referer": this.referer,
         "X-Title": "Vayva Merchant",
       },
       body: JSON.stringify({
@@ -90,20 +92,17 @@ export class OpenRouterClient {
     const data = (await res.json()) as ChatCompletionResponse;
 
     if (options.storeId) {
-      await prisma.aiUsageEvent
-        .create({
-          data: {
-            storeId: options.storeId,
-            model: String(data.model || options.model || ""),
-            inputTokens: data.usage?.prompt_tokens || 0,
-            outputTokens: data.usage?.completion_tokens || 0,
-            toolCallsCount: data.choices?.[0]?.message?.tool_calls?.length || 0,
-            requestId: options.requestId || "",
-            success: true,
-            channel: this.context === "MERCHANT" ? "INAPP" : "WHATSAPP",
-          },
-        })
-        .catch(() => {});
+      // Log usage via backend API (fire and forget)
+      api.post('/ai/usage/log', {
+        storeId: options.storeId,
+        channel: this.context === "MERCHANT" ? "INAPP" : "WHATSAPP",
+        model: String(data.model || options.model || ""),
+        inputTokens: data.usage?.prompt_tokens || 0,
+        outputTokens: data.usage?.completion_tokens || 0,
+        toolCallsCount: data.choices?.[0]?.message?.tool_calls?.length || 0,
+        requestId: options.requestId || "",
+        success: true,
+      }).catch(() => {}); // Ignore logging errors
     }
 
     return data;

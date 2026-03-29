@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/wallet/pin/verify",
+      endpoint: "/wallet/pin/verify",
       operation: "VERIFY_PIN",
     });
     return NextResponse.json(

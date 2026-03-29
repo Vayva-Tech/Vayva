@@ -57,7 +57,7 @@ export function CreateCampaignDialog({ open, onClose, onSuccess }: CreateCampaig
         coverImage: coverImage || undefined,
       };
 
-      const response = await fetch('/api/nonprofit/campaigns', {
+      const response = await fetch('/nonprofit/campaigns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

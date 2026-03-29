@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { PropertyService } from '../../../services/industry/property.service';
+import { PropertyService } from '../../../../services/industry/property.service';
 
 const propertyService = new PropertyService();
 

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { HealthcareService } from '../../../services/industry/healthcare.service';
+import { HealthcareService } from '../../../../services/industry/healthcare.service';
 
 const healthcareService = new HealthcareService();
 

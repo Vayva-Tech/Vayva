@@ -48,9 +48,9 @@ export function AdvancedAnalytics() {
     try {
       // Fetch data from multiple sources
       const [donationsRes, campaignsRes, donorsRes] = await Promise.all([
-        apiJson<{ data: any[] }>("/api/nonprofit/donations"),
-        apiJson<{ data: any[] }>("/api/nonprofit/campaigns"),
-        apiJson<{ data: any[] }>("/api/nonprofit/donors"),
+        apiJson<{ data: any[] }>("/nonprofit/donations"),
+        apiJson<{ data: any[] }>("/nonprofit/campaigns"),
+        apiJson<{ data: any[] }>("/nonprofit/donors"),
       ]);
 
       const donations = donationsRes.data || [];

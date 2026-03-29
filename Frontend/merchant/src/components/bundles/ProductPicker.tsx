@@ -40,7 +40,7 @@ export function ProductPicker({
     try {
       setLoading(true);
       const data = await apiJson<Product[]>(
-        "/api/products/items?status=active",
+        "/products/items?status=active",
       );
       setProducts(data || []);
     } catch (error: unknown) {

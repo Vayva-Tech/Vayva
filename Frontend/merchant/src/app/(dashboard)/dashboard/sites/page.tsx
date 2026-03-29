@@ -45,7 +45,7 @@ export default function SitesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiJson<{ data: SiteOverview }>("/api/sites/overview")
+    apiJson<{ data: SiteOverview }>("/sites/overview")
       .then((res: any) => setSite(res.data))
       .catch(() => toast.error("Failed to load site overview"))
       .finally(() => setLoading(false));

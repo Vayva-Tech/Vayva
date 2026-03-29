@@ -46,7 +46,7 @@ export default function CheckoutPage() {
 
   const fetchCart = async () => {
     try {
-      const data = await apiJson<Cart>("/api/market/cart");
+      const data = await apiJson<Cart>("/market/cart");
       if (!data || data.items.length === 0) {
         router.push("/market/cart");
         return;
@@ -66,7 +66,7 @@ export default function CheckoutPage() {
     }
     try {
       setProcessing(true);
-      const result = await apiJson<{ orderId: string; paymentUrl: string }>("/api/market/orders", {
+      const result = await apiJson<{ orderId: string; paymentUrl: string }>("/market/orders", {
         method: "POST",
         body: JSON.stringify({ shippingAddress: address, paymentMethod: "paystack" }),
       });

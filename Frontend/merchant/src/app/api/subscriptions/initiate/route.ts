@@ -135,7 +135,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/subscriptions/initiate",
+      endpoint: "/subscriptions/initiate",
       operation: "POST",
     });
     return NextResponse.json(

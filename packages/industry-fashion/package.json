@@ -34,10 +34,11 @@
   "exports": {
     ".": "./src/index.ts",
     "./engine": "./src/fashion.engine.ts",
+    "./dashboard": "./src/dashboard-config.ts",
     "./components": "./src/components/index.ts",
     "./features": "./src/features/index.ts",
     "./services": "./src/services/index.ts",
-    "./dashboard": "./src/dashboard-config.ts",
+    "./widgets": "./src/widgets/index.ts",
     "./types": "./src/types.ts"
   }
 }

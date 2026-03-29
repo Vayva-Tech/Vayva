@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/analytics", operation: "POST" });
+    handleApiError(error, { endpoint: "/embedded/analytics", operation: "POST" });
     return NextResponse.json({ error: "Failed to track analytics event" }, { status: 500 });
   }
 }

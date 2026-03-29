@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
 
 export const dynamic = "force-dynamic";
@@ -14,30 +14,9 @@ export async function GET(
 
     const { id } = await params;
 
-    const order = await prisma.order.findUnique({
-      where: { id },
-      include: {
-        store: { select: { id: true, name: true, logoUrl: true } },
-        customer: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            phone: true,
-          },
-        },
-        items: true,
-        shipments: true,
-        paymentTransactions: { orderBy: { createdAt: "desc" } },
-        orderEvents: { orderBy: { createdAt: "desc" } },
-      },
-    });
-
-    if (!order)
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
-
-    return NextResponse.json({ data: order });
+    const response = await apiClient.get(`/api/v1/admin/orders/${id}`);
+    
+    return NextResponse.json(response);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
     if (

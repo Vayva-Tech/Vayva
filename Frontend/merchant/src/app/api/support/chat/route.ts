@@ -6,7 +6,6 @@ import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { SupportBotService } from "@/lib/support/support-bot.service";
-import { prisma } from "@vayva/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -110,7 +109,7 @@ export async function POST(request: NextRequest) {
             suggestedActions: result.actions,
         });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/support/chat", operation: "POST" });
+    handleApiError(error, { endpoint: "/support/chat", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

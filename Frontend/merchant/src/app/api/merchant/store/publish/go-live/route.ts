@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       readiness?: unknown;
       message?: string;
       error?: string;
-    }>(buildBackendUrl("/api/merchant/store/publish/go-live"), {
+    }>(buildBackendUrl("/merchant/store/publish/go-live"), {
       method: "POST",
       headers: { ...auth.headers },
     });
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/store/publish/go-live",
+      endpoint: "/merchant/store/publish/go-live",
       operation: "POST",
       storeId,
     });

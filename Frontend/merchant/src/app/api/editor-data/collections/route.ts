@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,18 +10,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const storeId = auth.user.storeId;
-    const collections = await prisma.collection?.findMany({
-      where: { storeId },
-      include: {
-        _count: {
-          select: { collectionProducts: true },
-        },
-      },
-      orderBy: { updatedAt: "desc" },
-    }) || [];
 
-    // Format to match EditorCollection interface
-    const formatted = collections.map((col) => ({
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/commerce/collections?storeId=${storeId}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    const formatted = (response.data?.collections || []).map((col: any) => ({
       id: col.id,
       name: col.title,
       slug: col.handle,
@@ -39,7 +34,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/editor-data/collections", operation: "GET" });
+    handleApiError(error, { endpoint: "/editor-data/collections", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

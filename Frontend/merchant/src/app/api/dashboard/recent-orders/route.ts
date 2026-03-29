@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/dashboard/recent-orders",
+      endpoint: "/dashboard/recent-orders",
       operation: "GET_RECENT_ORDERS",
     });
     return NextResponse.json(

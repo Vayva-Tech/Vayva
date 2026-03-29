@@ -3,6 +3,7 @@ import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import useSWR from "swr";
+import { fetcher } from "@/lib/utils";
 import {
   Brain,
   MessageSquare,
@@ -34,7 +35,12 @@ interface AIUsageData {
   };
   usageCategories: { label: string; value: number; color: string }[];
   dailyUsage: { day: string; value: number }[];
-  recentActivity: { action: string; type: string; time: string; credits: number }[];
+  recentActivity: {
+    action: string;
+    type: string;
+    time: string;
+    credits: number;
+  }[];
   whatsappMessages: { used: number; limit: number; plan: string };
   features: {
     whatsapp: { conversationsToday: number; satisfactionRate: string };
@@ -43,15 +49,6 @@ interface AIUsageData {
   };
   resetDate: string;
 }
-
-// ===========================================================================
-// SWR FETCHER
-// ===========================================================================
-
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-});
 
 // ===========================================================================
 // SKELETON COMPONENTS
@@ -93,7 +90,10 @@ function AIHubSkeleton() {
         {/* Feature cards skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse">
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse"
+            >
               <div className="w-12 h-12 bg-gray-200 rounded-xl mb-4" />
               <div className="w-32 h-5 bg-gray-200 rounded mb-2" />
               <div className="w-full h-12 bg-gray-200 rounded mb-4" />
@@ -128,7 +128,10 @@ function AIHubSkeleton() {
           </div>
           <div className="divide-y divide-gray-50">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="px-6 py-3.5 flex items-center justify-between">
+              <div
+                key={i}
+                className="px-6 py-3.5 flex items-center justify-between"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-gray-100 rounded-xl" />
                   <div>
@@ -183,7 +186,13 @@ function CreditProgressRing({
             <stop offset="100%" stopColor="#15803d" />
           </linearGradient>
           <filter id="ringShadow">
-            <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#22C55E" floodOpacity="0.3" />
+            <feDropShadow
+              dx="0"
+              dy="0"
+              stdDeviation="3"
+              floodColor="#22C55E"
+              floodOpacity="0.3"
+            />
           </filter>
         </defs>
         {/* Background track */}
@@ -215,7 +224,9 @@ function CreditProgressRing({
         <span className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none">
           {remaining.toLocaleString()}
         </span>
-        <span className="text-sm font-medium text-gray-400 mt-1">credits remaining</span>
+        <span className="text-sm font-medium text-gray-400 mt-1">
+          credits remaining
+        </span>
         <span className="text-xs font-semibold text-green-600 mt-1.5 bg-green-50 px-2.5 py-0.5 rounded-full">
           {Math.round((1 - percentage) * 100)}% left
         </span>
@@ -240,7 +251,10 @@ function UsageBarChart({ data }: { data: { day: string; value: number }[] }) {
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="flex items-end gap-2" style={{ minWidth: chartWidth + 60 }}>
+      <div
+        className="flex items-end gap-2"
+        style={{ minWidth: chartWidth + 60 }}
+      >
         {/* Y-axis */}
         <div
           className="flex flex-col justify-between text-xs text-gray-400 font-medium pr-2 shrink-0"
@@ -254,9 +268,13 @@ function UsageBarChart({ data }: { data: { day: string; value: number }[] }) {
         {/* Bars */}
         <div className="flex items-end gap-3 flex-1">
           {data.map((item, idx) => {
-            const barHeight = maxVal > 0 ? (item.value / maxVal) * chartHeight : 0;
+            const barHeight =
+              maxVal > 0 ? (item.value / maxVal) * chartHeight : 0;
             return (
-              <div key={idx} className="flex flex-col items-center gap-2 flex-1">
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-2 flex-1"
+              >
                 <span className="text-xs font-bold text-gray-700">
                   {item.value.toLocaleString()}
                 </span>
@@ -265,7 +283,9 @@ function UsageBarChart({ data }: { data: { day: string; value: number }[] }) {
                   style={{ height: Math.max(barHeight, 4) }}
                   title={`${item.day}: ${item.value.toLocaleString()} credits`}
                 />
-                <span className="text-xs font-medium text-gray-500">{item.day}</span>
+                <span className="text-xs font-medium text-gray-500">
+                  {item.day}
+                </span>
               </div>
             );
           })}
@@ -283,9 +303,9 @@ export default function AIHubPage() {
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
 
   const { data, error, isLoading, mutate } = useSWR<AIUsageData>(
-    '/api/ai/usage',
+    "/ai/credits",
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { revalidateOnFocus: false, dedupingInterval: 30000 },
   );
 
   // Error state
@@ -296,8 +316,12 @@ export default function AIHubPage() {
           <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load AI Hub</h3>
-          <p className="text-sm text-gray-500 mb-4">There was a problem fetching your AI usage data. Please try again.</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            Failed to load AI Hub
+          </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            There was a problem fetching your AI usage data. Please try again.
+          </p>
           <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
@@ -325,8 +349,12 @@ export default function AIHubPage() {
               <Brain size={24} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">AI Hub</h1>
-              <p className="text-sm text-gray-500">Your AI-powered commerce assistant</p>
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                AI Hub
+              </h1>
+              <p className="text-sm text-gray-500">
+                Your AI-powered commerce assistant
+              </p>
             </div>
           </div>
           <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -334,7 +362,9 @@ export default function AIHubPage() {
               <Brain className="w-7 h-7 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Hub</h3>
-            <p className="text-sm text-gray-500 max-w-sm mb-4">Start using AI features to see usage statistics here</p>
+            <p className="text-sm text-gray-500 max-w-sm mb-4">
+              Start using AI features to see usage statistics here
+            </p>
           </div>
         </div>
       </div>
@@ -361,8 +391,12 @@ export default function AIHubPage() {
               <Brain size={24} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">AI Hub</h1>
-              <p className="text-sm text-gray-500">Your AI-powered commerce assistant</p>
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                AI Hub
+              </h1>
+              <p className="text-sm text-gray-500">
+                Your AI-powered commerce assistant
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -377,7 +411,9 @@ export default function AIHubPage() {
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               {WHATSAPP_MESSAGES.plan} Plan
             </span>
-            <span className="text-xs text-gray-400 font-medium">Resets {data.resetDate ?? "next cycle"}</span>
+            <span className="text-xs text-gray-400 font-medium">
+              Resets {data.resetDate ?? "next cycle"}
+            </span>
           </div>
         </div>
 
@@ -388,10 +424,12 @@ export default function AIHubPage() {
           <div className="p-6 lg:p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Credit Usage</h2>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Credit Usage
+                </h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {CREDIT_USED.toLocaleString()} of {CREDIT_TOTAL.toLocaleString()} credits used
-                  this cycle
+                  {CREDIT_USED.toLocaleString()} of{" "}
+                  {CREDIT_TOTAL.toLocaleString()} credits used this cycle
                 </p>
               </div>
               <Button className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/25 transition-all">
@@ -402,24 +440,35 @@ export default function AIHubPage() {
 
             <div className="flex flex-col lg:flex-row items-center gap-10">
               {/* Ring */}
-              <CreditProgressRing used={CREDIT_USED} total={CREDIT_TOTAL} size={210} />
+              <CreditProgressRing
+                used={CREDIT_USED}
+                total={CREDIT_TOTAL}
+                size={210}
+              />
 
               {/* Breakdown bars */}
               <div className="flex-1 w-full space-y-5">
                 {USAGE_CATEGORIES.map((cat, idx) => {
                   const pct =
-                    CREDIT_USED > 0 ? Math.round((cat.value / CREDIT_USED) * 100) : 0;
-                  const barPct = CREDIT_TOTAL > 0 ? (cat.value / CREDIT_TOTAL) * 100 : 0;
+                    CREDIT_USED > 0
+                      ? Math.round((cat.value / CREDIT_USED) * 100)
+                      : 0;
+                  const barPct =
+                    CREDIT_TOTAL > 0 ? (cat.value / CREDIT_TOTAL) * 100 : 0;
 
                   return (
                     <div key={idx}>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-sm font-medium text-gray-700">{cat.label}</span>
+                        <span className="text-sm font-medium text-gray-700">
+                          {cat.label}
+                        </span>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-gray-900">
                             {cat.value.toLocaleString()}
                           </span>
-                          <span className="text-xs text-gray-400 font-medium">({pct}%)</span>
+                          <span className="text-xs text-gray-400 font-medium">
+                            ({pct}%)
+                          </span>
                         </div>
                       </div>
                       <div className="h-2.5 bg-white rounded-full overflow-hidden shadow-inner">
@@ -438,16 +487,19 @@ export default function AIHubPage() {
           {/* Credit rates footer */}
           <div className="bg-white/60 backdrop-blur-sm border-t border-green-100 px-6 lg:px-8 py-3 flex flex-wrap items-center gap-6 text-xs text-gray-500">
             <span>
-              <strong className="text-gray-700">1</strong> credit / WhatsApp reply
+              <strong className="text-gray-700">1</strong> credit / WhatsApp
+              reply
             </span>
             <span>
-              <strong className="text-gray-700">12</strong> credits / product description
+              <strong className="text-gray-700">12</strong> credits / product
+              description
             </span>
             <span>
               <strong className="text-gray-700">3</strong> credits / smart reply
             </span>
             <span>
-              <strong className="text-gray-700">25</strong> credits / analytics forecast
+              <strong className="text-gray-700">25</strong> credits / analytics
+              forecast
             </span>
           </div>
         </div>
@@ -476,19 +528,27 @@ export default function AIHubPage() {
                 />
               </Button>
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">WhatsApp AI Agent</h3>
+            <h3 className="text-base font-bold text-gray-900 mb-1">
+              WhatsApp AI Agent
+            </h3>
             <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-              AI handles customer inquiries on WhatsApp automatically, from order tracking to product
-              questions.
+              AI handles customer inquiries on WhatsApp automatically, from
+              order tracking to product questions.
             </p>
             <div className="mt-auto space-y-3">
               <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5">
-                <span className="text-xs text-gray-500">Conversations today</span>
-                <span className="text-sm font-extrabold text-gray-900">{features?.whatsapp?.conversationsToday ?? 0}</span>
+                <span className="text-xs text-gray-500">
+                  Conversations today
+                </span>
+                <span className="text-sm font-extrabold text-gray-900">
+                  {features?.whatsapp?.conversationsToday ?? 0}
+                </span>
               </div>
               <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5">
                 <span className="text-xs text-gray-500">Satisfaction rate</span>
-                <span className="text-sm font-extrabold text-green-600">{features?.whatsapp?.satisfactionRate ?? "--"}</span>
+                <span className="text-sm font-extrabold text-green-600">
+                  {features?.whatsapp?.satisfactionRate ?? "--"}
+                </span>
               </div>
             </div>
           </div>
@@ -500,14 +560,19 @@ export default function AIHubPage() {
                 <FileText size={22} className="text-emerald-600" />
               </div>
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">Smart Product Writer</h3>
+            <h3 className="text-base font-bold text-gray-900 mb-1">
+              Smart Product Writer
+            </h3>
             <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-              Auto-generate compelling product descriptions optimized for Nigerian shoppers and SEO.
+              Auto-generate compelling product descriptions optimized for
+              Nigerian shoppers and SEO.
             </p>
             <div className="mt-auto">
               <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5 mb-3">
                 <span className="text-xs text-gray-500">Products enhanced</span>
-                <span className="text-sm font-extrabold text-gray-900">{features?.productWriter?.productsEnhanced ?? 0}</span>
+                <span className="text-sm font-extrabold text-gray-900">
+                  {features?.productWriter?.productsEnhanced ?? 0}
+                </span>
               </div>
               <Button className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 transition-all">
                 <Sparkles size={16} />
@@ -528,19 +593,27 @@ export default function AIHubPage() {
                 <TrendingUp size={22} className="text-teal-600" />
               </div>
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">Predictive Analytics</h3>
+            <h3 className="text-base font-bold text-gray-900 mb-1">
+              Predictive Analytics
+            </h3>
             <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-              AI-powered demand forecasting to optimize inventory for peak seasons like Owambe and
-              Detty December.
+              AI-powered demand forecasting to optimize inventory for peak
+              seasons like Owambe and Detty December.
             </p>
             <div className="mt-auto space-y-3">
               <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5">
-                <span className="text-xs text-gray-500">Forecasts generated</span>
-                <span className="text-sm font-extrabold text-gray-900">{features?.predictive?.forecastsGenerated ?? 0}</span>
+                <span className="text-xs text-gray-500">
+                  Forecasts generated
+                </span>
+                <span className="text-sm font-extrabold text-gray-900">
+                  {features?.predictive?.forecastsGenerated ?? 0}
+                </span>
               </div>
               <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5">
                 <span className="text-xs text-gray-500">Accuracy rate</span>
-                <span className="text-sm font-extrabold text-green-600">{features?.predictive?.accuracyRate ?? "--"}</span>
+                <span className="text-sm font-extrabold text-green-600">
+                  {features?.predictive?.accuracyRate ?? "--"}
+                </span>
               </div>
             </div>
           </div>
@@ -554,7 +627,9 @@ export default function AIHubPage() {
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-base font-bold text-gray-900">Usage History</h2>
+                <h2 className="text-base font-bold text-gray-900">
+                  Usage History
+                </h2>
                 <p className="text-sm text-gray-500 mt-0.5">
                   Daily credit consumption — last 7 days
                 </p>
@@ -564,7 +639,8 @@ export default function AIHubPage() {
                 <span>
                   Avg:{" "}
                   {Math.round(
-                    DAILY_USAGE.reduce((s, d) => s + d.value, 0) / DAILY_USAGE.length
+                    DAILY_USAGE.reduce((s, d) => s + d.value, 0) /
+                      DAILY_USAGE.length,
                   ).toLocaleString()}{" "}
                   / day
                 </span>
@@ -580,7 +656,9 @@ export default function AIHubPage() {
                 <MessageSquare size={18} className="text-green-600" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-gray-900">Message Limit</h2>
+                <h2 className="text-base font-bold text-gray-900">
+                  Message Limit
+                </h2>
                 <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
                   WhatsApp — {WHATSAPP_MESSAGES.plan} Plan
                 </p>
@@ -597,7 +675,9 @@ export default function AIHubPage() {
                   / {WHATSAPP_MESSAGES.limit.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">messages used this month</p>
+              <p className="text-xs text-gray-500 mt-1">
+                messages used this month
+              </p>
             </div>
 
             {/* Progress bar */}
@@ -623,7 +703,9 @@ export default function AIHubPage() {
                   Remaining
                 </p>
                 <p className="text-lg font-extrabold text-green-600">
-                  {(WHATSAPP_MESSAGES.limit - WHATSAPP_MESSAGES.used).toLocaleString()}
+                  {(
+                    WHATSAPP_MESSAGES.limit - WHATSAPP_MESSAGES.used
+                  ).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -631,8 +713,11 @@ export default function AIHubPage() {
             {/* Plan comparison hint */}
             <div className="mt-4 bg-green-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-600">
-                <span className="font-semibold text-gray-700">Starter:</span> 342/500 &middot;{" "}
-                <span className="font-bold text-green-700">Pro: 2,150/5,000</span>
+                <span className="font-semibold text-gray-700">Starter:</span>{" "}
+                342/500 &middot;{" "}
+                <span className="font-bold text-green-700">
+                  Pro: 2,150/5,000
+                </span>
               </p>
             </div>
           </div>
@@ -645,7 +730,9 @@ export default function AIHubPage() {
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity size={16} className="text-green-500" />
-              <h2 className="text-base font-bold text-gray-900">Recent AI Activity</h2>
+              <h2 className="text-base font-bold text-gray-900">
+                Recent AI Activity
+              </h2>
             </div>
             <Button className="text-xs font-semibold text-green-600 hover:text-green-700 transition-colors flex items-center gap-1">
               View all <ChevronRight size={14} />
@@ -670,7 +757,9 @@ export default function AIHubPage() {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{item.action}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {item.action}
+                    </p>
                     <p className="text-xs text-gray-400">{item.type}</p>
                   </div>
                 </div>
@@ -678,7 +767,9 @@ export default function AIHubPage() {
                   <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
                     -{item.credits} cr
                   </span>
-                  <span className="text-xs text-gray-400 font-medium">{item.time}</span>
+                  <span className="text-xs text-gray-400 font-medium">
+                    {item.time}
+                  </span>
                 </div>
               </div>
             ))}
@@ -688,4 +779,3 @@ export default function AIHubPage() {
     </div>
   );
 }
-

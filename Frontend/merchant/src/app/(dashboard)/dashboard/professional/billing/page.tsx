@@ -120,17 +120,17 @@ export default function ProfessionalBillingPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Invoice #</th>
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Matter</th>
-                  <th className="py-3 px-4 font-medium">Description</th>
-                  <th className="py-3 px-4 font-medium">Amount</th>
-                  <th className="py-3 px-4 font-medium">Issued</th>
-                  <th className="py-3 px-4 font-medium">Due Date</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Invoice #</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Matter</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Description</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Amount</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Issued</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Due Date</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

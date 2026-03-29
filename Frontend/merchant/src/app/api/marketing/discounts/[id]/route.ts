@@ -32,7 +32,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/marketing/discounts/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/marketing/discounts/:id", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -68,7 +68,7 @@ export async function PATCH(
 
     return NextResponse.json(result.data);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/marketing/discounts/:id", operation: "PATCH" });
+    handleApiError(error, { endpoint: "/marketing/discounts/:id", operation: "PATCH" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

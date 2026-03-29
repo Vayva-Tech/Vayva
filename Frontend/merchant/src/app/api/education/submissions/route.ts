@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 // GET /api/education/submissions?assignmentId=xxx - Get submissions for an assignment
 export async function GET(request: NextRequest) {
@@ -23,36 +22,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify assignment belongs to store
-    const assignment = await (prisma as any).educationAssignment.findFirst({
-      where: {
-        id: assignmentId,
-        lesson: {
-          module: {
-            course: { storeId },
-          },
-        },
-      },
+    // Fetch submissions via backend API
+    const params: Record<string, string> = { assignmentId };
+    if (studentId) params.studentId = studentId;
+    
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/education/submissions?${new URLSearchParams(params)}`, {
+      method: 'GET',
+      headers: auth.headers,
     });
 
-    if (!assignment) {
-      return NextResponse.json(
-        { success: false, error: "Assignment not found" },
-        { status: 404 }
-      );
-    }
-
-    let where: Record<string, unknown> = { assignmentId };
-    if (studentId) {
-      where.studentId = studentId;
-    }
-
-    const submissions = await (prisma as any).educationSubmission.findMany({
-      where,
-      orderBy: { submittedAt: 'desc' },
-    });
-
-    return NextResponse.json({ success: true, data: submissions });
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
       endpoint: '/api/education/submissions',

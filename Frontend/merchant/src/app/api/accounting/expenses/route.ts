@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/accounting/expenses",
+      endpoint: "/accounting/expenses",
       operation: "GET_EXPENSES",
     });
     return NextResponse.json(
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/accounting/expenses",
+      endpoint: "/accounting/expenses",
       operation: "CREATE_EXPENSE",
     });
     return NextResponse.json(

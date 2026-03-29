@@ -20,13 +20,13 @@ export async function GET(request: NextRequest) {
       queryParams.set("offset", offset.toString());
 
       // Call backend API
-      const result = await apiJson(`${buildBackendUrl("/api/payments/transactions")}?${queryParams.toString()}`, {
+      const result = await apiJson(`${buildBackendUrl("/payments/transactions")}?${queryParams.toString()}`, {
         headers: auth.headers,
       });
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/transactions", operation: "GET" });
+    handleApiError(error, { endpoint: "/transactions", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

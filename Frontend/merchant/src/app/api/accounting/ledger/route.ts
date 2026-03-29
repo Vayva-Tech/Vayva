@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/accounting/ledger",
+      endpoint: "/accounting/ledger",
       operation: "GET_LEDGER",
     });
     return NextResponse.json(

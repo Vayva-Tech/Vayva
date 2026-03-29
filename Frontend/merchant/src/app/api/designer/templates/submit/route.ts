@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/designer/templates/submit", operation: "POST" });
+    handleApiError(error, { endpoint: "/designer/templates/submit", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -98,7 +98,7 @@ export function DynamicOnboarding() {
   const fetchOnboardingProgress = async () => {
     try {
       const data = await apiJson<{ progress: OnboardingProgress }>(
-        "/api/onboarding/progress",
+        "/onboarding/progress",
         { method: "GET" }
       );
 
@@ -137,7 +137,7 @@ export function DynamicOnboarding() {
 
   const markStepComplete = async (stepId: string) => {
     try {
-      await apiJson("/api/onboarding/complete", {
+      await apiJson("/onboarding/complete", {
         method: "POST",
         body: JSON.stringify({ stepId }),
       });

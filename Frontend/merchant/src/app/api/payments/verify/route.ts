@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/payments/verify",
+        endpoint: "/payments/verify",
         operation: "VERIFY_PAYMENT",
       }
     );

@@ -32,7 +32,7 @@ export default function RealEstateAgentsPage() {
 
   const fetchAgents = async () => {
     try {
-      const response = await apiJson<{ data: Agent[] }>("/api/realestate/agents?limit=200");
+      const response = await apiJson<{ data: Agent[] }>("/realestate/agents?limit=200");
       setAgents(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch agents", error);

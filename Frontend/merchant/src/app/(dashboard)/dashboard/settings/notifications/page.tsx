@@ -46,7 +46,7 @@ export default function NotificationsPage() {
     const fetchPrefs = async () => {
       try {
         const data = await apiJson<NotificationPrefs>(
-          "/api/merchant/notifications/preferences",
+          "/merchant/notifications/preferences",
         );
         if (data) {
           setPreferences({
@@ -94,7 +94,7 @@ export default function NotificationsPage() {
 
     try {
       await apiJson<{ success: boolean }>(
-        "/api/merchant/notifications/preferences",
+        "/merchant/notifications/preferences",
         {
           method: "POST",
           body: JSON.stringify(next),
@@ -128,7 +128,7 @@ export default function NotificationsPage() {
 
     try {
       await apiJson<{ success: boolean }>(
-        "/api/merchant/notifications/preferences",
+        "/merchant/notifications/preferences",
         {
           method: "POST",
           body: JSON.stringify(next),

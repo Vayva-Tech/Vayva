@@ -45,7 +45,7 @@ export default function ModulesPage() {
 
   useEffect(() => { void fetchModules(); }, []);
 
-  const fetchModules = async () => { try { setLoading(true); const data = await apiJson<FeatureModule[]>("/api/modules"); setModules(data || []); } catch (error) { logger.error("[FETCH_MODULES_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load modules"); } finally { setLoading(false); } };
+  const fetchModules = async () => { try { setLoading(true); const data = await apiJson<FeatureModule[]>("/modules"); setModules(data || []); } catch (error) { logger.error("[FETCH_MODULES_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load modules"); } finally { setLoading(false); } };
 
   const handleSave = async () => {
     if (!formData.name) return toast.error("Name is required");
@@ -53,7 +53,7 @@ export default function ModulesPage() {
     try {
       const payload = { ...formData, dependencies: formData.dependencies.split(",").map(d => d.trim()).filter(Boolean) };
       if (editingModule) { await apiJson(`/api/modules/${editingModule.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Module updated"); }
-      else { await apiJson("/api/modules", { method: "POST", body: JSON.stringify(payload) }); toast.success("Module created"); }
+      else { await apiJson("/modules", { method: "POST", body: JSON.stringify(payload) }); toast.success("Module created"); }
       setIsOpen(false); setEditingModule(null); resetForm(); void fetchModules();
     } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
   };

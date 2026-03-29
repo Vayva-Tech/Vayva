@@ -145,9 +145,9 @@ export default function RentalModuleDashboard() {
   const loadData = async () => {
     try {
       const [productsRes, bookingsRes, statsRes] = await Promise.all([
-        apiJson<{ products: RentalProduct[] }>("/api/rentals/products"),
-        apiJson<{ bookings: RentalBooking[] }>("/api/rentals/bookings"),
-        apiJson<RentalStats>("/api/rentals/stats"),
+        apiJson<{ products: RentalProduct[] }>("/rentals/products"),
+        apiJson<{ bookings: RentalBooking[] }>("/rentals/bookings"),
+        apiJson<RentalStats>("/rentals/stats"),
       ]);
       setProducts(productsRes.products || []);
       setBookings(bookingsRes.bookings || []);
@@ -168,7 +168,7 @@ export default function RentalModuleDashboard() {
     totalUnits: number;
   }) => {
     try {
-      await apiJson("/api/rentals/products", {
+      await apiJson("/rentals/products", {
         method: "POST",
         body: JSON.stringify(data),
       });

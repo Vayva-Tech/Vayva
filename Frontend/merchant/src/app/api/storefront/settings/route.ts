@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/storefront/settings", operation: "GET" });
+    handleApiError(error, { endpoint: "/storefront/settings", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

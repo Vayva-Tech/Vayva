@@ -93,7 +93,7 @@ export function CampaignWallet({ balance, platform, onFundSuccess }: CampaignWal
           vaAccountNumber: string;
           vaBankName: string;
           vaAccountName: string;
-        }>("/api/wallet");
+        }>("/wallet");
         if (wallet?.vaStatus === "CREATED") {
           const isTrialMode = wallet.vaAccountNumber === "TRIAL_MODE";
           setVirtualAccount({
@@ -115,7 +115,7 @@ export function CampaignWallet({ balance, platform, onFundSuccess }: CampaignWal
       const response = await apiJson<{
         authorization_url: string;
         reference: string;
-      }>("/api/campaigns/fund", {
+      }>("/campaigns/fund", {
         method: "POST",
         body: JSON.stringify({
           amount: parsedAmount * 100, // Convert to kobo

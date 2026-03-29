@@ -1,38 +1,56 @@
-import { FastifyPluginAsync } from 'fastify';
-import { CollectionService } from '../../../services/commerce/collection.service';
+import { FastifyInstance, FastifyPluginAsync } from "fastify";
+import { CollectionService } from "../../../../services/commerce/collection.service";
 
-const collectionService = new CollectionService();
+const service = new CollectionService();
 
-export const collectionRoutes: FastifyPluginAsync = async (server) => {
-  server.get('/', {
+export const collectionRoutes: FastifyPluginAsync = async (
+  server: FastifyInstance,
+) => {
+  // GET /api/v1/commerce/collections
+  server.get("/", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
-      
-      const collections = await collectionService.findAll(storeId);
-      return reply.send({ success: true, data: collections });
+
+      try {
+        const collections = await service.findAll(storeId);
+        return reply.send({ success: true, data: collections });
+      } catch (error) {
+        return reply.code(500).send({
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch collections",
+        });
+      }
     },
   });
 
-  server.post('/', {
+  // POST /api/v1/commerce/collections
+  server.post("/", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
       const data = request.body as any;
 
       try {
-        const collection = await collectionService.create(storeId, data);
+        const collection = await service.create(storeId, data);
         return reply.code(201).send({ success: true, data: collection });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to create collection' 
+        return reply.code(400).send({
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to create collection",
         });
       }
     },
   });
 
-  server.put('/:id', {
+  // PUT /api/v1/commerce/collections/:id
+  server.put("/:id", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
@@ -40,30 +58,37 @@ export const collectionRoutes: FastifyPluginAsync = async (server) => {
       const data = request.body as any;
 
       try {
-        const collection = await collectionService.update(id, storeId, data);
+        const collection = await service.update(id, storeId, data);
         return reply.send({ success: true, data: collection });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to update collection' 
+        return reply.code(400).send({
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to update collection",
         });
       }
     },
   });
 
-  server.delete('/:id', {
+  // DELETE /api/v1/commerce/collections/:id
+  server.delete("/:id", {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
       const { id } = request.params as any;
 
       try {
-        const result = await collectionService.delete(id, storeId);
-        return reply.send(result);
+        const result = await service.delete(id, storeId);
+        return reply.send({ success: true, data: result });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to delete collection' 
+        return reply.code(400).send({
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Failed to delete collection",
         });
       }
     },

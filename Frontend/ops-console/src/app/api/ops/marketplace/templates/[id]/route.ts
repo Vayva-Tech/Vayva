@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export async function PATCH(
   request: Request,
@@ -15,17 +15,9 @@ export async function PATCH(
   const body = await request.json();
 
   try {
-    const updated = await prisma.template.update({
-      where: { id },
-      data: body,
-    });
-
-    await OpsAuthService.logEvent(user.id, "TEMPLATE_UPDATE", {
-      templateId: id,
-      updates: body,
-    });
-
-    return NextResponse.json({ data: updated });
+    const response = await apiClient.patch(`/api/v1/admin/marketplace/templates/${id}`, body);
+    
+    return NextResponse.json(response);
   } catch {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }

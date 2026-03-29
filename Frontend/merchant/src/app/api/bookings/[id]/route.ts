@@ -29,7 +29,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/bookings/[id]",
+      endpoint: "/bookings/[id]",
       operation: "GET_BOOKING",
     });
     return NextResponse.json(
@@ -69,7 +69,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/bookings/[id]",
+      endpoint: "/bookings/[id]",
       operation: "UPDATE_BOOKING",
     });
     return NextResponse.json(
@@ -106,7 +106,7 @@ export async function DELETE(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/bookings/[id]",
+      endpoint: "/bookings/[id]",
       operation: "DELETE_BOOKING",
     });
     return NextResponse.json(

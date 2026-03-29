@@ -58,7 +58,7 @@ export default function PaymentStep() {
     const loadBanks = async () => {
       try {
         setLoadingBanks(true);
-        const data = await apiJson<Bank[]>("/api/payments/banks");
+        const data = await apiJson<Bank[]>("/payments/banks");
         if (Array.isArray(data)) {
           setBanks(data);
           setFilteredBanks(data);

@@ -65,7 +65,7 @@ export default function FeatureRequestsPage() {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ items: FeatureRequest[] }>("/api/merchant/feature-request");
+      const response = await apiJson<{ items: FeatureRequest[] }>("/merchant/feature-request");
       setRequests(response.items || []);
     } catch (error) {
       logger.error("[FEATURE_REQUESTS_LOAD_ERROR]", { error });

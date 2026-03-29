@@ -56,7 +56,7 @@ export default function NewMenuItemPage() {
     setLoading(true);
 
     try {
-      await apiJson<{ success: boolean }>("/api/menu-items", {
+      await apiJson<{ success: boolean }>("/menu-items", {
         method: "POST",
         body: JSON.stringify({
           ...formData,

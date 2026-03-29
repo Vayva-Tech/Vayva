@@ -37,7 +37,7 @@ export default function BeautyClientsPage() {
 
   const fetchClients = async () => {
     try {
-      const response = await apiJson<{ data: Client[] }>("/api/beauty/clients?limit=500");
+      const response = await apiJson<{ data: Client[] }>("/beauty/clients?limit=500");
       setClients(response.data || generateMockClients());
     } catch (error) {
       setClients(generateMockClients());

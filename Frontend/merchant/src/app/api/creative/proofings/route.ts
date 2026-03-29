@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/creative/proofings", operation: "GET" });
+    handleApiError(error, { endpoint: "/creative/proofings", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/creative/proofings", operation: "POST" });
+    handleApiError(error, { endpoint: "/creative/proofings", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/creative/proofings", operation: "PUT" });
+    handleApiError(error, { endpoint: "/creative/proofings", operation: "PUT" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

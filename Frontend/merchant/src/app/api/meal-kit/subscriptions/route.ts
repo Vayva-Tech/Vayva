@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/meal-kit/subscriptions",
+        endpoint: "/meal-kit/subscriptions",
         operation: "GET_SUBSCRIPTIONS",
       }
     );
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/meal-kit/subscriptions",
+        endpoint: "/meal-kit/subscriptions",
         operation: "CREATE_SUBSCRIPTION",
       }
     );

@@ -1,0 +1,28 @@
+{
+  "name": "@vayva/ml-gateway",
+  "version": "0.1.0",
+  "description": "ML Query Router - Intelligent routing between local LLM and OpenRouter",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.26.0",
+    "@fastify/cors": "^9.0.1",
+    "@fastify/formbody": "^7.4.0",
+    "axios": "^1.6.7",
+    "neo4j-driver": "^5.17.0",
+    "qdrant-client": "^1.7.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  }
+}

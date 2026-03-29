@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { MarketingService } from '../../../services/platform/marketing.service';
+import { MarketingService } from '../../../../services/platform/marketing.service';
 
 const marketingService = new MarketingService();
 

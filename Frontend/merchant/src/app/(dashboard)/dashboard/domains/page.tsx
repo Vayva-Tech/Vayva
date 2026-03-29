@@ -38,12 +38,12 @@ export default function DomainsPage() {
 
   const fetchDomains = async () => {
     try {
-      const res = await apiJson<{ data: DomainsData }>("/api/account/domains");
+      const res = await apiJson<{ data: DomainsData }>("/account/domains");
       setData(res.data);
     } catch {
       // Fallback: construct from site overview
       try {
-        const siteRes = await apiJson<{ data: { slug: string; domain: string } }>("/api/sites/overview");
+        const siteRes = await apiJson<{ data: { slug: string; domain: string } }>("/sites/overview");
         setData({
           defaultDomain: siteRes.data.domain || `${siteRes.data.slug}.vayva.ng`,
           customDomains: [],
@@ -64,7 +64,7 @@ export default function DomainsPage() {
 
     setConnecting(true);
     try {
-      await apiJson("/api/account/domains", {
+      await apiJson("/account/domains", {
         method: "POST",
         body: JSON.stringify({ domain: newDomain.trim() }),
       });

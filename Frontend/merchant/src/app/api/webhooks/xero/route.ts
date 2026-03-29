@@ -62,7 +62,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       success: boolean;
       data?: unknown;
       error?: string;
-    }>(buildBackendUrl("/api/webhookevent"), {
+    }>(buildBackendUrl("/webhookevent"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/webhooks/xero", operation: "POST" });
+    handleApiError(error, { endpoint: "/webhooks/xero", operation: "POST" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

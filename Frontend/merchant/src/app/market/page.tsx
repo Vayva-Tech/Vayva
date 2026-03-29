@@ -49,8 +49,8 @@ export default function MarketplacePage() {
     try {
       setLoading(true);
       const [productsData, categoriesData] = await Promise.all([
-        apiJson<MarketProduct[]>("/api/market/products"),
-        apiJson<MarketCategory[]>("/api/market/categories"),
+        apiJson<MarketProduct[]>("/market/products"),
+        apiJson<MarketCategory[]>("/market/categories"),
       ]);
       setProducts(productsData || []);
       setCategories(categoriesData || []);
@@ -63,7 +63,7 @@ export default function MarketplacePage() {
 
   const addToCart = async (productId: string) => {
     try {
-      await apiJson("/api/market/cart/items", {
+      await apiJson("/market/cart/items", {
         method: "POST",
         body: JSON.stringify({ productId, quantity: 1 }),
       });

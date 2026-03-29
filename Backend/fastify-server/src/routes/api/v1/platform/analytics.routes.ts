@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { AnalyticsService } from '../../../services/platform/analytics.service';
+import { AnalyticsService } from '../../../../services/platform/analytics.service';
 
 const analyticsService = new AnalyticsService();
 

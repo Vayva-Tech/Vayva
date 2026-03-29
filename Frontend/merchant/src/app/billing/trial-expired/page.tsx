@@ -28,7 +28,7 @@ export default function TrialExpiredPage() {
       try {
         setIsLoading(true);
         const data = await apiJson<SubscriptionResponse>(
-          "/api/billing/subscription",
+          "/billing/subscription",
         );
         // Simulating stat fetch if not in subscription API
         setStats({
@@ -52,7 +52,7 @@ export default function TrialExpiredPage() {
     setIsProcessing(planKey);
     try {
       const data = await apiJson<SubscriptionResponse>(
-        "/api/billing/subscription",
+        "/billing/subscription",
         {
           method: "POST",
           body: JSON.stringify({ newPlan: planKey.toUpperCase() }),

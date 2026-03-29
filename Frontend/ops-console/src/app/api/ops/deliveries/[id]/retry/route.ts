@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
 
 export async function POST(
@@ -16,41 +16,9 @@ export async function POST(
     const resolvedParams = await params;
     const { id } = resolvedParams;
 
-    // Fetch shipment
-    const shipment = await prisma.shipment.findUnique({
-      where: { id },
-      include: { order: true },
-    });
-
-    if (!shipment) {
-      return NextResponse.json(
-        { error: "Shipment not found" },
-        { status: 404 },
-      );
-    }
-
-    // 1. Audit log
-    await OpsAuthService.logEvent(user.id, "SHIPMENT_RETRY_DISPATCH", {
-      shipmentId: id,
-      orderId: shipment.orderId,
-      reason: "Manual retry by OP",
-    });
-
-    // 2. Logic to retry dispatch
-    // This would traditionally call a logistics service (Kwik, etc.)
-    // to create a new job. For now, we update status to trigger re-sync
-    // or background worker pickup.
-    await prisma.shipment.update({
-      where: { id },
-      data: {
-        status: "CREATED",
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Dispatch retry initiated",
-    });
+    const response = await apiClient.post(`/api/v1/admin/deliveries/${id}/retry`);
+    
+    return NextResponse.json(response);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {

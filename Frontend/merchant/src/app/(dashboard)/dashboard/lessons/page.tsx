@@ -55,7 +55,7 @@ export default function LessonsPage() {
   const fetchLessons = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<Lesson[]>("/api/education/lessons");
+      const data = await apiJson<Lesson[]>("/education/lessons");
       setLessons(data || []);
     } catch (error) {
       logger.error("[FETCH_LESSONS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" });
@@ -81,7 +81,7 @@ export default function LessonsPage() {
         await apiJson(`/api/education/lessons/${editingLesson.id}`, { method: "PUT", body: JSON.stringify(payload) });
         toast.success("Lesson updated");
       } else {
-        await apiJson("/api/education/lessons", { method: "POST", body: JSON.stringify(payload) });
+        await apiJson("/education/lessons", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Lesson created");
       }
       setIsOpen(false);

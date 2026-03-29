@@ -4,7 +4,6 @@ import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { OnboardingService } from "@/services/onboarding.service";
-import { prisma } from "@vayva/db";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +15,7 @@ export async function GET(request: NextRequest) {
     const state = await OnboardingService.getState(storeId);
         return NextResponse.json(state);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/onboarding/state", operation: "GET" });
+    handleApiError(error, { endpoint: "/onboarding/state", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -41,7 +40,6 @@ export async function PUT(request: NextRequest) {
         });
         // Sync status to Store model if provided (Release Blocker Fix)
         if (status) {
-            const prisma = (await import("@/lib/prisma")).prisma;
             await prisma.store?.update({
                 where: { id: storeId },
                 data: { onboardingStatus: status }
@@ -53,7 +51,7 @@ export async function PUT(request: NextRequest) {
             },
         });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/onboarding/state", operation: "PUT" });
+    handleApiError(error, { endpoint: "/onboarding/state", operation: "PUT" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

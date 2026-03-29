@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export const dynamic = "force-dynamic";
 
@@ -10,18 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  const listings = await prisma.marketplaceListing.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    select: {
-      id: true,
-      status: true,
-      category: true,
-      createdAt: true,
-      updatedAt: true,
-      product: { select: { title: true, storeId: true } },
-    },
-  });
-
-  return NextResponse.json({ data: listings });
+  const response = await apiClient.get('/api/v1/admin/marketplace/apps');
+  
+  return NextResponse.json(response);
 }

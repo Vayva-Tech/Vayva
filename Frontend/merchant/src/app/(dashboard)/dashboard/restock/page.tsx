@@ -137,10 +137,10 @@ export default function SmartRestockDashboard() {
     try {
       setLoading(true);
       const [alertsRes, suggestionsRes, statsRes, settingsRes] = await Promise.all([
-        apiJson<{ alerts: RestockAlert[] }>("/api/restock/alerts"),
-        apiJson<{ suggestions: ReorderSuggestion[] }>("/api/restock/suggestions"),
-        apiJson<RestockStats>("/api/restock/stats"),
-        apiJson<RestockSettings>("/api/restock/settings"),
+        apiJson<{ alerts: RestockAlert[] }>("/restock/alerts"),
+        apiJson<{ suggestions: ReorderSuggestion[] }>("/restock/suggestions"),
+        apiJson<RestockStats>("/restock/stats"),
+        apiJson<RestockSettings>("/restock/settings"),
       ]);
 
       setAlerts(alertsRes.alerts || []);
@@ -166,7 +166,7 @@ export default function SmartRestockDashboard() {
 
   const handleCreatePurchaseOrder = async (suggestion: ReorderSuggestion) => {
     try {
-      await apiJson("/api/restock/purchase-orders", {
+      await apiJson("/restock/purchase-orders", {
         method: "POST",
         body: JSON.stringify({
           supplierId: suggestion.supplierId,
@@ -185,7 +185,7 @@ export default function SmartRestockDashboard() {
 
   const handleUpdateSettings = async (newSettings: RestockSettings) => {
     try {
-      await apiJson("/api/restock/settings", {
+      await apiJson("/restock/settings", {
         method: "PATCH",
         body: JSON.stringify(newSettings),
       });

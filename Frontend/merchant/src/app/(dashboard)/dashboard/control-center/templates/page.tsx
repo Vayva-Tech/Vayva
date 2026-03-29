@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api-client-shared";
 import { TemplateGallery } from "@/components/templates/TemplateGallery";
 import { DashboardPageShell } from "@/components/layout/DashboardPageShell";
 
@@ -17,14 +17,19 @@ export default async function TemplateSelectionPage() {
     redirect("/auth/signin");
   }
 
-  // Get the current store's template
-  const store = await prisma.store.findFirst({
-    where: {
-      id: (session.user as any).storeId || "",
-    },
-  });
-
-  const currentTemplateId = store?.currentTemplateId;
+  // Get the current store's template via backend API
+  let currentTemplateId: string | undefined;
+  try {
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/store/current`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${(session as any).accessToken || ''}`,
+      },
+    });
+    currentTemplateId = response.data?.currentTemplateId;
+  } catch (error) {
+    console.error('Failed to fetch store template:', error);
+  }
 
   return (
     <DashboardPageShell

@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
         error,
         {
-            endpoint: "/api/settings/shipping",
+            endpoint: "/settings/shipping",
             operation: "GET_SHIPPING",
         }
     );
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
         error,
         {
-            endpoint: "/api/settings/shipping",
+            endpoint: "/settings/shipping",
             operation: "UPDATE_SHIPPING",
         }
     );

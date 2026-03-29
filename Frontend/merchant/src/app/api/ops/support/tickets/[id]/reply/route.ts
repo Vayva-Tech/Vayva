@@ -58,7 +58,7 @@ export async function POST(
     return NextResponse.json({ message: result.data });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ops/support/tickets/[id]/reply",
+      endpoint: "/ops/support/tickets/[id]/reply",
       operation: "SUBMIT_TICKET_REPLY",
     });
     logger.error("[OPS_TICKET_REPLY] Failed to submit reply", {

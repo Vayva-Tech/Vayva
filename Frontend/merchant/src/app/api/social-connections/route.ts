@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/social-connections",
+      endpoint: "/social-connections",
       operation: "GET_SOCIAL_CONNECTIONS",
     });
     return NextResponse.json(
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/social-connections",
+      endpoint: "/social-connections",
       operation: "POST_SOCIAL_CONNECTIONS",
     });
     return NextResponse.json(

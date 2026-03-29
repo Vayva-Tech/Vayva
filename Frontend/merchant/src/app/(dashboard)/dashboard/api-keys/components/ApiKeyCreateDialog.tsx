@@ -75,7 +75,7 @@ export function ApiKeyCreateDialog({
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/integrations/api-keys", {
+      const response = await fetch("/integrations/api-keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

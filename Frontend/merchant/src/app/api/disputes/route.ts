@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/disputes", operation: "GET" });
+    handleApiError(error, { endpoint: "/disputes", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -80,7 +80,7 @@ export function CohortAnalysis({ storeId, className }: CohortAnalysisProps) {
         try {
             setLoading(true);
 
-            const response = await fetch('/api/v1/analytics/cohort', {
+            const response = await fetch('/v1/analytics/cohort', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: metricType, months: 6 }),

@@ -60,7 +60,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/support/tickets/[id]",
+      endpoint: "/merchant/support/tickets/[id]",
       operation: "PATCH",
       storeId,
     });

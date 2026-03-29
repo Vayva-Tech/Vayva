@@ -81,7 +81,7 @@ export function FeedbackForm({ triggerLabel = "Give feedback", onClose }: Feedba
         const formData = new FormData();
         formData.append("file", screenshot);
         
-        const uploadRes = await fetch("/api/upload/feedback-screenshot", {
+        const uploadRes = await fetch("/upload/feedback-screenshot", {
           method: "POST",
           body: formData,
         });
@@ -93,7 +93,7 @@ export function FeedbackForm({ triggerLabel = "Give feedback", onClose }: Feedba
       }
 
       // Submit feedback
-      await apiJson("/api/feedback", {
+      await apiJson("/feedback", {
         method: "POST",
         body: JSON.stringify({
           rating,
@@ -318,7 +318,7 @@ export function PostActionFeedback({ action, isOpen, onClose }: PostActionFeedba
     
     setIsSubmitting(true);
     try {
-      await apiJson("/api/feedback/post-action", {
+      await apiJson("/feedback/post-action", {
         method: "POST",
         body: JSON.stringify({
           action,

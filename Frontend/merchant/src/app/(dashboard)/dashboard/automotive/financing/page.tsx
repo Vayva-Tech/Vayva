@@ -155,19 +155,19 @@ export default function AutomotiveFinancingPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Customer</th>
-                    <th className="text-left py-3 px-4 font-semibold">Vehicle</th>
-                    <th className="text-left py-3 px-4 font-semibold">Sale Price</th>
-                    <th className="text-left py-3 px-4 font-semibold">Down Payment</th>
-                    <th className="text-left py-3 px-4 font-semibold">Loan Amount</th>
-                    <th className="text-left py-3 px-4 font-semibold">Interest Rate</th>
-                    <th className="text-left py-3 px-4 font-semibold">Term</th>
-                    <th className="text-left py-3 px-4 font-semibold">Monthly Payment</th>
-                    <th className="text-left py-3 px-4 font-semibold">Credit Score</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Customer</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Vehicle</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Sale Price</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Down Payment</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Loan Amount</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Interest Rate</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Term</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Monthly Payment</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Credit Score</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
   const addToCart = async () => {
     if (!product) return;
     try {
-      await apiJson("/api/market/cart/items", {
+      await apiJson("/market/cart/items", {
         method: "POST",
         body: JSON.stringify({ productId: product.id, quantity }),
       });

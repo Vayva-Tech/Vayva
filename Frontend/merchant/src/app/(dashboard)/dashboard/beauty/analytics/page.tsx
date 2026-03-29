@@ -31,7 +31,7 @@ export default function BeautyAnalyticsPage() {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await apiJson<{ data: Analytics }>("/api/beauty/analytics");
+      const response = await apiJson<{ data: Analytics }>("/beauty/analytics");
       setAnalytics(response.data || generateMockAnalytics());
     } catch (error) {
       setAnalytics(generateMockAnalytics());

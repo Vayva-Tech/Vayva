@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/otp/verify",
+      endpoint: "/account/otp/verify",
       operation: "VERIFY_OTP",
     });
     return NextResponse.json(

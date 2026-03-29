@@ -160,7 +160,7 @@ export function useCreateInventoryAdjustment() {
   
   return useMutation({
     mutationFn: async (data: Omit<InventoryAdjustment, "id" | "createdAt" | "createdBy">) => {
-      return apiFetch<{ adjustment: InventoryAdjustment }>("/api/inventory/adjustments", {
+      return apiFetch<{ adjustment: InventoryAdjustment }>("/inventory/adjustments", {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -255,7 +255,7 @@ export function useCreateCashSession() {
   
   return useMutation({
     mutationFn: async (data: { deviceId: string; openingAmount: number }) => {
-      return apiFetch<{ session: CashSession }>("/api/pos/cash/sessions", {
+      return apiFetch<{ session: CashSession }>("/pos/cash/sessions", {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -331,7 +331,7 @@ export function useCreateSubscription() {
       frequency: string;
       preferences?: Record<string, unknown>;
     }) => {
-      return apiFetch<{ subscription: BoxSubscription }>("/api/box-subscriptions/subscriptions", {
+      return apiFetch<{ subscription: BoxSubscription }>("/box-subscriptions/subscriptions", {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -397,7 +397,7 @@ export function useCreateRentalBooking() {
       endsAt: string;
       notes?: string;
     }) => {
-      return apiFetch<{ booking: RentalBooking }>("/api/rentals/bookings", {
+      return apiFetch<{ booking: RentalBooking }>("/rentals/bookings", {
         method: "POST",
         body: JSON.stringify(data),
       });

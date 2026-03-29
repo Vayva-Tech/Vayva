@@ -70,7 +70,7 @@ export function BiometricSetup() {
         };
         timeout: number;
         attestation: string;
-      }>("/api/auth/webauthn/register-options", { method: "GET" });
+      }>("/auth/webauthn/register-options", { method: "GET" });
 
       // Convert base64url strings to ArrayBuffer
       const challengeBuffer = base64URLToBuffer(options.challenge);
@@ -104,7 +104,7 @@ export function BiometricSetup() {
       const response = credential.response as AuthenticatorAttestationResponse;
       
       const result = await apiJson<WebAuthnRegistrationResponse>(
-        "/api/auth/webauthn/register",
+        "/auth/webauthn/register",
         {
           method: "POST",
           body: JSON.stringify({
@@ -148,7 +148,7 @@ export function BiometricSetup() {
         allowCredentials: { id: string; type: string }[];
         userVerification: string;
         timeout: number;
-      }>("/api/auth/webauthn/verify-options", { method: "GET" });
+      }>("/auth/webauthn/verify-options", { method: "GET" });
 
       const challengeBuffer = base64URLToBuffer(options.challenge);
 
@@ -173,7 +173,7 @@ export function BiometricSetup() {
       const response = assertion.response as AuthenticatorAssertionResponse;
       
       const result = await apiJson<WebAuthnVerificationResponse>(
-        "/api/auth/webauthn/verify",
+        "/auth/webauthn/verify",
         {
           method: "POST",
           body: JSON.stringify({

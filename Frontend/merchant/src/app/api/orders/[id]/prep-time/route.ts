@@ -34,7 +34,7 @@ export async function POST(
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/orders/:id/prep-time", operation: "POST" });
+    handleApiError(error, { endpoint: "/orders/:id/prep-time", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

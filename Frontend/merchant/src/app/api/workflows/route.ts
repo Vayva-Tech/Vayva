@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(data);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/workflows", operation: "GET_WORKFLOWS" });
+    handleApiError(error, { endpoint: "/workflows", operation: "GET_WORKFLOWS" });
     return NextResponse.json({ error: "Failed to list workflows" }, { status: 500 });
   }
 }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(data);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/workflows", operation: "POST_WORKFLOW" });
+    handleApiError(error, { endpoint: "/workflows", operation: "POST_WORKFLOW" });
     return NextResponse.json({ error: "Failed to create workflow" }, { status: 500 });
   }
 }

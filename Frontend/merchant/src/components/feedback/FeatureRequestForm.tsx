@@ -92,7 +92,7 @@ export function FeatureRequestForm({
         const formData = new FormData();
         formData.append("file", attachment);
         
-        const uploadRes = await fetch("/api/upload/feature-request-attachment", {
+        const uploadRes = await fetch("/upload/feature-request-attachment", {
           method: "POST",
           body: formData,
         });
@@ -104,7 +104,7 @@ export function FeatureRequestForm({
       }
 
       // Submit feature request
-      await apiJson("/api/merchant/feature-request", {
+      await apiJson("/merchant/feature-request", {
         method: "POST",
         body: JSON.stringify({
           requestType,

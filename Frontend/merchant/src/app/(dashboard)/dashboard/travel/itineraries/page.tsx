@@ -37,7 +37,7 @@ export default function TravelItinerariesPage() {
   const fetchItineraries = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Itinerary[] }>("/api/travel/itineraries?limit=500");
+      const response = await apiJson<{ data: Itinerary[] }>("/travel/itineraries?limit=500");
       setItineraries(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch itineraries", error);

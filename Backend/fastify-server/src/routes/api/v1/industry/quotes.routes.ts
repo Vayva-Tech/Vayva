@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { QuoteService } from '../../../services/industry/quote.service';
+import { QuoteService } from '../../../../services/industry/quote.service';
 
 const quoteService = new QuoteService();
 

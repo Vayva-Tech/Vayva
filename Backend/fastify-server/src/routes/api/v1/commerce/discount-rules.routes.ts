@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { DiscountRulesService } from '../../../services/commerce/discountRules.service';
+import { DiscountRulesService } from '../../../../services/commerce/discountRules.service';
 
 const discountRulesService = new DiscountRulesService();
 

@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         data: Array<{ id: string; orderNumber: string; status: string; total: number; customerEmail?: string }>;
         meta: { total: number; limit: number; offset: number };
       }>(
-        `${buildBackendUrl("/api/orders")}?limit=${limit}&offset=${offset}&status=${status || ''}&search=${search || ''}&customerId=${customerId || ''}&dateFrom=${dateFrom || ''}&dateTo=${dateTo || ''}`,
+        `${buildBackendUrl("/orders")}?limit=${limit}&offset=${offset}&status=${status || ''}&search=${search || ''}&customerId=${customerId || ''}&dateFrom=${dateFrom || ''}&dateTo=${dateTo || ''}`,
       {
           headers: auth.headers,
         }
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/orders", operation: "GET" });
+    handleApiError(error, { endpoint: "/orders", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

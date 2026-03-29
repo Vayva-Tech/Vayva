@@ -1,5 +1,5 @@
-import { prisma } from "@vayva/db";
-import crypto from "crypto";
+import { prisma } from "../client";
+import _crypto from "crypto";
 
 /**
  * Ensures that a request with a specific Idempotency-Key is only processed once.
@@ -18,33 +18,52 @@ export async function withIdempotency<T>(
     execute: () => Promise<T>
 ): Promise<T> {
     // Check for existing record
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const existing = await (prisma as any).idempotencyRecord.findUnique({
-        where: { key }
+    const existing = await prisma.idempotencyKeyV2.findUnique({
+        where: {
+            storeId_scope_key: {
+                storeId: merchantId,
+                scope: route,
+                key: key
+            }
+        }
     });
 
     if (existing) {
-        if (existing.userId !== userId || existing.merchantId !== merchantId) {
-            throw new Error("Idempotency key collision or unauthorized reuse");
+        if (existing.status === "COMPLETED" && existing.responseJson) {
+            return existing.responseJson as T;
         }
-        return existing.response as T;
+        // If it's still in progress or failed, we might want to handle it differently.
+        // For now, if it exists, we throw to prevent concurrent executions if not COMPLETED.
+        if (existing.status === "STARTED") {
+            throw new Error("Request still in progress");
+        }
     }
 
     // Execute the operation
     const result = await execute();
 
     // Record the result
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (prisma as any).idempotencyRecord.create({
-        data: {
-            key,
-            userId,
-            merchantId,
-            route,
+    await prisma.idempotencyKeyV2.upsert({
+        where: {
+            storeId_scope_key: {
+                storeId: merchantId,
+                scope: route,
+                key: key
+            }
+        },
+        update: {
+            status: "COMPLETED",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            response: result as any,
-            responseHash: "", // Optional: for integrity checks
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h expiry
+            responseJson: result as any,
+            updatedAt: new Date()
+        },
+        create: {
+            storeId: merchantId,
+            scope: route,
+            key: key,
+            status: "COMPLETED",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            responseJson: result as any
         }
     });
 

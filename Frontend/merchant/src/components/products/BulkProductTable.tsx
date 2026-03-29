@@ -62,7 +62,7 @@ export function BulkProductTable({ initialProducts }: BulkProductTableProps) {
         data: changes,
       }));
 
-      const result = await apiJson<BulkUpdateResponse>("/api/products/bulk", {
+      const result = await apiJson<BulkUpdateResponse>("/products/bulk", {
         method: "PATCH",
         body: JSON.stringify({ items: itemsToUpdate }),
       });

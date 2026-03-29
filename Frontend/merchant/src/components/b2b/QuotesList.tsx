@@ -42,7 +42,7 @@ export function QuotesList() {
 
   const fetchQuotes = async () => {
     try {
-      const response = await fetch('/api/b2b/quotes');
+      const response = await fetch('/b2b/quotes');
       if (response.ok) {
         const data = await response.json();
         setQuotes(data.quotes || []);

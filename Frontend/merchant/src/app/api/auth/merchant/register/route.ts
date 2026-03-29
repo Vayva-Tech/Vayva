@@ -23,7 +23,10 @@ export async function POST(request: NextRequest) {
     const password = getString(body.password);
     const firstName = getString(body.firstName);
     const lastName = getString(body.lastName);
-    const _businessName = getString(body.businessName);
+    const storeName = getString(body.storeName);
+    const industrySlug = getString(body.industrySlug);
+    const otpMethod = getString(body.otpMethod) || "EMAIL";
+    
     // 0. Kill Switch & Rate Limit
     const isEnabled =
       process.env.NODE_ENV !== "production" ||
@@ -46,6 +49,7 @@ export async function POST(request: NextRequest) {
       }
       throw e;
     }
+    
     // 0.1 AI Anti-Abuse Check (skip in development)
     if (process.env.NODE_ENV === "production") {
       const ipHash = Buffer.from(ip).toString("base64"); // Simple hash for demo
@@ -63,6 +67,7 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+    
     // Soft Launch Protection
     const launchMode = process.env.LAUNCH_MODE || "public";
     if (launchMode === "soft") {
@@ -79,13 +84,15 @@ export async function POST(request: NextRequest) {
       }
       // In a real app, verify inviteToken in DB.
     }
+    
     // Validation
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !storeName) {
       return NextResponse.json(
         apiError(ApiErrorCode.VALIDATION_ERROR, "Missing required fields"),
         { status: 400 },
       );
     }
+    
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -94,6 +101,7 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+    
     // Password validation (minimum 8 characters)
     if (password.length < 8) {
       return NextResponse.json(
@@ -104,66 +112,69 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    // Check if user already exists via Backend API
-    try {
-      const checkResponse = await apiJson<{ exists: boolean }>(
-        `${process.env.BACKEND_API_URL}/api/auth/check-email?email=${encodeURIComponent(email.toLowerCase())}`,
-        { method: "GET" }
-      );
-      if (checkResponse.exists) {
-        return NextResponse.json(
-          apiError(ApiErrorCode.FORBIDDEN, "User already exists"),
-          { status: 409 },
-        );
-      }
-    } catch {
-      // Continue to registration attempt
-    }
 
-    // Forward registration to Backend API
-    const backendResponse = await fetch(`${process.env.BACKEND_API_URL}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email.toLowerCase(),
-        password,
-        firstName,
-        lastName,
-      }),
-    });
-
-    if (!backendResponse.ok) {
-      const errorData = await backendResponse.json().catch(() => ({ error: "Registration failed" }));
+    // ALWAYS delegate to backend - NO direct database access
+    if (!process.env.BACKEND_API_URL) {
+      logger.error("[REGISTER_POST] BACKEND_API_URL not configured");
       return NextResponse.json(
-        apiError(ApiErrorCode.INTERNAL_SERVER_ERROR, errorData.error || "Registration failed"),
-        { status: backendResponse.status },
+        apiError(ApiErrorCode.INTERNAL_SERVER_ERROR, "Backend API URL not configured"),
+        { status: 503 },
       );
     }
 
-    const user = await backendResponse.json();
-
-    // Send OTP via email service
-    const { ResendEmailService } = await import("@/lib/email/resend");
-    await ResendEmailService.sendOTPEmail(user.email, user.otpCode, firstName);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          phone: user.phone || undefined,
-          emailVerified: false,
-          phoneVerified: user.isPhoneVerified ?? false,
-          role: "OWNER",
-          createdAt: user.createdAt || new Date().toISOString(),
+    // Call backend registration endpoint - backend handles:
+    // 1. Duplicate email check
+    // 2. User creation with bcrypt password hashing
+    // 3. Merchant/store creation
+    // 4. OTP generation and storage
+    // 5. OTP email sending via Resend
+    const result = await apiJson<{
+      success: boolean;
+      data?: {
+        userId: string;
+        email: string;
+        requiresVerification: boolean;
+        otpMethod?: string;
+      };
+      error?: { code: string; message: string };
+    }>(
+      `${process.env.BACKEND_API_URL.replace(/\/$/, "")}/api/auth/merchant/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      },
-    });
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          password,
+          firstName,
+          lastName,
+          storeName,
+          industrySlug: industrySlug || undefined,
+          otpMethod: otpMethod as "EMAIL" | "WHATSAPP",
+        }),
+      }
+    );
+    
+    if (!result.success || result.error) {
+      const errorCode = result.error?.code || "INTERNAL_SERVER_ERROR";
+      const errorMessage = result.error?.message || "Registration failed";
+      return NextResponse.json(
+        apiError(errorCode as ApiErrorCode, errorMessage),
+        { status: errorCode === "USER_EXISTS" ? 409 : 400 },
+      );
+    }
+
+    // Return backend response as-is (no duplication of OTP email)
+    return NextResponse.json(result);
   } catch (error: unknown) {
-    logger.error("[AUTH_REGISTER_POST] Registration failed", { error: error instanceof Error ? error.message : String(error), email: body?.email });
+    logger.error(
+      "[AUTH_REGISTER_POST] Registration failed",
+      { 
+        error: error instanceof Error ? error.message : String(error), 
+        email: body?.email 
+      }
+    );
     return NextResponse.json(
       apiError(ApiErrorCode.INTERNAL_SERVER_ERROR, "Registration failed"),
       { status: 500 },

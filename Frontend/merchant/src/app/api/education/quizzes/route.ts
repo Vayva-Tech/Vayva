@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
@@ -25,42 +24,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let lessonIds: string[];
-
-    if (lessonId) {
-      const lesson = await prisma.lesson.findFirst({
-        where: {
-          id: lessonId,
-          module: { course: { storeId } },
-        },
-        select: { id: true },
-      });
-      if (!lesson) {
-        return NextResponse.json({ success: true, data: [] });
-      }
-      lessonIds = [lesson.id];
-    } else {
-      const lessons = await prisma.lesson.findMany({
-        where: {
-          module: { courseId: courseId!, course: { storeId } },
-        },
-        select: { id: true },
-      });
-      lessonIds = lessons.map((l) => l.id);
-    }
-
-    if (lessonIds.length === 0) {
-      return NextResponse.json({ success: true, data: [] });
-    }
-
-    const quizzes = await prisma.quiz.findMany({
-      where: { lessonId: { in: lessonIds } },
+    // Fetch quizzes via backend API
+    const params: Record<string, string> = {};
+    if (lessonId) params.lessonId = lessonId;
+    if (courseId) params.courseId = courseId;
+    
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/education/quizzes?${new URLSearchParams(params)}`, {
+      method: 'GET',
+      headers: auth.headers,
     });
 
-    return NextResponse.json({ success: true, data: quizzes });
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/education/quizzes",
+      endpoint: "/education/quizzes",
       operation: "GET_QUIZZES",
     });
     return NextResponse.json({ error: "Failed to fetch quizzes" }, { status: 500 });
@@ -91,7 +68,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/education/quizzes",
+      endpoint: "/education/quizzes",
       operation: "CREATE_QUIZ",
     });
     return NextResponse.json({ error: "Failed to create quiz" }, { status: 500 });
@@ -129,7 +106,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/education/quizzes",
+      endpoint: "/education/quizzes",
       operation: "UPDATE_QUIZ",
     });
     return NextResponse.json({ error: "Failed to update quiz" }, { status: 500 });
@@ -168,7 +145,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/education/quizzes",
+      endpoint: "/education/quizzes",
       operation: "DELETE_QUIZ",
     });
     return NextResponse.json({ error: "Failed to delete quiz" }, { status: 500 });

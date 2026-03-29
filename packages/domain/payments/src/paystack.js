@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Paystack = void 0;
 const PAYSTACK_BASE = "https://api.paystack.co";
 function isRecord(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -33,7 +36,7 @@ async function paystackFetch(path, init) {
         data: "data" in json ? json.data : null,
     };
 }
-export const Paystack = {
+exports.Paystack = {
     async createCustomer(args) {
         if (!args.email)
             throw new Error("email required");
@@ -258,3 +261,4 @@ export const Paystack = {
         };
     },
 };
+//# sourceMappingURL=paystack.js.map

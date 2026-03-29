@@ -24,7 +24,7 @@ export const VisualMerchandisingWidget: React.FC = () => {
   const { data: lookbooks, isLoading } = useQuery<Lookbook[]>({
     queryKey: ['lookbooks'],
     queryFn: async () => {
-      const res = await fetch('/api/fashion/lookbooks?includeUnpublished=true');
+      const res = await fetch('/fashion/lookbooks?includeUnpublished=true');
       const data = await res.json();
       return data.lookbooks;
     },

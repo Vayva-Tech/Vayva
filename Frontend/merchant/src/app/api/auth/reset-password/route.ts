@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/auth/reset-password",
+        endpoint: "/auth/reset-password",
         operation: "RESET_PASSWORD",
       }
     );

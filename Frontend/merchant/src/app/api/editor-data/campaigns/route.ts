@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
@@ -15,35 +13,27 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query") || "";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-    const campaigns = (await prisma.campaign?.findMany({
-      where: {
-        storeId,
-        ...(query && {
-          OR: [
-            { name: { contains: query, mode: "insensitive" } },
-            { messageBody: { contains: query, mode: "insensitive" } },
-          ],
-        }),
-      },
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        channel: true,
-        scheduledAt: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-    })) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
+
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/marketing/campaigns?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
 
     return NextResponse.json(
-      { success: true, data: campaigns },
+      { success: true, data: response.data?.campaigns || [] },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/editor-data/campaigns",
+      endpoint: "/editor-data/campaigns",
       operation: "GET_EDITOR_CAMPAIGNS",
     });
     return NextResponse.json(

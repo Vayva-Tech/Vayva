@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/creative/ai/insights",
+        endpoint: "/creative/ai/insights",
         operation: "GET_AI_INSIGHTS",
       }
     );

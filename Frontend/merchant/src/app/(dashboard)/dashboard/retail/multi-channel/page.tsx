@@ -182,17 +182,17 @@ export default function RetailMultiChannelPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Order ID</th>
-                    <th className="text-left py-3 px-4 font-semibold">Customer</th>
-                    <th className="text-left py-3 px-4 font-semibold">Channel</th>
-                    <th className="text-left py-3 px-4 font-semibold">Platform/Location</th>
-                    <th className="text-left py-3 px-4 font-semibold">Items</th>
-                    <th className="text-left py-3 px-4 font-semibold">Amount</th>
-                    <th className="text-left py-3 px-4 font-semibold">Date</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Order ID</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Customer</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Channel</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Platform/Location</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Items</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Amount</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Date</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

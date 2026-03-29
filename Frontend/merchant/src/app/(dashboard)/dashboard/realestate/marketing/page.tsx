@@ -32,7 +32,7 @@ export default function RealEstateMarketingPage() {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await apiJson<{ data: MarketingCampaign[] }>("/api/realestate/marketing/campaigns?limit=200");
+      const response = await apiJson<{ data: MarketingCampaign[] }>("/realestate/marketing/campaigns?limit=200");
       setCampaigns(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch marketing campaigns", error);

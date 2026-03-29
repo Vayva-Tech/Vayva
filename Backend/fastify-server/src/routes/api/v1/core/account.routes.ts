@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { AccountService } from '../../../services/core/account.service';
+import { AccountService } from '../../../../services/core/account.service';
 
 const accountService = new AccountService();
 

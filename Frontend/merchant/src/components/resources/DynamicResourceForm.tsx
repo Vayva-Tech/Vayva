@@ -106,7 +106,7 @@ export const DynamicResourceForm = ({
       // 2. Submit to Universal API with Sanitization
       const isCreate = mode === "create";
       const endpoint = isCreate
-        ? "/api/resources/create"
+        ? "/resources/create"
         : `/api/resources/${primaryObject}/${resourceId}`;
 
       // Basic sanitization for known numeric fields if they exist in formData

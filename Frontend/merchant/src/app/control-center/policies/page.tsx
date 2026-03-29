@@ -21,7 +21,7 @@ type PolicyType = "returns" | "shipping" | "privacy" | "terms";
 // Test fetch
 const fetchPolicies = async () => {
   try {
-    return await apiJson<PoliciesResponse>("/api/store/policies");
+    return await apiJson<PoliciesResponse>("/store/policies");
   } catch (error: unknown) {
     const _errMsg = error instanceof Error ? error.message : String(error);
     logger.error("[FETCH_POLICIES_ERROR]", { error: _errMsg, app: "merchant" });
@@ -31,7 +31,7 @@ const fetchPolicies = async () => {
 
 const savePolicies = async (data: Record<string, unknown>) => {
   try {
-    await apiJson<{ success: boolean }>("/api/store/policies", {
+    await apiJson<{ success: boolean }>("/store/policies", {
       method: "PATCH",
       body: JSON.stringify(data),
     });

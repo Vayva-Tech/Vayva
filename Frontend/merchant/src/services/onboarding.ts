@@ -51,7 +51,7 @@ export const OnboardingService = {
     getState: async () => {
         try {
             // Fetch from backend API
-            const data = await apiJson<any>("/api/onboarding/state");
+            const data = await apiJson<any>("/onboarding/state");
             const storedData = data?.data || {};
             const status = String(data?.status || data?.onboardingStatus || "IN_PROGRESS");
             const currentStep = data?.currentStepKey || data?.currentStep || "welcome";
@@ -88,7 +88,7 @@ export const OnboardingService = {
     saveStep: async (stepId: any, data: any) => {
         try {
             // Save to backend API
-            await apiJson("/api/onboarding/state", {
+            await apiJson("/onboarding/state", {
                 method: "PUT",
                 body: JSON.stringify({
                     data: data,
@@ -128,7 +128,7 @@ export const OnboardingService = {
         try {
             // Mark as complete via API
             const currentState = await OnboardingService.getState();
-            await apiJson("/api/onboarding/state", {
+            await apiJson("/onboarding/state", {
                 method: "PUT",
                 body: JSON.stringify({
                     data: currentState,

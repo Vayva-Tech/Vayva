@@ -46,7 +46,7 @@ export default function IncidentsListPage() {
     const fetchIncidents = async () => {
       try {
         setLoading(true);
-        const data = await apiJson<RescueIncident[]>("/api/rescue/incidents");
+        const data = await apiJson<RescueIncident[]>("/rescue/incidents");
         setIncidents(data);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -136,14 +136,14 @@ export default function IncidentsListPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50 border-b border-gray-100" scope="col">
                 <tr>
-                  <th className="text-left p-4 text-sm font-medium text-gray-700">Type</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-700">Location</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-700">Priority</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-700">Status</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-700">Responder</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-700">Time</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-700" scope="col">Type</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-700" scope="col">Location</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-700" scope="col">Priority</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-700" scope="col">Status</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-700" scope="col">Responder</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-700" scope="col">Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">

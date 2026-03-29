@@ -56,7 +56,7 @@ export default function CasesPage() {
   const fetchCases = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<SupportCase[]>("/api/support/cases");
+      const data = await apiJson<SupportCase[]>("/support/cases");
       setCases(data || []);
     } catch (error) {
       logger.error("[FETCH_CASES_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" });
@@ -77,7 +77,7 @@ export default function CasesPage() {
         await apiJson(`/api/support/cases/${editingCase.id}`, { method: "PUT", body: JSON.stringify(payload) });
         toast.success("Case updated");
       } else {
-        await apiJson("/api/support/cases", { method: "POST", body: JSON.stringify(payload) });
+        await apiJson("/support/cases", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Case created");
       }
       setIsOpen(false);

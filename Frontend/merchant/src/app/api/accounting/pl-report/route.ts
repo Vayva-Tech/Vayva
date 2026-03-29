@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/accounting/pl-report",
+      endpoint: "/accounting/pl-report",
       operation: "GET_PL_REPORT",
     });
     return NextResponse.json(

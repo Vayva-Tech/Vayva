@@ -34,7 +34,7 @@ export default function FashionCustomersPage() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await apiJson<{ data: Customer[] }>("/api/fashion/customers?limit=500");
+      const response = await apiJson<{ data: Customer[] }>("/fashion/customers?limit=500");
       setCustomers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch fashion customers", error);

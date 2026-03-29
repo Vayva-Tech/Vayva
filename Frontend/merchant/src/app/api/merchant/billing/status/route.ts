@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,56 +9,41 @@ export async function GET(request: NextRequest) {
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const storeId = auth.user.storeId;
-    const [store, subscription] = await Promise.all([
-            prisma.store.findUnique({
-                where: { id: storeId },
-                select: { plan: true },
-            }),
-            prisma.subscription.findUnique({
-                where: { storeId },
-                select: { 
-                    planKey: true, 
-                    status: true, 
-                    currentPeriodEnd: true, 
-                    cancelAtPeriodEnd: true,
-                    trialEndsAt: true,
-                    gracePeriodEndsAt: true,
-                },
-            }),
-        ]);
 
-        const planKey = (subscription?.planKey || store?.plan || "FREE").toUpperCase();
-        const status = subscription?.status || "TRIALING";
-        const periodEnd = subscription?.currentPeriodEnd || null;
+    const result = await apiJson<{
+      currentPlan: {
+        planKey: string;
+        status: string;
+        periodEnd: string | null;
+        cancelAtPeriodEnd: boolean;
+        trialEndsAt: string | null;
+        gracePeriodEndsAt: string | null;
+      };
+      subscription: {
+        status: string;
+        periodEnd: string | null;
+        cancelAtPeriodEnd: boolean;
+        trialEndsAt: string | null;
+        gracePeriodEndsAt: string | null;
+      } | null;
+      invoices: any[];
+    }>("/api/v1/merchant/billing/status", {
+      headers: { ...auth.headers },
+    });
 
-        return NextResponse.json({
-            currentPlan: {
-                planKey: planKey.toLowerCase(),
-                status: status.toLowerCase(),
-                periodEnd,
-                cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd || false,
-                trialEndsAt: subscription?.trialEndsAt,
-                gracePeriodEndsAt: subscription?.gracePeriodEndsAt,
-            },
-            subscription: subscription ? {
-                status: subscription.status,
-                periodEnd: subscription.currentPeriodEnd,
-                cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-                trialEndsAt: subscription.trialEndsAt,
-                gracePeriodEndsAt: subscription.gracePeriodEndsAt,
-            } : null,
-            invoices: [], // Note: Invoice integration to be added in future release
-        }, {
-            headers: {
-                "Cache-Control": "no-store",
-            },
-        });
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/billing/status", operation: "GET" });
+    handleApiError(error, {
+      endpoint: "/merchant/billing/status",
+      operation: "GET",
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

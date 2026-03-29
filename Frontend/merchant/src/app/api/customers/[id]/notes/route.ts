@@ -20,7 +20,7 @@ export async function GET(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/customers/:id/notes", operation: "GET" });
+    handleApiError(error, { endpoint: "/customers/:id/notes", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch notes" }, { status: 500 });
   }
 }
@@ -47,7 +47,7 @@ export async function POST(
     );
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/customers/:id/notes", operation: "POST" });
+    handleApiError(error, { endpoint: "/customers/:id/notes", operation: "POST" });
     return NextResponse.json({ error: "Failed to create note" }, { status: 500 });
   }
 }

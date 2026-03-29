@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/bookings",
+      endpoint: "/bookings",
       operation: "GET_BOOKINGS",
     });
     return NextResponse.json(

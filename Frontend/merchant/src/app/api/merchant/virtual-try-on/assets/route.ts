@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/virtual-try-on/assets", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/virtual-try-on/assets", operation: "POST" });
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/virtual-try-on/assets", operation: "GET" });
+    handleApiError(error, { endpoint: "/merchant/virtual-try-on/assets", operation: "GET" });
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

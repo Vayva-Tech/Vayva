@@ -28,7 +28,7 @@ export default function NewFeatureFlagPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch("/api/saas/feature-flags", {
+      const res = await fetch("/saas/feature-flags", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

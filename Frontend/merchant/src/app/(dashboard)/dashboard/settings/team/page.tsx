@@ -39,7 +39,7 @@ export default function TeamSettingsPage() {
     const phone = formData.get("phone") as string;
 
     try {
-      await apiJson("/api/merchant/team/invite", {
+      await apiJson("/merchant/team/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, role, phone: phone || undefined }),
@@ -57,7 +57,7 @@ export default function TeamSettingsPage() {
   const handleRemove = async (userId: string) => {
     setRemoving(true);
     try {
-      await apiJson("/api/merchant/team/member/remove", {
+      await apiJson("/merchant/team/member/remove", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
@@ -76,14 +76,14 @@ export default function TeamSettingsPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<TeamResponse>("/api/merchant/team");
+      const data = await apiJson<TeamResponse>("/merchant/team");
       if (data) {
         setMembers(data.members || []);
         setInvites(data.invites || []);
       }
 
       // Fetch custom roles
-      const rolesData = await apiJson<CustomRole[]>("/api/settings/roles");
+      const rolesData = await apiJson<CustomRole[]>("/settings/roles");
       if (rolesData) {
         setCustomRoles(rolesData);
       }
@@ -190,13 +190,13 @@ export default function TeamSettingsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Member</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Role</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Joined</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

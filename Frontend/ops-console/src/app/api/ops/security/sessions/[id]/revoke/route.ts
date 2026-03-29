@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export async function DELETE(
   request: Request,
@@ -14,13 +14,10 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    await prisma.merchantSession.delete({
-      where: { id },
-    });
-
-    await OpsAuthService.logEvent(user.id, "SESSION_REVOKE", { sessionId: id });
-
-    return NextResponse.json({ success: true });
+    // Proxy to backend Fastify API
+    const response = await apiClient.delete(`/api/v1/compliance/sessions/${id}`);
+    
+    return NextResponse.json(response);
   } catch {
     return NextResponse.json(
       { error: "Failed to revoke session" },

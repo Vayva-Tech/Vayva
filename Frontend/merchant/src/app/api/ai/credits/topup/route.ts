@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ai/credits/topup",
+      endpoint: "/ai/credits/topup",
       operation: "POST_AI_CREDITS_TOPUP",
     });
     return NextResponse.json(

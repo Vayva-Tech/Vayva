@@ -95,7 +95,7 @@ export const StoreProvider = ({
         if (demoMode) {
           // Load Tests
           const storeProducts = await apiJson<ProductServiceItem[]>(
-            "/api/products/items",
+            "/products/items",
           );
           setProducts(storeProducts || []);
           setMerchant({
@@ -107,10 +107,10 @@ export const StoreProvider = ({
         } else {
           // Load Real Data
           const [fetchedProducts, merchantInfo] = await Promise.all([
-            apiJson<ProductServiceItem[]>("/api/products/items").catch(
+            apiJson<ProductServiceItem[]>("/products/items").catch(
               () => [] as ProductServiceItem[],
             ),
-            apiJson<MerchantMeResponse>("/api/auth/merchant/me").catch(
+            apiJson<MerchantMeResponse>("/auth/merchant/me").catch(
               () => null,
             ),
           ]);

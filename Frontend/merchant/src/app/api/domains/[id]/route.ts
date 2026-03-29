@@ -42,7 +42,7 @@ export async function DELETE(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/domains/[id]",
+      endpoint: "/domains/[id]",
       operation: "DELETE_DOMAIN",
     });
     return NextResponse.json(

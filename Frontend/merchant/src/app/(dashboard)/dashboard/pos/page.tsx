@@ -161,13 +161,13 @@ export default function POSPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50" scope="col">
               <tr>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Time</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Customer</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Items</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Amount</th>
+                <th className="text-left py-3 px-5 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Payment Method</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

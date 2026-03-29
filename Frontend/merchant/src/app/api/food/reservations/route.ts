@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ reservations });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/food/reservations",
+      endpoint: "/food/reservations",
       operation: "FETCH_RESERVATIONS",
     });
     const errorMessage = error instanceof Error ? error.message : String(error);

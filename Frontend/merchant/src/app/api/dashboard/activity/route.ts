@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/dashboard/activity",
+      endpoint: "/dashboard/activity",
       operation: "GET_DASHBOARD_ACTIVITY",
     });
     return NextResponse.json(

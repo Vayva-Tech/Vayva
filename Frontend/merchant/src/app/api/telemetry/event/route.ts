@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
-import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,43 +8,33 @@ export async function POST(request: NextRequest) {
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const storeId = auth.user.storeId;
+    
     const body = await request.json().catch(() => ({}));
-        const { eventName, properties } = body;
-        
-        // Extract canonical fields from props
-        const templateSlug = properties?.templateSlug ||
-            properties?.template ||
-            properties?.templateId;
-        const plan = properties?.plan;
-        const entryPoint = properties?.entryPoint;
-        const step = properties?.step || properties?.stepKey;
-        const fastPath = !!properties?.fastPath;
-
-        await prisma.onboardingAnalyticsEvent?.create({
-            data: {
-                storeId,
-                sessionId: properties?.sessionId,
-                eventName,
-                templateSlug,
-                plan,
-                entryPoint,
-                step,
-                fastPath,
-                metadata: properties || {},
-            },
-        });
-
-        if (eventName === "ONBOARDING_ABANDONED") {
-            logger.warn("[TELEMETRY] Onboarding abandoned", { templateSlug, step, storeId });
-        }
-        if (eventName === "ONBOARDING_STEP_ERROR") {
-            logger.error("[TELEMETRY] Onboarding step error", { templateSlug, step, error: properties?.error, storeId });
-        }
-
-        return NextResponse.json({ success: true });
+    const { eventName, properties } = body;
+    
+    // Proxy to backend
+    const backendUrl = `${process.env.BACKEND_API_URL}/api/v1/platform/telemetry/event`;
+    
+    const response = await fetch(backendUrl, {
+      method: "POST",
+      headers: {
+        ...auth.headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ eventName, properties }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Backend returned ${response.status}`);
+    }
+    
+    return NextResponse.json({ success: true });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/telemetry/event", operation: "POST" });
+    handleApiError(error, {
+      endpoint: "/telemetry/event",
+      operation: "POST",
+    });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

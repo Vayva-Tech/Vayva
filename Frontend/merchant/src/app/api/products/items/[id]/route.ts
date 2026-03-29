@@ -45,7 +45,7 @@ export async function GET(
     return NextResponse.json({ success: true, data: product });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/items/[id]",
+      endpoint: "/products/items/[id]",
       operation: "GET_PRODUCT_ITEM",
     });
     return NextResponse.json(
@@ -88,7 +88,7 @@ export async function PUT(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/items/[id]",
+      endpoint: "/products/items/[id]",
       operation: "UPDATE_PRODUCT_ITEM",
     });
     return NextResponse.json(
@@ -127,7 +127,7 @@ export async function DELETE(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/items/[id]",
+      endpoint: "/products/items/[id]",
       operation: "DELETE_PRODUCT_ITEM",
     });
     return NextResponse.json(

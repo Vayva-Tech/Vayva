@@ -120,16 +120,16 @@ export default function NightlifeBarManagementPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Item Name</th>
-                  <th className="py-3 px-4 font-medium">Category</th>
-                  <th className="py-3 px-4 font-medium">Quantity</th>
-                  <th className="py-3 px-4 font-medium">Min Level</th>
-                  <th className="py-3 px-4 font-medium">Cost/Unit</th>
-                  <th className="py-3 px-4 font-medium">Supplier</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Item Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Category</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Quantity</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Min Level</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Cost/Unit</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Supplier</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

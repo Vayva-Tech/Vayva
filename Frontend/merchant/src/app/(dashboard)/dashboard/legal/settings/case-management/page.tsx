@@ -44,7 +44,7 @@ export default function CaseManagementSettingsPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/legal/settings/case-management', {
+      const response = await fetch('/legal/settings/case-management', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),

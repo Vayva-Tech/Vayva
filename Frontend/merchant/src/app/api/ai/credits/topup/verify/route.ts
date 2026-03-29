@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await request.json().catch(() => ({}));
-    const res = await fetch(buildBackendUrl("/api/ai/credits/topup/verify"), {
+    const res = await fetch(buildBackendUrl("/ai/credits/topup/verify"), {
       method: "POST",
       headers: auth.headers,
       body: JSON.stringify(body),
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ai/credits/topup/verify",
+      endpoint: "/ai/credits/topup/verify",
       operation: "AI_TOPUP_VERIFY",
     });
     return NextResponse.json({ error: "Failed to verify AI top-up" }, { status: 500 });

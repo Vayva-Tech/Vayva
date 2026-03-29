@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ rewards, total });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/loyalty/rewards",
+      endpoint: "/loyalty/rewards",
       operation: "FETCH_LOYALTY_REWARDS",
     });
     return NextResponse.json({ error: "Failed to fetch loyalty rewards" }, { status: 500 });

@@ -40,7 +40,7 @@ export function TrashBin() {
   const fetchTrashedItems = async () => {
     try {
       const data = await apiJson<{ items: TrashedItem[] }>(
-        "/api/trash-bin",
+        "/trash-bin",
         { method: "GET" }
       );
       setItems(data.items || []);
@@ -55,7 +55,7 @@ export function TrashBin() {
 
   const restoreItem = async (item: TrashedItem) => {
     try {
-      await apiJson("/api/trash-bin/restore", {
+      await apiJson("/trash-bin/restore", {
         method: "POST",
         body: JSON.stringify({ itemId: item.id, type: item.type }),
       });
@@ -70,7 +70,7 @@ export function TrashBin() {
 
   const permanentlyDelete = async (item: TrashedItem) => {
     try {
-      await apiJson("/api/trash-bin/permanent-delete", {
+      await apiJson("/trash-bin/permanent-delete", {
         method: "POST",
         body: JSON.stringify({ itemId: item.id, type: item.type }),
       });
@@ -85,7 +85,7 @@ export function TrashBin() {
 
   const emptyTrash = async () => {
     try {
-      await apiJson("/api/trash-bin/empty", { method: "POST" });
+      await apiJson("/trash-bin/empty", { method: "POST" });
       setItems([]);
       toast.success("Trash bin emptied");
     } catch {

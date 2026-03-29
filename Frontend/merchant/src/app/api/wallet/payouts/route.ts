@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/wallet/payouts",
+      endpoint: "/wallet/payouts",
       operation: "GET_PAYOUTS",
     });
     return NextResponse.json(

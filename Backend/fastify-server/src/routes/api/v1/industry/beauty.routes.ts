@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { BeautyService } from '../../../services/industry/beauty.service';
+import { BeautyService } from '../../../../services/industry/beauty.service';
 
 const beautyService = new BeautyService();
 

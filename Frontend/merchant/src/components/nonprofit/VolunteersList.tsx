@@ -52,7 +52,7 @@ export function VolunteersList() {
 
   const fetchVolunteers = async () => {
     try {
-      const response = await fetch('/api/nonprofit/volunteers');
+      const response = await fetch('/nonprofit/volunteers');
       if (response.ok) {
         const data = await response.json();
         setVolunteers(data.volunteers || []);
@@ -64,7 +64,7 @@ export function VolunteersList() {
 
   const fetchShifts = async () => {
     try {
-      const response = await fetch('/api/nonprofit/volunteers/shifts');
+      const response = await fetch('/nonprofit/volunteers/shifts');
       if (response.ok) {
         const data = await response.json();
         setShifts(data.shifts || []);

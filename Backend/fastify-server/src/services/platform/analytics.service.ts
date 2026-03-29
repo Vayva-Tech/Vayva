@@ -77,6 +77,321 @@ export class AnalyticsService {
     return { events, total, page, limit, pages: Math.ceil(total / limit) };
   }
 
+  /**
+   * Get comprehensive platform analytics for ops dashboard
+   */
+  async getComprehensiveAnalytics() {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    const [
+      merchantCount,
+      activeMerchantCount,
+      totalGMVResult,
+      totalOrdersCount,
+      avgOrderValueResult,
+      newMerchantsThisMonth,
+      newMerchantsLastMonth,
+      gmvThisMonth,
+      gmvLastMonth,
+      ordersThisMonth,
+      ordersLastMonth,
+      openTickets,
+      pendingKyc,
+      totalRevenueResult,
+      totalRefundsResult,
+    ] = await Promise.all([
+      this.db.store.count(),
+      this.db.store.count({ where: { isActive: true } }),
+      this.db.order.aggregate({ _sum: { totalAmount: true } }),
+      this.db.order.count(),
+      this.db.order.aggregate({ _avg: { totalAmount: true } }),
+      this.db.store.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      this.db.store.count({ where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      this.db.order.aggregate({ _sum: { totalAmount: true }, where: { createdAt: { gte: thirtyDaysAgo } } }),
+      this.db.order.aggregate({ _sum: { totalAmount: true }, where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      this.db.order.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      this.db.order.count({ where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      this.db.supportTicket.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
+      this.db.kycRecord.count({ where: { status: 'PENDING' } }),
+      this.db.subscriptionPayment.count({}),
+      this.db.refund.count({}),
+    ]);
+
+    return {
+      overview: {
+        totalMerchants: merchantCount,
+        activeMerchants: activeMerchantCount,
+        totalGMV: totalGMVResult._sum.totalAmount || 0,
+        totalOrders: totalOrdersCount,
+        avgOrderValue: avgOrderValueResult._avg.totalAmount || 0,
+      },
+      growth: {
+        merchantGrowthRate: newMerchantsLastMonth > 0 ? ((newMerchantsThisMonth - newMerchantsLastMonth) / newMerchantsLastMonth) * 100 : 0,
+        gmvGrowthRate: gmvLastMonth._sum.totalAmount && gmvLastMonth._sum.totalAmount! > 0 ? ((gmvThisMonth._sum.totalAmount! - gmvLastMonth._sum.totalAmount!) / gmvLastMonth._sum.totalAmount!) * 100 : 0,
+        orderGrowthRate: ordersLastMonth > 0 ? ((ordersThisMonth - ordersLastMonth) / ordersLastMonth) * 100 : 0,
+      },
+      operational: {
+        openTickets,
+        pendingKyc,
+      },
+      financial: {
+        totalRevenue: totalRevenueResult,
+        totalRefunds: totalRefundsResult,
+      },
+    };
+  }
+
+  /**
+   * Get dashboard stats for ops
+   */
+  async getDashboardStats() {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [
+      currentMerchantCount,
+      prevMerchantCount,
+      currentRevenue,
+      prevRevenue,
+      currentOrders,
+      prevOrders,
+      openTickets,
+      recentActivity,
+      activeSubscriptions,
+      mrrTotal,
+      newMerchantsThisWeek,
+    ] = await Promise.all([
+      this.db.store?.count({ where: { isActive: true } }),
+      this.db.store?.count({ where: { isActive: true, createdAt: { lt: thirtyDaysAgo } } }),
+      this.db.subscriptionPayment.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      this.db.subscriptionPayment.count({ where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      this.db.order.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      this.db.order.count({ where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      this.db.supportTicket.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
+      this.db.opsAuditEvent.findMany({ take: 10, orderBy: { createdAt: 'desc' } }),
+      this.db.merchantAiSubscription.count({ where: { status: 'ACTIVE' } }),
+      this.db.merchantAiSubscription.aggregate({ _sum: { monthlyFee: true } }),
+      this.db.store.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+    ]);
+
+    return {
+      stats: {
+        merchants: {
+          current: currentMerchantCount || 0,
+          delta: (currentMerchantCount || 0) - (prevMerchantCount || 0),
+        },
+        revenue: {
+          current: currentRevenue || 0,
+          delta: currentRevenue - prevRevenue,
+        },
+        orders: {
+          current: currentOrders || 0,
+          delta: currentOrders - prevOrders,
+        },
+        tickets: {
+          open: openTickets || 0,
+        },
+        subscriptions: {
+          active: activeSubscriptions || 0,
+          mrr: mrrTotal._sum.monthlyFee || 0,
+        },
+        activity: {
+          newMerchantsThisWeek: newMerchantsThisWeek || 0,
+          recentLogs: recentActivity,
+        },
+      },
+    };
+  }
+
+  /**
+   * Get platform analytics breakdown
+   */
+  async getPlatformBreakdown() {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    const [
+      totalMerchants,
+      activeMerchants,
+      newMerchantsThisMonth,
+      newMerchantsLastMonth,
+      industryData,
+      planData,
+      topMerchantsData,
+    ] = await Promise.all([
+      this.db.store.count(),
+      this.db.store.count({
+        where: {
+          orders: {
+            some: {
+              createdAt: { gte: thirtyDaysAgo },
+            },
+          },
+        },
+      }),
+      this.db.store.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      this.db.store.count({ where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      this.db.store.groupBy({
+        by: ['industrySlug'],
+        _count: { id: true },
+      }),
+      this.db.store.groupBy({
+        by: ['planKey'],
+        _count: { id: true },
+      }),
+      this.db.store.findMany({
+        take: 10,
+        orderBy: {
+          orders: {
+            _count: 'desc',
+          },
+        },
+        include: {
+          orders: {
+            select: { total: true },
+            where: { createdAt: { gte: thirtyDaysAgo } },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      overview: {
+        totalMerchants,
+        activeMerchants,
+        growthRate: newMerchantsLastMonth > 0 ? ((newMerchantsThisMonth - newMerchantsLastMonth) / newMerchantsLastMonth) * 100 : 0,
+      },
+      breakdown: {
+        byIndustry: industryData.map((d: any) => ({ category: d.industrySlug || 'Unknown', count: d._count.id })),
+        byPlan: planData.map((d: any) => ({ planKey: d.planKey || 'Unknown', count: d._count.id })),
+      },
+      topPerformers: topMerchantsData.map((m: any) => ({
+        id: m.id,
+        name: m.name,
+        orderCount: m.orders.length,
+        totalRevenue: m.orders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0),
+      })),
+    };
+  }
+
+  /**
+   * Get time series data for metrics
+   */
+  async getTimeSeries(metric: string, periodDays: number, granularity: string) {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - periodDays);
+
+    let data: Array<{ date: string; value: number; label: string }> = [];
+
+    if (metric === 'gmv') {
+      const orders = await this.db.order.findMany({
+        where: {
+          createdAt: { gte: startDate, lte: endDate },
+          paymentStatus: 'SUCCESS',
+        },
+        select: {
+          createdAt: true,
+          total: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      const groupedData = new Map<string, number>();
+      orders.forEach((order) => {
+        const dateKey = order.createdAt.toISOString().split('T')[0];
+        groupedData.set(dateKey, (groupedData.get(dateKey) || 0) + Number(order.total || 0));
+      });
+
+      data = Array.from(groupedData.entries()).map(([date, value]) => ({
+        date,
+        value,
+        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      }));
+    } else if (metric === 'merchants') {
+      const merchants = await this.db.store.findMany({
+        where: {
+          createdAt: { gte: startDate, lte: endDate },
+        },
+        select: {
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      const groupedData = new Map<string, number>();
+      merchants.forEach((merchant) => {
+        const dateKey = merchant.createdAt.toISOString().split('T')[0];
+        groupedData.set(dateKey, (groupedData.get(dateKey) || 0) + 1);
+      });
+
+      let cumulative = 0;
+      data = Array.from(groupedData.entries()).map(([date, value]) => {
+        cumulative += value;
+        return {
+          date,
+          value: cumulative,
+          label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        };
+      });
+    } else if (metric === 'orders') {
+      const orders = await this.db.order.findMany({
+        where: {
+          createdAt: { gte: startDate, lte: endDate },
+        },
+        select: {
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      const groupedData = new Map<string, number>();
+      orders.forEach((order) => {
+        const dateKey = order.createdAt.toISOString().split('T')[0];
+        groupedData.set(dateKey, (groupedData.get(dateKey) || 0) + 1);
+      });
+
+      data = Array.from(groupedData.entries()).map(([date, value]) => ({
+        date,
+        value,
+        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      }));
+    }
+
+    return { data, metric, period: `${periodDays}d` };
+  }
+
+  /**
+   * Get CSAT scores
+   */
+  async getCsatScores() {
+    const feedbacks = await this.db.supportTicketFeedback.findMany({
+      select: { rating: true },
+    });
+
+    const total = feedbacks.length;
+    const great = feedbacks.filter((f) => f.rating === 'GREAT').length;
+    const okay = feedbacks.filter((f) => f.rating === 'OKAY').length;
+    const bad = feedbacks.filter((f) => f.rating === 'BAD').length;
+
+    const csatScore = total > 0 ? Math.round((great / total) * 100) : 0;
+
+    return {
+      data: {
+        total,
+        great,
+        okay,
+        bad,
+        csatScore,
+        target: 85,
+      },
+    };
+  }
+
   async trackEvent(storeId: string, eventData: any) {
     const { eventType, userId, metadata, sessionId } = eventData;
 

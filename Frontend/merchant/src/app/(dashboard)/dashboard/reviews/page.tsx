@@ -37,7 +37,7 @@ export default function ReviewsPage() {
   const loadReviews = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<Review[]>("/api/reviews");
+      const data = await apiJson<Review[]>("/reviews");
       setReviews(data || []);
     } catch (error) {
       logger.error("[REVIEWS_LOAD_ERROR]", { error });
@@ -110,14 +110,14 @@ export default function ReviewsPage() {
             positive={pendingReviews === 0}
           />
           <SummaryWidget
-            icon={<ThumbsUp size={18} />}
+            icon={<thumbsUp size={18} / scope="col">}
             label="Approved"
             value={String(publishedReviews)}
             trend="live"
             positive
           />
           <SummaryWidget
-            icon={<ThumbsDown size={18} />}
+            icon={<thumbsDown size={18} / scope="col">}
             label="Archived"
             value={String(archivedReviews)}
             trend="hidden"
@@ -166,13 +166,13 @@ export default function ReviewsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Review</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Rating</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Review</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Product</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

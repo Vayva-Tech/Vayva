@@ -40,7 +40,7 @@ export default function TravelCustomersPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Customer[] }>("/api/travel/customers?limit=500");
+      const response = await apiJson<{ data: Customer[] }>("/travel/customers?limit=500");
       setCustomers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch customers", error);

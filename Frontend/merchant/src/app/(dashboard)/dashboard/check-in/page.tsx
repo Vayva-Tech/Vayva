@@ -59,7 +59,7 @@ export default function CheckInPage() {
       try {
         setLoading(true);
         const data = await apiJson<BookingsResponse>(
-          "/api/bookings?status=CONFIRMED,CHECKED_IN&limit=50&sort=date:desc",
+          "/bookings?status=CONFIRMED,CHECKED_IN&limit=50&sort=date:desc",
         );
         const bookings = Array.isArray(data)
           ? data

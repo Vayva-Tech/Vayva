@@ -272,7 +272,7 @@ class DashboardUsageTracker {
 
     try {
       // Batch send interactions
-      await fetch('/api/analytics/dashboard-usage', {
+      await fetch('/analytics/dashboard-usage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

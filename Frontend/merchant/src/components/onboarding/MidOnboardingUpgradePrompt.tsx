@@ -67,7 +67,7 @@ export function MidOnboardingUpgradePrompt({ stepId }: UpgradePromptProps) {
     setLoading(true);
     try {
       // Track upgrade intent
-      const response = await fetch("/api/billing/upgrade", {
+      const response = await fetch("/billing/upgrade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

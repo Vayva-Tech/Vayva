@@ -24,7 +24,7 @@ export async function POST(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/whatsapp/broadcasts/:id/cancel", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/whatsapp/broadcasts/:id/cancel", operation: "POST" });
     return NextResponse.json({ error: "Failed to cancel broadcast" }, { status: 500 });
   }
 }

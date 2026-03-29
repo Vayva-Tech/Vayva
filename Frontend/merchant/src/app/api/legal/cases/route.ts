@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 // GET /api/legal/cases - Get all legal cases
 export async function GET(request: NextRequest) {
@@ -20,66 +19,21 @@ export async function GET(request: NextRequest) {
     const clientId = searchParams.get("clientId");
     const priority = searchParams.get("priority");
 
-    const where: Record<string, unknown> = { storeId };
-
-    if (status) {
-      where.status = status;
-    }
-
-    if (clientId) {
-      where.clientId = clientId;
-    }
-
-    if (priority) {
-      where.priority = priority;
-    }
-
-    const [cases, total] = await Promise.all([
-      (prisma as any).legalCase.findMany({
-        where,
-        include: {
-          client: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          assignedTo: {
-            select: {
-              id: true,
-              name: true,
-              avatar: true,
-            },
-          },
-          _count: {
-            select: {
-              documents: true,
-              timeEntries: true,
-              invoices: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        skip: offset,
-        take: limit,
-      }),
-      (prisma as any).legalCase.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: cases,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + cases.length < total,
-      },
+    // Fetch legal cases via backend API
+    const params: Record<string, string> = { limit: String(limit), offset: String(offset) };
+    if (status) params.status = status;
+    if (clientId) params.clientId = clientId;
+    if (priority) params.priority = priority;
+    
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/legal/cases?${new URLSearchParams(params)}`, {
+      method: 'GET',
+      headers: auth.headers,
     });
+
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/legal/cases",
+      endpoint: "/legal/cases",
       operation: "GET_LEGAL_CASES",
     });
     return NextResponse.json(

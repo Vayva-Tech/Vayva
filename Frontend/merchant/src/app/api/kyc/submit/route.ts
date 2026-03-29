@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result.data);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/kyc/submit", operation: "POST" });
+    handleApiError(error, { endpoint: "/kyc/submit", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

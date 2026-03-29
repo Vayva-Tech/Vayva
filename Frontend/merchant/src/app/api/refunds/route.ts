@@ -18,13 +18,13 @@ export async function GET(request: NextRequest) {
       if (status) queryParams.set("status", status);
       queryParams.set("limit", String(limit));
       queryParams.set("offset", String(offset));
-      const result = await apiJson(`${buildBackendUrl("/api/refunds")}?${queryParams.toString()}`, {
+      const result = await apiJson(`${buildBackendUrl("/refunds")}?${queryParams.toString()}`, {
         headers: auth.headers,
       });
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/refunds", operation: "GET" });
+    handleApiError(error, { endpoint: "/refunds", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -26,7 +26,7 @@ export default function SubscriptionCallbackPage() {
   const handleVerifyPayment = async (ref: string) => {
     setVerifying(true);
     try {
-      await apiJson<{ success: boolean }>("/api/billing/verify-payment", {
+      await apiJson<{ success: boolean }>("/billing/verify-payment", {
         method: "POST",
         body: JSON.stringify({ reference: ref }),
       });

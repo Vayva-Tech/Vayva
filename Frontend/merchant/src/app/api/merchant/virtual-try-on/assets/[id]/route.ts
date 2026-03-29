@@ -53,7 +53,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/virtual-try-on/assets/[id]",
+      endpoint: "/merchant/virtual-try-on/assets/[id]",
       operation: "GET_VTO_ASSET",
       storeId,
     });
@@ -103,7 +103,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/virtual-try-on/assets/[id]",
+      endpoint: "/merchant/virtual-try-on/assets/[id]",
       operation: "UPDATE_VTO_ASSET",
       storeId,
     });
@@ -141,7 +141,7 @@ export async function DELETE(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/virtual-try-on/assets/[id]",
+      endpoint: "/merchant/virtual-try-on/assets/[id]",
       operation: "DELETE_VTO_ASSET",
       storeId,
     });

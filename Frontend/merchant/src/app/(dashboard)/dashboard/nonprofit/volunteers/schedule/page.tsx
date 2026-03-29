@@ -63,8 +63,8 @@ export default function VolunteerScheduler() {
     try {
       setLoading(true);
       const [shiftsRes, volunteersRes] = await Promise.all([
-        apiJson<{ data: any[] }>("/api/nonprofit/volunteers/shifts"),
-        apiJson<{ data: any[] }>("/api/nonprofit/volunteers"),
+        apiJson<{ data: any[] }>("/nonprofit/volunteers/shifts"),
+        apiJson<{ data: any[] }>("/nonprofit/volunteers"),
       ]);
 
       setShifts(shiftsRes.data || []);
@@ -111,7 +111,7 @@ export default function VolunteerScheduler() {
 
   const handleCreateShift = async (formData: FormData) => {
     try {
-      await apiJson("/api/nonprofit/volunteers/shifts", {
+      await apiJson("/nonprofit/volunteers/shifts", {
         method: "POST",
         body: JSON.stringify({
           title: formData.get("title"),

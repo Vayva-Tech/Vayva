@@ -30,7 +30,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/orders/[id]",
+      endpoint: "/orders/[id]",
       operation: "GET_ORDER",
     });
     return NextResponse.json(
@@ -71,7 +71,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/orders/[id]",
+      endpoint: "/orders/[id]",
       operation: "UPDATE_ORDER",
     });
     return NextResponse.json(
@@ -108,7 +108,7 @@ export async function DELETE(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/orders/[id]",
+      endpoint: "/orders/[id]",
       operation: "DELETE_ORDER",
     });
     return NextResponse.json(

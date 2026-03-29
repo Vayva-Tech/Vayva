@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/profile",
+      endpoint: "/account/profile",
       operation: "GET_PROFILE",
     });
     return NextResponse.json(

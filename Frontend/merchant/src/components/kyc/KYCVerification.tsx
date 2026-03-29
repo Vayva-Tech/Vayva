@@ -39,7 +39,7 @@ export function KYCVerification({ onSuccess, onCancel }: KYCVerificationProps) {
   const fetchStatus = useCallback(async () => {
     try {
       setStatusLoading(true);
-      const data = await apiJson<KycStatusResponse>("/api/kyc/status");
+      const data = await apiJson<KycStatusResponse>("/kyc/status");
       setKycStatus(data);
     } catch {
       setKycStatus({
@@ -74,7 +74,7 @@ export function KYCVerification({ onSuccess, onCancel }: KYCVerificationProps) {
     setError(null);
 
     try {
-      const result = await apiJson<KycSubmitResponse>("/api/kyc/submit", {
+      const result = await apiJson<KycSubmitResponse>("/kyc/submit", {
         method: "POST",
         body: JSON.stringify({
           nin: nin.trim(),

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { ServiceCatalogService } from '../../../services/commerce/serviceCatalog.service';
+import { ServiceCatalogService } from '../../../../services/commerce/serviceCatalog.service';
 
 const serviceCatalogService = new ServiceCatalogService();
 

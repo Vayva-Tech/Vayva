@@ -24,7 +24,7 @@ export const NotificationBell = ({
     const fetchCount = async () => {
       try {
         const data = await apiJson<UnreadCountResponse>(
-          "/api/notifications/unread-count",
+          "/notifications/unread-count",
         );
         setUnreadCount(data?.count || 0);
       } catch (err: unknown) {

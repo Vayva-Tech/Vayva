@@ -54,7 +54,7 @@ export default function DisputesPage() {
   const fetchDisputes = async () => {
     try {
       setLoading(true);
-      const result = await apiJson<DisputesResponse>("/api/disputes");
+      const result = await apiJson<DisputesResponse>("/disputes");
       setDisputes(result?.data || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -156,14 +156,14 @@ export default function DisputesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-white  text-gray-700 font-medium border-b border-gray-100">
+              <thead className="bg-white  text-gray-700 font-medium border-b border-gray-100" scope="col">
                 <tr>
-                  <th className="px-6 py-3">Order / Customer</th>
-                  <th className="px-6 py-3">Amount</th>
-                  <th className="px-6 py-3">Reason</th>
-                  <th className="px-6 py-3">Evidence Due</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
+                  <th className="px-6 py-3" scope="col">Order / Customer</th>
+                  <th className="px-6 py-3" scope="col">Amount</th>
+                  <th className="px-6 py-3" scope="col">Reason</th>
+                  <th className="px-6 py-3" scope="col">Evidence Due</th>
+                  <th className="px-6 py-3" scope="col">Status</th>
+                  <th className="px-6 py-3 text-right" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/30">

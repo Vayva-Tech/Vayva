@@ -39,7 +39,7 @@ export default function PublishPage() {
 
   const fetchSite = async () => {
     try {
-      const res = await apiJson<{ data: SiteOverview }>("/api/sites/overview");
+      const res = await apiJson<{ data: SiteOverview }>("/sites/overview");
       setSite(res.data);
     } catch {
       toast.error("Failed to load publish status");
@@ -60,7 +60,7 @@ export default function PublishPage() {
       await new Promise((resolve) => setTimeout(resolve, 800));
       toast.info("Deploying to global CDN...");
 
-      await apiJson<{ success: boolean }>("/api/merchant/store/publish", {
+      await apiJson<{ success: boolean }>("/merchant/store/publish", {
         method: "POST",
       });
 

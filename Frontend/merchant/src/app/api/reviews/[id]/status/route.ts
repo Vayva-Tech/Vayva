@@ -37,7 +37,7 @@ export async function PATCH(
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/reviews/:id/status", operation: "PATCH" });
+    handleApiError(error, { endpoint: "/reviews/:id/status", operation: "PATCH" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

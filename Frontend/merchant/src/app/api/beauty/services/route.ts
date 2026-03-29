@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/beauty/services",
+      endpoint: "/beauty/services",
       operation: "GET_BEAUTY_SERVICES",
     });
     return NextResponse.json({ error: "Failed to fetch beauty services" }, { status: 500 });

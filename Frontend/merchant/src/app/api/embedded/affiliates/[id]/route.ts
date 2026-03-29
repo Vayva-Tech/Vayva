@@ -23,7 +23,7 @@ export async function GET(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/affiliates/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/embedded/affiliates/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch affiliate" }, { status: 500 });
   }
 }

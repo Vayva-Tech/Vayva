@@ -67,7 +67,7 @@ export default function NewServicePage() {
         return;
       }
 
-      await apiJson<CreateServiceResponse>("/api/services", {
+      await apiJson<CreateServiceResponse>("/services", {
         method: "POST",
         body: JSON.stringify({
           ...formData,

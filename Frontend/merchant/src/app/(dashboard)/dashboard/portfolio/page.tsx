@@ -27,7 +27,7 @@ export default function PortfolioPage() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch("/api/portfolio");
+      const res = await fetch("/portfolio");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setProjects(data.projects || []);
@@ -49,7 +49,7 @@ export default function PortfolioPage() {
     }
 
     try {
-      const res = await fetch("/api/portfolio", {
+      const res = await fetch("/portfolio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

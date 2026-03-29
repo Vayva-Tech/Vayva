@@ -141,7 +141,7 @@ export default function PetCareDashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/petcare/stats");
+      const response = await apiJson<{ data: DashboardStats }>("/petcare/stats");
       setStats(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch pet care stats", error);
@@ -151,7 +151,7 @@ export default function PetCareDashboardPage() {
 
   const fetchAppointments = async () => {
     try {
-      const response = await apiJson<{ data: Appointment[] }>("/api/petcare/appointments?today=true");
+      const response = await apiJson<{ data: Appointment[] }>("/petcare/appointments?today=true");
       setAppointments(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch appointments", error);
@@ -161,7 +161,7 @@ export default function PetCareDashboardPage() {
 
   const fetchLowStockItems = async () => {
     try {
-      const response = await apiJson<{ data: InventoryItem[] }>("/api/petcare/inventory?low-stock=true");
+      const response = await apiJson<{ data: InventoryItem[] }>("/petcare/inventory?low-stock=true");
       setLowStockItems(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch low stock items", error);
@@ -171,7 +171,7 @@ export default function PetCareDashboardPage() {
 
   const fetchCriticalPatients = async () => {
     try {
-      const response = await apiJson<{ data: Patient[] }>("/api/petcare/patients?status=critical");
+      const response = await apiJson<{ data: Patient[] }>("/petcare/patients?status=critical");
       setCriticalPatients(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch critical patients", error);

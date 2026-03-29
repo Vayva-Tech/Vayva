@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/inventory/transfers",
+      endpoint: "/inventory/transfers",
       operation: "GET_INVENTORY_TRANSFERS",
     });
     return NextResponse.json(

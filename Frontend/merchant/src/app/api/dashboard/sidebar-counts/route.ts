@@ -1,63 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
-import { requireAuthFromRequest } from "@/lib/session.server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-
-// GET /api/dashboard/sidebar-counts - Get pending/unread counts for sidebar nav items
-export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireAuthFromRequest(request);
-    if (!user?.storeId) {
-      return NextResponse.json({ data: {} }, { status: 401 });
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const storeId = user.storeId;
+    const { searchParams } = new URL(request.url);
+    const queryParams = new URLSearchParams();
+    
+    // Forward relevant query parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (value) {
+        queryParams.set(key, value);
+      }
+    }
 
-    const [unreadNotifications, openTickets, activeOrders, refundRequests] =
-      await Promise.all([
-        prisma.notification.count({ where: { storeId, isRead: false } }),
-        prisma.supportTicket.count({
-          where: { storeId, status: { in: ["open", "in_progress", "waiting"] } },
-        }),
-        prisma.order.count({
-          where: {
-            storeId,
-            status: {
-              in: [
-                "PENDING_PAYMENT",
-                "PAID",
-                "PROCESSING",
-                "FULFILLING",
-                "OUT_FOR_DELIVERY",
-                "SHIPPED",
-                "REFUND_REQUESTED",
-                "DISPUTED",
-              ],
-            },
-          },
-        }),
-        prisma.refund.count({
-          where: { storeId, status: { in: ["REQUESTED", "APPROVED", "PROCESSING"] } },
-        }),
-      ]);
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/dashboard/sidebar-counts` + (queryParams.toString() ? `?${queryParams}` : ""),
+      { headers: auth.headers }
+    );
 
-    // Each key is a normalized sidebar path (e.g. "/dashboard/orders"),
-    // each value is the pending / unread count to display as a badge.
-    const counts: Record<string, number> = {
-      "/dashboard/notifications": unreadNotifications,
-      "/dashboard/support": openTickets,
-      "/dashboard/orders": activeOrders,
-      "/dashboard/finance/refunds": refundRequests,
-    };
-
-    return NextResponse.json({ data: counts });
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, {
-      endpoint: "/api/dashboard/sidebar-counts",
-      operation: "GET",
-    });
-    return NextResponse.json({ data: {} });
+    handleApiError(error, { endpoint: "/dashboard/sidebar-counts/route.ts", operation: "GET" });
+    return NextResponse.json(
+      { error: "Failed to complete operation" },
+      { status: 500 }
+    );
   }
 }

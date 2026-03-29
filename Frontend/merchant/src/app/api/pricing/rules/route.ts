@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/pricing/rules",
+        endpoint: "/pricing/rules",
         operation: "GET_PRICING_RULES",
       }
     );
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/pricing/rules",
+        endpoint: "/pricing/rules",
         operation: "CREATE_PRICING_RULE",
       }
     );

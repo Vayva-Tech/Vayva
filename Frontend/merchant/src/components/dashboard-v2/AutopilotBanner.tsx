@@ -42,7 +42,7 @@ export function AutopilotBanner() {
         setError(null);
         
         // Check if autopilot add-on is active
-        const addonsData = await apiJson<AddonResponse>("/api/merchant/addons");
+        const addonsData = await apiJson<AddonResponse>("/merchant/addons");
         const autopilot = (addonsData?.addOns || []).find(
           (a) => a.id === "vayva.autopilot",
         );
@@ -54,7 +54,7 @@ export function AutopilotBanner() {
 
         // Fetch pending runs
         const feedData = await apiJson<AutopilotFeedResponse>(
-          "/api/merchant/autopilot/feed?status=PROPOSED&limit=1",
+          "/merchant/autopilot/feed?status=PROPOSED&limit=1",
         );
         setPendingCount(feedData?.pendingCount || 0);
         if (feedData?.runs && feedData.runs.length > 0) {

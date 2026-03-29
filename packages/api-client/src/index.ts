@@ -7,11 +7,12 @@ import {
   LoginRequest,
   AuthResponseData,
   InviteStaffRequest,
-  AcceptInviteRequest
+  AcceptInviteRequest,
 } from "@vayva/shared";
 
-// Use relative path to work with Next.js API routes in all environments
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+// Point to Fastify backend - all API calls go through Fastify
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 
 class ApiClient {
   private async request<T>(
@@ -31,15 +32,16 @@ class ApiClient {
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(url, { ...options, signal: controller.signal });
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
 
       if (!response.ok) {
-        const errorData: ApiResponse<T> = await response
-          .json()
-          .catch(() => ({
-            success: false,
-            error: { code: "UNKNOWN_ERROR", message: "Unknown error" }
-          }));
+        const errorData: ApiResponse<T> = await response.json().catch(() => ({
+          success: false,
+          error: { code: "UNKNOWN_ERROR", message: "Unknown error" },
+        }));
 
         return errorData;
       }
@@ -63,11 +65,18 @@ class ApiClient {
     }
   }
 
-  async get<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  async get<T>(
+    path: string,
+    options: RequestInit = {},
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(path, { ...options, method: "GET" });
   }
 
-  async post<T>(path: string, data?: unknown, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  async post<T>(
+    path: string,
+    data?: unknown,
+    options: RequestInit = {},
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(path, {
       ...options,
       method: "POST",
@@ -75,7 +84,11 @@ class ApiClient {
     });
   }
 
-  async put<T>(path: string, data?: unknown, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  async put<T>(
+    path: string,
+    data?: unknown,
+    options: RequestInit = {},
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(path, {
       ...options,
       method: "PUT",
@@ -83,7 +96,11 @@ class ApiClient {
     });
   }
 
-  async patch<T>(path: string, data?: unknown, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  async patch<T>(
+    path: string,
+    data?: unknown,
+    options: RequestInit = {},
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(path, {
       ...options,
       method: "PATCH",
@@ -91,7 +108,10 @@ class ApiClient {
     });
   }
 
-  async delete<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  async delete<T>(
+    path: string,
+    options: RequestInit = {},
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(path, { ...options, method: "DELETE" });
   }
 
@@ -128,7 +148,9 @@ class ApiClient {
         body: JSON.stringify(data),
       }),
     logout: () =>
-      this.request<{ success: boolean }>("/auth/merchant/logout", { method: "POST" }),
+      this.request<{ success: boolean }>("/auth/merchant/logout", {
+        method: "POST",
+      }),
     me: () => this.request<AuthMeResponse>("/auth/merchant/me"),
   };
 

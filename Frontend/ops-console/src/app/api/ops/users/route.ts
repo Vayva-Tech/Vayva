@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
 
 export const dynamic = "force-dynamic";
@@ -17,30 +17,11 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("q") || "";
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {};
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const users = await prisma.opsUser.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-        lastLoginAt: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" },
+    const response = await apiClient.get('/api/v1/admin/users', {
+      q: search,
     });
 
-    return NextResponse.json(users);
+    return NextResponse.json(response);
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch users" },
@@ -70,14 +51,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { user, tempPassword } = await OpsAuthService.createUser(
-      currentUser.role,
-      {
-        email,
-        name,
-        role,
-      },
-    );
+    const response = await apiClient.post('/api/v1/admin/users', {
+      email,
+      name,
+      role,
+    });
 
     // Audit Log
     await OpsAuthService.logEvent(currentUser.id, "OPS_USER_CREATED", {
@@ -85,16 +63,7 @@ export async function POST(req: NextRequest) {
       role,
     });
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-      tempPassword, // Return temp password to display once
-    });
+    return NextResponse.json(response);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
@@ -136,22 +105,13 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Soft delete (deactivate) or hard delete? Let's toggle active state for now or hard delete if requested.
-    // For security, let's just delete for now to keep it clean, or update isActive.
-    // The implementation plan implies management. Let's do a hard delete for cleanup or deactivate.
-    // Schema has `isActive`. Let's toggle that via a PATCH, but for DELETE method specifically...
-    // Let's implement DELETE as actual delete for cleanup, or maybe just deactivate?
-    // Let's stick to DELETE = Delete for simplicity of "Remove User".
-
-    await prisma.opsUser.delete({
-      where: { id: userId },
-    });
+    const response = await apiClient.delete(`/api/v1/admin/users/${userId}`);
 
     await OpsAuthService.logEvent(currentUser.id, "OPS_USER_DELETED", {
       deletedUserId: userId,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(response);
   } catch {
     return NextResponse.json(
       { error: "Failed to delete user" },
@@ -183,41 +143,16 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const user = await prisma.opsUser.findUnique({ where: { id: userId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    let logAction = "";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let updateData: any = {};
-
-    switch (action) {
-      case "TOGGLE_STATUS":
-        updateData = { isActive: !user.isActive };
-        logAction = user.isActive
-          ? "OPS_USER_DEACTIVATED"
-          : "OPS_USER_ACTIVATED";
-        break;
-      case "RESET_2FA":
-        // Reset 2FA by clearing the secret
-        updateData = { twoFactorSecret: null };
-        logAction = "OPS_USER_2FA_RESET";
-        break;
-      default:
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-    }
-
-    const updated = await prisma.opsUser.update({
-      where: { id: userId },
-      data: updateData,
+    const response = await apiClient.patch(`/api/v1/admin/users/${userId}`, {
+      action,
     });
 
-    await OpsAuthService.logEvent(currentUser.id, logAction, {
+    await OpsAuthService.logEvent(currentUser.id, response.logAction, {
       targetUserId: userId,
-      targetUserEmail: user.email,
+      targetUserEmail: response.user?.email,
     });
 
-    return NextResponse.json({ success: true, user: updated });
+    return NextResponse.json(response);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {

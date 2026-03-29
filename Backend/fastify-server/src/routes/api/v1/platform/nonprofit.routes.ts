@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { NonprofitService } from '../../../services/platform/nonprofit.service';
+import { NonprofitService } from '../../../../services/platform/nonprofit.service';
 
 const nonprofitService = new NonprofitService();
 

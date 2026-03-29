@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ warranties });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/electronics/warranties",
+      endpoint: "/electronics/warranties",
       operation: "FETCH_WARRANTIES",
     });
     return NextResponse.json(

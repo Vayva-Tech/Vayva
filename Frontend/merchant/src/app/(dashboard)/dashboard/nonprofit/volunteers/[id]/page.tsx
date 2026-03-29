@@ -73,7 +73,7 @@ export default function VolunteerDetailPage() {
     try {
       setLoading(true);
       const [volunteersRes, shiftsRes] = await Promise.all([
-        apiJson<{ data: any[] }>("/api/nonprofit/volunteers"),
+        apiJson<{ data: any[] }>("/nonprofit/volunteers"),
         apiJson<{ data: any[] }>(`/api/nonprofit/volunteers/shifts?volunteerId=${volunteerId}`),
       ]);
 

@@ -21,7 +21,7 @@ export async function GET(
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/portfolio/[id]",
+      endpoint: "/portfolio/[id]",
       operation: "GET",
       storeId,
     });
@@ -53,7 +53,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/portfolio/[id]",
+      endpoint: "/portfolio/[id]",
       operation: "PATCH",
       storeId,
     });

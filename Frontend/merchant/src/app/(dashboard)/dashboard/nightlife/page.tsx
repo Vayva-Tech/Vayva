@@ -53,7 +53,7 @@ export default function NightlifeDashboardPage() {
       const result = await apiJson<{
         success?: boolean;
         data?: { metrics: NightlifeMetrics; venueStatus?: VenueStatus };
-      }>("/api/nightlife/dashboard");
+      }>("/nightlife/dashboard");
 
       const payload = result?.data;
       if (result?.success !== false && payload?.metrics) {

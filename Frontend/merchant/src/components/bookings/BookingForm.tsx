@@ -68,7 +68,7 @@ export function BookingForm({
     try {
       const url = initialData
         ? `/api/bookings/${initialData.id}`
-        : "/api/bookings";
+        : "/bookings";
       const method = initialData ? "PUT" : "POST";
 
       const payload = {

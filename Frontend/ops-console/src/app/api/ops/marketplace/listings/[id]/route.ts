@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, ListingStatus } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { logger } from "@vayva/shared";
+import { apiClient } from "@/lib/api-client";
 
 export async function PATCH(
   req: NextRequest,
@@ -14,29 +13,10 @@ export async function PATCH(
     const body = await req.json();
     const { action, note } = body;
 
-    const statusMap: Record<string, string> = {
-      approve: "APPROVED",
-      reject: "REJECTED",
-      suspend: "SUSPENDED",
-    };
-
-    const newStatus = statusMap[action];
-    if (!newStatus) {
-      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-    }
-
-    const listing = await prisma.marketplaceListing.update({
-      where: { id },
-      data: {
-        status: newStatus as ListingStatus,
-        moderationNote: note || null,
-        moderatedBy: user.id || "ops_admin",
-      },
-    });
-
-    return NextResponse.json({ success: true, listing });
-  } catch (error: unknown) {
-    logger.error("[LISTING_ACTION_ERROR]", { error });
+    const response = await apiClient.patch(`/api/v1/admin/marketplace/listings/${id}`, { action, note });
+    
+    return NextResponse.json(response);
+  } catch (error) {
     return NextResponse.json(
       { error: "Failed to update listing" },
       { status: 500 },

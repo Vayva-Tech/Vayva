@@ -33,7 +33,7 @@ export async function GET(
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/policies/:type",
+      endpoint: "/merchant/policies/:type",
       operation: "GET",
     });
     return NextResponse.json(
@@ -70,7 +70,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/policies/:type",
+      endpoint: "/merchant/policies/:type",
       operation: "POST",
     });
     return NextResponse.json(

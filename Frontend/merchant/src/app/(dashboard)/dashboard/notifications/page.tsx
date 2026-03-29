@@ -71,7 +71,7 @@ export default function NotificationsPage() {
   const markAsRead = async (id: string) => {
     try {
       await apiJson<{ success: boolean }>(
-        "/api/merchant/notifications/mark-read",
+        "/merchant/notifications/mark-read",
         {
           method: "POST",
           body: JSON.stringify({ ids: [id] }),
@@ -94,7 +94,7 @@ export default function NotificationsPage() {
   const markAllRead = async () => {
     try {
       await apiJson<{ success: boolean }>(
-        "/api/merchant/notifications/mark-read",
+        "/merchant/notifications/mark-read",
         {
           method: "POST",
           body: JSON.stringify({ mark_all: true }),

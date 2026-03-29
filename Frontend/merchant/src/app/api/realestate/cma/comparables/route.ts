@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/realestate/cma/comparables", operation: "GET" });
+    handleApiError(error, { endpoint: "/realestate/cma/comparables", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

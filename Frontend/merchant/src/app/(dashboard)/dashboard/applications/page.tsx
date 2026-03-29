@@ -52,7 +52,7 @@ export default function ApplicationsPage() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<Application[]>("/api/hr/applications");
+      const data = await apiJson<Application[]>("/hr/applications");
       setApplications(data || []);
     } catch (error) {
       logger.error("[FETCH_APPLICATIONS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" });
@@ -73,7 +73,7 @@ export default function ApplicationsPage() {
         await apiJson(`/api/hr/applications/${editingApplication.id}`, { method: "PUT", body: JSON.stringify(payload) });
         toast.success("Application updated");
       } else {
-        await apiJson("/api/hr/applications", { method: "POST", body: JSON.stringify(payload) });
+        await apiJson("/hr/applications", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Application created");
       }
       setIsOpen(false);

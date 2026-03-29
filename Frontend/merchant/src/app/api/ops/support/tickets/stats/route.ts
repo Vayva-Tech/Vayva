@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result.data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ops/support/tickets/stats",
+      endpoint: "/ops/support/tickets/stats",
       operation: "GET_TICKET_STATS",
     });
     logger.error("[OPS_TICKETS_STATS] Failed to fetch ticket statistics", {

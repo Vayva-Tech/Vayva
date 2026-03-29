@@ -1,4 +1,12 @@
-import IORedis from "ioredis";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isBuildTime = isBuildTime;
+exports.getRedis = getRedis;
+exports.closeRedis = closeRedis;
+const ioredis_1 = __importDefault(require("ioredis"));
 /**
  * BUILD-SAFE REDIS FACTORY
  *
@@ -10,7 +18,7 @@ let lastRedisErrorLogAtMs = 0;
 /**
  * Determines if we are currently in a build environment where Redis should not connect.
  */
-export function isBuildTime() {
+function isBuildTime() {
     return (process.env.NEXT_PHASE === "phase-production-build" ||
         process.env.VERCEL_BUILD_STEP === "1" ||
         (process.env.VERCEL_ENV &&
@@ -26,7 +34,7 @@ export function isBuildTime() {
  * Returns a Redis instance, lazily initialized.
  * Throws an error if called during build time (unless forced).
  */
-export async function getRedis(config = {}) {
+async function getRedis(config = {}) {
     if (redisInstance)
         return redisInstance;
     if (isBuildTime()) {
@@ -44,7 +52,7 @@ export async function getRedis(config = {}) {
     }
     const url = config.url || process.env.REDIS_URL || "redis://localhost:6379";
     try {
-        const instance = new IORedis(url, {
+        const instance = new ioredis_1.default(url, {
             maxRetriesPerRequest: null,
             ...config.options,
         });
@@ -77,7 +85,7 @@ export async function getRedis(config = {}) {
 /**
  * Helper to close connection safely
  */
-export async function closeRedis() {
+async function closeRedis() {
     if (redisInstance) {
         const instance = redisInstance;
         redisInstance = null;

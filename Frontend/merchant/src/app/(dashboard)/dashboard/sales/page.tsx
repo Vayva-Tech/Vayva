@@ -48,10 +48,10 @@ export default function SalesHubPage() {
       setLoading(true);
       const [leadsRes, quotesRes] = await Promise.all([
         apiJson<{ success?: boolean; data?: Array<{ status?: string }> }>(
-          "/api/leads?limit=200",
+          "/leads?limit=200",
         ),
         apiJson<{ success?: boolean; data?: Array<{ status?: string }> }>(
-          "/api/quotes?limit=200",
+          "/quotes?limit=200",
         ),
       ]);
       const leads = leadsRes.data ?? [];

@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ops/support/tickets",
+      endpoint: "/ops/support/tickets",
       operation: "GET_SUPPORT_TICKETS",
     });
     logger.error("[OPS_TICKETS] Failed to fetch support tickets", {

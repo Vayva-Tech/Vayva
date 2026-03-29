@@ -60,7 +60,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     handleApiError(
       error,
       {
-        endpoint: "/api/feedback",
+        endpoint: "/feedback",
         operation: "SUBMIT_FEEDBACK",
         storeId: undefined,
       }

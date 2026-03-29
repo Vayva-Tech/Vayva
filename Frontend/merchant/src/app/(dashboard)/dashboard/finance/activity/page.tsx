@@ -44,7 +44,7 @@ function kindLabel(kind: ActivityKind) {
 
 export default function FinanceActivityPage() {
   const { data, isLoading, error, mutate } = useSWR<{ data: ActivityItem[] }>(
-    "/api/finance/activity?limit=200",
+    "/finance/activity?limit=200",
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 30000 },
   );

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
         handleApiError(
             error,
             {
-                endpoint: "/api/templates/apply",
+                endpoint: "/templates/apply",
                 operation: "APPLY_TEMPLATE",
                 storeId,
             }

@@ -32,7 +32,7 @@ export default function BeautyMarketingPage() {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await apiJson<{ data: Campaign[] }>("/api/beauty/campaigns");
+      const response = await apiJson<{ data: Campaign[] }>("/beauty/campaigns");
       setCampaigns(response.data || generateMockCampaigns());
     } catch (error) {
       setCampaigns(generateMockCampaigns());

@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/checkout/initialize",
+      endpoint: "/checkout/initialize",
       operation: "POST_CHECKOUT_INITIALIZE",
     });
     return NextResponse.json(

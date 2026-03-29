@@ -32,7 +32,7 @@ export default function RestaurantReservationsPage() {
 
   const fetchReservations = async () => {
     try {
-      const response = await apiJson<{ data: Reservation[] }>("/api/restaurant/reservations?limit=200");
+      const response = await apiJson<{ data: Reservation[] }>("/restaurant/reservations?limit=200");
       setReservations(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch reservations", error);

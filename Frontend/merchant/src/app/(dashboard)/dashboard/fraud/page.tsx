@@ -137,10 +137,10 @@ export default function FraudDetectionDashboard() {
     try {
       setLoading(true);
       const [checksRes, rulesRes, statsRes, blocklistRes] = await Promise.all([
-        apiJson<{ checks: FraudCheck[] }>("/api/fraud/checks"),
-        apiJson<{ rules: FraudRule[] }>("/api/fraud/rules"),
-        apiJson<FraudStats>("/api/fraud/stats"),
-        apiJson<{ entries: BlocklistEntry[] }>("/api/fraud/blocklist"),
+        apiJson<{ checks: FraudCheck[] }>("/fraud/checks"),
+        apiJson<{ rules: FraudRule[] }>("/fraud/rules"),
+        apiJson<FraudStats>("/fraud/stats"),
+        apiJson<{ entries: BlocklistEntry[] }>("/fraud/blocklist"),
       ]);
 
       setChecks(checksRes.checks || []);
@@ -169,7 +169,7 @@ export default function FraudDetectionDashboard() {
 
   const handleAddToBlocklist = async (type: BlocklistEntry["type"], value: string) => {
     try {
-      await apiJson("/api/fraud/blocklist", {
+      await apiJson("/fraud/blocklist", {
         method: "POST",
         body: JSON.stringify({ type, value, reason: "Fraudulent activity" }),
       });

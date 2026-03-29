@@ -21,7 +21,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/quotes/[id]",
+      endpoint: "/quotes/[id]",
       operation: "GET",
       storeId,
     });

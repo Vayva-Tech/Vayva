@@ -32,6 +32,7 @@
     "./features": "./src/features/index.ts",
     "./services": "./src/services/index.ts",
     "./dashboard": "./src/dashboard/index.ts",
+    "./widgets": "./src/widgets/index.ts",
     "./types": "./src/types/index.ts"
   }
 }

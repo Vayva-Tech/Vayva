@@ -156,17 +156,17 @@ export default function AutomotiveInventoryPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Vehicle</th>
-                    <th className="text-left py-3 px-4 font-semibold">VIN</th>
-                    <th className="text-left py-3 px-4 font-semibold">Year</th>
-                    <th className="text-left py-3 px-4 font-semibold">Condition</th>
-                    <th className="text-left py-3 px-4 font-semibold">Mileage</th>
-                    <th className="text-left py-3 px-4 font-semibold">Price</th>
-                    <th className="text-left py-3 px-4 font-semibold">Days in Stock</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Vehicle</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">VIN</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Year</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Condition</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Mileage</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Price</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Days in Stock</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

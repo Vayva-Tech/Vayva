@@ -37,35 +37,62 @@ export default function WelcomeStep() {
       desc: "Tell us about your brand",
     },
     { icon: "Wrench", title: "Select Tools", desc: "Customize dashboard" },
-    { icon: "MessageSquare", title: "Connect Socials", desc: "Link IG & WhatsApp" },
+    {
+      icon: "MessageSquare",
+      title: "Connect Socials",
+      desc: "Link IG & WhatsApp",
+    },
     { icon: "CreditCard", title: "Payment Setup", desc: "Add bank account" },
-    { icon: "Shield", title: "KYC Verification", desc: "Identity verification" },
-    { icon: "Package", title: "Add First Item", desc: "Create product listing" },
-    { icon: "FileText", title: "Store Policies", desc: "Set terms & conditions" },
+    {
+      icon: "Shield",
+      title: "KYC Verification",
+      desc: "Identity verification",
+    },
+    {
+      icon: "Package",
+      title: "Add First Item",
+      desc: "Create product listing",
+    },
+    {
+      icon: "FileText",
+      title: "Store Policies",
+      desc: "Set terms & conditions",
+    },
     { icon: "Rocket", title: "Publish Storefront", desc: "Make it live" },
     { icon: "CheckCircle", title: "Review & Finish", desc: "Final checks" },
   ];
 
+  // Improved onboarding messaging: emphasize this as a one-time setup
+  const setupMessage =
+    "This is a one-time setup to get your store live. You won't need to repeat these steps.";
+
   const valueProps = [
-    { 
-      icon: Robot, 
+    {
+      icon: Robot,
       text: "AI Virtual Employee captures orders 24/7",
-      unlock: "Unlocks after Step 5 (Socials)"
+      unlock: "Unlocks after Step 5 (Socials)",
     },
-    { 
-      icon: Package, 
+    {
+      icon: Package,
       text: "Auto-tracks inventory & stock levels",
-      unlock: "Available after Step 7 (First Item)"
+      unlock: "Available after Step 7 (First Item)",
     },
-    { 
-      icon: Wallet, 
+    {
+      icon: Wallet,
       text: "Instant payouts to your bank account",
-      unlock: "Activates after Steps 6-7 (Finance + KYC)"
+      unlock: "Activates after Steps 6-7 (Finance + KYC)",
     },
   ];
 
   return (
     <div className="space-y-6">
+      <div
+        className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm mb-4"
+        role="note"
+        aria-label="Onboarding note"
+      >
+        <p className="text-sm text-gray-700">{setupMessage}</p>
+      </div>
       {/* Premium Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-vayva-green/10 mb-2">
@@ -75,7 +102,8 @@ export default function WelcomeStep() {
           Welcome, {firstName}!
         </h1>
         <p className="text-gray-500 max-w-md mx-auto text-lg">
-          Let's build your complete merchant platform. We've streamlined setup into 10 quick steps.
+          Let's build your complete merchant platform. We've streamlined setup
+          into 10 quick steps.
         </p>
       </div>
 
@@ -119,24 +147,37 @@ export default function WelcomeStep() {
               🎯 One-Time Business Setup - Extremely Important
             </h3>
             <p className="text-sm text-purple-800 mb-3">
-              This comprehensive setup ensures your store is configured perfectly for your specific business needs. 
-              Getting this right means:
+              This comprehensive setup ensures your store is configured
+              perfectly for your specific business needs. Getting this right
+              means:
             </p>
             <ul className="space-y-2 mb-3">
               <li className="flex items-start gap-2 text-sm text-purple-700">
-                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle
+                  size={16}
+                  className="text-purple-600 mt-0.5 flex-shrink-0"
+                />
                 <span>✅ AI captures orders correctly for your industry</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-purple-700">
-                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle
+                  size={16}
+                  className="text-purple-600 mt-0.5 flex-shrink-0"
+                />
                 <span>✅ Payment processing works flawlessly</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-purple-700">
-                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle
+                  size={16}
+                  className="text-purple-600 mt-0.5 flex-shrink-0"
+                />
                 <span>✅ Customer experience is personalized</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-purple-700">
-                <CheckCircle size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle
+                  size={16}
+                  className="text-purple-600 mt-0.5 flex-shrink-0"
+                />
                 <span>✅ Analytics and insights are relevant</span>
               </li>
             </ul>
@@ -145,7 +186,9 @@ export default function WelcomeStep() {
                 ⏱️ Time Required: 15-20 minutes total
               </p>
               <p className="text-xs text-purple-700 mt-1">
-                Most merchants complete this once and never need to revisit. The accuracy of your responses here directly impacts your success on Vayva.
+                Most merchants complete this once and never need to revisit. The
+                accuracy of your responses here directly impacts your success on
+                Vayva.
               </p>
             </div>
           </div>
@@ -219,7 +262,8 @@ export default function WelcomeStep() {
         {/* Conditional Steps Note */}
         <div className="pt-4 border-t border-gray-100">
           <p className="text-xs text-gray-400 text-center">
-            💡 <strong>Note:</strong> Additional industry-specific steps may be added based on your business type.
+            💡 <strong>Note:</strong> Additional industry-specific steps may be
+            added based on your business type.
           </p>
         </div>
       </div>

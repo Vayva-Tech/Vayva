@@ -55,7 +55,7 @@ export default function LegalCalendarPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: CourtEvent[] }>("/api/legal/court-events");
+      const response = await apiJson<{ data: CourtEvent[] }>("/legal/court-events");
       setEvents(response.data || generateMockEvents());
     } catch (error) {
       setEvents(generateMockEvents());

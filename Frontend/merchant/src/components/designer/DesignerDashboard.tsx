@@ -29,8 +29,8 @@ export const DesignerDashboard = () => {
     const loadData = async () => {
       try {
         const [templatesData, statsData] = await Promise.all([
-          apiJson<DesignerTemplate[]>("/api/designer/templates"),
-          apiJson<DesignerStats>("/api/designer/stats").catch(() => null),
+          apiJson<DesignerTemplate[]>("/designer/templates"),
+          apiJson<DesignerStats>("/designer/stats").catch(() => null),
         ]);
         const tpls = templatesData || [];
         setTemplates(tpls);

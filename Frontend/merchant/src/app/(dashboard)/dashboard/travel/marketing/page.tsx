@@ -36,7 +36,7 @@ export default function TravelMarketingPage() {
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Campaign[] }>("/api/travel/marketing/campaigns?limit=500");
+      const response = await apiJson<{ data: Campaign[] }>("/travel/marketing/campaigns?limit=500");
       setCampaigns(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch marketing campaigns", error);

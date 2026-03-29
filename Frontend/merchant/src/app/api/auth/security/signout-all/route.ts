@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/auth/security/signout-all",
+      endpoint: "/auth/security/signout-all",
       operation: "SIGNOUT_ALL_SESSIONS",
     });
     return NextResponse.json(

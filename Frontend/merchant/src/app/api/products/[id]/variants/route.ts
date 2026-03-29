@@ -27,7 +27,7 @@ export async function GET(
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/variants",
+      endpoint: "/products/[id]/variants",
       operation: "GET_VARIANTS",
     });
     return NextResponse.json(
@@ -64,7 +64,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/variants",
+      endpoint: "/products/[id]/variants",
       operation: "POST_VARIANT",
     });
     return NextResponse.json(

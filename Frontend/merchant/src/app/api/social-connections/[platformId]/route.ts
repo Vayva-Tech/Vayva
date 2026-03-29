@@ -30,7 +30,7 @@ export async function DELETE(
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/social-connections/[platformId]",
+      endpoint: "/social-connections/[platformId]",
       operation: "DELETE_SOCIAL_CONNECTION",
     });
     return NextResponse.json(

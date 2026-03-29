@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/kyc/upload-url",
+      endpoint: "/kyc/upload-url",
       operation: "POST_KYC_UPLOAD_URL",
     });
     return NextResponse.json(

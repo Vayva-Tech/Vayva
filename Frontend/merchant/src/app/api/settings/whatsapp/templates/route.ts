@@ -29,7 +29,7 @@ export const POST = withVayvaAPI(
       return NextResponse.json(template);
     } catch (error: unknown) {
       handleApiError(error, {
-        endpoint: "/api/settings/whatsapp/templates",
+        endpoint: "/settings/whatsapp/templates",
         operation: "POST_WHATSAPP",
         storeId,
       });

@@ -38,7 +38,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/disputes/:id/evidence/:fileId/download",
+      endpoint: "/disputes/:id/evidence/:fileId/download",
       operation: "GET",
     });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });

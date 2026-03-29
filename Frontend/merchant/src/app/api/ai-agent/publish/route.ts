@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ai-agent/publish",
+      endpoint: "/ai-agent/publish",
       operation: "PUBLISH_AI_AGENT",
     });
     return NextResponse.json(

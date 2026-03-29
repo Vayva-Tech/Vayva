@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/auth/merchant/login",
+        endpoint: "/auth/merchant/login",
         operation: "MERCHANT_LOGIN",
         additionalInfo: { email: getString(body.email) },
       }

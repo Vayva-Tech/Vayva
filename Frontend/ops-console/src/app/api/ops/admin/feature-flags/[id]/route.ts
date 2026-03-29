@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
 import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
+import { apiClient } from "@/lib/api-client";
 
 // Update feature flag
 export async function PATCH(
@@ -22,23 +22,12 @@ export async function PATCH(
     const body = await req.json();
     const { enabled, description } = body;
 
-    const updateData: Record<string, unknown> = {};
-    if (enabled !== undefined) updateData.enabled = enabled;
-    if (description !== undefined) updateData.description = description;
-
-    const flag = await prisma.featureFlag.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        key: true,
-        description: true,
-        enabled: true,
-        updatedAt: true,
-      },
+    const response = await apiClient.patch(`/api/v1/admin/feature-flags/${id}`, {
+      enabled,
+      description,
     });
 
-    return NextResponse.json({ success: true, flag });
+    return NextResponse.json(response);
   } catch (error) {
     const authRes = opsApiAuthErrorResponse(error);
     if (authRes) return authRes;
@@ -66,25 +55,10 @@ export async function GET(
     }
 
     const { id } = await params;
-    const flag = await prisma.featureFlag.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        key: true,
-        description: true,
-        enabled: true,
-        updatedAt: true,
-      },
-    });
 
-    if (!flag) {
-      return NextResponse.json(
-        { error: "Feature flag not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ flag });
+    const response = await apiClient.get(`/api/v1/admin/feature-flags/${id}`);
+    
+    return NextResponse.json(response);
   } catch (error) {
     const authRes = opsApiAuthErrorResponse(error);
     if (authRes) return authRes;

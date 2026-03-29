@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/whatsapp/templates", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/whatsapp/templates", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

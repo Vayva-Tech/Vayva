@@ -51,7 +51,7 @@ export default function StatementsPage() {
       try {
         setLoading(true);
         const data = await apiJson<StatementsResponse>(
-          "/api/finance/statements",
+          "/finance/statements",
         );
         const list: Statement[] = Array.isArray(data)
           ? (data as Statement[])
@@ -94,7 +94,7 @@ export default function StatementsPage() {
         `Generating statement for ${statement.month} ${statement.year}...`,
       );
       const data = await apiJson<GenerateStatementResponse>(
-        "/api/finance/statements/generate",
+        "/finance/statements/generate",
         {
           method: "POST",
           body: JSON.stringify({

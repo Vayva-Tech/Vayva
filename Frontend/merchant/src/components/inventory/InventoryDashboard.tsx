@@ -177,7 +177,7 @@ export function InventoryDashboard() {
     }
 
     try {
-      await apiJson("/api/merchant/inventory/adjust", {
+      await apiJson("/merchant/inventory/adjust", {
         method: "POST",
         body: JSON.stringify({
           storeId: "current-store-id",

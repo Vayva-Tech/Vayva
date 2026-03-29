@@ -70,7 +70,7 @@ export const SupportChat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const data = await apiJson<SupportChatResponse>("/api/support/chat", {
+      const data = await apiJson<SupportChatResponse>("/support/chat", {
         method: "POST",
         body: JSON.stringify({
           query: input,
@@ -118,7 +118,7 @@ export const SupportChat: React.FC = () => {
       prev.map((m) => (m.id === msgLocalId ? { ...m, feedback: rating } : m)),
     );
     try {
-      await apiJson<{ success: boolean }>("/api/support/feedback", {
+      await apiJson<{ success: boolean }>("/support/feedback", {
         method: "POST",
         body: JSON.stringify({
           messageId: serverId,

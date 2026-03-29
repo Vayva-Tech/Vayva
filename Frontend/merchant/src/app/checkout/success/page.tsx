@@ -29,7 +29,7 @@ function CheckoutSuccessContent() {
 
   const verifyPayment = async (ref: string) => {
     try {
-      const response = await apiJson<PaymentVerification>("/api/payments/verify", {
+      const response = await apiJson<PaymentVerification>("/payments/verify", {
         method: "POST",
         body: JSON.stringify({ reference: ref }),
       });

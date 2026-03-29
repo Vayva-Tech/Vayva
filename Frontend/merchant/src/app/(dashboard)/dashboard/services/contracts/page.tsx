@@ -150,18 +150,18 @@ export default function ServicesContractsPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Contract Title</th>
-                    <th className="text-left py-3 px-4 font-semibold">Client</th>
-                    <th className="text-left py-3 px-4 font-semibold">Type</th>
-                    <th className="text-left py-3 px-4 font-semibold">Value</th>
-                    <th className="text-left py-3 px-4 font-semibold">Start Date</th>
-                    <th className="text-left py-3 px-4 font-semibold">End Date</th>
-                    <th className="text-left py-3 px-4 font-semibold">Auto-Renew</th>
-                    <th className="text-left py-3 px-4 font-semibold">Days to Expiry</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Contract Title</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Client</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Type</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Value</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Start Date</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">End Date</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Auto-Renew</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Days to Expiry</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

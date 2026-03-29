@@ -122,7 +122,7 @@ export default function InboxPage() {
       conversationsAbortRef.current = controller;
 
       const data = await apiJson<ConversationsResponse>(
-        "/api/inbox/conversations",
+        "/inbox/conversations",
         { signal: controller.signal },
       );
       setConversations(Array.isArray(data?.items) ? data.items : []);

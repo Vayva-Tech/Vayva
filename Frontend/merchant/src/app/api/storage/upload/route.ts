@@ -71,7 +71,7 @@ export const POST = withVayvaAPI(
       });
     } catch (error: unknown) {
       handleApiError(error, {
-        endpoint: "/api/storage/upload",
+        endpoint: "/storage/upload",
         operation: "POST_STORAGE_UPLOAD",
         storeId,
       });

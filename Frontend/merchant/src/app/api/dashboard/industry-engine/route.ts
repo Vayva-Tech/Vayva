@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
         },
       });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/dashboard/industry-engine", operation: "GET" });
+    handleApiError(error, { endpoint: "/dashboard/industry-engine", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

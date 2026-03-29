@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/billing/downgrade",
+      endpoint: "/billing/downgrade",
       operation: "GET_DOWNGRADE_OPTIONS",
     });
     return NextResponse.json(
@@ -300,7 +300,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/billing/downgrade",
+      endpoint: "/billing/downgrade",
       operation: "POST_DOWNGRADE",
     });
     return NextResponse.json(

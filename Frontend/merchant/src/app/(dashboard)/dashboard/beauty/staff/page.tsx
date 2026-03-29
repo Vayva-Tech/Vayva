@@ -32,7 +32,7 @@ export default function BeautyStaffPage() {
 
   const fetchStaff = async () => {
     try {
-      const response = await apiJson<{ data: Staff[] }>("/api/beauty/staff");
+      const response = await apiJson<{ data: Staff[] }>("/beauty/staff");
       setStaff(response.data || generateMockStaff());
     } catch (error) {
       setStaff(generateMockStaff());

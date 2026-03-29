@@ -124,7 +124,7 @@ export default function BlogMediaDashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/blog-media/stats");
+      const response = await apiJson<{ data: DashboardStats }>("/blog-media/stats");
       setStats(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch blog stats", error);
@@ -134,7 +134,7 @@ export default function BlogMediaDashboardPage() {
 
   const fetchRecentPosts = async () => {
     try {
-      const response = await apiJson<{ data: BlogPost[] }>("/api/blog-media/posts?limit=10&sort=recent");
+      const response = await apiJson<{ data: BlogPost[] }>("/blog-media/posts?limit=10&sort=recent");
       setRecentPosts(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch recent posts", error);
@@ -144,7 +144,7 @@ export default function BlogMediaDashboardPage() {
 
   const fetchUpcomingContent = async () => {
     try {
-      const response = await apiJson<{ data: ContentCalendarEvent[] }>("/api/blog-media/calendar?upcoming=true");
+      const response = await apiJson<{ data: ContentCalendarEvent[] }>("/blog-media/calendar?upcoming=true");
       setUpcomingContent(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch upcoming content", error);
@@ -243,7 +243,7 @@ export default function BlogMediaDashboardPage() {
                 <span>SEO</span>
               </Button>
               <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/blog-media/comments")}>
-                <ThumbsUp className="h-8 w-8" />
+                <thumbsUp className="h-8 w-8" / scope="col">
                 <span>Comments</span>
               </Button>
               <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/blog-media/social")}>

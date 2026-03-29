@@ -126,17 +126,17 @@ export default function ProfessionalTimeTrackingPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Attorney</th>
-                  <th className="py-3 px-4 font-medium">Matter</th>
-                  <th className="py-3 px-4 font-medium">Description</th>
-                  <th className="py-3 px-4 font-medium">Date</th>
-                  <th className="py-3 px-4 font-medium">Hours</th>
-                  <th className="py-3 px-4 font-medium">Rate</th>
-                  <th className="py-3 px-4 font-medium">Total</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Attorney</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Matter</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Description</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Date</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Hours</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Rate</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Total</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

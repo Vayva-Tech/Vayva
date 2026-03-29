@@ -64,7 +64,7 @@ export default function SSOSettingsPage() {
     setLoading(true);
     try {
       const [idpsData] = await Promise.all([
-        apiJson<{ idps: IdentityProvider[] }>("/api/auth/saml/login"),
+        apiJson<{ idps: IdentityProvider[] }>("/auth/saml/login"),
       ]);
       setIdps(idpsData.idps || []);
     } catch {
@@ -87,7 +87,7 @@ export default function SSOSettingsPage() {
           };
 
       const { idp } = await apiJson<{ idp: IdentityProvider }>(
-        "/api/auth/saml/metadata",
+        "/auth/saml/metadata",
         { method: "POST", body: JSON.stringify(payload) }
       );
 
@@ -114,7 +114,7 @@ export default function SSOSettingsPage() {
     setGeneratingToken(true);
     try {
       const { token } = await apiJson<{ token: string; expiresAt: string }>(
-        "/api/auth/scim/token",
+        "/auth/scim/token",
         { method: "POST" }
       );
       setScimToken(token);

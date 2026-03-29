@@ -33,7 +33,7 @@ export default function BeautyCommissionsPage() {
 
   const fetchCommissions = async () => {
     try {
-      const response = await apiJson<{ data: Commission[] }>("/api/beauty/commissions");
+      const response = await apiJson<{ data: Commission[] }>("/beauty/commissions");
       setCommissions(response.data || generateMockCommissions());
     } catch (error) {
       setCommissions(generateMockCommissions());

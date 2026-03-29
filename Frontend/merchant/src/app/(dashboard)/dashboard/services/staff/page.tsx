@@ -120,16 +120,16 @@ export default function ServicesStaffPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Name</th>
-                  <th className="py-3 px-4 font-medium">Role</th>
-                  <th className="py-3 px-4 font-medium">Specialization</th>
-                  <th className="py-3 px-4 font-medium">Contact Info</th>
-                  <th className="py-3 px-4 font-medium">Hourly Rate</th>
-                  <th className="py-3 px-4 font-medium">Active Clients</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Role</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Specialization</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Contact Info</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Hourly Rate</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Active Clients</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

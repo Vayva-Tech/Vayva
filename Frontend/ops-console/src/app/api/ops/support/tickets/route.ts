@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
 import { opsApiAuthErrorResponse } from "@/lib/ops-api-auth";
+import { apiClient } from "@/lib/api-client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,60 +20,16 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("q") || "";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
-    const skip = (page - 1) * limit;
 
-    const where: any = {};
-
-    if (status && status !== "all") {
-      where.status = status.toUpperCase();
-    }
-
-    if (priority && priority !== "all") {
-      where.priority = priority.toUpperCase();
-    }
-
-    if (search) {
-      where.OR = [
-        { subject: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const [tickets, total] = await Promise.all([
-      prisma.supportTicket.findMany({
-        where,
-        select: {
-          id: true,
-          subject: true,
-          status: true,
-          priority: true,
-          createdAt: true,
-          updatedAt: true,
-          customer: {
-            select: { email: true, phone: true },
-          },
-          store: {
-            select: { name: true },
-          },
-        },
-        orderBy: [
-          { priority: "desc" },
-          { createdAt: "desc" },
-        ],
-        skip,
-        take: limit,
-      }),
-      prisma.supportTicket.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      tickets,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+    const response = await apiClient.get('/api/v1/admin/support/tickets', {
+      status,
+      priority,
+      q: search,
+      page,
+      limit,
     });
+
+    return NextResponse.json(response);
   } catch (error) {
     const authRes = opsApiAuthErrorResponse(error);
     if (authRes) return authRes;
@@ -106,22 +62,13 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const updateData: any = {};
-    if (status) updateData.status = status;
-    if (priority) updateData.priority = priority;
-    if (assignedToId !== undefined) updateData.assignedToId = assignedToId;
-
-    const ticket = await prisma.supportTicket.update({
-      where: { id: ticketId },
-      data: updateData,
-      select: {
-        id: true,
-        status: true,
-        priority: true,
-      },
+    const response = await apiClient.patch(`/api/v1/admin/support/tickets/${ticketId}`, {
+      status,
+      priority,
+      assignedToId,
     });
 
-    return NextResponse.json({ success: true, ticket });
+    return NextResponse.json(response);
   } catch (error) {
     const authRes = opsApiAuthErrorResponse(error);
     if (authRes) return authRes;

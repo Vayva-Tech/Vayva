@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/team/member/update-role", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/team/member/update-role", operation: "POST" });
     return NextResponse.json({ error: "Failed to update member role" }, { status: 500 });
   }
 }

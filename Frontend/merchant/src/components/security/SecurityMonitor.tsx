@@ -61,8 +61,8 @@ export function SecurityMonitor() {
   const fetchSecurityData = async () => {
     try {
       const [historyData, alertsData] = await Promise.all([
-        apiJson<{ attempts: LoginAttempt[] }>("/api/security/login-history", { method: "GET" }),
-        apiJson<{ alerts: SuspiciousActivity[] }>("/api/security/suspicious-activity", { method: "GET" }),
+        apiJson<{ attempts: LoginAttempt[] }>("/security/login-history", { method: "GET" }),
+        apiJson<{ alerts: SuspiciousActivity[] }>("/security/suspicious-activity", { method: "GET" }),
       ]);
 
       setLoginHistory(historyData.attempts || []);
@@ -87,7 +87,7 @@ export function SecurityMonitor() {
     if (!pendingDevice) return;
 
     try {
-      await apiJson("/api/security/verify-device", {
+      await apiJson("/security/verify-device", {
         method: "POST",
         body: JSON.stringify({
           attemptId: pendingDevice.id,
@@ -100,7 +100,7 @@ export function SecurityMonitor() {
       } else {
         toast.info("Device rejected. Session terminated.");
         // Force logout if rejecting
-        window.location.href = "/api/auth/logout";
+        window.location.href = "/auth/logout";
       }
 
       setShowVerifyDevice(false);
@@ -113,7 +113,7 @@ export function SecurityMonitor() {
 
   const resolveAlert = async (alertId: string) => {
     try {
-      await apiJson("/api/security/resolve-alert", {
+      await apiJson("/security/resolve-alert", {
         method: "POST",
         body: JSON.stringify({ alertId }),
       });

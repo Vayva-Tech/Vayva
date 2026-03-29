@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { prisma, type Prisma } from "@vayva/db";
-import { logger } from "@/lib/logger";
+import { api } from '@/lib/api-client';
 
 // Zod schemas for type safety
 const ExportScopeSchema = z.object({
@@ -41,42 +40,22 @@ export class DataGovernanceService {
         requestedBy: z.infer<typeof RequestedBySchema>,
         scopes: z.infer<typeof ExportScopeSchema>,
     ) {
-        const request = await prisma.dataExportRequest?.create({
-            data: {
-                storeId,
-                requestedBy: JSON.stringify(requestedBy),
-                scopes: scopes as unknown as Prisma.InputJsonValue,
-                status: "PENDING",
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7-day expiry
-            },
+        const response = await api.post('/governance/exports/request', {
+            storeId,
+            requestedBy,
+            scopes,
         });
-        // In a real system, we would enqueue a job here:
-        // await QueueService.enqueue('DATA_EXPORT', { requestId: request.id });
-        logger.info("Data export requested", { storeId, requestId: request.id });
-        return request;
+        return response.data;
     }
     /**
      * Log a PII-redacted AI trace for audit
      */
     static async logAiTrace(params: z.infer<typeof AiTraceParamsSchema>) {
         try {
-            await prisma.aiTrace?.create({
-                data: {
-                    storeId: params.storeId,
-                    conversationId: params.conversationId,
-                    requestId: params.requestId,
-                    model: params.model,
-                    toolsUsed: params.toolsUsed as unknown as Prisma.InputJsonValue,
-                    retrievedDocs: params.retrievedDocs as unknown as Prisma.InputJsonValue,
-                    inputSummary: this.redactPII(params.inputSummary),
-                    outputSummary: this.redactPII(params.outputSummary),
-                    guardrailFlags: params.guardrailFlags as unknown as Prisma.InputJsonValue,
-                    latencyMs: params.latencyMs,
-                },
-            });
+            await api.post('/governance/traces/log', params);
         }
         catch (error) {
-            logger.error("[DataGovernance] Failed to log AI trace:", error);
+            console.error('[GOVERNANCE] Failed to log AI trace', error);
         }
     }
     /**

@@ -217,7 +217,7 @@ export function UniversalProDashboardV2({
   const { data: dashboardData, isLoading, error } = useSWR<{
     success: boolean;
     data: DashboardData;
-  }>("/api/dashboard/pro-overview", fetcher, {
+  }>("/dashboard/pro-overview", fetcher, {
     refreshInterval: 60000,
     revalidateOnFocus: false,
     errorRetryCount: 2,

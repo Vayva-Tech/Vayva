@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ...result, success: true });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/auth/pin/verify",
+      endpoint: "/auth/pin/verify",
       operation: "VERIFY_PIN",
     });
     return NextResponse.json(

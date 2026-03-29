@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       success: boolean;
       data?: unknown;
       error?: string;
-    }>(buildBackendUrl("/api/merchant/referrals/program"), {
+    }>(buildBackendUrl("/merchant/referrals/program"), {
       method: "POST",
       headers: { ...auth.headers },
       body: JSON.stringify(validated.data),
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, program: result.data });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/referrals/program",
+      endpoint: "/merchant/referrals/program",
       operation: "POST",
       storeId,
     });

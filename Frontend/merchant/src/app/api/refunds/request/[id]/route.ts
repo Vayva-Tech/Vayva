@@ -67,7 +67,7 @@ export async function POST(
       { headers: standardHeaders(correlationId) },
     );
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/refunds/request/:id", operation: "POST" });
+    handleApiError(error, { endpoint: "/refunds/request/:id", operation: "POST" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

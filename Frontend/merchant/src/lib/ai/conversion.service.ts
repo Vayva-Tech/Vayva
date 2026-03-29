@@ -1,4 +1,4 @@
-import { prisma } from "@vayva/db";
+import { api } from '@/lib/api-client';
 import { logger } from "@/lib/logger";
 export class ConversionService {
     /**
@@ -52,14 +52,12 @@ export class ConversionService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static async logPersuasion(data: Record<string, unknown>) {
         try {
-            await prisma.persuasionAttempt.create({
-                data: {
-                    storeId: data.storeId as string,
-                    conversationId: (data.conversationId as string) || "",
-                    strategy: data.strategy as string,
-                    evidenceIds: data.evidenceIds as string[] | undefined,
-                    confidenceScore: data.confidence as number,
-                },
+            await api.post('/ai/conversions/log-persuasion', {
+                storeId: data.storeId,
+                conversationId: data.conversationId || "",
+                strategy: data.strategy,
+                evidenceIds: data.evidenceIds,
+                confidenceScore: data.confidence,
             });
         }
         catch (error) {
@@ -72,14 +70,12 @@ export class ConversionService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static async recordConversion(data: Record<string, unknown>) {
         try {
-            await prisma.conversionEvent.create({
-                data: {
-                    storeId: data.storeId as string,
-                    conversationId: data.conversationId as string | null | undefined,
-                    eventType: data.eventType as string,
-                    valueKobo: (data.valueKobo as number | bigint | undefined) || BigInt(0),
-                    aiAttributionScore: 1.0, // Simple for now
-                },
+            await api.post('/ai/conversions/record', {
+                storeId: data.storeId,
+                conversationId: data.conversationId,
+                eventType: data.eventType,
+                valueKobo: data.valueKobo || 0,
+                aiAttributionScore: 1.0,
             });
         }
         catch (error) {

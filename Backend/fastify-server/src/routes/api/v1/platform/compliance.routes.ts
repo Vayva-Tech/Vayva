@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { ComplianceService } from '../../../services/platform/compliance.service';
+import { ComplianceService } from '../../../../services/platform/compliance.service';
 
 const complianceService = new ComplianceService();
 

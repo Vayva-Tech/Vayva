@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { WebstudioService } from '../../../services/platform/webstudio.service';
+import { WebstudioService } from '../../../../services/platform/webstudio.service';
 
 const webstudioService = new WebstudioService();
 

@@ -33,7 +33,7 @@ export const QuickActions = () => {
         setLoading(true);
         setError(null);
         const res = await apiJson<ActivationProgressResponse>(
-          "/api/merchant/dashboard/activation-progress",
+          "/merchant/dashboard/activation-progress",
         );
         setIndustrySlug(res.data?.industrySlug || "retail");
       } catch (e: any) {

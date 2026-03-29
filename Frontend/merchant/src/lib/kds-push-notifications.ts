@@ -197,7 +197,7 @@ class KDSPushNotificationService {
    */
   private async sendSubscriptionToBackend(subscription: PushSubscription): Promise<void> {
     try {
-      await fetch('/api/restaurant/kds/push/subscribe', {
+      await fetch('/restaurant/kds/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(subscription.toJSON()),

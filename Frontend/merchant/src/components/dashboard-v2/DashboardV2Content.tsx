@@ -135,14 +135,14 @@ function getGreeting(): string {
   return "Good Night.";
 }
 
-// Normalize plan name to standard tiers
+// Normalize plan name to standard tiers (STARTER, PRO, PRO+)
 function normalizePlan(rawPlan: string | null | undefined): string {
-  if (!rawPlan) return "FREE";
+  if (!rawPlan) return "STARTER";
   const v = rawPlan.toLowerCase().trim();
-  if (v === "pro" || v === "business" || v === "enterprise") return "PRO";
-  if (v === "starter" || v === "growth") return "STARTER";
-  if (v === "free" || v === "trial") return "FREE";
-  return "FREE";
+  if (v === "pro+" || v === "pro_plus" || v === "pro+") return "PRO_PLUS";
+  if (v === "pro" || v === "professional" || v === "premium") return "PRO";
+  if (v === "starter" || v === "basic") return "STARTER";
+  return "STARTER";
 }
 
 // Helper to calculate AI efficiency score from metrics
@@ -164,9 +164,9 @@ function calculateEfficiencyScore(metrics: Record<string, number>): number {
 export function DashboardV2Content(props: DashboardV2ContentProps) {
   const { merchant } = useAuth();
   const userPlan = normalizePlan((merchant as any)?.plan);
-  const isFREE = userPlan === "FREE";
   const isSTARTER = userPlan === "STARTER";
   const isPRO = userPlan === "PRO";
+  const isPRO_PLUS = userPlan === "PRO_PLUS";
 
   // Plan-based feature gating
   const showFinancialCharts = !isFREE; // STARTER and PRO only

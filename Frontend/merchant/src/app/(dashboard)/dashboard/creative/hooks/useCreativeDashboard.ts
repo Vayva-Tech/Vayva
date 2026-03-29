@@ -93,7 +93,7 @@ export function useCreativeDashboard() {
     queryKey: ['creative-dashboard'],
     queryFn: async () => {
       try {
-        const response = await fetch('/api/creative/dashboard', {
+        const response = await fetch('/creative/dashboard', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(30000),

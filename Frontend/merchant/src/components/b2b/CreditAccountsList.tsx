@@ -33,7 +33,7 @@ export function CreditAccountsList() {
 
   const fetchAccounts = async () => {
     try {
-      const response = await fetch('/api/b2b/credit-accounts');
+      const response = await fetch('/b2b/credit-accounts');
       if (response.ok) {
         const data = await response.json();
         setAccounts(data.accounts || []);

@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
     }
     const email = getString(body.email);
     const code = getString(body.code) || getString(body.otp);
+    const method = getString(body.method) || "EMAIL";
     const rememberMe = body.rememberMe === true;
     // Validation
     if (!email || !code) {
@@ -45,21 +46,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call backend API to verify OTP
+    // Call backend API to verify OTP with all required parameters
     const result = await apiJson<{
       success: boolean;
-      user?: { id: string; email: string; firstName?: string };
-      storeId?: string;
-      token?: string;
-      error?: string;
+      data?: {
+        user?: { id: string; email: string; firstName?: string };
+        storeId?: string;
+        token?: string;
+      };
+      error?: { code: string; message: string };
     }>(
-      `${process.env.BACKEND_API_URL}/api/auth/merchant/verify-otp`,
+      `${process.env.BACKEND_API_URL.replace(/\/$/, "")}/api/auth/merchant/verify-otp`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ 
+          email, 
+          code,
+          method: method as "EMAIL" | "WHATSAPP",
+          rememberMe 
+        }),
       }
     );
     
@@ -80,7 +88,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/auth/merchant/verify-otp",
+        endpoint: "/auth/merchant/verify-otp",
         operation: "VERIFY_OTP",
         storeId: undefined,
       }

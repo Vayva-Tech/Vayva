@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 // GET /api/fitness/classes - Get all fitness classes
 export async function GET(request: NextRequest) {
@@ -19,53 +17,26 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const instructorId = searchParams.get("instructorId");
 
-    const where: Record<string, unknown> = { storeId };
-
-    if (status) {
-      where.status = status;
-    }
-
-    if (instructorId) {
-      where.instructorId = instructorId;
-    }
-
-    const [classes, total] = await Promise.all([
-      (prisma as any).fitnessClass.findMany({
-        where,
-        include: {
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              avatar: true,
-            },
-          },
-          _count: {
-            select: {
-              bookings: true,
-            },
-          },
-        },
-        orderBy: { schedule: "asc" },
-        skip: offset,
-        take: limit,
-      }),
-      (prisma as any).fitnessClass.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: classes,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + classes.length < total,
-      },
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+      offset: offset.toString(),
     });
+
+    if (status) queryParams.set("status", status);
+    if (instructorId) queryParams.set("instructorId", instructorId);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/fitness/classes?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/fitness/classes",
+      endpoint: "/fitness/classes",
       operation: "GET_FITNESS_CLASSES",
     });
     return NextResponse.json(

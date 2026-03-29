@@ -14,7 +14,7 @@ export const POST = withVayvaAPI(PERMISSIONS.INTEGRATIONS_MANAGE, async (req: Ne
         handleApiError(
             error,
             {
-                endpoint: "/api/settings/whatsapp",
+                endpoint: "/settings/whatsapp",
                 operation: "GET_WHATSAPP_STATUS",
                 storeId,
             }

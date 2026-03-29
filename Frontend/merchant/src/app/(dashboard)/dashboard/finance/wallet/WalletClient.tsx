@@ -48,7 +48,7 @@ const fetcher = (url: string) =>
 export function WalletClient({ balance, pending, wallet }: WalletClientProps) {
   const router = useRouter();
   const { data: activityData, isLoading: activityLoading } = useSWR<{ data: ActivityItem[] }>(
-    "/api/finance/activity?limit=10",
+    "/finance/activity?limit=10",
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 30000 },
   );

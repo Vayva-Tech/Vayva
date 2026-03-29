@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { InvoiceService } from '../../../services/core/invoice.service';
+import { InvoiceService } from '../../../../services/core/invoice.service';
 
 const invoiceService = new InvoiceService();
 

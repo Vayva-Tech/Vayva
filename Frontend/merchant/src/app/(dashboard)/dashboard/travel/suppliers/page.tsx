@@ -40,7 +40,7 @@ export default function TravelSuppliersPage() {
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Supplier[] }>("/api/travel/suppliers?limit=500");
+      const response = await apiJson<{ data: Supplier[] }>("/travel/suppliers?limit=500");
       setSuppliers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch suppliers", error);

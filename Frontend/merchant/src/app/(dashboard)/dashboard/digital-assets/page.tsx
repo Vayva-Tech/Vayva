@@ -61,7 +61,7 @@ export default function DigitalAssetsPage() {
   const fetchAssets = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<DigitalAsset[]>("/api/digital-assets");
+      const data = await apiJson<DigitalAsset[]>("/digital-assets");
       setAssets(data || []);
     } catch (error) {
       logger.error("[FETCH_ASSETS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" });
@@ -87,7 +87,7 @@ export default function DigitalAssetsPage() {
         await apiJson(`/api/digital-assets/${editingAsset.id}`, { method: "PUT", body: JSON.stringify(payload) });
         toast.success("Asset updated");
       } else {
-        await apiJson("/api/digital-assets", { method: "POST", body: JSON.stringify(payload) });
+        await apiJson("/digital-assets", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Asset created");
       }
       setIsOpen(false);
@@ -267,14 +267,14 @@ export default function DigitalAssetsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Asset</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Downloads</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Asset</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Type</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Category</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Size</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Downloads</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

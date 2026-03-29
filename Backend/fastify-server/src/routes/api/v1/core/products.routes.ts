@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { ProductsService } from '../../../services/core/products.service';
+import { ProductsService } from '../../../../services/core/products.service';
 
 const productsService = new ProductsService();
 

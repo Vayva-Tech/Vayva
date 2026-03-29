@@ -62,8 +62,8 @@ export default function LegalTimeBillingPage() {
     try {
       setLoading(true);
       const [timeRes, invoicesRes] = await Promise.all([
-        apiJson<{ data: TimeEntry[] }>("/api/legal/time-entries"),
-        apiJson<{ data: Invoice[] }>("/api/legal/invoices"),
+        apiJson<{ data: TimeEntry[] }>("/legal/time-entries"),
+        apiJson<{ data: Invoice[] }>("/legal/invoices"),
       ]);
       setTimeEntries(timeRes.data || generateMockTimeEntries());
       setInvoices(invoicesRes.data || generateMockInvoices());

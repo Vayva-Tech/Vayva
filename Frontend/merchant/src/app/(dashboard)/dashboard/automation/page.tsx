@@ -37,7 +37,7 @@ export default function AutomationPage() {
 
   const fetchRules = async () => {
     try {
-      const data = await apiJson<{ rules: AutomationRule[] }>("/api/automation/rules");
+      const data = await apiJson<{ rules: AutomationRule[] }>("/automation/rules");
       setRules(data.rules || []);
     } catch (error) {
       logger.error("[AUTOMATION_FETCH_ERROR]", { error });
@@ -346,7 +346,7 @@ function CreateRuleModal({
 
     setSubmitting(true);
     try {
-      await apiJson("/api/automation/rules", {
+      await apiJson("/automation/rules", {
         method: "POST",
         body: JSON.stringify({
           type: selectedType,

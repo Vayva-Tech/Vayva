@@ -108,7 +108,7 @@ export function KPIBlocks({ currency = "NGN" }: KPIBlocksProps) {
     setError(null);
 
     try {
-      const result = await apiJson<KPIResponse>("/api/dashboard/kpis");
+      const result = await apiJson<KPIResponse>("/dashboard/kpis");
       if (result.success && result.data) {
         setData(result.data);
       } else {

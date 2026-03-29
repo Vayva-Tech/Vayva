@@ -44,7 +44,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/publish",
+      endpoint: "/products/[id]/publish",
       operation: "PUBLISH_PRODUCT",
     });
     return NextResponse.json(

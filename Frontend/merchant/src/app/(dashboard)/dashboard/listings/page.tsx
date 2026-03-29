@@ -28,7 +28,7 @@ export default function ListingsPage() {
   useEffect(() => { void fetchListings(); }, []);
 
   const fetchListings = async () => {
-    try { setLoading(true); const data = await apiJson<Listing[]>("/api/marketplace/listings"); setListings(data || []); } catch (error) { logger.error("[FETCH_LISTINGS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load listings"); } finally { setLoading(false); }
+    try { setLoading(true); const data = await apiJson<Listing[]>("/marketplace/listings"); setListings(data || []); } catch (error) { logger.error("[FETCH_LISTINGS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load listings"); } finally { setLoading(false); }
   };
 
   const handleSave = async () => {
@@ -37,7 +37,7 @@ export default function ListingsPage() {
     try {
       const payload = { ...formData, price: formData.price ? Number(formData.price) : 0, images: formData.images.split(",").map(i => i.trim()).filter(Boolean) };
       if (editingListing) { await apiJson(`/api/marketplace/listings/${editingListing.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Listing updated"); }
-      else { await apiJson("/api/marketplace/listings", { method: "POST", body: JSON.stringify(payload) }); toast.success("Listing created"); }
+      else { await apiJson("/marketplace/listings", { method: "POST", body: JSON.stringify(payload) }); toast.success("Listing created"); }
       setIsOpen(false); setEditingListing(null); resetForm(); void fetchListings();
     } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
   };

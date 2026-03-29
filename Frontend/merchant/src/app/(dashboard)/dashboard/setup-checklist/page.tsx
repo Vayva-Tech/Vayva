@@ -28,7 +28,7 @@ export default function SetupChecklistPage() {
     const loadReadiness = async () => {
       try {
         setLoading(true);
-        const data = await apiJson<ReadinessData>("/api/merchant/readiness");
+        const data = await apiJson<ReadinessData>("/merchant/readiness");
         setReadiness(data);
       } catch (error: unknown) {
         const message =

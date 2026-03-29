@@ -75,7 +75,7 @@ export function EnhancedCommandPalette() {
           starred: string[];
           recent: RecentAction[];
           personalized: CommandAction[];
-        }>("/api/command-palette/preferences", { method: "GET" });
+        }>("/command-palette/preferences", { method: "GET" });
         
         if (data.starred) setStarredActions(data.starred);
         if (data.recent) setRecentActions(data.recent);

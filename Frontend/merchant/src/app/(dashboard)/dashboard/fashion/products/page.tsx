@@ -36,7 +36,7 @@ export default function FashionProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await apiJson<{ data: Product[] }>("/api/fashion/products?limit=500");
+      const response = await apiJson<{ data: Product[] }>("/fashion/products?limit=500");
       setProducts(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch fashion products", error);

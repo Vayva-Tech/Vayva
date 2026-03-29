@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { SupportService } from '../../../services/platform/support.service';
+import { SupportService } from '../../../../services/platform/support.service';
 
 const supportService = new SupportService();
 

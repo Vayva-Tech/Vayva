@@ -65,7 +65,7 @@ export default function SocialsStep(): React.JSX.Element {
 
   const igConnectHref = useMemo(() => {
     const url = new URL(
-      "/api/socials/instagram/connect",
+      "/socials/instagram/connect",
       window.location.origin,
     );
     url.searchParams.set("returnTo", "/onboarding?step=socials");
@@ -80,11 +80,11 @@ export default function SocialsStep(): React.JSX.Element {
     setWaConnecting(true);
     setWaQr(null);
     try {
-      await apiJson<{ success: boolean }>("/api/whatsapp/instance", {
+      await apiJson<{ success: boolean }>("/whatsapp/instance", {
         method: "POST",
       });
       const data = await apiJson<WhatsappInstanceResponse>(
-        "/api/whatsapp/instance",
+        "/whatsapp/instance",
       );
       const qr = data.base64 || data.qrcode || null;
       if (qr) {
@@ -106,7 +106,7 @@ export default function SocialsStep(): React.JSX.Element {
       setIgLoading(true);
       try {
         const data = await apiJson<SocialStatusResponse>(
-          "/api/socials/instagram/status",
+          "/socials/instagram/status",
           { signal: controller.signal },
         );
         setIg({
@@ -129,7 +129,7 @@ export default function SocialsStep(): React.JSX.Element {
       setWaLoading(true);
       try {
         const data = await apiJson<WhatsappStatusResponse>(
-          "/api/wa-agent/status",
+          "/wa-agent/status",
           { signal: controller.signal },
         );
         setWa({
@@ -156,11 +156,11 @@ export default function SocialsStep(): React.JSX.Element {
   const disconnectInstagram = async () => {
     setIgBusy(true);
     try {
-      await apiJson<{ success: boolean }>("/api/socials/instagram/disconnect", {
+      await apiJson<{ success: boolean }>("/socials/instagram/disconnect", {
         method: "POST",
       });
       const refreshed = await apiJson<SocialStatusResponse>(
-        "/api/socials/instagram/status",
+        "/socials/instagram/status",
       );
       setIg({
         connected: Boolean(refreshed.connected),
@@ -182,11 +182,11 @@ export default function SocialsStep(): React.JSX.Element {
   const disconnectWhatsApp = async () => {
     setWaBusy(true);
     try {
-      await apiJson<{ success: boolean }>("/api/wa-agent/disconnect", {
+      await apiJson<{ success: boolean }>("/wa-agent/disconnect", {
         method: "POST",
       });
       const refreshed = await apiJson<WhatsappStatusResponse>(
-        "/api/wa-agent/status",
+        "/wa-agent/status",
       );
       setWa({
         connected: Boolean(refreshed.connected),

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/public/checkout/init", operation: "POST" });
+    handleApiError(error, { endpoint: "/public/checkout/init", operation: "POST" });
     return NextResponse.json({ error: "Failed to initialize checkout" }, { status: 500 });
   }
 }

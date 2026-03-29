@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/analytics/overview",
+      endpoint: "/analytics/overview",
       operation: "GET_ANALYTICS_OVERVIEW",
     });
     return NextResponse.json(

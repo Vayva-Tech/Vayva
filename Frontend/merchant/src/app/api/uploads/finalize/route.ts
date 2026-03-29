@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/uploads/finalize",
+      endpoint: "/uploads/finalize",
       operation: "FINALIZE_UPLOAD",
     });
     return NextResponse.json(

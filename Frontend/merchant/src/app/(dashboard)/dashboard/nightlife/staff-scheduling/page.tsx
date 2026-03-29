@@ -121,16 +121,16 @@ export default function NightlifeStaffSchedulingPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Staff Name</th>
-                  <th className="py-3 px-4 font-medium">Role</th>
-                  <th className="py-3 px-4 font-medium">Contact</th>
-                  <th className="py-3 px-4 font-medium">Date</th>
-                  <th className="py-3 px-4 font-medium">Shift Time</th>
-                  <th className="py-3 px-4 font-medium">Rate/Hour</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Staff Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Role</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Contact</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Date</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Shift Time</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Rate/Hour</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

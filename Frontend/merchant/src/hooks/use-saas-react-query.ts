@@ -21,7 +21,7 @@ export function useAggregateMetrics() {
   const { data, isLoading, error, refetch, isFetching } = useQuery<AggregateMetrics, Error>({
     queryKey: QUERY_KEYS.saas.aggregate,
     queryFn: async () => {
-      const response = await fetch('/api/saas/dashboard/aggregate');
+      const response = await fetch('/saas/dashboard/aggregate');
       if (!response.ok) {
         throw new Error(`Failed to fetch metrics: ${response.statusText}`);
       }
@@ -49,7 +49,7 @@ export function useSubscriptionMetrics() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.saas.subscriptions,
     queryFn: async () => {
-      const response = await fetch('/api/saas/subscriptions/metrics');
+      const response = await fetch('/saas/subscriptions/metrics');
       if (!response.ok) throw new Error('Failed to fetch subscription metrics');
       const result = await response.json();
       return result.metrics;
@@ -73,7 +73,7 @@ export function useTenantGrowth() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.saas.tenantGrowth,
     queryFn: async () => {
-      const response = await fetch('/api/saas/tenants/growth');
+      const response = await fetch('/saas/tenants/growth');
       if (!response.ok) throw new Error('Failed to fetch tenant growth');
       const result = await response.json();
       return result.metrics;
@@ -97,7 +97,7 @@ export function useChurnRisk() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.saas.churnRisk,
     queryFn: async () => {
-      const response = await fetch('/api/saas/churn/risk-score');
+      const response = await fetch('/saas/churn/risk-score');
       if (!response.ok) throw new Error('Failed to fetch churn risk');
       const result = await response.json();
       return result.risks;
@@ -121,7 +121,7 @@ export function useFeatureFlags() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.saas.features,
     queryFn: async () => {
-      const response = await fetch('/api/saas/features');
+      const response = await fetch('/saas/features');
       if (!response.ok) throw new Error('Failed to fetch feature flags');
       const result = await response.json();
       return result.flags;
@@ -145,7 +145,7 @@ export function useUsageAnalytics() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.saas.usage,
     queryFn: async () => {
-      const response = await fetch('/api/saas/usage/metrics');
+      const response = await fetch('/saas/usage/metrics');
       if (!response.ok) throw new Error('Failed to fetch usage analytics');
       const result = await response.json();
       return result.metrics;

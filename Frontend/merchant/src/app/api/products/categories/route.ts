@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/categories",
+      endpoint: "/products/categories",
       operation: "GET_PRODUCT_CATEGORIES",
     });
     return NextResponse.json(

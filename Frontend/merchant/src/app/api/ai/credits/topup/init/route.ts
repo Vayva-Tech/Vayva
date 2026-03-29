@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await request.json().catch(() => ({}));
-    const res = await fetch(buildBackendUrl("/api/ai/credits/topup/init"), {
+    const res = await fetch(buildBackendUrl("/ai/credits/topup/init"), {
       method: "POST",
       headers: auth.headers,
       body: JSON.stringify(body),
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ai/credits/topup/init",
+      endpoint: "/ai/credits/topup/init",
       operation: "AI_TOPUP_INIT",
     });
     return NextResponse.json({ error: "Failed to initialize AI top-up" }, { status: 500 });

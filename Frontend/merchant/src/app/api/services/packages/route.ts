@@ -67,7 +67,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/services/packages",
+        endpoint: "/services/packages",
         operation: "GET_SERVICE_PACKAGES",
         storeId: undefined,
       }

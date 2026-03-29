@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/posts",
+      endpoint: "/posts",
       operation: "GET_POSTS",
     });
     return NextResponse.json(

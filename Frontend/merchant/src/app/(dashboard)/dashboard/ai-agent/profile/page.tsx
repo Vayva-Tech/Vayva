@@ -62,7 +62,7 @@ export default function AgentProfilePage() {
   const loadProfile = async () => {
     try {
       setIsLoading(true);
-      const data = await apiJson<AgentProfile>("/api/ai-agent/profile");
+      const data = await apiJson<AgentProfile>("/ai-agent/profile");
       if (!data) return;
 
       setAgent(data);
@@ -89,7 +89,7 @@ export default function AgentProfilePage() {
     if (isSaving) return;
     setIsSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/ai-agent/profile", {
+      await apiJson<{ success: boolean }>("/ai-agent/profile", {
         method: "PUT",
         body: JSON.stringify(draft),
       });
@@ -116,7 +116,7 @@ export default function AgentProfilePage() {
     if (isSaving) return;
     setIsSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/ai-agent/publish", {
+      await apiJson<{ success: boolean }>("/ai-agent/publish", {
         method: "POST",
       });
       toast.success("Agent profile published!");

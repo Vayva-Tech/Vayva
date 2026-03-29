@@ -32,7 +32,7 @@ export default function BeautyServicesPage() {
 
   const fetchServices = async () => {
     try {
-      const response = await apiJson<{ data: Service[] }>("/api/beauty/services");
+      const response = await apiJson<{ data: Service[] }>("/beauty/services");
       setServices(response.data || generateMockServices());
     } catch (error) {
       setServices(generateMockServices());

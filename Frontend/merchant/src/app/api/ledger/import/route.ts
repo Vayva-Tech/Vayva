@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Call backend API
-      const result = await apiJson(`${buildBackendUrl("/api/ledger/import")}`,
+      const result = await apiJson(`${buildBackendUrl("/ledger/import")}`,
       {
           method: "POST",
           headers: {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/ledger/import", operation: "POST" });
+    handleApiError(error, { endpoint: "/ledger/import", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

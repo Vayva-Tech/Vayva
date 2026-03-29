@@ -24,7 +24,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       success: boolean;
       data?: { id?: string };
       error?: string;
-    }>(buildBackendUrl("/api/resources/create"), {
+    }>(buildBackendUrl("/resources/create"), {
       method: "POST",
       headers: auth.headers,
       body: JSON.stringify({ primaryObject, data }),
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     return NextResponse.json({ success: true, id: result.data?.id || "" });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/resources/create", operation: "POST" });
+    handleApiError(error, { endpoint: "/resources/create", operation: "POST" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

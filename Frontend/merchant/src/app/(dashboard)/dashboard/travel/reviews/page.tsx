@@ -163,7 +163,7 @@ export default function TravelReviewsPage() {
 
               <div className="flex items-center justify-between pt-4 border-t">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <ThumbsUp className="h-4 w-4" />
+                  <thumbsUp className="h-4 w-4" / scope="col">
                   <span>{review.helpful} found this helpful</span>
                 </div>
                 <div className="flex gap-2">

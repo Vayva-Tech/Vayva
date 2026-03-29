@@ -38,7 +38,7 @@ export default function NewResourcePage() {
 
     setCreating(true);
     try {
-      const res = await fetch("/api/resources/create", {
+      const res = await fetch("/resources/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

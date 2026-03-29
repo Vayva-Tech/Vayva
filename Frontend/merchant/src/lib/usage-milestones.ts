@@ -3,9 +3,13 @@
  * 
  * Provides utilities for detecting when merchants reach significant usage milestones.
  * Used by milestone tracker worker and real-time dashboard notifications.
+ * 
+ * MIGRATED: Now calls backend API instead of direct Prisma queries
  */
 
-import { prisma } from "@vayva/db";
+import { logger } from "@vayva/shared";
+
+const BACKEND_URL = process.env.BACKEND_API_URL || '';
 
 export interface MilestoneConfig {
   type: MilestoneType;
@@ -120,234 +124,160 @@ export const MILESTONE_CONFIGS: Record<MilestoneType, MilestoneConfig> = {
   },
 };
 
+export interface MilestoneProgress {
+  currentMilestone: MilestoneConfig | null;
+  nextMilestone: MilestoneConfig | null;
+  progress: number;
+}
+
+interface CheckMilestonesResult {
+  newMilestones: MilestoneConfig[];
+  count: number;
+}
+
 /**
  * Check if merchant has reached any new milestones
  */
 export async function checkNewMilestones(storeId: string): Promise<MilestoneConfig[]> {
-  const newMilestones: MilestoneConfig[] = [];
-
   try {
-    // Get all stats in parallel
-    const [
-      orderCount,
-      productCount,
-      customerCount,
-      revenueStats,
-    ] = await Promise.all([
-      getOrderCount(storeId),
-      getProductCount(storeId),
-      getCustomerCount(storeId),
-      getRevenueStats(storeId),
-    ]);
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/usage/milestones/check`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ storeId }),
+    });
 
-    // Check order milestones
-    checkThreshold(
-      "orders",
-      orderCount,
-      ["orders_10", "orders_50", "orders_100"],
-      storeId,
-      newMilestones
-    );
-
-    // Check product milestones
-    checkThreshold(
-      "products",
-      productCount,
-      ["products_10", "products_50", "products_100"],
-      storeId,
-      newMilestones
-    );
-
-    // Check customer milestones
-    checkThreshold(
-      "customers",
-      customerCount,
-      ["customers_10", "customers_50", "customers_100"],
-      storeId,
-      newMilestones
-    );
-
-    // Check revenue milestones
-    if (revenueStats >= 50000) {
-      await checkRevenueMilestone(revenueStats, storeId, newMilestones);
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: { message: 'Failed to check milestones' } }));
+      logger.error('[UsageMilestones] Failed to check milestones', error);
+      return [];
     }
 
-    // Check first order
-    if (orderCount >= 1) {
-      await checkFirstOrder(storeId, newMilestones);
-    }
+    const data = await res.json();
+    return data.data.newMilestones || [];
   } catch (error) {
-    console.error("[USAGE_MILESTONES] Error checking milestones:", error);
+    logger.error('[UsageMilestones] Error checking milestones', error);
+    return [];
   }
-
-  return newMilestones;
-}
-
-/**
- * Helper to check thresholds for count-based milestones
- */
-function checkThreshold(
-  prefix: string,
-  count: number,
-  milestoneTypes: MilestoneType[],
-  storeId: string,
-  newMilestones: MilestoneConfig[]
-) {
-  for (const milestoneType of milestoneTypes) {
-    const config = MILESTONE_CONFIGS[milestoneType];
-    if (count >= config.threshold) {
-      newMilestones.push(config);
-    }
-  }
-}
-
-/**
- * Check revenue milestone specifically
- */
-async function checkRevenueMilestone(
-  revenue: number,
-  storeId: string,
-  newMilestones: MilestoneConfig[]
-) {
-  const revenueMilestones: MilestoneType[] = [
-    "revenue_50k",
-    "revenue_100k",
-    "revenue_500k",
-    "revenue_1m",
-  ];
-
-  for (const milestoneType of revenueMilestones) {
-    const config = MILESTONE_CONFIGS[milestoneType];
-    if (revenue >= config.threshold) {
-      // Check if already recorded
-      const exists = await prisma.milestoneRecord.findFirst({
-        where: {
-          storeId,
-          milestoneType,
-        },
-      });
-
-      if (!exists) {
-        newMilestones.push(config);
-      }
-    }
-  }
-}
-
-/**
- * Check first order milestone
- */
-async function checkFirstOrder(
-  storeId: string,
-  newMilestones: MilestoneConfig[]
-) {
-  const exists = await prisma.milestoneRecord.findFirst({
-    where: {
-      storeId,
-      milestoneType: "first_order",
-    },
-  });
-
-  if (!exists) {
-    newMilestones.push(MILESTONE_CONFIGS.first_order);
-  }
-}
-
-/**
- * Get total order count for store
- */
-async function getOrderCount(storeId: string): Promise<number> {
-  return prisma.order.count({
-    where: { storeId },
-  });
-}
-
-/**
- * Get total product count for store
- */
-async function getProductCount(storeId: string): Promise<number> {
-  return prisma.product.count({
-    where: { storeId },
-  });
-}
-
-/**
- * Get unique customer count for store
- */
-async function getCustomerCount(storeId: string): Promise<number> {
-  const customers = await prisma.order.groupBy({
-    by: ["customerEmail"],
-    where: { storeId },
-  });
-  return customers.length;
-}
-
-/**
- * Get total revenue for store
- */
-async function getRevenueStats(storeId: string): Promise<number> {
-  const stats = await prisma.order.aggregate({
-    where: { storeId },
-    _sum: { total: true },
-  });
-  return Number(stats._sum.total || 0);
 }
 
 /**
  * Get progress to next milestone
  */
-export async function getNextMilestoneProgress(
-  storeId: string
-): Promise<{
-  currentMilestone: MilestoneConfig | null;
-  nextMilestone: MilestoneConfig | null;
-  progress: number;
-}> {
-  const [orderCount, productCount, customerCount, revenue] = await Promise.all([
-    getOrderCount(storeId),
-    getProductCount(storeId),
-    getCustomerCount(storeId),
-    getRevenueStats(storeId),
-  ]);
+export async function getNextMilestoneProgress(storeId: string): Promise<MilestoneProgress> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/usage/milestones/progress`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-  // Find highest achieved milestone in each category
-  let highestProgress = 0;
-  let currentMilestone: MilestoneConfig | null = null;
-  let nextMilestone: MilestoneConfig | null = null;
-
-  const categories = [
-    { type: "orders", value: orderCount, prefixes: ["orders_10", "orders_50", "orders_100"] },
-    { type: "products", value: productCount, prefixes: ["products_10", "products_50", "products_100"] },
-    { type: "customers", value: customerCount, prefixes: ["customers_10", "customers_50", "customers_100"] },
-  ];
-
-  for (const category of categories) {
-    const milestones = category.prefixes as MilestoneType[];
-    let achievedIndex = -1;
-
-    for (let i = 0; i < milestones.length; i++) {
-      const config = MILESTONE_CONFIGS[milestones[i]];
-      if (category.value >= config.threshold) {
-        achievedIndex = i;
-      }
+    if (!res.ok) {
+      throw new Error('Failed to fetch milestone progress');
     }
 
-    if (achievedIndex >= 0 && achievedIndex < milestones.length - 1) {
-      const current = MILESTONE_CONFIGS[milestones[achievedIndex]];
-      const next = MILESTONE_CONFIGS[milestones[achievedIndex + 1]];
-      const progress = (category.value / next.threshold) * 100;
-
-      if (progress > highestProgress) {
-        highestProgress = progress;
-        currentMilestone = current;
-        nextMilestone = next;
-      }
-    }
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    logger.error('[UsageMilestones] Error fetching progress', error);
+    return {
+      currentMilestone: null,
+      nextMilestone: null,
+      progress: 0,
+    };
   }
+}
 
-  return {
-    currentMilestone,
-    nextMilestone,
-    progress: Math.min(highestProgress, 100),
-  };
+/**
+ * Get achieved milestones history
+ */
+export async function getMilestoneHistory(storeId: string): Promise<{
+  milestoneType: MilestoneType;
+  label: string;
+  celebrationMessage: string;
+  achievedAt: Date;
+}[]> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/usage/milestones/history`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch milestone history');
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    logger.error('[UsageMilestones] Error fetching history', error);
+    return [];
+  }
+}
+
+/**
+ * Get list of achieved milestone types
+ */
+export async function getAchievedMilestones(storeId: string): Promise<MilestoneType[]> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/usage/milestones/list`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch achieved milestones');
+    }
+
+    const data = await res.json();
+    return data.data.achieved || [];
+  } catch (error) {
+    logger.error('[UsageMilestones] Error fetching achieved milestones', error);
+    return [];
+  }
+}
+
+/**
+ * Get all milestone configurations
+ */
+export async function getMilestoneConfigurations(): Promise<Record<MilestoneType, MilestoneConfig>> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/usage/milestones/config`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch milestone configurations');
+    }
+
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    logger.error('[UsageMilestones] Error fetching configurations', error);
+    return MILESTONE_CONFIGS;
+  }
+}
+
+/**
+ * Get auth token from cookies
+ */
+async function getAuthToken(): Promise<string | null> {
+  try {
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    return cookieStore.get('auth_token')?.value || null;
+  } catch {
+    return null;
+  }
 }

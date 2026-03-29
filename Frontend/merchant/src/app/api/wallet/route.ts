@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/wallet",
+      endpoint: "/wallet",
       operation: "GET_WALLET",
     });
     return NextResponse.json(

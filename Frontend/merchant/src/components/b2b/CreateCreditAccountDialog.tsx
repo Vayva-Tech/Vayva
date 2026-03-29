@@ -45,7 +45,7 @@ export function CreateCreditAccountDialog({
         isActive: false,
       } as unknown as CreateCreditAccountInput;
 
-      const response = await fetch('/api/b2b/credit-accounts', {
+      const response = await fetch('/b2b/credit-accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

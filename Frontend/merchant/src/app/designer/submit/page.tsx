@@ -27,7 +27,7 @@ export default function SubmitTemplatePage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await apiJson<{ success: boolean }>("/api/designer/templates/submit", {
+      await apiJson<{ success: boolean }>("/designer/templates/submit", {
         method: "POST",
         body: JSON.stringify(formData),
       });

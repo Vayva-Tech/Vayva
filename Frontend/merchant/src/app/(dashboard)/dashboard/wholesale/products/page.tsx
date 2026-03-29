@@ -84,16 +84,16 @@ export default function WholesaleProductsPage() {
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">SKU</th>
-                  <th className="py-3 px-4 font-medium">Product Name</th>
-                  <th className="py-3 px-4 font-medium">Category</th>
-                  <th className="py-3 px-4 font-medium">Base Price</th>
-                  <th className="py-3 px-4 font-medium">MOQ</th>
-                  <th className="py-3 px-4 font-medium">Stock Level</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">SKU</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Product Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Category</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Base Price</th>
+                  <th className="py-3 px-4 font-medium" scope="col">MOQ</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Stock Level</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

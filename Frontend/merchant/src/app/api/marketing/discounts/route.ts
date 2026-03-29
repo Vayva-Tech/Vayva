@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/marketing/discounts", operation: "GET" });
+    handleApiError(error, { endpoint: "/marketing/discounts", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, result: result.data });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/marketing/discounts", operation: "POST" });
+    handleApiError(error, { endpoint: "/marketing/discounts", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

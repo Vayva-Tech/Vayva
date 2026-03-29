@@ -107,16 +107,16 @@ export default function EducationProgressPage() {
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Student</th>
-                  <th className="py-3 px-4 font-medium">Course</th>
-                  <th className="py-3 px-4 font-medium">Completion</th>
-                  <th className="py-3 px-4 font-medium">Grade</th>
-                  <th className="py-3 px-4 font-medium">Assignments</th>
-                  <th className="py-3 px-4 font-medium">Last Activity</th>
-                  <th className="py-3 px-4 font-medium">Risk Level</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Student</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Course</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Completion</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Grade</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Assignments</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Last Activity</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Risk Level</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

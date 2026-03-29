@@ -52,7 +52,7 @@ export async function GET(
     });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/public/referrals/code/[code]",
+      endpoint: "/public/referrals/code/[code]",
       operation: "GET_REFERRAL_CODE",
       additionalInfo: { requestId },
     });

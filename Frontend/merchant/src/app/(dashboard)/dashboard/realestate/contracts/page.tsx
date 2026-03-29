@@ -33,7 +33,7 @@ export default function RealEstateContractsPage() {
 
   const fetchContracts = async () => {
     try {
-      const response = await apiJson<{ data: Contract[] }>("/api/realestate/contracts?limit=200");
+      const response = await apiJson<{ data: Contract[] }>("/realestate/contracts?limit=200");
       setContracts(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch contracts", error);

@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/public/checkout/verify", operation: "POST" });
+    handleApiError(error, { endpoint: "/public/checkout/verify", operation: "POST" });
     return NextResponse.json(
       { error: "Payment verification failed" },
       { status: 500, headers: { "Cache-Control": "no-store" } },

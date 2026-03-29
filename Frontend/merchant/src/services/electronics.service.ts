@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { api } from '@/lib/api-client';
 import type {
   WarrantyRecord,
   ExtendedProtectionPlan,
@@ -9,84 +9,22 @@ export class ElectronicsService {
   // ===== WARRANTY RECORDS =====
 
   async getWarrantyByOrder(orderId: string): Promise<WarrantyRecord[]> {
-    const warranties = await prisma.warrantyRecord?.findMany({
-      where: { orderId },
-    });
-
-    return warranties.map((w: any) => ({
-      id: w.id,
-      storeId: w.storeId,
-      orderId: w.orderId,
-      productId: w.productId,
-      customerId: w.customerId,
-      serialNumber: w.serialNumber ?? undefined,
-      warrantyType: w.warrantyType as any,
-      startDate: w.startDate,
-      endDate: w.endDate,
-      durationMonths: w.durationMonths,
-      status: (w as any).status as WarrantyStatus,
-      renewalOffered: w.renewalOffered,
-      createdAt: w.createdAt,
-    }));
+    const response = await api.get(`/electronics/warranties/order/${orderId}`);
+    return response.data || [];
   }
 
   async getCustomerWarranties(customerId: string): Promise<WarrantyRecord[]> {
-    const warranties = await prisma.warrantyRecord?.findMany({
-      where: { customerId },
-      orderBy: { endDate: 'asc' },
-    });
-
-    return warranties.map((w: any) => ({
-      id: w.id,
-      storeId: w.storeId,
-      orderId: w.orderId,
-      productId: w.productId,
-      customerId: w.customerId,
-      serialNumber: w.serialNumber ?? undefined,
-      warrantyType: w.warrantyType as any,
-      startDate: w.startDate,
-      endDate: w.endDate,
-      durationMonths: w.durationMonths,
-      status: (w as any).status as WarrantyStatus,
-      renewalOffered: w.renewalOffered,
-      createdAt: w.createdAt,
-    }));
+    const response = await api.get(`/electronics/warranties/customer/${customerId}`);
+    return response.data || [];
   }
 
   async createWarranty(
     data: Omit<WarrantyRecord, 'id' | 'createdAt' | 'status' | 'renewalOffered'>
   ): Promise<WarrantyRecord> {
-    const warranty = await prisma.warrantyRecord?.create({
-      data: {
-        storeId: data.storeId,
-        orderId: data.orderId,
-        productId: data.productId,
-        customerId: data.customerId,
-        serialNumber: data.serialNumber,
-        warrantyType: data.warrantyType,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        durationMonths: data.durationMonths,
-        status: 'active',
-        renewalOffered: false,
-      },
+    const response = await api.post('/electronics/warranties', {
+      ...data,
     });
-
-    return {
-      id: warranty.id,
-      storeId: warranty.storeId,
-      orderId: warranty.orderId,
-      productId: warranty.productId,
-      customerId: warranty.customerId,
-      serialNumber: warranty.serialNumber ?? undefined,
-      warrantyType: warranty.warrantyType as any,
-      startDate: warranty.startDate,
-      endDate: warranty.endDate,
-      durationMonths: warranty.durationMonths,
-      status: (warranty as any).status as WarrantyStatus,
-      renewalOffered: warranty.renewalOffered,
-      createdAt: warranty.createdAt,
-    };
+    return response.data || {};
   }
 
   async updateWarrantyStatus(
@@ -94,60 +32,22 @@ export class ElectronicsService {
     id: string,
     status: WarrantyStatus
   ): Promise<WarrantyRecord> {
-    const updated = await prisma.warrantyRecord?.updateMany({
-      where: { id, storeId },
-      data: { status },
+    const response = await api.put(`/electronics/warranties/${id}/status`, {
+      storeId,
+      status,
     });
-    if (!updated || updated.count !== 1) {
-      throw new Error('Warranty not found');
-    }
-    const warranty = await prisma.warrantyRecord?.findFirst({
-      where: { id, storeId },
-    });
-    if (!warranty) {
-      throw new Error('Warranty not found');
-    }
-
-    return {
-      id: warranty.id,
-      storeId: warranty.storeId,
-      orderId: warranty.orderId,
-      productId: warranty.productId,
-      customerId: warranty.customerId,
-      serialNumber: warranty.serialNumber ?? undefined,
-      warrantyType: warranty.warrantyType as any,
-      startDate: warranty.startDate,
-      endDate: warranty.endDate,
-      durationMonths: warranty.durationMonths,
-      status: (warranty as any).status as WarrantyStatus,
-      renewalOffered: warranty.renewalOffered,
-      createdAt: warranty.createdAt,
-    };
+    return response.data || {};
   }
 
   async getExpiringWarranties(
     storeId: string,
     daysThreshold: number = 30
   ): Promise<WarrantyRecord[]> {
-    const threshold = new Date();
-    threshold.setDate(threshold.getDate() + daysThreshold);
-
-    const warranties = await prisma.warrantyRecord?.findMany({
-      where: {
-        storeId,
-        endDate: { lte: threshold },
-        status: 'active',
-        renewalOffered: false,
-      },
+    const response = await api.get(`/electronics/${storeId}/warranties/expiring`, {
+      daysThreshold,
     });
-
-    return warranties.map((w: any) => ({
-      id: w.id,
-      storeId: w.storeId,
-      orderId: w.orderId,
-      productId: w.productId,
-      customerId: w.customerId,
-      serialNumber: w.serialNumber ?? undefined,
+    return response.data || [];
+  }
       warrantyType: w.warrantyType as any,
       startDate: w.startDate,
       endDate: w.endDate,
@@ -161,52 +61,19 @@ export class ElectronicsService {
   // ===== EXTENDED PROTECTION PLANS =====
 
   async getProtectionPlans(storeId: string): Promise<ExtendedProtectionPlan[]> {
-    const plans = await prisma.extendedProtectionPlan?.findMany({
-      where: { storeId, isActive: true },
-    });
-
-    return plans.map((p: any) => ({
-      id: p.id,
-      storeId: p.storeId,
-      name: p.name,
-      description: p.description ?? undefined,
-      coverage: p.coverage,
-      price: Number(p.price),
-      durationMonths: p.durationMonths,
-      isActive: p.isActive,
-      createdAt: p.createdAt,
-      updatedAt: p.updatedAt,
-    }));
+    const response = await api.get(`/electronics/${storeId}/protection-plans`);
+    return response.data || [];
   }
 
   async createProtectionPlan(
     storeId: string,
     data: Omit<ExtendedProtectionPlan, 'id' | 'storeId' | 'createdAt' | 'updatedAt' | 'isActive'>
   ): Promise<ExtendedProtectionPlan> {
-    const plan = await prisma.extendedProtectionPlan?.create({
-      data: {
-        storeId,
-        name: data.name,
-        description: data.description,
-        coverage: data.coverage,
-        price: data.price,
-        durationMonths: data.durationMonths,
-        isActive: true,
-      },
+    const response = await api.post('/electronics/protection-plans', {
+      storeId,
+      ...data,
     });
-
-    return {
-      id: plan.id,
-      storeId: plan.storeId,
-      name: plan.name,
-      description: plan.description ?? undefined,
-      coverage: plan.coverage,
-      price: Number(plan.price),
-      durationMonths: plan.durationMonths,
-      isActive: plan.isActive,
-      createdAt: plan.createdAt,
-      updatedAt: plan.updatedAt,
-    };
+    return response.data || {};
   }
 
   // ===== WARRANTY CLAIMS =====
@@ -218,75 +85,25 @@ export class ElectronicsService {
       description?: string;
     }
   ): Promise<any> {
-    const claim = await prisma.warrantyClaim?.create({
-      data: {
-        warrantyId,
-        claimNumber: `WCL-${Date.now()}`,
-        issue: data.issue,
-        status: 'pending',
-      },
+    const response = await api.post(`/electronics/warranties/${warrantyId}/claims`, {
+      warrantyId,
+      ...data,
     });
-
-    return {
-      id: claim.id,
-      warrantyId: claim.warrantyId,
-      claimNumber: claim.claimNumber,
-      issue: claim.issue,
-      status: (claim as any).status as any,
-      claimedAt: claim.claimedAt,
-    };
+    return response.data || {};
   }
 
   async getWarrantyClaims(warrantyId: string): Promise<any[]> {
-    const claims = await prisma.warrantyClaim?.findMany({
-      where: { warrantyId },
-      orderBy: { claimedAt: 'desc' },
-    });
-
-    return claims.map((c: any) => ({
-      id: c.id,
-      warrantyId: c.warrantyId,
-      claimNumber: c.claimNumber,
-      issue: c.issue,
-      status: (c as any).status as any,
-      resolution: c.resolution ?? undefined,
-      claimedAt: c.claimedAt,
-      resolvedAt: c.resolvedAt ?? undefined,
-    }));
+    const response = await api.get(`/electronics/warranties/${warrantyId}/claims`);
+    return response.data || [];
   }
 
   // ===== RENEWAL OFFERS =====
 
   async markRenewalOffered(storeId: string, id: string): Promise<WarrantyRecord> {
-    const updated = await prisma.warrantyRecord?.updateMany({
-      where: { id, storeId },
-      data: { renewalOffered: true },
+    const response = await api.post(`/electronics/warranties/${id}/mark-renewal-offered`, {
+      storeId,
     });
-    if (!updated || updated.count !== 1) {
-      throw new Error('Warranty not found');
-    }
-    const warranty = await prisma.warrantyRecord?.findFirst({
-      where: { id, storeId },
-    });
-    if (!warranty) {
-      throw new Error('Warranty not found');
-    }
-
-    return {
-      id: warranty.id,
-      storeId: warranty.storeId,
-      orderId: warranty.orderId,
-      productId: warranty.productId,
-      customerId: warranty.customerId,
-      serialNumber: warranty.serialNumber ?? undefined,
-      warrantyType: warranty.warrantyType as any,
-      startDate: warranty.startDate,
-      endDate: warranty.endDate,
-      durationMonths: warranty.durationMonths,
-      status: (warranty as any).status as WarrantyStatus,
-      renewalOffered: warranty.renewalOffered,
-      createdAt: warranty.createdAt,
-    };
+    return response.data || {};
   }
 }
 

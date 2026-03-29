@@ -3,6 +3,7 @@ import { Button } from "@vayva/ui";
 
 import { useState } from "react";
 import useSWR from "swr";
+import { fetcher } from "@/lib/utils";
 import {
   Megaphone,
   Users,
@@ -32,19 +33,21 @@ import {
 
 interface CampaignsData {
   kpis: { label: string; value: string }[];
-  campaignPerformance: { name: string; impressions: number; conversions: number }[];
-  activeCampaigns: { id: string; name: string; status: string; reach: string; conversions: number; spend: string }[];
+  campaignPerformance: {
+    name: string;
+    impressions: number;
+    conversions: number;
+  }[];
+  activeCampaigns: {
+    id: string;
+    name: string;
+    status: string;
+    reach: string;
+    conversions: number;
+    spend: string;
+  }[];
   socialStats: { platform: string; value: string; change: string }[];
 }
-
-/* ------------------------------------------------------------------ */
-/*  SWR Fetcher                                                        */
-/* ------------------------------------------------------------------ */
-
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-});
 
 /* ------------------------------------------------------------------ */
 /*  Skeleton Components                                                */
@@ -150,9 +153,19 @@ const statusStyles: Record<string, { bg: string; text: string; icon: any }> = {
 };
 
 // ── Chart helpers ──────────────────────────────────────────
-function BarChartSVG({ campaignPerformance }: { campaignPerformance: { name: string; impressions: number; conversions: number }[] }) {
+function BarChartSVG({
+  campaignPerformance,
+}: {
+  campaignPerformance: {
+    name: string;
+    impressions: number;
+    conversions: number;
+  }[];
+}) {
   if (!campaignPerformance || campaignPerformance.length === 0) return null;
-  const maxImpressions = Math.max(...campaignPerformance.map((c) => c.impressions));
+  const maxImpressions = Math.max(
+    ...campaignPerformance.map((c) => c.impressions),
+  );
   const chartWidth = 500;
   const chartHeight = 200;
   const barGroupWidth = chartWidth / campaignPerformance.length;
@@ -160,11 +173,15 @@ function BarChartSVG({ campaignPerformance }: { campaignPerformance: { name: str
   const gap = 6;
 
   return (
-    <svg viewBox={`0 0 ${chartWidth} ${chartHeight + 40}`} className="w-full h-64">
+    <svg
+      viewBox={`0 0 ${chartWidth} ${chartHeight + 40}`}
+      className="w-full h-64"
+    >
       {campaignPerformance.map((campaign, i) => {
         const x = i * barGroupWidth + (barGroupWidth - barWidth * 2 - gap) / 2;
         const impHeight = (campaign.impressions / maxImpressions) * chartHeight;
-        const convHeight = (campaign.conversions / maxImpressions) * chartHeight;
+        const convHeight =
+          (campaign.conversions / maxImpressions) * chartHeight;
 
         return (
           <g key={campaign.name}>
@@ -207,11 +224,30 @@ function BarChartSVG({ campaignPerformance }: { campaignPerformance: { name: str
 }
 
 // ── KPI Icon Map ──────────────────────────────────────────
-const kpiIcons: Record<string, { icon: any; iconBg: string; iconColor: string }> = {
-  "Campaigns Active": { icon: Megaphone, iconBg: "bg-green-50", iconColor: "text-green-600" },
-  "Email Subscribers": { icon: Users, iconBg: "bg-blue-50", iconColor: "text-blue-600" },
-  "Conversion Rate": { icon: TrendingUp, iconBg: "bg-purple-50", iconColor: "text-purple-600" },
-  "Revenue from Campaigns": { icon: DollarSign, iconBg: "bg-amber-50", iconColor: "text-amber-600" },
+const kpiIcons: Record<
+  string,
+  { icon: any; iconBg: string; iconColor: string }
+> = {
+  "Campaigns Active": {
+    icon: Megaphone,
+    iconBg: "bg-green-50",
+    iconColor: "text-green-600",
+  },
+  "Email Subscribers": {
+    icon: Users,
+    iconBg: "bg-blue-50",
+    iconColor: "text-blue-600",
+  },
+  "Conversion Rate": {
+    icon: TrendingUp,
+    iconBg: "bg-purple-50",
+    iconColor: "text-purple-600",
+  },
+  "Revenue from Campaigns": {
+    icon: DollarSign,
+    iconBg: "bg-amber-50",
+    iconColor: "text-amber-600",
+  },
 };
 
 // ── Social Icon Map ───────────────────────────────────────
@@ -226,9 +262,9 @@ export default function MarketingPage() {
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
   const { data, error, isLoading, mutate } = useSWR<CampaignsData>(
-    '/api/marketing/overview',
+    "/marketing/overview",
     fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { revalidateOnFocus: false, dedupingInterval: 30000 },
   );
 
   const kpiData = data?.kpis || [];
@@ -244,8 +280,12 @@ export default function MarketingPage() {
           <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Failed to load campaigns</h3>
-          <p className="text-sm text-gray-500 mb-4">There was a problem fetching your marketing data. Please try again.</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            Failed to load campaigns
+          </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            There was a problem fetching your marketing data. Please try again.
+          </p>
           <Button
             onClick={() => mutate()}
             className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors"
@@ -269,12 +309,16 @@ export default function MarketingPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => <KPICardSkeleton key={i} />)}
+          {[1, 2, 3, 4].map((i) => (
+            <KPICardSkeleton key={i} />
+          ))}
         </div>
         <ChartSkeleton />
         <CampaignTableSkeleton />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => <KPICardSkeleton key={i} />)}
+          {[1, 2, 3, 4].map((i) => (
+            <KPICardSkeleton key={i} />
+          ))}
         </div>
       </div>
     );
@@ -286,16 +330,24 @@ export default function MarketingPage() {
       <div className="space-y-8 pb-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Marketing</h1>
-            <p className="text-sm text-gray-500 mt-1">Create campaigns and grow your audience across Nigeria</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+              Marketing
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Create campaigns and grow your audience across Nigeria
+            </p>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
             <Megaphone className="w-7 h-7 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">No campaigns yet</h3>
-          <p className="text-sm text-gray-500 max-w-sm mb-4">Create your first marketing campaign to grow your store</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            No campaigns yet
+          </h3>
+          <p className="text-sm text-gray-500 max-w-sm mb-4">
+            Create your first marketing campaign to grow your store
+          </p>
           <Button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-colors">
             <Plus className="w-4 h-4" />
             Create Campaign
@@ -335,7 +387,11 @@ export default function MarketingPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiData.map((kpi) => {
-          const iconConfig = kpiIcons[kpi.label] || { icon: Megaphone, iconBg: "bg-gray-50", iconColor: "text-gray-600" };
+          const iconConfig = kpiIcons[kpi.label] || {
+            icon: Megaphone,
+            iconBg: "bg-gray-50",
+            iconColor: "text-gray-600",
+          };
           const Icon = iconConfig.icon;
           return (
             <div
@@ -521,7 +577,9 @@ export default function MarketingPage() {
                   <p className="text-xs text-gray-500 font-medium">
                     {stat.platform}
                   </p>
-                  <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {stat.value}
+                  </p>
                   <p className="text-xs text-green-600 flex items-center gap-0.5 mt-0.5">
                     <ArrowUpRight size={12} />
                     {stat.change}
@@ -535,4 +593,3 @@ export default function MarketingPage() {
     </div>
   );
 }
-

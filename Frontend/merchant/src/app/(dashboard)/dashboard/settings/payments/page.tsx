@@ -32,7 +32,7 @@ export default function PaymentsSettingsPage() {
       try {
         setLoading(true);
         const data = await apiJson<SettlementAccount>(
-          "/api/settings/payments/beneficiaries",
+          "/settings/payments/beneficiaries",
         );
         setSettlementAccount(data ?? null);
       } catch (e: any) {
@@ -61,7 +61,7 @@ export default function PaymentsSettingsPage() {
     setSavingBank(true);
     try {
       const data = await apiJson<SettlementAccount>(
-        "/api/settings/payments/beneficiaries",
+        "/settings/payments/beneficiaries",
         {
           method: "POST",
           body: JSON.stringify(bankForm),

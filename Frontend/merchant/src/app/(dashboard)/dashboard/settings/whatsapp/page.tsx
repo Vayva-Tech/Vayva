@@ -23,20 +23,20 @@ interface WhatsAppSettingsResponse {
 
 export default function WhatsAppSettingsPage() {
   const { data, error, isLoading } = useSWR<WhatsAppSettingsResponse>(
-    "/api/settings/whatsapp",
+    "/settings/whatsapp",
     (url: string) => apiJson<WhatsAppSettingsResponse>(url),
   );
 
   const handleChannelUpdate = async (updateData: unknown) => {
     try {
-      await apiJson<{ success: boolean }>("/api/settings/whatsapp", {
+      await apiJson<{ success: boolean }>("/settings/whatsapp", {
         method: "PATCH",
         body: JSON.stringify({
           type: "CHANNEL",
           data: updateData,
         }),
       });
-      void mutate("/api/settings/whatsapp");
+      void mutate("/settings/whatsapp");
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
       logger.error("[CHANNEL_UPDATE_ERROR]", {
@@ -50,14 +50,14 @@ export default function WhatsAppSettingsPage() {
 
   const handleSafetyUpdate = async (updateData: unknown) => {
     try {
-      await apiJson<{ success: boolean }>("/api/settings/whatsapp", {
+      await apiJson<{ success: boolean }>("/settings/whatsapp", {
         method: "PATCH",
         body: JSON.stringify({
           type: "SETTINGS",
           data: { safetyFilters: updateData },
         }),
       });
-      void mutate("/api/settings/whatsapp");
+      void mutate("/settings/whatsapp");
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
       logger.error("[SAFETY_UPDATE_ERROR]", {
@@ -104,7 +104,7 @@ export default function WhatsAppSettingsPage() {
         <TabsContent value="templates">
           <TemplateManager
             templates={data?.templates || []}
-            onRefresh={() => mutate("/api/settings/whatsapp")}
+            onRefresh={() => mutate("/settings/whatsapp")}
           />
         </TabsContent>
 

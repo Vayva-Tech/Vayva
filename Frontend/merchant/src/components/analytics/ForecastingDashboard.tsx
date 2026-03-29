@@ -54,7 +54,7 @@ export function ForecastingDashboard() {
     try {
       setGenerating(true);
 
-      const response = await fetch("/api/forecasting", {
+      const response = await fetch("/forecasting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

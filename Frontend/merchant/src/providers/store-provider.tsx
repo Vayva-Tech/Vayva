@@ -1,7 +1,20 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import type { Store } from '@vayva/db';
+
+// Local Store interface to avoid coupling with @vayva/db
+interface Store {
+  id: string;
+  name: string;
+  slug?: string;
+  status?: string;
+  tier?: string;
+  plan?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  lastLoginAt?: string | null;
+  [key: string]: unknown;
+}
 
 interface StoreContextType {
   store: Store | null;
@@ -50,7 +63,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const response = await fetch('/api/current-store');
+        const response = await fetch('/current-store');
         if (response.ok) {
           const storeData = (await response.json()) as Store;
           setStore(storeData);

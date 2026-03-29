@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { WholesaleService } from '../../../services/industry/wholesale.service';
+import { WholesaleService } from '../../../../services/industry/wholesale.service';
 
 const wholesaleService = new WholesaleService();
 

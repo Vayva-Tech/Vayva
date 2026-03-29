@@ -41,7 +41,7 @@ export default function PostsPage() {
 
   useEffect(() => { void fetchPosts(); }, []);
 
-  const fetchPosts = async () => { try { setLoading(true); const data = await apiJson<Post[]>("/api/posts"); setPosts(data || []); } catch (error) { logger.error("[FETCH_POSTS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load posts"); } finally { setLoading(false); } };
+  const fetchPosts = async () => { try { setLoading(true); const data = await apiJson<Post[]>("/posts"); setPosts(data || []); } catch (error) { logger.error("[FETCH_POSTS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load posts"); } finally { setLoading(false); } };
 
   const handleSave = async () => {
     if (!formData.title) return toast.error("Title is required");
@@ -49,7 +49,7 @@ export default function PostsPage() {
     try {
       const payload = { ...formData, slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, "-"), tags: formData.tags.split(",").map(t => t.trim()).filter(Boolean) };
       if (editingPost) { await apiJson(`/api/posts/${editingPost.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Post updated"); }
-      else { await apiJson("/api/posts", { method: "POST", body: JSON.stringify(payload) }); toast.success("Post created"); }
+      else { await apiJson("/posts", { method: "POST", body: JSON.stringify(payload) }); toast.success("Post created"); }
       setIsOpen(false); setEditingPost(null); resetForm(); void fetchPosts();
     } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
   };

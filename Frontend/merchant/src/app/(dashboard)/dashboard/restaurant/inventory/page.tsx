@@ -33,7 +33,7 @@ export default function RestaurantInventoryPage() {
 
   const fetchInventory = async () => {
     try {
-      const response = await apiJson<{ data: InventoryItem[] }>("/api/restaurant/inventory?limit=500");
+      const response = await apiJson<{ data: InventoryItem[] }>("/restaurant/inventory?limit=500");
       setInventory(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch inventory", error);

@@ -33,7 +33,7 @@ export default function BeautyInventoryPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await apiJson<{ data: Product[] }>("/api/beauty/products");
+      const response = await apiJson<{ data: Product[] }>("/beauty/products");
       setProducts(response.data || generateMockProducts());
     } catch (error) {
       setProducts(generateMockProducts());

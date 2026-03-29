@@ -1,18 +1,5 @@
-import { db } from "@/lib/db";
-import { Prisma } from "@vayva/db";
+import { api } from '@/lib/api-client';
 import type {
-  RawCourse,
-  RawModule,
-  RawLesson,
-  RawEnrollment,
-  RawCertificate,
-  RawQuiz,
-  RawQuizQuestion,
-  RawQuizAttempt,
-  RawCertificateTemplate,
-  RawLessonProgress,
-} from "@/types/education-db";
-import {
   Course,
   CourseModule,
   Lesson,
@@ -42,151 +29,49 @@ import {
   LessonType,
 } from "@/types/education";
 
-// Helper to safely convert Prisma Decimal to number
-const toNumber = (val: { toNumber(): number } | number | null | undefined): number => {
-  if (val === null || val === undefined) return 0;
-  return typeof val === "number" ? val : val.toNumber();
-};
-
 export const EducationService = {
   // ============================================================================
   // COURSES
   // ============================================================================
 
   async createCourse(storeId: string, data: CreateCourseInput): Promise<Course> {
-    const course = await db.course?.create({
-      data: {
-        storeId,
-        title: data.title,
-        description: data.description,
-        thumbnailUrl: data.thumbnailUrl,
-        instructorId: data.instructorId,
-        price: new Prisma.Decimal(data.price),
-        currency: data.currency ?? "NGN",
-        level: data.level,
-        category: data.category,
-        tags: data.tags ?? [],
-        duration: 0,
-        isPublished: false,
-      },
-      include: {
-        modules: {
-          include: { lessons: true },
-        },
-      },
+    const response = await api.post('/education/courses', {
+      storeId,
+      ...data,
     });
-
-    return mapCourse(course);
+    return response.data || {};
   },
 
   async getCourses(storeId: string, options?: { publishedOnly?: boolean; instructorId?: string }): Promise<Course[]> {
-    const courses = await db.course?.findMany({
-      where: {
-        storeId,
-        isPublished: options?.publishedOnly ? true : undefined,
-        instructorId: options?.instructorId,
-      },
-      include: {
-        modules: {
-          include: { lessons: true },
-        },
-        _count: {
-          select: { enrollments: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
+    const response = await api.get('/education/courses', {
+      storeId,
+      ...options,
     });
-
-    return courses.map((course: RawCourse) => ({
-      ...mapCourse(course),
-      totalStudents: course._count?.enrollments,
-    }));
+    return response.data || [];
   },
 
   async getCourseById(courseId: string): Promise<Course | null> {
-    const course = await db.course?.findUnique({
-      where: { id: courseId },
-      include: {
-        modules: {
-          include: { lessons: true },
-          orderBy: { orderIndex: "asc" },
-        },
-        _count: {
-          select: { enrollments: true },
-        },
-      },
-    });
-
-    if (!course) return null;
-
-    return {
-      ...mapCourse(course),
-      totalStudents: course._count?.enrollments,
-    };
+    const response = await api.get(`/education/courses/${courseId}`);
+    return response.data || null;
   },
 
   async updateCourse(courseId: string, data: UpdateCourseInput): Promise<Course> {
-    const updateData: Prisma.CourseUpdateInput = {};
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.thumbnailUrl !== undefined) updateData.thumbnailUrl = data.thumbnailUrl;
-    if (data.instructorId !== undefined) updateData.instructorId = data.instructorId;
-    if (data.price !== undefined) updateData.price = new Prisma.Decimal(data.price);
-    if (data.level !== undefined) updateData.level = data.level;
-    if (data.category !== undefined) updateData.category = data.category;
-    if (data.tags !== undefined) updateData.tags = data.tags;
-
-    const course = await db.course?.update({
-      where: { id: courseId },
-      data: updateData,
-      include: {
-        modules: {
-          include: { lessons: true },
-        },
-      },
-    });
-
-    return mapCourse(course);
+    const response = await api.patch(`/education/courses/${courseId}`, data);
+    return response.data || {};
   },
 
   async publishCourse(courseId: string): Promise<Course> {
-    const course = await db.course?.update({
-      where: { id: courseId },
-      data: {
-        isPublished: true,
-        publishedAt: new Date(),
-      },
-      include: {
-        modules: {
-          include: { lessons: true },
-        },
-      },
-    });
-
-    return mapCourse(course);
+    const response = await api.post(`/education/courses/${courseId}/publish`);
+    return response.data || {};
   },
 
   async unpublishCourse(courseId: string): Promise<Course> {
-    const course = await db.course?.update({
-      where: { id: courseId },
-      data: {
-        isPublished: false,
-        publishedAt: null,
-      },
-      include: {
-        modules: {
-          include: { lessons: true },
-        },
-      },
-    });
-
-    return mapCourse(course);
+    const response = await api.post(`/education/courses/${courseId}/unpublish`);
+    return response.data || {};
   },
 
   async deleteCourse(courseId: string): Promise<void> {
-    await db.course?.delete({
-      where: { id: courseId },
-    });
+    await api.delete(`/education/courses/${courseId}`);
   },
 
   // ============================================================================
@@ -194,6 +79,18 @@ export const EducationService = {
   // ============================================================================
 
   async addModule(courseId: string, data: CreateModuleInput): Promise<CourseModule> {
+    const response = await api.post(`/education/courses/${courseId}/modules`, data);
+    return response.data || {};
+  },
+
+  async updateModule(moduleId: string, data: Partial<CreateModuleInput>): Promise<CourseModule> {
+    const response = await api.patch(`/education/modules/${moduleId}`, data);
+    return response.data || {};
+  },
+
+  async deleteModule(moduleId: string): Promise<void> {
+    await api.delete(`/education/modules/${moduleId}`);
+  },
     const module = await db.courseModule?.create({
       data: {
         courseId,
@@ -233,45 +130,17 @@ export const EducationService = {
   // ============================================================================
 
   async addLesson(moduleId: string, data: CreateLessonInput): Promise<Lesson> {
-    const lesson = await db.lesson?.create({
-      data: {
-        moduleId,
-        title: data.title,
-        description: data.description,
-        type: data.type,
-        content: data.content as unknown as Prisma.InputJsonValue,
-        duration: data.duration,
-        isPreview: data.isPreview ?? false,
-        orderIndex: data.orderIndex,
-        isPublished: false,
-      },
-    });
-
-    return mapLesson(lesson);
+    const response = await api.post(`/education/modules/${moduleId}/lessons`, data);
+    return response.data || {};
   },
 
   async updateLesson(lessonId: string, data: Partial<CreateLessonInput>): Promise<Lesson> {
-    const updateData: Prisma.LessonUpdateInput = {};
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.type !== undefined) updateData.type = data.type;
-    if (data.content !== undefined) updateData.content = data.content as unknown as Prisma.InputJsonValue;
-    if (data.duration !== undefined) updateData.duration = data.duration;
-    if (data.isPreview !== undefined) updateData.isPreview = data.isPreview;
-    if (data.orderIndex !== undefined) updateData.orderIndex = data.orderIndex;
-
-    const lesson = await db.lesson?.update({
-      where: { id: lessonId },
-      data: updateData,
-    });
-
-    return mapLesson(lesson);
+    const response = await api.patch(`/education/lessons/${lessonId}`, data);
+    return response.data || {};
   },
 
   async deleteLesson(lessonId: string): Promise<void> {
-    await db.lesson?.delete({
-      where: { id: lessonId },
-    });
+    await api.delete(`/education/lessons/${lessonId}`);
   },
 
   // ============================================================================
@@ -279,82 +148,27 @@ export const EducationService = {
   // ============================================================================
 
   async enrollStudent(data: CreateEnrollmentInput): Promise<Enrollment> {
-    // Check if already enrolled
-    const existing = await db.enrollment?.findUnique({
-      where: {
-        courseId_studentId: {
-          courseId: data.courseId,
-          studentId: data.studentId,
-        },
-      },
-    });
-
-    if (existing) {
-      throw new Error("Student is already enrolled in this course");
-    }
-
-    const enrollment = await db.enrollment?.create({
-      data: {
-        courseId: data.courseId,
-        studentId: data.studentId,
-        status: "active",
-        progress: 0,
-        startedAt: new Date(),
-        lastAccessedAt: new Date(),
-        totalTimeSpent: 0,
-      },
-    });
-
-    return mapEnrollment(enrollment);
+    const response = await api.post('/education/enrollments', data);
+    return response.data || {};
   },
 
   async getEnrollmentsByCourse(courseId: string): Promise<Enrollment[]> {
-    const enrollments = await db.enrollment?.findMany({
-      where: { courseId },
-      include: {
-        course: {
-          include: {
-            modules: {
-              include: { lessons: true },
-            },
-          },
-        },
-        certificate: true,
-      },
+    const response = await api.get('/education/enrollments', {
+      courseId,
     });
-
-    return enrollments.map(mapEnrollment);
+    return response.data || [];
   },
 
   async getEnrollmentsByStudent(studentId: string): Promise<Enrollment[]> {
-    const enrollments = await db.enrollment?.findMany({
-      where: { studentId },
-      include: {
-        course: {
-          include: {
-            modules: {
-              include: { lessons: true },
-            },
-          },
-        },
-        certificate: true,
-      },
+    const response = await api.get('/education/enrollments/student', {
+      studentId,
     });
-
-    return enrollments.map(mapEnrollment);
+    return response.data || [];
   },
 
   async updateEnrollmentProgress(enrollmentId: string, data: UpdateLessonProgressInput) {
-    const enrollment = await db.enrollment?.update({
-      where: { id: enrollmentId },
-      data: {
-        progress: data.isCompleted !== undefined ? { increment: 0 } : undefined,
-        lastAccessedAt: new Date(),
-        totalTimeSpent: data.timeSpent !== undefined ? { increment: data.timeSpent } : undefined,
-      },
-    });
-
-    return mapEnrollment(enrollment);
+    const response = await api.patch(`/education/enrollments/${enrollmentId}/progress`, data);
+    return response.data || {};
   },
 
   // ============================================================================
@@ -362,69 +176,18 @@ export const EducationService = {
   // ============================================================================
 
   async createQuiz(lessonId: string, data: CreateQuizInput): Promise<Quiz> {
-    const quiz = await db.quiz?.create({
-      data: {
-        lessonId,
-        title: data.title,
-        description: data.description,
-        timeLimit: data.timeLimit,
-        passingScore: data.passingScore ?? 70,
-        maxAttempts: data.maxAttempts ?? 3,
-        shuffleQuestions: data.shuffleQuestions ?? true,
-        showCorrectAnswers: data.showCorrectAnswers ?? true,
-      },
-      include: { questions: true },
-    });
-
-    return {
-      ...quiz,
-      questions: quiz.questions?.map((q: any) => ({
-        ...q,
-        options: q.options as unknown as QuizQuestion["options"],
-      })),
-    };
+    const response = await api.post(`/education/lessons/${lessonId}/quizzes`, data);
+    return response.data || {};
   },
 
   async addQuestion(quizId: string, data: CreateQuizQuestionInput): Promise<QuizQuestion> {
-    const question = await db.quizQuestion?.create({
-      data: {
-        quizId,
-        question: data.question,
-        type: data.type,
-        options: data.options as unknown as Prisma.InputJsonValue,
-        correctAnswer: data.correctAnswer,
-        explanation: data.explanation,
-        points: data.points ?? 1,
-        orderIndex: data.orderIndex,
-      },
-    });
-
-    return {
-      ...question,
-      options: question.options as unknown as QuizQuestion["options"],
-    };
+    const response = await api.post(`/education/quizzes/${quizId}/questions`, data);
+    return response.data || {};
   },
 
   async getQuizById(quizId: string): Promise<Quiz | null> {
-    const quiz = await db.quiz?.findUnique({
-      where: { id: quizId },
-      include: {
-        questions: {
-          orderBy: { orderIndex: "asc" },
-        },
-      },
-    });
-
-    if (!quiz) return null;
-
-    return {
-      ...quiz,
-      questions: quiz.questions?.map((q: RawQuizQuestion) => ({
-        ...q,
-        type: q.type as QuestionType,
-        options: q.options as unknown as QuizQuestion["options"],
-      })),
-    };
+    const response = await api.get(`/education/quizzes/${quizId}`);
+    return response.data || null;
   },
 
   async submitQuizAttempt(
@@ -432,6 +195,13 @@ export const EducationService = {
     enrollmentId: string,
     answers: Record<string, string>
   ): Promise<{ attempt: QuizAttempt; isPassed: boolean }> {
+    const response = await api.post('/education/quiz-attempts', {
+      quizId,
+      enrollmentId,
+      answers,
+    });
+    return response.data || {};
+  },
     const quiz = await db.quiz?.findUnique({
       where: { id: quizId },
       include: { questions: true },
@@ -624,6 +394,31 @@ export const EducationService = {
   // ============================================================================
 
   async getCourseAnalytics(courseId: string): Promise<CourseAnalytics> {
+    const response = await api.get(`/education/courses/${courseId}/analytics`);
+    return response.data || {};
+  },
+
+  // ============================================================================
+  // LESSON PROGRESS
+  // ============================================================================
+
+  async updateLessonProgress(
+    enrollmentId: string,
+    lessonId: string,
+    data: UpdateLessonProgressInput
+  ) {
+    const response = await api.post('/education/lesson-progress', {
+      enrollmentId,
+      lessonId,
+      data,
+    });
+    return response.data || {};
+  },
+
+  async recalculateEnrollmentProgress(enrollmentId: string): Promise<void> {
+    await api.post(`/education/enrollments/${enrollmentId}/recalculate-progress`);
+  },
+};
     const [
       enrollments,
       completedCount,
@@ -780,54 +575,6 @@ export const EducationService = {
     });
   },
 };
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-function mapCourse(course: RawCourse): Course {
-  return {
-    id: course.id,
-    storeId: course.storeId,
-    title: course.title,
-    description: course.description ?? "",
-    thumbnailUrl: course.thumbnailUrl,
-    instructorId: course.instructorId,
-    price: typeof course.price === "number" ? course.price : course.price?.toNumber() ?? 0,
-    currency: course.currency,
-    duration: course.duration,
-    level: course.level as CourseLevel,
-    category: course.category,
-    tags: course.tags,
-    isPublished: course.isPublished,
-    publishedAt: course.publishedAt,
-    createdAt: course.createdAt,
-    updatedAt: course.updatedAt,
-    modules: course.modules?.map(mapModule) ?? [],
-  };
-}
-
-function mapModule(module: RawModule): CourseModule {
-  return {
-    id: module.id,
-    courseId: module.courseId,
-    title: module.title,
-    description: module.description,
-    orderIndex: module.orderIndex,
-    isPublished: module.isPublished,
-    lessons: module.lessons?.map(mapLesson) ?? [],
-  };
-}
-
-function mapLesson(lesson: RawLesson): Lesson {
-  const content = lesson.content as unknown as VideoContent | TextContent | QuizContent | AssignmentContent;
-
-  return {
-    id: lesson.id,
-    moduleId: lesson.moduleId,
-    title: lesson.title,
-    description: lesson.description,
-    type: lesson.type as LessonType,
     content,
     duration: lesson.duration,
     isPreview: lesson.isPreview,

@@ -184,17 +184,17 @@ export default function RetailLoyaltyPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Member</th>
-                    <th className="text-left py-3 px-4 font-semibold">Tier</th>
-                    <th className="text-left py-3 px-4 font-semibold">Points</th>
-                    <th className="text-left py-3 px-4 font-semibold">Lifetime Points</th>
-                    <th className="text-left py-3 px-4 font-semibold">Total Spent</th>
-                    <th className="text-left py-3 px-4 font-semibold">Visits</th>
-                    <th className="text-left py-3 px-4 font-semibold">Last Purchase</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Member</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Tier</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Points</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Lifetime Points</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Total Spent</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Visits</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Last Purchase</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

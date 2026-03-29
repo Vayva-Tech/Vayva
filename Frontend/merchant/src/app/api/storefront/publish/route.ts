@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       success: boolean;
       data?: { deployment?: any; message?: string };
       error?: string;
-    }>(buildBackendUrl("/api/storefront/publish"), {
+    }>(buildBackendUrl("/storefront/publish"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

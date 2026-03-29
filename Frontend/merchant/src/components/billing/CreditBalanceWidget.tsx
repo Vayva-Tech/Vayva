@@ -27,7 +27,7 @@ export function CreditBalanceWidget() {
   const { data: balance, isLoading, error } = useQuery<CreditBalance>({
     queryKey: ['credits', 'balance'],
     queryFn: async () => {
-      const res = await fetch('/api/credits/balance');
+      const res = await fetch('/credits/balance');
       if (!res.ok) throw new Error('Failed to fetch credits');
       return res.json();
     },
@@ -44,8 +44,8 @@ export function CreditBalanceWidget() {
     ? (balance.remainingCredits / balance.monthlyCredits) * 100
     : 0;
 
-  const isLow = percentage < 20 && balance.plan !== 'FREE';
-  const isFree = balance.plan === 'FREE';
+  const isLow = percentage < 20 && balance.plan !== 'STARTER';
+  const isStarter = balance.plan === 'STARTER';
 
   return (
     <div className="relative group">
@@ -55,7 +55,7 @@ export function CreditBalanceWidget() {
           "flex items-center gap-2.5 px-3.5 py-2 rounded-xl border transition-all cursor-pointer hover:shadow-md",
           isLow 
             ? "bg-red-50 border-red-200 hover:border-red-300" 
-            : isFree
+            : isStarter
             ? "bg-gray-50 border-gray-200 hover:border-gray-300"
             : "bg-green-50 border-green-200 hover:border-green-300"
         )}>
@@ -63,11 +63,11 @@ export function CreditBalanceWidget() {
             "p-1.5 rounded-lg",
             isLow 
               ? "bg-red-100 text-red-600" 
-              : isFree
+              : isStarter
               ? "bg-gray-200 text-gray-600"
               : "bg-green-100 text-green-600"
           )}>
-            {isFree ? (
+            {isStarter ? (
               <Info size={16} weight="fill" />
             ) : (
               <Zap size={16} weight="fill" />
@@ -77,20 +77,22 @@ export function CreditBalanceWidget() {
           <div className="flex flex-col min-w-0">
             <span className={cn(
               "text-xs font-bold",
-              isLow ? "text-red-700" : isFree ? "text-gray-700" : "text-green-700"
+              isLow ? "text-red-700" : isStarter ? "text-gray-700" : "text-green-700"
             )}>
-              {isFree ? 'Trial' : `${balance.remainingCredits.toLocaleString()} credits`}
+              {isStarter ? 'Trial' : `${balance.remainingCredits.toLocaleString()} credits`}
             </span>
-            {!isFree && balance.monthlyCredits > 0 && (
+            {!isStarter && balance.monthlyCredits > 0 && (
               <span className="text-[10px] text-gray-600">
                 {percentage.toFixed(0)}% remaining
               </span>
             )}
           </div>
 
-          {isLow && (
+          {isLow ? (
             <AlertTriangle size={14} className="text-red-600 shrink-0" />
-          )}
+          ) : isStarter ? (
+            <Info size={16} weight="fill" />
+          ) : null}
         </div>
       </Link>
 

@@ -48,7 +48,7 @@ export default function BlogPage() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<BlogPost[]>("/api/blog/posts");
+      const data = await apiJson<BlogPost[]>("/blog/posts");
       setPosts(data || []);
     } catch (error: unknown) {
       logger.error("[FETCH_BLOG_POSTS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" });
@@ -67,7 +67,7 @@ export default function BlogPage() {
         await apiJson(`/api/blog/posts/${editingPost.id}`, { method: "PUT", body: JSON.stringify(payload) });
         toast.success("Post updated");
       } else {
-        await apiJson("/api/blog/posts", { method: "POST", body: JSON.stringify(payload) });
+        await apiJson("/blog/posts", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Post created");
       }
       setIsOpen(false);

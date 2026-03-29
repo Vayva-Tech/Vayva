@@ -2,6 +2,10 @@
  * Grocery Industry UI Components
  */
 
+// KPI Cards
+export { GroceryKPICards } from './GroceryKPICards';
+export type { GroceryKPICardsProps } from './GroceryKPICards';
+
 export { FreshnessTracker } from './FreshnessTracker';
 export type { FreshnessTrackerProps, FreshnessRecord as FreshnessTrackerRecord, FreshnessStats } from './FreshnessTracker';
 

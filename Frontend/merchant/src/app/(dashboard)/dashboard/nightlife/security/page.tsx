@@ -119,16 +119,16 @@ export default function NightlifeSecurityPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Incident</th>
-                  <th className="py-3 px-4 font-medium">Type</th>
-                  <th className="py-3 px-4 font-medium">Location</th>
-                  <th className="py-3 px-4 font-medium">Date/Time</th>
-                  <th className="py-3 px-4 font-medium">Reported By</th>
-                  <th className="py-3 px-4 font-medium">Severity</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Incident</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Type</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Location</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Date/Time</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Reported By</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Severity</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

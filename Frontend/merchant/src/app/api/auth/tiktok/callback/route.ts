@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
             // best-effort
           }
 
-          await fetch(new URL("/api/ad-platforms/accounts", request.nextUrl.origin), {
+          await fetch(new URL("/ad-platforms/accounts", request.nextUrl.origin), {
             method: "POST",
             headers: {
               ...auth.headers,

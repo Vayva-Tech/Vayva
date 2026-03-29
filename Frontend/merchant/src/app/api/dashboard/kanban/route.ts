@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/dashboard/kanban",
+      endpoint: "/dashboard/kanban",
       operation: "GET_KANBAN_ORDERS",
     });
     return NextResponse.json(

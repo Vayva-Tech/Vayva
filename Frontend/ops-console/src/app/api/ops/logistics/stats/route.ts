@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export const dynamic = "force-dynamic";
 
@@ -10,29 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-  const [total, pending, inTransit, delivered] = await Promise.all([
-    prisma.shipment.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.shipment.count({
-      where: { status: "CREATED", createdAt: { gte: thirtyDaysAgo } },
-    }),
-    prisma.shipment.count({
-      where: { status: "IN_TRANSIT", createdAt: { gte: thirtyDaysAgo } },
-    }),
-    prisma.shipment.count({
-      where: { status: "DELIVERED", createdAt: { gte: thirtyDaysAgo } },
-    }),
-  ]);
-
-  return NextResponse.json({
-    data: {
-      total,
-      pending,
-      inTransit,
-      delivered,
-      period: "30d",
-    },
-  });
+  const response = await apiClient.get('/api/v1/admin/logistics/stats');
+  
+  return NextResponse.json(response);
 }

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/addons/cancel", operation: "POST" });
+    handleApiError(error, { endpoint: "/merchant/addons/cancel", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

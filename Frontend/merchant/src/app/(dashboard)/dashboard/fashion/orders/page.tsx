@@ -33,7 +33,7 @@ export default function FashionOrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await apiJson<{ data: Order[] }>("/api/fashion/orders?limit=200");
+      const response = await apiJson<{ data: Order[] }>("/fashion/orders?limit=200");
       setOrders(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch fashion orders", error);

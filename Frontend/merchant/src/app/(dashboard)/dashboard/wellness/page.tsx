@@ -77,7 +77,7 @@ export default function WellnessDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/wellness/stats");
+      const response = await apiJson<{ data: DashboardStats }>("/wellness/stats");
       setStats(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch wellness stats", error);
@@ -87,7 +87,7 @@ export default function WellnessDashboard() {
 
   const fetchClasses = async () => {
     try {
-      const response = await apiJson<{ data: FitnessClass[] }>("/api/wellness/classes?limit=10");
+      const response = await apiJson<{ data: FitnessClass[] }>("/wellness/classes?limit=10");
       setClasses(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch classes", error);
@@ -97,7 +97,7 @@ export default function WellnessDashboard() {
 
   const fetchMembers = async () => {
     try {
-      const response = await apiJson<{ data: Member[] }>("/api/wellness/members?limit=10");
+      const response = await apiJson<{ data: Member[] }>("/wellness/members?limit=10");
       setMembers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch members", error);

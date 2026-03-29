@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/shipping/kwik/quote",
+      endpoint: "/shipping/kwik/quote",
       operation: "GET_KWIK_QUOTE",
     });
     return NextResponse.json(

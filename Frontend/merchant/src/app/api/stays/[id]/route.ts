@@ -38,7 +38,7 @@ export async function GET(
       },
     });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/stays/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/stays/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

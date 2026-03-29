@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { api } from '@/lib/api-client';
 import { logger } from "@/lib/logger";
 import { checkRateLimitCustom, RateLimitError } from "@/lib/ratelimit";
 
@@ -41,10 +41,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const taken = await prisma.store.findFirst({
-      where: { slug: normalized },
-      select: { id: true },
-    });
+    // Check slug availability via backend API
+    const response = await api.get(`/onboarding/check-slug`, { slug: normalized });
+    const taken = response.data?.taken || false;
 
     return NextResponse.json(
       {

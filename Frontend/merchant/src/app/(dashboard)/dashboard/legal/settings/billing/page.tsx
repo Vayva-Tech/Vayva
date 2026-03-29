@@ -39,7 +39,7 @@ export default function BillingSettingsPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/legal/settings/billing', {
+      const response = await fetch('/legal/settings/billing', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),

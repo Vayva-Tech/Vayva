@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/public/referrals/track-click", operation: "POST" });
+    handleApiError(error, { endpoint: "/public/referrals/track-click", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

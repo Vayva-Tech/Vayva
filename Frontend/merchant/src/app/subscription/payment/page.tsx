@@ -117,7 +117,7 @@ export default function SubscriptionPaymentPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/subscriptions/initiate", {
+      const res = await fetch("/subscriptions/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -25,7 +25,7 @@ export class WhatsAppAgentClient {
    * Connect WhatsApp instance for a store
    */
   static async connect(storeId: string): Promise<{ success: boolean; qrCode?: string }> {
-    const res = await fetch("/api/whatsapp/connect", {
+    const res = await fetch("/whatsapp/connect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ storeId }),
@@ -40,7 +40,7 @@ export class WhatsAppAgentClient {
    * Disconnect WhatsApp instance
    */
   static async disconnect(storeId: string): Promise<{ success: boolean }> {
-    const res = await fetch("/api/whatsapp/disconnect", {
+    const res = await fetch("/whatsapp/disconnect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ storeId }),

@@ -21,10 +21,9 @@ interface DashboardWrapperProps {
 function DashboardContentWrapper({ children, initialIndustry }: DashboardWrapperProps) {
   const { featureFlags, currentTier } = useDashboard();
 
-  // Initialize feature flags when tier changes (FREE maps to STARTER for limits)
+  // Initialize feature flags when tier changes (all users start with STARTER)
   useEffect(() => {
-    const tier: PlanTier =
-      currentTier === "FREE" ? "STARTER" : currentTier;
+    const tier: PlanTier = currentTier as PlanTier;
     featureFlags.initialize(tier);
   }, [currentTier, featureFlags]);
 

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { DomainsService } from '../../../services/platform/domains.service';
+import { DomainsService } from '../../../../services/platform/domains.service';
 
 const domainsService = new DomainsService();
 

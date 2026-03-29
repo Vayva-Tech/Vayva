@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { SettingsService } from '../../../services/core/settings.service';
+import { SettingsService } from '../../../../services/core/settings.service';
 
 const settingsService = new SettingsService();
 

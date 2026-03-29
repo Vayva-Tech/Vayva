@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/security/status",
+      endpoint: "/account/security/status",
       operation: "GET_SECURITY_STATUS",
     });
     return NextResponse.json(

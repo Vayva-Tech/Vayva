@@ -1,4 +1,7 @@
-import { prisma } from "@vayva/db";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.withIdempotency = withIdempotency;
+const client_1 = require("../client");
 /**
  * Ensures that a request with a specific Idempotency-Key is only processed once.
  *
@@ -8,30 +11,53 @@ import { prisma } from "@vayva/db";
  * @param route The API route being called
  * @param execute The operation to perform if the key is new
  */
-export async function withIdempotency(key, userId, merchantId, route, execute) {
+async function withIdempotency(key, userId, merchantId, route, execute) {
     // Check for existing record
-    const existing = await prisma.idempotencyRecord.findUnique({
-        where: { key }
+    const existing = await client_1.prisma.idempotencyKeyV2.findUnique({
+        where: {
+            storeId_scope_key: {
+                storeId: merchantId,
+                scope: route,
+                key: key
+            }
+        }
     });
     if (existing) {
-        if (existing.userId !== userId || existing.merchantId !== merchantId) {
-            throw new Error("Idempotency key collision or unauthorized reuse");
+        if (existing.status === "COMPLETED" && existing.responseJson) {
+            return existing.responseJson;
         }
-        return existing.response;
+        // If it's still in progress or failed, we might want to handle it differently.
+        // For now, if it exists, we throw to prevent concurrent executions if not COMPLETED.
+        if (existing.status === "STARTED") {
+            throw new Error("Request still in progress");
+        }
     }
     // Execute the operation
     const result = await execute();
     // Record the result
-    await prisma.idempotencyRecord.create({
-        data: {
-            key,
-            userId,
-            merchantId,
-            route,
-            response: result,
-            responseHash: "", // Optional: for integrity checks
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h expiry
+    await client_1.prisma.idempotencyKeyV2.upsert({
+        where: {
+            storeId_scope_key: {
+                storeId: merchantId,
+                scope: route,
+                key: key
+            }
+        },
+        update: {
+            status: "COMPLETED",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            responseJson: result,
+            updatedAt: new Date()
+        },
+        create: {
+            storeId: merchantId,
+            scope: route,
+            key: key,
+            status: "COMPLETED",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            responseJson: result
         }
     });
     return result;
 }
+//# sourceMappingURL=idempotency.js.map

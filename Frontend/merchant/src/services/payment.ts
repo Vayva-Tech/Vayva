@@ -21,7 +21,7 @@ export class PaymentService {
     amount: number;
     bankAccountId: string;
   }): Promise<{ success: boolean; payoutId?: string; message?: string }> {
-    const res = await fetch("/api/payments/payouts", {
+    const res = await fetch("/payments/payouts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -41,7 +41,7 @@ export class PaymentService {
     pin: string;
     bankAccountId: string;
   }): Promise<{ withdrawalId?: string; error?: string; message?: string }> {
-    const res = await fetch("/api/wallet/withdraw/initiate", {
+    const res = await fetch("/wallet/withdraw/initiate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -60,7 +60,7 @@ export class PaymentService {
     withdrawalId: string,
     otpCode: string
   ): Promise<{ success?: boolean; error?: string; message?: string }> {
-    const res = await fetch("/api/wallet/withdraw/confirm", {
+    const res = await fetch("/wallet/withdraw/confirm", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ withdrawalId, otpCode }),

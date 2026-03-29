@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { LedgerService } from '../../../services/core/ledger.service';
+import { LedgerService } from '../../../../services/core/ledger.service';
 
 const ledgerService = new LedgerService();
 

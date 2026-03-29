@@ -28,7 +28,7 @@ export function IncidentBanner() {
     const checkIncidents = async () => {
       try {
         const data = await apiJson<Incident | null>(
-          "/api/system/incidents/active",
+          "/system/incidents/active",
         );
         if (data && data.id !== dismissedId) {
           setIncident(data);

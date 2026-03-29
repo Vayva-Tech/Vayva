@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
 import { startOfDay, endOfDay } from "date-fns";
 
 export async function GET(request: NextRequest) {
@@ -97,7 +96,7 @@ export async function GET(request: NextRequest) {
         });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/nightlife/reservations", operation: "GET" });
+    handleApiError(error, { endpoint: "/nightlife/reservations", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -33,7 +33,7 @@ export default function RestaurantOrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await apiJson<{ data: Order[] }>("/api/restaurant/orders?limit=200");
+      const response = await apiJson<{ data: Order[] }>("/restaurant/orders?limit=200");
       setOrders(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch restaurant orders", error);

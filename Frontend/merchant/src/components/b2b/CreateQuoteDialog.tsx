@@ -99,7 +99,7 @@ export function CreateQuoteDialog({ open, onClose, onSuccess }: CreateQuoteDialo
         terms: terms || undefined,
       };
 
-      const response = await fetch('/api/b2b/quotes', {
+      const response = await fetch('/b2b/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

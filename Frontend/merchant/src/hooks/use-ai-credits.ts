@@ -25,7 +25,7 @@ export function useAICredits() {
   const fetchCredits = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/ai/credits');
+      const response = await fetch('/ai/credits');
       
       if (!response.ok) {
         throw new Error('Failed to fetch credits');
@@ -44,7 +44,7 @@ export function useAICredits() {
   // Purchase additional credits
   const purchaseCredits = useCallback(async (amount: number, paymentReference?: string) => {
     try {
-      const response = await fetch('/api/ai/credits/topup', {
+      const response = await fetch('/ai/credits/topup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

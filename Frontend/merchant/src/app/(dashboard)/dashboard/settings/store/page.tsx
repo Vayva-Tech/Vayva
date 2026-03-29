@@ -99,7 +99,7 @@ export default function StoreSettingsPage() {
   const fetchProfile = async (signal?: AbortSignal) => {
     try {
       setLoading(true);
-      const data = await apiJson<StoreProfile>("/api/account/store", {
+      const data = await apiJson<StoreProfile>("/account/store", {
         signal,
       });
       setProfile(data);
@@ -120,7 +120,7 @@ export default function StoreSettingsPage() {
   const fetchAiSettings = async (signal?: AbortSignal) => {
     try {
       const data = await apiJson<StoreAiAgentSettings>(
-        "/api/merchant/settings/ai-agent",
+        "/merchant/settings/ai-agent",
         { signal },
       );
       setAiSettings(data);
@@ -141,7 +141,7 @@ export default function StoreSettingsPage() {
     setAiSaving(true);
     try {
       const updated = await apiJson<StoreAiAgentSettings>(
-        "/api/merchant/settings/ai-agent",
+        "/merchant/settings/ai-agent",
         {
           method: "PATCH",
           body: JSON.stringify(aiSettings),
@@ -184,7 +184,7 @@ export default function StoreSettingsPage() {
         },
       };
 
-      await apiJson<{ success: boolean }>("/api/account/store", {
+      await apiJson<{ success: boolean }>("/account/store", {
         method: "PUT",
         body: JSON.stringify(sanitizedProfile),
       });

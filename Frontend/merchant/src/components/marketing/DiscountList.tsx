@@ -52,7 +52,7 @@ export function DiscountList() {
     error,
     mutate,
   } = useSWR<DiscountListResponse | DiscountItem[]>(
-    "/api/marketing/discounts",
+    "/marketing/discounts",
     (url: string) => apiJson<DiscountListResponse | DiscountItem[]>(url),
   );
   const [confirmDelete, setConfirmDelete] = useState<{

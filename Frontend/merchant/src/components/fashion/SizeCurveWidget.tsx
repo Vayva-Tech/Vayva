@@ -18,7 +18,7 @@ export const SizeCurveWidget: React.FC = () => {
   const { data, isLoading } = useQuery<SizeCurveData[]>({
     queryKey: ['size-curve'],
     queryFn: async () => {
-      const res = await fetch('/api/fashion/analytics/size-curve');
+      const res = await fetch('/fashion/analytics/size-curve');
       const data = await res.json();
       return data.curve || data.recommendations || [];
     },

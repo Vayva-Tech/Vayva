@@ -10,3 +10,5 @@ export * from './store-performance';
 export * from './transfers';
 export * from './channel-sync.feature';
 export * from './customer-segmentation.feature';
+export * from './supplier-management';
+export * from './demand-forecasting';

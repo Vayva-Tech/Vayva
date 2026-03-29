@@ -33,7 +33,7 @@ export default function EditorPage() {
       try {
         setLoading(true);
         const res = await apiJson<{ data: SiteOverview }>(
-          "/api/sites/overview",
+          "/sites/overview",
         );
         setSite(res.data);
       } catch (error: unknown) {
@@ -59,7 +59,7 @@ export default function EditorPage() {
       if (site.currentTemplate?.type === "custom" && site.currentTemplate?.id) {
         // Already a custom template project
         const wsRes = await apiJson<{ data: { editorUrl: string } }>(
-          "/api/webstudio/projects",
+          "/webstudio/projects",
           {
             method: "POST",
             body: JSON.stringify({
@@ -75,7 +75,7 @@ export default function EditorPage() {
         // Need to create a project from system template first
         toast.info("Creating a customizable copy of the template...");
         const res = await apiJson<{ data: { id: string } }>(
-          "/api/templates/mine",
+          "/templates/mine",
           {
             method: "POST",
             body: JSON.stringify({
@@ -87,7 +87,7 @@ export default function EditorPage() {
         );
 
         const wsRes = await apiJson<{ data: { editorUrl: string } }>(
-          "/api/webstudio/projects",
+          "/webstudio/projects",
           {
             method: "POST",
             body: JSON.stringify({ templateProjectId: res.data?.id }),
@@ -95,7 +95,7 @@ export default function EditorPage() {
         );
 
         // Also apply it to the store so the editor works on this copy
-        await apiJson<{ success: boolean }>("/api/templates/apply", {
+        await apiJson<{ success: boolean }>("/templates/apply", {
           method: "POST",
           body: JSON.stringify({ templateProjectId: res.data?.id }),
         });
@@ -103,7 +103,7 @@ export default function EditorPage() {
         window.open(wsRes.data?.editorUrl, "_blank");
         // Reload context
         const nextSite = await apiJson<{ data: SiteOverview }>(
-          "/api/sites/overview",
+          "/sites/overview",
         );
         setSite(nextSite.data);
       }

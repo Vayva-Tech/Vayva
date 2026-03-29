@@ -22,7 +22,7 @@ export async function GET(
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/resources/:primaryObject/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/resources/:primaryObject/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }
@@ -49,7 +49,7 @@ export async function PATCH(
     );
     return NextResponse.json(result);
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/resources/:primaryObject/:id", operation: "PATCH" });
+    handleApiError(error, { endpoint: "/resources/:primaryObject/:id", operation: "PATCH" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

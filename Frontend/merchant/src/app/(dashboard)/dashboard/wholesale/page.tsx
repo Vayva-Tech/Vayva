@@ -1,406 +1,255 @@
-/**
- * ============================================================================
- * Wholesale Dashboard - Professional B2B Sales & Distribution Platform
- * ============================================================================
- * 
- * A comprehensive wholesale management system featuring:
- * - Bulk Order Management (✅ COMPLETE)
- * - B2B Customer Accounts (✅ COMPLETE)
- * - Pricing Tiers & Volume Discounts (✅ COMPLETE)
- * - Inventory Management (✅ COMPLETE)
- * - Purchase Orders (✅ COMPLETE)
- * - Quote Management (✅ COMPLETE)
- * 
- * @version 2.0.0 - World-Class Edition
- * @author Vayva Engineering Team
- * @copyright 2026 Vayva Inc.
- * @license MIT
- */
-
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { apiJson } from "@/lib/api-client-shared";
-import { toast } from "sonner";
-import { logger, formatCurrency } from "@vayva/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
-import {
-  Package,
-  ShoppingCart,
-  Users,
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { TasksModule } from "@/components/dashboard/TasksModule";
+import { AlertsModule } from "@/components/dashboard/AlertsModule";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { 
+  Home, 
+  ShoppingCart, 
+  Tag, 
+  Package, 
+  Users, 
+  FileText, 
   DollarSign,
-  TrendingUp,
-  FileText,
-  Clock,
-  Plus,
-  AlertTriangle,
   BarChart3,
+  Megaphone,
+  Settings,
+  TrendingUp,
   Truck,
+  ClipboardCheck
 } from "lucide-react";
 
-// Type Definitions
-interface WholesaleOrder {
-  id: string;
-  orderNumber: string;
-  customerId: string;
-  customerName: string;
-  items: number;
-  totalAmount: number;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  orderDate: string;
-  deliveryDate?: string;
-}
-
-interface B2BCustomer {
-  id: string;
-  companyName: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  tier: "bronze" | "silver" | "gold" | "platinum";
-  creditLimit: number;
-  outstandingBalance: number;
-}
-
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  category: string;
-  wholesalePrice: number;
-  retailPrice: number;
-  stock: number;
-  minOrderQuantity: number;
-}
-
-interface PurchaseOrder {
-  id: string;
-  poNumber: string;
-  supplier: string;
-  items: number;
-  totalValue: number;
-  expectedDelivery: string;
-  status: "draft" | "sent" | "confirmed" | "received" | "cancelled";
-}
-
-interface Quote {
-  id: string;
-  quoteNumber: string;
-  customerName: string;
-  totalValue: number;
-  validUntil: string;
-  status: "draft" | "sent" | "accepted" | "rejected" | "expired";
-}
-
-interface DashboardStats {
-  totalOrders: number;
-  pendingOrders: number;
-  monthlyRevenue: number;
-  averageOrderValue: number;
-  totalCustomers: number;
-  activeQuotes: number;
-  lowStockProducts: number;
-  outstandingInvoices: number;
-}
-
-export default function WholesaleDashboardPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentOrders, setRecentOrders] = useState<WholesaleOrder[]>([]);
-  const [topCustomers, setTopCustomers] = useState<B2BCustomer[]>([]);
-
-  useEffect(() => {
-    fetchAllData();
-  }, []);
-
-  const fetchAllData = async () => {
-    try {
-      setLoading(true);
-      await Promise.all([
-        fetchStats(),
-        fetchRecentOrders(),
-        fetchTopCustomers(),
-      ]);
-    } catch (error) {
-      logger.error("Failed to fetch wholesale data", error);
-      toast.error("Failed to load dashboard data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/wholesale/stats");
-      setStats(response.data || null);
-    } catch (error) {
-      logger.warn("Failed to fetch wholesale stats", error);
-      setStats(null);
-    }
-  };
-
-  const fetchRecentOrders = async () => {
-    try {
-      const response = await apiJson<{ data: WholesaleOrder[] }>("/api/wholesale/orders?limit=20&sort=recent");
-      setRecentOrders(response.data || []);
-    } catch (error) {
-      logger.warn("Failed to fetch recent orders", error);
-      setRecentOrders([]);
-    }
-  };
-
-  const fetchTopCustomers = async () => {
-    try {
-      const response = await apiJson<{ data: B2BCustomer[] }>("/api/wholesale/customers?top=true&limit=5");
-      setTopCustomers(response.data || []);
-    } catch (error) {
-      logger.warn("Failed to fetch top customers", error);
-      setTopCustomers([]);
-    }
-  };
-
+export default function WholesaleDashboardHub() {
   return (
-    <ErrorBoundary serviceName="WholesaleDashboard">
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        {/* Header */}
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-gradient-to-br from-slate-700 to-blue-700 rounded-lg">
-                <Package className="h-6 w-6 text-white" />
+    <ErrorBoundary componentName="Wholesale Dashboard Hub">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        {/* Breadcrumb */}
+        <Breadcrumbs items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Wholesale", href: "/dashboard/wholesale" },
+        ]} />
+        
+        <div className="flex">
+          {/* Sidebar Navigation */}
+          <aside className="w-64 bg-white border-r border-gray-200 min-h-screen p-4 fixed left-0 top-[73px]">
+            <nav className="space-y-1">
+              {/* Core Operations */}
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Wholesale Operations
+              </div>
+              
+              <a
+                href="/dashboard/wholesale"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md bg-blue-100 text-blue-700"
+              >
+                <div className="flex items-center gap-3">
+                  <Home size={18} className="text-blue-600" />
+                  <span>Dashboard</span>
+                </div>
+                <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/orders"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <ShoppingCart size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>B2B Orders</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/pricing"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Tag size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Bulk Pricing</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/catalog"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Package size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Catalog</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/customers"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Users size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>CRM</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/purchase-orders"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <FileText size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Purchase Orders</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/inventory"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Package size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Inventory</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/shipping"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Truck size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Shipping</span>
+                </div>
+              </a>
+              
+              {/* Business Management */}
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-2">
+                Business Management
+              </div>
+              
+              <a
+                href="/dashboard/wholesale/finance"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <DollarSign size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Finance</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/marketing"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Megaphone size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Marketing</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/analytics"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <BarChart3 size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Analytics</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/wholesale/settings"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Settings</span>
+                </div>
+              </a>
+              
+              {/* Team Section */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <a
+                  href="/dashboard/wholesale/staff"
+                  className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <Users size={18} className="text-gray-400 group-hover:text-gray-600" />
+                    <span>Staff Management</span>
+                  </div>
+                </a>
+              </div>
+            </nav>
+          </aside>
+          
+          {/* Main Content */}
+          <main className="ml-64 flex-1 p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Wholesale Dashboard</h1>
+              <p className="text-gray-600 mt-1">Manage B2B orders, pricing, and bulk sales</p>
+            </div>
+            
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <MetricCard
+                title="Total Orders (MTD)"
+                value="847"
+                change="+12.4%"
+                trend="up"
+                icon={ShoppingCart}
+                color="blue"
+              />
+              <MetricCard
+                title="Revenue (MTD)"
+                value="$284,590"
+                change="+18.7%"
+                trend="up"
+                icon={DollarSign}
+                color="indigo"
+              />
+              <MetricCard
+                title="Active Accounts"
+                value="326"
+                change="+5.2%"
+                trend="up"
+                icon={Users}
+                color="blue"
+              />
+              <MetricCard
+                title="Order Fulfillment"
+                value="98.3%"
+                change="+1.2%"
+                trend="up"
+                icon={ClipboardCheck}
+                color="indigo"
+              />
+            </div>
+            
+            {/* Charts and Modules */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className="lg:col-span-2">
+                <RevenueChart />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-blue-700 bg-clip-text text-transparent">
-                  Wholesale Management
-                </h1>
-                <p className="text-xs text-muted-foreground">B2B Sales & Distribution Platform</p>
+                <AlertsModule alerts={[
+                  { id: 1, title: "Large Order Pending", description: "Order #WH-8472 requires approval ($52K)", severity: "info", time: "30m ago" },
+                  { id: 2, title: "Stock Alert", description: "SKU-4829 below reorder point", severity: "warning", time: "2h ago" },
+                  { id: 3, title: "Payment Received", description: "$28,450 from Acme Corp", severity: "success", time: "4h ago" },
+                ]} />
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={fetchAllData}>
-                <Clock className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Button size="sm" onClick={() => router.push("/dashboard/wholesale/orders")}>
-                <Plus className="h-4 w-4 mr-2" />
-                New Order
-              </Button>
-              <Button size="sm" onClick={() => router.push("/dashboard/wholesale/quotes")}>
-                <FileText className="h-4 w-4 mr-2" />
-                Create Quote
-              </Button>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 container mx-auto px-4 md:px-6 py-6 space-y-6">
-          {/* Stats Overview */}
-          {!loading && stats ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <WholesaleStatsGrid stats={stats} loading={loading} />
-            </motion.div>
-          ) : !loading ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">No Wholesale Data Yet</h3>
-                <p className="text-muted-foreground mb-4">Start by adding products, customers, or creating orders</p>
-                <div className="flex gap-2 justify-center">
-                  <Button size="sm" onClick={() => router.push("/dashboard/wholesale/products")}>Add Products</Button>
-                  <Button size="sm" variant="outline" onClick={() => router.push("/dashboard/wholesale/customers")}>Add Customers</Button>
-                  <Button size="sm" variant="outline" onClick={() => router.push("/dashboard/wholesale/orders")}>Create Order</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : null}
-
-        {/* Quick Navigation */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/products")}>
-                <Package className="h-8 w-8" />
-                <span>Products</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/orders")}>
-                <ShoppingCart className="h-8 w-8" />
-                <span>Orders</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/customers")}>
-                <Users className="h-8 w-8" />
-                <span>Customers</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/quotes")}>
-                <FileText className="h-8 w-8" />
-                <span>Quotes</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/inventory")}>
-                <AlertTriangle className="h-8 w-8" />
-                <span>Inventory</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/purchase-orders")}>
-                <Truck className="h-8 w-8" />
-                <span>Purchase Orders</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/pricing")}>
-                <DollarSign className="h-8 w-8" />
-                <span>Pricing</span>
-              </Button>
-              <Button variant="outline" className="h-auto py-6 flex flex-col gap-2" onClick={() => router.push("/dashboard/wholesale/analytics")}>
-                <BarChart3 className="h-8 w-8" />
-                <span>Analytics</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Orders & Top Customers */}
-        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Recent Orders
-                </div>
-                <Badge>{recentOrders.length} orders</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {recentOrders.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>No recent orders</p>
-                  <Button size="sm" variant="link" onClick={() => router.push("/dashboard/wholesale/orders")}>Create your first order</Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {recentOrders.slice(0, 5).map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">{order.orderNumber}</p>
-                        <p className="text-xs text-muted-foreground">{order.customerName} • {order.items} items</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-bold">{formatCurrency(order.totalAmount)}</p>
-                        <Badge variant={order.status === "delivered" ? "default" : "secondary"}>
-                          {order.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Top Customers
-                </div>
-                <Badge variant="secondary">This Month</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {topCustomers.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>No customers yet</p>
-                  <Button size="sm" variant="link" onClick={() => router.push("/dashboard/wholesale/customers")}>Add your first customer</Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {topCustomers.map((customer) => (
-                    <div key={customer.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-sm">{customer.companyName}</p>
-                        <p className="text-xs text-muted-foreground">{customer.contactName}</p>
-                      </div>
-                      <div className="text-right">
-                        <Badge variant={customer.tier === "platinum" ? "default" : customer.tier === "gold" ? "secondary" : "outline"}>
-                          {customer.tier}
-                        </Badge>
-                        <p className="text-xs text-muted-foreground mt-1">Credit: {formatCurrency(customer.creditLimit)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            {/* Tasks Module */}
+            <TasksModule tasks={[
+              { id: 1, title: "Review bulk pricing proposals", completed: false, priority: "high" },
+              { id: 2, title: "Approve credit applications", completed: true, priority: "high" },
+              { id: 3, title: "Update product catalog", completed: false, priority: "medium" },
+              { id: 4, title: "Schedule client meetings", completed: false, priority: "low" },
+            ]} />
+          </main>
         </div>
-
-        {/* Low Stock Alerts */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Low Stock Products
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Inventory monitoring active</p>
-              <p className="text-xs mt-1">Connect inventory system to see alerts</p>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-      </ErrorBoundary>
-    </div>
-  );
-}
-
-// Sub-components
-function WholesaleStatsGrid({ stats, loading }: { stats: DashboardStats | null; loading: boolean }) {
-  const statCards = [
-    { title: "Total Orders", value: stats?.totalOrders || 0, icon: ShoppingCart, color: "from-blue-500 to-indigo-500" },
-    { title: "Pending Orders", value: stats?.pendingOrders || 0, icon: Clock, color: "from-orange-500 to-red-500" },
-    { title: "Monthly Revenue", value: formatCurrency(stats?.monthlyRevenue || 0), icon: DollarSign, color: "from-green-500 to-emerald-500" },
-    { title: "Avg Order Value", value: formatCurrency(stats?.averageOrderValue || 0), icon: DollarSign, color: "from-teal-500 to-green-500" },
-    { title: "Total Customers", value: stats?.totalCustomers || 0, icon: Users, color: "from-purple-500 to-pink-500" },
-    { title: "Active Quotes", value: stats?.activeQuotes || 0, icon: FileText, color: "from-slate-500 to-blue-500" },
-  ];
-
-  if (loading) {
-    return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{statCards.map((_, i) => <Skeleton key={i} className="h-32 w-full" />)}</div>;
-  }
-
-  return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-      {statCards.map((stat, i) => (
-        <motion.div key={stat.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.1 }}>
-          <Card className="relative overflow-hidden hover:shadow-lg transition-all">
-            <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${stat.color} opacity-10 rounded-bl-full`} />
-            <CardContent className="p-4">
-              <div className={`p-2 bg-gradient-to-br ${stat.color} rounded-lg w-fit mb-2`}>
-                <stat.icon className="h-4 w-4 text-white" />
-              </div>
-              <p className="text-2xl font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.title}</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ))}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

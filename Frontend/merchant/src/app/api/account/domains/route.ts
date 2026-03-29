@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/domains",
+      endpoint: "/account/domains",
       operation: "GET_DOMAINS",
     });
     throw error;

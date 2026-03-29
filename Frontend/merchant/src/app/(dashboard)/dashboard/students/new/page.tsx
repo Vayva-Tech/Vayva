@@ -27,7 +27,7 @@ export default function NewStudentPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiJson("/api/education/students", {
+      await apiJson("/education/students", {
         method: "POST",
         body: JSON.stringify({
           ...form,

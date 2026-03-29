@@ -384,7 +384,7 @@ export default function OnboardingLayout({
                   className="h-10 rounded-xl border-gray-100 bg-white hover:bg-gray-50 text-gray-500"
                   onClick={() => {
                     if (typeof window !== "undefined") {
-                      window.location.href = "/api/auth/signout";
+                      window.location.href = "/auth/signout";
                     }
                   }}
                 >

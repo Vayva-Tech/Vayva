@@ -120,16 +120,16 @@ export default function ProfessionalMattersPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Matter #</th>
-                  <th className="py-3 px-4 font-medium">Title</th>
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Practice Area</th>
-                  <th className="py-3 px-4 font-medium">Attorney</th>
-                  <th className="py-3 px-4 font-medium">Value</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Matter #</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Title</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Practice Area</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Attorney</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Value</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

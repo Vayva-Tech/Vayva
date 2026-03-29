@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
 
 export const dynamic = "force-dynamic";
@@ -15,38 +15,17 @@ export async function POST(
 
     const { id } = await params;
 
-    const webhook = await prisma.webhookEvent?.findUnique({
-      where: { id },
-    });
-
-    if (!webhook) {
-      return NextResponse.json({ error: "Webhook not found" }, { status: 404 });
-    }
-
-    // Reset webhook to raw state
-    await prisma.webhookEvent?.update({
-      where: { id },
-      data: {
-        status: "RECEIVED",
-        error: null,
-        processedAt: null,
-        // receivedAt is NOT reset to preserve history order
-      },
-    });
+    const response = await apiClient.post(`/api/v1/admin/webhooks/${id}/replay`);
 
     // Create audit log
     await OpsAuthService.logEvent(user.id, "WEBHOOK_REPLAY", {
       targetType: "WebhookEvent",
       targetId: id,
       reason: "Manual replay triggered by operator",
-      storeName: webhook.merchantId ?? undefined,
-      webhookType: webhook.eventType,
+      ...response,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Webhook queued for reprocessing",
-    });
+    return NextResponse.json(response);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
     if (

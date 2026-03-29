@@ -1,49 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
-import { requireAuthFromRequest } from "@/lib/session.server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireAuthFromRequest(request);
-    if (!user?.storeId) {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const storeId = auth.user.storeId;
 
     const { searchParams } = new URL(request.url);
     const search = (searchParams.get("search") || "").trim();
     const status = (searchParams.get("status") || "").trim();
 
-    const students = await prisma.student.findMany({
-      where: {
-        storeId: user.storeId,
-        ...(status ? { status } : {}),
-        ...(search
-          ? {
-              OR: [
-                { firstName: { contains: search, mode: "insensitive" } },
-                { lastName: { contains: search, mode: "insensitive" } },
-                { email: { contains: search, mode: "insensitive" } },
-                { studentId: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 200,
-    });
+    const queryParams = new URLSearchParams({ storeId });
+    if (search) queryParams.set("search", search);
+    if (status) queryParams.set("status", status);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/education/students?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
 
     return NextResponse.json(
-      {
-        data: students,
-        pagination: { page: 1, limit: 200, total: students.length, pages: 1 },
-      },
+      response,
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/students", operation: "GET" });
+    handleApiError(error, { endpoint: "/education/students", operation: "GET" });
     return NextResponse.json({ error: "Failed to load students" }, { status: 500 });
   }
 }
@@ -91,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, student: created }, { status: 201 });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/students", operation: "POST" });
+    handleApiError(error, { endpoint: "/education/students", operation: "POST" });
     return NextResponse.json({ error: "Failed to create student" }, { status: 500 });
   }
 }

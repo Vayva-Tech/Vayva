@@ -86,7 +86,7 @@ export default function ControlCenterPage() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const me = await apiJson<Record<string, unknown>>("/api/me");
+      const me = await apiJson<Record<string, unknown>>("/me");
       const name =
         (me.storeName as string) ||
         (me.businessName as string) ||
@@ -108,7 +108,7 @@ export default function ControlCenterPage() {
           message?: string;
           time?: string;
         }>
-      >("/api/dashboard/activity?limit=15");
+      >("/dashboard/activity?limit=15");
 
       const list = Array.isArray(rawActivity) ? rawActivity : [];
       const iconFor = (t: string | undefined) => {

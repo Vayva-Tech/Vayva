@@ -31,7 +31,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/realestate/agents/[id]/performance",
+      endpoint: "/realestate/agents/[id]/performance",
       operation: "GET",
       storeId,
     });

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       data?: { orderId?: string; customerPhone?: string };
       error?: string;
     }>(
-      `${buildBackendUrl("/api/public/returns/validate-token")}?token=${encodeURIComponent(token)}`
+      `${buildBackendUrl("/public/returns/validate-token")}?token=${encodeURIComponent(token)}`
     );
 
     if (!validateResult.success || !validateResult.data) {
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       success: boolean;
       data?: { id?: string };
       error?: string;
-    }>(buildBackendUrl("/api/public/returns/request"), {
+    }>(buildBackendUrl("/public/returns/request"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, id: createResult.data?.id });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/public/returns/request", operation: "POST" });
+    handleApiError(error, { endpoint: "/public/returns/request", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

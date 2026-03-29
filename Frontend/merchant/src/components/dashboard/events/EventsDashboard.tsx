@@ -47,7 +47,7 @@ export function EventsDashboard({ eventId, planTier = "basic" }: EventsDashboard
 
   // Fetch dashboard data
   const { data: dashboardData, error: dashboardError } = useSWR<EventsDashboardApiResponse>(
-    eventId ? `/api/dashboard/events?eventId=${eventId}` : "/api/dashboard/events",
+    eventId ? `/api/dashboard/events?eventId=${eventId}` : "/dashboard/events",
     fetcher,
     { refreshInterval: 30000 } // Refresh every 30 seconds
   );

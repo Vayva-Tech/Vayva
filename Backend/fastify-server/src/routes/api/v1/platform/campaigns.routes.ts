@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { CampaignsService } from '../../../services/platform/campaigns.service';
+import { CampaignsService } from '../../../../services/platform/campaigns.service';
 
 const campaignsService = new CampaignsService();
 

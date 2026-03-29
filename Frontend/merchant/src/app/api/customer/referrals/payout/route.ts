@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/customer/referrals/payout", operation: "POST" });
+    handleApiError(error, { endpoint: "/customer/referrals/payout", operation: "POST" });
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/customer/referrals/payout", operation: "GET" });
+    handleApiError(error, { endpoint: "/customer/referrals/payout", operation: "GET" });
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

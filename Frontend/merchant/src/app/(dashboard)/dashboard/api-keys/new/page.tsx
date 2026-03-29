@@ -31,7 +31,7 @@ export default function NewApiKeyPage() {
   useEffect(() => {
     const loadTenants = async () => {
       try {
-        const res = await fetch("/api/saas/tenants");
+        const res = await fetch("/saas/tenants");
         const json = await res.json();
         setTenants((json.tenants || []).map((t: any) => ({ id: t.id, name: t.name })));
       } catch (error) {
@@ -51,7 +51,7 @@ export default function NewApiKeyPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/saas/api-keys", {
+      const res = await fetch("/saas/api-keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

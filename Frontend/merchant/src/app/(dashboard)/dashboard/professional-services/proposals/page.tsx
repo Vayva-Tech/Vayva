@@ -100,14 +100,14 @@ export default function ProfessionalServicesProposalsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Proposal</th>
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Value</th>
-                  <th className="py-3 px-4 font-medium">Created</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Proposal</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Value</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Created</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

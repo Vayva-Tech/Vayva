@@ -50,7 +50,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ valuations });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/automotive/tradeins",
+      endpoint: "/automotive/tradeins",
       operation: "FETCH_TRADE_INS",
     });
     return NextResponse.json(

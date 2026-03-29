@@ -45,7 +45,7 @@ export async function GET(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/healthcare/patients/[id]",
+      endpoint: "/healthcare/patients/[id]",
       operation: "GET_PATIENT_DETAILS",
     });
     return NextResponse.json(

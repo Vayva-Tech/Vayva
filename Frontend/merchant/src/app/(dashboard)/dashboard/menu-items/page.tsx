@@ -104,7 +104,7 @@ export default function MenuItemsPage() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<MenuItem[]>("/api/menu-items");
+      const data = await apiJson<MenuItem[]>("/menu-items");
       setItems(data || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -140,7 +140,7 @@ export default function MenuItemsPage() {
         });
         toast.success("Menu item updated");
       } else {
-        await apiJson("/api/menu-items", {
+        await apiJson("/menu-items", {
           method: "POST",
           body: JSON.stringify(payload),
         });

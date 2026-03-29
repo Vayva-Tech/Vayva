@@ -21,7 +21,7 @@ export const WaAgentService = {
             throw new Error("WhatsApp integration is not configured");
         }
         try {
-            const data = await apiJson<ApiEnvelope<WaAgentSettings>>("/api/seller/ai/whatsapp-settings");
+            const data = await apiJson<ApiEnvelope<WaAgentSettings>>("/seller/ai/whatsapp-settings");
             const fallback: WaAgentSettings = {
                 enabled: false,
                 businessHours: {},
@@ -47,7 +47,7 @@ export const WaAgentService = {
             throw new Error("WhatsApp integration is not configured");
         }
         try {
-            await apiJson("/api/seller/ai/whatsapp-settings", {
+            await apiJson("/seller/ai/whatsapp-settings", {
                 method: "PUT",
                 body: JSON.stringify(settings),
             });
@@ -64,7 +64,7 @@ export const WaAgentService = {
             throw new Error("WhatsApp integration is not configured");
         }
         try {
-            const data = await apiJson<ApiEnvelope<WaAgentProfile>>("/api/seller/ai/profile");
+            const data = await apiJson<ApiEnvelope<WaAgentProfile>>("/seller/ai/profile");
             const fallback: WaAgentProfile = {
                 agentName: "Assistant",
                 tonePreset: "Friendly",
@@ -89,7 +89,7 @@ export const WaAgentService = {
             throw new Error("WhatsApp integration is not configured");
         }
         try {
-            await apiJson("/api/seller/ai/profile", {
+            await apiJson("/seller/ai/profile", {
                 method: "PUT",
                 body: JSON.stringify(profile),
             });
@@ -108,7 +108,7 @@ export const WaAgentService = {
             return [];
         }
         try {
-            const url = new URL("/api/support/conversations", window.location?.origin);
+            const url = new URL("/support/conversations", window.location?.origin);
             if (channel) url.searchParams?.set("channel", channel);
             const data = await apiJson<ApiEnvelope<SupportConversation[]>>(url.pathname + url.search);
             const conversations = data?.data ?? [];
@@ -129,7 +129,7 @@ export const WaAgentService = {
             throw new Error("WhatsApp integration is not configured");
         }
         try {
-            return await apiJson("/api/ai/chat", {
+            return await apiJson("/ai/chat", {
                 method: "POST",
                 body: JSON.stringify({ messages: [{ role: "user", content: text }] }),
             });
@@ -145,7 +145,7 @@ export const WaAgentService = {
         if (!FEATURES.WHATSAPP_ENABLED)
             return [];
         try {
-            const data = await apiJson<ApiEnvelope<SupportApproval[]>>("/api/support/approvals");
+            const data = await apiJson<ApiEnvelope<SupportApproval[]>>("/support/approvals");
             return data?.data ?? [];
         }
         catch (e) {
@@ -188,7 +188,7 @@ export const WaAgentService = {
         if (!FEATURES.WHATSAPP_ENABLED)
             return [];
         try {
-            const json = await apiJson<ApiEnvelope<KnowledgeBaseEntry[]>>("/api/seller/ai/knowledge-base");
+            const json = await apiJson<ApiEnvelope<KnowledgeBaseEntry[]>>("/seller/ai/knowledge-base");
             const entries = json?.data ?? [];
             // Map knowledge base entries to UI interface
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

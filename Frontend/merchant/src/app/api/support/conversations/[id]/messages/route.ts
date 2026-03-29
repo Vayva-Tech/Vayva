@@ -22,7 +22,7 @@ export async function GET(
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/support/conversations/:id/messages", operation: "GET" });
+    handleApiError(error, { endpoint: "/support/conversations/:id/messages", operation: "GET" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }
@@ -49,7 +49,7 @@ export async function POST(
     );
     return NextResponse.json(result);
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/support/conversations/:id/messages", operation: "POST" });
+    handleApiError(error, { endpoint: "/support/conversations/:id/messages", operation: "POST" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

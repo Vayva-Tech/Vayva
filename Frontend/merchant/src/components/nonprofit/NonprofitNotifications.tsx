@@ -66,7 +66,7 @@ export function NonprofitNotifications({ onNotificationClick }: NonprofitNotific
 
     try {
       // Fetch grants and check deadlines
-      const grantsRes = await apiJson<{ data: any[] }>("/api/nonprofit/grants?limit=100");
+      const grantsRes = await apiJson<{ data: any[] }>("/nonprofit/grants?limit=100");
       const grants = grantsRes.data || [];
 
       grants.forEach((grant) => {
@@ -103,7 +103,7 @@ export function NonprofitNotifications({ onNotificationClick }: NonprofitNotific
       });
 
       // Fetch campaigns and check milestones
-      const campaignsRes = await apiJson<{ data: any[] }>("/api/nonprofit/campaigns");
+      const campaignsRes = await apiJson<{ data: any[] }>("/nonprofit/campaigns");
       const campaigns = campaignsRes.data || [];
 
       campaigns.forEach((campaign) => {
@@ -137,7 +137,7 @@ export function NonprofitNotifications({ onNotificationClick }: NonprofitNotific
       });
 
       // Fetch upcoming volunteer shifts
-      const shiftsRes = await apiJson<{ data: any[] }>("/api/nonprofit/volunteers/shifts");
+      const shiftsRes = await apiJson<{ data: any[] }>("/nonprofit/volunteers/shifts");
       const shifts = shiftsRes.data || [];
 
       shifts.forEach((shift: any) => {

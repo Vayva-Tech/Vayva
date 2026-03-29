@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { CouponService } from '../../../services/commerce/coupon.service';
+import { CouponService } from '../../../../services/commerce/coupon.service';
 
 const couponService = new CouponService();
 

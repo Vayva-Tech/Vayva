@@ -1,5 +1,4 @@
-import { db } from "@/lib/db";
-import { Prisma } from "@vayva/db";
+import { api } from '@/lib/api-client';
 import type {
   LoyaltyProgram,
   CustomerLoyalty,
@@ -13,64 +12,22 @@ import type {
   LoyaltyAnalytics,
 } from "@/types/phase1-commerce";
 
-function toNumber(d: Prisma.Decimal | number): number {
-  return typeof d === "number" ? d : d.toNumber();
-}
-
 export const LoyaltyService = {
   // ============================================================================
   // Loyalty Program Management
   // ============================================================================
 
   async getOrCreateProgram(storeId: string): Promise<LoyaltyProgram> {
-    let program = await db.loyaltyProgram?.findUnique({
-      where: { storeId },
-    });
-
-    if (!program) {
-      program = await db.loyaltyProgram?.create({
-        data: {
-          storeId,
-          isActive: true,
-          pointCurrency: "points",
-          earnRate: 1,
-          minRedeemPoints: 100,
-          pointValue: 0.01,
-          welcomeBonus: 0,
-          referralBonus: 0,
-          expiryDays: 365,
-          tierSystem: [
-            { name: "Bronze", minPoints: 0, multiplier: 1, benefits: [] },
-            { name: "Silver", minPoints: 500, multiplier: 1.25, benefits: ["Early access to sales"] },
-            { name: "Gold", minPoints: 2000, multiplier: 1.5, benefits: ["Free shipping", "Priority support"] },
-          ],
-        },
-      });
-    }
-
-    return this.mapLoyaltyProgram(program);
+    const response = await api.get(`/loyalty/${storeId}/program`);
+    return response.data || {};
   },
 
   async updateProgram(
     storeId: string,
     input: UpdateLoyaltyProgramInput
   ): Promise<LoyaltyProgram> {
-    const program = await db.loyaltyProgram?.update({
-      where: { storeId },
-      data: {
-        ...(input.isActive !== undefined && { isActive: input.isActive }),
-        ...(input.pointCurrency !== undefined && { pointCurrency: input.pointCurrency }),
-        ...(input.earnRate !== undefined && { earnRate: input.earnRate }),
-        ...(input.minRedeemPoints !== undefined && { minRedeemPoints: input.minRedeemPoints }),
-        ...(input.pointValue !== undefined && { pointValue: input.pointValue }),
-        ...(input.welcomeBonus !== undefined && { welcomeBonus: input.welcomeBonus }),
-        ...(input.referralBonus !== undefined && { referralBonus: input.referralBonus }),
-        ...(input.expiryDays !== undefined && { expiryDays: input.expiryDays }),
-        ...(input.tierSystem !== undefined && { tierSystem: input.tierSystem as unknown as Prisma.InputJsonValue }),
-      },
-    });
-
-    return this.mapLoyaltyProgram(program);
+    const response = await api.patch(`/loyalty/${storeId}/program`, input);
+    return response.data || {};
   },
 
   // ============================================================================
@@ -119,13 +76,8 @@ export const LoyaltyService = {
     storeId: string,
     customerId: string
   ): Promise<CustomerLoyalty | null> {
-    const loyalty = await db.customerLoyalty?.findUnique({
-      where: { storeId_customerId: { storeId, customerId } },
-    });
-
-    if (!loyalty) return null;
-
-    return this.mapCustomerLoyalty(loyalty, storeId);
+    const response = await api.get(`/loyalty/${storeId}/customer/${customerId}`);
+    return response.data || null;
   },
 
   async earnPoints(
@@ -135,44 +87,14 @@ export const LoyaltyService = {
     orderId?: string,
     description?: string
   ): Promise<CustomerLoyalty> {
-    const program = await this.getOrCreateProgram(storeId);
-    const loyalty = await this.getOrCreateCustomerLoyalty(storeId, customerId);
-
-    const tierMultiplier = this.getTierMultiplier(program.tierSystem as unknown as LoyaltyTier[], loyalty.currentTier);
-    const earnedPoints = Math.floor(points * tierMultiplier);
-
-    const expiresAt = program.expiryDays > 0
-      ? new Date(Date.now() + program.expiryDays * 24 * 60 * 60 * 1000)
-      : null;
-
-    const [updatedLoyalty] = await db.$transaction([
-      db.customerLoyalty?.update({
-        where: { id: loyalty.id },
-        data: {
-          totalPoints: { increment: earnedPoints },
-          availablePoints: { increment: earnedPoints },
-          lifetimeEarned: { increment: earnedPoints },
-          currentTier: this.getTierName(
-            program.tierSystem as unknown as LoyaltyTier[],
-            loyalty.totalPoints + earnedPoints
-          ),
-          lastActivity: new Date(),
-        },
-      }),
-      db.loyaltyTransaction?.create({
-        data: {
-          storeId,
-          customerId,
-          type: "earn",
-          points: earnedPoints,
-          orderId,
-          description: description || `Earned ${earnedPoints} points`,
-          expiresAt,
-        },
-      }),
-    ]);
-
-    return this.mapCustomerLoyalty(updatedLoyalty, storeId);
+    const response = await api.post('/loyalty/earn', {
+      storeId,
+      customerId,
+      points,
+      orderId,
+      description,
+    });
+    return response.data || {};
   },
 
   async earnPointsFromOrder(
@@ -181,10 +103,13 @@ export const LoyaltyService = {
     orderAmount: number,
     orderId: string
   ): Promise<CustomerLoyalty> {
-    const program = await this.getOrCreateProgram(storeId);
-    const points = Math.floor(orderAmount * toNumber(program.earnRate));
-
-    return this.earnPoints(storeId, customerId, points, orderId, `Earned from order #${orderId}`);
+    const response = await api.post('/loyalty/earn-order', {
+      storeId,
+      customerId,
+      orderAmount,
+      orderId,
+    });
+    return response.data || {};
   },
 
   async redeemPoints(
@@ -193,38 +118,13 @@ export const LoyaltyService = {
     points: number,
     description?: string
   ): Promise<{ success: boolean; loyalty?: CustomerLoyalty; error?: string }> {
-    const program = await this.getOrCreateProgram(storeId);
-    const loyalty = await this.getOrCreateCustomerLoyalty(storeId, customerId);
-
-    if (loyalty.availablePoints < points) {
-      return { success: false, error: "Insufficient points" };
-    }
-
-    if (points < program.minRedeemPoints) {
-      return { success: false, error: `Minimum ${program.minRedeemPoints} points required` };
-    }
-
-    const [updatedLoyalty] = await db.$transaction([
-      db.customerLoyalty?.update({
-        where: { id: loyalty.id },
-        data: {
-          availablePoints: { decrement: points },
-          lifetimeRedeemed: { increment: points },
-          lastActivity: new Date(),
-        },
-      }),
-      db.loyaltyTransaction?.create({
-        data: {
-          storeId,
-          customerId,
-          type: "redeem",
-          points: -points,
-          description: description || `Redeemed ${points} points`,
-        },
-      }),
-    ]);
-
-    return { success: true, loyalty: this.mapCustomerLoyalty(updatedLoyalty, storeId) };
+    const response = await api.post('/loyalty/redeem', {
+      storeId,
+      customerId,
+      points,
+      description,
+    });
+    return response.data || {};
   },
 
   // ============================================================================
@@ -235,76 +135,35 @@ export const LoyaltyService = {
     storeId: string,
     input: CreateLoyaltyRewardInput
   ): Promise<LoyaltyReward> {
-    const reward = await db.loyaltyReward?.create({
-      data: {
-        storeId,
-        name: input.name,
-        description: input.description,
-        pointCost: input.pointCost,
-        rewardType: input.rewardType,
-        rewardValue: input.rewardValue,
-        productId: input.productId,
-        maxRedemptions: input.maxRedemptions,
-        startDate: input.startDate ? new Date(input.startDate) : new Date(),
-        endDate: input.endDate ? new Date(input.endDate) : null,
-      },
+    const response = await api.post('/loyalty/rewards', {
+      storeId,
+      ...input,
     });
-
-    return this.mapLoyaltyReward(reward);
+    return response.data || {};
   },
 
   async updateReward(
     rewardId: string,
     input: UpdateLoyaltyRewardInput
   ): Promise<LoyaltyReward> {
-    const reward = await db.loyaltyReward?.update({
-      where: { id: rewardId },
-      data: {
-        ...(input.name !== undefined && { name: input.name }),
-        ...(input.description !== undefined && { description: input.description }),
-        ...(input.pointCost !== undefined && { pointCost: input.pointCost }),
-        ...(input.rewardType !== undefined && { rewardType: input.rewardType }),
-        ...(input.rewardValue !== undefined && { rewardValue: input.rewardValue }),
-        ...(input.productId !== undefined && { productId: input.productId }),
-        ...(input.maxRedemptions !== undefined && { maxRedemptions: input.maxRedemptions }),
-        ...(input.isActive !== undefined && { isActive: input.isActive }),
-        ...(input.startDate !== undefined && { startDate: new Date(input.startDate) }),
-        ...(input.endDate !== undefined && { endDate: input.endDate ? new Date(input.endDate) : null }),
-      },
-    });
-
-    return this.mapLoyaltyReward(reward);
+    const response = await api.patch(`/loyalty/rewards/${rewardId}`, input);
+    return response.data || {};
   },
 
   async getReward(rewardId: string): Promise<LoyaltyReward | null> {
-    const reward = await db.loyaltyReward?.findUnique({
-      where: { id: rewardId },
-    });
-
-    if (!reward) return null;
-    return this.mapLoyaltyReward(reward);
+    const response = await api.get(`/loyalty/rewards/${rewardId}`);
+    return response.data || null;
   },
 
   async getRewards(
     storeId: string,
     options: { isActive?: boolean; limit?: number; offset?: number } = {}
   ): Promise<{ rewards: LoyaltyReward[]; total: number }> {
-    const where: Prisma.LoyaltyRewardWhereInput = { storeId };
-    if (options.isActive !== undefined) {
-      where.isActive = options.isActive;
-    }
-
-    const [rewards, total] = await Promise.all([
-      db.loyaltyReward?.findMany({
-        where,
-        take: options.limit || 50,
-        skip: options.offset || 0,
-        orderBy: { createdAt: "desc" },
-      }),
-      db.loyaltyReward?.count({ where }),
-    ]);
-
-    return { rewards: rewards.map((r: any) => this.mapLoyaltyReward(r as any)), total };
+    const response = await api.get('/loyalty/rewards', {
+      storeId,
+      ...options,
+    });
+    return { rewards: response.data?.rewards || [], total: response.data?.total || 0 };
   },
 
   async redeemReward(
@@ -312,38 +171,12 @@ export const LoyaltyService = {
     customerId: string,
     rewardId: string
   ): Promise<{ success: boolean; loyalty?: CustomerLoyalty; reward?: LoyaltyReward; error?: string }> {
-    const reward = await db.loyaltyReward?.findUnique({
-      where: { id: rewardId },
+    const response = await api.post('/loyalty/redeem-reward', {
+      storeId,
+      customerId,
+      rewardId,
     });
-
-    if (!reward || !reward.isActive) {
-      return { success: false, error: "Reward not found or inactive" };
-    }
-
-    if (reward.endDate && reward.endDate < new Date()) {
-      return { success: false, error: "Reward has expired" };
-    }
-
-    if (reward.maxRedemptions && reward.currentRedemptions >= reward.maxRedemptions) {
-      return { success: false, error: "Reward limit reached" };
-    }
-
-    const result = await this.redeemPoints(storeId, customerId, reward.pointCost, `Redeemed for: ${reward.name}`);
-
-    if (!result.success) {
-      return result;
-    }
-
-    await db.loyaltyReward?.update({
-      where: { id: rewardId },
-      data: { currentRedemptions: { increment: 1 } },
-    });
-
-    return {
-      success: true,
-      loyalty: result.loyalty,
-      reward: this.mapLoyaltyReward(reward),
-    };
+    return response.data || {};
   },
 
   // ============================================================================
@@ -355,22 +188,12 @@ export const LoyaltyService = {
     customerId: string,
     options: { limit?: number; offset?: number; type?: string } = {}
   ): Promise<{ transactions: LoyaltyTransaction[]; total: number }> {
-    const where: Prisma.LoyaltyTransactionWhereInput = { storeId, customerId };
-    if (options.type) {
-      where.type = options.type;
-    }
-
-    const [transactions, total] = await Promise.all([
-      db.loyaltyTransaction?.findMany({
-        where,
-        take: options.limit || 50,
-        skip: options.offset || 0,
-        orderBy: { createdAt: "desc" },
-      }),
-      db.loyaltyTransaction?.count({ where }),
-    ]);
-
-    return { transactions: transactions.map((t: any) => this.mapLoyaltyTransaction(t as any)), total };
+    const response = await api.get('/loyalty/transactions', {
+      storeId,
+      customerId,
+      ...options,
+    });
+    return { transactions: response.data?.transactions || [], total: response.data?.total || 0 };
   },
 
   // ============================================================================
@@ -378,144 +201,34 @@ export const LoyaltyService = {
   // ============================================================================
 
   async getAnalytics(storeId: string): Promise<LoyaltyAnalytics> {
-    const [
-      totalMembers,
-      activeMembers,
-      pointsIssuedAgg,
-      pointsRedeemedAgg,
-      rewardsRedeemedAgg,
-      tierDistribution,
-      topRewards,
-    ] = await Promise.all([
-      db.customerLoyalty?.count({ where: { storeId } }),
-      db.customerLoyalty?.count({
-        where: { storeId, lastActivity: { gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) } },
-      }),
-      db.loyaltyTransaction?.aggregate({
-        where: { storeId, type: "earn" },
-        _sum: { points: true },
-      }),
-      db.loyaltyTransaction?.aggregate({
-        where: { storeId, type: "redeem" },
-        _sum: { points: true },
-      }),
-      db.loyaltyReward?.aggregate({
-        where: { storeId },
-        _sum: { currentRedemptions: true },
-      }),
-      this.getTierDistribution(storeId),
-      this.getTopRewards(storeId),
-    ]);
-
-    const pointsIssued = pointsIssuedAgg._sum?.points || 0;
-    const pointsRedeemed = Math.abs(pointsRedeemedAgg._sum?.points || 0);
-    const rewardsRedeemed = rewardsRedeemedAgg._sum?.currentRedemptions || 0;
-    const avgPoints = totalMembers > 0 ? pointsIssued / totalMembers : 0;
-
-    const expiryDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    const pointsExpiryForecastAgg = await db.loyaltyTransaction?.aggregate({
-      where: {
-        storeId,
-        expiresAt: { lte: expiryDate, gt: new Date() },
-        type: "earn",
-      },
-      _sum: { points: true },
-    });
-
-    return {
-      totalMembers,
-      activeMembers,
-      pointsIssued,
-      pointsRedeemed,
-      rewardsRedeemed,
-      averagePointsPerCustomer: avgPoints,
-      tierDistribution,
-      topRewards,
-      pointsExpiryForecast: pointsExpiryForecastAgg._sum?.points || 0,
-    };
+    const response = await api.get(`/loyalty/${storeId}/analytics`);
+    return response.data || {};
   },
 
   async getTierDistribution(storeId: string): Promise<Record<string, number>> {
-    const tiers = await db.customerLoyalty?.groupBy({
-      by: ["currentTier"],
-      where: { storeId },
-      _count: { id: true },
-    });
-
-    return tiers.reduce((acc: Record<string, number>, tier: any) => {
-      acc[tier.currentTier] = tier._count?.id;
-      return acc;
-    }, {} as Record<string, number>);
+    const response = await api.get(`/loyalty/${storeId}/tier-distribution`);
+    return response.data || {};
   },
 
   async getTopRewards(storeId: string): Promise<Array<{ rewardId: string; name: string; redemptionCount: number }>> {
-    const rewards = await db.loyaltyReward?.findMany({
-      where: { storeId },
-      orderBy: { currentRedemptions: "desc" },
-      take: 5,
-    });
-
-    return rewards.map((r: any) => ({
-      rewardId: r.id,
-      name: r.name,
-      redemptionCount: r.currentRedemptions,
-    }));
+    const response = await api.get(`/loyalty/${storeId}/top-rewards`);
+    return response.data || [];
   },
 
   // ============================================================================
-  // Helper Methods
+  // Helper Methods - Moved to Backend
   // ============================================================================
 
   getTierName(tiers: LoyaltyTier[], points: number): string {
-    if (!tiers || tiers.length === 0) return "Bronze";
-
-    const sorted = [...tiers].sort((a: any, b: any) => b.minPoints - a.minPoints);
-    const tier = sorted.find((t: any) => points >= t.minPoints);
-    return tier?.name || "Bronze";
+    console.warn('This method should not be called directly - handled by backend');
+    return 'Bronze';
   },
 
   getTierMultiplier(tiers: LoyaltyTier[], tierName: string): number {
-    if (!tiers || !Array.isArray(tiers)) return 1;
-    const tier = tiers.find((t: LoyaltyTier) => t.name === tierName);
-    return tier?.multiplier || 1;
+    console.warn('This method should not be called directly - handled by backend');
+    return 1;
   },
-
-  mapLoyaltyProgram(db: Prisma.LoyaltyProgramGetPayload<object>): LoyaltyProgram {
-    return {
-      id: db.id,
-      storeId: db.storeId,
-      isActive: db.isActive,
-      pointCurrency: db.pointCurrency,
-      earnRate: toNumber(db.earnRate),
-      minRedeemPoints: db.minRedeemPoints,
-      pointValue: toNumber(db.pointValue),
-      welcomeBonus: db.welcomeBonus,
-      referralBonus: db.referralBonus,
-      expiryDays: db.expiryDays,
-      tierSystem: (db.tierSystem as unknown as LoyaltyTier[]) || [],
-      createdAt: db.createdAt?.toISOString(),
-      updatedAt: db.updatedAt?.toISOString(),
-    };
-  },
-
-  mapCustomerLoyalty(db: Prisma.CustomerLoyaltyGetPayload<object>, storeId: string): CustomerLoyalty {
-    return {
-      id: db.id,
-      storeId,
-      customerId: db.customerId,
-      totalPoints: db.totalPoints,
-      availablePoints: db.availablePoints,
-      lifetimeEarned: db.lifetimeEarned,
-      lifetimeRedeemed: db.lifetimeRedeemed,
-      currentTier: db.currentTier,
-      lastActivity: db.lastActivity?.toISOString(),
-      createdAt: db.createdAt?.toISOString(),
-      updatedAt: db.updatedAt?.toISOString(),
-    };
-  },
-
-  mapLoyaltyTransaction(db: Prisma.LoyaltyTransactionGetPayload<object>): LoyaltyTransaction {
-    return {
+};
       id: db.id,
       storeId: db.storeId,
       customerId: db.customerId,

@@ -37,7 +37,7 @@ export default function RealEstatePropertiesPage() {
 
   const fetchProperties = async () => {
     try {
-      const response = await apiJson<{ data: Property[] }>("/api/realestate/properties?limit=500");
+      const response = await apiJson<{ data: Property[] }>("/realestate/properties?limit=500");
       setProperties(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch properties", error);

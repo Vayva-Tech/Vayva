@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/onboarding/complete",
+      endpoint: "/merchant/onboarding/complete",
       operation: "POST",
     });
     return NextResponse.json(

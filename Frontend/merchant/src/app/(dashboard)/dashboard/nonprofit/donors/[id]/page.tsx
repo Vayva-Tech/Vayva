@@ -81,7 +81,7 @@ export default function DonorDetailPage() {
     try {
       setLoading(true);
       const [donorsRes, donationsRes] = await Promise.all([
-        apiJson<{ data: any[] }>("/api/nonprofit/donors"),
+        apiJson<{ data: any[] }>("/nonprofit/donors"),
         apiJson<{ data: any[] }>(`/api/nonprofit/donations?donorId=${donorId}`),
       ]);
 

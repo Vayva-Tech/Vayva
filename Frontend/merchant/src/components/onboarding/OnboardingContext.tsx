@@ -104,7 +104,7 @@ export function OnboardingProvider({
     isLoading,
     mutate: reload,
   } = useSWR<OnboardingServerState>(
-    "/api/onboarding/state",
+    "/onboarding/state",
     (url: string) => apiJson<OnboardingServerState>(url),
     {
       revalidateOnFocus: false,
@@ -160,7 +160,7 @@ export function OnboardingProvider({
             isComplete,
           });
 
-          await apiJson<{ success: boolean }>("/api/onboarding/state", {
+          await apiJson<{ success: boolean }>("/onboarding/state", {
             method: "PUT",
             body: JSON.stringify(payload),
           });
@@ -289,7 +289,7 @@ export function OnboardingProvider({
         hasFinance: !!formData.finance,
       });
 
-      await apiJson<{ success: boolean }>("/api/merchant/onboarding/complete", {
+      await apiJson<{ success: boolean }>("/onboarding/complete", {
         method: "POST",
         body: JSON.stringify(formData),
       });
@@ -312,7 +312,7 @@ export function OnboardingProvider({
       
       try {
         // Try to get plan from database first (more reliable)
-        const storeData = await apiJson<{ metadata?: { intendedPlanKey?: string } }>("/api/merchant/store/status", { method: "GET" });
+        const storeData = await apiJson<{ metadata?: { intendedPlanKey?: string } }>("/merchant/store/status", { method: "GET" });
         if (storeData?.metadata?.intendedPlanKey) {
           postOnboardingPlan = storeData.metadata.intendedPlanKey;
           logger.info("[ONBOARDING_COMPLETE] Retrieved plan from database", {
@@ -388,7 +388,7 @@ export function OnboardingProvider({
         status: "TRIAL_MODE",
       };
 
-      await apiJson<{ success: boolean }>("/api/onboarding/state", {
+      await apiJson<{ success: boolean }>("/onboarding/state", {
         method: "PUT",
         body: JSON.stringify(payload),
       });

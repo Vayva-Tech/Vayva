@@ -176,18 +176,18 @@ export function checkStoreRestrictions(
 
   if (isWrite) {
     const isOrders =
-      endpoint.startsWith("/api/orders") ||
-      endpoint.startsWith("/api/kitchen/orders");
+      endpoint.startsWith("/orders") ||
+      endpoint.startsWith("/kitchen/orders");
     const isProducts =
-      endpoint.startsWith("/api/products") ||
-      endpoint.startsWith("/api/collections");
-    const isMarketing = endpoint.startsWith("/api/marketing");
+      endpoint.startsWith("/products") ||
+      endpoint.startsWith("/collections");
+    const isMarketing = endpoint.startsWith("/marketing");
     const isSettings =
-      endpoint.startsWith("/api/settings") ||
-      endpoint.startsWith("/api/merchant/policies") ||
-      endpoint.startsWith("/api/storefront") ||
-      endpoint.startsWith("/api/domains") ||
-      endpoint.startsWith("/api/merchant/store/publish");
+      endpoint.startsWith("/settings") ||
+      endpoint.startsWith("/merchant/policies") ||
+      endpoint.startsWith("/storefront") ||
+      endpoint.startsWith("/domains") ||
+      endpoint.startsWith("/merchant/store/publish");
 
     if (restrictions?.ordersDisabled === true && isOrders) {
       return {

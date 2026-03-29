@@ -1,0 +1,108 @@
+version: '3.8'
+
+# ============================================================================
+# ML SERVER 1 - INFERENCE & VECTOR SEARCH
+# Local LLM, Vector Database, and Embedding Service
+# ============================================================================
+
+services:
+  # ============================================================================
+  # Ollama - Local LLM Inference Server
+  # ============================================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ml-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=/root/.ollama/models
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 10G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - ml-network
+
+  # ============================================================================
+  # Qdrant - Vector Database
+  # ============================================================================
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ml-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - ml-network
+
+  # ============================================================================
+  # Embedding Service - FastAPI + BGE-M3
+  # ============================================================================
+  embedding-service:
+    build:
+      context: ./apps/ml-embeddings
+      dockerfile: Dockerfile
+    container_name: ml-embedding-service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - MODEL_NAME=BAAI/bge-m3
+      - PORT=8001
+      - DEVICE=cpu
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    networks:
+      - ml-network
+
+networks:
+  ml-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/16
+
+volumes:
+  ollama_data:
+    driver: local
+  qdrant_storage:
+    driver: local

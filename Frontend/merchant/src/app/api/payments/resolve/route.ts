@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/payments/resolve", operation: "GET" });
+    handleApiError(error, { endpoint: "/payments/resolve", operation: "GET" });
     return NextResponse.json({ error: "Could not resolve account" }, { status: 422, headers: { "Cache-Control": "no-store" } });
   }
 }

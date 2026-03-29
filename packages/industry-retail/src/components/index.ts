@@ -5,6 +5,10 @@
 export { RetailDashboard } from "./RetailDashboard";
 export type { RetailDashboardProps } from "./RetailDashboard";
 
+// KPI Cards
+export { RetailKPICards } from "./RetailKPICards";
+export type { RetailKPICardsProps } from "./RetailKPICards";
+
 // Channel Sync
 export { ChannelSyncMonitor } from "./ChannelSyncMonitor";
 export type { ChannelSyncMonitorProps } from "./ChannelSyncMonitor";

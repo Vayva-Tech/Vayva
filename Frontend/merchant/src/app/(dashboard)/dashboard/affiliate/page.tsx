@@ -99,7 +99,7 @@ export default function AffiliateDashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ success: boolean; stats: AffiliateStats; referrals: Referral[]; payouts: Payout[]; affiliate?: { code: string } }>("/api/affiliate/dashboard");
+      const response = await apiJson<{ success: boolean; stats: AffiliateStats; referrals: Referral[]; payouts: Payout[]; affiliate?: { code: string } }>("/affiliate/dashboard");
       if (response.success) {
         setStats(response.stats);
         setReferrals(response.referrals || []);
@@ -126,7 +126,7 @@ export default function AffiliateDashboardPage() {
 
   const handleRequestPayout = async () => {
     try {
-      const res = await apiJson<{ success: boolean }>("/api/affiliate/payout", {
+      const res = await apiJson<{ success: boolean }>("/affiliate/payout", {
         method: "POST",
         body: JSON.stringify({ method: "wallet" }),
       });
@@ -276,13 +276,13 @@ export default function AffiliateDashboardPage() {
           <Card>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-gray-50 border-b" scope="col">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Order</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Amount</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Commission</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Date</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Order</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Amount</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Commission</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -335,12 +335,12 @@ export default function AffiliateDashboardPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-gray-50 border-b" scope="col">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Amount</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Method</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Date</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Amount</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Method</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">

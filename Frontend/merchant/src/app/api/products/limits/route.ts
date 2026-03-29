@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/products/limits",
+        endpoint: "/products/limits",
         operation: "GET_PRODUCT_LIMITS",
       }
     );

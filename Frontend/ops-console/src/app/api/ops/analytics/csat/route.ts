@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { logger } from "@vayva/shared";
+import { apiClient } from "@/lib/api-client";
 
 export async function GET(_request: Request) {
   const { user } = await OpsAuthService.requireSession();
@@ -10,33 +9,12 @@ export async function GET(_request: Request) {
   }
 
   try {
-    const feedbacks = await prisma.supportTicketFeedback.findMany({
-      select: { rating: true },
-    });
-
-    const total = feedbacks.length;
-    const great = feedbacks.filter((f) => f.rating === "GREAT").length;
-    const okay = feedbacks.filter((f) => f.rating === "OKAY").length;
-    const bad = feedbacks.filter((f) => f.rating === "BAD").length;
-
-    const csatScore = total > 0 ? Math.round((great / total) * 100) : 0;
-
-    return NextResponse.json({
-      data: {
-        total,
-        great,
-        okay,
-        bad,
-        csatScore,
-        target: 85,
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: unknown) {
-    logger.error("[CSAT_AGGREGATE_ERROR]", { error });
+    const response = await apiClient.get('/api/v1/analytics/ops/csat');
+    return NextResponse.json(response);
+  } catch (error) {
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
+      { error: "Failed to fetch CSAT scores" },
+      { status: 500 }
     );
   }
 }

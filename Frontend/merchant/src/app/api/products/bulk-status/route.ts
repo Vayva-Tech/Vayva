@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/bulk-status",
+      endpoint: "/products/bulk-status",
       operation: "BULK_UPDATE_STATUS",
     });
     return NextResponse.json(

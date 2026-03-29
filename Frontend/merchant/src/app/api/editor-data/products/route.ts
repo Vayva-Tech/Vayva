@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
@@ -15,37 +13,22 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query") || "";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-    const products = await prisma.product?.findMany({
-      where: {
-        storeId,
-        ...(query && {
-          OR: [
-            { title: { contains: query, mode: "insensitive" } },
-            { description: { contains: query, mode: "insensitive" } },
-          ],
-        }),
-      },
-      select: {
-        id: true,
-        title: true,
-        handle: true,
-        price: true,
-        compareAtPrice: true,
-        status: true,
-        productImages: {
-          take: 1,
-          select: { url: true },
-        },
-        productVariants: {
-          take: 1,
-          select: { imageUrl: true },
-        },
-      },
-      orderBy: { updatedAt: "desc" },
-      take: limit,
-    }) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
 
-    const formatted = products.map((product) => {
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/core/products?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    // Transform backend response to match frontend expectations
+    const formatted = (response.data?.products || []).map((product: any) => {
       const thumbnail =
         product.productImages?.[0]?.url ||
         product.productVariants?.[0]?.imageUrl ||
@@ -70,7 +53,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/editor-data/products",
+      endpoint: "/editor-data/products",
       operation: "GET_EDITOR_PRODUCTS",
     });
     return NextResponse.json(

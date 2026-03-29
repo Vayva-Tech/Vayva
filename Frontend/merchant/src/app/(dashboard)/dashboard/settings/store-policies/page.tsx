@@ -71,7 +71,7 @@ export default function StorePoliciesPage() {
 
   async function loadPolicies() {
     try {
-      const data = await apiJson<PoliciesResponse>("/api/merchant/policies");
+      const data = await apiJson<PoliciesResponse>("/merchant/policies");
       setPolicies(data?.policies || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -115,7 +115,7 @@ export default function StorePoliciesPage() {
   async function handleGenerate() {
     setLoading(true);
     try {
-      await apiJson<{ success: boolean }>("/api/merchant/policies/generate", {
+      await apiJson<{ success: boolean }>("/merchant/policies/generate", {
         method: "POST",
       });
       await loadPolicies();

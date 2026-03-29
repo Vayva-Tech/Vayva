@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(profile, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/settings/profile", operation: "GET" });
+    handleApiError(error, { endpoint: "/settings/profile", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/settings/profile", operation: "POST" });
+    handleApiError(error, { endpoint: "/settings/profile", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

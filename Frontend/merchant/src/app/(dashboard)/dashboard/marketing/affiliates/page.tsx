@@ -79,7 +79,7 @@ export default function AffiliatesPage() {
     
     try {
       const response = await apiJson<{ success: boolean; affiliate: Affiliate }>(
-        "/api/affiliates",
+        "/affiliates",
         {
           method: "POST",
           body: JSON.stringify(newAffiliate),
@@ -287,15 +287,15 @@ export default function AffiliatesPage() {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50 border-b border-gray-100" scope="col">
                 <tr>
-                  <th className="text-left p-4 font-bold text-gray-700 text-sm">Affiliate</th>
-                  <th className="text-left p-4 font-bold text-gray-700 text-sm">Status</th>
-                  <th className="text-left p-4 font-bold text-gray-700 text-sm">Commission</th>
-                  <th className="text-left p-4 font-bold text-gray-700 text-sm">Referral Code</th>
-                  <th className="text-left p-4 font-bold text-gray-700 text-sm">Earnings</th>
-                  <th className="text-left p-4 font-bold text-gray-700 text-sm">Performance</th>
-                  <th className="text-right p-4 font-bold text-gray-700 text-sm">Actions</th>
+                  <th className="text-left p-4 font-bold text-gray-700 text-sm" scope="col">Affiliate</th>
+                  <th className="text-left p-4 font-bold text-gray-700 text-sm" scope="col">Status</th>
+                  <th className="text-left p-4 font-bold text-gray-700 text-sm" scope="col">Commission</th>
+                  <th className="text-left p-4 font-bold text-gray-700 text-sm" scope="col">Referral Code</th>
+                  <th className="text-left p-4 font-bold text-gray-700 text-sm" scope="col">Earnings</th>
+                  <th className="text-left p-4 font-bold text-gray-700 text-sm" scope="col">Performance</th>
+                  <th className="text-right p-4 font-bold text-gray-700 text-sm" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>

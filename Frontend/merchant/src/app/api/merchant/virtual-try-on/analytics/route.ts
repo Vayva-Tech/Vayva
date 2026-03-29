@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/merchant/virtual-try-on/analytics", operation: "GET" });
+    handleApiError(error, { endpoint: "/merchant/virtual-try-on/analytics", operation: "GET" });
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }

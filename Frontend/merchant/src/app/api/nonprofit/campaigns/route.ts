@@ -1,42 +1,38 @@
-import { NextRequest } from "next/server";
-import { prisma, logger } from "@vayva/shared";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
+import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
     const campaignId = searchParams.get("campaignId");
 
     if (campaignId) {
-      // Get single campaign with donations
-      const campaign = await prisma.donationCampaign.findUnique({
-        where: { id: campaignId },
-        include: {
-          donations: {
-            include: {
-              donor: true,
-            },
-            orderBy: { createdAt: "desc" },
-          },
-          _count: {
-            select: { donations: true },
-          },
-        },
-      });
-
-      return Response.json({ data: [campaign] });
+      // Get single campaign
+      const response = await apiJson(
+        `${process.env.BACKEND_API_URL}/api/v1/campaigns/${campaignId}`,
+        {
+          headers: auth.headers,
+        }
+      );
+      return NextResponse.json(response);
     }
 
     // Get all campaigns
-    const campaigns = await prisma.donationCampaign.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        _count: {
-          select: { donations: true },
-        },
-      },
-    });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/campaigns?storeId=${storeId}`,
+      {
+        headers: auth.headers,
+      }
+    );
 
-    return Response.json({ data: campaigns });
+    return NextResponse.json(response);
   } catch (error: unknown) {
     const _errMsg = error instanceof Error ? error.message : String(error);
     logger.error("[CAMPAIGNS_GET_ERROR]", { error: _errMsg });
@@ -46,24 +42,23 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const storeId = auth.user.storeId;
     const body = await request.json();
-    const { title, description, goal, currency, startDate, endDate, category, impactMetrics } = body;
 
-    const campaign = await prisma.donationCampaign.create({
-      data: {
-        title,
-        description,
-        goal: parseFloat(goal),
-        currency: currency || "USD",
-        startDate: startDate ? new Date(startDate) : undefined,
-        endDate: endDate ? new Date(endDate) : undefined,
-        category: category || "general",
-        status: "draft",
-        impactMetrics: impactMetrics || {},
-      },
-    });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/campaigns`,
+      {
+        method: "POST",
+        headers: auth.headers,
+        body: JSON.stringify({ ...body, storeId }),
+      }
+    );
 
-    return Response.json({ data: campaign });
+    return NextResponse.json(response);
   } catch (error: unknown) {
     const _errMsg = error instanceof Error ? error.message : String(error);
     logger.error("[CAMPAIGN_CREATE_ERROR]", { error: _errMsg });

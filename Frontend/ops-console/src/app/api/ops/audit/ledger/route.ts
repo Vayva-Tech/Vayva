@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma, Prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
-
-type LedgerEntryWithStore = Prisma.LedgerEntryGetPayload<{
-  include: {
-    store: { select: { name: true } };
-  };
-}>;
 
 export async function GET(req: Request) {
   try {
@@ -17,27 +11,12 @@ export async function GET(req: Request) {
     const storeId = searchParams.get("storeId");
     const count = parseInt(searchParams.get("limit") || "100");
 
-    const ledgerEntries = await prisma.ledgerEntry.findMany({
-      where: storeId ? { storeId } : undefined,
-      orderBy: { occurredAt: "desc" },
-      take: count,
-      include: { store: { select: { name: true } } },
+    const response = await apiClient.get('/api/v1/admin/audit/ledger', {
+      storeId,
+      limit: count,
     });
 
-    const entries = ledgerEntries.map((entry: LedgerEntryWithStore) => ({
-      id: entry.id,
-      storeName: entry.store?.name,
-      date: entry.occurredAt,
-      type: entry.referenceType,
-      account: entry.account,
-      description: entry.description || `Transaction ${entry.referenceId}`,
-      amount: entry.amount,
-      currency: entry.currency,
-      direction: entry.direction,
-      balanceAfter:
-        (entry.metadata as Record<string, unknown> | null)?.balanceAfter ||
-        null,
-    }));
+    return NextResponse.json(response);
 
     return NextResponse.json({ entries, integrityCheck: "VALID" });
   } catch (error: unknown) {

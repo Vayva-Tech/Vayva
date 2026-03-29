@@ -29,7 +29,7 @@ export default function CampaignsPage() {
 
   useEffect(() => {
     // Load persisted accounts for this store (written by OAuth callbacks).
-    fetch("/api/ad-platforms/accounts")
+    fetch("/ad-platforms/accounts")
       .then((r) => (r.ok ? r.json() : null))
       .then((json: any) => {
         const accounts = Array.isArray(json?.accounts) ? (json.accounts as ConnectedAccount[]) : [];
@@ -97,7 +97,7 @@ export default function CampaignsPage() {
   const handleSubmitCampaign = async (data: CampaignCreateInput) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/campaigns", {
+      const response = await fetch("/campaigns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

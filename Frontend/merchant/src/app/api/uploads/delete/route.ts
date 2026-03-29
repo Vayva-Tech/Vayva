@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/uploads/delete",
+      endpoint: "/uploads/delete",
       operation: "DELETE_UPLOAD",
     });
     return NextResponse.json(

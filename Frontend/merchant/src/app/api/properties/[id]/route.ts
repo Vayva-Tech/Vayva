@@ -31,7 +31,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/properties/[id]",
+      endpoint: "/properties/[id]",
       operation: "GET_PROPERTY",
       storeId,
     });
@@ -75,7 +75,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/properties/[id]",
+      endpoint: "/properties/[id]",
       operation: "UPDATE_PROPERTY",
       storeId,
     });
@@ -112,7 +112,7 @@ export async function DELETE(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/properties/[id]",
+      endpoint: "/properties/[id]",
       operation: "DELETE_PROPERTY",
       storeId,
     });

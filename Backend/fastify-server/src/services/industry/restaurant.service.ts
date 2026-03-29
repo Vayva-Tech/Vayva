@@ -295,4 +295,171 @@ export class RestaurantService {
     logger.info(`[Restaurant] Updated order ${orderId} status to ${fulfillmentStatus}`);
     return order;
   }
+
+  /**
+   * Get all menu items for a store
+   */
+  async getMenuItems(storeId: string, filters?: any) {
+    const where: any = {
+      storeId,
+      productType: 'menu_item',
+      status: 'ACTIVE',
+    };
+
+    if (filters?.category) {
+      where.metadata = {
+        path: ['category'],
+        equals: filters.category,
+      };
+    }
+
+    if (filters?.available !== undefined) {
+      where.metadata = {
+        ...(where.metadata || {}),
+        path: ['available'],
+        equals: filters.available,
+      };
+    }
+
+    const menuItems = await this.db.product.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return menuItems;
+  }
+
+  /**
+   * Update menu item
+   */
+  async updateMenuItem(itemId: string, data: any) {
+    const updateData: any = {};
+
+    if (data.name !== undefined) {
+      updateData.title = String(data.name);
+      updateData.handle =
+        String(data.name || '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-') +
+        '-' +
+        Date.now();
+    }
+
+    if (data.description !== undefined) {
+      updateData.description = String(data.description);
+    }
+
+    if (data.price !== undefined && typeof data.price === 'number') {
+      updateData.price = data.price;
+    }
+
+    if (data.status !== undefined) {
+      updateData.status = String(data.status);
+    }
+
+    if (data.metadata !== undefined) {
+      updateData.metadata = data.metadata;
+    }
+
+    const updated = await this.db.product.update({
+      where: { id: itemId },
+      data: updateData,
+    });
+
+    logger.info(`[Restaurant] Updated menu item ${itemId}`);
+    return updated;
+  }
+
+  /**
+   * Delete menu item (soft delete)
+   */
+  async deleteMenuItem(itemId: string) {
+    const updated = await this.db.product.update({
+      where: { id: itemId },
+      data: {
+        status: 'ARCHIVED',
+      },
+    });
+
+    logger.info(`[Restaurant] Archived menu item ${itemId}`);
+    return updated;
+  }
+
+  /**
+   * Get menu categories for a store
+   */
+  async getCategories(storeId: string) {
+    const menuItems = await this.db.product.findMany({
+      where: {
+        storeId,
+        productType: 'menu_item',
+        status: 'ACTIVE',
+      },
+      select: {
+        metadata: true,
+      },
+    });
+
+    // Extract unique categories from metadata
+    const categorySet = new Set<string>();
+    menuItems.forEach((item) => {
+      const metadata = item.metadata as any;
+      if (metadata?.category) {
+        categorySet.add(metadata.category);
+      }
+    });
+
+    return Array.from(categorySet).sort();
+  }
+
+  /**
+   * Calculate recipe cost based on ingredients
+   */
+  async calculateRecipeCost(recipeId: string) {
+    const recipe = await this.db.recipe.findUnique({
+      where: { id: recipeId },
+      include: {
+        ingredients: {
+          include: {
+            ingredient: true,
+          },
+        },
+      },
+    });
+
+    if (!recipe) {
+      throw new Error('Recipe not found');
+    }
+
+    let totalCost = 0;
+    const costBreakdown = [];
+
+    for (const recipeIngredient of recipe.ingredients) {
+      const ingredient = recipeIngredient.ingredient;
+      const quantity = Number(recipeIngredient.quantity);
+      const unitCost = Number(ingredient.costPerUnit || 0);
+      const ingredientCost = quantity * unitCost;
+
+      totalCost += ingredientCost;
+      costBreakdown.push({
+        ingredientId: ingredient.id,
+        ingredientName: ingredient.name,
+        quantity,
+        unitCost,
+        totalCost: ingredientCost,
+      });
+    }
+
+    const result = {
+      recipeId: recipe.id,
+      recipeName: recipe.name,
+      totalCost,
+      costBreakdown,
+      suggestedPrice: totalCost * 3, // Standard 3x food cost multiplier
+      foodCostPercentage: 33.33,
+    };
+
+    logger.info(`[Restaurant] Calculated recipe cost for ${recipeId}: ₦${totalCost.toFixed(2)}`);
+    return result;
+  }
 }

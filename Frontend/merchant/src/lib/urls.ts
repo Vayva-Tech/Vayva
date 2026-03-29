@@ -10,9 +10,9 @@ export const urls = {
   products: "/dashboard/products",
   settings: "/dashboard/settings",
   api: {
-    account: "/api/account",
-    orders: "/api/orders",
-    products: "/api/products",
+    account: "/account",
+    orders: "/orders",
+    products: "/products",
   },
   marketingBase: () => {
     return process.env.NEXT_PUBLIC_MARKETING_URL || "https://vayva.ng";

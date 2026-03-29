@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/reviews", operation: "GET" });
+    handleApiError(error, { endpoint: "/embedded/reviews", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch reviews" }, { status: 500 });
   }
 }
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/reviews", operation: "POST" });
+    handleApiError(error, { endpoint: "/embedded/reviews", operation: "POST" });
     return NextResponse.json({ error: "Failed to submit review" }, { status: 500 });
   }
 }

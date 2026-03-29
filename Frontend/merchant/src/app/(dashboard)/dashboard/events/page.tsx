@@ -28,7 +28,7 @@ export default function EventsDashboardPage() {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('/api/events');
+      const response = await fetch('/events');
       if (response.ok) {
         const data = await response.json();
         setEvents(data.events || []);

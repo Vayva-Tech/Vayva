@@ -83,7 +83,7 @@ export default function DesignerPage() {
   const fetchTemplates = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<{ templates: Template[] }>("/api/designer");
+      const data = await apiJson<{ templates: Template[] }>("/designer");
       setTemplates(data?.templates || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -96,7 +96,7 @@ export default function DesignerPage() {
 
   const fetchStats = async () => {
     try {
-      const data = await apiJson<DesignerStats>("/api/designer/stats");
+      const data = await apiJson<DesignerStats>("/designer/stats");
       setStats(data);
     } catch (error: unknown) {
       // Stats endpoint might not exist, that's okay
@@ -130,7 +130,7 @@ export default function DesignerPage() {
     e.preventDefault();
     try {
       setSubmitting(true);
-      const url = mode === "CREATE" ? "/api/designer" : `/api/designer/${selectedTemplate?.id}`;
+      const url = mode === "CREATE" ? "/designer" : `/api/designer/${selectedTemplate?.id}`;
       const method = mode === "CREATE" ? "POST" : "PATCH";
 
       await apiJson(url, {
@@ -172,7 +172,7 @@ export default function DesignerPage() {
 
   const handleDuplicate = async (template: Template) => {
     try {
-      await apiJson("/api/designer", {
+      await apiJson("/designer", {
         method: "POST",
         body: JSON.stringify({
           name: `${template.name} (Copy)`,

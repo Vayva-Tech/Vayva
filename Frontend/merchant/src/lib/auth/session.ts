@@ -1,7 +1,7 @@
 import { getServerSession, type Session } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextResponse, type NextRequest } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { api } from '@/lib/api-client';
 import { getSessionUser } from "@/lib/session.server";
 
 type AuthSession = Session & {
@@ -29,14 +29,16 @@ export async function requireAuth(): Promise<AuthSession> {
     const session = await getServerSession(authOptions);
 
     if (session?.user?.id) {
-        const user = await prisma.user?.findUnique({
-            where: { id: session.user?.id },
-            select: { id: true, isEmailVerified: true }
-        });
-        if (!user) {
+        try {
+            const response = await api.get(`/auth/users/${session.user.id}/verify`);
+            const user = response.data;
+            if (!user) {
+                throw new Error("Unauthorized - User not found");
+            }
+            return session as AuthSession;
+        } catch {
             throw new Error("Unauthorized - User not found");
         }
-        return session as AuthSession;
     }
 
     const fallbackUser = await getSessionUser();
@@ -44,20 +46,21 @@ export async function requireAuth(): Promise<AuthSession> {
         throw new Error("Unauthorized");
     }
 
-    const user = await prisma.user?.findUnique({
-        where: { id: fallbackUser.id },
-        select: { id: true, isEmailVerified: true }
-    });
-    if (!user) {
+    try {
+        const response = await api.get(`/auth/users/${fallbackUser.id}/verify`);
+        const user = response.data;
+        if (!user) {
+            throw new Error("Unauthorized - User not found");
+        }
+        return {
+            user: {
+                ...fallbackUser,
+                emailVerified: Boolean(user.isEmailVerified),
+            },
+        } as AuthSession;
+    } catch {
         throw new Error("Unauthorized - User not found");
     }
-
-    return {
-        user: {
-            ...fallbackUser,
-            emailVerified: Boolean(user.isEmailVerified),
-        },
-    } as AuthSession;
 }
 
 export async function requireStoreAccess(storeId?: string) {

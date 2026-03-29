@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
             message: "Rescue initiated",
         });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/rescue/report", operation: "POST" });
+    handleApiError(error, { endpoint: "/rescue/report", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/autopilot/evaluate",
+      endpoint: "/merchant/autopilot/evaluate",
       operation: "EVALUATE_AUTOPILOT",
     });
     return NextResponse.json(

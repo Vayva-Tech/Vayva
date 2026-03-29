@@ -31,7 +31,7 @@ function SubscriptionPaymentCompleteInner(): React.JSX.Element {
 
     void (async () => {
       try {
-        const res = await fetch("/api/public/checkout/verify", {
+        const res = await fetch("/public/checkout/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           cache: "no-store",

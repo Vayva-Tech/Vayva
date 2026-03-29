@@ -4,7 +4,7 @@ import { EscalationPolicy } from "./escalation-policy";
 import { logger } from "@/lib/logger";
 import fs from "fs";
 import path from "path";
-import type { prisma as PrismaClient } from "@vayva/db";
+import { api } from "@/lib/api-client";
 
 interface ChatMessage {
     role: "system" | "user" | "assistant";
@@ -52,7 +52,7 @@ Support Guidelines:
                 headers: {
                     "Authorization": `Bearer ${apiKey}`,
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://vayva.tech",
+                    "HTTP-Referer": process.env.OPENROUTER_REFERER || "https://merchant.vayva.ng",
                     "X-Title": "Vayva Merchant Support Bot",
                 },
                 body: JSON.stringify({
@@ -85,19 +85,17 @@ Support Guidelines:
                     aiSummary: `Auto-escalation triggered. Reason: ${decision.reason}. User Query: "${query}"`,
                 });
                 
-                const prismaCtx = (global as { prisma?: typeof PrismaClient }).prisma || (await import("@vayva/db")).prisma;
-                await prismaCtx.supportTelemetryEvent.create({
-                    data: {
-                        storeId,
-                        conversationId: "support_bot_" + Date.now(),
-                        eventType: "BOT_ESCALATED",
-                        payload: {
-                            trigger: decision.trigger,
-                            reason: decision.reason,
-                            policyVersion: "2025-12-28_v1",
-                        },
+                // Log telemetry via backend API (fire and forget)
+                api.post('/support/telemetry/log', {
+                    storeId,
+                    conversationId: "support_bot_" + Date.now(),
+                    eventType: "BOT_ESCALATED",
+                    payload: {
+                        trigger: decision.trigger,
+                        reason: decision.reason,
+                        policyVersion: "2025-12-28_v1",
                     },
-                });
+                }).catch(() => {}); // Ignore telemetry errors
             }
             
             return {

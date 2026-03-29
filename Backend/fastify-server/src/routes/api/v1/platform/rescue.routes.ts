@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { RescueService } from '../../../services/platform/rescue.service';
+import { RescueService } from '../../../../services/platform/rescue.service';
 
 const rescueService = new RescueService();
 

@@ -54,7 +54,7 @@ export function UsageInvoices() {
     try {
       setLoading(true);
       const response = await apiJson<{ invoices: Invoice[] }>(
-        "/api/merchant/billing/invoices"
+        "/merchant/billing/invoices"
       );
       setInvoices(response.invoices);
     } catch (error) {

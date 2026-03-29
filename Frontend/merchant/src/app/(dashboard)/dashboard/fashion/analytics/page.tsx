@@ -31,7 +31,7 @@ export default function FashionAnalyticsPage() {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await apiJson<{ data: Analytics }>("/api/fashion/analytics");
+      const response = await apiJson<{ data: Analytics }>("/fashion/analytics");
       setAnalytics(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch fashion analytics", error);

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { CartService } from '../../../services/commerce/cart.service';
+import { CartService } from '../../../../services/commerce/cart.service';
 
 const cartService = new CartService();
 

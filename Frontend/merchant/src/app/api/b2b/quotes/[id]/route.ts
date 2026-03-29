@@ -37,7 +37,7 @@ export async function GET(
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/quotes/[id]",
+        endpoint: "/b2b/quotes/[id]",
         operation: "FETCH_QUOTE",
       }
     );
@@ -85,7 +85,7 @@ export async function PATCH(
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/quotes/[id]",
+        endpoint: "/b2b/quotes/[id]",
         operation: "UPDATE_QUOTE",
       }
     );
@@ -139,7 +139,7 @@ export async function POST(
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/quotes/[id]/accept",
+        endpoint: "/b2b/quotes/[id]/accept",
         operation: "ACCEPT_QUOTE",
       }
     );

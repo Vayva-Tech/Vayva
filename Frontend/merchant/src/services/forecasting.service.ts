@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { api } from '@/lib/api-client';
 import {
   SalesForecast,
   CashFlowForecast,
@@ -7,70 +7,6 @@ import {
   ForecastFactors,
   ForecastingOverview
 } from "@/types/intelligence";
-import type { Prisma } from "@vayva/db";
-type Decimal = Prisma.Decimal;
-type InputJsonValue = Prisma.InputJsonValue;
-
-// Helper to convert Decimal to number
-const toNumber = (d: Decimal | number): number =>
-  typeof d === "number" ? d : Number(d);
-
-// Mapper functions to convert Prisma results to custom types
-const mapSalesForecast = (f: {
-  id: string;
-  storeId: string;
-  period: Date;
-  periodType: string;
-  predictedRevenue: Decimal | number;
-  confidence: Decimal | number;
-  upperBound: Decimal | number;
-  lowerBound: Decimal | number;
-  factors: unknown;
-  createdAt: Date;
-  updatedAt: Date;
-}): SalesForecast => ({
-  ...f,
-  periodType: f.periodType as PeriodType,
-  predictedRevenue: toNumber(f.predictedRevenue),
-  confidence: toNumber(f.confidence),
-  upperBound: toNumber(f.upperBound),
-  lowerBound: toNumber(f.lowerBound),
-  factors: f.factors as ForecastFactors,
-});
-
-const mapCashFlowForecast = (f: {
-  id: string;
-  storeId: string;
-  date: Date;
-  predictedInflow: Decimal | number;
-  predictedOutflow: Decimal | number;
-  netFlow: Decimal | number;
-  runwayDays: number | null;
-  alerts: unknown;
-  createdAt: Date;
-}): CashFlowForecast => ({
-  ...f,
-  predictedInflow: toNumber(f.predictedInflow),
-  predictedOutflow: toNumber(f.predictedOutflow),
-  netFlow: toNumber(f.netFlow),
-  alerts: f.alerts as { lowBalance: boolean; shortfallRisk: number },
-});
-
-const mapInventoryForecast = (f: {
-  id: string;
-  storeId: string;
-  productId: string;
-  predictedDemand: number;
-  stockoutRisk: Decimal | number;
-  suggestedReorder: number;
-  optimalReorderDate: Date;
-  confidence: Decimal | number;
-  createdAt: Date;
-}): InventoryForecast => ({
-  ...f,
-  stockoutRisk: toNumber(f.stockoutRisk),
-  confidence: toNumber(f.confidence),
-});
 
 export class ForecastingService {
   // Sales Forecasting Methods
@@ -80,18 +16,13 @@ export class ForecastingService {
     startDate: Date,
     endDate: Date
   ): Promise<SalesForecast[]> {
-    const forecasts = await prisma.salesForecast?.findMany({
-      where: {
-        storeId,
-        periodType,
-        period: {
-          gte: startDate,
-          lte: endDate
-        }
-      },
-      orderBy: { period: "asc" }
+    const response = await api.get('/forecasting/sales', {
+      storeId,
+      periodType,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
     });
-    return forecasts.map(mapSalesForecast) as any;
+    return response.data || [];
   }
 
   static async generateSalesForecast(
@@ -99,6 +30,26 @@ export class ForecastingService {
     periodType: PeriodType,
     periods: number
   ): Promise<SalesForecast[]> {
+    const response = await api.post('/forecasting/sales/generate', {
+      storeId,
+      periodType,
+      periods,
+    });
+    return response.data || [];
+  }
+
+  static async getCashFlowForecast(
+    storeId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<CashFlowForecast[]> {
+    const response = await api.get('/forecasting/cashflow', {
+      storeId,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
+    return response.data || [];
+  }
     const now = new Date();
     const forecasts: SalesForecast[] = [];
 
@@ -162,43 +113,11 @@ export class ForecastingService {
     storeId: string,
     days: number
   ): Promise<CashFlowForecast[]> {
-    const now = new Date();
-    const forecasts: CashFlowForecast[] = [];
-
-    for (let i = 0; i < days; i++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() + i);
-
-      const prediction = await this.calculateCashFlowPrediction(storeId, date);
-
-      const forecast = await prisma.cashFlowForecast?.upsert({
-        where: {
-          storeId_date: {
-            storeId,
-            date
-          }
-        },
-        update: {
-          predictedInflow: prediction.inflow,
-          predictedOutflow: prediction.outflow,
-          netFlow: prediction.netFlow,
-          runwayDays: prediction.runwayDays,
-          alerts: prediction.alerts as unknown as InputJsonValue
-        },
-        create: {
-          storeId,
-          date,
-          predictedInflow: prediction.inflow,
-          predictedOutflow: prediction.outflow,
-          netFlow: prediction.netFlow,
-          runwayDays: prediction.runwayDays,
-          alerts: prediction.alerts as unknown as InputJsonValue
-        }
-      });
-      forecasts.push(mapCashFlowForecast(forecast));
-    }
-
-    return forecasts;
+    const response = await api.post('/forecasting/cashflow/generate', {
+      storeId,
+      days,
+    });
+    return response.data || [];
   }
 
   // Inventory Forecasting Methods
@@ -206,89 +125,30 @@ export class ForecastingService {
     storeId: string,
     productId?: string
   ): Promise<InventoryForecast[]> {
-    const where: { storeId: string; productId?: string } = { storeId };
-    if (productId) {
-      where.productId = productId;
-    }
-
-    const forecasts = await prisma.inventoryForecast?.findMany({
-      where,
-      orderBy: { createdAt: "desc" }
+    const response = await api.get('/forecasting/inventory', {
+      storeId,
+      productId,
     });
-    return forecasts.map(mapInventoryForecast) as any;
+    return response.data || [];
   }
 
   static async generateInventoryForecast(
     storeId: string,
     productId: string
   ): Promise<InventoryForecast> {
-    const historicalData = await this.getHistoricalInventoryData(storeId, productId);
-    const prediction = this.calculateInventoryPrediction(historicalData);
-
-    const forecast = await prisma.inventoryForecast?.upsert({
-      where: {
-        storeId_productId: {
-          storeId,
-          productId
-        }
-      },
-      update: {
-        predictedDemand: prediction.demand,
-        stockoutRisk: prediction.stockoutRisk,
-        suggestedReorder: prediction.suggestedReorder,
-        optimalReorderDate: prediction.optimalReorderDate,
-        confidence: prediction.confidence
-      },
-      create: {
-        storeId,
-        productId,
-        predictedDemand: prediction.demand,
-        stockoutRisk: prediction.stockoutRisk,
-        suggestedReorder: prediction.suggestedReorder,
-        optimalReorderDate: prediction.optimalReorderDate,
-        confidence: prediction.confidence
-      }
+    const response = await api.post('/forecasting/inventory/generate', {
+      storeId,
+      productId,
     });
-
-    return mapInventoryForecast(forecast);
+    return response.data || {};
   }
 
   // Helper Methods
   static async getForecastingOverview(storeId: string): Promise<ForecastingOverview> {
-    const now = new Date();
-    const thirtyDaysFromNow = new Date(now);
-    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-
-    const [sales, cashFlow, inventory] = await Promise.all([
-      this.getSalesForecast(storeId, "daily", now, thirtyDaysFromNow),
-      this.getCashFlowForecast(storeId, now, thirtyDaysFromNow),
-      this.getInventoryForecast(storeId)
-    ]);
-
-    return { sales, cashFlow, inventory };
+    const response = await api.get(`/forecasting/${storeId}/overview`);
+    return response.data || {};
   }
-
-  private static calculatePeriodDate(baseDate: Date, periodType: PeriodType, offset: number): Date {
-    const date = new Date(baseDate);
-    switch (periodType) {
-      case "daily":
-        date.setDate(date.getDate() + offset);
-        break;
-      case "weekly":
-        date.setDate(date.getDate() + offset * 7);
-        break;
-      case "monthly":
-        date.setMonth(date.getMonth() + offset);
-        break;
-    }
-    return date;
-  }
-
-  private static async getHistoricalSalesData(
-    storeId: string,
-    period: Date,
-    periodType: PeriodType
-  ): Promise<{ revenue: number; orders: number; avgOrderValue: number }> {
+}
     const startDate = new Date(period);
     const endDate = new Date(period);
 

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 // GET /api/fitness/memberships - Get all memberships for the merchant
 export async function GET(request: NextRequest) {
@@ -19,49 +17,26 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const search = searchParams.get("search");
 
-    const where: Record<string, unknown> = { storeId };
-
-    if (status) {
-      where.status = status;
-    }
-
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const [memberships, total] = await Promise.all([
-      (prisma as any).fitnessMembership.findMany({
-        where,
-        include: {
-          _count: {
-            select: {
-              members: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        skip: offset,
-        take: limit,
-      }),
-      (prisma as any).fitnessMembership.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: memberships,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + memberships.length < total,
-      },
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+      offset: offset.toString(),
     });
+
+    if (status) queryParams.set("status", status);
+    if (search) queryParams.set("search", search);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/fitness/memberships?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/fitness/memberships",
+      endpoint: "/fitness/memberships",
       operation: "GET_FITNESS_MEMBERSHIPS",
     });
     return NextResponse.json(

@@ -47,7 +47,7 @@ export const SecurityProvider = ({
     const checkPinStatus = async () => {
       try {
         const data = await apiJson<SecurityStatusResponse>(
-          "/api/account/security/status",
+          "/account/security/status",
         );
         if (isMounted) setHasPinSet(data?.pinSet ?? true);
       } catch (e: unknown) {

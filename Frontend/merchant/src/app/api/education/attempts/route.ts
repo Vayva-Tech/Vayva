@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/attempts", operation: "GET" });
+    handleApiError(error, { endpoint: "/education/attempts", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch attempts" }, { status: 500 });
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/attempts", operation: "POST" });
+    handleApiError(error, { endpoint: "/education/attempts", operation: "POST" });
     return NextResponse.json({ error: "Failed to create attempt" }, { status: 500 });
   }
 }
@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/attempts", operation: "PUT" });
+    handleApiError(error, { endpoint: "/education/attempts", operation: "PUT" });
     return NextResponse.json({ error: "Failed to update attempt" }, { status: 500 });
   }
 }

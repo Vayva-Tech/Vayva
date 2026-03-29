@@ -153,7 +153,7 @@ export default function TemplatesPage() {
   const fetchSystem = useCallback(() => {
     setLoadingSystem(true);
     apiJson<{ data: SystemTemplate[]; meta: { count: number } }>(
-      "/api/templates/system",
+      "/templates/system",
     )
       .then((res: any) => setSystemTemplates(res.data))
       .catch((error: any) => {
@@ -170,7 +170,7 @@ export default function TemplatesPage() {
   const fetchMine = useCallback(() => {
     setLoadingMine(true);
     apiJson<{ data: TemplateProject[]; meta: { count: number } }>(
-      "/api/templates/mine",
+      "/templates/mine",
     )
       .then((res: any) => setMyTemplates(res.data))
       .catch((error: any) => {
@@ -185,7 +185,7 @@ export default function TemplatesPage() {
   }, []);
 
   const fetchEnabledExtensions = useCallback(() => {
-    apiJson<{ data: string[] }>("/api/editor-data/extensions")
+    apiJson<{ data: string[] }>("/editor-data/extensions")
       .then((res: any) => setEnabledExtensions(res.data || []))
       .catch((error: any) => {
         logger.warn("[FETCH_EXTENSIONS_ERROR]", {
@@ -204,7 +204,7 @@ export default function TemplatesPage() {
     // Fetch store overview to get currently applied template
     apiJson<{
       data: { currentTemplate?: { type: string; id?: string; key?: string } };
-    }>("/api/sites/overview")
+    }>("/sites/overview")
       .then((res: any) => {
         const site = res.data;
         setCurrentTemplateId(
@@ -230,7 +230,7 @@ export default function TemplatesPage() {
   const handleApplySystem = async (key: string) => {
     setApplying(key);
     try {
-      await apiJson<{ success: boolean }>("/api/templates/apply", {
+      await apiJson<{ success: boolean }>("/templates/apply", {
         method: "POST",
         body: JSON.stringify({ systemTemplateKey: key }),
       });
@@ -252,7 +252,7 @@ export default function TemplatesPage() {
   const handleApplyCustom = async (id: string) => {
     setApplying(id);
     try {
-      await apiJson<{ success: boolean }>("/api/templates/apply", {
+      await apiJson<{ success: boolean }>("/templates/apply", {
         method: "POST",
         body: JSON.stringify({ templateProjectId: id }),
       });
@@ -278,7 +278,7 @@ export default function TemplatesPage() {
     setCreating(true);
     try {
       const res = await apiJson<{ data: TemplateProject }>(
-        "/api/templates/mine",
+        "/templates/mine",
         {
           method: "POST",
           body: JSON.stringify({
@@ -290,7 +290,7 @@ export default function TemplatesPage() {
       );
 
       const wsRes = await apiJson<{ data: { editorUrl: string } }>(
-        "/api/webstudio/projects",
+        "/webstudio/projects",
         {
           method: "POST",
           body: JSON.stringify({
@@ -319,7 +319,7 @@ export default function TemplatesPage() {
 
     try {
       const res = await apiJson<{ data: { editorUrl: string } }>(
-        "/api/webstudio/projects",
+        "/webstudio/projects",
         {
           method: "POST",
           body: JSON.stringify({

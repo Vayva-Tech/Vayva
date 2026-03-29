@@ -44,7 +44,7 @@ export async function GET(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/inventory/history",
+      endpoint: "/products/[id]/inventory/history",
       operation: "GET_INVENTORY_HISTORY",
     });
     return NextResponse.json(

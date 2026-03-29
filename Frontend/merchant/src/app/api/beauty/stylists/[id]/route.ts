@@ -20,7 +20,7 @@ export async function GET(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/stylists/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/beauty/stylists/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch stylist" }, { status: 500 });
   }
 }
@@ -47,7 +47,7 @@ export async function PUT(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/stylists/:id", operation: "PUT" });
+    handleApiError(error, { endpoint: "/beauty/stylists/:id", operation: "PUT" });
     return NextResponse.json({ error: "Failed to update stylist" }, { status: 500 });
   }
 }
@@ -72,7 +72,7 @@ export async function DELETE(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/stylists/:id", operation: "DELETE" });
+    handleApiError(error, { endpoint: "/beauty/stylists/:id", operation: "DELETE" });
     return NextResponse.json({ error: "Failed to delete stylist" }, { status: 500 });
   }
 }

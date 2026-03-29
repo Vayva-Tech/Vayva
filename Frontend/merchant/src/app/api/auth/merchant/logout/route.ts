@@ -14,7 +14,7 @@ export async function POST(_request: Request) {
     handleApiError(
       error,
       {
-        endpoint: "/api/auth/merchant/logout",
+        endpoint: "/auth/merchant/logout",
         operation: "MERCHANT_LOGOUT",
       }
     );

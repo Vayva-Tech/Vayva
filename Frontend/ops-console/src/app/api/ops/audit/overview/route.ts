@@ -1,28 +1,15 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
 
 export async function GET(req: Request) {
   try {
     await OpsAuthService.requireSession();
 
-    const [merchants, stores, transactions, kycPending] = await Promise.all([
-      prisma.tenant.count(),
-      prisma.store.count(),
-      prisma.paymentTransaction.count(),
-      prisma.kycRecord.count({ where: { status: "PENDING" } }),
-    ]);
-
-    const stats = {
-      merchants,
-      stores,
-      transactions,
-      kycPending,
-      lastUpdated: new Date().toISOString(),
-    };
-
-    return NextResponse.json({ stats });
+    const response = await apiClient.get('/api/v1/admin/audit/overview');
+    
+    return NextResponse.json(response);
   } catch (error: unknown) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

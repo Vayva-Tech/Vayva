@@ -86,7 +86,7 @@ export default function SocialMediaDashboard() {
           }>;
           summary: { totalConnected: number; totalPlatforms: number };
         };
-      }>("/api/social-connections");
+      }>("/social-connections");
 
       const raw = result?.data;
       if (result?.success === false || !raw) {

@@ -43,7 +43,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/orders/[id]/notes",
+      endpoint: "/orders/[id]/notes",
       operation: "POST_ORDER_NOTE",
     });
     return NextResponse.json(

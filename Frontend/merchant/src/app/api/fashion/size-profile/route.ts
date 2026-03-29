@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ profile: result.data });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/fashion/size-profile",
+      endpoint: "/fashion/size-profile",
       operation: "FETCH_SIZE_PROFILE",
     });
     return NextResponse.json(

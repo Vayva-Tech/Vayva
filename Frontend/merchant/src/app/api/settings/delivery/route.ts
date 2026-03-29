@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/settings/delivery",
+      endpoint: "/settings/delivery",
       operation: "GET_DELIVERY_SETTINGS",
     });
     return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/settings/delivery",
+      endpoint: "/settings/delivery",
       operation: "UPDATE_DELIVERY_SETTINGS",
     });
     return NextResponse.json(

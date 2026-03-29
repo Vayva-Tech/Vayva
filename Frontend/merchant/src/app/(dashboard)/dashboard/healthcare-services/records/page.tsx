@@ -43,7 +43,7 @@ export default function HealthcareRecordsPage() {
   const fetchRecords = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: MedicalRecord[] }>("/api/healthcare/records?limit=200");
+      const response = await apiJson<{ data: MedicalRecord[] }>("/healthcare/records?limit=200");
       setRecords(response.data || generateMockRecords());
     } catch (error) {
       setRecords(generateMockRecords());

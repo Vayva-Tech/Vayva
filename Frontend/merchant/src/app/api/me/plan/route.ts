@@ -8,14 +8,14 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
     if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const result = await apiJson(`${buildBackendUrl("/api/auth/merchant/me")}`, {
+    const result = await apiJson(`${buildBackendUrl("/auth/merchant/me")}`, {
       headers: auth.headers,
       cache: "no-store",
     });
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/me/plan", operation: "GET" });
+    handleApiError(error, { endpoint: "/me/plan", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

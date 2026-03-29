@@ -42,7 +42,7 @@ export default function MarketOrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<MarketOrder[]>("/api/market/orders");
+      const data = await apiJson<MarketOrder[]>("/market/orders");
       setOrders(data || []);
     } catch (error) {
       toast.error("Failed to load orders");

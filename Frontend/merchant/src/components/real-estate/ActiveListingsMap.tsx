@@ -29,7 +29,7 @@ export const ActiveListingsMap: React.FC = () => {
 
   const fetchProperties = async () => {
     try {
-      const response = await fetch('/api/realestate/properties?status=available&limit=50');
+      const response = await fetch('/realestate/properties?status=available&limit=50');
       const data = await response.json();
       
       if (data.success) {

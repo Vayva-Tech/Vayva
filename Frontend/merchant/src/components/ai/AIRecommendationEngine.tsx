@@ -386,7 +386,7 @@ export function AIRecommendationEngine() {
   // Generate API code snippet
   const generateAPICode = (placement: Placement) => {
     const code = `// Fetch recommendations for ${placement.name}
-const response = await fetch('/api/recommendations?placement=${placement.id}&userId={{user_id}}&context={{context}}');
+const response = await fetch('/recommendations?placement=${placement.id}&userId={{user_id}}&context={{context}}');
 const { recommendations } = await response.json();
 
 // Render recommendations

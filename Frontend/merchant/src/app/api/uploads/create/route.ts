@@ -190,7 +190,7 @@ export const POST = withVayvaAPI(
       handleApiError(
         error,
         {
-          endpoint: "/api/unknown",
+          endpoint: "/unknown",
           operation: "POST_UPLOADS",
           storeId,
         }

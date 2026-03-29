@@ -28,7 +28,7 @@ export const WholesaleStatusWidget: React.FC = () => {
   const { data: orders, isLoading } = useQuery<WholesaleOrder[]>({
     queryKey: ['wholesale-orders-pending'],
     queryFn: async () => {
-      const res = await fetch('/api/fashion/wholesale/orders');
+      const res = await fetch('/fashion/wholesale/orders');
       const data = await res.json();
       return data.orders;
     },

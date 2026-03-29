@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/security",
+      endpoint: "/account/security",
       operation: "GET_SECURITY_SETTINGS",
     });
     return NextResponse.json(

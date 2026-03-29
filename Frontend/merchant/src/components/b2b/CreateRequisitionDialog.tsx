@@ -91,7 +91,7 @@ export function CreateRequisitionDialog({
         notes: notes || undefined,
       };
 
-      const response = await fetch('/api/b2b/requisitions', {
+      const response = await fetch('/b2b/requisitions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

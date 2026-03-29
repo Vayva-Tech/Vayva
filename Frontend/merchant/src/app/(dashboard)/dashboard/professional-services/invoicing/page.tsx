@@ -31,7 +31,7 @@ export default function ProfessionalServicesInvoicingPage() {
 
   const fetchInvoices = async () => {
     try {
-      const response = await apiJson<{ data: Invoice[] }>("/api/professional-services/invoices?limit=200");
+      const response = await apiJson<{ data: Invoice[] }>("/professional-services/invoices?limit=200");
       setInvoices(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch invoices", error);

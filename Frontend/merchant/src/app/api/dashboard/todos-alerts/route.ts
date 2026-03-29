@@ -8,13 +8,13 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
     if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const result = await apiJson(`${buildBackendUrl("/api/dashboard/todos-alerts")}`, {
+    const result = await apiJson(`${buildBackendUrl("/dashboard/todos-alerts")}`, {
       headers: auth.headers,
     });
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/dashboard/todos-alerts", operation: "GET" });
+    handleApiError(error, { endpoint: "/dashboard/todos-alerts", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

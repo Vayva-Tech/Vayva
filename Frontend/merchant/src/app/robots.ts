@@ -18,7 +18,7 @@ export default function robots() {
         "/control-center/",
         "/ops/",
         "/invite/",
-        "/api/",
+        "/",
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,

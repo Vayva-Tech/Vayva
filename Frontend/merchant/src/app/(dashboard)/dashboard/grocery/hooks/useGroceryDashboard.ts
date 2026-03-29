@@ -105,7 +105,7 @@ export function useGroceryDashboard() {
     queryKey,
     queryFn: async () => {
       try {
-        const response = await fetch('/api/grocery/dashboard', {
+        const response = await fetch('/grocery/dashboard', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

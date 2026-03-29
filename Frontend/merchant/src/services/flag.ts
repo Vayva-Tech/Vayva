@@ -7,7 +7,7 @@ export class FlagService {
    * Check if email is allowed to register (anti-fraud)
    */
   static async checkRegistrationFlags(email: string): Promise<{ allowed: boolean; reason?: string }> {
-    const res = await fetch("/api/auth/merchant/check-flag", {
+    const res = await fetch("/auth/merchant/check-flag", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),

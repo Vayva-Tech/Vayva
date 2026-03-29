@@ -31,7 +31,7 @@ export default function RestaurantStaffPage() {
 
   const fetchStaff = async () => {
     try {
-      const response = await apiJson<{ data: Staff[] }>("/api/restaurant/staff?limit=200");
+      const response = await apiJson<{ data: Staff[] }>("/restaurant/staff?limit=200");
       setStaff(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch staff", error);

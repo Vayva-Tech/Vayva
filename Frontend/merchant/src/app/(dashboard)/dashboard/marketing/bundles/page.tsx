@@ -52,7 +52,7 @@ export default function BundlesPage() {
   const fetchBundles = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<DiscountRule[]>("/api/marketing/discounts");
+      const data = await apiJson<DiscountRule[]>("/marketing/discounts");
       // Client-side filter: Treat discounts applied to specific products/collections as "Bundles"
       const bundleItems = (data || []).filter(
         (d: DiscountRule) => d.appliesTo === "PRODUCTS" || d.appliesTo === "COLLECTIONS",
@@ -83,7 +83,7 @@ export default function BundlesPage() {
       await apiJson<{ success: boolean }>(
         isEdit
           ? `/api/marketing/discounts/${formData.id}`
-          : "/api/marketing/discounts",
+          : "/marketing/discounts",
         {
           method: isEdit ? "PATCH" : "POST",
           body: JSON.stringify({
@@ -249,13 +249,13 @@ export default function BundlesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Bundle Name</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Contents</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Bundle Name</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Discount</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Contents</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

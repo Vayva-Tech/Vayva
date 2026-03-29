@@ -45,7 +45,7 @@ export async function GET(req: Request) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/events",
+      endpoint: "/events",
       operation: "GET_EVENTS",
     });
     return NextResponse.json(

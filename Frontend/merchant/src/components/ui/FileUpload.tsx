@@ -63,7 +63,7 @@ export function FileUpload({
     try {
       // 1. Create upload intent (signed URL / client token)
       const intent = await apiJson<UploadIntentResponse>(
-        "/api/uploads/create",
+        "/uploads/create",
         {
           method: "POST",
           body: JSON.stringify({
@@ -96,7 +96,7 @@ export function FileUpload({
 
       // 3. Finalize upload (server-side sniffing + entity attachment)
       const finalize = await apiJson<UploadFinalizeResponse>(
-        "/api/uploads/finalize",
+        "/uploads/finalize",
         {
           method: "POST",
           body: JSON.stringify({

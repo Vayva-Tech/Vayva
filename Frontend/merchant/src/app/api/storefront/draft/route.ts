@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await apiJson<{ found: boolean; draft?: unknown }>(
-      buildBackendUrl("/api/storefront/draft"),
+      buildBackendUrl("/storefront/draft"),
       { headers: auth.headers, cache: "no-store" },
     );
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
     const body = await request.json();
     
-    const result = await apiJson<{ success: boolean; draft?: unknown }>(buildBackendUrl("/api/storefront/draft"), {
+    const result = await apiJson<{ success: boolean; draft?: unknown }>(buildBackendUrl("/storefront/draft"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
 
     const result = await apiJson<{ success: boolean; draft?: unknown }>(
-      buildBackendUrl("/api/storefront/draft"),
+      buildBackendUrl("/storefront/draft"),
       {
         method: "PATCH",
         headers: {
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/storefront/draft",
+      endpoint: "/storefront/draft",
       operation: "PATCH_DRAFT",
     });
     return NextResponse.json(

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result.data);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/menu-items",
+      endpoint: "/menu-items",
       operation: "CREATE_MENU_ITEM",
     });
     const message = error instanceof Error ? error.message : String(error);

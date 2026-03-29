@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/orders/track", operation: "GET" });
+    handleApiError(error, { endpoint: "/embedded/orders/track", operation: "GET" });
     return NextResponse.json({ error: "Failed to track order" }, { status: 500 });
   }
 }

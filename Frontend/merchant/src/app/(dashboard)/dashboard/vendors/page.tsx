@@ -114,9 +114,9 @@ export default function MultiVendorDashboard() {
   const loadData = async () => {
     try {
       const [vendorsRes, statsRes, payoutsRes] = await Promise.all([
-        apiJson<{ vendors: Vendor[] }>("/api/vendors"),
-        apiJson<VendorStats>("/api/vendors/stats"),
-        apiJson<{ payouts: CommissionPayout[] }>("/api/vendors/payouts"),
+        apiJson<{ vendors: Vendor[] }>("/vendors"),
+        apiJson<VendorStats>("/vendors/stats"),
+        apiJson<{ payouts: CommissionPayout[] }>("/vendors/payouts"),
       ]);
       setVendors(vendorsRes.vendors || []);
       setStats(statsRes);
@@ -148,7 +148,7 @@ export default function MultiVendorDashboard() {
 
   const handleInviteVendor = async (email: string, businessName: string) => {
     try {
-      await apiJson("/api/vendors/invite", {
+      await apiJson("/vendors/invite", {
         method: "POST",
         body: JSON.stringify({ email, businessName }),
       });

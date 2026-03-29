@@ -51,7 +51,7 @@ export default function TravelAnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: AnalyticsData }>("/api/travel/analytics");
+      const response = await apiJson<{ data: AnalyticsData }>("/travel/analytics");
       setAnalytics(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch analytics", error);

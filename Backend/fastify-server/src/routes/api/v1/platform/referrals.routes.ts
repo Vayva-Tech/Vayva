@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { ReferralService } from '../../../services/marketing/referral.service';
+import { ReferralService } from '../../../../services/marketing/referral.service';
 
 const referralService = new ReferralService();
 

@@ -123,9 +123,9 @@ export default function RouteOptimizerDashboard() {
     try {
       setLoading(true);
       const [routesRes, vehiclesRes, statsRes] = await Promise.all([
-        apiJson<{ routes: DeliveryRoute[] }>("/api/routes"),
-        apiJson<{ vehicles: Vehicle[] }>("/api/routes/vehicles"),
-        apiJson<RouteStats>("/api/routes/stats"),
+        apiJson<{ routes: DeliveryRoute[] }>("/routes"),
+        apiJson<{ vehicles: Vehicle[] }>("/routes/vehicles"),
+        apiJson<RouteStats>("/routes/stats"),
       ]);
 
       setRoutes(routesRes.routes || []);
@@ -163,7 +163,7 @@ export default function RouteOptimizerDashboard() {
     orderIds: string[];
   }) => {
     try {
-      await apiJson("/api/routes", {
+      await apiJson("/routes", {
         method: "POST",
         body: JSON.stringify(data),
       });

@@ -29,14 +29,14 @@ export async function GET(request: NextRequest) {
         pagination: { total: number; page: number; limit: number; totalPages: number };
       };
       error?: string;
-    }>(`${buildBackendUrl("/api/realestate/agents")}?${queryParams.toString()}`, {
+    }>(`${buildBackendUrl("/realestate/agents")}?${queryParams.toString()}`, {
       headers: auth.headers,
     });
 
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/realestate/agents",
+      endpoint: "/realestate/agents",
       operation: "GET_AGENTS",
       storeId,
     });

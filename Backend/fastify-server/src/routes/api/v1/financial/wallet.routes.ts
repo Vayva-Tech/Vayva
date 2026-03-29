@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { WalletService } from '../../../services/financial/wallet.service';
+import { WalletService } from '../../../../services/financial/wallet.service';
 
 const walletService = new WalletService();
 

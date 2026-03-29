@@ -24,7 +24,7 @@ export default function PayoutsPage() {
   const fetchPayouts = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<PayoutResponse>("/api/wallet/payouts");
+      const data = await apiJson<PayoutResponse>("/wallet/payouts");
       setPayouts(data?.payouts || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -41,7 +41,7 @@ export default function PayoutsPage() {
   const fetchAccounts = async () => {
     try {
       setAccountsLoading(true);
-      const data = await apiJson<BankAccount[]>("/api/wallet/payout-accounts");
+      const data = await apiJson<BankAccount[]>("/wallet/payout-accounts");
       setAccounts(Array.isArray(data) ? data : []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -145,13 +145,13 @@ export default function PayoutsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Reference</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Date</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Amount</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Destination</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -316,7 +316,7 @@ function WithdrawalModal({
 
       // For instant withdrawal, use direct API call
       if (instantWithdrawal) {
-        const response = await fetch("/api/finance/payouts", {
+        const response = await fetch("/finance/payouts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

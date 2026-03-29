@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/auth/sudo",
+      endpoint: "/auth/sudo",
       operation: "SUDO_AUTH",
     });
     return NextResponse.json(

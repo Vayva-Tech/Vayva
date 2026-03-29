@@ -43,7 +43,7 @@ export default function GrantAnalyticsDashboard() {
     try {
       setLoading(true);
       const [grantsData] = await Promise.all([
-        apiJson<{ data: any[] }>("/api/nonprofit/grants?limit=100"),
+        apiJson<{ data: any[] }>("/nonprofit/grants?limit=100"),
       ]);
 
       const grants = grantsData.data || [];

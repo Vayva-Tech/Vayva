@@ -135,7 +135,7 @@ export default function GrantsPage() {
       if (filters.deadlineFrom) queryParams.append("deadlineFrom", filters.deadlineFrom);
       if (filters.deadlineTo) queryParams.append("deadlineTo", filters.deadlineTo);
 
-      const data = await apiJson<{ data: NonprofitGrant[]; meta: PaginationMeta }>("/api/nonprofit/grants?" + queryParams.toString());
+      const data = await apiJson<{ data: NonprofitGrant[]; meta: PaginationMeta }>("/nonprofit/grants?" + queryParams.toString());
       setGrants(data.data || []);
       setMeta(data.meta || { page: 1, limit: 20, total: 0, totalPages: 0 });
     } catch (error: unknown) {
@@ -181,7 +181,7 @@ export default function GrantsPage() {
         });
         toast.success("Grant updated successfully");
       } else {
-        await apiJson("/api/nonprofit/grants", {
+        await apiJson("/nonprofit/grants", {
           method: "POST",
           body: JSON.stringify(payload),
         });

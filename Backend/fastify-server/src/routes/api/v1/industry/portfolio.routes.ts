@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { PortfolioService } from '../../../services/industry/portfolio.service';
+import { PortfolioService } from '../../../../services/industry/portfolio.service';
 
 const portfolioService = new PortfolioService();
 

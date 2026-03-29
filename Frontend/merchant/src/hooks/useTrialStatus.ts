@@ -16,7 +16,7 @@ export function useTrialStatus() {
   const { data, isLoading, error } = useQuery<TrialStatus>({
     queryKey: ['trial', 'status'],
     queryFn: async () => {
-      const res = await fetch('/api/trial/status');
+      const res = await fetch('/trial/status');
       if (!res.ok) throw new Error('Failed to fetch trial status');
       return res.json();
     },

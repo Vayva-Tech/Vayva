@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, Prisma } from "@vayva/db";
 import { logger } from "@vayva/shared";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,17 +12,13 @@ export async function GET(req: NextRequest) {
     const severity = searchParams.get("severity");
     const surface = searchParams.get("surface");
 
-    const incidents = await prisma.rescueIncident?.findMany({
-      where: {
-        ...(status && { status: status as Prisma.EnumRescueIncidentStatusFilter<"RescueIncident"> }),
-        ...(severity && { severity: severity as Prisma.EnumRescueIncidentSeverityFilter<"RescueIncident"> }),
-        ...(surface && { surface: surface as Prisma.EnumRescueSurfaceFilter<"RescueIncident"> }),
-      },
-      orderBy: { createdAt: "desc" },
-      take: 50,
+    const response = await apiClient.get('/api/v1/admin/rescue/incidents', {
+      ...(status && { status }),
+      ...(severity && { severity }),
+      ...(surface && { surface }),
     });
 
-    return NextResponse.json(incidents);
+    return NextResponse.json(response);
   } catch (error: unknown) {
     logger.error("[RESCUE_INCIDENTS_GET]", { error });
     return NextResponse.json(

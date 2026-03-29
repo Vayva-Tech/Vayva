@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { EventsService } from '../../../services/industry/events.service';
+import { EventsService } from '../../../../services/industry/events.service';
 
 const eventsService = new EventsService();
 

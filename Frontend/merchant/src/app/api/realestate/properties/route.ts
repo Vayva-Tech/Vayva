@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
 // GET /api/realestate/properties - Get properties with filters
 export async function GET(request: NextRequest) {
   try {
@@ -22,60 +20,30 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const page = parseInt(searchParams.get("page") || "1");
 
-    const where: any = { storeId };
-
-    if (status) where.status = status;
-    if (type) where.type = type;
-    if (purpose) where.purpose = purpose;
-    if (city) where.city = city;
-    
-    if (minPrice || maxPrice) {
-      where.price = {};
-      if (minPrice) where.price.gte = parseFloat(minPrice);
-      if (maxPrice) where.price.lte = parseFloat(maxPrice);
-    }
-
-    const [properties, total] = await Promise.all([
-      prisma.property.findMany({
-        where,
-        include: {
-          viewings: {
-            select: {
-              id: true,
-              scheduledAt: true,
-              status: true
-            }
-          },
-          documents: {
-            select: {
-              id: true,
-              title: true,
-              type: true
-            }
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: (page - 1) * limit
-      }),
-      prisma.property.count({ where })
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        properties,
-        pagination: {
-          total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit)
-        }
-      }
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+      offset: ((page - 1) * limit).toString(),
     });
+
+    if (status) queryParams.set("status", status);
+    if (type) queryParams.set("type", type);
+    if (purpose) queryParams.set("purpose", purpose);
+    if (city) queryParams.set("city", city);
+    if (minPrice) queryParams.set("minPrice", minPrice);
+    if (maxPrice) queryParams.set("maxPrice", maxPrice);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/properties?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/realestate/properties",
+      endpoint: "/realestate/properties",
       operation: "GET_PROPERTIES",
     });
     return NextResponse.json(

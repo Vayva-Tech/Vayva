@@ -17,7 +17,6 @@ interface PlanComparisonModalProps {
 interface PlanFeature {
   name: string;
   description?: string;
-  free: string | boolean;
   starter: string | boolean;
   pro: string | boolean;
   proPlus: string | boolean;
@@ -25,14 +24,6 @@ interface PlanFeature {
 }
 
 const PLANS = {
-  FREE: {
-    key: 'free',
-    name: 'Free',
-    price: 0,
-    description: 'For individuals just starting out',
-    color: 'from-gray-500 to-slate-500',
-    popular: false,
-  },
   STARTER: {
     key: 'starter',
     name: 'Starter',
@@ -63,7 +54,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Products',
     description: 'Maximum number of products in catalog',
-    free: '10',
     starter: '100',
     pro: '1,000',
     proPlus: 'Unlimited',
@@ -72,7 +62,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Orders per Month',
     description: 'Maximum orders you can process monthly',
-    free: '20',
     starter: '200',
     pro: '2,000',
     proPlus: 'Unlimited',
@@ -81,7 +70,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Customers',
     description: 'Customer records you can store',
-    free: '50',
     starter: '500',
     pro: '5,000',
     proPlus: 'Unlimited',
@@ -90,7 +78,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Team Members',
     description: 'Users with access to your store',
-    free: '1',
     starter: '3',
     pro: '10',
     proPlus: 'Unlimited',
@@ -99,7 +86,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Staff Accounts',
     description: 'Additional staff seats',
-    free: '0',
     starter: '5',
     pro: '20',
     proPlus: 'Unlimited',
@@ -107,7 +93,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'AI Autopilot',
     description: 'Automated business operations',
-    free: false,
     starter: 'Basic',
     pro: 'Advanced',
     proPlus: 'Full + Custom',
@@ -116,7 +101,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Analytics Depth',
     description: 'Data insights and reporting',
-    free: 'Basic',
     starter: 'Standard',
     pro: 'Advanced',
     proPlus: 'Custom + Predictive',
@@ -125,7 +109,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'API Access',
     description: 'Integration capabilities',
-    free: false,
     starter: false,
     pro: true,
     proPlus: 'Priority',
@@ -133,7 +116,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Custom Reports',
     description: 'Tailored analytics dashboards',
-    free: false,
     starter: false,
     pro: '5 reports',
     proPlus: 'Unlimited',
@@ -141,7 +123,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Email Support',
     description: 'Customer support via email',
-    free: true,
     starter: true,
     pro: 'Priority',
     proPlus: 'VIP',
@@ -149,7 +130,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Phone Support',
     description: 'Direct phone line to support',
-    free: false,
     starter: false,
     pro: true,
     proPlus: '24/7 Dedicated',
@@ -157,7 +137,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Success Manager',
     description: 'Dedicated account manager',
-    free: false,
     starter: false,
     pro: false,
     proPlus: true,
@@ -166,7 +145,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Custom Domain',
     description: 'Use your own domain name',
-    free: false,
     starter: true,
     pro: true,
     proPlus: 'Multiple domains',
@@ -174,7 +152,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'White Label',
     description: 'Remove Vayva branding',
-    free: false,
     starter: false,
     pro: true,
     proPlus: true,
@@ -182,7 +159,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Advanced Permissions',
     description: 'Granular user access control',
-    free: false,
     starter: false,
     pro: true,
     proPlus: true,
@@ -190,7 +166,6 @@ const FEATURES: PlanFeature[] = [
   {
     name: 'Workflow Automation',
     description: 'Custom business workflows',
-    free: false,
     starter: false,
     pro: '10 workflows',
     proPlus: 'Unlimited',

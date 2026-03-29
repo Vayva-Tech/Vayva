@@ -43,7 +43,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/realestate/leads/[id]/convert",
+      endpoint: "/realestate/leads/[id]/convert",
       operation: "CONVERT_LEAD",
       storeId,
     });

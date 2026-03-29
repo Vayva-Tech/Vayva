@@ -37,7 +37,7 @@ export default function WholesaleCatalogPage() {
     try {
       setLoading(true);
       const data = await apiJson<WholesaleProductsResponse>(
-        "/api/products?type=wholesale",
+        "/products?type=wholesale",
       );
       setProducts(data?.products || []);
     } catch (error: unknown) {

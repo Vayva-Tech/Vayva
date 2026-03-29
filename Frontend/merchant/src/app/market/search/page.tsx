@@ -47,7 +47,7 @@ export default function MarketSearchPage() {
 
   const addToCart = async (productId: string) => {
     try {
-      await apiJson("/api/market/cart/items", {
+      await apiJson("/market/cart/items", {
         method: "POST",
         body: JSON.stringify({ productId, quantity: 1 }),
       });

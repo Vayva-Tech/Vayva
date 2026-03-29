@@ -5,6 +5,10 @@ export type { FashionDashboardProps } from './FashionDashboard';
 export { KPICard } from './KPICard';
 export type { KPICardProps } from './KPICard';
 
+// KPI Cards
+export { FashionKPICards } from './FashionKPICards';
+export type { FashionKPICardsProps } from './FashionKPICards';
+
 export { SizeCurveAnalysis } from './SizeCurveAnalysis';
 export type { SizeCurveAnalysisProps } from './SizeCurveAnalysis';
 

@@ -71,7 +71,7 @@ export function AffiliatePayoutApproval() {
     try {
       setIsProcessing(payout.id);
       const approvedBy = user?.email || user?.id || "unknown";
-      const response = await fetch("/api/affiliate/payout/approvals", {
+      const response = await fetch("/affiliate/payout/approvals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,7 +114,7 @@ export function AffiliatePayoutApproval() {
     try {
       setIsProcessing(selectedPayout.id);
       const rejectedBy = user?.email || user?.id || "unknown";
-      const response = await fetch("/api/affiliate/payout/approvals", {
+      const response = await fetch("/affiliate/payout/approvals", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

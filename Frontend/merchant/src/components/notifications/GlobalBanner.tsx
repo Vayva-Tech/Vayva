@@ -18,7 +18,7 @@ export const GlobalBanner = () => {
       try {
         // Fetch unread critical/action_required items
         const res = await apiJson<NotificationsResponse>(
-          "/api/merchant/notifications?status=unread&limit=5",
+          "/merchant/notifications?status=unread&limit=5",
         );
         const items = res.items || [];
 

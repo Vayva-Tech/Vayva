@@ -1,5 +1,4 @@
-import { db } from "@/lib/db";
-import { Prisma, type Prisma as PrismaClient } from "@vayva/db";
+import { api } from '@/lib/api-client';
 
 interface MenuItemData {
     name: string;
@@ -11,45 +10,30 @@ interface MenuItemData {
 
 export const MenuService = {
     async createMenuItem(storeId: string, data: MenuItemData) {
-        const product = await db.product?.create({
-            data: {
-                storeId,
-                title: data.name,
-                handle: data.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now(),
-                description: data.description,
-                price: new Prisma.Decimal(data.price),
-                productType: "menu_item",
-                status: "ACTIVE",
-                trackInventory: false,
-                metadata: data.metadata as unknown as PrismaClient.InputJsonValue,
-            }
+        const response = await api.post('/menu-items', {
+            storeId,
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            productType: "MENU_ITEM",
+            metadata: data.metadata,
         });
-        return product;
+        return response.data;
     },
     
     async getKitchenOrders(storeId: string) {
-        return await db.order?.findMany({
-            where: {
-                storeId,
-                fulfillmentStatus: { in: ["UNFULFILLED", "PREPARING"] },
-                paymentStatus: { in: ["SUCCESS", "VERIFIED"] }
-            },
-            include: {
-                items: true,
-            },
-            orderBy: {
-                createdAt: "asc"
-            }
+        const response = await api.get('/kitchen/orders', {
+            storeId,
+            fulfillmentStatus: 'UNFULFILLED,PREPARING',
+            paymentStatus: 'SUCCESS,VERIFIED',
         });
+        return response.data || [];
     },
     
     async updateOrderStatus(orderId: string, status: string) {
-        const fulfillmentStatus = status === "READY" ? "READY_FOR_PICKUP" : "READY_FOR_PICKUP";
-        return await db.order?.update({
-            where: { id: orderId },
-            data: {
-                fulfillmentStatus
-            }
+        const response = await api.patch(`/kitchen/orders/${orderId}/status`, {
+            status,
         });
+        return response.data;
     }
 };

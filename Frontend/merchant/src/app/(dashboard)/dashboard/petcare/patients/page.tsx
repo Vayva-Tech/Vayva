@@ -62,7 +62,7 @@ export default function PetCarePatientsPage() {
   const fetchPatients = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Patient[] }>("/api/petcare/patients");
+      const response = await apiJson<{ data: Patient[] }>("/petcare/patients");
       setPatients(response.data || []);
     } catch (error) {
       logger.error("Failed to fetch patients", error);

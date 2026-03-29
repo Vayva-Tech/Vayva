@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export async function GET(
   req: NextRequest,
@@ -10,18 +10,9 @@ export async function GET(
     await OpsAuthService.requireSession();
     const { id } = await params;
 
-    const incident = await prisma.rescueIncident.findUnique({
-      where: { id },
-      include: {
-        fixActions: { orderBy: { createdAt: "desc" } },
-        auditLogs: { orderBy: { createdAt: "desc" } },
-      },
-    });
-
-    if (!incident)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    return NextResponse.json(incident);
+    const response = await apiClient.get(`/api/v1/admin/rescue/incidents/${id}`);
+    
+    return NextResponse.json(response);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: "Unauthorized" },

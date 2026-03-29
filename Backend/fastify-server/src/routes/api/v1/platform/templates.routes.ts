@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { TemplateService } from '../../../services/platform/template.service';
+import { TemplateService } from '../../../../services/platform/template.service';
 
 const templateService = new TemplateService();
 

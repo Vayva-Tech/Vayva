@@ -33,7 +33,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     return NextResponse.json({ requests: result.data || [] });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/realestate/maintenance",
+      endpoint: "/realestate/maintenance",
       operation: "FETCH_MAINTENANCE_REQUESTS",
     });
     return NextResponse.json(
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       success: boolean;
       data?: unknown;
       error?: string;
-    }>(buildBackendUrl("/api/realestate/maintenance"), {
+    }>(buildBackendUrl("/realestate/maintenance"), {
       method: "POST",
       headers: auth.headers,
       body: JSON.stringify({

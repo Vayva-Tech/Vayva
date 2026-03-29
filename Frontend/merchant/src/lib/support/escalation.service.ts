@@ -1,49 +1,17 @@
-import { prisma } from "@vayva/db";
-import { logger } from "@/lib/logger";
+import { api } from '@/lib/api-client';
 
 export class EscalationService {
     /**
      * Trigger a handoff from AI to Human Support
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static async triggerHandoff(params: Record<string, any>) {
         try {
-            // 1. Create Support Ticket
-            const ticket = await prisma.supportTicket?.create({
-                data: {
-                    storeId: params.storeId,
-                    type: this.mapTriggerToType(params.trigger),
-                    category: this.mapTriggerToCategory(params.trigger) as any,
-                    status: status as any,
-                    priority: this.mapTriggerToPriority(params.trigger) as any,
-                    subject: `AI Escalation: ${params.trigger} - ${(params.reason || "").substring(0, 30)}...`,
-                    summary: params.aiSummary,
-                    lastMessageAt: new Date(),
-                },
-            });
-
-            // 2. Create Audit Event
-            await prisma.handoffEvent?.create({
-                data: {
-                    storeId: params.storeId,
-                    conversationId: params.conversationId,
-                    ticketId: ticket.id,
-                    triggerType: params.trigger, // Mapped to triggerType
-                    aiSummary: params.aiSummary,
-                    // reason/metadata omitted if not in schema
-                },
-            });
-
-            logger.info("[EscalationService] Handoff triggered", {
-                ticketId: ticket.id,
-                ...params,
-            });
-
-            return ticket;
+            const response = await api.post('/support/escalation/handoff', params);
+            return response.data;
         }
         catch (error) {
-            logger.error("[EscalationService] Failed to trigger handoff", error);
-            throw error; // Rethrow so the bot knows it failed
+            console.error('[EscalationService] Failed to trigger handoff', error);
+            throw error;
         }
     }
 

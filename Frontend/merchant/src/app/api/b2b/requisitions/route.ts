@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/requisitions",
+        endpoint: "/b2b/requisitions",
         operation: "FETCH_REQUISITIONS",
       }
     );
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/requisitions",
+        endpoint: "/b2b/requisitions",
         operation: "CREATE_REQUISITION",
       }
     );

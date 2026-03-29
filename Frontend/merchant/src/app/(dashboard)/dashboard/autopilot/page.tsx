@@ -64,7 +64,7 @@ export default function AutopilotPage() {
   const loadFeed = useCallback(async () => {
     setError(null);
     try {
-      const addonsData = await apiJson<AddonsResponse>("/api/merchant/addons");
+      const addonsData = await apiJson<AddonsResponse>("/merchant/addons");
       const autopilot = (addonsData?.addOns || []).find(
         (a) => a.id === "vayva.autopilot",
       );
@@ -79,7 +79,7 @@ export default function AutopilotPage() {
       }
 
       const feed = await apiJson<FeedResponse>(
-        "/api/merchant/autopilot/feed?limit=50",
+        "/merchant/autopilot/feed?limit=50",
       );
       setRuns(feed.runs || []);
       setPendingCount(feed.pendingCount ?? 0);
@@ -104,7 +104,7 @@ export default function AutopilotPage() {
     setEvaluating(true);
     setError(null);
     try {
-      await apiJson("/api/merchant/autopilot/evaluate", { method: "POST" });
+      await apiJson("/merchant/autopilot/evaluate", { method: "POST" });
       await loadFeed();
     } catch (e: unknown) {
       const msg =
@@ -119,7 +119,7 @@ export default function AutopilotPage() {
     setActionId(runId);
     setError(null);
     try {
-      await apiJson("/api/merchant/autopilot/action", {
+      await apiJson("/merchant/autopilot/action", {
         method: "POST",
         body: JSON.stringify({ runId, action }),
       });

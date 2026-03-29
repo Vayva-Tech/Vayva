@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { NightlifeService } from '../../../services/industry/nightlife.service';
+import { NightlifeService } from '../../../../services/industry/nightlife.service';
 
 const nightlifeService = new NightlifeService();
 

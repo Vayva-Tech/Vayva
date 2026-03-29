@@ -29,7 +29,7 @@ export function WellnessMembersPage() {
   const fetchMembers = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/members?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/members?limit=500");
       setMembers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch members", error);
@@ -103,7 +103,7 @@ export function WellnessClassesPage() {
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/classes?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/classes?limit=500");
       setClasses(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch classes", error);
@@ -178,7 +178,7 @@ export function WellnessTrainersPage() {
   const fetchTrainers = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/trainers?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/trainers?limit=500");
       setTrainers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch trainers", error);
@@ -248,7 +248,7 @@ export function WellnessMembershipsPage() {
   const fetchMemberships = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/memberships?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/memberships?limit=500");
       setMemberships(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch memberships", error);
@@ -318,7 +318,7 @@ export function WellnessProgressPage() {
   const fetchProgress = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/progress?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/progress?limit=500");
       setProgress(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch progress data", error);
@@ -387,7 +387,7 @@ export function WellnessAppointmentsPage() {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/appointments?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/appointments?limit=500");
       setAppointments(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch appointments", error);
@@ -457,7 +457,7 @@ export function WellnessNutritionPage() {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any[] }>("/api/wellness/nutrition/plans?limit=500");
+      const response = await apiJson<{ data: any[] }>("/wellness/nutrition/plans?limit=500");
       setPlans(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch nutrition plans", error);
@@ -527,7 +527,7 @@ export function WellnessAnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: any }>("/api/wellness/analytics");
+      const response = await apiJson<{ data: any }>("/wellness/analytics");
       setAnalytics(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch analytics", error);

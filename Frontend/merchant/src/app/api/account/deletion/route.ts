@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/account/deletion", operation: "GET" });
+    handleApiError(error, { endpoint: "/account/deletion", operation: "GET" });
     return NextResponse.json({ error: "Failed to get deletion status" }, { status: 500 });
   }
 }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/account/deletion", operation: "POST" });
+    handleApiError(error, { endpoint: "/account/deletion", operation: "POST" });
     return NextResponse.json({ error: "Deletion initiation failed" }, { status: 500 });
   }
 }
@@ -60,7 +60,7 @@ export async function DELETE(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/account/deletion", operation: "DELETE" });
+    handleApiError(error, { endpoint: "/account/deletion", operation: "DELETE" });
     return NextResponse.json({ error: "Failed to cancel deletion" }, { status: 500 });
   }
 }

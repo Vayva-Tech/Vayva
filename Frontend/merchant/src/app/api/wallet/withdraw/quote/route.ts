@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/wallet/withdraw/quote",
+      endpoint: "/wallet/withdraw/quote",
       operation: "POST_WITHDRAW_QUOTE",
     });
     return NextResponse.json(

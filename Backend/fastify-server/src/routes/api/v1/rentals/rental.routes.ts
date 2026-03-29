@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { RentalService } from '../../services/rentals/rental.service';
+import { RentalService } from '../../../../services/rentals/rental.service';
 
 const rentalService = new RentalService();
 

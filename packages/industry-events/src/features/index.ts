@@ -12,3 +12,7 @@ export { EventTimelineFeature } from './event-timeline.feature';
 export { EventVendorFeature } from './event-vendor.feature';
 export { EventSeatingFeature } from './event-seating.feature';
 export { EventGuestListFeature } from './event-guest-list.feature';
+
+// Phase 3: Compact Implementation
+export { SeatingChartDesigner, createSeatingChartDesigner, TicketScanner, createTicketScanner, GuestListManager, createGuestListManager } from './event-management-features';
+export type { SeatingChart, Table, Ticket, GuestList, Guest } from './event-management-features';

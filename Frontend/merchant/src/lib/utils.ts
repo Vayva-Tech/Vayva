@@ -66,7 +66,7 @@ export const telemetry = {
   track: async (eventName: string, properties: Record<string, unknown>) => {
     try {
       // keepalive: true ensures the request completes even if page navigation occurs
-      await apiJson<{ success: boolean }>("/api/telemetry/event", {
+      await apiJson<{ success: boolean }>("/telemetry/event", {
         method: "POST",
         keepalive: true,
         body: JSON.stringify({

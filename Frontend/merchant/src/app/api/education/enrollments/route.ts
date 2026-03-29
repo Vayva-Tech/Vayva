@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma, type Order, type OrderItem, type Customer } from "@vayva/db";
 /**
  * GET /api/education/enrollments
  * Returns all enrollments for courses owned by this store
@@ -63,7 +62,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/education/enrollments",
+      endpoint: "/education/enrollments",
       operation: "GET_ENROLLMENTS",
     });
     return NextResponse.json(

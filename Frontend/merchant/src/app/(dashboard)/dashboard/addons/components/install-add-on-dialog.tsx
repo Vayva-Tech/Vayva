@@ -100,7 +100,7 @@ export function InstallAddOnDialog({
 
   const installDependency = async (dependencyId: string) => {
     try {
-      const res = await fetch('/api/addons/install', {
+      const res = await fetch('/addons/install', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ storeId, addonId: dependencyId }),
@@ -139,7 +139,7 @@ export function InstallAddOnDialog({
     setProgress(steps);
 
     try {
-      const res = await fetch('/api/addons/install', {
+      const res = await fetch('/addons/install', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

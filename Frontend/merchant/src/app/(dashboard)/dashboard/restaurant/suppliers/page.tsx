@@ -32,7 +32,7 @@ export default function RestaurantSuppliersPage() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await apiJson<{ data: Supplier[] }>("/api/restaurant/suppliers?limit=200");
+      const response = await apiJson<{ data: Supplier[] }>("/restaurant/suppliers?limit=200");
       setSuppliers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch suppliers", error);

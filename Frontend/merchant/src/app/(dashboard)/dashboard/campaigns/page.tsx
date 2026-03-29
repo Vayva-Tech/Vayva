@@ -53,7 +53,7 @@ export default function CampaignsPage() {
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<Campaign[]>("/api/marketing/campaigns");
+      const data = await apiJson<Campaign[]>("/marketing/campaigns");
       setCampaigns(data || []);
     } catch (error) {
       logger.error("[FETCH_CAMPAIGNS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" });
@@ -72,7 +72,7 @@ export default function CampaignsPage() {
         await apiJson(`/api/marketing/campaigns/${editingCampaign.id}`, { method: "PUT", body: JSON.stringify(payload) });
         toast.success("Campaign updated");
       } else {
-        await apiJson("/api/marketing/campaigns", { method: "POST", body: JSON.stringify(payload) });
+        await apiJson("/marketing/campaigns", { method: "POST", body: JSON.stringify(payload) });
         toast.success("Campaign created");
       }
       setIsOpen(false);
@@ -263,14 +263,14 @@ export default function CampaignsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50" scope="col">
                 <tr>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Audience</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Campaign</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Type</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Audience</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Performance</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

@@ -117,7 +117,7 @@ export const PinEntryModal = ({
     setIsLoading(true);
     try {
       const endpoint =
-        action === "verify" ? "/api/auth/pin/verify" : "/api/auth/pin/setup";
+        action === "verify" ? "/auth/pin/verify" : "/auth/pin/setup";
 
       const res = await apiJson<VerificationResponse>(endpoint, {
         method: "POST",

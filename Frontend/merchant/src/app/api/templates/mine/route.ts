@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/templates/mine",
+      endpoint: "/templates/mine",
       operation: "GET_TEMPLATES_MINE",
     });
     return NextResponse.json(
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/templates/mine",
+      endpoint: "/templates/mine",
       operation: "POST_TEMPLATES_MINE",
     });
     return NextResponse.json(

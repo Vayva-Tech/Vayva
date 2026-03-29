@@ -51,7 +51,7 @@ export async function GET(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/collections/[id]",
+      endpoint: "/collections/[id]",
       operation: "GET_COLLECTION",
     });
     return NextResponse.json(
@@ -104,7 +104,7 @@ export async function PUT(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/collections/[id]",
+      endpoint: "/collections/[id]",
       operation: "UPDATE_COLLECTION",
     });
     return NextResponse.json(
@@ -153,7 +153,7 @@ export async function DELETE(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/collections/[id]",
+      endpoint: "/collections/[id]",
       operation: "DELETE_COLLECTION",
     });
     return NextResponse.json(

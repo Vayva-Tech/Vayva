@@ -1,0 +1,1 @@
+{"version":3,"file":"lowStockAlert.d.ts","sourceRoot":"","sources":["lowStockAlert.tsx"],"names":[],"mappings":"AAIA,wBAAgB,kBAAkB,CAAC,KAAK,EAAE;IACxC,SAAS,EAAE,MAAM,CAAC;IAClB,QAAQ,EAAE,KAAK,CAAC;QAAE,IAAI,EAAE,MAAM,CAAC;QAAC,SAAS,EAAE,MAAM,CAAA;KAAE,CAAC,CAAC;IACrD,YAAY,EAAE,MAAM,CAAC;CACtB,2CAiEA"}

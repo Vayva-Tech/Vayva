@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/analytics/insights",
+        endpoint: "/analytics/insights",
         operation: "GET_ANALYTICS_INSIGHTS",
       }
     );

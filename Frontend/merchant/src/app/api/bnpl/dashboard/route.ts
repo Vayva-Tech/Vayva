@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@vayva/db";
+import { apiJson } from "@/lib/api-client-shared";
 
 function getString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
@@ -73,96 +73,20 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const statusFilter = (url.searchParams.get("status") || "all").toLowerCase();
 
-    const where: Record<string, unknown> = { storeId };
-    if (statusFilter !== "all") {
-      // UI uses lowercase; DB stores uppercase strings (per schema comment)
-      where.status = statusFilter.toUpperCase();
-    }
-
-    const agreementsRaw = await (prisma as any).bNPLAgreement.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: 200,
-      include: {
-        order: {
-          select: {
-            id: true,
-            customerPhone: true,
-            customerEmail: true,
-            customer: { select: { firstName: true, lastName: true, phone: true, email: true } },
-          },
-        },
-      },
+    const queryParams = new URLSearchParams({
+      status: statusFilter,
     });
 
-    const agreements = (agreementsRaw as any[]).map((a) => {
-      const order = a.order as any;
-      const cust = order?.customer as any;
-      const customerName =
-        [cust?.firstName, cust?.lastName].filter(Boolean).join(" ").trim() ||
-        order?.customerEmail ||
-        cust?.email ||
-        "Customer";
-      const customerPhone = order?.customerPhone || cust?.phone || "—";
-      const customerEmail = order?.customerEmail || cust?.email || "—";
-
-      const totalAmount = Number(a.totalAmount || 0);
-      const currency = String(a.currency || "NGN");
-      const installmentsCount = Number(a.installments || 0) || 4;
-      const installments = parseInstallments(a.installmentData, installmentsCount, totalAmount);
-
-      const upfrontAmount = getNumber((a.metadata as any)?.upfrontAmount) ?? 0;
-      const installmentAmount =
-        getNumber((a.metadata as any)?.installmentAmount) ??
-        (installmentsCount > 0 ? totalAmount / installmentsCount : totalAmount);
-
-      return {
-        id: String(a.id),
-        orderId: String(a.orderId),
-        customerName,
-        customerPhone,
-        customerEmail,
-        provider: String(a.provider || "paystack").toLowerCase(),
-        totalAmount,
-        upfrontAmount,
-        installmentAmount,
-        numberOfInstallments: installmentsCount,
-        status: normalizeStatus(a.status),
-        appliedAt: (a.createdAt ? new Date(a.createdAt) : new Date()).toISOString(),
-        approvedAt: a.updatedAt ? new Date(a.updatedAt).toISOString() : undefined,
-        installments,
-        currency,
-      };
-    });
-
-    const totalAgreements = agreements.length;
-    const activeAgreements = agreements.filter((a) => a.status === "ACTIVE").length;
-    const completedAgreements = agreements.filter((a) => a.status === "COMPLETED").length;
-    const defaultedAgreements = agreements.filter((a) => a.status === "DEFAULTED").length;
-    const totalValue = agreements.reduce((sum, a) => sum + (a.totalAmount || 0), 0);
-    const outstandingValue = agreements
-      .filter((a) => a.status === "ACTIVE" || a.status === "PENDING" || a.status === "APPROVED")
-      .reduce((sum, a) => sum + (a.totalAmount || 0), 0);
-    const avgOrderValue = totalAgreements > 0 ? totalValue / totalAgreements : 0;
-
-    return NextResponse.json(
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/bnpl/dashboard?${queryParams}`,
       {
-        success: true,
-        stats: {
-          totalAgreements,
-          activeAgreements,
-          completedAgreements,
-          defaultedAgreements,
-          totalValue,
-          outstandingValue,
-          avgOrderValue,
-        },
-        agreements,
-      },
-      { headers: { "Cache-Control": "no-store" } },
+        headers: auth.headers,
+      }
     );
+
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/bnpl/dashboard", operation: "GET" });
+    handleApiError(error, { endpoint: "/bnpl/dashboard", operation: "GET" });
     return NextResponse.json({ success: false, error: "Failed to load BNPL dashboard" }, { status: 500 });
   }
 }

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ai-agent/profile",
+      endpoint: "/ai-agent/profile",
       operation: "GET_AI_AGENT_PROFILE",
     });
     return NextResponse.json(

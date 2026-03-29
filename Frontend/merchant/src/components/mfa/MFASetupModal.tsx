@@ -36,7 +36,7 @@ export function MFASetupModal({ isOpen, onClose, onEnabled }: MFASetupModalProps
     setLoading(true);
     setError(null);
     try {
-      const data = await apiJson<SetupResponse>("/api/mfa/setup", {
+      const data = await apiJson<SetupResponse>("/mfa/setup", {
         method: "POST",
       });
 
@@ -70,7 +70,7 @@ export function MFASetupModal({ isOpen, onClose, onEnabled }: MFASetupModalProps
     setLoading(true);
     setError(null);
     try {
-      const data = await apiJson<VerifyResponse>("/api/mfa/verify", {
+      const data = await apiJson<VerifyResponse>("/mfa/verify", {
         method: "POST",
         body: JSON.stringify({
           secret,

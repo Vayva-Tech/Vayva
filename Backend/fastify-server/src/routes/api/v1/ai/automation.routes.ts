@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { AutomationService } from '../../../services/ai/automation.service';
+import { AutomationService } from '../../../../services/ai/automation.service';
 
 const automationService = new AutomationService();
 

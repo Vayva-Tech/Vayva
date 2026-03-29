@@ -75,7 +75,7 @@ export default function CampaignDetailPage() {
       setLoading(true);
       // Fetch campaign details and donations
       const [campaignsRes, donationsRes] = await Promise.all([
-        apiJson<{ data: any[] }>("/api/nonprofit/campaigns"),
+        apiJson<{ data: any[] }>("/nonprofit/campaigns"),
         apiJson<{ data: any[] }>(`/api/nonprofit/donations?campaignId=${campaignId}`),
       ]);
 

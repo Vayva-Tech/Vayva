@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { LeadService } from '../../../services/marketing/lead.service';
+import { LeadService } from '../../../../services/marketing/lead.service';
 
 const leadService = new LeadService();
 

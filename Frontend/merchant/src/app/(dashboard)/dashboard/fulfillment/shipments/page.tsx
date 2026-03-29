@@ -118,7 +118,7 @@ export default function ShipmentsPage() {
       const res = await apiJson<{
         success?: boolean;
         data?: ApiShipmentRow[];
-      }>("/api/fulfillment/shipments");
+      }>("/fulfillment/shipments");
       const rows = res?.data ?? [];
       setShipments(rows.map(mapApiShipment));
       setLoadState("ready");
@@ -327,30 +327,30 @@ export default function ShipmentsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead>
+              <thead scope="col">
                 <tr className="border-b border-gray-100 bg-gray-50/60">
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     Tracking ID
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     Order ID
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     Customer
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     Carrier
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     Ship Date
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" scope="col">
                     ETA
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right" scope="col">
                     Actions
                   </th>
                 </tr>

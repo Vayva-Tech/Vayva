@@ -1,12 +1,23 @@
 /**
  * Centralized client-side API fetch helper with strict typing and error handling.
  * Prevents runtime crashes from empty/unknown JSON responses.
+ *
+ * All API calls go through Fastify backend.
  */
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+
 export async function apiJson<T>(
   input: Parameters<typeof fetch>[0],
   init?: Parameters<typeof fetch>[1],
 ): Promise<T> {
-  const res = await fetch(input, {
+  // If input is a relative path (starts with /), prepend the API base URL
+  const url =
+    typeof input === "string" && input.startsWith("/")
+      ? `${API_BASE}${input}`
+      : input;
+
+  const res = await fetch(url, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -30,8 +41,7 @@ export async function apiJson<T>(
       correlationId?: string | null;
     };
     error.status = res.status;
-    error.correlationId =
-      res.headers?.get?.("x-correlation-id") ?? null;
+    error.correlationId = res.headers?.get?.("x-correlation-id") ?? null;
     throw error;
   }
 

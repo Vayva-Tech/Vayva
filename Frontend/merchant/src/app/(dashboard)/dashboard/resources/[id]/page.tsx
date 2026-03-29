@@ -35,7 +35,7 @@ export default function ResourceDetailPage() {
     const fetchResource = async () => {
       try {
         // Try to get from list API first
-        const res = await fetch("/api/resources/list?type=service");
+        const res = await fetch("/resources/list?type=service");
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         const found = data?.find((r: Resource) => r.id === id);

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,37 +14,21 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query") || "";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-    // Properties for real estate
-    const properties = await prisma.property?.findMany({
-      where: {
-        storeId,
-        ...(query && {
-          OR: [
-            { title: { contains: query, mode: "insensitive" } },
-            { description: { contains: query, mode: "insensitive" } },
-            { address: { contains: query, mode: "insensitive" } },
-            { city: { contains: query, mode: "insensitive" } },
-            { state: { contains: query, mode: "insensitive" } },
-          ],
-        }),
-      },
-      select: {
-        id: true,
-        title: true,
-        price: true,
-        images: true,
-        address: true,
-        city: true,
-        state: true,
-        bedrooms: true,
-        bathrooms: true,
-        status: true,
-      },
-      orderBy: { updatedAt: "desc" },
-      take: limit,
-    }) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
 
-    const formatted = properties.map((prop) => ({
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/properties?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    const formatted = (response.data?.properties || []).map((prop: any) => ({
       id: prop.id,
       name: prop.title,
       price: Number(prop.price) || 0,
@@ -64,7 +46,7 @@ export async function GET(request: NextRequest) {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/editor-data/properties", operation: "GET" });
+    handleApiError(error, { endpoint: "/editor-data/properties", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

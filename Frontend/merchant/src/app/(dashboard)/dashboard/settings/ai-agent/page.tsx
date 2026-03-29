@@ -84,7 +84,7 @@ export default function AiAgentSettingsPage() {
     try {
       setLoading(true);
       const data = await apiJson<AiAgentSettings>(
-        "/api/merchant/settings/ai-agent",
+        "/merchant/settings/ai-agent",
       );
       setSettings(data);
     } catch (error: unknown) {
@@ -104,7 +104,7 @@ export default function AiAgentSettingsPage() {
     setSaving(true);
     try {
       const updated = await apiJson<AiAgentSettings>(
-        "/api/merchant/settings/ai-agent",
+        "/merchant/settings/ai-agent",
         {
           method: "PATCH",
           body: JSON.stringify(settings),
@@ -149,7 +149,7 @@ export default function AiAgentSettingsPage() {
         message: string;
         conversationId: string;
         metadata: { productsCount: number; recentOrders: number };
-      }>("/api/merchant/ai-chat", {
+      }>("/merchant/ai-chat", {
         method: "POST",
         body: JSON.stringify({
           messages: [...chatMessages, userMessage].map((m) => ({

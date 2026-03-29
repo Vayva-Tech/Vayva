@@ -76,7 +76,7 @@ export default function NewEventPage() {
     setLoading(true);
 
     try {
-      await apiJson<{ success: boolean }>("/api/nightlife/events", {
+      await apiJson<{ success: boolean }>("/nightlife/events", {
         method: "POST",
         body: JSON.stringify({ ...formData, ticketTypes }),
       });

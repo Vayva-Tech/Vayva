@@ -37,7 +37,7 @@ export default function BeautyBookingsPage() {
 
   const fetchAppointments = async () => {
     try {
-      const response = await apiJson<{ data: Appointment[] }>("/api/beauty/appointments?limit=200");
+      const response = await apiJson<{ data: Appointment[] }>("/beauty/appointments?limit=200");
       setAppointments(response.data || generateMockAppointments());
     } catch (error) {
       setAppointments(generateMockAppointments());

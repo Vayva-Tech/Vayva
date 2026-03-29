@@ -75,7 +75,7 @@ export default function InsightsPage() {
     const fetchInsights = async () => {
       try {
         setLoading(true);
-        const json = await apiJson<InsightsData>("/api/customers/insights");
+        const json = await apiJson<InsightsData>("/customers/insights");
         if (json && json.stats) {
           setData(json);
         }

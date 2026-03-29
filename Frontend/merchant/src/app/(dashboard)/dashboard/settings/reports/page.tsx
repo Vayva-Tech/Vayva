@@ -66,7 +66,7 @@ export default function ScheduledReportsAdmin() {
   const fetchReports = async () => {
     try {
       // In production: fetch from API
-      // const response = await fetch('/api/reports/schedule');
+      // const response = await fetch('/reports/schedule');
       // const data = await response.json();
       
       // Mock data
@@ -104,7 +104,7 @@ export default function ScheduledReportsAdmin() {
   const handleCreateReport = async () => {
     try {
       // In production: POST to API
-      // await fetch('/api/reports/schedule', {
+      // await fetch('/reports/schedule', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(newReport),

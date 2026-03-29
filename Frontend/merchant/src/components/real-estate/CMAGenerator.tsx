@@ -25,7 +25,7 @@ export const CMAGenerator: React.FC = () => {
 
   const fetchCMAReports = async () => {
     try {
-      const response = await fetch('/api/realestate/cma/reports?limit=5');
+      const response = await fetch('/realestate/cma/reports?limit=5');
       const data = await response.json();
       
       if (data.success) {

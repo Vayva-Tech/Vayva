@@ -43,10 +43,10 @@ export const WithdrawalModal = ({
         setLoading(true);
         try {
           const [eligRes, accRes] = await Promise.all([
-            apiJson<WithdrawalEligibility>("/api/wallet/withdraw/eligibility", {
+            apiJson<WithdrawalEligibility>("/wallet/withdraw/eligibility", {
               signal: controller.signal,
             }),
-            apiJson<PayoutAccount[]>("/api/wallet/payout-accounts", {
+            apiJson<PayoutAccount[]>("/wallet/payout-accounts", {
               signal: controller.signal,
             }),
           ]);
@@ -73,7 +73,7 @@ export const WithdrawalModal = ({
     if (!amount || amount <= 0) return;
     setLoading(true);
     try {
-      const q = await apiJson<WithdrawalQuote>("/api/wallet/withdraw/quote", {
+      const q = await apiJson<WithdrawalQuote>("/wallet/withdraw/quote", {
         method: "POST",
         body: JSON.stringify({
           amount: parseFloat(amount.toString()) || 0,
@@ -97,7 +97,7 @@ export const WithdrawalModal = ({
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      await apiJson<{ success: boolean }>("/api/wallet/withdraw", {
+      await apiJson<{ success: boolean }>("/wallet/withdraw", {
         method: "POST",
         body: JSON.stringify({
           amount: parseFloat(amount.toString()) || 0,

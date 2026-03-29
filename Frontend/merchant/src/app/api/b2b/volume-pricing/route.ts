@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/b2b/volume-pricing", operation: "GET" });
+    handleApiError(error, { endpoint: "/b2b/volume-pricing", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch volume pricing" }, { status: 500 });
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/b2b/volume-pricing", operation: "POST" });
+    handleApiError(error, { endpoint: "/b2b/volume-pricing", operation: "POST" });
     return NextResponse.json({ error: "Failed to create volume pricing" }, { status: 500 });
   }
 }

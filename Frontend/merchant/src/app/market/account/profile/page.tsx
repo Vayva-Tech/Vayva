@@ -40,8 +40,8 @@ export default function MarketAccountProfilePage() {
     try {
       setLoading(true);
       const [profileData, addressesData] = await Promise.all([
-        apiJson<Profile>("/api/market/account/profile"),
-        apiJson<Address[]>("/api/market/account/addresses"),
+        apiJson<Profile>("/market/account/profile"),
+        apiJson<Address[]>("/market/account/addresses"),
       ]);
       setProfile(profileData);
       setAddresses(addressesData || []);
@@ -61,7 +61,7 @@ export default function MarketAccountProfilePage() {
         });
         toast.success("Address updated");
       } else {
-        await apiJson("/api/market/account/addresses", {
+        await apiJson("/market/account/addresses", {
           method: "POST",
           body: JSON.stringify(address),
         });

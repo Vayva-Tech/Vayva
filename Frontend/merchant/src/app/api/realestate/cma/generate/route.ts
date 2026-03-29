@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/realestate/cma/generate", operation: "POST" });
+    handleApiError(error, { endpoint: "/realestate/cma/generate", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

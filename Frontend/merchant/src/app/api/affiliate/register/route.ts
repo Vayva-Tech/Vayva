@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/affiliate/register", operation: "POST" });
+    handleApiError(error, { endpoint: "/affiliate/register", operation: "POST" });
     return NextResponse.json({ error: "Failed to register affiliate" }, { status: 500 });
   }
 }
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/affiliate/register", operation: "PUT" });
+    handleApiError(error, { endpoint: "/affiliate/register", operation: "PUT" });
     return NextResponse.json({ error: "Failed to update bank details" }, { status: 500 });
   }
 }

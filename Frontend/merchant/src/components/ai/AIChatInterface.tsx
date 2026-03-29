@@ -170,7 +170,7 @@ export function AIChatInterface({ industry, storeId, merchantId }: AIChatInterfa
     }, 800);
 
     try {
-      const res = await fetch('/api/merchant/ai-chat', {
+      const res = await fetch('/merchant/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

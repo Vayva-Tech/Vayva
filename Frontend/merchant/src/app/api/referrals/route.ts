@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/referrals", operation: "GET" });
+    handleApiError(error, { endpoint: "/referrals", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

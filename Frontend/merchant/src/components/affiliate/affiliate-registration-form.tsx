@@ -123,7 +123,7 @@ export function AffiliateRegistrationForm({ storeId, onSuccess }: AffiliateRegis
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("/api/affiliate/register", {
+      const response = await fetch("/affiliate/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

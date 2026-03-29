@@ -66,7 +66,7 @@ function CheckoutPageContent() {
 
     try {
       // Initialize Paystack payment
-      const initRes = await fetch("/api/checkout/initialize", {
+      const initRes = await fetch("/checkout/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,7 +106,7 @@ function CheckoutPageContent() {
         callback: async (response: { reference: string }) => {
           try {
             // Verify payment
-            const verifyRes = await fetch("/api/public/checkout/verify", {
+            const verifyRes = await fetch("/public/checkout/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ reference: response.reference }),

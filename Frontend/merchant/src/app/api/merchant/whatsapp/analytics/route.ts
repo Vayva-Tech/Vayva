@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       success: boolean;
       data?: { analytics?: unknown };
       error?: string;
-    }>(buildBackendUrl("/api/merchant/whatsapp/analytics"), {
+    }>(buildBackendUrl("/merchant/whatsapp/analytics"), {
       headers: auth.headers,
     });
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ analytics: result.data?.analytics });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/whatsapp/analytics",
+      endpoint: "/merchant/whatsapp/analytics",
       operation: "GET_WHATSAPP_ANALYTICS",
       storeId,
     });

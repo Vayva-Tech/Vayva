@@ -93,7 +93,7 @@ export function TemplateManager(props: TemplateManagerProps) {
         },
       ];
 
-      await apiJson<TemplateResponse>("/api/settings/whatsapp/templates", {
+      await apiJson<TemplateResponse>("/settings/whatsapp/templates", {
         method: "POST",
         body: JSON.stringify({
           name: newTemplate.name,

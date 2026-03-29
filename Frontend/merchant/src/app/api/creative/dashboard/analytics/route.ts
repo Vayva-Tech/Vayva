@@ -59,7 +59,7 @@ export async function GET(req: Request) {
     });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/creative/dashboard/analytics",
+      endpoint: "/creative/dashboard/analytics",
       operation: "FETCH_ANALYTICS",
     });
 

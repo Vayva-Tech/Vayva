@@ -35,7 +35,7 @@ export const ExtensionsGallery = () => {
     try {
       setLoading(true);
       const data = await apiJson<ExtensionsResponse>(
-        "/api/control-center/extensions",
+        "/control-center/extensions",
       );
       setExtensions(data.extensions || []);
     } catch (error: unknown) {
@@ -53,7 +53,7 @@ export const ExtensionsGallery = () => {
   const handleToggle = async (ext: Extension) => {
     setToggling(ext.id);
     try {
-      await apiJson<{ success: boolean }>("/api/control-center/extensions", {
+      await apiJson<{ success: boolean }>("/control-center/extensions", {
         method: "PATCH",
         body: JSON.stringify({ extensionId: ext.id, enabled: !ext.isEnabled }),
       });

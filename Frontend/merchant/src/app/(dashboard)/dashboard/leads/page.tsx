@@ -116,7 +116,7 @@ export default function LeadsPage() {
 
     setIsSubmitting(true);
     try {
-      const newLead = await apiJson<Lead>("/api/leads", {
+      const newLead = await apiJson<Lead>("/leads", {
         method: "POST",
         body: JSON.stringify({
           ...formData,

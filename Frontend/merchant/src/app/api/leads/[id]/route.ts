@@ -46,7 +46,7 @@ export async function GET(
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/leads/[id]",
+      endpoint: "/leads/[id]",
       operation: "GET_LEAD",
     });
     return NextResponse.json(
@@ -104,7 +104,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/leads/[id]",
+      endpoint: "/leads/[id]",
       operation: "PATCH_LEAD",
     });
     return NextResponse.json(

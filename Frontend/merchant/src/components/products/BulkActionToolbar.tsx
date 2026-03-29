@@ -36,7 +36,7 @@ export function BulkActionToolbar({
     if (selectedCount === 0) return;
     setIsDeleting(true);
     try {
-      const result = await apiJson<BulkActionResponse>("/api/products/bulk-delete", {
+      const result = await apiJson<BulkActionResponse>("/products/bulk-delete", {
         method: "POST",
         body: JSON.stringify({ ids: selectedIds }),
       });
@@ -63,7 +63,7 @@ export function BulkActionToolbar({
     else setIsUnpublishing(true);
 
     try {
-      const result = await apiJson<BulkActionResponse>("/api/products/bulk-status", {
+      const result = await apiJson<BulkActionResponse>("/products/bulk-status", {
         method: "POST",
         body: JSON.stringify({ ids: selectedIds, published: publish }),
       });

@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/dashboard/pro",
+      endpoint: "/dashboard/pro",
       operation: "GET_PRO_DASHBOARD",
     });
     return NextResponse.json(

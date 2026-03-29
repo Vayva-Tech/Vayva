@@ -42,12 +42,12 @@ export default function ProjectsPage() {
 
   useEffect(() => { void fetchProjects(); }, []);
 
-  const fetchProjects = async () => { try { setLoading(true); const data = await apiJson<Project[]>("/api/projects"); setProjects(data || []); } catch (error) { logger.error("[FETCH_PROJECTS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load projects"); } finally { setLoading(false); } };
+  const fetchProjects = async () => { try { setLoading(true); const data = await apiJson<Project[]>("/projects"); setProjects(data || []); } catch (error) { logger.error("[FETCH_PROJECTS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load projects"); } finally { setLoading(false); } };
 
   const handleSave = async () => {
     if (!formData.name) return toast.error("Name is required");
     setIsSubmitting(true);
-    try { const payload = { ...formData, budget: formData.budget ? Number(formData.budget) : null }; if (editingProject) { await apiJson(`/api/projects/${editingProject.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Project updated"); } else { await apiJson("/api/projects", { method: "POST", body: JSON.stringify(payload) }); toast.success("Project created"); } setIsOpen(false); setEditingProject(null); resetForm(); void fetchProjects(); } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
+    try { const payload = { ...formData, budget: formData.budget ? Number(formData.budget) : null }; if (editingProject) { await apiJson(`/api/projects/${editingProject.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Project updated"); } else { await apiJson("/projects", { method: "POST", body: JSON.stringify(payload) }); toast.success("Project created"); } setIsOpen(false); setEditingProject(null); resetForm(); void fetchProjects(); } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
   };
 
   const handleDelete = async (id: string) => { try { await apiJson(`/api/projects/${id}`, { method: "DELETE" }); toast.success("Deleted"); setDeleteConfirm(null); void fetchProjects(); } catch { toast.error("Failed to delete"); } };

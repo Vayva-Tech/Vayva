@@ -107,16 +107,16 @@ export default function GroceryInventoryPage() {
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">SKU</th>
-                  <th className="py-3 px-4 font-medium">Product Name</th>
-                  <th className="py-3 px-4 font-medium">Category</th>
-                  <th className="py-3 px-4 font-medium">Quantity</th>
-                  <th className="py-3 px-4 font-medium">Min/Max</th>
-                  <th className="py-3 px-4 font-medium">Location</th>
-                  <th className="py-3 px-4 font-medium">Last Restocked</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col">SKU</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Product Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Category</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Quantity</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Min/Max</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Location</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Last Restocked</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
                 </tr>
               </thead>
               <tbody>

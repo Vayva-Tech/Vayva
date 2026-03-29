@@ -55,7 +55,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/marketplace/payouts",
+        endpoint: "/marketplace/payouts",
         operation: "FETCH_PAYOUTS",
       }
     );
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/marketplace/payouts/calculate",
+        endpoint: "/marketplace/payouts/calculate",
         operation: "CALCULATE_PAYOUT",
       }
     );
@@ -170,7 +170,7 @@ export async function PATCH(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/marketplace/payouts",
+        endpoint: "/marketplace/payouts",
         operation: "UPDATE_PAYOUT",
       }
     );
@@ -212,7 +212,7 @@ export async function PUT(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/marketplace/payouts/summary",
+        endpoint: "/marketplace/payouts/summary",
         operation: "FETCH_PAYOUT_SUMMARY",
       }
     );

@@ -29,7 +29,7 @@ export async function GET() {
     handleApiError(
       error,
       {
-        endpoint: "/api/payments/banks",
+        endpoint: "/payments/banks",
         operation: "FETCH_BANKS_LIST",
       }
     );

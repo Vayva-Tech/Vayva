@@ -50,7 +50,7 @@ export default function PetCareServicesPage() {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Service[] }>("/api/petcare/services");
+      const response = await apiJson<{ data: Service[] }>("/petcare/services");
       setServices(response.data || []);
     } catch (error) {
       logger.error("Failed to fetch services", error);

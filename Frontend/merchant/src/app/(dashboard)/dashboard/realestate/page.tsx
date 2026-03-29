@@ -150,7 +150,7 @@ export default function RealEstateDashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/realestate/stats");
+      const response = await apiJson<{ data: DashboardStats }>("/realestate/stats");
       setStats(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch real estate stats", error);
@@ -160,7 +160,7 @@ export default function RealEstateDashboardPage() {
 
   const fetchListings = async () => {
     try {
-      const response = await apiJson<{ data: Listing[] }>("/api/realestate/listings?limit=10&status=active");
+      const response = await apiJson<{ data: Listing[] }>("/realestate/listings?limit=10&status=active");
       setListings(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch listings", error);
@@ -170,7 +170,7 @@ export default function RealEstateDashboardPage() {
 
   const fetchShowings = async () => {
     try {
-      const response = await apiJson<{ data: Showing[] }>("/api/realestate/showings?upcoming=true");
+      const response = await apiJson<{ data: Showing[] }>("/realestate/showings?upcoming=true");
       setShowings(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch showings", error);
@@ -180,7 +180,7 @@ export default function RealEstateDashboardPage() {
 
   const fetchContracts = async () => {
     try {
-      const response = await apiJson<{ data: Contract[] }>("/api/realestate/contracts?recent=true");
+      const response = await apiJson<{ data: Contract[] }>("/realestate/contracts?recent=true");
       setRecentContracts(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch contracts", error);

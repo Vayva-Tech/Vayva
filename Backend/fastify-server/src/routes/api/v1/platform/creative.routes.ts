@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { CreativeService } from '../../../services/platform/creative.service';
+import { CreativeService } from '../../../../services/platform/creative.service';
 
 const creativeService = new CreativeService();
 

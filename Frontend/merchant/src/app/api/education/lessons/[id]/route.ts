@@ -36,7 +36,7 @@ export async function PUT(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/lessons/:id", operation: "PUT" });
+    handleApiError(error, { endpoint: "/education/lessons/:id", operation: "PUT" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

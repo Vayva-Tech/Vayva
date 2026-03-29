@@ -24,7 +24,7 @@ export default function BetaDesktopAppPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const me = await apiJson<{ email?: string; user?: { email?: string } }>("/api/me");
+        const me = await apiJson<{ email?: string; user?: { email?: string } }>("/me");
         const resolved = me.email ?? me.user?.email;
         if (!cancelled && resolved) setEmail(resolved);
       } catch {
@@ -40,7 +40,7 @@ export default function BetaDesktopAppPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiJson("/api/beta/desktop-app-waitlist", {
+      await apiJson("/beta/desktop-app-waitlist", {
         method: "POST",
         body: JSON.stringify({ email: email.trim(), interest }),
       });

@@ -36,7 +36,7 @@ export default function SecurityPage() {
     setChangingPassword(true);
     try {
       await apiJson<{ success: boolean }>(
-        "/api/account/security/change-password",
+        "/account/security/change-password",
         {
           method: "POST",
           body: JSON.stringify(passwordForm),

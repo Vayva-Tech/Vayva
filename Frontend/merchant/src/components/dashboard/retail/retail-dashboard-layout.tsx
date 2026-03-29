@@ -25,7 +25,7 @@ export function RetailDashboardLayout({ storeId, className }: RetailDashboardLay
     // Fetch dashboard data from API
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch('/api/retail/dashboard');
+        const response = await fetch('/retail/dashboard');
         const result = await response.json();
         
         if (result.success) {

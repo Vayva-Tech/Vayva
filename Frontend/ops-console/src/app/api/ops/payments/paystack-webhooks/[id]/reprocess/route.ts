@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpsAuthService } from "@/lib/ops-auth";
-import { prisma } from "@vayva/db";
+import { apiClient } from "@/lib/api-client";
 import { logger } from "@vayva/shared";
 
 export const dynamic = "force-dynamic";
 
 /**
  * POST /api/ops/payments/paystack-webhooks/[id]/reprocess
- * Reprocess a Paystack webhook event with idempotency protection
+ * Reprocess a webhook event via backend Fastify API
  * Requires: OPERATOR role or higher
  */
 export async function POST(
@@ -22,87 +22,14 @@ export async function POST(
     const body = await req.json().catch(() => ({}));
     const { reason = "Manual reprocessing by operator" } = body;
 
-    // Find the webhook event using PaymentWebhookEvent model
-    const webhookEvent = await prisma.paymentWebhookEvent.findUnique({
-      where: { id },
-    });
+    // Proxy to backend Fastify API
+    const response = await apiClient.post(
+      `/api/v1/financial/webhooks/${id}/reprocess`,
+      { reason }
+    );
 
-    if (!webhookEvent) {
-      return NextResponse.json(
-        { error: "Webhook event not found" },
-        { status: 404 },
-      );
-    }
-
-    // Check if already processed successfully
-    if (webhookEvent.status === "PROCESSED") {
-      return NextResponse.json(
-        {
-          error: "Event already processed",
-          message: "This webhook event has already been processed successfully",
-          event: {
-            id: webhookEvent.id,
-            provider: webhookEvent.provider,
-            eventType: webhookEvent.eventType,
-            status: webhookEvent.status,
-            processedAt: webhookEvent.processedAt,
-          },
-        },
-        { status: 409 },
-      );
-    }
-
-    // Update status to PENDING for reprocessing
-    await prisma.paymentWebhookEvent.update({
-      where: { id },
-      data: {
-        status: "RECEIVED",
-        error: null,
-      },
-    });
-
-    // Log the reprocessing request
-    logger.info("[PAYSTACK_WEBHOOK_REPROCESS]", {
-      eventId: id,
-      providerEventId: webhookEvent.providerEventId,
-      eventType: webhookEvent.eventType,
-      storeId: webhookEvent.storeId,
-      operatorId: user.id,
-      operatorEmail: user.email,
-      reason,
-      previousStatus: webhookEvent.status,
-    });
-
-    // Create audit log
-    await OpsAuthService.logEvent(user.id, "WEBHOOK_REPROCESS", {
-      targetType: "PaymentWebhookEvent",
-      targetId: id,
-      provider: webhookEvent.provider,
-      eventType: webhookEvent.eventType,
-      storeId: webhookEvent.storeId,
-      reason,
-      previousStatus: webhookEvent.status,
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Webhook event queued for reprocessing",
-      event: {
-        id: webhookEvent.id,
-        provider: webhookEvent.provider,
-        providerEventId: webhookEvent.providerEventId,
-        eventType: webhookEvent.eventType,
-        status: "QUEUED",
-        storeId: webhookEvent.storeId,
-        receivedAt: webhookEvent.receivedAt,
-      },
-      reprocessedBy: {
-        id: user.id,
-        email: user.email,
-      },
-      reason,
-    });
-    } catch (error: unknown) {
+    return NextResponse.json(response);
+  } catch (error: unknown) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

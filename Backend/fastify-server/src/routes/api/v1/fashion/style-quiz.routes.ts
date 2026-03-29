@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { FashionStyleQuizService } from '../../services/fashion/style-quiz.service';
+import { FashionStyleQuizService } from '../../../../services/fashion/style-quiz.service';
 
 const fashionService = new FashionStyleQuizService();
 

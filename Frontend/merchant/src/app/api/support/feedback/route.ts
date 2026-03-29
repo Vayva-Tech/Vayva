@@ -61,7 +61,7 @@ export async function GET(request: Request) {
         handleApiError(
           error,
           {
-            endpoint: "/api/support/feedback",
+            endpoint: "/support/feedback",
             operation: "SUBMIT_FEEDBACK",
           }
         );

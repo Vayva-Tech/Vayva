@@ -149,18 +149,18 @@ export default function RetailDynamicPricingPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Product</th>
-                    <th className="text-left py-3 px-4 font-semibold">Current Price</th>
-                    <th className="text-left py-3 px-4 font-semibold">New Price</th>
-                    <th className="text-left py-3 px-4 font-semibold">Change</th>
-                    <th className="text-left py-3 px-4 font-semibold">Rule Type</th>
-                    <th className="text-left py-3 px-4 font-semibold">Trigger</th>
-                    <th className="text-left py-3 px-4 font-semibold">Duration</th>
-                    <th className="text-left py-3 px-4 font-semibold">Impact</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Product</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Current Price</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">New Price</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Change</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Rule Type</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Trigger</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Duration</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Impact</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

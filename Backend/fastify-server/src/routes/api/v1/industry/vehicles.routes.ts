@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { VehicleService } from '../../../services/industry/vehicle.service';
+import { VehicleService } from '../../../../services/industry/vehicle.service';
 
 const vehicleService = new VehicleService();
 

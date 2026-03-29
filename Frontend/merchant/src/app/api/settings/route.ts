@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
         error,
         {
-            endpoint: "/api/settings",
+            endpoint: "/settings",
             operation: "GET_SETTINGS",
         }
     );
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
         error,
         {
-            endpoint: "/api/settings",
+            endpoint: "/settings",
             operation: "UPDATE_SETTINGS",
         }
     );

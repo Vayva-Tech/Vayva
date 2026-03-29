@@ -104,17 +104,17 @@ export default function RealEstateMarketingPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Campaign</th>
-                  <th className="py-3 px-4 font-medium">Type</th>
-                  <th className="py-3 px-4 font-medium">Budget</th>
-                  <th className="py-3 px-4 font-medium">Spent</th>
-                  <th className="py-3 px-4 font-medium">Impressions</th>
-                  <th className="py-3 px-4 font-medium">Leads</th>
-                  <th className="py-3 px-4 font-medium">ROI</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Campaign</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Type</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Budget</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Spent</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Impressions</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Leads</th>
+                  <th className="py-3 px-4 font-medium" scope="col">ROI</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

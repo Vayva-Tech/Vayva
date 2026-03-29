@@ -69,7 +69,7 @@ export default function DonationDetailPage() {
   const fetchDonation = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<{ data: any[] }>("/api/nonprofit/donations");
+      const data = await apiJson<{ data: any[] }>("/nonprofit/donations");
       const foundDonation = data.data?.find((d: any) => d.id === donationId);
 
       if (!foundDonation) {

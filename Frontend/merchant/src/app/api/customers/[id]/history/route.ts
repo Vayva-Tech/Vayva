@@ -20,7 +20,7 @@ export async function GET(
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/customers/:id/history", operation: "GET" });
+    handleApiError(error, { endpoint: "/customers/:id/history", operation: "GET" });
     return NextResponse.json([], { status: 500 });
   }
 }

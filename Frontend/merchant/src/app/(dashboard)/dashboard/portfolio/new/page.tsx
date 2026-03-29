@@ -21,7 +21,7 @@ export default function NewPortfolioPage() {
 
     setCreating(true);
     try {
-      const res = await fetch("/api/portfolio", {
+      const res = await fetch("/portfolio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

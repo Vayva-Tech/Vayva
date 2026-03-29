@@ -74,7 +74,7 @@ export function QuoteGenerator({
     setLoading(true);
     try {
       const response = await apiJson<{ quote?: Quote; error?: string }>(
-        "/api/shipping/custom/quote",
+        "/shipping/custom/quote",
         {
           method: "POST",
           body: JSON.stringify({

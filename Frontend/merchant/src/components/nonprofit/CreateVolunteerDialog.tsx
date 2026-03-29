@@ -54,7 +54,7 @@ export function CreateVolunteerDialog({ open, onClose, onSuccess }: CreateVolunt
         availability: availability ? JSON.parse(availability) : undefined,
       } as unknown as CreateVolunteerInput;
 
-      const response = await fetch('/api/nonprofit/volunteers', {
+      const response = await fetch('/nonprofit/volunteers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

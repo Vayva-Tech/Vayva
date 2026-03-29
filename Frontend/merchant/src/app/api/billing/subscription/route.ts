@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/billing/subscription",
+      endpoint: "/billing/subscription",
       operation: "GET_SUBSCRIPTION",
     });
     return NextResponse.json(

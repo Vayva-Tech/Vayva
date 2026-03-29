@@ -70,15 +70,15 @@ export default function EducationEnrollmentsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Student</th>
-                  <th className="py-3 px-4 font-medium">Course</th>
-                  <th className="py-3 px-4 font-medium">Enrollment Date</th>
-                  <th className="py-3 px-4 font-medium">Progress</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium">Payment</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Student</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Course</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Enrollment Date</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Progress</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Payment</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

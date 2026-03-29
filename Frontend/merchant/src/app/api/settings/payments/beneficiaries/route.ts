@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/settings/payments/beneficiaries", operation: "GET" });
+    handleApiError(error, { endpoint: "/settings/payments/beneficiaries", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch beneficiaries" }, { status: 500 });
   }
 }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/settings/payments/beneficiaries", operation: "POST" });
+    handleApiError(error, { endpoint: "/settings/payments/beneficiaries", operation: "POST" });
     return NextResponse.json({ error: "Failed to add beneficiary" }, { status: 500 });
   }
 }

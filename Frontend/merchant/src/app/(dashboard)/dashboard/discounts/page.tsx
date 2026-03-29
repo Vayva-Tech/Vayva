@@ -44,7 +44,7 @@ export default function DiscountsPage() {
 
   const fetchDiscounts = async () => {
     try {
-      const data = await apiJson<{ discounts: Discount[] }>("/api/discounts");
+      const data = await apiJson<{ discounts: Discount[] }>("/discounts");
       setDiscounts(data.discounts || []);
     } catch (error) {
       logger.error("[DISCOUNTS_FETCH_ERROR]", { error });
@@ -378,7 +378,7 @@ function CreateDiscountModal({
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiJson("/api/discounts", {
+      await apiJson("/discounts", {
         method: "POST",
         body: JSON.stringify({
           ...form,

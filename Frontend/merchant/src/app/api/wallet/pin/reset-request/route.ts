@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/wallet/pin/reset-request",
+      endpoint: "/wallet/pin/reset-request",
       operation: "POST_WALLET_PIN_RESET_REQUEST",
     });
     return NextResponse.json(

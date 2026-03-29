@@ -105,8 +105,8 @@ export default function VoiceCommerceDashboard() {
   const loadData = async () => {
     try {
       const [sessionsRes, statsRes] = await Promise.all([
-        apiJson<{ sessions: VoiceSession[] }>("/api/voice/sessions"),
-        apiJson<VoiceStats>("/api/voice/stats"),
+        apiJson<{ sessions: VoiceSession[] }>("/voice/sessions"),
+        apiJson<VoiceStats>("/voice/stats"),
       ]);
       setSessions(sessionsRes.sessions || []);
       setStats(statsRes);

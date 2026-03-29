@@ -71,7 +71,7 @@ export default function LegalClientsPage() {
   const fetchClients = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Client[] }>("/api/legal/clients");
+      const response = await apiJson<{ data: Client[] }>("/legal/clients");
       setClients(response.data || generateMockClients());
     } catch (error) {
       setClients(generateMockClients());

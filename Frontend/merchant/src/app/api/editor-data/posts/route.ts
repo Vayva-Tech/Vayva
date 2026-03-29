@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
@@ -15,30 +13,22 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query") || "";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-    const posts = (await prisma.blogPost?.findMany({
-      where: {
-        storeId,
-        ...(query && {
-          OR: [
-            { title: { contains: query, mode: "insensitive" } },
-            { slug: { contains: query, mode: "insensitive" } },
-          ],
-        }),
-      },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        excerpt: true,
-        featuredImage: true,
-        status: true,
-        publishedAt: true,
-      },
-      orderBy: { updatedAt: "desc" },
-      take: limit,
-    })) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
 
-    const formatted = posts.map((p) => ({
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/blog/posts?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    // Transform backend response to match frontend expectations
+    const formatted = (response.data?.posts || []).map((p: any) => ({
       id: p.id,
       name: p.title,
       slug: p.slug,
@@ -54,7 +44,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/editor-data/posts",
+      endpoint: "/editor-data/posts",
       operation: "GET_EDITOR_POSTS",
     });
     return NextResponse.json(

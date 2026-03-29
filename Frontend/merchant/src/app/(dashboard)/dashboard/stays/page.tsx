@@ -44,7 +44,7 @@ export default function StaysPage() {
 
   useEffect(() => { void fetchPackages(); }, []);
 
-  const fetchPackages = async () => { try { setLoading(true); const data = await apiJson<StayPackage[]>("/api/stays"); setPackages(data || []); } catch (error) { logger.error("[FETCH_STAYS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load stays"); } finally { setLoading(false); } };
+  const fetchPackages = async () => { try { setLoading(true); const data = await apiJson<StayPackage[]>("/stays"); setPackages(data || []); } catch (error) { logger.error("[FETCH_STAYS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load stays"); } finally { setLoading(false); } };
 
   const handleSave = async () => {
     if (!formData.name || !formData.location) return toast.error("Name and location required");
@@ -52,7 +52,7 @@ export default function StaysPage() {
     try {
       const payload = { ...formData, pricePerNight: Number(formData.pricePerNight) || 0, maxGuests: Number(formData.maxGuests) || 1, bedrooms: Number(formData.bedrooms) || 0, bathrooms: Number(formData.bathrooms) || 0, amenities: formData.amenities.split(",").map(a => a.trim()).filter(Boolean), images: formData.images.split(",").map(i => i.trim()).filter(Boolean) };
       if (editingPackage) { await apiJson(`/api/stays/${editingPackage.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Stay updated"); }
-      else { await apiJson("/api/stays", { method: "POST", body: JSON.stringify(payload) }); toast.success("Stay created"); }
+      else { await apiJson("/stays", { method: "POST", body: JSON.stringify(payload) }); toast.success("Stay created"); }
       setIsOpen(false); setEditingPackage(null); resetForm(); void fetchPackages();
     } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
   };

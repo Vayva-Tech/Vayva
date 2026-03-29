@@ -69,7 +69,7 @@ export async function POST(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/orders/[id]/delivery/manual-status",
+      endpoint: "/orders/[id]/delivery/manual-status",
       operation: "POST_MANUAL_DELIVERY_STATUS",
     });
     return NextResponse.json(

@@ -35,7 +35,7 @@ export default function MessagesPage() {
     try {
       setLoading(true);
       const result = await apiJson<ConversationsResponse>(
-        "/api/support/conversations",
+        "/support/conversations",
       );
       setConversations(result?.data || []);
     } catch (error: unknown) {

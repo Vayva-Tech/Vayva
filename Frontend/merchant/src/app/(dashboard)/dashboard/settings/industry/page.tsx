@@ -100,7 +100,7 @@ export default function IndustrySettingsPage() {
     setIsLoading(true);
 
     try {
-      await apiJson<{ success: boolean }>("/api/settings/industry", {
+      await apiJson<{ success: boolean }>("/settings/industry", {
         method: "POST",
         body: JSON.stringify({ industrySlug: selectedSlug }),
       });

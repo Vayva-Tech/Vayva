@@ -151,18 +151,18 @@ export default function AutomotiveCRMPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Customer</th>
-                    <th className="text-left py-3 px-4 font-semibold">Type</th>
-                    <th className="text-left py-3 px-4 font-semibold">Contact</th>
-                    <th className="text-left py-3 px-4 font-semibold">Interested Vehicle</th>
-                    <th className="text-left py-3 px-4 font-semibold">Budget</th>
-                    <th className="text-left py-3 px-4 font-semibold">Last Contact</th>
-                    <th className="text-left py-3 px-4 font-semibold">Next Follow-Up</th>
-                    <th className="text-left py-3 px-4 font-semibold">Source</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Customer</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Type</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Contact</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Interested Vehicle</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Budget</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Last Contact</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Next Follow-Up</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Source</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

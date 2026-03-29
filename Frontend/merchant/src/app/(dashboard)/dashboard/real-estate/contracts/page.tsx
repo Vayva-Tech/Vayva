@@ -103,15 +103,15 @@ export default function RealEstateContractsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Property</th>
-                  <th className="py-3 px-4 font-medium">Buyer → Seller</th>
-                  <th className="py-3 px-4 font-medium">Contract Value</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium">Closing Date</th>
-                  <th className="py-3 px-4 font-medium">Contingencies</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Property</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Buyer → Seller</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Contract Value</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Closing Date</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Contingencies</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

@@ -43,7 +43,7 @@ export default function EnrollmentsPage() {
     try {
       setLoading(true);
       const data = await apiJson<Enrollment[] | EnrollmentsResponse>(
-        "/api/education/enrollments",
+        "/education/enrollments",
       );
       const list = Array.isArray(data) ? data : data?.data;
       setEnrollments(Array.isArray(list) ? list : []);

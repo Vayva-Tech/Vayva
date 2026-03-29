@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/products/bulk", operation: "PATCH" });
+    handleApiError(error, { endpoint: "/products/bulk", operation: "PATCH" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 },

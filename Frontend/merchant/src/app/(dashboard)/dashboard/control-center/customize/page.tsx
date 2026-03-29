@@ -45,7 +45,7 @@ export default function StorefrontCustomizePage() {
   const loadDraft = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<DraftResponse>("/api/storefront/draft");
+      const data = await apiJson<DraftResponse>("/storefront/draft");
       setDraft(data?.draft || null);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -77,7 +77,7 @@ export default function StorefrontCustomizePage() {
 
     // 3. Persist to DB (Debounced or on Blur? For now simple patch)
     try {
-      await apiJson<{ success: boolean }>("/api/storefront/draft", {
+      await apiJson<{ success: boolean }>("/storefront/draft", {
         method: "PATCH",
         body: JSON.stringify({ themeConfig: newConfig }),
       });
@@ -90,7 +90,7 @@ export default function StorefrontCustomizePage() {
   const handlePublish = async () => {
     setIsSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/storefront/publish", {
+      await apiJson<{ success: boolean }>("/storefront/publish", {
         method: "POST",
       });
       toast.success("Storefront Published Live!");
@@ -187,10 +187,10 @@ export default function StorefrontCustomizePage() {
 
       <div className="flex-1 flex min-h-0">
         {/* Customizer Sidebar */}
-        <ThemeCustomizer
+        <themeCustomizer
           draft={draft}
           onUpdate={handleUpdate}
-          onReset={() => loadDraft()}
+          onReset={() = scope="col"> loadDraft()}
         />
 
         {/* Preview Area */}

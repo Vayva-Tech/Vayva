@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/error-report",
+        endpoint: "/error-report",
         operation: "LOG_CLIENT_ERROR",
       }
     );

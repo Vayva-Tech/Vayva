@@ -121,16 +121,16 @@ export default function ServicesBookingsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Service</th>
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Contact</th>
-                  <th className="py-3 px-4 font-medium">Date/Time</th>
-                  <th className="py-3 px-4 font-medium">Duration</th>
-                  <th className="py-3 px-4 font-medium">Price</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Service</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Contact</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Date/Time</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Duration</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Price</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

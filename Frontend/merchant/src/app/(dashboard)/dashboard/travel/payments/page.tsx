@@ -37,7 +37,7 @@ export default function TravelPaymentsPage() {
   const fetchPayments = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Payment[] }>("/api/travel/payments?limit=500");
+      const response = await apiJson<{ data: Payment[] }>("/travel/payments?limit=500");
       setPayments(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch payments", error);

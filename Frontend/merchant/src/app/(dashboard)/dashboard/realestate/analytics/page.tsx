@@ -30,7 +30,7 @@ export default function RealEstateAnalyticsPage() {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await apiJson<{ data: AnalyticsMetrics }>("/api/realestate/analytics");
+      const response = await apiJson<{ data: AnalyticsMetrics }>("/realestate/analytics");
       setAnalytics(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch real estate analytics", error);

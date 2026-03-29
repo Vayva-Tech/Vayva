@@ -121,16 +121,16 @@ export default function ServicesClientsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Client Name</th>
-                  <th className="py-3 px-4 font-medium">Company</th>
-                  <th className="py-3 px-4 font-medium">Type</th>
-                  <th className="py-3 px-4 font-medium">Contact Info</th>
-                  <th className="py-3 px-4 font-medium">Active Contracts</th>
-                  <th className="py-3 px-4 font-medium">Total Revenue</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Company</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Type</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Contact Info</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Active Contracts</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Total Revenue</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

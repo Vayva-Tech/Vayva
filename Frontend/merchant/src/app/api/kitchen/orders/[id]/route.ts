@@ -29,7 +29,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     handleApiError(
       error,
       {
-        endpoint: "/api/kitchen/orders/[id]",
+        endpoint: "/kitchen/orders/[id]",
         operation: "UPDATE_ORDER_STATUS",
       }
     );

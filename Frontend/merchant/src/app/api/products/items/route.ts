@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
             },
         });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/products/items", operation: "GET" });
+    handleApiError(error, { endpoint: "/products/items", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

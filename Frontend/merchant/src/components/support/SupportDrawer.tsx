@@ -58,7 +58,7 @@ export const SupportDrawer = ({
     setTicketsLoading(true);
     try {
       const res = await apiJson<{ items?: Ticket[] } | Ticket[]>(
-        "/api/merchant/support/tickets?limit=20",
+        "/merchant/support/tickets?limit=20",
       );
       const items = Array.isArray(res) ? res : res.items || [];
       setTickets(items);
@@ -88,7 +88,7 @@ export const SupportDrawer = ({
     setFormLoading(true);
     setFormError(null);
     try {
-      await apiJson<CreateTicketResponse>("/api/support/create", {
+      await apiJson<CreateTicketResponse>("/support/create", {
         method: "POST",
         body: JSON.stringify({
           subject: formData.subject.trim(),

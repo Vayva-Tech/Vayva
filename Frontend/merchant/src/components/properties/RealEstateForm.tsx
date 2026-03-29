@@ -85,7 +85,7 @@ export function RealEstateForm({
     try {
       const url = initialData
         ? `/api/properties/${initialData.id}`
-        : "/api/properties";
+        : "/properties";
       const method = initialData ? "PUT" : "POST";
 
       const payload = {

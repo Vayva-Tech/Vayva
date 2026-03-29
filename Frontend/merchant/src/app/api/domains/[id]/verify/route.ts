@@ -29,7 +29,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/domains/[id]/verify",
+      endpoint: "/domains/[id]/verify",
       operation: "POST_DOMAIN_VERIFY",
     });
     return NextResponse.json(

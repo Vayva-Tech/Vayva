@@ -17,14 +17,14 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await apiJson<Record<string, unknown>>(
-      buildBackendUrl("/api/auth/merchant/me"),
+      buildBackendUrl("/auth/merchant/me"),
       { headers: auth.headers, cache: "no-store" }
     );
 
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/auth/merchant/me",
+      endpoint: "/auth/merchant/me",
       operation: "GET_MERCHANT_PROFILE",
     });
     return NextResponse.json(

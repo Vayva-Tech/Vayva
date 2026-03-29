@@ -46,7 +46,7 @@ export async function DELETE(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/templates/mine/[id]",
+      endpoint: "/templates/mine/[id]",
       operation: "DELETE_TEMPLATE_MINE",
     });
     return NextResponse.json(

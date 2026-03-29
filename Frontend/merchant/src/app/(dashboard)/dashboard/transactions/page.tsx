@@ -60,8 +60,8 @@ export default function TransactionsPage() {
   const fetchData = async () => {
     try {
       const [txData, settleData] = await Promise.all([
-        apiJson<{ transactions: Transaction[] }>("/api/transactions"),
-        apiJson<{ settlements: Settlement[] }>("/api/settlements"),
+        apiJson<{ transactions: Transaction[] }>("/transactions"),
+        apiJson<{ settlements: Settlement[] }>("/settlements"),
       ]);
       setTransactions(txData.transactions || []);
       setSettlements(settleData.settlements || []);
@@ -231,13 +231,13 @@ function TransactionsTable({ transactions }: { transactions: Transaction[] }) {
 
   return (
     <table className="w-full">
-      <thead className="bg-gray-50 border-b border-gray-200">
+      <thead className="bg-gray-50 border-b border-gray-200" scope="col">
         <tr>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">Transaction</th>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">Type</th>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">Status</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Amount</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Date</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">Transaction</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">Type</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">Status</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Amount</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Date</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border">
@@ -313,14 +313,14 @@ function SettlementsTable({ settlements }: { settlements: Settlement[] }) {
 
   return (
     <table className="w-full">
-      <thead className="bg-gray-50 border-b border-gray-200">
+      <thead className="bg-gray-50 border-b border-gray-200" scope="col">
         <tr>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">Period</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Transactions</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Gross</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Fees</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Net</th>
-          <th className="text-center p-4 text-sm font-bold text-gray-700">Status</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">Period</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Transactions</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Gross</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Fees</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Net</th>
+          <th className="text-center p-4 text-sm font-bold text-gray-700" scope="col">Status</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border">

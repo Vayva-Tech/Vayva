@@ -1,81 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@vayva/db";
 
-type PortfolioFindUnique = (args: unknown) => Promise<unknown | null>;
-
-function getPortfolioFindUnique(): PortfolioFindUnique | null {
-  const raw = prisma as unknown as { portfolio?: { findUnique: PortfolioFindUnique } };
-  return raw.portfolio?.findUnique ?? null;
-}
-
-// Note: Vayva does not use Cloudinary. Beauty gallery reads from DB only.
-
-/**
- * GET /api/beauty/gallery/[id]
- * Get specific photo details
- */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { id } = await params;
-    if (!id) {
-      return NextResponse.json({ error: "Missing id" }, { status: 400 });
-    }
-
     const auth = await buildBackendAuthHeaders(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const storeId = auth.user.storeId;
-    if (!storeId) {
+    if (!auth?.user?.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const findUnique = getPortfolioFindUnique();
-    if (!findUnique) {
-      return NextResponse.json({ error: "Photo not found" }, { status: 404 });
+    const { searchParams } = new URL(request.url);
+    const queryParams = new URLSearchParams();
+    
+    // Forward relevant query parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (value) {
+        queryParams.set(key, value);
+      }
     }
 
-    const photo = await findUnique({
-      where: {
-        id,
-        merchantId: storeId,
-        type: "GALLERY",
-      },
-      include: {
-        stylist: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        service: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
-    });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/beauty/gallery` + (queryParams.toString() ? `?${queryParams}` : ""),
+      { headers: auth.headers }
+    );
 
-    if (!photo) {
-      return NextResponse.json({ error: "Photo not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: photo,
-    });
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, {
-      endpoint: "/api/beauty/gallery/[id]",
-      operation: "GET_GALLERY_PHOTO",
-    });
-    return NextResponse.json({ error: "Failed to fetch gallery photo" }, { status: 500 });
+    handleApiError(error, { endpoint: "/beauty/gallery/[id]/route.ts", operation: "GET" });
+    return NextResponse.json(
+      { error: "Failed to complete operation" },
+      { status: 500 }
+    );
   }
 }

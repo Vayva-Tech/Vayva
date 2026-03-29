@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/loyalty", operation: "GET" });
+    handleApiError(error, { endpoint: "/embedded/loyalty", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch loyalty data" }, { status: 500 });
   }
 }

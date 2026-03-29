@@ -113,7 +113,7 @@ export default function TravelDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/travel/stats");
+      const response = await apiJson<{ data: DashboardStats }>("/travel/stats");
       setStats(response.data || null);
     } catch (error) {
       logger.warn("Failed to fetch travel stats", error);
@@ -123,7 +123,7 @@ export default function TravelDashboard() {
 
   const fetchRecentBookings = async () => {
     try {
-      const response = await apiJson<{ data: Booking[] }>("/api/travel/bookings?limit=10");
+      const response = await apiJson<{ data: Booking[] }>("/travel/bookings?limit=10");
       setRecentBookings(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch recent bookings", error);
@@ -133,7 +133,7 @@ export default function TravelDashboard() {
 
   const fetchPopularDestinations = async () => {
     try {
-      const response = await apiJson<{ data: PopularDestination[] }>("/api/travel/destinations/popular?limit=5");
+      const response = await apiJson<{ data: PopularDestination[] }>("/travel/destinations/popular?limit=5");
       setPopularDestinations(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch popular destinations", error);
@@ -143,7 +143,7 @@ export default function TravelDashboard() {
 
   const fetchUpcomingTrips = async () => {
     try {
-      const response = await apiJson<{ data: UpcomingTrip[] }>("/api/travel/trips/upcoming?limit=5");
+      const response = await apiJson<{ data: UpcomingTrip[] }>("/travel/trips/upcoming?limit=5");
       setUpcomingTrips(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch upcoming trips", error);

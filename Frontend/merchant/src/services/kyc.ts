@@ -1,4 +1,4 @@
-import { prisma, type KycStatus } from "@vayva/db";
+import { api } from '@/lib/api-client';
 import { encrypt } from "@/lib/security/encryption";
 
 export class KycService {
@@ -20,33 +20,19 @@ export class KycService {
             actorUserId: data.actorUserId,
         };
 
-        const record = await prisma.kycRecord?.upsert({
-            where: { storeId },
-            create: {
-                storeId,
-                ninLast4,
-                bvnLast4: "",
-                status: "PENDING",
-                fullNinEncrypted: encrypt(data.nin),
-                audit: [auditEntry],
-            },
-            update: {
-                ninLast4,
-                status: "PENDING",
-                fullNinEncrypted: encrypt(data.nin),
-                audit: { push: auditEntry },
-            },
-        });
-
-        await prisma.store?.update({
-            where: { id: storeId },
-            data: { kycStatus: "PENDING" },
+        // Call backend API to submit KYC for review
+        const response = await api.post('/kyc/submit', {
+            storeId,
+            nin: encrypt(data.nin),
+            cacNumber: data.cacNumber,
+            consent: data.consent,
+            auditEntry,
         });
 
         return {
-            success: true,
-            status: "pending" as KycStatus,
-            recordId: record.id,
+            success: response.success,
+            status: response.data?.status || 'pending',
+            recordId: response.data?.id,
         };
     }
 }

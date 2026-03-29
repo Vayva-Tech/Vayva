@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,29 +14,21 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query") || "";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-    // Menu items / dishes for food businesses
-    const dishes = await prisma.menuItem?.findMany({
-      where: {
-        storeId,
-        ...(query && {
-          OR: [
-            { name: { contains: query, mode: "insensitive" } },
-            { description: { contains: query, mode: "insensitive" } },
-          ],
-        }),
-      },
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        imageUrl: true,
-        category: true,
-      },
-      orderBy: { updatedAt: "desc" },
-      take: limit,
-    }) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
 
-    const formatted = dishes.map((dish) => ({
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/restaurant/menu-items?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    const formatted = (response.data?.menuItems || []).map((dish: any) => ({
       id: dish.id,
       name: dish.name,
       price: Number(dish.price) || 0,
@@ -53,7 +43,7 @@ export async function GET(request: NextRequest) {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/editor-data/dishes", operation: "GET" });
+    handleApiError(error, { endpoint: "/editor-data/dishes", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -53,7 +53,7 @@ export function CampaignsList() {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await fetch('/api/nonprofit/campaigns');
+      const response = await fetch('/nonprofit/campaigns');
       if (response.ok) {
         const data = await response.json();
         setCampaigns(data.campaigns || []);

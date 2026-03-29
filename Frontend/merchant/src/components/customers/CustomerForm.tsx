@@ -57,7 +57,7 @@ export function CustomerForm({ initialData, onSuccess }: CustomerFormProps) {
 
       const url = initialData
         ? `/api/customers/${initialData.id}`
-        : "/api/customers";
+        : "/customers";
       const method = initialData ? "PUT" : "POST";
 
       await apiJson<CustomerUpdateResponse>(url, {

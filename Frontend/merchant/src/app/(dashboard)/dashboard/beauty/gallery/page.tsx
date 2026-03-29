@@ -69,7 +69,7 @@ export default function BeautyGalleryPage() {
       formData.append("isBeforeAfter", uploadForm.isBeforeAfter.toString());
       formData.append("requiresApproval", uploadForm.requiresApproval.toString());
 
-      const response = await fetch("/api/beauty/gallery", {
+      const response = await fetch("/beauty/gallery", {
         method: "POST",
         body: formData,
       });

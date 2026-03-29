@@ -22,7 +22,7 @@ export async function GET(
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/workflows/[id]",
+      endpoint: "/workflows/[id]",
       operation: "GET_WORKFLOW",
     });
     return NextResponse.json({ error: "Failed to load workflow" }, { status: 500 });
@@ -51,7 +51,7 @@ export async function PUT(
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/workflows/[id]",
+      endpoint: "/workflows/[id]",
       operation: "PUT_WORKFLOW",
     });
     return NextResponse.json({ error: "Failed to update workflow" }, { status: 500 });
@@ -82,7 +82,7 @@ export async function DELETE(
     return NextResponse.json(body, { status: res.status });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/workflows/[id]",
+      endpoint: "/workflows/[id]",
       operation: "DELETE_WORKFLOW",
     });
     return NextResponse.json({ error: "Failed to delete workflow" }, { status: 500 });

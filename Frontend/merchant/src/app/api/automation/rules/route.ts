@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/automation/rules",
+      endpoint: "/automation/rules",
       operation: "GET_AUTOMATION_RULES",
     });
     return NextResponse.json(

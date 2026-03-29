@@ -5,7 +5,7 @@ import { GET as getDomains } from "./domains/route";
 import { POST as verifyDomain } from "./domains/verify/route";
 import { POST as changePassword } from "./security/change-password/route";
 import { requireAuth } from "@/lib/auth/session";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@vayva/db"; // Direct import for tests only
 import bcrypt from "bcryptjs";
 const testStoreId = "store_test_999";
 const testUserId = "user_test_999";

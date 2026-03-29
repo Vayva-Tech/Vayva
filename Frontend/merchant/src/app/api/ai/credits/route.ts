@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ai/credits",
+      endpoint: "/ai/credits",
       operation: "GET_AI_CREDITS",
     });
     return NextResponse.json(

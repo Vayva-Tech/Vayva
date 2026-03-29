@@ -80,7 +80,7 @@ export function PredictiveInsights({ storeId, className }: PredictiveInsightsPro
     const fetchChurnPrediction = async () => {
         try {
             setLoading(prev => ({ ...prev, churn: true }));
-            const response = await fetch('/api/v1/analytics/predictive/churn', {
+            const response = await fetch('/v1/analytics/predictive/churn', {
                 method: 'POST',
             });
             if (response.ok) {
@@ -95,7 +95,7 @@ export function PredictiveInsights({ storeId, className }: PredictiveInsightsPro
     const fetchInventoryForecasts = async () => {
         try {
             setLoading(prev => ({ ...prev, inventory: true }));
-            const response = await fetch('/api/v1/analytics/predictive/inventory', {
+            const response = await fetch('/v1/analytics/predictive/inventory', {
                 method: 'POST',
             });
             if (response.ok) {
@@ -110,7 +110,7 @@ export function PredictiveInsights({ storeId, className }: PredictiveInsightsPro
     const fetchRevenuePrediction = async () => {
         try {
             setLoading(prev => ({ ...prev, revenue: true }));
-            const response = await fetch('/api/v1/analytics/predictive/revenue', {
+            const response = await fetch('/v1/analytics/predictive/revenue', {
                 method: 'POST',
             });
             if (response.ok) {

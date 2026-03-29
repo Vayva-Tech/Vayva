@@ -103,7 +103,7 @@ export default function AccountEditPage() {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<MerchantProfile>("/api/account/profile");
+      const data = await apiJson<MerchantProfile>("/account/profile");
       if (data) {
         setProfile(data);
       }
@@ -123,7 +123,7 @@ export default function AccountEditPage() {
     if (!otpDialog.canResend) return;
     setOtpDialog({ ...otpDialog, sendingOtp: true, canResend: false });
     try {
-      await apiJson<{ success: boolean }>("/api/account/otp/send", {
+      await apiJson<{ success: boolean }>("/account/otp/send", {
         method: "POST",
         body: JSON.stringify({
           field: otpDialog.field,
@@ -150,7 +150,7 @@ export default function AccountEditPage() {
 
     setOtpDialog({ ...otpDialog, verifyingOtp: true });
     try {
-      await apiJson<{ success: boolean }>("/api/account/otp/verify", {
+      await apiJson<{ success: boolean }>("/account/otp/verify", {
         method: "POST",
         body: JSON.stringify({
           field: otpDialog.field,
@@ -183,7 +183,7 @@ export default function AccountEditPage() {
     if (saving) return;
     setSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/account/profile", {
+      await apiJson<{ success: boolean }>("/account/profile", {
         method: "PATCH",
         body: JSON.stringify(profile),
       });
@@ -206,7 +206,7 @@ export default function AccountEditPage() {
 
     setDeleteDialog({ ...deleteDialog, deleting: true });
     try {
-      await apiJson<{ success: boolean }>("/api/account/deletion", {
+      await apiJson<{ success: boolean }>("/account/deletion", {
         method: "POST",
       });
       toast.success("Account deletion initiated. You will be logged out.");

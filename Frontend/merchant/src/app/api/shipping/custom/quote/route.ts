@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/shipping/custom/quote",
+      endpoint: "/shipping/custom/quote",
       operation: "CREATE_CUSTOM_QUOTE",
     });
     return NextResponse.json(

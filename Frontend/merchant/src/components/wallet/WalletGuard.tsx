@@ -51,7 +51,7 @@ export default function WalletGuard({ children }: WalletGuardProps) {
 
     try {
       const data = await apiJson<WalletPinVerifyResponse>(
-        "/api/wallet/pin/verify",
+        "/wallet/pin/verify",
         {
           method: "POST",
           body: JSON.stringify({ pin }),
@@ -95,7 +95,7 @@ export default function WalletGuard({ children }: WalletGuardProps) {
     try {
       toast.info("Sending reset link...");
       const d = await apiJson<WalletPinResetResponse>(
-        "/api/wallet/pin/reset-request",
+        "/wallet/pin/reset-request",
         { method: "POST" },
       );
       toast.success(d?.message || "Reset link sent");

@@ -40,7 +40,7 @@ export function CheckoutRedirectErrorHandler({ expectedPlan, email }: CheckoutRe
 
         // Try to fetch store status to verify plan
         try {
-          const response = await fetch("/api/merchant/store/status", {
+          const response = await fetch("/merchant/store/status", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
           });

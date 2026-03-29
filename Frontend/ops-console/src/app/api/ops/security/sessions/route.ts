@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@vayva/db";
 import { OpsAuthService } from "@/lib/ops-auth";
+import { apiClient } from "@/lib/api-client";
 
 export const dynamic = "force-dynamic";
 
@@ -10,18 +10,8 @@ export async function GET(_request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  const sessions = await prisma.merchantSession.findMany({
-    where: {
-      expiresAt: { gt: new Date() }, // Only active sessions
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: {
-        select: { email: true, firstName: true, lastName: true },
-      },
-    },
-    take: 50,
-  });
-
-  return NextResponse.json({ data: sessions });
+  // Proxy to backend Fastify API
+  const response = await apiClient.get('/api/v1/compliance/sessions/ops');
+  
+  return NextResponse.json(response);
 }

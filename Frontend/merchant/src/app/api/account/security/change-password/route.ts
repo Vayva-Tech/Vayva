@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/security/change-password",
+      endpoint: "/account/security/change-password",
       operation: "CHANGE_PASSWORD",
     });
     return NextResponse.json(

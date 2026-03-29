@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 // GET /api/education/progress?courseId=xxx - Get student progress for a course
 export async function GET(request: NextRequest) {
@@ -23,37 +22,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify course belongs to store
-    const course = await (prisma as any).educationCourse.findFirst({
-      where: { id: courseId, storeId },
-    });
-
-    if (!course) {
-      return NextResponse.json(
-        { success: false, error: "Course not found" },
-        { status: 404 }
-      );
-    }
-
-    let where: Record<string, unknown> = { courseId };
+    // Fetch progress via backend API
+    const params: Record<string, string> = { courseId };
     if (studentId) {
-      where.studentId = studentId;
+      params.studentId = studentId;
     }
 
-    const progress = await (prisma as any).educationProgress.findMany({
-      where,
-      include: {
-        lesson: {
-          select: {
-            id: true,
-            title: true,
-            type: true,
-          },
-        },
-      },
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/education/progress`, {
+      method: 'GET',
+      headers: auth.headers,
     });
 
-    return NextResponse.json({ success: true, data: progress });
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
       endpoint: '/api/education/progress',

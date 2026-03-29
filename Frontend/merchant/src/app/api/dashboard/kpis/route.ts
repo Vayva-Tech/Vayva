@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Call backend API
-      const result = await apiJson(`${buildBackendUrl("/api/dashboard/kpis")}`,
+      const result = await apiJson(`${buildBackendUrl("/dashboard/kpis")}`,
       {
           headers: auth.headers,
         }
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/dashboard/kpis", operation: "GET" });
+    handleApiError(error, { endpoint: "/dashboard/kpis", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/appointments", operation: "GET" });
+    handleApiError(error, { endpoint: "/beauty/appointments", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch appointments" }, { status: 500 });
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/appointments", operation: "POST" });
+    handleApiError(error, { endpoint: "/beauty/appointments", operation: "POST" });
     return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
   }
 }

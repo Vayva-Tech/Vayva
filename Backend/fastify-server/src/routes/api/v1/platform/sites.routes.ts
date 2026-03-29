@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { SiteService } from '../../../services/platform/site.service';
+import { SiteService } from '../../../../services/platform/site.service';
 
 const siteService = new SiteService();
 

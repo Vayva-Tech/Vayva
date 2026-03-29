@@ -33,7 +33,7 @@ export default function RestaurantMenuPage() {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await apiJson<{ data: MenuItem[] }>("/api/restaurant/menu?limit=500");
+      const response = await apiJson<{ data: MenuItem[] }>("/restaurant/menu?limit=500");
       setMenuItems(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch menu items", error);

@@ -57,8 +57,8 @@ export default function InventoryLocationsPage() {
   const fetchData = async () => {
     try {
       const [locData, transferData] = await Promise.all([
-        apiJson<{ locations: Location[] }>("/api/inventory/locations"),
-        apiJson<{ transfers: StockTransfer[] }>("/api/inventory/transfers"),
+        apiJson<{ locations: Location[] }>("/inventory/locations"),
+        apiJson<{ transfers: StockTransfer[] }>("/inventory/transfers"),
       ]);
       setLocations(locData.locations || []);
       setTransfers(transferData.transfers || []);
@@ -425,14 +425,14 @@ function TransfersList({
 
   return (
     <table className="w-full">
-      <thead className="bg-gray-50 border-b border-gray-200">
+      <thead className="bg-gray-50 border-b border-gray-200" scope="col">
         <tr>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">Product</th>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">From</th>
-          <th className="text-left p-4 text-sm font-bold text-gray-700">To</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Quantity</th>
-          <th className="text-center p-4 text-sm font-bold text-gray-700">Status</th>
-          <th className="text-right p-4 text-sm font-bold text-gray-700">Date</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">Product</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">From</th>
+          <th className="text-left p-4 text-sm font-bold text-gray-700" scope="col">To</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Quantity</th>
+          <th className="text-center p-4 text-sm font-bold text-gray-700" scope="col">Status</th>
+          <th className="text-right p-4 text-sm font-bold text-gray-700" scope="col">Date</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border">
@@ -518,7 +518,7 @@ function CreateLocationModal({
         });
         toast.success("Location updated successfully");
       } else {
-        await apiJson("/api/inventory/locations", {
+        await apiJson("/inventory/locations", {
           method: "POST",
           body: JSON.stringify(form),
         });

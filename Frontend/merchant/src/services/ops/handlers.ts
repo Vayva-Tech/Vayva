@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { OpsAuthService } from "@/lib/ops-auth";
 import { KycStatus } from "@vayva/db";
 import { z } from "zod";
@@ -15,6 +14,7 @@ import {
     OpsLoginResponseData,
     logger
 } from "@vayva/shared";
+import { api } from '@/lib/api-client';
 
 interface KycAuditItem {
     firstName?: string;
@@ -95,36 +95,8 @@ export async function handleGetMerchants(
     const query = searchParams.get("query") || "";
 
     try {
-        const merchants = await prisma.store?.findMany({
-            where: {
-                OR: [
-                    { name: { contains: query, mode: "insensitive" } },
-                    { slug: { contains: query, mode: "insensitive" } },
-                ],
-            },
-            include: {
-                kycRecord: true,
-                aiSubscription: true,
-            },
-            orderBy: { createdAt: "desc" },
-            take: 50,
-        });
-
-        const formatted: MerchantListItem[] = (merchants as StoreWithRelations[]).map((m) => {
-            const aiSub = m.aiSubscription;
-            const kyc = m.kycRecord;
-
-            return {
-                id: m.id,
-                name: m.name,
-                slug: m.slug,
-                ownerEmail: "Unknown",
-                plan: aiSub?.planKey || "FREE",
-                kycStatus: kyc?.status || "PENDING",
-                createdAt: m.createdAt?.toISOString(),
-                lastActive: m.updatedAt?.toISOString(),
-            };
-        });
+        const response = await api.get('/ops/merchants', { query });
+        const formatted: MerchantListItem[] = response.data?.merchants || [];
 
         return NextResponse.json({
             success: true,
@@ -161,43 +133,25 @@ export async function handleGetKyc(
     const status = searchParams.get("status") || "pending";
 
     try {
-        const records = await prisma.kycRecord?.findMany({
-            where: { status: status as KycStatus },
-            include: {
-                store: {
-                    include: {
-                        aiSubscription: true,
-                    },
-                },
-            },
-            orderBy: { createdAt: "desc" },
-            take: 100,
-        });
-
-        const formatted: KycListItem[] = (records as unknown as KycRecordWithStore[]).map((r) => {
-            const auditData = (r.audit as unknown as KycAuditItem[]) || [];
-            const latestAttempt =
-                Array.isArray(auditData) && auditData.length > 0 ? auditData[auditData.length - 1] : {};
-
-            const store = r.store;
-
-            return {
-                id: r.id,
-                storeId: r.storeId,
-                storeName: store?.name || "Unknown Store",
-                ownerName: latestAttempt?.firstName
-                    ? `${latestAttempt.firstName} ${latestAttempt.lastName}`
-                    : "Merchant",
-                method: latestAttempt?.method || "Unknown",
-                provider: latestAttempt?.provider || "Internal",
-                status: (r as any).status,
-                attemptTime: r.createdAt?.toISOString(),
-                plan: store?.aiSubscription?.planKey || "FREE",
-            };
-        });
+        const response = await api.get('/ops/kyc', { status });
+        const formatted: KycListItem[] = response.data?.kycRecords || [];
 
         return NextResponse.json({
             success: true,
+            data: { kycRecords: formatted }
+        });
+    } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        logger.error("[OPS_GET_KYC_ERROR]", { error: error.message });
+        return NextResponse.json(
+            {
+                success: false,
+                error: { code: ApiErrorCode.INTERNAL_SERVER_ERROR, message: "Internal server error" }
+            },
+            { status: 500 }
+        );
+    }
+}
             data: { records: formatted }
         });
     } catch (err: unknown) {
@@ -239,24 +193,8 @@ export async function handleGetOpsUsers(
     }
 
     try {
-        const users = await prisma.opsUser?.findMany({
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-                isActive: true,
-                lastLoginAt: true,
-                createdAt: true,
-            },
-            orderBy: { createdAt: "desc" },
-        });
-
-        const formatted: OpsUserListItem[] = users.map((u: any) => ({
-            ...u,
-            lastLoginAt: u.lastLoginAt?.toISOString() || null,
-            createdAt: u.createdAt?.toISOString(),
-        }));
+        const response = await api.get('/ops/users');
+        const formatted: OpsUserListItem[] = response.data || [];
 
         return NextResponse.json({
             success: true,

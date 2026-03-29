@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma, type Product, type ProductVariant } from "@vayva/db";
 
 const VALID_ORDER_STATUSES = ["PAID", "PROCESSING", "COMPLETED", "DELIVERED"];
 
@@ -84,7 +83,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/nightlife/events/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/nightlife/events/:id", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

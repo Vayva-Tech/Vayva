@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data, { status: res.status });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/autopilot/feed",
+      endpoint: "/merchant/autopilot/feed",
       operation: "GET_AUTOPILOT_FEED",
     });
     return NextResponse.json(

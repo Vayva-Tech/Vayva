@@ -61,7 +61,7 @@ export function DonationsList() {
 
   const fetchDonations = async () => {
     try {
-      const response = await fetch('/api/nonprofit/donations');
+      const response = await fetch('/nonprofit/donations');
       if (response.ok) {
         const data = await response.json();
         setDonations(data.donations || []);

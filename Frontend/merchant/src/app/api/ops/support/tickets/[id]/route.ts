@@ -53,7 +53,7 @@ export async function GET(
     return NextResponse.json({ ticket: result.data });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ops/support/tickets/[id]",
+      endpoint: "/ops/support/tickets/[id]",
       operation: "GET_TICKET_DETAILS",
     });
     logger.error("[OPS_TICKET_GET] Failed to fetch ticket", {

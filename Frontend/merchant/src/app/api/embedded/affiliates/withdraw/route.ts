@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/embedded/affiliates/withdraw", operation: "POST" });
+    handleApiError(error, { endpoint: "/embedded/affiliates/withdraw", operation: "POST" });
     return NextResponse.json({ error: "Failed to process withdrawal" }, { status: 500 });
   }
 }

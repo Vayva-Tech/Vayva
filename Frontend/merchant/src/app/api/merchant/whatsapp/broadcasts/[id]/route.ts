@@ -24,7 +24,7 @@ export async function GET(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/whatsapp/broadcasts/[id]",
+      endpoint: "/merchant/whatsapp/broadcasts/[id]",
       operation: "GET",
       storeId,
     });
@@ -65,7 +65,7 @@ export async function PATCH(
     return NextResponse.json(result.data);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/whatsapp/broadcasts/[id]",
+      endpoint: "/merchant/whatsapp/broadcasts/[id]",
       operation: "PATCH",
       storeId,
     });
@@ -104,7 +104,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/whatsapp/broadcasts/[id]",
+      endpoint: "/merchant/whatsapp/broadcasts/[id]",
       operation: "DELETE",
       storeId,
     });

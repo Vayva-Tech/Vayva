@@ -65,7 +65,7 @@ export function NotificationPreferencesPanel() {
   const fetchPreferences = async () => {
     try {
       const data = await apiJson<{ preferences: NotificationPreferences }>(
-        "/api/notifications/preferences",
+        "/notifications/preferences",
         { method: "GET" }
       );
       if (data.preferences) {
@@ -81,7 +81,7 @@ export function NotificationPreferencesPanel() {
   const savePreferences = async () => {
     setSaving(true);
     try {
-      await apiJson("/api/notifications/preferences", {
+      await apiJson("/notifications/preferences", {
         method: "POST",
         body: JSON.stringify({ preferences }),
       });
@@ -193,7 +193,7 @@ export function useRealtimeNotifications() {
 
     const connect = () => {
       try {
-        eventSource = new EventSource("/api/notifications/stream");
+        eventSource = new EventSource("/notifications/stream");
 
         eventSource.onopen = () => {
           setConnected(true);

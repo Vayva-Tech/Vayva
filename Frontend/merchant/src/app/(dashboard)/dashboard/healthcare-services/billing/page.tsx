@@ -32,7 +32,7 @@ export default function HealthcareBillingPage() {
 
   const fetchClaims = async () => {
     try {
-      const response = await apiJson<{ data: Claim[] }>("/api/healthcare/claims?limit=100");
+      const response = await apiJson<{ data: Claim[] }>("/healthcare/claims?limit=100");
       setClaims(response.data || generateMockClaims());
     } catch (error) {
       setClaims(generateMockClaims());

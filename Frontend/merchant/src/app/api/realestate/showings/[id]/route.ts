@@ -20,7 +20,7 @@ export async function GET(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/realestate/showings/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/realestate/showings/:id", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

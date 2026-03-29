@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,60 +12,29 @@ export async function GET(request: NextRequest) {
     }
     const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
-      const moduleId = searchParams.get("moduleId");
-      const courseId = searchParams.get("courseId");
+    const moduleId = searchParams.get("moduleId");
+    const courseId = searchParams.get("courseId");
 
-      if (!moduleId && !courseId) {
-        return NextResponse.json(
-          { success: false, error: "moduleId or courseId is required" },
-          { status: 400 }
-        );
-      }
+    if (!moduleId && !courseId) {
+      return NextResponse.json(
+        { success: false, error: "moduleId or courseId is required" },
+        { status: 400 }
+      );
+    }
 
-      let where: Record<string, unknown> = {};
+    // Fetch lessons via backend API
+    const params: Record<string, string> = {};
+    if (moduleId) params.moduleId = moduleId;
+    if (courseId) params.courseId = courseId;
+    
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/education/lessons?${new URLSearchParams(params)}`, {
+      method: 'GET',
+      headers: auth.headers,
+    });
 
-      if (moduleId) {
-        where = {
-          moduleId,
-          module: {
-            course: { storeId },
-          },
-        };
-      } else {
-        where = {
-          module: {
-            courseId,
-            course: { storeId },
-          },
-        };
-      }
-
-      const lessons = await (prisma as any).educationLesson.findMany({
-        where,
-        include: {
-          module: {
-            select: {
-              id: true,
-              title: true,
-              courseId: true,
-            },
-          },
-          _count: {
-            select: {
-              assignments: true,
-              quizzes: true,
-            },
-          },
-        },
-        orderBy: { order: "asc" },
-      });
-
-      return NextResponse.json({
-        success: true,
-        data: lessons,
-      });
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/education/lessons", operation: "GET" });
+    handleApiError(error, { endpoint: "/education/lessons", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

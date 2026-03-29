@@ -162,8 +162,8 @@ export default function CatalogMigrationDashboard() {
   const loadData = async () => {
     try {
       const [jobsRes, statsRes] = await Promise.all([
-        apiJson<{ jobs: MigrationJob[] }>("/api/migration/jobs"),
-        apiJson<MigrationStats>("/api/migration/stats"),
+        apiJson<{ jobs: MigrationJob[] }>("/migration/jobs"),
+        apiJson<MigrationStats>("/migration/stats"),
       ]);
       setJobs(jobsRes.jobs || []);
       setStats(statsRes);
@@ -199,7 +199,7 @@ export default function CatalogMigrationDashboard() {
     settings: MigrationJob["settings"];
   }) => {
     try {
-      await apiJson("/api/migration/jobs", {
+      await apiJson("/migration/jobs", {
         method: "POST",
         body: JSON.stringify(data),
       });

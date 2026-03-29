@@ -31,7 +31,7 @@ export async function DELETE(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/variants/[variantId]",
+      endpoint: "/products/[id]/variants/[variantId]",
       operation: "DELETE_VARIANT",
     });
     return NextResponse.json(
@@ -71,7 +71,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/variants/[variantId]",
+      endpoint: "/products/[id]/variants/[variantId]",
       operation: "PATCH_VARIANT",
     });
     return NextResponse.json(

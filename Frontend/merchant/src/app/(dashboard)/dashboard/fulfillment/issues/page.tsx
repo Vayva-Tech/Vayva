@@ -72,7 +72,7 @@ export default function DeliveryIssuesPage() {
     else setRefreshing(true);
     try {
       const result = await apiJson<ShipmentsResponse>(
-        "/api/fulfillment/shipments?issue=true",
+        "/fulfillment/shipments?issue=true",
       );
       setForbidden(false);
       setIssues(Array.isArray(result?.data) ? result.data : []);
@@ -122,7 +122,7 @@ export default function DeliveryIssuesPage() {
       const subject = `Support Call Request - #${shipment.orderNumber}`;
       const description = `Merchant requested a support call regarding shipment for order #${shipment.orderNumber}. Issue: ${shipment.status}`;
 
-      await apiJson<{ success: boolean }>("/api/support/tickets", {
+      await apiJson<{ success: boolean }>("/support/tickets", {
         method: "POST",
         body: JSON.stringify({
           type: "FULFILLMENT_ISSUE",
@@ -168,7 +168,7 @@ export default function DeliveryIssuesPage() {
       formData.append("file", evidenceFile);
       formData.append("folder", "evidence");
 
-      const uploadRes = await fetch("/api/storage/upload", {
+      const uploadRes = await fetch("/storage/upload", {
         method: "POST",
         body: formData,
       });
@@ -184,7 +184,7 @@ export default function DeliveryIssuesPage() {
       const url = uploadData.url;
 
       // 2. Submit Ticket
-      await apiJson<{ success: boolean }>("/api/support/tickets", {
+      await apiJson<{ success: boolean }>("/support/tickets", {
         method: "POST",
         body: JSON.stringify({
           type: "FULFILLMENT_EVIDENCE",
@@ -272,13 +272,13 @@ export default function DeliveryIssuesPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
+              <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100" scope="col">
                 <tr>
-                  <th className="px-6 py-3">Order</th>
-                  <th className="px-6 py-3">Issue Type</th>
-                  <th className="px-6 py-3">Carrier</th>
-                  <th className="px-6 py-3">Last Update</th>
-                  <th className="px-6 py-3 text-right">Resolution</th>
+                  <th className="px-6 py-3" scope="col">Order</th>
+                  <th className="px-6 py-3" scope="col">Issue Type</th>
+                  <th className="px-6 py-3" scope="col">Carrier</th>
+                  <th className="px-6 py-3" scope="col">Last Update</th>
+                  <th className="px-6 py-3 text-right" scope="col">Resolution</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

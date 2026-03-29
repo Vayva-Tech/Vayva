@@ -13,13 +13,13 @@ export async function GET(request: NextRequest) {
 
       const queryParams = new URLSearchParams();
       queryParams.set("limit", limit.toString());
-      const result = await apiJson(`${buildBackendUrl("/api/dashboard/recent-bookings")}?${queryParams.toString()}`, {
+      const result = await apiJson(`${buildBackendUrl("/dashboard/recent-bookings")}?${queryParams.toString()}`, {
         headers: auth.headers,
       });
       
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/dashboard/recent-bookings", operation: "GET" });
+    handleApiError(error, { endpoint: "/dashboard/recent-bookings", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

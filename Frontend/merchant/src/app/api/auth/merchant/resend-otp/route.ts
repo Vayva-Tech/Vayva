@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/auth/merchant/resend-otp",
+      endpoint: "/auth/merchant/resend-otp",
       operation: "RESEND_OTP",
       storeId: undefined,
     });

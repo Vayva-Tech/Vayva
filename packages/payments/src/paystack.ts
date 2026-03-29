@@ -193,6 +193,7 @@ export type PaystackService = {
   // Bank Resolution
   getBanks: (country?: string) => Promise<PaystackBank[]>;
   resolveAccount: (accountNumber: string, bankCode: string) => Promise<PaystackResolvedAccount>;
+  verifyBvnIdentity: (bvn: string) => Promise<{ bvn: string; first_name: string; last_name: string; middle_name: string | null; name_match_score: number; verified: boolean }>;
 
   // Subscriptions & Plans
   createPlan: (args: { name: string; amountKobo: number; interval: "daily" | "weekly" | "monthly" | "annually"; description?: string; send_invoices?: boolean }) => Promise<{ planCode: string; plan: PaystackPlan; raw: PaystackApiResponse }>;
@@ -318,6 +319,42 @@ export const Paystack: PaystackService = {
     if (!accountNumber || !bankCode) throw new Error("accountNumber and bankCode required");
     const json = await paystackFetch(`/bank/resolve?account_number=${encodeURIComponent(accountNumber)}&bank_code=${encodeURIComponent(bankCode)}`, { method: "GET" });
     return json.data as unknown as PaystackResolvedAccount;
+  },
+
+  async verifyBvnIdentity(bvn: string): Promise<{ bvn: string; first_name: string; last_name: string; middle_name: string | null; name_match_score: number; verified: boolean }> {
+    if (!bvn || !/^\d{11}$/.test(bvn)) throw new Error("Valid 11-digit BVN required");
+    
+    try {
+      // Paystack BVN verification endpoint
+      const json = await paystackFetch(`/identity/verify/bvn`, {
+        method: "POST",
+        body: JSON.stringify({ bvn }),
+      });
+      
+      const data = json.data;
+      const firstName = String(data.first_name || data.firstname || "");
+      const lastName = String(data.last_name || data.lastname || "");
+      const middleName = data.middle_name || data.middlename || null;
+      
+      // Calculate name match score (Paystack returns confidence score)
+      const nameMatchScore = typeof data.name_match_score === "number" 
+        ? data.name_match_score 
+        : typeof data.confidence_score === "number" 
+          ? data.confidence_score 
+          : 0;
+      
+      return {
+        bvn: String(data.bvn || bvn),
+        first_name: firstName,
+        last_name: lastName,
+        middle_name: middleName ? String(middleName) : null,
+        name_match_score: nameMatchScore,
+        verified: Boolean(data.verified !== false && data.status === "verified"),
+      };
+    } catch (error) {
+      logger.error("[Paystack.verifyBvnIdentity]", { bvn, error });
+      throw new Error("BVN verification failed");
+    }
   },
 
   async createRefund(args: { transaction: string; amount?: number; customer_note?: string; merchant_note?: string }): Promise<PaystackRefundResult> {

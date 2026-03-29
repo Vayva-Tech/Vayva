@@ -182,16 +182,16 @@ export default function SaaSSubscriptionsPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Customer</th>
-                    <th className="text-left py-3 px-4 font-semibold">Plan</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">MRR</th>
-                    <th className="text-left py-3 px-4 font-semibold">Seats</th>
-                    <th className="text-left py-3 px-4 font-semibold">Usage</th>
-                    <th className="text-left py-3 px-4 font-semibold">Renewal Date</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Customer</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Plan</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">MRR</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Seats</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Usage</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Renewal Date</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

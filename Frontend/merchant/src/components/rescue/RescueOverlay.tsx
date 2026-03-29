@@ -40,7 +40,7 @@ export function RescueOverlay({ error, reset }: RescueOverlayProps) {
     // Initiate Rescue
     const reportError = async () => {
       try {
-        const data = await apiJson<RescueReportResponse>("/api/rescue/report", {
+        const data = await apiJson<RescueReportResponse>("/rescue/report", {
           method: "POST",
           body: JSON.stringify({
             route: window.location.pathname,

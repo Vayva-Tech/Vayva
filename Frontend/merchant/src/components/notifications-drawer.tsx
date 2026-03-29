@@ -33,7 +33,7 @@ export const NotificationsDrawer = ({
     if (isOpen) {
       const loadNotifications = async () => {
         try {
-          const data = await apiJson<any[]>("/api/notifications");
+          const data = await apiJson<any[]>("/notifications");
           if (Array.isArray(data)) setNotifications(data);
         } catch (err: unknown) {
           const _errMsg = err instanceof Error ? err.message : String(err);

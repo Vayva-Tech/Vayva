@@ -121,16 +121,16 @@ export default function CreativePortfolioPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Project Title</th>
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Category</th>
-                  <th className="py-3 px-4 font-medium">Description</th>
-                  <th className="py-3 px-4 font-medium">Views</th>
-                  <th className="py-3 px-4 font-medium">Featured</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Project Title</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Category</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Description</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Views</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Featured</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

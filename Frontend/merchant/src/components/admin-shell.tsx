@@ -158,9 +158,8 @@ export const AdminShell = ({
     return (
       v === "starter" ||
       v === "pro" ||
-      v === "growth" ||
-      v === "business" ||
-      v === "enterprise" ||
+      v === "pro+" ||
+      v === "pro_plus" ||
       v === "professional" ||
       v === "premium"
     );
@@ -268,7 +267,7 @@ export const AdminShell = ({
 
     const bootstrap = async () => {
       try {
-        const data = await apiJson<BootstrapResponse>("/api/auth/merchant/me", {
+        const data = await apiJson<BootstrapResponse>("/auth/merchant/me", {
           signal: controller.signal,
         });
         const payload = data?.data || data;
@@ -333,7 +332,7 @@ export const AdminShell = ({
 
       try {
         const data = await apiJson<StorefrontUrlResponse>(
-          "/api/storefront/url",
+          "/storefront/url",
           { signal: controller.signal },
         );
         setStoreLink(data?.url || "");
@@ -349,7 +348,7 @@ export const AdminShell = ({
 
       try {
         const data = await apiJson<StorefrontStatusResponse>(
-          "/api/storefront/status",
+          "/storefront/status",
           { signal: controller.signal },
         );
         setStoreStatus(data?.status || "draft");
@@ -398,7 +397,7 @@ export const AdminShell = ({
     setIsPublishing(true);
     try {
       await apiJson<{ success: boolean }>(
-        "/api/merchant/store/publish/go-live",
+        "/merchant/store/publish/go-live",
         { method: "POST" },
       );
 
@@ -603,7 +602,7 @@ export const AdminShell = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-xl hover:bg-transparent text-green-600"
+                    className="rounded-xl hover:bg-transparent text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                     aria-label="Close navigation"
                   >
                     <X size={20} />
@@ -613,7 +612,7 @@ export const AdminShell = ({
                     variant="ghost"
                     size="icon"
                     onClick={toggleSidebar}
-                    className="rounded-xl hover:bg-gray-100 text-gray-400"
+                    className="rounded-xl hover:bg-gray-100 text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                     title={isSidebarPinned ? "Collapse sidebar" : "Pin sidebar"}
                     aria-label={isSidebarPinned ? "Collapse sidebar" : "Pin sidebar"}
                   >
@@ -794,7 +793,7 @@ export const AdminShell = ({
                     <Button
                       type="button"
                       onClick={() => setMobileMenuOpen(true)}
-                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center text-green-600 hover:bg-transparent transition-colors"
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl flex items-center justify-center text-green-600 hover:bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                       aria-label="Open navigation menu"
                     >
                       <PanelLeftOpen size={22} strokeWidth={2} />
@@ -804,7 +803,7 @@ export const AdminShell = ({
                     <Button
                       type="button"
                       onClick={() => router.back()}
-                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors"
+                      className="min-w-[44px] min-h-[44px] shrink-0 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                       aria-label="Go back"
                     >
                       <Icon name="ArrowLeft" size={20} />

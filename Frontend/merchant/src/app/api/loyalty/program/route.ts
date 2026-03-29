@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     handleApiError(
       error,
       {
-        endpoint: "/api/loyalty/program",
+        endpoint: "/loyalty/program",
         operation: "FETCH_LOYALTY_PROGRAM",
       }
     );
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     handleApiError(
       error,
       {
-        endpoint: "/api/loyalty/program",
+        endpoint: "/loyalty/program",
         operation: "UPDATE_LOYALTY_PROGRAM",
       }
     );

@@ -60,7 +60,7 @@ export default function FlashSalesPage() {
     try {
       setLoading(true);
       const data = await apiJson<FlashSalesResponse>(
-        "/api/marketing/flash-sales",
+        "/marketing/flash-sales",
       );
       setSales(data?.data || []);
     } catch (error: unknown) {
@@ -88,7 +88,7 @@ export default function FlashSalesPage() {
         startTime.getTime() + Number(formData.durationHours) * 60 * 60 * 1000,
       );
 
-      await apiJson<{ success: boolean }>("/api/marketing/flash-sales", {
+      await apiJson<{ success: boolean }>("/marketing/flash-sales", {
         method: "POST",
         body: JSON.stringify({
           name: formData.name,

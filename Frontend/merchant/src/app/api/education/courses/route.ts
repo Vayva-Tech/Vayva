@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { PERMISSIONS } from "@/lib/team/permissions";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
 
 // GET /api/education/courses - Get all courses for the merchant
 export async function GET(request: NextRequest) {
@@ -21,66 +19,28 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const instructorId = searchParams.get("instructorId");
 
-    const where: Record<string, unknown> = { storeId };
-
-    if (status) {
-      where.status = status;
-    }
-
-    if (category) {
-      where.category = category;
-    }
-
-    if (instructorId) {
-      where.instructorId = instructorId;
-    }
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const [courses, total] = await Promise.all([
-      (prisma as any).educationCourse.findMany({
-        where,
-        include: {
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              avatar: true,
-            },
-          },
-          _count: {
-            select: {
-              modules: true,
-              enrollments: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        skip: offset,
-        take: limit,
-      }),
-      (prisma as any).educationCourse.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: courses,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + courses.length < total,
-      },
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+      offset: offset.toString(),
     });
+
+    if (status) queryParams.set("status", status);
+    if (category) queryParams.set("category", category);
+    if (instructorId) queryParams.set("instructorId", instructorId);
+    if (search) queryParams.set("search", search);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/education/courses?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/education/courses",
+      endpoint: "/education/courses",
       operation: "GET_COURSES",
     });
     return NextResponse.json(

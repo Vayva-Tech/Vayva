@@ -1,28 +1,23 @@
-import { NextRequest } from "next/server";
-import { prisma, logger } from "@vayva/shared";
+import { NextRequest, NextResponse } from "next/server";
+import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
+import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const campaign = await prisma.donationCampaign.findUnique({
-      where: { id: params.id },
-      include: {
-        donations: {
-          include: {
-            donor: true,
-          },
-          orderBy: { createdAt: "desc" },
-        },
-        _count: {
-          select: { donations: true },
-        },
-      },
-    });
-
-    if (!campaign) {
-      return Response.json({ error: "Campaign not found" }, { status: 404 });
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    return Response.json({ data: [campaign] });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/campaigns/${params.id}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error: unknown) {
     const _errMsg = error instanceof Error ? error.message : String(error);
     logger.error("[CAMPAIGN_GET_ERROR]", { error: _errMsg });
@@ -32,24 +27,22 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
-    
-    const campaign = await prisma.donationCampaign.update({
-      where: { id: params.id },
-      data: {
-        title: body.title,
-        description: body.description,
-        goal: body.goal ? parseFloat(body.goal) : undefined,
-        currency: body.currency,
-        startDate: body.startDate ? new Date(body.startDate) : undefined,
-        endDate: body.endDate ? new Date(body.endDate) : undefined,
-        category: body.category,
-        status: body.status,
-        impactMetrics: body.impactMetrics,
-      },
-    });
 
-    return Response.json({ data: campaign });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/campaigns/${params.id}`,
+      {
+        method: "PUT",
+        headers: auth.headers,
+        body: JSON.stringify(body),
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error: unknown) {
     const _errMsg = error instanceof Error ? error.message : String(error);
     logger.error("[CAMPAIGN_UPDATE_ERROR]", { error: _errMsg });
@@ -59,11 +52,20 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await prisma.donationCampaign.delete({
-      where: { id: params.id },
-    });
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    return Response.json({ success: true });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/campaigns/${params.id}`,
+      {
+        method: "DELETE",
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(response);
   } catch (error: unknown) {
     const _errMsg = error instanceof Error ? error.message : String(error);
     logger.error("[CAMPAIGN_DELETE_ERROR]", { error: _errMsg });

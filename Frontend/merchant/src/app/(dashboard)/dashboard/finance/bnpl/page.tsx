@@ -233,14 +233,14 @@ export default function BNPLDashboardPage() {
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 border-b" scope="col">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Customer</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Provider</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Amount</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Progress</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Applied</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Customer</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Provider</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Amount</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Progress</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600" scope="col">Applied</th>
               </tr>
             </thead>
             <tbody className="divide-y">

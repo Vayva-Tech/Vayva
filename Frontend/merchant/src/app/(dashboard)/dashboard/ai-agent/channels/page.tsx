@@ -58,7 +58,7 @@ export default function AgentChannelsPage() {
   const loadProfile = async () => {
     try {
       setIsLoading(true);
-      const data = await apiJson<AgentProfileResponse>("/api/ai-agent/profile");
+      const data = await apiJson<AgentProfileResponse>("/ai-agent/profile");
       if (!data) return;
 
       // Load from draft config if exists, else live
@@ -92,7 +92,7 @@ export default function AgentChannelsPage() {
     try {
       // First fetch current draft to blend
       const draftData = await apiJson<AgentProfileResponse>(
-        "/api/ai-agent/profile",
+        "/ai-agent/profile",
       );
       const currentConfig = draftData?.config || {};
 
@@ -101,7 +101,7 @@ export default function AgentChannelsPage() {
         channels: channels,
       };
 
-      await apiJson<{ success: boolean }>("/api/ai-agent/profile", {
+      await apiJson<{ success: boolean }>("/ai-agent/profile", {
         method: "PUT",
         body: JSON.stringify(newConfig),
       });

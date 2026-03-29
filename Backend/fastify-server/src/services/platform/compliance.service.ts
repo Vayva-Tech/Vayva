@@ -83,6 +83,347 @@ export class ComplianceService {
     return { success: true, message: 'Risk resolved' };
   }
 
+  /**
+   * Get active merchant sessions for ops dashboard
+   */
+  async getActiveSessions() {
+    const sessions = await this.db.merchantSession.findMany({
+      where: {
+        expiresAt: { gt: new Date() }, // Only active sessions
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: { email: true, firstName: true, lastName: true },
+        },
+      },
+      take: 50,
+    });
+
+    return { data: sessions };
+  }
+
+  /**
+   * Get KYC queue for ops dashboard
+   */
+  async getKycQueue() {
+    const records = await this.db.kycRecord.findMany({
+      where: { status: 'PENDING' },
+      include: {
+        store: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            industrySlug: true,
+            onboardingStatus: true,
+            onboardingLastStep: true,
+          },
+        },
+      },
+      orderBy: { submittedAt: 'asc' },
+    });
+
+    // Get bank info for each record
+    const data = await Promise.all(
+      records.map(async (rec) => {
+        const bank = await this.db.bankBeneficiary.findFirst({
+          where: { storeId: rec.storeId, isDefault: true },
+          select: {
+            bankName: true,
+            bankCode: true,
+            accountNumber: true,
+            accountName: true,
+          },
+        });
+
+        return {
+          id: rec.id,
+          storeId: rec.storeId,
+          status: rec.status,
+          ninLast4: rec.ninLast4 || '',
+          bvnLast4: rec.bvnLast4 || '',
+          cacNumberEncrypted: rec.cacNumberEncrypted,
+          submittedAt: rec.submittedAt?.toISOString() || rec.createdAt.toISOString(),
+          reviewedAt: rec.reviewedAt?.toISOString() || null,
+          notes: rec.notes,
+          store: rec.store,
+          bank,
+        };
+      }),
+    );
+
+    return { data };
+  }
+
+  /**
+   * Process KYC action (approve/reject)
+   */
+  async processKycAction(
+    kycId: string,
+    userId: string,
+    userEmail: string,
+    action: 'approve' | 'reject',
+    notes?: string,
+    rejectionReason?: string
+  ) {
+    const record = await this.db.kycRecord.findUnique({
+      where: { id: kycId },
+      include: { store: true },
+    });
+
+    if (!record) {
+      throw new Error('KYC record not found');
+    }
+
+    const newStatus = action === 'approve' ? 'VERIFIED' : 'REJECTED';
+
+    // Update KYC record
+    await this.db.kycRecord.update({
+      where: { id: kycId },
+      data: {
+        status: newStatus,
+        reviewedAt: new Date(),
+        reviewedBy: userId || 'ops_admin',
+        notes: notes || null,
+        rejectionReason: action === 'reject' ? rejectionReason : null,
+      },
+    });
+
+    // Update store KYC status
+    const storeKycStatus = action === 'approve' ? 'VERIFIED' : 'REJECTED';
+    await this.db.store.update({
+      where: { id: record.storeId },
+      data: {
+        kycStatus: storeKycStatus,
+      },
+    });
+
+    // Update wallet KYC status if exists
+    await this.db.wallet.updateMany({
+      where: { storeId: record.storeId },
+      data: {
+        kycStatus: storeKycStatus,
+      },
+    });
+
+    logger.info(`[KYC_${action.toUpperCase()}]`, {
+      kycRecordId: kycId,
+      storeId: record.storeId,
+      storeName: record.store?.name,
+      processedBy: userEmail,
+    });
+
+    return { success: true };
+  }
+
+  /**
+   * Assign KYC records to reviewers
+   */
+  async assignKycRecords(
+    kycIds: string[],
+    reviewerId: string,
+    assignedByUserId: string,
+    assignedByEmail: string
+  ) {
+    // Validate reviewer exists and has permissions
+    const reviewer = await this.db.opsUser?.findUnique({
+      where: { id: reviewerId },
+    });
+
+    if (!reviewer) {
+      throw new Error('Reviewer not found');
+    }
+
+    const allowedRoles = ['OPS_OWNER', 'SUPERVISOR', 'OPERATOR', 'OPS_ADMIN'];
+    if (!allowedRoles.includes(reviewer.role)) {
+      throw new Error('Reviewer does not have KYC review privileges');
+    }
+
+    // Create assignment note
+    const assignmentNote = JSON.stringify({
+      assignedTo: reviewerId,
+      assignedToName: reviewer.name,
+      assignedAt: new Date().toISOString(),
+      assignedBy: assignedByUserId,
+      assignedByEmail: assignedByEmail,
+    });
+
+    // Update KYC records
+    const updatePromises = kycIds.map((kycId) =>
+      this.db.kycRecord?.update({
+        where: { id: kycId, status: 'PENDING' },
+        data: {
+          notes: assignmentNote,
+        },
+      })
+    );
+
+    const updatedRecords = await Promise.allSettled(updatePromises);
+    const successful = updatedRecords.filter((r) => r.status === 'fulfilled').length;
+    const failed = updatedRecords.filter((r) => r.status === 'rejected').length;
+
+    logger.info('[KYC_ASSIGNED]', {
+      kycIds,
+      assignedTo: reviewerId,
+      assignedToEmail: reviewer.email,
+      assignedToName: reviewer.name,
+      count: successful,
+      failed,
+    });
+
+    return {
+      success: true,
+      assigned: successful,
+      failed,
+      reviewer: {
+        id: reviewer.id,
+        name: reviewer.name,
+        email: reviewer.email,
+      },
+    };
+  }
+
+  /**
+   * Get eligible KYC reviewers
+   */
+  async getKycReviewers() {
+    const reviewers = await this.db.opsUser?.findMany({
+      where: {
+        isActive: true,
+        role: { in: ['OPS_OWNER', 'SUPERVISOR', 'OPERATOR', 'OPS_ADMIN'] },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    // Count assignments for each reviewer
+    const allPendingKyc = await this.db.kycRecord?.findMany({
+      where: { status: 'PENDING' },
+      select: { notes: true },
+    });
+
+    const reviewersWithCounts = reviewers.map((reviewer) => {
+      const count = allPendingKyc.filter((kyc) => {
+        if (!kyc.notes) return false;
+        try {
+          const notesData = JSON.parse(kyc.notes);
+          return notesData.assignedTo === reviewer.id;
+        } catch {
+          return false;
+        }
+      }).length;
+      return {
+        ...reviewer,
+        currentAssignments: count,
+      };
+    });
+
+    return { reviewers: reviewersWithCounts };
+  }
+
+  /**
+   * Revoke a merchant session
+   */
+  async revokeSession(sessionId: string, userId: string) {
+    await this.db.merchantSession.delete({
+      where: { id: sessionId },
+    });
+
+    logger.info(`[SESSION_REVOKE] Session ${sessionId} revoked by ${userId}`);
+    return { success: true };
+  }
+
+  /**
+   * Get security audit logs
+   */
+  async getSecurityLogs(params: {
+    page: number;
+    limit: number;
+    type?: string;
+    userId?: string;
+  }) {
+    const { page, limit, type, userId } = params;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (type) where.eventType = type;
+    if (userId) where.opsUserId = userId;
+
+    const [events, total] = await Promise.all([
+      this.db.opsAuditEvent.findMany({
+        where,
+        include: {
+          opsUser: {
+            select: { name: true, email: true, role: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip,
+      }),
+      this.db.opsAuditEvent.count({ where }),
+    ]);
+
+    return {
+      data: events,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  /**
+   * Get security statistics dashboard
+   */
+  async getSecurityStats() {
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const [failedLogins, activeSessions, adminActions, activeUsers] =
+      await Promise.all([
+        this.db.opsAuditEvent?.count({
+          where: {
+            eventType: 'OPS_LOGIN_FAILED',
+            createdAt: { gte: yesterday },
+          },
+        }) ?? 0,
+        this.db.opsSession?.count({
+          where: {
+            expiresAt: { gt: now },
+          },
+        }) ?? 0,
+        this.db.opsAuditEvent?.count({
+          where: {
+            createdAt: { gte: yesterday },
+          },
+        }) ?? 0,
+        this.db.opsSession?.groupBy({
+          by: ['opsUserId'],
+          where: {
+            expiresAt: { gt: now },
+          },
+        }) ?? [],
+      ]);
+
+    return {
+      stats: {
+        failedLogins,
+        activeSessions,
+        adminActions,
+        uniqueActiveUsers: activeUsers.length,
+      },
+    };
+  }
+
   async deleteGdprData(userId: string, storeId: string) {
     const user = await this.db.user.findUnique({ where: { id: userId } });
 

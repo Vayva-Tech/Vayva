@@ -80,7 +80,7 @@ export function useHealthcareDashboard() {
     queryKey: ['healthcare-dashboard'],
     queryFn: async () => {
       try {
-        const response = await fetch('/api/healthcare/dashboard', {
+        const response = await fetch('/healthcare/dashboard', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(30000),

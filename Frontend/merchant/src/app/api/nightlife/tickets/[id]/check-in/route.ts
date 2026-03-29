@@ -26,7 +26,7 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/nightlife/tickets/[id]/check-in",
+      endpoint: "/nightlife/tickets/[id]/check-in",
       operation: "POST",
       storeId,
     });

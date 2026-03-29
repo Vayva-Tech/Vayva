@@ -56,7 +56,7 @@ export const WalletService = {
    * Get wallet summary for the current merchant
    */
   getSummary: async (): Promise<WalletSummary> => {
-    const response = await apiJson<{ success: boolean; data: WalletSummary }>("/api/wallet");
+    const response = await apiJson<{ success: boolean; data: WalletSummary }>("/wallet");
     if (!response.success) {
       throw new Error("Failed to fetch wallet summary");
     }
@@ -84,7 +84,7 @@ export const WalletService = {
    * Verify wallet PIN
    */
   verifyPin: async (pin: string): Promise<boolean> => {
-    const response = await apiJson<{ success: boolean; valid: boolean }>("/api/wallet/verify-pin", {
+    const response = await apiJson<{ success: boolean; valid: boolean }>("/wallet/verify-pin", {
       method: "POST",
       body: JSON.stringify({ pin }),
     });
@@ -95,7 +95,7 @@ export const WalletService = {
    * Set wallet PIN
    */
   setPin: async (pin: string): Promise<void> => {
-    const response = await apiJson<{ success: boolean }>("/api/wallet/set-pin", {
+    const response = await apiJson<{ success: boolean }>("/wallet/set-pin", {
       method: "POST",
       body: JSON.stringify({ pin }),
     });
@@ -113,7 +113,7 @@ export const WalletService = {
     accountNumber: string;
     accountName: string;
   }): Promise<BankAccount> => {
-    const response = await apiJson<{ success: boolean; data: BankAccount }>("/api/wallet/banks", {
+    const response = await apiJson<{ success: boolean; data: BankAccount }>("/wallet/banks", {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -127,7 +127,7 @@ export const WalletService = {
    * Get list of saved bank accounts
    */
   getBanks: async (): Promise<BankAccount[]> => {
-    const response = await apiJson<{ success: boolean; data: BankAccount[] }>("/api/wallet/banks");
+    const response = await apiJson<{ success: boolean; data: BankAccount[] }>("/wallet/banks");
     if (!response.success) {
       throw new Error("Failed to fetch bank accounts");
     }
@@ -139,7 +139,7 @@ export const WalletService = {
    */
   getEligibility: async (): Promise<EligibilityResult> => {
     const response = await apiJson<{ success: boolean; data: EligibilityResult }>(
-      "/api/wallet/withdraw/eligibility"
+      "/wallet/withdraw/eligibility"
     );
     if (!response.success) {
       throw new Error("Failed to check eligibility");
@@ -152,7 +152,7 @@ export const WalletService = {
    */
   getWithdrawalQuote: async (amount: number): Promise<WithdrawalQuote> => {
     const response = await apiJson<{ success: boolean; data: WithdrawalQuote }>(
-      "/api/wallet/withdraw/quote",
+      "/wallet/withdraw/quote",
       {
         method: "POST",
         body: JSON.stringify({ amount }),
@@ -172,7 +172,7 @@ export const WalletService = {
     bankAccountId: string,
     idempotencyKey: string
   ): Promise<WithdrawalResult> => {
-    const response = await apiJson<WithdrawalResult>("/api/wallet/withdraw", {
+    const response = await apiJson<WithdrawalResult>("/wallet/withdraw", {
       method: "POST",
       body: JSON.stringify({ amountKobo, bankAccountId, idempotencyKey }),
       headers: {
@@ -190,7 +190,7 @@ export const WalletService = {
     otpCode: string
   ): Promise<{ success: boolean; message?: string }> => {
     const response = await apiJson<{ success: boolean; message?: string }>(
-      "/api/wallet/withdraw/confirm",
+      "/wallet/withdraw/confirm",
       {
         method: "POST",
         body: JSON.stringify({ withdrawalId, otpCode }),

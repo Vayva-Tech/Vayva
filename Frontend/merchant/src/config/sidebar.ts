@@ -160,6 +160,11 @@ const MODULE_TO_SIDEBAR: Record<
     href: "/dashboard/listings",
     icon: "Briefcase",
   },
+  pos: {
+    name: "Point of Sale",
+    href: "/dashboard/pos",
+    icon: "MonitorPlay",
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -187,6 +192,7 @@ const COMMERCE_MODULES = new Set([
   "properties",
   "vehicles",
   "enrollments",
+  "pos", // Point of Sale
 ]);
 const GROWTH_MODULES = new Set([
   "marketing",

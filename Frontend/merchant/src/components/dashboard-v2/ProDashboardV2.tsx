@@ -479,7 +479,7 @@ export function ProDashboardV2() {
   const { data: dashboardData, isLoading } = useSWR<{
     success: boolean;
     data: DashboardData;
-  }>("/api/dashboard/pro-overview", fetcher, {
+  }>("/dashboard/pro-overview", fetcher, {
     refreshInterval: 30000,
   });
 

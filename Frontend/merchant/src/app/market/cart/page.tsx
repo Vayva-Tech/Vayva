@@ -45,7 +45,7 @@ export default function CartPage() {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<Cart>("/api/market/cart");
+      const data = await apiJson<Cart>("/market/cart");
       setCart(data);
     } catch (error) {
       toast.error("Failed to load cart");
@@ -79,7 +79,7 @@ export default function CartPage() {
 
   const clearCart = async () => {
     try {
-      await apiJson("/api/market/cart", { method: "DELETE" });
+      await apiJson("/market/cart", { method: "DELETE" });
       toast.success("Cart cleared");
       void fetchCart();
     } catch {

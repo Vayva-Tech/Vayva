@@ -35,7 +35,7 @@ export function KitchenProvider({ children }: { children: React.ReactNode }) {
     const fetchMetrics = async () => {
       try {
         const data = await apiJson<KitchenOrdersResponse | KitchenOrder[]>(
-          "/api/kitchen/orders",
+          "/kitchen/orders",
         );
         const list = Array.isArray(data) ? data : data?.items;
         if (Array.isArray(list)) {

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
         });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/properties/viewings", operation: "GET" });
+    handleApiError(error, { endpoint: "/properties/viewings", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

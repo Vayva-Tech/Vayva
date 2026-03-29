@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { AiAgentService } from '../../../services/ai/aiAgent.service';
+import { AiAgentService } from '../../../../services/ai/aiAgent.service';
 
 const aiAgentService = new AiAgentService();
 

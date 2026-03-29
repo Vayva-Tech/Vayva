@@ -32,7 +32,7 @@ export default function RestaurantMarketingPage() {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await apiJson<{ data: MarketingCampaign[] }>("/api/restaurant/marketing/campaigns?limit=200");
+      const response = await apiJson<{ data: MarketingCampaign[] }>("/restaurant/marketing/campaigns?limit=200");
       setCampaigns(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch marketing campaigns", error);

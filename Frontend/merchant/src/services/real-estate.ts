@@ -1,5 +1,4 @@
-import { db } from "@/lib/db";
-import { Prisma } from "@vayva/db";
+import { api } from '@/lib/api-client';
 
 // Types for Real Estate models
 export interface Property {
@@ -149,191 +148,56 @@ export const RealEstateService = {
   // ============================================================================
 
   async createProperty(storeId: string, data: CreatePropertyInput): Promise<Property> {
-    const property = await db.property?.create({
-      data: {
-        storeId,
-        title: data.title,
-        description: data.description,
-        type: data.type,
-        purpose: data.purpose,
-        price: new Prisma.Decimal(data.price),
-        currency: data.currency ?? "NGN",
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        zipCode: data.zipCode,
-        lat: data.lat !== undefined ? new Prisma.Decimal(data.lat) : null,
-        lng: data.lng !== undefined ? new Prisma.Decimal(data.lng) : null,
-        bedrooms: data.bedrooms,
-        bathrooms: data.bathrooms,
-        area: data.area,
-        yearBuilt: data.yearBuilt,
-        amenities: data.amenities ?? [],
-        images: data.images ?? [],
-        videoUrl: data.videoUrl,
-        virtualTourUrl: data.virtualTourUrl,
-        floorPlanUrl: data.floorPlanUrl,
-        agentId: data.agentId,
-      },
-      include: {
-        viewings: true,
-        applications: true,
-        documents: true,
-      },
+    const response = await api.post('/real-estate/properties', {
+      storeId,
+      ...data,
     });
+    return response.data || {};
+  },
 
-    return mapProperty(property);
+  async getProperty(propertyId: string): Promise<Property | null> {
+    const response = await api.get(`/real-estate/properties/${propertyId}`);
+    return response.data || null;
   },
 
   async getProperties(
     storeId: string,
-    options?: {
-      status?: Property["status"];
-      purpose?: Property["purpose"];
-      type?: Property["type"];
-      featured?: boolean;
-      minPrice?: number;
-      maxPrice?: number;
-      city?: string;
-      state?: string;
-    }
-  ): Promise<Property[]> {
-    const properties = await db.property?.findMany({
-      where: {
-        storeId,
-        status: options?.status as any,
-        purpose: options?.purpose,
-        type: options?.type,
-        featured: options?.featured,
-        city: options?.city ? { contains: options.city, mode: "insensitive" } : undefined,
-        state: options?.state ? { contains: options.state, mode: "insensitive" } : undefined,
-        price: {
-          gte: options?.minPrice !== undefined ? new Prisma.Decimal(options.minPrice) : undefined,
-          lte: options?.maxPrice !== undefined ? new Prisma.Decimal(options.maxPrice) : undefined,
-        },
-      },
-      include: {
-        viewings: {
-          orderBy: { scheduledAt: "desc" },
-          take: 5,
-        },
-        applications: {
-          where: { status: "pending" },
-          take: 5,
-        },
-        documents: true,
-      },
-      orderBy: { createdAt: "desc" },
+    options?: GetPropertiesOptions
+  ): Promise<{ properties: Property[]; total: number }> {
+    const response = await api.get('/real-estate/properties', {
+      storeId,
+      ...options,
     });
-
-    return properties.map(mapProperty) as any;
+    return response.data || { properties: [], total: 0 };
   },
 
   async getPropertyById(propertyId: string): Promise<Property | null> {
-    const property = await db.property?.findUnique({
-      where: { id: propertyId },
-      include: {
-        viewings: {
-          orderBy: { scheduledAt: "desc" },
-        },
-        applications: {
-          orderBy: { createdAt: "desc" },
-        },
-        documents: true,
-      },
-    });
-
-    if (!property) return null;
-    return mapProperty(property);
+    const response = await api.get(`/real-estate/properties/${propertyId}`);
+    return response.data || null;
   },
 
   async updateProperty(propertyId: string, data: UpdatePropertyInput): Promise<Property> {
-    const updateData: Prisma.PropertyUpdateInput = {};
-
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.type !== undefined) updateData.type = data.type;
-    if (data.purpose !== undefined) updateData.purpose = data.purpose;
-    if (data.price !== undefined) updateData.price = new Prisma.Decimal(data.price);
-    if (data.currency !== undefined) updateData.currency = data.currency;
-    if (data.address !== undefined) updateData.address = data.address;
-    if (data.city !== undefined) updateData.city = data.city;
-    if (data.state !== undefined) updateData.state = data.state;
-    if (data.zipCode !== undefined) updateData.zipCode = data.zipCode;
-    if (data.lat !== undefined) updateData.lat = new Prisma.Decimal(data.lat);
-    if (data.lng !== undefined) updateData.lng = new Prisma.Decimal(data.lng);
-    if (data.bedrooms !== undefined) updateData.bedrooms = data.bedrooms;
-    if (data.bathrooms !== undefined) updateData.bathrooms = data.bathrooms;
-    if (data.area !== undefined) updateData.area = data.area;
-    if (data.yearBuilt !== undefined) updateData.yearBuilt = data.yearBuilt;
-    if (data.amenities !== undefined) updateData.amenities = data.amenities;
-    if (data.images !== undefined) updateData.images = data.images;
-    if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
-    if (data.virtualTourUrl !== undefined) updateData.virtualTourUrl = data.virtualTourUrl;
-    if (data.floorPlanUrl !== undefined) updateData.floorPlanUrl = data.floorPlanUrl;
-    if ((data as any).status !== undefined) (updateData as any).status = (data as any).status as any;
-    if (data.featured !== undefined) updateData.featured = data.featured;
-    if (data.agentId !== undefined) updateData.agentId = data.agentId;
-
-    const property = await db.property?.update({
-      where: { id: propertyId },
-      data: updateData,
-      include: {
-        viewings: true,
-        applications: true,
-        documents: true,
-      },
-    });
-
-    return mapProperty(property);
+    const response = await api.put(`/real-estate/properties/${propertyId}`, data);
+    return response.data || {};
   },
 
   async deleteProperty(propertyId: string): Promise<void> {
-    await db.property?.delete({
-      where: { id: propertyId },
-    });
+    await api.delete(`/real-estate/properties/${propertyId}`);
   },
 
   async markAsSold(propertyId: string): Promise<Property> {
-    const property = await db.property?.update({
-      where: { id: propertyId },
-      data: { status: "sold" },
-      include: {
-        viewings: true,
-        applications: true,
-        documents: true,
-      },
-    });
-
-    return mapProperty(property);
+    const response = await api.patch(`/real-estate/properties/${propertyId}/status`, { status: 'sold' });
+    return response.data || {};
   },
 
   async markAsRented(propertyId: string): Promise<Property> {
-    const property = await db.property?.update({
-      where: { id: propertyId },
-      data: { status: "rented" },
-      include: {
-        viewings: true,
-        applications: true,
-        documents: true,
-      },
-    });
-
-    return mapProperty(property);
+    const response = await api.patch(`/real-estate/properties/${propertyId}/status`, { status: 'rented' });
+    return response.data || {};
   },
 
   async featureProperty(propertyId: string): Promise<Property> {
-    const property = await db.property?.update({
-      where: { id: propertyId },
-      data: { featured: true },
-      include: {
-        viewings: true,
-        applications: true,
-        documents: true,
-      },
-    });
-
-    return mapProperty(property);
+    const response = await api.patch(`/real-estate/properties/${propertyId}/feature`, { featured: true });
+    return response.data || {};
   },
 
   // ============================================================================
@@ -341,297 +205,102 @@ export const RealEstateService = {
   // ============================================================================
 
   async scheduleViewing(data: CreateViewingInput): Promise<Viewing> {
-    const viewing = await db.viewing?.create({
-      data: {
-        propertyId: data.propertyId,
-        clientName: data.clientName,
-        clientEmail: data.clientEmail,
-        clientPhone: data.clientPhone,
-        scheduledAt: data.scheduledAt,
-        duration: data.duration ?? 30,
-        status: "scheduled",
-      },
-      include: {
-        property: true,
-      },
-    });
-
-    return mapViewing(viewing);
+    const response = await api.post('/real-estate/viewings', data);
+    return response.data || {};
   },
 
-  async getViewingsByProperty(propertyId: string): Promise<Viewing[]> {
-    const viewings = await db.viewing?.findMany({
-      where: { propertyId },
-      include: { property: true },
-      orderBy: { scheduledAt: "desc" },
-    });
-
-    return viewings.map(mapViewing) as any;
+  async getViewing(viewingId: string): Promise<Viewing | null> {
+    const response = await api.get(`/real-estate/viewings/${viewingId}`);
+    return response.data || null;
   },
 
-  async getViewingsByDateRange(storeId: string, startDate: Date, endDate: Date): Promise<Viewing[]> {
-    const viewings = await db.viewing?.findMany({
-      where: {
-        property: { storeId },
-        scheduledAt: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      include: { property: true },
-      orderBy: { scheduledAt: "asc" },
-    });
-
-    return viewings.map(mapViewing) as any;
+  async getPropertyViewings(propertyId: string): Promise<Viewing[]> {
+    const response = await api.get(`/real-estate/properties/${propertyId}/viewings`);
+    return response.data || [];
   },
 
   async confirmViewing(viewingId: string): Promise<Viewing> {
-    const viewing = await db.viewing?.update({
-      where: { id: viewingId },
-      data: { status: "confirmed" as any },
-      include: { property: true },
-    });
-
-    return mapViewing(viewing);
+    const response = await api.patch(`/real-estate/viewings/${viewingId}/confirm`);
+    return response.data || {};
   },
 
-  async completeViewing(viewingId: string, feedback?: { notes?: string; rating?: number }): Promise<Viewing> {
-    const viewing = await db.viewing?.update({
-      where: { id: viewingId },
-      data: {
-        status: "completed",
-        feedback: feedback?.notes,
-        rating: feedback?.rating,
-      },
-      include: { property: true },
-    });
-
-    return mapViewing(viewing);
+  async cancelViewing(viewingId: string, reason?: string): Promise<Viewing> {
+    const response = await api.patch(`/real-estate/viewings/${viewingId}/cancel`, { reason });
+    return response.data || {};
   },
 
-  async cancelViewing(viewingId: string): Promise<Viewing> {
-    const viewing = await db.viewing?.update({
-      where: { id: viewingId },
-      data: { status: "cancelled" },
-      include: { property: true },
+  async completeViewing(viewingId: string, feedback?: string, rating?: number): Promise<Viewing> {
+    const response = await api.patch(`/real-estate/viewings/${viewingId}/complete`, {
+      feedback,
+      rating,
     });
-
-    return mapViewing(viewing);
+    return response.data || {};
   },
 
-  async markNoShow(viewingId: string): Promise<Viewing> {
-    const viewing = await db.viewing?.update({
-      where: { id: viewingId },
-      data: { status: "no_show" },
-      include: { property: true },
-    });
-
-    return mapViewing(viewing);
-  },
-
-  async deleteViewing(viewingId: string): Promise<void> {
-    await db.viewing?.delete({
-      where: { id: viewingId },
-    });
+  async noShowViewing(viewingId: string): Promise<Viewing> {
+    const response = await api.patch(`/real-estate/viewings/${viewingId}/no-show`);
+    return response.data || {};
   },
 
   // ============================================================================
   // RENTAL APPLICATIONS
   // ============================================================================
 
-  async submitApplication(data: CreateApplicationInput): Promise<RentalApplication> {
-    const application = await db.rentalApplication?.create({
-      data: {
-        propertyId: data.propertyId,
-        applicantName: data.applicantName,
-        applicantEmail: data.applicantEmail,
-        applicantPhone: data.applicantPhone,
-        currentAddress: data.currentAddress,
-        employer: data.employer,
-        income: data.income !== undefined ? new Prisma.Decimal(data.income) : null,
-        references: data.references as unknown as Prisma.InputJsonValue,
-        documents: {},
-        status: "pending",
-      },
-      include: { property: true },
-    });
-
-    return mapApplication(application);
+  async createRentalApplication(data: CreateRentalApplicationInput): Promise<RentalApplication> {
+    const response = await api.post('/real-estate/applications', data);
+    return response.data || {};
   },
 
-  async getApplicationsByProperty(propertyId: string): Promise<RentalApplication[]> {
-    const applications = await db.rentalApplication?.findMany({
-      where: { propertyId },
-      include: { property: true },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return applications.map(mapApplication) as any;
+  async getRentalApplication(applicationId: string): Promise<RentalApplication | null> {
+    const response = await api.get(`/real-estate/applications/${applicationId}`);
+    return response.data || null;
   },
 
-  async getApplicationsByStore(storeId: string, status?: RentalApplication["status"]): Promise<RentalApplication[]> {
-    const applications = await db.rentalApplication?.findMany({
-      where: {
-        property: { storeId },
-        status,
-      },
-      include: { property: true },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return applications.map(mapApplication) as any;
+  async getPropertyApplications(propertyId: string): Promise<RentalApplication[]> {
+    const response = await api.get(`/real-estate/properties/${propertyId}/applications`);
+    return response.data || [];
   },
 
-  async approveApplication(applicationId: string): Promise<RentalApplication> {
-    const application = await db.rentalApplication?.update({
-      where: { id: applicationId },
-      data: { status: "approved" },
-      include: { property: true },
-    });
-
-    return mapApplication(application);
+  async approveApplication(applicationId: string, notes?: string): Promise<RentalApplication> {
+    const response = await api.patch(`/real-estate/applications/${applicationId}/approve`, { notes });
+    return response.data || {};
   },
 
-  async rejectApplication(applicationId: string, notes?: string): Promise<RentalApplication> {
-    const application = await db.rentalApplication?.update({
-      where: { id: applicationId },
-      data: {
-        status: "rejected",
-        notes: notes ?? undefined,
-      },
-      include: { property: true },
-    });
-
-    return mapApplication(application);
+  async rejectApplication(applicationId: string, reason: string): Promise<RentalApplication> {
+    const response = await api.patch(`/real-estate/applications/${applicationId}/reject`, { reason });
+    return response.data || {};
   },
 
-  async updateApplicationDocuments(applicationId: string, documents: Record<string, string>): Promise<RentalApplication> {
-    const application = await db.rentalApplication?.update({
-      where: { id: applicationId },
-      data: {
-        documents: documents as unknown as Prisma.InputJsonValue,
-      },
-      include: { property: true },
-    });
-
-    return mapApplication(application);
-  },
-
-  async updateScreeningResult(applicationId: string, result: Record<string, unknown>): Promise<RentalApplication> {
-    const application = await db.rentalApplication?.update({
-      where: { id: applicationId },
-      data: {
-        screeningResult: result as unknown as Prisma.InputJsonValue,
-      },
-      include: { property: true },
-    });
-
-    return mapApplication(application);
+  async withdrawApplication(applicationId: string): Promise<RentalApplication> {
+    const response = await api.patch(`/real-estate/applications/${applicationId}/withdraw`);
+    return response.data || {};
   },
 
   // ============================================================================
   // PROPERTY DOCUMENTS
   // ============================================================================
 
-  async addDocument(data: CreateDocumentInput): Promise<PropertyDocument> {
-    const document = await db.propertyDocument?.create({
-      data: {
-        propertyId: data.propertyId,
-        title: data.title,
-        type: data.type,
-        url: data.url,
-        isPrivate: data.isPrivate ?? false,
-      },
-      include: { property: true },
-    });
-
-    return mapDocument(document);
+  async uploadPropertyDocument(propertyId: string, data: UploadDocumentInput): Promise<PropertyDocument> {
+    const response = await api.post(`/real-estate/properties/${propertyId}/documents`, data);
+    return response.data || {};
   },
 
-  async getDocumentsByProperty(propertyId: string): Promise<PropertyDocument[]> {
-    const documents = await db.propertyDocument?.findMany({
-      where: { propertyId },
-      include: { property: true },
-      orderBy: { uploadedAt: "desc" },
-    });
-
-    return documents.map(mapDocument) as any;
+  async getPropertyDocuments(propertyId: string): Promise<PropertyDocument[]> {
+    const response = await api.get(`/real-estate/properties/${propertyId}/documents`);
+    return response.data || [];
   },
 
-  async deleteDocument(documentId: string): Promise<void> {
-    await db.propertyDocument?.delete({
-      where: { id: documentId },
-    });
+  async deletePropertyDocument(documentId: string): Promise<void> {
+    await api.delete(`/real-estate/documents/${documentId}`);
   },
 
   // ============================================================================
   // ANALYTICS
   // ============================================================================
 
-  async getPropertyAnalytics(storeId: string): Promise<{
-    totalProperties: number;
-    availableProperties: number;
-    soldProperties: number;
-    rentedProperties: number;
-    pendingProperties: number;
-    totalViewings: number;
-    upcomingViewings: number;
-    pendingApplications: number;
-    averagePriceByType: Record<string, number>;
-  }> {
-    const [
-      totalProperties,
-      availableProperties,
-      soldProperties,
-      rentedProperties,
-      pendingProperties,
-      totalViewings,
-      upcomingViewings,
-      pendingApplications,
-      propertiesByType,
-    ] = await Promise.all([
-      db.property?.count({ where: { storeId } }),
-      db.property?.count({ where: { storeId, status: "available" } }),
-      db.property?.count({ where: { storeId, status: "sold" } }),
-      db.property?.count({ where: { storeId, status: "rented" } }),
-      db.property?.count({ where: { storeId, status: "pending" as any } }),
-      db.viewing?.count({ where: { property: { storeId } } }),
-      db.viewing?.count({
-        where: {
-          property: { storeId },
-          scheduledAt: { gte: new Date() },
-          status: { in: ["scheduled" as any, "confirmed" as any] },
-        },
-      }),
-      db.rentalApplication?.count({
-        where: {
-          property: { storeId },
-          status: "pending",
-        },
-      }),
-      db.property?.groupBy({
-        by: ["type"],
-        where: { storeId },
-        _avg: { price: true },
-      }),
-    ]);
-
-    const averagePriceByType: Record<string, number> = {};
-    for (const item of propertiesByType) {
-      averagePriceByType[item.type] = item._avg?.price?.toNumber() ?? 0;
-    }
-
-    return {
-      totalProperties,
-      availableProperties,
-      soldProperties,
-      rentedProperties,
-      pendingProperties,
-      totalViewings,
-      upcomingViewings,
-      pendingApplications,
-      averagePriceByType,
-    };
+  async getPropertyAnalytics(storeId: string): Promise<PropertyAnalytics> {
+    const response = await api.get(`/real-estate/${storeId}/analytics`);
+    return response.data || {};
   },
 };
 

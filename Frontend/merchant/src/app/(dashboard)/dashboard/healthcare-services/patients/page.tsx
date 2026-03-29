@@ -108,7 +108,7 @@ export default function HealthcarePatientsPage() {
   const fetchPatients = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Patient[] }>("/api/healthcare/patients?limit=500");
+      const response = await apiJson<{ data: Patient[] }>("/healthcare/patients?limit=500");
       setPatients(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch healthcare patients", error);
@@ -120,7 +120,7 @@ export default function HealthcarePatientsPage() {
 
   const handleCreatePatient = async (patientData: Partial<Patient>) => {
     try {
-      const response = await apiJson<{ data: Patient }>("/api/healthcare/patients", {
+      const response = await apiJson<{ data: Patient }>("/healthcare/patients", {
         method: "POST",
         body: JSON.stringify(patientData),
       });

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
@@ -15,32 +13,21 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query") || "";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-    const events = (await prisma.event?.findMany({
-      where: {
-        storeId,
-        ...(query && {
-          OR: [
-            { title: { contains: query, mode: "insensitive" } },
-            { category: { contains: query, mode: "insensitive" } },
-            { venue: { contains: query, mode: "insensitive" } },
-          ],
-        }),
-      },
-      select: {
-        id: true,
-        title: true,
-        category: true,
-        startDate: true,
-        endDate: true,
-        status: true,
-        bannerImage: true,
-        venue: true,
-      },
-      orderBy: { startDate: "asc" },
-      take: limit,
-    })) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
 
-    const formatted = events.map((e) => ({
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/events?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    const formatted = (response.data?.events || []).map((e: any) => ({
       id: e.id,
       name: e.title,
       category: e.category,
@@ -57,7 +44,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/editor-data/events",
+      endpoint: "/editor-data/events",
       operation: "GET_EDITOR_EVENTS",
     });
     return NextResponse.json(

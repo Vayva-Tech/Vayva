@@ -54,7 +54,7 @@ export function DashboardSetupChecklist() {
     async function loadActivation() {
       try {
         const res = await apiJson<ActivationProgressResponse>(
-          "/api/merchant/dashboard/activation-progress",
+          "/merchant/dashboard/activation-progress",
         );
         setActivation(res.data);
       } catch (e: any) {

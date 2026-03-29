@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { SocialService } from '../../../services/platform/social.service';
+import { SocialService } from '../../../../services/platform/social.service';
 
 const socialService = new SocialService();
 

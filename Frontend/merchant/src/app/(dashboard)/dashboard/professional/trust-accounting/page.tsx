@@ -118,16 +118,16 @@ export default function ProfessionalTrustAccountingPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Matter</th>
-                  <th className="py-3 px-4 font-medium">Balance</th>
-                  <th className="py-3 px-4 font-medium">Retainer</th>
-                  <th className="py-3 px-4 font-medium">Utilization</th>
-                  <th className="py-3 px-4 font-medium">Last Activity</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Matter</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Balance</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Retainer</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Utilization</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Last Activity</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

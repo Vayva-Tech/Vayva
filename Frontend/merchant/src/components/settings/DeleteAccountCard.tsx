@@ -34,7 +34,7 @@ export function DeleteAccountCard() {
   const handleDelete = async () => {
     try {
       setLoading(true);
-      await apiJson<{ success: boolean }>("/api/account/delete", {
+      await apiJson<{ success: boolean }>("/account/delete", {
         method: "POST",
         body: JSON.stringify({ reason }),
       });

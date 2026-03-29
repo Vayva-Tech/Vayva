@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/realestate/dashboard/aggregate", operation: "GET" });
+    handleApiError(error, { endpoint: "/realestate/dashboard/aggregate", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

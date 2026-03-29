@@ -49,7 +49,7 @@ export function TemplateGallery({ currentTemplateId }: TemplateGalleryProps) {
     const load = async () => {
       try {
         setLoading(true);
-        const data = await apiJson<BackendTemplate[]>("/api/templates");
+        const data = await apiJson<BackendTemplate[]>("/templates");
         setTemplates(Array.isArray(data) ? data : []);
       } catch (e: unknown) {
         toast.error("Failed to load templates");
@@ -92,7 +92,7 @@ export function TemplateGallery({ currentTemplateId }: TemplateGalleryProps) {
     try {
       // Create/update draft so Customize can load immediately
       const result = await apiJson<{ success: boolean; draft?: unknown }>(
-        "/api/storefront/draft",
+        "/storefront/draft",
         {
           method: "POST",
           body: JSON.stringify({ activeTemplateId: template.id }),

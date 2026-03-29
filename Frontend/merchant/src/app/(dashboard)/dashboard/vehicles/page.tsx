@@ -93,7 +93,7 @@ export default function VehiclesPage() {
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<Vehicle[]>("/api/vehicles");
+      const data = await apiJson<Vehicle[]>("/vehicles");
       setVehicles(data || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);
@@ -127,7 +127,7 @@ export default function VehiclesPage() {
         });
         toast.success("Vehicle updated");
       } else {
-        await apiJson("/api/vehicles", {
+        await apiJson("/vehicles", {
           method: "POST",
           body: JSON.stringify(payload),
         });

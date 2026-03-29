@@ -81,7 +81,7 @@ export default function AppealsPage() {
   const fetchAppeals = async () => {
     try {
       setLoading(true);
-      const result = await apiJson<AppealsResponse>("/api/appeals");
+      const result = await apiJson<AppealsResponse>("/appeals");
       setData(result?.data);
     } catch (err: unknown) {
       const _errMsg = err instanceof Error ? err.message : String(err);
@@ -99,7 +99,7 @@ export default function AppealsPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiJson<{ success: boolean }>("/api/appeals", {
+      await apiJson<{ success: boolean }>("/appeals", {
         method: "POST",
         body: JSON.stringify(formData),
       });

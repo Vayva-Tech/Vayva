@@ -33,7 +33,7 @@ export const NotificationCenter = ({
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      let url = "/api/notifications?limit=50";
+      let url = "/notifications?limit=50";
 
       if (filter === "unread") {
         url += "&unread=true";
@@ -54,7 +54,7 @@ export const NotificationCenter = ({
 
   const handleMarkRead = async (id: string) => {
     try {
-      await apiJson<{ success: boolean }>("/api/notifications/mark-read", {
+      await apiJson<{ success: boolean }>("/notifications/mark-read", {
         method: "POST",
         body: JSON.stringify({ notificationId: id }),
       });
@@ -77,7 +77,7 @@ export const NotificationCenter = ({
 
   const handleMarkAllRead = async () => {
     try {
-      await apiJson<{ success: boolean }>("/api/notifications/mark-all-read", {
+      await apiJson<{ success: boolean }>("/notifications/mark-all-read", {
         method: "POST",
       });
       setNotifications((prev) =>

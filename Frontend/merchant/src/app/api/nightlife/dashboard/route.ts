@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/nightlife/dashboard",
+      endpoint: "/nightlife/dashboard",
       operation: "GET_NIGHTLIFE_DASHBOARD",
     });
     return NextResponse.json(

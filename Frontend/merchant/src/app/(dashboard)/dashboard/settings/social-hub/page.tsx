@@ -151,7 +151,7 @@ export default function SocialMediaHub() {
               engagement: number;
             }>;
           };
-        }>("/api/social-connections");
+        }>("/social-connections");
         if (cancelled || res?.success === false || !res.data) return;
         setPlatforms(mergePlatformsFromApi(buildDefaultPlatforms(), res.data));
       } catch (e) {
@@ -184,7 +184,7 @@ export default function SocialMediaHub() {
             engagement: number;
           }>;
         };
-      }>("/api/social-connections");
+      }>("/social-connections");
       if (res?.data && res.success !== false) {
         setPlatforms(mergePlatformsFromApi(buildDefaultPlatforms(), res.data));
       }
@@ -203,7 +203,7 @@ export default function SocialMediaHub() {
 
     setLoading(true);
     try {
-      await apiJson("/api/social-connections", {
+      await apiJson("/social-connections", {
         method: "POST",
         body: JSON.stringify({
           platform: platformId,

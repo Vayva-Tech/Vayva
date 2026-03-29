@@ -77,7 +77,7 @@ export function WebhookCreateDialog({
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/integrations/webhooks", {
+      const response = await fetch("/integrations/webhooks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

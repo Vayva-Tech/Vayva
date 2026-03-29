@@ -79,7 +79,7 @@ export default function QRCodeManagementPage() {
       setLoading(true);
       const [codesRes, statsRes] = await Promise.all([
         apiJson<{ success: boolean; codes: typeof codes }>(`/api/qr?status=${filter !== "all" ? filter : ""}`),
-        apiJson<{ success: boolean; stats: typeof stats }>("/api/qr/stats"),
+        apiJson<{ success: boolean; stats: typeof stats }>("/qr/stats"),
       ]);
 
       if (codesRes.success) setCodes(codesRes.codes || []);
@@ -350,7 +350,7 @@ function CreateQRModal({
     
     setLoading(true);
     try {
-      const res = await apiJson<{ success: boolean }>("/api/qr", {
+      const res = await apiJson<{ success: boolean }>("/qr", {
         method: "POST",
         body: JSON.stringify({
           type: selectedType,

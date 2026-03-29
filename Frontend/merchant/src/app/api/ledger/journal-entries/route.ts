@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: result.data }, { status: 201 });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/ledger/journal-entries",
+      endpoint: "/ledger/journal-entries",
       operation: "POST",
     });
     return NextResponse.json(

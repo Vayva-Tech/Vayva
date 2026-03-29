@@ -47,7 +47,7 @@ export default function StorefrontSettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const data = await apiJson<{ settings: CheckoutSettings }>("/api/storefront/settings");
+      const data = await apiJson<{ settings: CheckoutSettings }>("/storefront/settings");
       setSettings(data.settings || getDefaultSettings());
     } catch (error) {
       logger.error("[STOREFRONT_SETTINGS_FETCH_ERROR]", { error });
@@ -80,7 +80,7 @@ export default function StorefrontSettingsPage() {
     if (!settings) return;
     setSaving(true);
     try {
-      await apiJson("/api/storefront/settings", {
+      await apiJson("/storefront/settings", {
         method: "PUT",
         body: JSON.stringify(settings),
       });

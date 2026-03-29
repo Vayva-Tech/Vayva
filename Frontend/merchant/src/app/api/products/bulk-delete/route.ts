@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/bulk-delete",
+      endpoint: "/products/bulk-delete",
       operation: "BULK_DELETE_PRODUCTS",
     });
     return NextResponse.json(

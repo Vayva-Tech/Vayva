@@ -26,7 +26,7 @@ export default function NewTenantPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch("/api/saas/tenants", {
+      const res = await fetch("/saas/tenants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

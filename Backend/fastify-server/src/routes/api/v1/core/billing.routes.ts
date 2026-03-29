@@ -1,143 +1,226 @@
 import { FastifyPluginAsync } from 'fastify';
-import { BillingService } from '../../../services/core/billing.service';
+import { SubscriptionsService } from '../../../../services/core/subscriptions.service';
 
-const billingService = new BillingService();
+const subscriptionsService = new SubscriptionsService();
 
 export const billingRoutes: FastifyPluginAsync = async (server) => {
-  server.get('/', {
+  /**
+   * GET /api/v1/billing/current - Get current subscription details
+   */
+  server.get('/current', {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
-      const subscription = await billingService.getSubscription(storeId);
-      return reply.send({ success: true, data: subscription });
-    },
-  });
-
-  server.post('/subscription', {
-    preHandler: [server.authenticate],
-    handler: async (request, reply) => {
-      const storeId = (request.user as any).storeId;
-      const subscriptionData = request.body as any;
 
       try {
-        const subscription = await billingService.getSubscription(storeId);
-        if (!subscription) {
-          const created = await billingService.getSubscription(storeId);
-          return reply.send({ success: true, data: created });
-        }
-        return reply.send({ success: true, data: subscription });
+        const subscription = await subscriptionsService.getCurrentSubscription(storeId);
+        
+        return reply.send({ 
+          success: true, 
+          data: {
+            planKey: subscription?.planKey || 'STARTER',
+            status: subscription?.status || 'INACTIVE',
+            currentPeriodStart: subscription?.currentPeriodStart,
+            currentPeriodEnd: subscription?.currentPeriodEnd,
+            trialEndsAt: subscription?.trialEndsAt,
+            cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd,
+            provider: subscription?.provider,
+          }
+        });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to get subscription' 
+        return reply.code(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to fetch subscription',
         });
       }
     },
   });
 
+  /**
+   * GET /api/v1/billing/features - Get available features by plan
+   */
+  server.get('/features', {
+    preHandler: [server.authenticate],
+    handler: async (request, reply) => {
+      const storeId = (request.user as any).storeId;
+
+      try {
+        const features = await subscriptionsService.getAvailableFeatures(storeId);
+        
+        return reply.send({ 
+          success: true, 
+          data: features
+        });
+      } catch (error) {
+        return reply.code(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to fetch features',
+        });
+      }
+    },
+  });
+
+  /**
+   * POST /api/v1/billing/create-checkout - Create Paystack checkout session
+   */
+  server.post('/create-checkout', {
+    preHandler: [server.authenticate],
+    handler: async (request, reply) => {
+      const storeId = (request.user as any).storeId;
+      const { planKey, billingCycle, successUrl, cancelUrl } = request.body as any;
+
+      try {
+        const checkoutSession = await subscriptionsService.createCheckoutSession({
+          storeId,
+          planKey,
+          billingCycle: billingCycle || 'monthly',
+          successUrl,
+          cancelUrl,
+        });
+
+        return reply.send({ 
+          success: true, 
+          data: checkoutSession 
+        });
+      } catch (error) {
+        return reply.code(400).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to create checkout session',
+        });
+      }
+    },
+  });
+
+  /**
+   * POST /api/v1/billing/create-portal - Create billing portal session
+   */
+  server.post('/create-portal', {
+    preHandler: [server.authenticate],
+    handler: async (request, reply) => {
+      const storeId = (request.user as any).storeId;
+      const { returnUrl } = request.body as any;
+
+      try {
+        const portalSession = await subscriptionsService.createPortalSession({
+          storeId,
+          returnUrl,
+        });
+
+        return reply.send({ 
+          success: true, 
+          data: portalSession 
+        });
+      } catch (error) {
+        return reply.code(400).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to create portal session',
+        });
+      }
+    },
+  });
+
+  /**
+   * GET /api/v1/billing/usage - Get current usage metrics
+   */
+  server.get('/usage', {
+    preHandler: [server.authenticate],
+    handler: async (request, reply) => {
+      const storeId = (request.user as any).storeId;
+
+      try {
+        const usage = await subscriptionsService.getUsageMetrics(storeId);
+        
+        return reply.send({ 
+          success: true, 
+          data: usage
+        });
+      } catch (error) {
+        return reply.code(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to fetch usage',
+        });
+      }
+    },
+  });
+
+  /**
+   * POST /api/v1/billing/upgrade - Upgrade plan immediately
+   */
   server.post('/upgrade', {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
-      const upgradeData = request.body as any;
+      const { targetPlanKey, paymentMethodId } = request.body as any;
 
       try {
-        const updated = await billingService.upgradePlan(storeId, upgradeData);
-        return reply.send({ success: true, data: updated });
+        const result = await subscriptionsService.upgradePlan({
+          storeId,
+          targetPlanKey,
+          paymentMethodId,
+        });
+
+        return reply.send({ 
+          success: true, 
+          data: result 
+        });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to upgrade plan' 
+        return reply.code(400).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to upgrade plan',
         });
       }
     },
   });
 
-  server.post('/downgrade', {
-    preHandler: [server.authenticate],
-    handler: async (request, reply) => {
-      const storeId = (request.user as any).storeId;
-      const downgradeData = request.body as any;
-
-      try {
-        const updated = await billingService.downgradePlan(storeId, downgradeData);
-        return reply.send({ success: true, data: updated });
-      } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to downgrade plan' 
-        });
-      }
-    },
-  });
-
+  /**
+   * POST /api/v1/billing/cancel - Cancel subscription at period end
+   */
   server.post('/cancel', {
     preHandler: [server.authenticate],
     handler: async (request, reply) => {
       const storeId = (request.user as any).storeId;
-      const reason = (request.body as any).reason || '';
+      const { cancellationReason } = request.body as any;
 
       try {
-        const cancelled = await billingService.cancelSubscription(storeId, reason);
-        return reply.send({ success: true, data: cancelled });
+        const result = await subscriptionsService.cancelAtPeriodEnd({
+          storeId,
+          cancellationReason,
+        });
+
+        return reply.send({ 
+          success: true, 
+          data: result 
+        });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to cancel subscription' 
+        return reply.code(400).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to cancel subscription',
         });
       }
     },
   });
 
-  server.post('/proration/calculate', {
-    preHandler: [server.authenticate],
+  /**
+   * POST /api/v1/billing/webhook - Paystack webhook handler
+   */
+  server.post('/webhook', {
+    // No authentication - Paystack signatures are verified differently
     handler: async (request, reply) => {
-      const storeId = (request.user as any).storeId;
-      const { planId } = request.body as any;
+      const eventBody = request.body as any;
 
       try {
-        const proration = await billingService.calculateProration(storeId, planId);
-        return reply.send({ success: true, data: proration });
-      } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to calculate proration' 
+        const result = await subscriptionsService.handlePaystackWebhook({
+          eventBody,
         });
-      }
-    },
-  });
 
-  server.post('/verify-payment', {
-    preHandler: [server.authenticate],
-    handler: async (request, reply) => {
-      const storeId = (request.user as any).storeId;
-      const paymentData = request.body as any;
-
-      try {
-        const payment = await billingService.verifyPayment(storeId, paymentData);
-        return reply.code(201).send({ success: true, data: payment });
-      } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to verify payment' 
+        return reply.send({ 
+          success: true, 
+          data: result 
         });
-      }
-    },
-  });
-
-  server.post('/verify-template', {
-    preHandler: [server.authenticate],
-    handler: async (request, reply) => {
-      const storeId = (request.user as any).storeId;
-      const { templateId } = request.body as any;
-
-      try {
-        const verification = await billingService.verifyTemplate(storeId, templateId);
-        return reply.send({ success: true, data: verification });
       } catch (error) {
-        return reply.code(400).send({ 
-          success: false, 
-          error: error instanceof Error ? error.message : 'Failed to verify template' 
+        return reply.code(400).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Webhook processing failed',
         });
       }
     },

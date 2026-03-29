@@ -109,7 +109,7 @@ export default function LegalMattersPage() {
   const fetchMatters = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Matter[] }>("/api/legal/matters?limit=500");
+      const response = await apiJson<{ data: Matter[] }>("/legal/matters?limit=500");
       setMatters(response.data || generateMockMatters());
     } catch (error) {
       logger.warn("Using mock matters data", error);
@@ -121,7 +121,7 @@ export default function LegalMattersPage() {
 
   const handleCreateMatter = async (matterData: Partial<Matter>) => {
     try {
-      const response = await apiJson<{ data: Matter }>("/api/legal/matters", {
+      const response = await apiJson<{ data: Matter }>("/legal/matters", {
         method: "POST",
         body: JSON.stringify(matterData),
       });

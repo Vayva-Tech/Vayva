@@ -77,7 +77,7 @@ export function CustomerSegmentationDashboard() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/api/segments?overview=true");
+      const response = await fetch("/segments?overview=true");
 
       if (!response.ok) {
         throw new Error("Failed to fetch segments");
@@ -97,7 +97,7 @@ export function CustomerSegmentationDashboard() {
     try {
       setAnalyzing(true);
 
-      const response = await fetch("/api/segments", {
+      const response = await fetch("/segments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "rfm-analysis" }),
@@ -128,7 +128,7 @@ export function CustomerSegmentationDashboard() {
     try {
       setCreatingPredefined(true);
 
-      const response = await fetch("/api/segments", {
+      const response = await fetch("/segments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "create-predefined" }),
@@ -157,7 +157,7 @@ export function CustomerSegmentationDashboard() {
 
   const createCustomSegment = async () => {
     try {
-      const response = await fetch("/api/segments", {
+      const response = await fetch("/segments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

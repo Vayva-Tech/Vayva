@@ -1,10 +1,13 @@
 /**
  * Enhanced Audit Logging System
  * Comprehensive tracking of security-sensitive and business-critical events
+ * 
+ * MIGRATED: Now calls backend API instead of direct Prisma queries
  */
 
-import { prisma } from "@vayva/db";
 import { logger } from "@vayva/shared";
+
+const BACKEND_URL = process.env.BACKEND_API_URL || '';
 
 export enum AuditEventType {
   // Authentication & Security
@@ -120,8 +123,16 @@ export interface AuditEventMeta {
   meta?: Record<string, unknown>;
 }
 
+export interface SuspiciousActivityReport {
+  failedLoginAttempts: number;
+  rateLimitViolations: number;
+  csrfViolations: number;
+  bruteForceAttempts: number;
+  unusualDataAccess: number;
+}
+
 /**
- * Log an audit event to the database
+ * Log an audit event to the database via backend API
  */
 export async function logAuditEvent(
   storeId: string | null,
@@ -130,33 +141,27 @@ export async function logAuditEvent(
   meta: AuditEventMeta = {}
 ): Promise<void> {
   try {
-    await prisma.auditLog.create({
-      data: {
-        storeId,
-        userId,
-        eventType,
-        ipAddress: meta.ipAddress,
-        userAgent: meta.userAgent,
-        targetType: meta.targetType,
-        targetId: meta.targetId,
-        reason: meta.reason,
-        metadata: meta.meta || {},
-        timestamp: new Date(),
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/audit/log`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
+      body: JSON.stringify({
+        eventType,
+        userId,
+        storeId,
+        meta,
+      }),
     });
 
-    logger.info(`[AUDIT] ${eventType}`, {
-      storeId,
-      userId,
-      ...meta,
-    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: { message: 'Failed to log audit event' } }));
+      logger.error('[AUDIT] Failed to log event', error);
+    }
   } catch (error) {
-    logger.error("[AUDIT] Failed to log event", {
-      storeId,
-      userId,
-      eventType,
-      error,
-    });
+    logger.error('[AUDIT] Error logging event', error);
     // Don't throw - audit logging failure shouldn't break main operation
   }
 }
@@ -175,113 +180,72 @@ export async function getAuditLogs(options: {
 }) {
   const { storeId, userId, eventType, startDate, endDate, limit = 50, offset = 0 } = options;
 
-  const where: Record<string, unknown> = {
-    storeId,
-  };
+  try {
+    const token = await getAuthToken();
+    const params = new URLSearchParams({
+      storeId,
+      limit: String(limit),
+      offset: String(offset),
+    });
 
-  if (userId) {
-    where.userId = userId;
-  }
+    if (userId) params.append('userId', userId);
+    if (eventType) params.append('eventType', eventType);
+    if (startDate) params.append('startDate', startDate.toISOString());
+    if (endDate) params.append('endDate', endDate.toISOString());
 
-  if (eventType) {
-    where.eventType = eventType;
-  }
-
-  if (startDate || endDate) {
-    where.timestamp = {};
-    if (startDate) {
-      where.timestamp.gte = startDate;
-    }
-    if (endDate) {
-      where.timestamp.lte = endDate;
-    }
-  }
-
-  const [logs, total] = await Promise.all([
-    prisma.auditLog.findMany({
-      where,
-      orderBy: { timestamp: "desc" },
-      take: limit,
-      skip: offset,
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
+    const res = await fetch(`${BACKEND_URL}/api/v1/audit/logs?${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
       },
-    }),
-    prisma.auditLog.count({ where }),
-  ]);
+    });
 
-  return {
-    logs,
-    total,
-    hasMore: offset + limit < total,
-  };
+    if (!res.ok) {
+      throw new Error('Failed to fetch audit logs');
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    logger.error('[AUDIT] Error fetching logs', error);
+    return {
+      logs: [],
+      total: 0,
+      hasMore: false,
+    };
+  }
 }
 
 /**
  * Get suspicious activity report
  */
-export async function getSuspiciousActivityReport(storeId: string, days = 7): Promise<{
-  failedLoginAttempts: number;
-  rateLimitViolations: number;
-  csrfViolations: number;
-  bruteForceAttempts: number;
-  unusualDataAccess: number;
-}> {
-  const since = new Date();
-  since.setDate(since.getDate() - days);
+export async function getSuspiciousActivityReport(storeId: string, days = 7): Promise<SuspiciousActivityReport> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(
+      `${BACKEND_URL}/api/v1/audit/suspicious-report?storeId=${storeId}&days=${days}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
 
-  const [failedLogins, rateLimits, csrfViolations, bruteForce, unusualAccess] = await Promise.all([
-    prisma.auditLog.count({
-      where: {
-        storeId,
-        eventType: AuditEventType.LOGIN_FAILED,
-        timestamp: { gte: since },
-      },
-    }),
-    prisma.auditLog.count({
-      where: {
-        storeId,
-        eventType: AuditEventType.RATE_LIMIT_EXCEEDED,
-        timestamp: { gte: since },
-      },
-    }),
-    prisma.auditLog.count({
-      where: {
-        storeId,
-        eventType: AuditEventType.CSRF_VIOLATION_DETECTED,
-        timestamp: { gte: since },
-      },
-    }),
-    prisma.auditLog.count({
-      where: {
-        storeId,
-        eventType: AuditEventType.BRUTE_FORCE_ATTEMPT,
-        timestamp: { gte: since },
-      },
-    }),
-    prisma.auditLog.count({
-      where: {
-        storeId,
-        eventType: AuditEventType.SENSITIVE_DATA_ACCESSED,
-        timestamp: { gte: since },
-      },
-    }),
-  ]);
+    if (!res.ok) {
+      throw new Error('Failed to fetch suspicious activity report');
+    }
 
-  return {
-    failedLoginAttempts: failedLogins,
-    rateLimitViolations: rateLimits,
-    csrfViolations: csrfViolations,
-    bruteForceAttempts: bruteForce,
-    unusualDataAccess: unusualAccess,
-  };
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    logger.error('[AUDIT] Error fetching suspicious activity report', error);
+    return {
+      failedLoginAttempts: 0,
+      rateLimitViolations: 0,
+      csrfViolations: 0,
+      bruteForceAttempts: 0,
+      unusualDataAccess: 0,
+    };
+  }
 }
 
 /**
@@ -292,25 +256,105 @@ export async function exportAuditLogs(
   startDate: Date,
   endDate: Date
 ): Promise<string> {
-  const logs = await prisma.auditLog.findMany({
-    where: {
-      storeId,
-      timestamp: {
-        gte: startDate,
-        lte: endDate,
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/audit/export`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
-    },
-    orderBy: { timestamp: "asc" },
-  });
+      body: JSON.stringify({
+        storeId,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      }),
+    });
 
-  // Convert to CSV format
-  const headers = ["timestamp", "eventType", "userId", "storeId", "ipAddress", "targetType", "targetId", "reason"];
-  const rows = logs.map((log) =>
-    headers.map((header) => {
-      const value = (log as any)[header];
-      return typeof value === "object" ? JSON.stringify(value) : String(value || "");
-    }).join(",")
-  );
+    if (!res.ok) {
+      throw new Error('Failed to export audit logs');
+    }
 
-  return [headers.join(","), ...rows].join("\n");
+    return await res.text();
+  } catch (error) {
+    logger.error('[AUDIT] Error exporting logs', error);
+    return '';
+  }
+}
+
+/**
+ * Get recent activity summary
+ */
+export async function getRecentActivitySummary(storeId: string, hours = 24): Promise<{
+  totalEvents: number;
+  uniqueUsers: number;
+  topEventTypes: Array<{ eventType: string; count: number }>;
+  suspiciousEvents: number;
+}> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(
+      `${BACKEND_URL}/api/v1/audit/activity-summary?storeId=${storeId}&hours=${hours}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch activity summary');
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    logger.error('[AUDIT] Error fetching activity summary', error);
+    return {
+      totalEvents: 0,
+      uniqueUsers: 0,
+      topEventTypes: [],
+      suspiciousEvents: 0,
+    };
+  }
+}
+
+/**
+ * Clear old audit logs (retention policy)
+ */
+export async function clearOldAuditLogs(retentionDays = 90): Promise<number> {
+  try {
+    const token = await getAuthToken();
+    const res = await fetch(`${BACKEND_URL}/api/v1/audit/cleanup`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ retentionDays }),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to clear old audit logs');
+    }
+
+    const data = await res.json();
+    return data.data.deletedCount;
+  } catch (error) {
+    logger.error('[AUDIT] Error clearing old logs', error);
+    return 0;
+  }
+}
+
+/**
+ * Get auth token from cookies
+ */
+async function getAuthToken(): Promise<string | null> {
+  try {
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    return cookieStore.get('auth_token')?.value || null;
+  } catch {
+    return null;
+  }
 }

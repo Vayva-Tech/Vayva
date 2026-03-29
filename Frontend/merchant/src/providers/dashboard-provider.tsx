@@ -17,11 +17,11 @@ import {
   getRemainingQuota,
 } from '@/lib/access-control/tier-limits';
 
-/** Session / display tier (FREE is not a billing PlanTier but is used in UI). */
-export type DashboardSessionTier = PlanTier | 'FREE';
+/** Session / display tier (all users start with STARTER trial). */
+export type DashboardSessionTier = PlanTier;
 
 function effectivePlanTierForLimits(tier: DashboardSessionTier): PlanTier {
-  return tier === 'FREE' ? 'STARTER' : tier;
+  return tier; // Already PlanTier, no conversion needed
 }
 
 interface DashboardContextType {

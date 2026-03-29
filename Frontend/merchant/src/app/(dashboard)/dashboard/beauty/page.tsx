@@ -360,7 +360,7 @@ export default function BeautyServicesPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await apiJson<{ data: DashboardStats }>("/api/beauty/stats");
+      const response = await apiJson<{ data: DashboardStats }>("/beauty/stats");
       setStats(response.data || generateMockStats());
     } catch (error) {
       setStats(generateMockStats());
@@ -369,7 +369,7 @@ export default function BeautyServicesPage() {
 
   const fetchClients = async () => {
     try {
-      const response = await apiJson<{ data: Client[] }>("/api/beauty/clients?limit=100");
+      const response = await apiJson<{ data: Client[] }>("/beauty/clients?limit=100");
       setClients(response.data || generateMockClients());
     } catch (error) {
       setClients(generateMockClients());
@@ -378,7 +378,7 @@ export default function BeautyServicesPage() {
 
   const fetchAppointments = async () => {
     try {
-      const response = await apiJson<{ data: Appointment[] }>("/api/beauty/appointments?today=true");
+      const response = await apiJson<{ data: Appointment[] }>("/beauty/appointments?today=true");
       setAppointments(response.data || generateMockAppointments());
     } catch (error) {
       setAppointments(generateMockAppointments());
@@ -387,7 +387,7 @@ export default function BeautyServicesPage() {
 
   const fetchServices = async () => {
     try {
-      const response = await apiJson<{ data: Service[] }>("/api/beauty/services");
+      const response = await apiJson<{ data: Service[] }>("/beauty/services");
       setServices(response.data || generateMockServices());
     } catch (error) {
       setServices(generateMockServices());
@@ -396,7 +396,7 @@ export default function BeautyServicesPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await apiJson<{ data: Product[] }>("/api/beauty/products");
+      const response = await apiJson<{ data: Product[] }>("/beauty/products");
       setProducts(response.data || generateMockProducts());
     } catch (error) {
       setProducts(generateMockProducts());
@@ -405,7 +405,7 @@ export default function BeautyServicesPage() {
 
   const fetchStaff = async () => {
     try {
-      const response = await apiJson<{ data: Staff[] }>("/api/beauty/staff");
+      const response = await apiJson<{ data: Staff[] }>("/beauty/staff");
       setStaff(response.data || generateMockStaff());
     } catch (error) {
       setStaff(generateMockStaff());

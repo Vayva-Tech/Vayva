@@ -30,7 +30,7 @@ export async function GET(req: any) {
         handleApiError(
             error,
             {
-                endpoint: "/api/jobs/cron/trial-reminders",
+                endpoint: "/jobs/cron/trial-reminders",
                 operation: "SEND_TRIAL_REMINDERS",
                 storeId: undefined,
             }

@@ -112,7 +112,7 @@ export default function KycStep() {
         payload.cacNumber = cacNumber.trim();
       }
 
-      const data = await apiJson<KycSubmitResponse>("/api/kyc/submit", {
+      const data = await apiJson<KycSubmitResponse>("/kyc/submit", {
         method: "POST",
         body: JSON.stringify(payload),
       });

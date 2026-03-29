@@ -35,7 +35,7 @@ export default function NightlifeEventsPage() {
   const loadEvents = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<NightlifeEvent[]>("/api/nightlife/events");
+      const data = await apiJson<NightlifeEvent[]>("/nightlife/events");
       setEvents(Array.isArray(data) ? data : []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);

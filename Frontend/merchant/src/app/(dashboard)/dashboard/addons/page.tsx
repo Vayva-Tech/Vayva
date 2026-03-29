@@ -70,7 +70,7 @@ export default function AddOnGallery() {
   const { data: addOns, isLoading: isLoadingAddOns } = useQuery({
     queryKey: ['addons', 'gallery'],
     queryFn: async () => {
-      const res = await fetch('/api/addons');
+      const res = await fetch('/addons');
       if (!res.ok) throw new Error('Failed to fetch add-ons');
       return res.json() as Promise<AddOnDefinition[]>;
     },

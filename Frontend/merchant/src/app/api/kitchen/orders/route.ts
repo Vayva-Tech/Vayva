@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/kitchen/orders",
+        endpoint: "/kitchen/orders",
         operation: "GET_KITCHEN_ORDERS",
       }
     );

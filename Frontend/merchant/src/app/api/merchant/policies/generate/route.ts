@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const result = await apiJson<{
       generated?: unknown;
       error?: string;
-    }>(buildBackendUrl("/api/merchant/policies/generate"), {
+    }>(buildBackendUrl("/merchant/policies/generate"), {
       method: "POST",
       headers: { ...auth.headers },
       body: JSON.stringify(body),
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/merchant/policies/generate",
+      endpoint: "/merchant/policies/generate",
       operation: "POST",
       storeId,
     });

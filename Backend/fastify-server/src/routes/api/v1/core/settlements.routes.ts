@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { SettlementService } from '../../../services/core/settlement.service';
+import { SettlementService } from '../../../../services/core/settlement.service';
 
 const settlementService = new SettlementService();
 

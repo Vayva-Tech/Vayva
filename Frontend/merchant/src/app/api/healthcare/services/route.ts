@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/healthcare/services", operation: "GET" });
+    handleApiError(error, { endpoint: "/healthcare/services", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/healthcare/services", operation: "POST" });
+    handleApiError(error, { endpoint: "/healthcare/services", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

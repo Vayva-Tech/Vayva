@@ -33,7 +33,7 @@ export default function PortfolioDetailPage() {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await fetch("/api/portfolio");
+        const res = await fetch("/portfolio");
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         const found = data.projects?.find((p: PortfolioProject) => p.id === id);

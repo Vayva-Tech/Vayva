@@ -48,7 +48,7 @@ export default function MembershipsPage() {
   useEffect(() => { void fetchMemberships(); }, []);
 
   const fetchMemberships = async () => {
-    try { setLoading(true); const data = await apiJson<Membership[]>("/api/memberships"); setMemberships(data || []); } catch (error) { logger.error("[FETCH_MEMBERSHIPS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load memberships"); } finally { setLoading(false); }
+    try { setLoading(true); const data = await apiJson<Membership[]>("/memberships"); setMemberships(data || []); } catch (error) { logger.error("[FETCH_MEMBERSHIPS_ERROR]", { error: error instanceof Error ? error.message : String(error), app: "merchant" }); toast.error("Could not load memberships"); } finally { setLoading(false); }
   };
 
   const handleSave = async () => {
@@ -57,7 +57,7 @@ export default function MembershipsPage() {
     try {
       const payload = { ...formData, price: formData.price ? Number(formData.price) : 0, trialDays: formData.trialDays ? Number(formData.trialDays) : 0, features: formData.features.split("\n").map(f => f.trim()).filter(Boolean) };
       if (editingMembership) { await apiJson(`/api/memberships/${editingMembership.id}`, { method: "PUT", body: JSON.stringify(payload) }); toast.success("Membership updated"); }
-      else { await apiJson("/api/memberships", { method: "POST", body: JSON.stringify(payload) }); toast.success("Membership created"); }
+      else { await apiJson("/memberships", { method: "POST", body: JSON.stringify(payload) }); toast.success("Membership created"); }
       setIsOpen(false); setEditingMembership(null); resetForm(); void fetchMemberships();
     } catch { toast.error("Failed to save"); } finally { setIsSubmitting(false); }
   };

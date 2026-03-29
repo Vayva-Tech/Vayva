@@ -45,7 +45,7 @@ export default function TrustAccountSettingsPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/legal/settings/trust', {
+      const response = await fetch('/legal/settings/trust', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),

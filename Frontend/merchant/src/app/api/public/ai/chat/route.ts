@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       success: boolean;
       data?: { response?: string };
       error?: string;
-    }>(buildBackendUrl("/api/public/ai/chat"), {
+    }>(buildBackendUrl("/public/ai/chat"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(aiResult.data || { response: "" });
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/public/ai/chat", operation: "POST" });
+    handleApiError(error, { endpoint: "/public/ai/chat", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

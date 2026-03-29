@@ -70,8 +70,8 @@ export default function ShippingSettingsPage() {
       try {
         setLoading(true);
         const [zonesData, deliveryData] = await Promise.all([
-          apiJson<ShippingZone[]>("/api/settings/shipping"),
-          apiJson<any>("/api/settings/delivery"),
+          apiJson<ShippingZone[]>("/settings/shipping"),
+          apiJson<any>("/settings/delivery"),
         ]);
 
         setZones(zonesData || []);
@@ -110,7 +110,7 @@ export default function ShippingSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/settings/shipping", {
+      await apiJson<{ success: boolean }>("/settings/shipping", {
         method: "POST",
         body: JSON.stringify(zones),
       });
@@ -131,7 +131,7 @@ export default function ShippingSettingsPage() {
   const handleSaveDelivery = async () => {
     setSavingDelivery(true);
     try {
-      await apiJson<{ success: boolean }>("/api/settings/delivery", {
+      await apiJson<{ success: boolean }>("/settings/delivery", {
         method: "POST",
         body: JSON.stringify(deliverySettings),
       });

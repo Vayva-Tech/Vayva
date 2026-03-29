@@ -89,7 +89,7 @@ export function KYCFileUpload({
       const { uploadUrl, fileUrl } = await apiJson<{
         uploadUrl: string;
         fileUrl: string;
-      }>("/api/kyc/upload-url", {
+      }>("/kyc/upload-url", {
         method: "POST",
         body: JSON.stringify({
           documentType,
@@ -131,7 +131,7 @@ export function KYCFileUpload({
       );
 
       // Notify backend of upload completion
-      await apiJson("/api/kyc/verify", {
+      await apiJson("/kyc/verify", {
         method: "POST",
         body: JSON.stringify({
           fileId,
@@ -225,7 +225,7 @@ export function KYCFileUpload({
 
   const removeFile = async (fileId: string) => {
     try {
-      await apiJson("/api/kyc/remove-file", {
+      await apiJson("/kyc/remove-file", {
         method: "POST",
         body: JSON.stringify({ fileId }),
       });

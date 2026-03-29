@@ -41,7 +41,7 @@ export default function TravelBookingsPage() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Booking[] }>("/api/travel/bookings?limit=500");
+      const response = await apiJson<{ data: Booking[] }>("/travel/bookings?limit=500");
       setBookings(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch bookings", error);

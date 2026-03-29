@@ -56,7 +56,7 @@ export default function ExtensionsPage() {
     const fetchCatalog = async () => {
       try {
         setLoading(true);
-        const data = await apiJson<AddOnsResponse>("/api/merchant/addons");
+        const data = await apiJson<AddOnsResponse>("/merchant/addons");
         setAddOns(data?.addOns || []);
       } catch (err: unknown) {
         const _errMsg = err instanceof Error ? err.message : String(err);

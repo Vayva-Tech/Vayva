@@ -51,7 +51,7 @@ export default function SocialsPage(): React.JSX.Element {
     const [aiReport, setAiReport] = useState<AIReport | null>(null);
 
     const connectHref = useMemo(() => {
-        const url = new URL("/api/socials/instagram/connect", window.location.origin);
+        const url = new URL("/socials/instagram/connect", window.location.origin);
         url.searchParams.set("returnTo", "/dashboard/socials");
         return url.pathname + url.search;
     }, []);
@@ -60,7 +60,7 @@ export default function SocialsPage(): React.JSX.Element {
         const controller = new AbortController();
         const fetchMe = async () => {
             try {
-                const data = await apiJson<any>("/api/auth/merchant/me", { signal: controller.signal });
+                const data = await apiJson<any>("/auth/merchant/me", { signal: controller.signal });
                 const payload = data?.data || data;
                 const enabled = Boolean(payload?.features?.socials?.enabled ?? payload?.merchant?.features?.socials?.enabled);
                 const igEnabled = Boolean(
@@ -112,7 +112,7 @@ export default function SocialsPage(): React.JSX.Element {
         const fetchIgStatus = async () => {
             setIgLoading(true);
             try {
-                const data = await apiJson<any>("/api/socials/instagram/status", { signal: controller.signal });
+                const data = await apiJson<any>("/socials/instagram/status", { signal: controller.signal });
                 if (!data) {
                     setIg(null);
                     return;
@@ -140,8 +140,8 @@ export default function SocialsPage(): React.JSX.Element {
     const disconnectInstagram = async () => {
         setIgBusy(true);
         try {
-            await apiJson("/api/socials/instagram/disconnect", { method: "POST" });
-            const refreshed = await apiJson<any>("/api/socials/instagram/status");
+            await apiJson("/socials/instagram/disconnect", { method: "POST" });
+            const refreshed = await apiJson<any>("/socials/instagram/status");
             setIg({
                 connected: Boolean(refreshed?.connected),
                 account: refreshed?.account ?? null,
@@ -162,7 +162,7 @@ export default function SocialsPage(): React.JSX.Element {
     useEffect(() => {
         const fetchReport = async () => {
             try {
-                const data = await apiJson<AIReport>("/api/socials/ai-report");
+                const data = await apiJson<AIReport>("/socials/ai-report");
                 if (data) setAiReport(data);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: unknown) {

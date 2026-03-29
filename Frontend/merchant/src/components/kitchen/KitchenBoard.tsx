@@ -38,7 +38,7 @@ export function KitchenBoard() {
   const fetchOrders = async () => {
     try {
       const data = await apiJson<KitchenOrder[] | KitchenOrdersResponse>(
-        "/api/kitchen/orders",
+        "/kitchen/orders",
       );
       // The API returns an array directly or { orders: [] }
       const orderList = Array.isArray(data) ? data : data.orders || [];

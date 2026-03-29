@@ -32,7 +32,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     const result = await apiJson<{
       calculation: FinancingCalculation;
-    }>(buildBackendUrl("/api/vehicles/financing/calculate"), {
+    }>(buildBackendUrl("/vehicles/financing/calculate"), {
       method: "POST",
       headers: auth.headers,
       body: JSON.stringify(validated),
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     return NextResponse.json(result);
   } catch (error: unknown) {
-    handleApiError(error, { endpoint: "/api/vehicles/financing", operation: "POST" });
+    handleApiError(error, { endpoint: "/vehicles/financing", operation: "POST" });
     return NextResponse.json({ error: "Failed to complete operation" }, { status: 500 });
   }
 }

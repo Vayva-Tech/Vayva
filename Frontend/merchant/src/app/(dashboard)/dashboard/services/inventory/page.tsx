@@ -181,17 +181,17 @@ export default function ServicesInventoryPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Item Name</th>
-                    <th className="text-left py-3 px-4 font-semibold">Category</th>
-                    <th className="text-left py-3 px-4 font-semibold">Quantity</th>
-                    <th className="text-left py-3 px-4 font-semibold">Unit Cost</th>
-                    <th className="text-left py-3 px-4 font-semibold">Total Value</th>
-                    <th className="text-left py-3 px-4 font-semibold">Supplier</th>
-                    <th className="text-left py-3 px-4 font-semibold">Last Restocked</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Item Name</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Category</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Quantity</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Unit Cost</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Total Value</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Supplier</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Last Restocked</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

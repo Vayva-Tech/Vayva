@@ -38,7 +38,7 @@ export default function EducationCoursesPage() {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: Course[] }>("/api/education/courses?limit=500");
+      const response = await apiJson<{ data: Course[] }>("/education/courses?limit=500");
       setCourses(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch courses", error);

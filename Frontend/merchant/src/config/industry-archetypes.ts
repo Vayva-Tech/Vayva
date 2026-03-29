@@ -27,6 +27,7 @@ const COMMERCE_MODULES = [
   "content",
   "b2b",
   "settings",
+  "pos", // Point of Sale
 ] as const;
 
 const BASE_PRODUCT_FORM = {
@@ -92,6 +93,7 @@ export const INDUSTRY_ARCHETYPES: Record<
       catalog: { index: "/dashboard/catalog", create: "/dashboard/catalog/new" },
       sales: { index: "/dashboard/orders" },
       fulfillment: { index: "/dashboard/shipments" },
+      pos: { index: "/dashboard/pos/retail" }, // Default to retail POS
     },
     dashboardWidgets: [
       {
@@ -137,6 +139,7 @@ export const INDUSTRY_ARCHETYPES: Record<
       "marketing",
       "customers",
       "settings",
+      "pos", // Point of Sale for restaurants
     ],
     moduleLabels: {
       catalog: "Menu Items",
@@ -152,6 +155,7 @@ export const INDUSTRY_ARCHETYPES: Record<
       catalog: { index: "/dashboard/menu-items", create: "/dashboard/menu-items/new" },
       sales: { index: "/dashboard/orders" },
       fulfillment: { index: "/dashboard/kitchen" },
+      pos: { index: "/dashboard/pos/restaurant" }, // Restaurant-specific POS
     },
     dashboardWidgets: [
       {
@@ -267,6 +271,7 @@ export const INDUSTRY_ARCHETYPES: Record<
       "events",
       "nonprofit",
       "settings",
+      "pos", // Point of Sale for digital/events
     ],
     moduleLabels: {
       catalog: "Digital Assets",
@@ -282,6 +287,7 @@ export const INDUSTRY_ARCHETYPES: Record<
       catalog: { index: "/dashboard/catalog", create: "/dashboard/catalog/new" },
       sales: { index: "/dashboard/orders" },
       content: { index: "/dashboard/content", create: "/dashboard/content/new" },
+      pos: { index: "/dashboard/pos/events" }, // Default to Events POS for content industries
     },
     dashboardWidgets: [
       {
@@ -757,6 +763,7 @@ const INDUSTRY_OVERRIDES: Record<string, Partial<IndustryConfig>> = {
     moduleRoutes: {
       events: { index: "/dashboard/events", create: "/dashboard/events/new" },
       sales: { index: "/dashboard/orders" },
+      pos: { index: "/dashboard/pos/events" }, // Events POS for ticketing
     },
     features: { events: true, payments: true, calendar: true },
     aiTools: ["get_events", "get_tickets", "check_availability"],
@@ -824,6 +831,7 @@ const INDUSTRY_OVERRIDES: Record<string, Partial<IndustryConfig>> = {
     moduleRoutes: {
       education: { index: "/dashboard/courses", create: "/dashboard/courses/new" },
       enrollments: { index: "/dashboard/enrollments" },
+      pos: { index: "/dashboard/pos/education" }, // Education POS for enrollment
     },
     forms: {
       course: {

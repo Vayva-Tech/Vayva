@@ -229,7 +229,7 @@ export function useContentCalendar(storeId: string) {
   const { data: calendar, isLoading } = useQuery({
     queryKey: ['content-calendar', storeId],
     queryFn: async () => {
-      const response = await fetch('/api/blog/calendar');
+      const response = await fetch('/blog/calendar');
       if (!response.ok) throw new Error('Failed to fetch calendar');
       const result = await response.json();
       return result.data;
@@ -237,7 +237,7 @@ export function useContentCalendar(storeId: string) {
   });
 
   const createEvent = async (data: any) => {
-    const response = await fetch('/api/blog/calendar', {
+    const response = await fetch('/blog/calendar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -296,7 +296,7 @@ export function useNewsletterSubscribers(storeId: string) {
   const { data: subscribers, isLoading } = useQuery({
     queryKey: ['newsletter-subscribers', storeId],
     queryFn: async () => {
-      const response = await fetch('/api/blog/newsletter/subscribers');
+      const response = await fetch('/blog/newsletter/subscribers');
       if (!response.ok) throw new Error('Failed to fetch subscribers');
       const result = await response.json();
       return result.data;
@@ -304,7 +304,7 @@ export function useNewsletterSubscribers(storeId: string) {
   });
 
   const addSubscriber = async (data: any) => {
-    const response = await fetch('/api/blog/newsletter/subscribers', {
+    const response = await fetch('/blog/newsletter/subscribers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -319,7 +319,7 @@ export function useNewsletterSubscribers(storeId: string) {
   };
 
   const unsubscribe = async (email: string) => {
-    const response = await fetch('/api/blog/newsletter/unsubscribe', {
+    const response = await fetch('/blog/newsletter/unsubscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
@@ -51,7 +50,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/support/conversations/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/support/conversations/:id", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

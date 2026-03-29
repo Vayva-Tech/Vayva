@@ -50,7 +50,7 @@ export function TestMessageDialog({
     }
     setIsSending(true);
     try {
-      await apiJson<TestMessageResponse>("/api/ai-agent/test-message", {
+      await apiJson<TestMessageResponse>("/ai-agent/test-message", {
         method: "POST",
         body: JSON.stringify({ channel, target, config: draftConfig }),
       });

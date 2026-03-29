@@ -630,7 +630,7 @@ function AddIngredientDialog({
     setIsSubmitting(true);
     try {
       // In a real implementation, this would be an API call
-      // await fetch('/api/recipe-cost/ingredients', {
+      // await fetch('/recipe-cost/ingredients', {
       //   method: 'POST',
       //   body: JSON.stringify({ storeId, ...formData })
       // });
@@ -811,7 +811,7 @@ function AddRecipeDialog({
     setIsSubmitting(true);
     try {
       // In a real implementation, this would be an API call
-      // await fetch('/api/recipe-cost/recipes', {
+      // await fetch('/recipe-cost/recipes', {
       //   method: 'POST',
       //   body: JSON.stringify({ storeId, ...formData })
       // });

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { SubscriptionsService } from '../../../services/core/subscriptions.service';
+import { SubscriptionsService } from '../../../../services/core/subscriptions.service';
 
 const subscriptionsService = new SubscriptionsService();
 

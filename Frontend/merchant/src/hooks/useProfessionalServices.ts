@@ -26,7 +26,7 @@ export function useProfessionalDashboard(): UseProfessionalDashboardReturn {
       setError(null);
       
       const response = await apiJson<ApiResponse<ProfessionalDashboardResponse>>(
-        "/api/professional/dashboard"
+        "/professional/dashboard"
       );
       
       if (response?.data) {
@@ -152,7 +152,7 @@ export function useMatters(filters?: { status?: string; practiceArea?: string })
   const createMatter = async (matterData: any) => {
     try {
       const response = await apiJson<ApiResponse<any>>(
-        "/api/professional/matters",
+        "/professional/matters",
         {
           method: "POST",
           body: JSON.stringify(matterData),
@@ -248,7 +248,7 @@ export function useClients(filters?: { type?: string; isActive?: boolean }): Use
   const createClient = async (clientData: any) => {
     try {
       const response = await apiJson<ApiResponse<any>>(
-        "/api/professional/clients",
+        "/professional/clients",
         {
           method: "POST",
           body: JSON.stringify(clientData),
@@ -336,7 +336,7 @@ export function useBilling(filters?: { matterId?: string; status?: string }): Us
   const logTime = async (timeEntry: any) => {
     try {
       const response = await apiJson<ApiResponse<any>>(
-        "/api/professional/billing/time-entries",
+        "/professional/billing/time-entries",
         {
           method: "POST",
           body: JSON.stringify(timeEntry),
@@ -358,7 +358,7 @@ export function useBilling(filters?: { matterId?: string; status?: string }): Us
   const createInvoice = async (invoiceData: any) => {
     try {
       const response = await apiJson<ApiResponse<any>>(
-        "/api/professional/billing/invoices",
+        "/professional/billing/invoices",
         {
           method: "POST",
           body: JSON.stringify(invoiceData),

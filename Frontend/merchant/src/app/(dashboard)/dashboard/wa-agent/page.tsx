@@ -66,11 +66,11 @@ export default function WhatsappSettingsPage() {
   const handleConnect = async () => {
     setStatus("connecting");
     try {
-      await apiJson<{ success: boolean }>("/api/whatsapp/instance", {
+      await apiJson<{ success: boolean }>("/whatsapp/instance", {
         method: "POST",
       });
       const data = await apiJson<{ base64?: string; qrcode?: string }>(
-        "/api/whatsapp/instance",
+        "/whatsapp/instance",
       );
       if (data?.base64 || data?.qrcode) {
         setQrCode(data.base64 || data.qrcode || null);
@@ -89,7 +89,7 @@ export default function WhatsappSettingsPage() {
     const loadProfile = async () => {
       try {
         const data = await apiJson<WaAgentProfileResponse>(
-          "/api/seller/ai/profile",
+          "/seller/ai/profile",
         );
         if (data?.data) {
           const profile = data.data;
@@ -124,7 +124,7 @@ export default function WhatsappSettingsPage() {
     const poll = setInterval(async () => {
       try {
         const res = await apiJson<{ connected?: boolean }>(
-          "/api/whatsapp/instance/status",
+          "/whatsapp/instance/status",
         );
         if (res?.connected && !cancelled) {
           setStatus("connected");
@@ -145,7 +145,7 @@ export default function WhatsappSettingsPage() {
   const handleSavePersona = async () => {
     try {
       // Update MerchantAiProfile (used by SalesAgent for WhatsApp responses)
-      await apiJson<{ success: boolean }>("/api/seller/ai/profile", {
+      await apiJson<{ success: boolean }>("/seller/ai/profile", {
         method: "PUT",
         body: JSON.stringify({
           agentName: persona.name,
@@ -179,7 +179,7 @@ export default function WhatsappSettingsPage() {
 
     try {
       const data = await apiJson<TestMessageResponse>(
-        "/api/ai-agent/test-message",
+        "/ai-agent/test-message",
         {
           method: "POST",
           body: JSON.stringify({ text: testInput }),

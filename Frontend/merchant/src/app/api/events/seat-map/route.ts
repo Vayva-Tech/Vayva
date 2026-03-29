@@ -79,7 +79,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/events/seat-map",
+        endpoint: "/events/seat-map",
         operation: "GET_SEAT_MAP",
         storeId: undefined,
       }

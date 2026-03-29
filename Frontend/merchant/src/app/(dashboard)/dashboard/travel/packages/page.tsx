@@ -40,7 +40,7 @@ export default function TravelPackagesPage() {
   const fetchPackages = async () => {
     try {
       setLoading(true);
-      const response = await apiJson<{ data: TravelPackage[] }>("/api/travel/packages?limit=500");
+      const response = await apiJson<{ data: TravelPackage[] }>("/travel/packages?limit=500");
       setPackages(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch packages", error);

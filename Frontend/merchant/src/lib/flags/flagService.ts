@@ -1,5 +1,4 @@
-import { prisma } from "@vayva/db";
-import { logger } from "@vayva/shared";
+import { api } from '@/lib/api-client';
 import crypto from "crypto";
 
 interface FlagContext {
@@ -15,34 +14,13 @@ interface FlagRules {
 export class FlagService {
     static async isEnabled(key: string, context: FlagContext = {}): Promise<boolean> {
         try {
-            const flag = await prisma.featureFlag.findUnique({
-                where: { key },
+            const response = await api.get(`/flags/${key}/evaluate`, {
+                merchantId: context.merchantId,
             });
-            if (!flag)
-                return false;
-            
-            const rules = flag.rules as FlagRules | null;
-            if (context.merchantId && rules) {
-                if (rules.merchant_blocklist?.includes(context.merchantId))
-                    return false;
-                if (rules.merchant_allowlist?.includes(context.merchantId))
-                    return true;
-                
-                if (rules.rollout_percent && rules.rollout_percent > 0) {
-                    const hash = crypto
-                        .createHash("sha256")
-                        .update(context.merchantId + key)
-                        .digest("hex");
-                    const val = parseInt(hash.substring(0, 8), 16);
-                    const bucket = val % 100;
-                    if (bucket < rules.rollout_percent)
-                        return true;
-                }
-            }
-            return flag.enabled;
+            return response.data?.enabled ?? false;
         }
         catch (e) {
-            logger.error(`[FlagService] Error evaluating ${key}`, { error: e instanceof Error ? e.message : String(e) });
+            console.error(`[FlagService] Error evaluating ${key}`, e);
             return false;
         }
     }

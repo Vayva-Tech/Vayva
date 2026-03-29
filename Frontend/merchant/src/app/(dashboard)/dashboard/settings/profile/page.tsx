@@ -76,7 +76,7 @@ export default function ProfileSettingsPage() {
     async function loadProfile() {
       try {
         setLoading(true);
-        const data = await apiJson<ProfileResponse>("/api/auth/merchant/me");
+        const data = await apiJson<ProfileResponse>("/auth/merchant/me");
         if (data?.data?.user) {
           const u = data.data?.user;
           const loaded = {
@@ -107,7 +107,7 @@ export default function ProfileSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await apiJson<{ success: boolean }>("/api/settings/profile", {
+      await apiJson<{ success: boolean }>("/settings/profile", {
         method: "POST",
         body: JSON.stringify(profile),
       });

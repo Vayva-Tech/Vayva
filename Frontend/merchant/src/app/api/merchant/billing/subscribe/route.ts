@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/merchant/billing/subscribe",
+      endpoint: "/merchant/billing/subscribe",
       operation: "CREATE_SUBSCRIPTION",
     });
     return NextResponse.json({ error: "Failed to create subscription" }, { status: 500 });

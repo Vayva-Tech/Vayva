@@ -37,7 +37,7 @@ export function useRealTimeKDS(): UseRealTimeKDSResult {
   useEffect(() => {
     const getStoreId = async () => {
       try {
-        const response = await fetch('/api/merchant/me');
+        const response = await fetch('/merchant/me');
         if (response.ok) {
           const userData = await response.json();
           setStoreId(userData.storeId);

@@ -1,156 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { checkRateLimitCustom } from "@/lib/rate-limit";
-import { FlagService } from "@/lib/flags/flagService";
-import { standardHeaders, computeKycStatus, isRegisteredBusiness } from "@vayva/shared";
-import { prisma, KycStatus } from "@vayva/db";
-import { encrypt } from "@/lib/security/encryption";
+
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const queryParams = new URLSearchParams();
+    
+    // Forward relevant query parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (value) {
+        queryParams.set(key, value);
+      }
+    }
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/kyc/cac/submit` + (queryParams.toString() ? `?${queryParams}` : ""),
+      { headers: auth.headers }
+    );
+
+    return NextResponse.json(response);
+  } catch (error) {
+    handleApiError(error, { endpoint: "/kyc/cac/submit/route.ts", operation: "GET" });
+    return NextResponse.json(
+      { error: "Failed to complete operation" },
+      { status: 500 }
+    );
+  }
+}
+
 
 export async function POST(request: NextRequest) {
   try {
-    const correlationId = request.headers.get("x-request-id") || crypto.randomUUID();
-
     const auth = await buildBackendAuthHeaders(request);
-    if (!auth) {
+    if (!auth?.user?.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const storeId = auth.user.storeId;
-    const userId = auth.user.id;
 
-    const body: unknown = await request.json().catch(() => ({}));
-    const record = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
-
-    const isEnabled = await FlagService.isEnabled("kyc.enabled", {
-      merchantId: storeId,
-    });
-    if (!isEnabled) {
-      return NextResponse.json(
-        { error: "Identity verification is temporarily paused", requestId: correlationId },
-        { status: 503, headers: standardHeaders(correlationId) }
-      );
-    }
-
-    await checkRateLimitCustom(userId, "kyc_cac_submit", 3, 3600);
-
-    const cacNumber = typeof record.cacNumber === "string" ? record.cacNumber : undefined;
-    const consent = record.consent === true;
-    const ip = request.headers.get("x-forwarded-for") || "unknown";
-
-    if (!cacNumber || !consent) {
-      return NextResponse.json(
-        {
-          error: "Missing required fields (cacNumber, consent)",
-          requestId: correlationId,
-        },
-        { status: 400, headers: standardHeaders(correlationId) }
-      );
-    }
-
-    const trimmedCac = cacNumber.trim();
-    if (!/^(RC|BN)?\d{5,8}$/i.test(trimmedCac)) {
-      return NextResponse.json(
-        {
-          error: "Invalid CAC registration number format",
-          requestId: correlationId,
-        },
-        { status: 400, headers: standardHeaders(correlationId) }
-      );
-    }
-
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { businessType: true },
-    });
-
-    if (!isRegisteredBusiness(store?.businessType)) {
-      return NextResponse.json(
-        {
-          error: "CAC submission is only required for registered businesses",
-          requestId: correlationId,
-        },
-        { status: 400, headers: standardHeaders(correlationId) }
-      );
-    }
-
-    const existing = await prisma.kycRecord.findUnique({ where: { storeId } });
-    const ninStatusCurrent = existing?.ninStatus || "NOT_STARTED";
-    const bvnStatusCurrent = existing?.bvnStatus || "NOT_STARTED";
-
-    const newCacStatus = "PENDING";
-
-    const overallStatus = computeKycStatus({
-      checks: {
-        ninStatus: ninStatusCurrent,
-        bvnStatus: bvnStatusCurrent,
-        cacStatus: newCacStatus,
-      },
-      isRegisteredBusiness: true,
-    });
-
-    const cacLast4 = trimmedCac.slice(-4);
-    const auditEntry = {
-      timestamp: new Date().toISOString(),
-      action: "CAC_SUBMITTED",
-      idLast4: cacLast4,
-      ipAddress: ip,
-      actorId: userId,
-    };
-
-    await prisma.kycRecord.upsert({
-      where: { storeId },
-      create: {
-        storeId,
-        ninLast4: "",
-        bvnLast4: "",
-        cacNumberEncrypted: encrypt(trimmedCac),
-        cacStatus: newCacStatus as KycStatus,
-        status: overallStatus as KycStatus,
-        audit: [auditEntry],
-      },
-      update: {
-        cacNumberEncrypted: encrypt(trimmedCac),
-        cacStatus: newCacStatus as KycStatus,
-        status: overallStatus as KycStatus,
-        audit: { push: auditEntry },
-      },
-    });
-
-    await prisma.store.update({
-      where: { id: storeId },
-      data: { kycStatus: overallStatus as KycStatus },
-    });
-
-    await prisma.auditLog
-      .create({
-        data: {
-          app: "merchant",
-          targetStoreId: storeId,
-          actorUserId: userId,
-          action: "KYC_CAC_SUBMITTED",
-          targetType: "system",
-          targetId: storeId,
-          ip,
-          requestId: correlationId,
-          metadata: {
-            cacLast4,
-            overallStatus,
-          },
-        },
-      })
-      .catch(() => {});
-
-    return NextResponse.json(
+    const body = await request.json();
+    
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/kyc/cac/submit`,
       {
-        success: true,
-        cacStatus: newCacStatus,
-        overallStatus,
-        requestId: correlationId,
-      },
-      { headers: standardHeaders(correlationId) }
+        method: "POST",
+        headers: auth.headers,
+        body: JSON.stringify(body),
+      }
     );
+
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/kyc/cac/submit", operation: "POST" });
+    handleApiError(error, { endpoint: "/kyc/cac/submit/route.ts", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

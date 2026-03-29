@@ -43,7 +43,7 @@ export default function ViewingsPage() {
   const fetchViewings = async () => {
     setIsLoading(true);
     try {
-      const data = await apiJson<ViewingsResponse>("/api/properties/viewings");
+      const data = await apiJson<ViewingsResponse>("/properties/viewings");
       if (data?.viewings) {
         setRequests(data.viewings);
       }

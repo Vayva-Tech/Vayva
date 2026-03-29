@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/otp/send",
+      endpoint: "/account/otp/send",
       operation: "SEND_OTP",
     });
     return NextResponse.json(

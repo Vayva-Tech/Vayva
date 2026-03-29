@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@/lib/prisma";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
@@ -10,11 +10,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const storeId = auth.user.storeId;
-    const policies = await prisma.merchantPolicy?.findMany({
-      where: { storeId },
-      orderBy: { type: "asc" },
+    
+    // Fetch policies via backend API
+    const response = await apiJson(`${process.env.BACKEND_API_URL}/api/merchant/policies`, {
+      method: 'GET',
+      headers: auth.headers,
     });
-    return NextResponse.json({ policies }, {
+    
+    return NextResponse.json({ policies: response.data || [] }, {
       headers: {
         "Cache-Control": "no-store",
       },

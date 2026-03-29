@@ -33,7 +33,7 @@ export default function ProfessionalServicesTimeTrackingPage() {
 
   const fetchTimeEntries = async () => {
     try {
-      const response = await apiJson<{ data: TimeEntry[] }>("/api/professional-services/time-entries?limit=200");
+      const response = await apiJson<{ data: TimeEntry[] }>("/professional-services/time-entries?limit=200");
       setTimeEntries(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch time entries", error);

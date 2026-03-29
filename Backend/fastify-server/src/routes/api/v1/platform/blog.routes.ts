@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { BlogService } from '../../../services/platform/blog.service';
+import { BlogService } from '../../../../services/platform/blog.service';
 
 const blogService = new BlogService();
 

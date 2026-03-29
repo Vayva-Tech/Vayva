@@ -6,7 +6,7 @@ const fetcher = <T,>(url: string) => apiJson<T>(url);
 
 export function useSidebarCounts() {
   const { data } = useSWR<{ data: Record<string, number> }>(
-    "/api/dashboard/sidebar-counts",
+    "/dashboard/sidebar-counts",
     fetcher,
     { refreshInterval: 30000, revalidateOnFocus: true }
   );

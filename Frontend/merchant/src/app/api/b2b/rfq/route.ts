@@ -1,327 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { z } from "zod";
-import { Prisma } from "@vayva/db";
-import { prisma } from "@/lib/prisma";
-import { logger } from "@/lib/logger";
+import { apiJson } from "@/lib/api-client-shared";
+import { handleApiError } from "@/lib/api-error-handler";
 
-const createRFQSchema = z.object({
-  customerId: z.string().uuid(),
-  dueDate: z.string().datetime().optional(),
-  deliveryDate: z.string().datetime().optional(),
-  deliveryLocation: z.string().max(500).optional(),
-  paymentTerms: z.string().optional(),
-  notes: z.string().max(2000).optional(),
-  attachments: z.array(z.string().url()).default([]),
-  items: z.array(z.object({
-    productId: z.string().uuid().optional(),
-    description: z.string().min(1).max(500),
-    quantity: z.number().int().positive(),
-    targetPrice: z.number().positive().optional(),
-    specifications: z.string().max(1000).optional(),
-  })).min(1),
-});
-
-const quoteSchema = z.object({
-  rfqId: z.string().uuid(),
-  itemQuotes: z.array(z.object({
-    itemId: z.string().uuid(),
-    quotedPrice: z.number().positive(),
-    quotedQuantity: z.number().int().positive().optional(),
-    notes: z.string().optional(),
-  })),
-});
-
-const updateStatusSchema = z.object({
-  status: z.enum(["open", "quoted", "accepted", "rejected", "expired"]),
-});
-
-function generateRFQNumber(storeId: string): string {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const storeShort = storeId.slice(0, 4).toUpperCase();
-  return `RFQ-${storeShort}-${timestamp}`;
-}
-
-/**
- * GET /api/b2b/rfq
- * List RFQ requests
- */
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: NextRequest) {
   try {
-    const auth = await buildBackendAuthHeaders(request as NextRequest);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const storeId = auth.user.storeId;
-    if (!storeId) {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-    const customerId = searchParams.get("customerId");
-    const limit = parseInt(searchParams.get("limit") || "50", 10);
-    const offset = parseInt(searchParams.get("offset") || "0", 10);
-
-    const where: Prisma.RFQRequestWhereInput = { storeId };
-    if (status) where.status = status;
-    if (customerId) where.customerId = customerId;
-
-    const [rfqs, total] = await Promise.all([
-      prisma.rFQRequest.findMany({
-        where,
-        include: { items: true },
-        orderBy: { createdAt: "desc" },
-        take: limit,
-        skip: offset,
-      }),
-      prisma.rFQRequest.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      rfqs,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + rfqs.length < total,
-      },
-    });
-  } catch (error) {
-    logger.error("[RFQ_GET] Failed to fetch RFQs", { error });
-    return NextResponse.json(
-      { error: "Failed to fetch RFQs" },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * POST /api/b2b/rfq
- * Create new RFQ request
- */
-export async function POST(request: Request): Promise<Response> {
-  try {
-    const auth = await buildBackendAuthHeaders(request as NextRequest);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const storeId = auth.user.storeId;
-    if (!storeId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const validated = createRFQSchema.parse(body);
-
-    const rfqNumber = generateRFQNumber(storeId);
-
-    const rfq = await prisma.rFQRequest.create({
-      data: {
-        storeId,
-        customerId: validated.customerId,
-        rfqNumber,
-        dueDate: validated.dueDate ? new Date(validated.dueDate) : undefined,
-        deliveryDate: validated.deliveryDate ? new Date(validated.deliveryDate) : undefined,
-        deliveryLocation: validated.deliveryLocation,
-        paymentTerms: validated.paymentTerms,
-        notes: validated.notes,
-        attachments: validated.attachments ?? [],
-        items: {
-          create: validated.items.map((item) => ({
-            productId: item.productId,
-            description: item.description,
-            quantity: item.quantity,
-            targetPrice:
-              item.targetPrice != null ? new Prisma.Decimal(item.targetPrice) : undefined,
-            specifications: item.specifications,
-          })),
-        },
-      },
-      include: { items: true },
-    });
-
-    logger.info("[RFQ_POST] RFQ created", {
-      rfqId: rfq.id,
-      rfqNumber,
-      storeId,
-      itemCount: validated.items.length,
-    });
-
-    return NextResponse.json({ rfq }, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid input", details: error.issues },
-        { status: 400 }
-      );
-    }
-    logger.error("[RFQ_POST] Failed to create RFQ", { error });
-    return NextResponse.json(
-      { error: "Failed to create RFQ" },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * PATCH /api/b2b/rfq
- * Update RFQ status
- */
-export async function PATCH(request: Request): Promise<Response> {
-  try {
-    const auth = await buildBackendAuthHeaders(request as NextRequest);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const storeId = auth.user.storeId;
-    if (!storeId) {
-      return NextResponse.json({ error: "Store ID required" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "RFQ ID required" },
-        { status: 400 }
-      );
-    }
-
-    const body = await request.json();
-    const validated = updateStatusSchema.parse(body);
-
-    const updated = await prisma.rFQRequest.updateMany({
-      where: { id, storeId },
-      data: {
-        status: validated.status,
-        updatedAt: new Date(),
-      },
-    });
-
-    if (updated.count === 0) {
-      return NextResponse.json({ error: "RFQ not found" }, { status: 404 });
-    }
-
-    const rfq = await prisma.rFQRequest.findFirst({
-      where: { id, storeId },
-      include: { items: true },
-    });
-
-    logger.info("[RFQ_PATCH] RFQ status updated", {
-      rfqId: id,
-      status: validated.status,
-    });
-
-    return NextResponse.json({ rfq });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid input", details: error.issues },
-        { status: 400 }
-      );
-    }
-    logger.error("[RFQ_PATCH] Failed to update RFQ", { error });
-    return NextResponse.json(
-      { error: "Failed to update RFQ" },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * POST /api/b2b/rfq/quote
- * Submit quote for RFQ items
- */
-export async function PUT(request: Request): Promise<Response> {
-  try {
-    const auth = await buildBackendAuthHeaders(request as NextRequest);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const storeId = auth.user.storeId;
-    if (!storeId) {
-      return NextResponse.json({ error: "Store ID required" }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const validated = quoteSchema.parse(body);
-
-    const rfqExists = await prisma.rFQRequest.findFirst({
-      where: { id: validated.rfqId, storeId },
-      select: { id: true },
-    });
-
-    if (!rfqExists) {
-      return NextResponse.json(
-        { error: "RFQ not found" },
-        { status: 404 }
-      );
-    }
-
-    // Update item quotes
-    for (const quote of validated.itemQuotes) {
-      await prisma.rFQItem.updateMany({
-        where: {
-          id: quote.itemId,
-          rfqId: validated.rfqId,
-          rfq: { storeId },
-        },
-        data: {
-          quotedPrice: quote.quotedPrice,
-          quotedQuantity: quote.quotedQuantity ?? undefined,
-          status: "quoted",
-          notes: quote.notes || undefined,
-        },
-      });
-    }
-
-    // Update RFQ status and total
-    const totalValue = validated.itemQuotes.reduce(
-      (sum, q: (typeof validated.itemQuotes)[number]) => sum + q.quotedPrice,
-      0
-    );
+    const queryParams = new URLSearchParams();
     
-    await prisma.rFQRequest.updateMany({
-      where: { id: validated.rfqId, storeId },
-      data: {
-        status: "quoted",
-        totalValue,
-        updatedAt: new Date(),
-      },
-    });
-
-    const updatedRFQ = await prisma.rFQRequest.findFirst({
-      where: { id: validated.rfqId, storeId },
-      include: { items: true },
-    });
-
-    if (!updatedRFQ) {
-      return NextResponse.json({ error: "RFQ not found after update" }, { status: 404 });
+    // Forward relevant query parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (value) {
+        queryParams.set(key, value);
+      }
     }
 
-    logger.info("[RFQ_QUOTE] Quote submitted", {
-      rfqId: validated.rfqId,
-      itemCount: validated.itemQuotes.length,
-      totalValue,
-    });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/b2b/rfq` + (queryParams.toString() ? `?${queryParams}` : ""),
+      { headers: auth.headers }
+    );
 
-    return NextResponse.json({
-      rfq: updatedRFQ,
-      quotedBy: "Staff",
-      quotedAt: new Date(),
-    });
+    return NextResponse.json(response);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid input", details: error.issues },
-        { status: 400 }
-      );
-    }
-    logger.error("[RFQ_QUOTE] Failed to submit quote", { error });
+    handleApiError(error, { endpoint: "/b2b/rfq/route.ts", operation: "GET" });
     return NextResponse.json(
-      { error: "Failed to submit quote" },
+      { error: "Failed to complete operation" },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function POST(request: NextRequest) {
+  try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/b2b/rfq`,
+      {
+        method: "POST",
+        headers: auth.headers,
+        body: JSON.stringify(body),
+      }
+    );
+
+    return NextResponse.json(response);
+  } catch (error) {
+    handleApiError(error, { endpoint: "/b2b/rfq/route.ts", operation: "POST" });
+    return NextResponse.json(
+      { error: "Failed to complete operation" },
       { status: 500 }
     );
   }

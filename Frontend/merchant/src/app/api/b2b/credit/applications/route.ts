@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import type { Prisma } from "@vayva/db";
 
 const applicationSchema = z.object({
   customerId: z.string(),
@@ -89,7 +88,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/credit/applications",
+        endpoint: "/b2b/credit/applications",
         operation: "GET_CREDIT_APPLICATIONS",
         storeId: undefined,
       }

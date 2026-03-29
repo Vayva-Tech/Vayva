@@ -32,7 +32,7 @@ interface WebhookStatsResponse {
 
 export function WebhookHealth() {
   const { data, isLoading } = useSWR<WebhookStatsResponse>(
-    "/api/settings/whatsapp/stats",
+    "/settings/whatsapp/stats",
     (url: string) => apiJson<WebhookStatsResponse>(url),
   );
 

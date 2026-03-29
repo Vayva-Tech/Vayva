@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST } from "./route";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@vayva/db"; // Direct import for tests only
 // Mocks
 vi.mock("@/lib/team/rbac", () => ({
     checkPermission: vi.fn() as any,

@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { WebsocketService } from '../../../services/platform/websocket.service';
+import { WebsocketService } from '../../../../services/platform/websocket.service';
 
 const websocketService = new WebsocketService();
 

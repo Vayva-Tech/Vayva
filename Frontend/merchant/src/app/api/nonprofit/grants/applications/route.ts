@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/nonprofit/grants/applications",
+      endpoint: "/nonprofit/grants/applications",
       operation: "FETCH_APPLICATIONS",
       storeId,
     });
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ application }, { status: 201 });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/nonprofit/grants/applications",
+      endpoint: "/nonprofit/grants/applications",
       operation: "CREATE_APPLICATION",
       storeId,
     });

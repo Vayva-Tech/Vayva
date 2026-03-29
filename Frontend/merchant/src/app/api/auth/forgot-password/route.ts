@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/auth/forgot-password",
+        endpoint: "/auth/forgot-password",
         operation: "FORGOT_PASSWORD",
       }
     );

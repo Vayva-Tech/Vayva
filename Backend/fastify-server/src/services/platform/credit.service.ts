@@ -17,7 +17,7 @@ export class CreditService {
         usedCredits: 0,
         remainingCredits: 0,
         resetDate: null,
-        plan: 'FREE',
+        plan: 'STARTER',
       };
     }
 
@@ -46,7 +46,7 @@ export class CreditService {
       usedCredits,
       remainingCredits,
       resetDate: resetDate.toISOString(),
-      plan: allocation.plan || 'FREE',
+      plan: allocation.plan || 'STARTER',
     };
   }
 

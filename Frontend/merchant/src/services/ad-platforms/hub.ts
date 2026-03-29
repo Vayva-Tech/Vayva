@@ -30,7 +30,7 @@ export class AdPlatformHub {
    * Connect an advertising platform
    */
   static async connect(storeId: string, platform: string): Promise<{ success: boolean }> {
-    const res = await fetch("/api/campaigns/platforms/connect", {
+    const res = await fetch("/campaigns/platforms/connect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ storeId, platform }),
@@ -45,7 +45,7 @@ export class AdPlatformHub {
    * Disconnect an advertising platform
    */
   static async disconnect(storeId: string, platform: string): Promise<{ success: boolean }> {
-    const res = await fetch("/api/campaigns/platforms/disconnect", {
+    const res = await fetch("/campaigns/platforms/disconnect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ storeId, platform }),

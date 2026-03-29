@@ -34,7 +34,7 @@ export default function FashionCollectionsPage() {
 
   const fetchCollections = async () => {
     try {
-      const response = await apiJson<{ data: Collection[] }>("/api/fashion/collections");
+      const response = await apiJson<{ data: Collection[] }>("/fashion/collections");
       setCollections(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch fashion collections", error);

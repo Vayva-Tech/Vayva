@@ -15,7 +15,7 @@ export function useUserPlan() {
     let isMounted = true;
     async function fetchPlan() {
       try {
-        const json = await apiJson<UserPlanResponse>("/api/me/plan");
+        const json = await apiJson<UserPlanResponse>("/me/plan");
         if (isMounted) setData(json);
       } catch (err) {
         const _errMsg = err instanceof Error ? err.message : String(err);

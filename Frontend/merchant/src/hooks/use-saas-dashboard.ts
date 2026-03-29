@@ -21,7 +21,7 @@ export function useAggregateMetrics() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await fetch('/api/saas/dashboard/aggregate');
+        const response = await fetch('/saas/dashboard/aggregate');
         if (!response.ok) throw new Error('Failed to fetch metrics');
         const result = await response.json();
         setData(result.metrics);
@@ -46,7 +46,7 @@ export function useSubscriptionMetrics() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await fetch('/api/saas/subscriptions/metrics');
+        const response = await fetch('/saas/subscriptions/metrics');
         if (!response.ok) throw new Error('Failed to fetch subscription metrics');
         const result = await response.json();
         setData(result.metrics);
@@ -71,7 +71,7 @@ export function useTenantGrowth() {
   useEffect(() => {
     const fetchGrowth = async () => {
       try {
-        const response = await fetch('/api/saas/tenants/growth');
+        const response = await fetch('/saas/tenants/growth');
         if (!response.ok) throw new Error('Failed to fetch tenant growth');
         const result = await response.json();
         setData(result.metrics);
@@ -96,7 +96,7 @@ export function useChurnRisk() {
   useEffect(() => {
     const fetchChurn = async () => {
       try {
-        const response = await fetch('/api/saas/churn/risk-score');
+        const response = await fetch('/saas/churn/risk-score');
         if (!response.ok) throw new Error('Failed to fetch churn risk');
         const result = await response.json();
         setData(result.data);
@@ -121,7 +121,7 @@ export function useFeatureFlags() {
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const response = await fetch('/api/saas/features');
+        const response = await fetch('/saas/features');
         if (!response.ok) throw new Error('Failed to fetch feature flags');
         const result = await response.json();
         setData(result.data);
@@ -146,7 +146,7 @@ export function useUsageAnalytics() {
   useEffect(() => {
     const fetchUsage = async () => {
       try {
-        const response = await fetch('/api/saas/usage/metrics');
+        const response = await fetch('/saas/usage/metrics');
         if (!response.ok) throw new Error('Failed to fetch usage analytics');
         const result = await response.json();
         setData(result.data);

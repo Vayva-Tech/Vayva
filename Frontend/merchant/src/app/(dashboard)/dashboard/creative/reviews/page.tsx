@@ -100,7 +100,7 @@ export default function CreativeReviewsPage() {
                 <p className="text-sm text-muted-foreground">Featured</p>
                 <p className="text-2xl font-bold">{reviews.filter(r => r.featured).length}</p>
               </div>
-              <ThumbsUp className="h-8 w-8 text-green-600" />
+              <thumbsUp className="h-8 w-8 text-green-600" / scope="col">
             </div>
           </CardContent>
         </Card>
@@ -121,17 +121,17 @@ export default function CreativeReviewsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Client</th>
-                  <th className="py-3 px-4 font-medium">Company</th>
-                  <th className="py-3 px-4 font-medium">Project</th>
-                  <th className="py-3 px-4 font-medium">Rating</th>
-                  <th className="py-3 px-4 font-medium">Review Title</th>
-                  <th className="py-3 px-4 font-medium">Comment</th>
-                  <th className="py-3 px-4 font-medium">Date</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Client</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Company</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Project</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Rating</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Review Title</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Comment</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Date</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

@@ -1,404 +1,255 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import { apiJson } from "@/lib/api-client-shared";
-import { toast } from "sonner";
-import { useStore } from "@/context/StoreContext";
-import { DashboardPageShell } from "@/components/layout/DashboardPageShell";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
-import {
-  WeeklyRecipeSelector,
-  SubscriptionPlanBuilder,
-  DeliverySlotPicker,
-  MealPreferenceTracker,
-  IngredientInventoryManager,
-} from "@vayva/industry-meal-kit";
-import {
-  Calendar,
-  Package,
-  Heart,
-  TrendingUp,
-  Users,
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { TasksModule } from "@/components/dashboard/TasksModule";
+import { AlertsModule } from "@/components/dashboard/AlertsModule";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { 
+  Home, 
+  Box, 
+  ShoppingCart, 
+  Users, 
+  Package, 
+  Truck, 
   DollarSign,
-  AlertCircle,
-  Plus,
-  ChefHat,
-  Truck,
+  BarChart3,
+  Megaphone,
+  Settings,
+  ClipboardList,
+  TrendingUp,
+  Clock
 } from "lucide-react";
 
-const MEAL_KIT_STATS_EMPTY = {
-  activeCustomers7d: 0,
-  revenue7d: 0,
-  orders7d: 0,
-  pendingDeliveries: 0,
-  lowStockIngredients: 0,
-};
-
-export default function MealKitDashboardPage() {
-  const { store } = useStore();
-  const storeId = store?.id ?? "";
-
-  const [activeTab, setActiveTab] = useState("overview");
-  const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
-  const [selectedDeliverySlot, setSelectedDeliverySlot] = useState<string>("");
-  const [deliveryZipCode, setDeliveryZipCode] = useState("");
-  const [preferenceCustomerId, setPreferenceCustomerId] = useState("");
-  const [stats, setStats] = useState(MEAL_KIT_STATS_EMPTY);
-  const [statsLoading, setStatsLoading] = useState(true);
-
-  const loadStats = useCallback(async () => {
-    try {
-      setStatsLoading(true);
-      const [overview, orderSummary] = await Promise.all([
-        apiJson<{
-          totalSales?: number;
-          totalOrders?: number;
-          activeCustomers?: number;
-        }>("/api/analytics/overview?range=7d"),
-        apiJson<{
-          processing?: number;
-          shipped?: number;
-        }>("/api/orders/summary"),
-      ]);
-
-      let lowStock = 0;
-      try {
-        const inventory = await apiJson<{
-          success?: boolean;
-          data?: { summary?: { lowStockCount?: number } };
-        }>("/api/beauty/inventory?lowStockOnly=true&limit=1&page=1");
-        if (inventory.success && inventory.data?.summary?.lowStockCount != null) {
-          lowStock = inventory.data.summary.lowStockCount;
-        }
-      } catch {
-        /* optional: stores without beauty inventory BFF */
-      }
-
-      setStats({
-        activeCustomers7d: overview.activeCustomers ?? 0,
-        revenue7d: overview.totalSales ?? 0,
-        orders7d: overview.totalOrders ?? 0,
-        pendingDeliveries: (orderSummary.processing ?? 0) + (orderSummary.shipped ?? 0),
-        lowStockIngredients: lowStock,
-      });
-    } catch {
-      toast.error("Could not load meal kit dashboard stats");
-      setStats(MEAL_KIT_STATS_EMPTY);
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadStats();
-  }, [loadStats]);
-
-  const weekStart = new Date();
-
+export default function MealKitDashboardHub() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className={statsLoading ? "opacity-60 pointer-events-none" : ""}
-    >
-      <DashboardPageShell
-        title="Meal Kit Manager"
-        description="Subscriptions, menus, and deliveries"
-      >
-        <div className="space-y-8">
-          {!storeId ? (
-            <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              Store context is still loading. Meal kit tools need an active store.
-            </p>
-          ) : null}
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-green-100 rounded-lg">
-                    <Users className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Active customers (7d)</p>
-                    <p className="text-2xl font-bold">{stats.activeCustomers7d}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <DollarSign className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Revenue (7d)</p>
-                    <p className="text-2xl font-bold">
-                      ₦
-                      {stats.revenue7d >= 1_000_000
-                        ? `${(stats.revenue7d / 1_000_000).toFixed(1)}M`
-                        : stats.revenue7d >= 1000
-                          ? `${(stats.revenue7d / 1000).toFixed(0)}k`
-                          : stats.revenue7d.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-purple-100 rounded-lg">
-                    <ChefHat className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Paid orders (7d)</p>
-                    <p className="text-2xl font-bold">{stats.orders7d}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-orange-100 rounded-lg">
-                    <Truck className="h-6 w-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">In-flight fulfillment</p>
-                    <p className="text-2xl font-bold">{stats.pendingDeliveries}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <ErrorBoundary serviceName="MealKitDashboard">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="recipes">Recipes</TabsTrigger>
-                <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-                <TabsTrigger value="delivery">Delivery</TabsTrigger>
-                <TabsTrigger value="preferences">Preferences</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      Quick actions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      onClick={() => setActiveTab("recipes")}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Recipes &amp; weekly menu
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      onClick={() => setActiveTab("subscriptions")}
-                    >
-                      <Package className="h-4 w-4 mr-2" />
-                      Subscription plans
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      onClick={() => setActiveTab("delivery")}
-                    >
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Delivery slots
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      onClick={() => setActiveTab("preferences")}
-                    >
-                      <Heart className="h-4 w-4 mr-2" />
-                      Customer preferences
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertCircle className="h-5 w-5" />
-                      Alerts
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {stats.lowStockIngredients > 0 ? (
-                        <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-                          <div>
-                            <p className="text-sm font-semibold text-red-900">Low stock</p>
-                            <p className="text-xs text-red-700">
-                              {stats.lowStockIngredients} SKU
-                              {stats.lowStockIngredients === 1 ? "" : "s"} below threshold (inventory)
-                            </p>
-                          </div>
-                        </div>
-                      ) : null}
-                      {stats.pendingDeliveries > 0 ? (
-                        <div className="flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                          <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
-                          <div>
-                            <p className="text-sm font-semibold text-yellow-900">Fulfillment</p>
-                            <p className="text-xs text-yellow-700">
-                              {stats.pendingDeliveries} order
-                              {stats.pendingDeliveries === 1 ? "" : "s"} processing or out for delivery
-                            </p>
-                          </div>
-                        </div>
-                      ) : null}
-                      {stats.lowStockIngredients === 0 && stats.pendingDeliveries === 0 ? (
-                        <p className="text-sm text-gray-500 py-2">No alerts right now.</p>
-                      ) : null}
-                    </div>
-                  </CardContent>
-                </Card>
+    <ErrorBoundary componentName="Meal Kit Dashboard Hub">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50">
+        {/* Breadcrumb */}
+        <Breadcrumbs items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Meal Kit", href: "/dashboard/meal-kit" },
+        ]} />
+        
+        <div className="flex">
+          {/* Sidebar Navigation */}
+          <aside className="w-64 bg-white border-r border-gray-200 min-h-screen p-4 fixed left-0 top-[73px]">
+            <nav className="space-y-1">
+              {/* Core Operations */}
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Meal Kit Operations
               </div>
-            </TabsContent>
-
-            <TabsContent value="recipes">
-              {storeId ? (
-                <WeeklyRecipeSelector
-                  storeId={storeId}
-                  weekStartDate={weekStart}
-                  selectedRecipes={selectedRecipes}
-                  onRecipeSelect={setSelectedRecipes}
-                  maxRecipes={5}
-                />
-              ) : (
-                <p className="text-sm text-gray-500">Connect a store to manage recipes.</p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="subscriptions">
-              {storeId ? (
-                <SubscriptionPlanBuilder
-                  storeId={storeId}
-                  onPlanSelect={() => toast.message("Plan selected")}
-                />
-              ) : (
-                <p className="text-sm text-gray-500">Connect a store to build plans.</p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="delivery" className="space-y-4">
-              {storeId ? (
-                <>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">Delivery area</CardTitle>
-                      <CardDescription>
-                        Optional ZIP or postal code filters slots when your backend supports it.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Label htmlFor="meal-kit-delivery-zip">ZIP / postal code</Label>
-                      <Input
-                        id="meal-kit-delivery-zip"
-                        value={deliveryZipCode}
-                        onChange={(e) => setDeliveryZipCode(e.target.value.trim())}
-                        placeholder="e.g. 101241"
-                        autoComplete="postal-code"
-                      />
-                    </CardContent>
-                  </Card>
-                  <DeliverySlotPicker
-                    storeId={storeId}
-                    customerZipCode={deliveryZipCode}
-                    selectedSlotId={selectedDeliverySlot}
-                    onSlotSelect={setSelectedDeliverySlot}
-                  />
-                </>
-              ) : (
-                <p className="text-sm text-gray-500">Connect a store to schedule delivery.</p>
-              )}
-            </TabsContent>
-
-            <TabsContent value="preferences" className="space-y-4">
-              {storeId ? (
-                <>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">Customer</CardTitle>
-                      <CardDescription>
-                        Enter the customer record ID from Customers (meal preferences are per customer).
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Label htmlFor="meal-kit-customer-id">Customer ID</Label>
-                      <Input
-                        id="meal-kit-customer-id"
-                        value={preferenceCustomerId}
-                        onChange={(e) => setPreferenceCustomerId(e.target.value.trim())}
-                        placeholder="e.g. cus_…"
-                        autoComplete="off"
-                      />
-                    </CardContent>
-                  </Card>
-                  {preferenceCustomerId ? (
-                    <MealPreferenceTracker
-                      storeId={storeId}
-                      customerId={preferenceCustomerId}
-                      onSave={() => toast.success("Preferences saved")}
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-500">Enter a customer ID to edit meal preferences.</p>
-                  )}
-                </>
-              ) : (
-                <p className="text-sm text-gray-500">Connect a store to manage preferences.</p>
-              )}
-            </TabsContent>
-          </Tabs>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="h-5 w-5" />
-                Ingredient inventory
-              </CardTitle>
-              <CardDescription>Stock levels tied to your meal-kit catalog</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {storeId ? (
-                <IngredientInventoryManager
-                  storeId={storeId}
-                  weekStartDate={weekStart}
-                  onRestockRequest={() => toast.message("Restock request recorded")}
-                />
-              ) : (
-                <p className="text-sm text-gray-500">Connect a store to manage inventory.</p>
-              )}
-            </CardContent>
-          </Card>
+              
+              <a
+                href="/dashboard/meal-kit"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md bg-green-100 text-green-700"
+              >
+                <div className="flex items-center gap-3">
+                  <Home size={18} className="text-green-600" />
+                  <span>Dashboard</span>
+                </div>
+                <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/recipes"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <ClipboardList size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Recipes</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/subscriptions"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Box size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Subscription Boxes</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/meal-plans"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Package size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Meal Plans</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/orders"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <ShoppingCart size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Orders</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/ingredients"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Package size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Ingredients</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/deliveries"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Truck size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Deliveries</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/customers"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Users size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Customers</span>
+                </div>
+              </a>
+              
+              {/* Business Management */}
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-2">
+                Business Management
+              </div>
+              
+              <a
+                href="/dashboard/meal-kit/finance"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <DollarSign size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Finance</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/marketing"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Megaphone size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Marketing</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/analytics"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <BarChart3 size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Analytics</span>
+                </div>
+              </a>
+              
+              <a
+                href="/dashboard/meal-kit/settings"
+                className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings size={18} className="text-gray-400 group-hover:text-gray-600" />
+                  <span>Settings</span>
+                </div>
+              </a>
+              
+              {/* Team Section */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <a
+                  href="/dashboard/meal-kit/staff"
+                  className="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <Users size={18} className="text-gray-400 group-hover:text-gray-600" />
+                    <span>Staff Management</span>
+                  </div>
+                </a>
+              </div>
+            </nav>
+          </aside>
+          
+          {/* Main Content */}
+          <main className="ml-64 flex-1 p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Meal Kit Dashboard</h1>
+              <p className="text-gray-600 mt-1">Manage recipes, subscriptions, and deliveries</p>
+            </div>
+            
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <MetricCard
+                title="Active Subscriptions"
+                value="2,847"
+                change="+8.4%"
+                trend="up"
+                icon={Box}
+                color="green"
+              />
+              <MetricCard
+                title="Boxes This Week"
+                value="1,234"
+                change="+12.1%"
+                trend="up"
+                icon={Package}
+                color="teal"
+              />
+              <MetricCard
+                title="Revenue (MTD)"
+                value="$84,290"
+                change="+15.3%"
+                trend="up"
+                icon={DollarSign}
+                color="green"
+              />
+              <MetricCard
+                title="On-Time Delivery"
+                value="96.8%"
+                change="+2.1%"
+                trend="up"
+                icon={Clock}
+                color="teal"
+              />
+            </div>
+            
+            {/* Charts and Modules */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className="lg:col-span-2">
+                <RevenueChart />
+              </div>
+              <div>
+                <AlertsModule alerts={[
+                  { id: 1, title: "Ingredient Shortage", description: "Organic chicken running low", severity: "warning", time: "1h ago" },
+                  { id: 2, title: "Delivery Delay", description: "Route 45 experiencing delays", severity: "info", time: "3h ago" },
+                  { id: 3, title: "New Recipe Approved", description: "Mediterranean Bowl ready for production", severity: "success", time: "5h ago" },
+                ]} />
+              </div>
+            </div>
+            
+            {/* Tasks Module */}
+            <TasksModule tasks={[
+              { id: 1, title: "Review weekly menu", completed: false, priority: "high" },
+              { id: 2, title: "Approve ingredient orders", completed: true, priority: "high" },
+              { id: 3, title: "Update nutrition info", completed: false, priority: "medium" },
+              { id: 4, title: "Plan promotional campaign", completed: false, priority: "low" },
+            ]} />
+          </main>
         </div>
-      </DashboardPageShell>
-      </ErrorBoundary>
-    </motion.div>
+      </div>
+    </ErrorBoundary>
   );
 }

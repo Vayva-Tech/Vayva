@@ -22,7 +22,7 @@ interface SSEState {
  * SSE hook for real-time updates
  * Usage:
  * const { connected, error } = useSSE({
- *   url: "/api/sse/notifications",
+ *   url: "/sse/notifications",
  *   onMessage: (data) => console.log(data),
  *   autoReconnect: true,
  * });

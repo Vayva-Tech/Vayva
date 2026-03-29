@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { PERMISSIONS } from "@/lib/team/permissions";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,40 +11,32 @@ export async function GET(request: NextRequest) {
     }
     const storeId = auth.user.storeId;
     const { searchParams } = new URL(request.url);
-      const query = searchParams.get("query") || "";
-      const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
+    const query = searchParams.get("query") || "";
+    const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 100);
 
-      const vehicles = (await prisma.vehicle?.findMany({
-        where: {
-          storeId,
-          ...(query && {
-            OR: [
-              { name: { contains: query, mode: "insensitive" } },
-              { licensePlate: { contains: query, mode: "insensitive" } },
-            ],
-          }),
-        },
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          licensePlate: true,
-          capacity: true,
-          isActive: true,
-        },
-        orderBy: { updatedAt: "desc" },
-        take: limit,
-      })) || [];
+    const queryParams = new URLSearchParams({
+      storeId,
+      limit: limit.toString(),
+    });
 
-      return NextResponse.json(
-        {
-          success: true,
-          data: vehicles,
-        },
-        { headers: { "Cache-Control": "no-store" } },
-      );
+    if (query) queryParams.set("search", query);
+
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/vehicles?${queryParams}`,
+      {
+        headers: auth.headers,
+      }
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: response.data?.vehicles || [],
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/editor-data/vehicles", operation: "GET" });
+    handleApiError(error, { endpoint: "/editor-data/vehicles", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

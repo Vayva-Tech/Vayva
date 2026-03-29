@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
-import { FulfillmentService } from '../../../services/core/fulfillment.service';
+import { FulfillmentService } from '../../../../services/core/fulfillment.service';
 
 const fulfillmentService = new FulfillmentService();
 

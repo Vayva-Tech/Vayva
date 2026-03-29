@@ -1,51 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
-    if (!auth) {
+    if (!auth?.user?.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const storeId = auth.user.storeId;
-    const url = new URL(request.url);
-    const channel = url.searchParams.get("channel")?.toUpperCase();
 
-    const where: Record<string, unknown> = { storeId };
-    if (channel) {
-      where.contact = { channel };
+    const { searchParams } = new URL(request.url);
+    const queryParams = new URLSearchParams();
+    
+    // Forward relevant query parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (value) {
+        queryParams.set(key, value);
+      }
     }
 
-    const conversations = await prisma.conversation?.findMany({
-      where,
-      orderBy: { updatedAt: "desc" },
-      include: {
-        messages: { orderBy: { createdAt: "desc" }, take: 1 },
-        contact: true,
-      },
-    });
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/support/conversations` + (queryParams.toString() ? `?${queryParams}` : ""),
+      { headers: auth.headers }
+    );
 
-    const formatted = conversations.map((c) => ({
-      id: c.id,
-      customerName: c.contact?.displayName || "Unknown",
-      customerPhone: c.contact?.phoneE164 || null,
-      customerEmail: null, // Contact model doesn't have email
-      channel: c.contact?.channel as string,
-      status: (c as any).status,
-      priority: c.priority,
-      lastMessage: c.messages[0]?.textBody || null,
-      lastMessageAt: c.messages[0]?.createdAt || c.updatedAt,
-      unreadCount: 0,
-      tags: c.tags || [],
-    }));
-
-    return NextResponse.json({ success: true, data: formatted }, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/support/conversations", operation: "GET" });
+    handleApiError(error, { endpoint: "/support/conversations/route.ts", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

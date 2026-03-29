@@ -50,7 +50,7 @@ export async function POST(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/products/[id]/calendar-sync",
+      endpoint: "/products/[id]/calendar-sync",
       operation: "ADD_CALENDAR_SYNC",
     });
     return NextResponse.json(

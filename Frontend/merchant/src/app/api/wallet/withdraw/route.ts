@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         
         return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/wallet/withdraw", operation: "GET" });
+    handleApiError(error, { endpoint: "/wallet/withdraw", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

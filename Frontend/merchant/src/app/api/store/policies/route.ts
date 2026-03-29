@@ -3,7 +3,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
-import { prisma } from "@vayva/db";
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,7 +29,7 @@ export async function GET(request: NextRequest) {
             },
         });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/store/policies", operation: "GET" });
+    handleApiError(error, { endpoint: "/store/policies", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

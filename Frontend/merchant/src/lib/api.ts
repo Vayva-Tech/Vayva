@@ -2,7 +2,8 @@
  * API client utilities for making HTTP requests
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 
 interface ApiResponse<T> {
   data?: T;
@@ -11,10 +12,10 @@ interface ApiResponse<T> {
 
 export async function apiJson<T>(
   url: string,
-  options?: Parameters<typeof fetch>[1]
+  options?: Parameters<typeof fetch>[1],
 ): Promise<T> {
   const fullUrl = url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
-  
+
   const response = await fetch(fullUrl, {
     headers: {
       "Content-Type": "application/json",
@@ -34,7 +35,7 @@ export async function apiJson<T>(
 export async function apiPost<T>(
   url: string,
   data: unknown,
-  options?: Parameters<typeof fetch>[1]
+  options?: Parameters<typeof fetch>[1],
 ): Promise<T> {
   return apiJson<T>(url, {
     method: "POST",
@@ -46,7 +47,7 @@ export async function apiPost<T>(
 export async function apiPut<T>(
   url: string,
   data: unknown,
-  options?: Parameters<typeof fetch>[1]
+  options?: Parameters<typeof fetch>[1],
 ): Promise<T> {
   return apiJson<T>(url, {
     method: "PUT",
@@ -57,7 +58,7 @@ export async function apiPut<T>(
 
 export async function apiDelete<T>(
   url: string,
-  options?: Parameters<typeof fetch>[1]
+  options?: Parameters<typeof fetch>[1],
 ): Promise<T> {
   return apiJson<T>(url, {
     method: "DELETE",

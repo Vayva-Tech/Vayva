@@ -61,7 +61,7 @@ export function DonorsList() {
   const fetchDonors = async () => {
     try {
       setLoading(true);
-      const data = await apiJson<{ data: any[] }>("/api/nonprofit/donors");
+      const data = await apiJson<{ data: any[] }>("/nonprofit/donors");
       setDonors(data.data || []);
     } catch (error: unknown) {
       const _errMsg = error instanceof Error ? error.message : String(error);

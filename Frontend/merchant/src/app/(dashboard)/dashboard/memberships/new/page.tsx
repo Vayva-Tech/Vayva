@@ -29,7 +29,7 @@ export default function NewMembershipPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiJson("/api/memberships", {
+      await apiJson("/memberships", {
         method: "POST",
         body: JSON.stringify({
           name: form.name,

@@ -140,6 +140,33 @@ export class BookingService {
     return booking;
   }
 
+  async createServiceProduct(storeId: string, data: {
+    name: string;
+    description?: string;
+    price: number;
+    metadata?: Record<string, any>;
+  }) {
+    const product = await this.db.product.create({
+      data: {
+        storeId,
+        title: data.name,
+        handle:
+          data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
+          '-' +
+          Date.now(),
+        description: data.description,
+        price: data.price,
+        status: 'ACTIVE',
+        trackInventory: false,
+        productType: 'SERVICE',
+        metadata: (data.metadata as any) || {},
+      },
+    });
+
+    logger.info(`[Booking] Created service product ${product.id}`);
+    return product;
+  }
+
   async updateBookingStatus(bookingId: string, storeId: string, status: string) {
     const booking = await this.db.booking.findFirst({
       where: { id: bookingId, storeId },
@@ -181,5 +208,53 @@ export class BookingService {
 
     logger.info(`[Booking] Cancelled booking ${bookingId}`);
     return updated;
+  }
+
+  async updateBooking(storeId: string, bookingId: string, data: {
+    startsAt?: Date;
+    endsAt?: Date;
+    customerId?: string;
+    serviceId?: string;
+    notes?: string;
+    status?: string;
+  }) {
+    const booking = await this.db.booking.findFirst({
+      where: { id: bookingId, storeId },
+    });
+
+    if (!booking) {
+      throw new Error('Booking not found');
+    }
+
+    const updated = await this.db.booking.update({
+      where: { id: bookingId },
+      data: {
+        startsAt: data.startsAt,
+        endsAt: data.endsAt,
+        customerId: data.customerId,
+        serviceId: data.serviceId,
+        notes: data.notes,
+        status: data.status,
+      },
+    });
+
+    logger.info(`[Booking] Updated booking ${bookingId}`);
+    return updated;
+  }
+
+  async deleteBooking(storeId: string, bookingId: string) {
+    const booking = await this.db.booking.findFirst({
+      where: { id: bookingId, storeId },
+    });
+
+    if (!booking) {
+      throw new Error('Booking not found');
+    }
+
+    await this.db.booking.delete({
+      where: { id: bookingId },
+    });
+
+    logger.info(`[Booking] Deleted booking ${bookingId}`);
   }
 }

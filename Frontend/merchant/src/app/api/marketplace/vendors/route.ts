@@ -4,8 +4,6 @@ import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
 import { z } from "zod";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@vayva/db";
 
 const backendBase = () => process.env.BACKEND_API_URL?.replace(/\/$/, "") ?? "";
 
@@ -104,7 +102,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/marketplace/vendors",
+      endpoint: "/marketplace/vendors",
       operation: "FETCH_VENDORS",
     });
     return NextResponse.json({ error: "Failed to fetch vendors" }, { status: 500 });

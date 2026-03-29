@@ -21,7 +21,7 @@ export function useTemplatePurchase() {
     setIsPurchasing(true);
     
     try {
-      const res = await fetch('/api/templates/purchase', {
+      const res = await fetch('/templates/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId }),

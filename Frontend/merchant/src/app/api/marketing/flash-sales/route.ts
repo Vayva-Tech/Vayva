@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
-import { prisma } from "@vayva/db";
 import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
 import { PERMISSIONS } from "@/lib/team/permissions";
@@ -31,7 +30,7 @@ export async function POST(request: NextRequest) {
         });
         return NextResponse.json({ success: true, data: flashSale });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/marketing/flash-sales", operation: "POST" });
+    handleApiError(error, { endpoint: "/marketing/flash-sales", operation: "POST" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }
@@ -57,7 +56,7 @@ export async function GET(request: NextRequest) {
             },
         });
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/marketing/flash-sales", operation: "GET" });
+    handleApiError(error, { endpoint: "/marketing/flash-sales", operation: "GET" });
     return NextResponse.json(
       { error: "Failed to complete operation" },
       { status: 500 }

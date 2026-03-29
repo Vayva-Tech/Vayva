@@ -62,7 +62,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     handleApiError(
       error,
       {
-        endpoint: "/api/stays/accommodations",
+        endpoint: "/stays/accommodations",
         operation: "GET_ACCOMMODATIONS",
         storeId: undefined,
       }

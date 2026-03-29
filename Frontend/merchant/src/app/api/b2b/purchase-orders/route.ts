@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/b2b/purchase-orders", operation: "GET" });
+    handleApiError(error, { endpoint: "/b2b/purchase-orders", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch purchase orders" }, { status: 500 });
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/b2b/purchase-orders", operation: "POST" });
+    handleApiError(error, { endpoint: "/b2b/purchase-orders", operation: "POST" });
     return NextResponse.json({ error: "Failed to create purchase order" }, { status: 500 });
   }
 }

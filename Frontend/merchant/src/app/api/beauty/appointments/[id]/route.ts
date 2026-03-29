@@ -20,7 +20,7 @@ export async function GET(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/appointments/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/beauty/appointments/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch appointment" }, { status: 500 });
   }
 }
@@ -47,7 +47,7 @@ export async function PUT(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/appointments/:id", operation: "PUT" });
+    handleApiError(error, { endpoint: "/beauty/appointments/:id", operation: "PUT" });
     return NextResponse.json({ error: "Failed to update appointment" }, { status: 500 });
   }
 }
@@ -72,7 +72,7 @@ export async function DELETE(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/appointments/:id", operation: "DELETE" });
+    handleApiError(error, { endpoint: "/beauty/appointments/:id", operation: "DELETE" });
     return NextResponse.json({ error: "Failed to cancel appointment" }, { status: 500 });
   }
 }

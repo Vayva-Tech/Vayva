@@ -31,7 +31,7 @@ export default function ReferralsPage() {
     const loadReferrals = async () => {
       try {
         setLoading(true);
-        const d = await apiJson<ReferralsResponse>("/api/referrals");
+        const d = await apiJson<ReferralsResponse>("/referrals");
         setData(d);
       } catch (error: unknown) {
         const _errMsg = error instanceof Error ? error.message : String(error);

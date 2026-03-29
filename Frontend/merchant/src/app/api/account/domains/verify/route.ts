@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/domains/verify",
+      endpoint: "/account/domains/verify",
       operation: "VERIFY_DOMAIN",
     });
     return NextResponse.json(

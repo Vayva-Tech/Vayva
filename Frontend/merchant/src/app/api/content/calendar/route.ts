@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ items });
   } catch (error: unknown) {
     handleApiError(error, {
-      endpoint: "/api/content/calendar",
+      endpoint: "/content/calendar",
       operation: "FETCH_CONTENT_CALENDAR",
     });
     const errorMessage = error instanceof Error ? error.message : String(error);

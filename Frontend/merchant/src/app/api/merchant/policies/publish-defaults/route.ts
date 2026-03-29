@@ -1,117 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBackendAuthHeaders } from "@/lib/backend-proxy";
+import { apiJson } from "@/lib/api-client-shared";
 import { handleApiError } from "@/lib/api-error-handler";
-import { prisma } from "@vayva/db";
-import { generatePolicyFromTemplate, sanitizeMarkdown, validatePolicyContent } from "@vayva/policies";
-export const dynamic = "force-dynamic";
 
-type PolicyType = "TERMS" | "PRIVACY" | "RETURNS" | "REFUNDS" | "SHIPPING_DELIVERY";
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await buildBackendAuthHeaders(request);
+    if (!auth?.user?.storeId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-type GeneratedType = "terms" | "privacy" | "returns" | "refunds" | "shipping_delivery";
+    const { searchParams } = new URL(request.url);
+    const queryParams = new URLSearchParams();
+    
+    // Forward relevant query parameters
+    for (const [key, value] of searchParams.entries()) {
+      if (value) {
+        queryParams.set(key, value);
+      }
+    }
 
-const TYPE_MAP: Record<GeneratedType, PolicyType> = {
-  terms: "TERMS",
-  privacy: "PRIVACY",
-  returns: "RETURNS",
-  refunds: "REFUNDS",
-  shipping_delivery: "SHIPPING_DELIVERY",
-};
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/merchant/policies` + (queryParams.toString() ? `?${queryParams}` : ""),
+      { headers: auth.headers }
+    );
 
-interface StoreSettings {
-  supportEmail?: string;
-  whatsappNumber?: string;
-  [key: string]: unknown;
+    return NextResponse.json(response);
+  } catch (error) {
+    handleApiError(error, { endpoint: "/merchant/policies/publish-defaults/route.ts", operation: "GET" });
+    return NextResponse.json(
+      { error: "Failed to complete operation" },
+      { status: 500 }
+    );
+  }
 }
+
 
 export async function POST(request: NextRequest) {
   try {
     const auth = await buildBackendAuthHeaders(request);
-    if (!auth) {
+    if (!auth?.user?.storeId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const storeId = auth.user.storeId;
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { id: true, name: true, slug: true, settings: true },
-    });
 
-    if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
-    }
-
-    const settings = (store.settings as StoreSettings | null) ?? {};
-
-    const generated = generatePolicyFromTemplate({
-      storeName: store.name,
-      storeSlug: store.slug || store.name.toLowerCase().replace(/\s+/g, "-"),
-      supportEmail: settings.supportEmail,
-      merchantSupportWhatsApp: settings.whatsappNumber,
-    });
-
-    const required: Array<GeneratedType> = [
-      "terms",
-      "privacy",
-      "returns",
-      "refunds",
-      "shipping_delivery",
-    ];
-
-    const published: PolicyType[] = [];
-    const skipped: PolicyType[] = [];
-
-    for (const policy of generated) {
-      const mappedType = TYPE_MAP[policy.type as GeneratedType];
-      if (!mappedType) continue;
-      if (!required.includes(policy.type as GeneratedType)) continue;
-
-      const validation = validatePolicyContent(policy.contentMd);
-      if (!validation.valid) {
-        skipped.push(mappedType);
-        continue;
+    const body = await request.json();
+    
+    const response = await apiJson(
+      `${process.env.BACKEND_API_URL}/api/v1/merchant/policies`,
+      {
+        method: "POST",
+        headers: auth.headers,
+        body: JSON.stringify(body),
       }
+    );
 
-      const contentHtml = sanitizeMarkdown(policy.contentMd);
-
-      await prisma.merchantPolicy.upsert({
-        where: {
-          storeId_type: {
-            storeId,
-            type: mappedType as any,
-          },
-        },
-        create: {
-          merchantId: storeId,
-          storeId,
-          storeSlug: store.slug || "",
-          type: mappedType as any,
-          title: policy.title,
-          contentMd: policy.contentMd,
-          contentHtml,
-          status: "PUBLISHED" as any,
-          publishedAt: new Date(),
-          publishedVersion: 1,
-        } as any,
-        update: {
-          title: policy.title,
-          contentMd: policy.contentMd,
-          contentHtml,
-          status: "PUBLISHED" as any,
-          publishedAt: new Date(),
-          publishedVersion: { increment: 1 } as any,
-        } as any,
-      });
-
-      published.push(mappedType);
-    }
-
-    return NextResponse.json({ success: true, published, skipped });
+    return NextResponse.json(response);
   } catch (error) {
-    handleApiError(error, {
-      endpoint: '/api/merchant/policies/publish-defaults',
-      operation: 'POST_PUBLISH_DEFAULTS',
-    });
+    handleApiError(error, { endpoint: "/merchant/policies/publish-defaults/route.ts", operation: "POST" });
     return NextResponse.json(
-      { error: 'Failed to complete operation' },
+      { error: "Failed to complete operation" },
       { status: 500 }
     );
   }

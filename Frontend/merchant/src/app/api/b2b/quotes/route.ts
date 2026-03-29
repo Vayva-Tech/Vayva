@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/quotes",
+        endpoint: "/b2b/quotes",
         operation: "FETCH_QUOTES",
       }
     );
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     handleApiError(
       error,
       {
-        endpoint: "/api/b2b/quotes",
+        endpoint: "/b2b/quotes",
         operation: "CREATE_QUOTE",
       }
     );

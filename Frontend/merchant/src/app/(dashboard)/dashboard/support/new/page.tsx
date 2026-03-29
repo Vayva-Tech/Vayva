@@ -35,7 +35,7 @@ export default function CreateTicketPage() {
     setIsLoading(true);
 
     try {
-      await apiJson<{ success: boolean }>("/api/support/create", {
+      await apiJson<{ success: boolean }>("/support/create", {
         method: "POST",
         body: JSON.stringify(formData),
       });

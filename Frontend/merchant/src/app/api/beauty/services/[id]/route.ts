@@ -63,7 +63,7 @@ export async function GET(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/beauty/services/[id]",
+      endpoint: "/beauty/services/[id]",
       operation: "GET_SERVICE",
     });
     return NextResponse.json({ error: "Failed to fetch service" }, { status: 500 });
@@ -114,7 +114,7 @@ export async function PUT(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/beauty/services/[id]",
+      endpoint: "/beauty/services/[id]",
       operation: "UPDATE_SERVICE",
     });
     return NextResponse.json({ error: "Failed to update service" }, { status: 500 });
@@ -161,7 +161,7 @@ export async function DELETE(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/beauty/services/[id]",
+      endpoint: "/beauty/services/[id]",
       operation: "DELETE_SERVICE",
     });
     return NextResponse.json({ error: "Failed to delete service" }, { status: 500 });

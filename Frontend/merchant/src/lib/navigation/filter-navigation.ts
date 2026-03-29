@@ -18,8 +18,7 @@ export interface NavItem {
 
 /** Tier + feature flags needed to filter nav (hooks must not run inside static helpers). */
 export interface NavigationAccessSnapshot {
-  /** Includes FREE from session gating though PlanTier is often narrower in types. */
-  currentTier: PlanTier | 'FREE';
+  currentTier: PlanTier;
   canAccessIndustryDashboards: boolean;
   canUseAI: boolean;
 }
@@ -37,11 +36,10 @@ export class NavigationFilter {
   static filterNavigation(items: NavItem[], access: NavigationAccessSnapshot): NavItem[] {
     const { currentTier, canAccessIndustryDashboards, canUseAI } = access;
 
-    const tierHierarchy: Record<PlanTier | 'FREE', number> = {
-      FREE: 0,
-      STARTER: 1,
-      PRO: 2,
-      PRO_PLUS: 3,
+    const tierHierarchy: Record<PlanTier, number> = {
+      STARTER: 0,
+      PRO: 1,
+      PRO_PLUS: 2,
     };
 
     const currentTierLevel = tierHierarchy[currentTier];
@@ -92,9 +90,9 @@ export class NavigationFilter {
   /**
    * Add upgrade badges to restricted items
    */
-  static addUpgradeBadges(items: NavItem[], currentTier: PlanTier | 'FREE'): NavItem[] {
-    const getNextTier = (tier: PlanTier | 'FREE'): PlanTier | null => {
-      const tierOrder: Array<PlanTier | 'FREE'> = ['FREE', 'STARTER', 'PRO', 'PRO_PLUS'];
+  static addUpgradeBadges(items: NavItem[], currentTier: PlanTier): NavItem[] {
+    const getNextTier = (tier: PlanTier): PlanTier | null => {
+      const tierOrder: Array<PlanTier> = ['STARTER', 'PRO', 'PRO_PLUS'];
       const currentIndex = tierOrder.indexOf(tier);
       if (currentIndex < 0 || currentIndex >= tierOrder.length - 1) return null;
       const next = tierOrder[currentIndex + 1];
@@ -131,12 +129,12 @@ export class NavigationFilter {
    * Get available industry dashboard routes for current tier
    */
   static getAvailableIndustries(
-    _currentTier: PlanTier | 'FREE',
+    _currentTier: PlanTier,
     canAccessIndustryDashboards: boolean,
   ): string[] {
     void _currentTier;
     if (!canAccessIndustryDashboards) {
-      return []; // Free users get no industry dashboards
+      return []; // STARTER users get no industry dashboards until they upgrade
     }
 
     // List of all available industries
@@ -155,7 +153,7 @@ export class NavigationFilter {
   /**
    * Generate tier-specific navigation configuration
    */
-  static getTierNavigationConfig(currentTier: PlanTier | 'FREE'): NavItem[] {
+  static getTierNavigationConfig(currentTier: PlanTier): NavItem[] {
     const baseNavigation: NavItem[] = [
       {
         id: 'dashboard',

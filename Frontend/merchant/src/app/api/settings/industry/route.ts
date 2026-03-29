@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/settings/industry",
+      endpoint: "/settings/industry",
       operation: "GET_INDUSTRY_SETTINGS",
     });
     return NextResponse.json(

@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import { Icon, cn, type IconName } from "@vayva/ui";
-import type { SuggestedAction } from "@/services/dashboard-actions";
-import type { DashboardAlert } from "@/services/dashboard-alerts";
+import type { SuggestedAction } from "@vayva/industry-core";
+
+// Local type for dashboard alerts (matches fastify-server response format)
+interface DashboardAlert {
+  id: string;
+  title: string;
+  message: string;
+  severity: "critical" | "warning" | "info";
+  evidence?: { key: string; value: number };
+}
 
 // ---------------------------------------------------------------------------
 // Shared shells for industry-native dashboard sections

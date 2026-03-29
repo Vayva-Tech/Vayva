@@ -52,7 +52,7 @@ export function TodosAlerts() {
     setError(null);
     try {
       const res = await apiJson<TodosAlertsResponse>(
-        "/api/dashboard/todos-alerts",
+        "/dashboard/todos-alerts",
       );
       setTodos(res.data?.todos || []);
       setAlerts(res.data?.alerts || []);
@@ -102,7 +102,7 @@ export function TodosAlerts() {
 
   const handleDismissAllAlerts = async () => {
     try {
-      await apiJson("/api/dashboard/alerts/dismiss-all", {
+      await apiJson("/dashboard/alerts/dismiss-all", {
         method: "POST",
       });
       setAlerts([]);

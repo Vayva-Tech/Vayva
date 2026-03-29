@@ -63,8 +63,8 @@ export default function BillingPage() {
     try {
       setLoading(true);
       const [billingData, usageData] = await Promise.all([
-        apiJson<BillingStatus>("/api/merchant/billing/status"),
-        apiJson<{ success: boolean; data?: { usage: any } }>("/api/billing/downgrade").catch(() => null),
+        apiJson<BillingStatus>("/billing/status"),
+        apiJson<{ success: boolean; data?: { usage: any } }>("/billing/downgrade").catch(() => null),
       ]);
       setStatus(billingData);
       if (usageData?.success && usageData.data) {
@@ -89,7 +89,7 @@ export default function BillingPage() {
     if (processing) return;
     setProcessing(slug);
     try {
-      const data = await apiJson<SubscribeResponse>("/api/merchant/billing/subscribe", {
+      const data = await apiJson<SubscribeResponse>("/billing/subscribe", {
         method: "POST",
         body: JSON.stringify({
           plan_slug: slug,
@@ -385,18 +385,18 @@ export default function BillingPage() {
         <h2 className="text-lg font-bold text-gray-900 mb-4">Invoice History</h2>
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <table className="w-full text-sm text-left">
-            <thead className="border-b border-gray-100 bg-gray-50">
+            <thead className="border-b border-gray-100 bg-gray-50" scope="col">
               <tr>
-                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider" scope="col">
                   Date
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider" scope="col">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider" scope="col">
                   Status
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider" />
+                <th className="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider" / scope="col">
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

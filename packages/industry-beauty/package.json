@@ -1,0 +1,38 @@
+{
+  "name": "@vayva/industry-beauty",
+  "version": "1.0.0",
+  "description": "Vayva Beauty Industry Engine - Salon, spa, beauty services management",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@vayva/db": "workspace:*",
+    "@vayva/industry-core": "workspace:*",
+    "@vayva/schemas": "workspace:*",
+    "@vayva/shared": "workspace:*",
+    "@vayva/ui": "workspace:^",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.30",
+    "@types/react": "19.2.7",
+    "react": "19.2.3",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/beauty.engine.ts",
+    "./components": "./src/components/index.ts",
+    "./features": "./src/features/index.ts",
+    "./services": "./src/services/index.ts",
+    "./dashboard": "./src/dashboard/index.ts",
+    "./widgets": "./src/widgets/index.ts",
+    "./types": "./src/types/index.ts"
+  }
+}

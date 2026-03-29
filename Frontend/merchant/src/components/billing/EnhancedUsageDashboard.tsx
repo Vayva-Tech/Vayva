@@ -185,7 +185,7 @@ export function EnhancedUsageDashboard() {
   const fetchUsageData = async () => {
     try {
       setLoading(true);
-      const result = await apiJson<UsageData>("/api/billing/quota-status");
+      const result = await apiJson<UsageData>("/billing/quota-status");
       setData(result);
     } catch (error) {
       toast.error("Failed to load usage data");
@@ -196,7 +196,7 @@ export function EnhancedUsageDashboard() {
 
   const fetchProPredictions = async () => {
     try {
-      const result = await apiJson<ProUsagePrediction[]>("/api/billing/predictions");
+      const result = await apiJson<ProUsagePrediction[]>("/billing/predictions");
       setPredictions(result);
     } catch (error) {
       // Silently fail for non-critical feature
@@ -205,7 +205,7 @@ export function EnhancedUsageDashboard() {
 
   const handlePurchaseAddon = async (metric: string) => {
     try {
-      const result = await apiJson<{ success?: boolean }>("/api/billing/purchase-addon", {
+      const result = await apiJson<{ success?: boolean }>("/billing/purchase-addon", {
         method: "POST",
         body: JSON.stringify({ metric, quantity: 1 })
       });

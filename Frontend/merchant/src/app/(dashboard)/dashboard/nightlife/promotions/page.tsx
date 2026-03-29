@@ -120,17 +120,17 @@ export default function NightlifePromotionsPage() {
         <CardContent className="pt-6">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
+              <thead className="border-b" scope="col">
                 <tr className="text-left text-sm text-muted-foreground">
-                  <th className="py-3 px-4 font-medium">Promotion Name</th>
-                  <th className="py-3 px-4 font-medium">Type</th>
-                  <th className="py-3 px-4 font-medium">Description</th>
-                  <th className="py-3 px-4 font-medium">Duration</th>
-                  <th className="py-3 px-4 font-medium">Budget</th>
-                  <th className="py-3 px-4 font-medium">Revenue</th>
-                  <th className="py-3 px-4 font-medium">ROI</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium"></th>
+                  <th className="py-3 px-4 font-medium" scope="col">Promotion Name</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Type</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Description</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Duration</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Budget</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Revenue</th>
+                  <th className="py-3 px-4 font-medium" scope="col">ROI</th>
+                  <th className="py-3 px-4 font-medium" scope="col">Status</th>
+                  <th className="py-3 px-4 font-medium" scope="col"></th>
                 </tr>
               </thead>
               <tbody>

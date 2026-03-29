@@ -84,7 +84,7 @@ export function CreateEventDialog({ open, onClose, onSuccess }: CreateEventDialo
         ticketTypes: ticketTypes.length > 0 ? ticketTypes : undefined,
       } as unknown as CreateEventInput;
 
-      const response = await fetch('/api/events', {
+      const response = await fetch('/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

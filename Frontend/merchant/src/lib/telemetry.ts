@@ -5,7 +5,7 @@ export const telemetry = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     track: async (eventName: any, properties: Record<string, unknown> | null | undefined) => {
         try {
-            await apiJson("/api/telemetry/event", {
+            await apiJson("/telemetry/event", {
                 method: "POST",
                 keepalive: true,
                 body: JSON.stringify({

@@ -20,7 +20,7 @@ export async function GET(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/packages/:id", operation: "GET" });
+    handleApiError(error, { endpoint: "/beauty/packages/:id", operation: "GET" });
     return NextResponse.json({ error: "Failed to fetch package" }, { status: 500 });
   }
 }
@@ -47,7 +47,7 @@ export async function PUT(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/packages/:id", operation: "PUT" });
+    handleApiError(error, { endpoint: "/beauty/packages/:id", operation: "PUT" });
     return NextResponse.json({ error: "Failed to update package" }, { status: 500 });
   }
 }
@@ -72,7 +72,7 @@ export async function DELETE(
     );
     return NextResponse.json(result);
   } catch (error) {
-    handleApiError(error, { endpoint: "/api/beauty/packages/:id", operation: "DELETE" });
+    handleApiError(error, { endpoint: "/beauty/packages/:id", operation: "DELETE" });
     return NextResponse.json({ error: "Failed to delete package" }, { status: 500 });
   }
 }

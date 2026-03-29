@@ -10,3 +10,7 @@ export type { TestDriveCoordinatorConfig } from './test-drive-coordinator.featur
 
 export { CRMIntegrationFeature } from './crm-integration.feature';
 export type { CRMIntegrationConfig } from './crm-integration.feature';
+
+// Phase 3: Enhanced Features
+export { TestDriveScheduler, createTestDriveScheduler, FinancingCalculatorService, createFinancingCalculatorService, TradeInValuationService, createTradeInValuationService } from './automotive-features';
+export type { TestDrive, FinancingCalculation, TradeInValuation } from './automotive-features';

@@ -89,7 +89,7 @@ export default function CatalogPage() {
     try {
       setLoading(true);
       const [catRes, prodRes] = await Promise.all([
-        apiJson<{ categories?: string[] }>("/api/products/categories"),
+        apiJson<{ categories?: string[] }>("/products/categories"),
         apiJson<{
           items?: Array<{
             name: string;
@@ -97,7 +97,7 @@ export default function CatalogPage() {
             status: string;
             productType?: string | null;
           }>;
-        }>("/api/products?limit=100&status=all"),
+        }>("/products?limit=100&status=all"),
       ]);
 
       const names = catRes?.categories?.length

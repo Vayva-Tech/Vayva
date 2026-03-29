@@ -183,18 +183,18 @@ export default function MealKitPlansPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead scope="col">
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold">Plan Name</th>
-                    <th className="text-left py-3 px-4 font-semibold">Type</th>
-                    <th className="text-left py-3 px-4 font-semibold">Duration</th>
-                    <th className="text-left py-3 px-4 font-semibold">Meals/Week</th>
-                    <th className="text-left py-3 px-4 font-semibold">Servings</th>
-                    <th className="text-left py-3 px-4 font-semibold">Price/Serving</th>
-                    <th className="text-left py-3 px-4 font-semibold">Subscribers</th>
-                    <th className="text-left py-3 px-4 font-semibold">Rating</th>
-                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold">Actions</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Plan Name</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Type</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Duration</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Meals/Week</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Servings</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Price/Serving</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Subscribers</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Rating</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

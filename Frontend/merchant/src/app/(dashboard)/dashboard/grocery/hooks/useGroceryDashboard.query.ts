@@ -65,7 +65,7 @@ export function useGroceryDashboard(businessId: string) {
   const { data, isLoading, error, refetch, isFetching, isError } = useQuery<DashboardData, Error>({
     queryKey,
     queryFn: async () => {
-      const response = await fetch('/api/grocery/dashboard');
+      const response = await fetch('/grocery/dashboard');
       if (!response.ok) {
         throw new Error(`Failed to fetch grocery dashboard: ${response.statusText}`);
       }

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/account/store",
+      endpoint: "/account/store",
       operation: "GET_STORE",
     });
     return NextResponse.json(

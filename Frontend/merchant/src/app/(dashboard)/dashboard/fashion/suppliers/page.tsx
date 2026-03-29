@@ -34,7 +34,7 @@ export default function FashionSuppliersPage() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await apiJson<{ data: Supplier[] }>("/api/fashion/suppliers");
+      const response = await apiJson<{ data: Supplier[] }>("/fashion/suppliers");
       setSuppliers(response.data || []);
     } catch (error) {
       logger.warn("Failed to fetch fashion suppliers", error);

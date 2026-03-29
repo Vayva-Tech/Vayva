@@ -292,7 +292,7 @@ export async function POST(
     });
   } catch (error) {
     handleApiError(error, {
-      endpoint: "/api/orders/[id]/delivery/dispatch",
+      endpoint: "/orders/[id]/delivery/dispatch",
       operation: "POST_ORDER_DISPATCH",
     });
     return NextResponse.json(
