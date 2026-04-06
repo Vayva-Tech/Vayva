@@ -22,8 +22,8 @@
     "@vayva/ui": "workspace:*",
     "clsx": "^2.1.1",
     "framer-motion": "^12.26.2",
-    "lucide-react": "^0.562.0",
-    "next": "16.1.6",
+    "lucide-react": "^0.577.0",
+    "next": "16.2.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.0"
