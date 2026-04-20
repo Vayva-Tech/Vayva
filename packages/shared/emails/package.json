@@ -11,10 +11,10 @@
     "./templates/*": "./src/templates/*"
   },
   "dependencies": {
-    "@react-email/render": "^2.0.4",
+    "@react-email/render": "^2.0.7",
     "@vayva/shared": "workspace:*",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "resend": "^6.8.0"
+    "resend": "^6.12.0"
   }
 }

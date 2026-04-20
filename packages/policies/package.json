@@ -8,7 +8,7 @@
         "typecheck": "tsc --noEmit -p tsconfig.json"
     },
     "dependencies": {
-        "dompurify": "^3.3.1",
+        "dompurify": "^3.4.0",
         "isomorphic-dompurify": "^2.35.0",
         "marked": "^11.2.0"
     },
